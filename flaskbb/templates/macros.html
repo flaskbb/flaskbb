@@ -1,0 +1,159 @@
+{%- macro inline_field(field, label_text='') -%}
+<div class="form-group {%- if field.errors %} has-error{%- endif %}">
+    {{field.label(class="sr-only")}}
+
+    {%- if kwargs['required'] or field.flags.required -%}
+        {% if label_text %}
+            {{field(class='form-control', placeholder=label_text, required="required", **kwargs)}}
+        {% else %}
+            {{field(class='form-control', placeholder=field.label.text, required="required", **kwargs)}}
+        {% endif %}
+    {%- else -%}
+        {% if label_text %}
+            {{field(class='form-control', placeholder=label_text, **kwargs)}}
+        {% else %}
+            {{field(class='form-control', placeholder=field.label.text, **kwargs)}}
+        {% endif %}
+    {%- endif -%}
+
+    {%- if field.errors %}
+        {%- for error in field.errors %}
+            <span class="help-block">{{error}}</span>
+        {%- endfor %}
+    {%- elif field.description -%}
+        <span class="help-block">{{field.description|safe}}</span>
+    {%- endif %}
+</div>
+{%- endmacro -%}
+
+
+{%- macro horizontal_field(field, label_text='', label_class='') -%}
+<div class="form-group {%- if field.errors %} has-error{%- endif %}">
+
+    {% if class %}
+        {{ field.label(class=class) }}
+    {% else %}
+        {{ field.label(class="col-lg-2 control-label") }}
+    {% endif %}
+    <div class="col-lg-3">
+
+    {%- if kwargs['required'] or field.flags.required -%}
+        {% if label_text %}
+            {{ field(class='form-control', placeholder=label_text, required="required", **kwargs) }}
+        {% else %}
+            {{ field(class='form-control', placeholder=field.label.text, required="required", **kwargs) }}
+        {% endif %}
+    {%- else -%}
+        {% if label_text %}
+            {{ field(class='form-control', placeholder=label_text, **kwargs) }}
+        {% else %}
+            {{ field(class='form-control', placeholder=field.label.text, **kwargs) }}
+        {% endif %}
+    {%- endif -%}
+
+    {%- if field.errors %}
+        {%- for error in field.errors %}
+            <span class="help-block">{{error}}</span>
+        {%- endfor %}
+    {%- elif field.description -%}
+            <span class="help-block">{{field.description|safe}}</span>
+    {%- endif %}
+
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{# See https://gist.github.com/ligthyear/1284631 #}
+{%- macro form_field_label(field) -%}
+    <label for="{{ field.id }}">{{ field.label.text }}</label>
+{% endmacro %}
+
+
+{%- macro form_field_description(field) -%}
+    {% if field.description %}
+        <span class="help-block">{{ field.description }}</span>
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro form_field_errors(field) -%}
+    {% if field.errors %}
+        {%- for error in field.errors -%}
+        <span class="label label-important">{{ error }}</span>
+        {%- endfor -%}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro form_field_boolean(field, inline=False) -%}
+    <label class="checkbox {%- if inline -%}inline{%- endif -%}">
+            {{ field(**kwargs) }}
+            {{ field.label.text }}
+            {{ form_field_description(field) }}
+            {{ form_field_errors(field) }}
+    </label>
+{%- endmacro -%}
+
+
+{%- macro form_field(field) -%}
+    {% if field.type == 'HiddenField' %}
+        {{ field() }}
+    {% else %}
+        {% if field.type == 'BooleanField' %}
+            {{ form_field_boolean(field, **kwargs) }}
+        {% else%}
+            {{ form_field_label(field) }}
+            <div class="input" id="{{field.id}}">
+            {% if field.type == 'RadioField' %}
+                {{ field(class='radio', **kwargs) }}
+            {% else %}
+                {{ field(**kwargs) }}
+            {% endif %}
+            {{ form_field_description(field) }}
+            {{ form_field_errors(field) }}
+            </div>
+        {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+
+{% macro topnav(endpoint, name, icon='', active=False) %}
+<li {% if endpoint == request.endpoint or active == True %}class="active"{% endif %}>
+    <a href={{ url_for(endpoint) }}>
+        {% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ name }}
+    </a>
+</li>
+{% endmacro %}
+
+
+{% macro navlink(endpoint, name) %}
+<li {% if endpoint == request.endpoint %}class="active"{% endif %}>
+    <a href={{ url_for(endpoint) }}>{{ name }}</a>
+</li>
+{% endmacro %}
+
+
+{% macro render_pagination(page_obj, url) %}
+<ul class="pagination" style="margin: 0; float:right">
+    {% if page_obj.has_prev %}
+        <li class="disabled"><a href="{{ url }}?page={{ page_obj.prev_num }}">&laquo;</a></li>
+    {% else %}
+        <li class="active"><a href="#">&laquo;</a></li>
+    {% endif %}
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="active"><a href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li class="disabled"><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+    {% else %}
+        <li class="active"><a href="#">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}

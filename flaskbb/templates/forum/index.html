@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<ol class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+</ol>
+{% for category in categories %}
+    {% include 'forum/category_layout.html' %}
+{% endfor %}
+
+<!-- Forum Stats -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td colspan="2">
+                <strong>Board Statistics</strong>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Total number of registered users: <strong>{{ stats['user_count'] }}</strong> <br />
+                Total number of topics: <strong>{{ stats['topic_count'] }}</strong> <br />
+                Total number of posts: <strong>{{ stats['post_count'] }}</strong> <br />
+            </td>
+            <td>
+                Newest registered user: <a href="{{ url_for('user.profile', username=stats['newest_user']) }}">{{ stats['newest_user'] }}</a> <br />
+                <strong>#TODO</strong> Registered users online: <strong>2</strong> <br />
+                <strong>#TODO</strong> Guests online: <strong>40</strong> <br />
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><strong>#TODO</strong> Who is online? [<a href="show_all_online_players.html" target="_blank">Full List</a>]</td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <a href="profile.html"><span style="color: green;"><strong><em>test1</em></strong></span></a>,
+                <a href="profile.html"><span style=""><em>test2</em></span></a>
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+
+{% endblock %}

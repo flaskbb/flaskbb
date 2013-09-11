@@ -1,0 +1,33 @@
+{% set page_title = "Register" %}
+
+{% extends "layout.html" %}
+{% block content %}
+{% import "macros.html" as wtf %}
+
+<form class="form-horizontal" role="form" method="POST">
+    <h2>Register</h2>
+    <hr>
+    {{ form.hidden_tag() }}
+    {{ wtf.horizontal_field(form.username)}}
+    {{ wtf.horizontal_field(form.email)}}
+    {{ wtf.horizontal_field(form.password)}}
+    {{ wtf.horizontal_field(form.confirm_password)}}
+
+    <div class="form-group">
+        <div class="col-lg-offset-2 col-lg-3">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox"> {{ form.accept_tos }} I accept the <a href="#">Terms of Service</a>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-offset-2 col-lg-10">
+            <button type="submit" class="btn btn-success">Register</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

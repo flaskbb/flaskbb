@@ -1,0 +1,13 @@
+{% set page_title = "Oh noes! 404" %}
+
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="well">
+    <h1>Oops, Page not found!</h1>
+    <p>The page you were looking for does not exist.</p>
+    <p><a href="{{url_for('forum.index')}}">Back to the Forums</a></p>
+</div>
+<hr>
+
+{% endblock %}

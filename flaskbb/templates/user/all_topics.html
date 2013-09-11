@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_pagination %}
+
+{% block content %}
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li ><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></li>
+    <li class="active">All Topics</li>
+</ul>
+
+<div class="pull-left">
+    {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
+</div> <!-- end span pagination -->
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th colspan="5">
+                All Topics created by {{ user.username }}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan="2">Thread</td>
+
+            <td>Posts</td>
+
+            <td>Views</td>
+
+            <td>Last Post</td>
+        </tr>
+
+        {% for topic in topics.items %}
+        <tr>
+            <td width="4%"></td>
+            <td>
+                <div>
+                    <a href="{{ url_for('forum.view_topic', topic=topic.id) }}">{{ topic.title }}</a> <br />
+                    <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
+                </div>
+            </td>
+            <td>
+                {{ topic.post_count }}
+            </td>
+            <td>
+                {{ topic.views }}
+            </td>
+            <td>
+                <a href="{{ url_for('forum.view_topic', topic=topic.id) }}#pid{{topic.last_post.id}}">{{ topic.last_post.date_created|time_since }}</a><br />
+                <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5">
+                No Topics so far.
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+{% endblock %}

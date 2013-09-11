@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block content %}
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li class="active">{{ user.username }}</li>
+</ul>
+
+<table class="table table-bordered">
+    <thead>
+      <th><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></th>
+      <th>Info</th>
+      <th>User Stats</th>
+    </thead>
+    <tbody>
+        <tr>
+          <td width="200px">
+            <table class="table table-borderless">
+              <tbody>
+                <tr><td><img src="{{ user.avatar }}" alt="Avatar" height="100" width="100"> </td></tr>
+                <!-- TODO: Implement online status -->
+                <tr><td><b></b> <span class="label label-success">Online</span></td></tr>
+                <tr><td><a href="{{ url_for('user.view_all_topics', username=user.username) }}">All Topics</a></td></tr>
+                <tr><td><a href="{{ url_for('user.view_all_posts', username=user.username) }}">All Posts</a></td></tr>
+              </tbody>
+            </table>
+          </td>
+          <td>{{ user.notes }}</td>
+          <td width="250px">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td align="right">Group:</td>
+                  <td><b>TODO: </b>Admin</td>
+                </tr>
+                <tr>
+                  <td align="right">Joined:</td>
+                  <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                </tr>
+                <tr>
+                  <td align="right">Posts:</td>
+                  <td>{{ user.post_count }} ({{ posts_per_day }} per day)</td>
+                </tr>
+                <tr>
+                  <td align="right">Last seen:</td>
+                  <td>{%- if user.lastseen -%} {{ user.lastseen|time_since }} {%- else -%} Never seen {%- endif -%}</td>
+                </tr>
+                <tr>
+                  <td align="right">Last post:</td>
+                  <td>{%- if user.last_post -%}
+                      <a href="{{ url_for('forum.view_post', post=user.last_post.id) }}">{{ user.last_post.date_created|time_since }}</a>
+                      {%- else -%}
+                        Never
+                      {%- endif -%}
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right">Online time:</td>
+                  <td><b>TODO: </b>1024 hours</td>
+                </tr>
+                <tr>
+                  <td align="right">Location:</td>
+                  <td>{%- if user.location -%} {{ user.location }} {%- else -%} No Info {%- endif -%}</td>
+                </tr>
+                <tr>
+                  <td align="right">Birthday:</td>
+                  <td>{% if user.birthday %} {{ user.birthday|format_date('%b %d %Y') }} {% else %} No Info {% endif %} {% if user.gender %} ({{ user.gender }}) {% endif %}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

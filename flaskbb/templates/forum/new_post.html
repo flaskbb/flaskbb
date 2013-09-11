@@ -1,0 +1,24 @@
+{% set page_title = "New Post" %}
+{% set active_forum_nav=True %}
+
+{% extends "layout.html" %}
+{% block content %}
+
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.view_category', category=topic.forum.category.id) }}">{{ topic.forum.category.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_forum', forum=topic.forum_id) }}">{{ topic.forum.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_topic', topic=topic.id) }}">{{ topic.title }} </a></li>
+    <li class="active">New Post</li>
+</ul>
+
+<form class="form" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <h3>New Post</h3>
+    <div class="form-group">
+    {{ form.content(rows="12", class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-success">Reply!</button>
+</form>
+
+{% endblock %}

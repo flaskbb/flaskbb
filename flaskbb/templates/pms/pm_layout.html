@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+{%- from 'macros.html' import navlink with context -%}
+
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('user.profile', username=current_user.username) }}">{{ current_user.username }}</a></li>
+    <li class="active">Private Message</li>
+</ul>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="sidebar">
+            <ul class="nav sidenav">
+                <li class="nav-header">Options | <small><a href="{{ url_for('pms.new_message') }}">New PM</a></small></li>
+                {{ navlink('pms.inbox', 'Inbox') }}
+                {{ navlink('pms.sent', 'Sent') }}
+                {{ navlink('pms.drafts', 'Drafts') }}
+                {{ navlink('pms.trash', 'Trash') }}
+            </ul>
+        </div><!--/.sidebar -->
+    </div><!--/.col-md-3 -->
+    <div class="col-md-9">
+        {% block pm_content %}{% endblock %}
+    </div><!--/.col-md-9 -->
+</div><!--/.row -->
+{% endblock %}

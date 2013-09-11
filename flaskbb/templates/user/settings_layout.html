@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+{%- from 'macros.html' import navlink with context -%}
+
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('user.profile', username=current_user.username) }}">{{ current_user.username }}</a></li>
+    <li class="active">Settings</li>
+</ul>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="sidebar">
+            <ul class="nav sidenav">
+                <li class="nav-header">Account Settings</li>
+                {{ navlink('user.settings', 'Overview') }}
+                {{ navlink('user.change_user_details', 'Change User Details') }}
+                {{ navlink('user.change_email', 'Change E-Mail Address') }}
+                {{ navlink('user.change_password', 'Change Password') }}
+                <li class="nav-header">Forum Settings</li>
+                <li><a href="#">Link</a></li>
+                <li><a href="#">Link</a></li>
+                <li><a href="#">Link</a></li>
+                <li><a href="#">Link</a></li>
+            </ul>
+        </div> <!--/.sidebar -->
+    </div><!--/.col-md-3 -->
+    <div class="col-md-9">
+        {% block settings_content %}{% endblock %}
+    </div><!--/.col-md-9 -->
+</div><!--/row-->
+
+{% endblock %}
+

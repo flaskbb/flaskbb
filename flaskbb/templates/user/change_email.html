@@ -1,0 +1,18 @@
+{% extends "user/settings_layout.html" %}
+{% from "macros.html" import horizontal_field %}
+
+{% block settings_content %}
+<form class="form-horizontal" role="form" method="POST">
+    <legend>Change E-Mail Adress</legend>
+    {{ form.hidden_tag() }}
+    {{ horizontal_field(form.old_email)}}
+    {{ horizontal_field(form.new_email)}}
+    {{ horizontal_field(form.confirm_new_email)}}
+
+    <div class="form-group">
+        <div class="col-lg-offset-3 col-lg-9">
+            <button type="submit" class="btn btn-success">Save</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

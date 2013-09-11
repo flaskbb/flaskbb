@@ -1,0 +1,8 @@
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+Flask-Login
+Flask-Script
+Flask-Mail
+Flask-Cache
+Flask-Themes2

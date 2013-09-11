@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_pagination %}
+
+{% block content %}
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li ><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></li>
+    <li class="active">All Posts</li>
+</ul>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+</div> <!-- end span pagination -->
+<table class="table table-bordered">
+    <tbody>
+    {% for post in posts.items %}
+        <tr>
+            <td>
+                <strong><a href="{{ url_for('forum.view_topic', topic=post.topic.id)}}">{{ post.topic.title }}</a></strong>
+                in <a href="{{ url_for('forum.view_forum', forum=post.topic.forum.id) }}">{{ post.topic.forum.title }}</a>
+                <span class="divider"> - </span>
+                <small>{{ post.date_created|time_since }}</small>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{ post.content }}
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endblock %}

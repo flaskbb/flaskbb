@@ -1,0 +1,18 @@
+{% extends "pms/pm_layout.html" %}
+{% block pm_content %}
+{% import "macros.html" as wtf %}
+<form class="form-horizontal" role="form" method="post" name="new">
+    <legend>Compose Message</legend>
+    {{ form.hidden_tag() }}
+    {{ wtf.horizontal_field(form.to_user)}}
+    {{ wtf.horizontal_field(form.subject)}}
+    {{ wtf.horizontal_field(form.message)}}
+
+    <div class="form-group">
+        <div class="col-lg-offset-1 col-lg-8">
+            <button class="btn btn-success" type="submit" name="send_message">Send Message</button>
+            <button class="btn btn-info" type="submit" name="save_message">Save as Draft</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

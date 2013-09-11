@@ -1,0 +1,126 @@
+{% set page_title = topic.title ~ " - Topic" %}
+{% set active_forum_nav=True %}
+
+{% extends "layout.html" %}
+{% block content %}
+{% from 'macros.html' import render_pagination, form_field %}
+
+<ol class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.view_category', category=topic.forum.category.id) }}">{{ topic.forum.category.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_forum', forum=topic.forum_id) }}">{{ topic.forum.title }}</a></li>
+    <li class="active">{{ topic.title }}</li>
+</ol>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(posts, url_for('forum.view_topic', topic=topic.id)) }}
+</div> <!-- end span pagination -->
+
+{% if current_user.is_authenticated() %}
+<div class="pull-right" style="padding-bottom: 10px">
+    <a href="{{ url_for('forum.new_post', topic=topic.id) }}" class="btn btn-primary">Reply</a>
+    {% if current_user.id == topic.user_id %}
+    <a href="{{ url_for('forum.delete_topic', topic=topic.id) }}" class="btn btn-primary">Delete Topic</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<table class="table table-bordered">
+    <tbody>
+        {% for post in posts.items %}
+        <tr>
+            <td >
+                <span class="pull-right">
+                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + posts.page * per_page }} {%- endif -%}</strong>
+                </span>
+                <span class="pull-left">
+                    <a href="
+                    {% if posts.page > 1 %}
+                        {{ url_for('forum.view_topic', topic=topic.id) }}?page={{ posts.page }}#pid{{ post.id }}
+                    {% else %}
+                        {{ url_for('forum.view_topic', topic=topic.id) }}#pid{{ post.id }}
+                    {% endif %}
+                        ">{{ post.date_created|format_date('%d %B %Y') }}</a>
+                    {% if post.date_modified %}
+                    <small>
+                        (Last modified: {{ post.date_modified|format_date }} by <a href="{{ url_for('user.profile', username=post.user.username) }}">{{ post.user.username }}</a>.)
+                    </small>
+                    {% endif %}
+                </span>
+            </td>
+        </tr>
+
+        <tr>
+        <td>
+            <table class="table table-borderless">
+                <tr>
+
+                    <td width="1">
+                        <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
+                    </td>
+
+                    <td>
+                        <a href="{{ url_for('user.profile', username=post.user.username) }}"><span style="color: green;"><strong><em>{{ post.user.username }}</em></strong></span></a>
+                        <!-- TODO: Implement online status and groups -->
+                        <span class="label label-success">Online</span><br />
+                        Administrator<br />
+                    </td>
+
+                    <td class="pull-right">
+                        Posts: {{ post.user.post_count }}<br />
+                        Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
+                        <!-- TODO: Implement Karma functionality -->
+                        Karma: <a href="#">124</a>
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="post_body" id="pid{{ post.id }}">
+                    {{ post.content }}
+                    <!-- Signaure Begin -->
+                    {% if post.user.signature %}
+                    <hr>
+                    {{ post.user.signature }}
+                    {% endif %}
+                    <!-- Signaure End -->
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="pull-left">
+                    <a href="{{ url_for('pms.new_message') }}?to_user={{ post.user.username }}">PM</a> | <a href="#">Website</a>
+                </span>
+
+                <span class="pull-right">
+                    {% if current_user.is_authenticated() and current_user.id == post.user_id %}
+                    <a href="{{ url_for('forum.edit_post', post=post.id) }}">Edit</a> |
+                    <a href="{{ url_for('forum.delete_post', post=post.id) }}">Delete</a> |
+                    {% endif %}
+                    <a href="#">Quote</a> |
+                    <a href="#">Report</a> |
+                    <a href="#">+1</a>
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+{% if current_user.is_authenticated() %}
+<form class="form" action="#" method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+    {{ form.content(rows="6", class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-success">Reply!</button>
+</form>
+{% endif %}
+
+{% endblock %}

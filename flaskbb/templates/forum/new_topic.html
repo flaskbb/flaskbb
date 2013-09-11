@@ -1,0 +1,30 @@
+{% set page_title = "New Topic" %}
+{% set active_forum_nav=True %}
+
+{% extends "layout.html" %}
+{% block content %}
+{% from "macros.html" import inline_field %}
+
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.view_category', category=forum.category_id) }}">{{ forum.category.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_forum', forum=forum.id) }}">{{ forum.title }}</a> </li>
+    <li class="active">New Topic</li>
+</ul>
+
+<form class="form" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <h3>New Topic</h3>
+    <div class="form-group">
+        <label>Topic Title</label>
+        {{ form.title(class="form-control", placeholder="Topic Title") }}
+    </div>
+
+    <div class="form-group">
+        <label>Content</label>
+        {{ form.content(rows="12", class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-success">Reply!</button>
+</form>
+
+{% endblock %}

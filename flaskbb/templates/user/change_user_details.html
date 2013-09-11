@@ -1,0 +1,22 @@
+{% extends "user/settings_layout.html" %}
+{% from "macros.html" import horizontal_field %}
+
+{% block settings_content %}
+<form class="form-horizontal" role="form" method="POST">
+    <legend class="">Change User Details</legend>
+    {{ form.hidden_tag() }}
+    {{ horizontal_field(form.birthday)}}
+    {{ horizontal_field(form.gender)}}
+    {{ horizontal_field(form.location)}}
+    {{ horizontal_field(form.website)}}
+    {{ horizontal_field(form.avatar)}}
+    {{ horizontal_field(form.signature)}}
+    {{ horizontal_field(form.notes)}}
+
+    <div class="form-group">
+        <div class="col-lg-offset-3 col-lg-9">
+            <button type="submit" class="btn btn-success">Save</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{% if not page_title %}FlaskBB{% else %}{{ page_title }} - FlaskBB{% endif %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="FlaskBB is a forum software written in Flask">
+        <meta name="author" content="FlaskBB Team">
+
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+        {% block css %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/flaskbb.css') }}">
+        {% endblock %}
+    </head>
+
+    <body>
+        <div id="wrap">
+        {% block navigation %}
+        {%- from "macros.html" import topnav with context -%}
+        <!-- Navigation -->
+            <nav class="navbar navbar-default navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/">FlaskBB</a>
+                    </div>
+                    <div class="collapse navbar-collapse navbar-ex1-collapse">
+                        <ul class="nav navbar-nav">
+                            {# active_forum_nav is set in {forum, category, topic}.html and new_{topic, post}.html #}
+                            {{ topnav(endpoint='forum.index', name='Forum', icon='glyphicon glyphicon-comment', active=active_forum_nav) }}
+                            {{ topnav(endpoint='forum.memberlist', name='Memberlist', icon='glyphicon glyphicon-user') }}
+                        </ul>
+
+                    {% if current_user and current_user.is_authenticated() %}
+                        <div class="btn-group navbar-btn navbar-right" style="padding-left: 15px; margin-right: -10px">
+                            <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
+                                <span class="glyphicon glyphicon-user"></span> {{ current_user.username }}
+                            </a>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ url_for('user.settings') }}"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                                <li><a href="{{ url_for('auth.logout') }}"><span class="glyphicon glyphicon-share-alt"></span> Logout</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group navbar-btn navbar-right">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-envelope"></span> <span class="badge">3</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ url_for('pms.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
+                                <li><a href="{{ url_for('pms.new_message') }}"><span class="glyphicon glyphicon-pencil"></span> New Message</a></li>
+                                <li class="divider"></li>
+                                <li><a href="{{ url_for('pms.view_message', id=1) }}"><strong>test1</strong> - <span class="muted">This is the message title1</span> </a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <div class="btn-group navbar-btn navbar-right">
+                            <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
+                                <span class="glyphicon glyphicon-user"></span> Login
+                            </a>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                                <li><a href="{{ url_for('auth.reset_password') }}">Reset Password</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                        <form class="navbar-form navbar-right" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search">
+                            </div>
+                        </form>
+                    </div><!-- nav-collapse -->
+                </div><!-- container -->
+            </nav> <!-- navbar navbar-inverse -->
+            {% endblock %}
+
+
+            <div class="container">
+                {% block messages %}
+                    {% include 'flashed_messages.html' %}
+                {% endblock %}
+
+                {% block content %}
+                {% endblock %}
+            </div> <!-- /container -->
+        </div> <!-- End wrap -->
+
+            {% block footer %}
+            <div id="footer">
+                <div class="container">
+                    <p class="text-muted credit pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                    <p class="text-muted credit pull-right">&copy; 2013 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                </div>
+            </div>
+            {% endblock %}
+
+        {% block javascript %}
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        {% endblock %}
+    </body>
+</html>

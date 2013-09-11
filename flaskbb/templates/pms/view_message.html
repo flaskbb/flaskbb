@@ -1,0 +1,44 @@
+{% extends "pms/pm_layout.html" %}
+{% block pm_content %}
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+        <td>
+            <table class="table table-borderless" border="0">
+                <tr>
+
+                    <td width="1">
+                        <img src="{{ message.from_user.avatar }}" alt="Avatar" height="100" width="100">
+                    </td>
+
+                    <td>
+                        <a href="{{ url_for('user.profile', username=message.from_user.username) }}"><span style="color: green;"><strong><em>{{ message.from_user.username }}</em></strong></span></a>
+                        <!-- TODO: Implement online status and groups -->
+                        <span class="badge badge-success">Online</span><br />
+                        Administrator<br />
+                    </td>
+
+                    <td class="pull-right">
+                        Posts: {{ message.from_user.post_count }}<br />
+                        Registered since: {{ message.from_user.date_joined|format_date('%b %d %Y') }}<br />
+                        <!-- TODO: Implement Karma functionality -->
+                        Karma: <a href="#">124</a>
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="message_body" id="mid{{ message.id }}">
+                    {% if message.message %}{{ message.message }}{% else %}(No Message){% endif %}
+                </div>
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+
+{% endblock %}
