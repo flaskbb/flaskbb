@@ -8,8 +8,10 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.wtf import (Form, TextField, Required, TextAreaField,
-                           ValidationError)
+from flask.ext.wtf import Form
+from wtforms import TextField, TextAreaField, ValidationError
+from wtforms.validators import Required
+
 from flask.ext.login import current_user
 
 from flaskbb.user.models import User

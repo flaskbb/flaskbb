@@ -8,8 +8,9 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.wtf import (Form, TextField, PasswordField, BooleanField,
-                           Required, Email, EqualTo, ValidationError, regexp)
+from flask.ext.wtf import Form
+from wtforms import TextField, PasswordField, BooleanField, ValidationError
+from wtforms.validators import Required, Email, EqualTo, regexp
 
 from flaskbb.user.models import User
 

@@ -11,7 +11,7 @@
 import random
 from datetime import datetime
 
-from flask.ext.wtf import Select, HTMLString, html_params
+from wtforms.widgets.core import Select, HTMLString, html_params
 
 
 def generate_random_pass(length=8):

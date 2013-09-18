@@ -8,9 +8,12 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.wtf import Form, Required, TextAreaField, TextField
+from flask.ext.wtf import Form
+from wtforms import TextAreaField, TextField
+from wtforms.validators import Required
 
 from flaskbb.forum.models import Topic, Post
+
 
 class QuickreplyForm(Form):
     content = TextAreaField("Quickreply", validators=[
