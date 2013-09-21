@@ -89,7 +89,7 @@ class Topic(db.Model):
     locked = db.Column(db.Boolean, default=False)
     important = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
-    post_count = db.Column(db.Integer, default=0) # bb normalization
+    post_count = db.Column(db.Integer, default=0)
 
     # One-to-one (uselist=False) relationship between first_post and topic
     first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id", ondelete="CASCADE"))
@@ -101,7 +101,6 @@ class Topic(db.Model):
 
     # One-to-many
     posts = db.relationship("Post", backref="topic", lazy="joined", primaryjoin="Post.topic_id == Topic.id", cascade="all, delete-orphan", post_update=True)
-
 
     def __init__(self, title=None):
         if title:
@@ -118,8 +117,8 @@ class Topic(db.Model):
         # Updates the topic - Because the thread title (by intention)
         # isn't change able, so we are just going to update the post content
         if self.id:
-            # untested
-            post.save(self)
+            db.session.add(self)
+            db.session.commit()
             return self
 
         # Set the forum and user id

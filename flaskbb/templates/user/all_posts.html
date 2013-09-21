@@ -16,8 +16,8 @@
     {% for post in posts.items %}
         <tr>
             <td>
-                <strong><a href="{{ url_for('forum.view_topic', topic=post.topic.id)}}">{{ post.topic.title }}</a></strong>
-                in <a href="{{ url_for('forum.view_forum', forum=post.topic.forum.id) }}">{{ post.topic.forum.title }}</a>
+                <strong><a href="{{ url_for('forum.view_topic', topic_id=post.topic.id)}}">{{ post.topic.title }}</a></strong>
+                in <a href="{{ url_for('forum.view_forum', forum_id=post.topic.forum.id) }}">{{ post.topic.forum.title }}</a>
                 <span class="divider"> - </span>
                 <small>{{ post.date_created|time_since }}</small>
             </td>

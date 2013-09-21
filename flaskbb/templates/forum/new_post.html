@@ -6,9 +6,9 @@
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ url_for('forum.view_category', category=topic.forum.category.id) }}">{{ topic.forum.category.title }}</a></li>
-    <li><a href="{{ url_for('forum.view_forum', forum=topic.forum_id) }}">{{ topic.forum.title }}</a></li>
-    <li><a href="{{ url_for('forum.view_topic', topic=topic.id) }}">{{ topic.title }} </a></li>
+    <li><a href="{{ url_for('forum.view_category', category_id=topic.forum.category.id) }}">{{ topic.forum.category.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_forum', forum_id=topic.forum_id) }}">{{ topic.forum.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }} </a></li>
     <li class="active">New Post</li>
 </ul>
 

@@ -41,18 +41,18 @@ def index():
                                   'newest_user': newest_user.username})
 
 
-@forum.route("/category/<int:category>")
-def view_category(category):
-    category = Category.query.filter_by(id=category).first()
+@forum.route("/category/<int:category_id>")
+def view_category(category_id):
+    category = Category.query.filter_by(id=category_id).first()
 
     return render_template("forum/category.html", category=category)
 
 
-@forum.route("/forum/<int:forum>")
-def view_forum(forum):
+@forum.route("/forum/<int:forum_id>")
+def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
-    forum = Forum.query.filter_by(id=forum).first()
+    forum = Forum.query.filter_by(id=forum_id).first()
     topics = Topic.query.filter_by(forum_id=forum.id).\
         order_by(Topic.last_post_id.desc()).\
         paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
@@ -60,16 +60,19 @@ def view_forum(forum):
     return render_template("forum/forum.html", forum=forum, topics=topics)
 
 
-@forum.route("/topic/<int:topic>", methods=["POST", "GET"])
-def view_topic(topic):
+@forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
+def view_topic(topic_id):
     page = request.args.get('page', 1, type=int)
 
-    form = QuickreplyForm()
-
-    topic = Topic.query.filter_by(id=topic).first()
+    topic = Topic.query.filter_by(id=topic_id).first()
     posts = Post.query.filter_by(topic_id=topic.id).\
         paginate(page, current_app.config['POSTS_PER_PAGE'], False)
 
+    # Count the topic views
+    topic.views += 1
+    topic.save()
+
+    form = QuickreplyForm()
     if form.validate_on_submit():
         post = form.save(current_user, topic)
         return view_post(post.id)
@@ -79,25 +82,25 @@ def view_topic(topic):
                            form=form)
 
 
-@forum.route("/post/<int:post>")
-def view_post(post):
-    post = Post.query.filter_by(id=post).first()
+@forum.route("/post/<int:post_id>")
+def view_post(post_id):
+    post = Post.query.filter_by(id=post_id).first()
     count = post.topic.post_count
     page = math.ceil(count / current_app.config["POSTS_PER_PAGE"])
     if count > 10:
         page += 1
     else:
-       page = 1
+        page = 1
 
-    return redirect(url_for("forum.view_topic", topic=post.topic.id) +
+    return redirect(url_for("forum.view_topic", topic_id=post.topic.id) +
                     "?page=%d#pid%s" % (page, post.id))
 
 
-@forum.route("/forum/<int:forum>/topic/new", methods=["POST", "GET"])
+@forum.route("/forum/<int:forum_id>/topic/new", methods=["POST", "GET"])
 @login_required
-def new_topic(forum):
+def new_topic(forum_id):
     form = NewTopicForm()
-    forum = Forum.query.filter_by(id=forum).first()
+    forum = Forum.query.filter_by(id=forum_id).first()
 
     if form.validate_on_submit():
         topic = form.save(current_user, forum)
@@ -107,21 +110,21 @@ def new_topic(forum):
     return render_template("forum/new_topic.html", forum=forum, form=form)
 
 
-@forum.route("/topic/<int:topic>/delete")
+@forum.route("/topic/<int:topic_id>/delete")
 @login_required
-def delete_topic(topic):
-    topic = Topic.query.filter_by(id=topic).first()
+def delete_topic(topic_id):
+    topic = Topic.query.filter_by(id=topic_id).first()
     involved_users = User.query.filter(Post.topic_id == topic.id,
                                        User.id == Post.user_id).all()
     topic.delete(users=involved_users)
     return redirect(url_for("forum.view_forum", forum=topic.forum_id))
 
 
-@forum.route("/topic/<int:topic>/post/new", methods=["POST", "GET"])
+@forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
 @login_required
-def new_post(topic):
+def new_post(topic_id):
     form = ReplyForm()
-    topic = Topic.query.filter_by(id=topic).first()
+    topic = Topic.query.filter_by(id=topic_id).first()
 
     if form.validate_on_submit():
         post = form.save(current_user, topic)
@@ -130,10 +133,10 @@ def new_post(topic):
     return render_template("forum/new_post.html", topic=topic, form=form)
 
 
-@forum.route("/post/<int:post>/edit", methods=["POST", "GET"])
+@forum.route("/post/<int:post_id>/edit", methods=["POST", "GET"])
 @login_required
-def edit_post(post):
-    post = Post.query.filter_by(id=post).first()
+def edit_post(post_id):
+    post = Post.query.filter_by(id=post_id).first()
 
     form = ReplyForm(obj=post)
     if form.validate_on_submit():
@@ -147,10 +150,10 @@ def edit_post(post):
     return render_template("forum/new_post.html", topic=post.topic, form=form)
 
 
-@forum.route("/post/<int:post>/delete")
+@forum.route("/post/<int:post_id>/delete")
 @login_required
-def delete_post(post):
-    post = Post.query.filter_by(id=post).first()
+def delete_post(post_id):
+    post = Post.query.filter_by(id=post_id).first()
     topic_id = post.topic_id
 
     post.delete()
@@ -158,7 +161,7 @@ def delete_post(post):
     # If the post was the first post in the topic, redirect to the forums
     if post.first_post:
         return redirect(url_for('forum.view_forum',
-                                 forum=post.topic.forum_id))
+                                forum=post.topic.forum_id))
     return redirect(url_for('forum.view_topic', topic=topic_id))
 
 
