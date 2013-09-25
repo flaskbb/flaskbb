@@ -14,19 +14,19 @@ from flaskbb.extensions import mail
 from flaskbb.decorators import async
 
 
-def send_new_password(user, pw):
+def send_reset_token(user, token):
     send_email(
         subject="Password Reset",
         recipients=[user.email],
         text_body=render_template(
             "email/reset_password.txt",
             user=user,
-            password=pw
+            token=token
         ),
         html_body=render_template(
             "email/reset_password.html",
             user=user,
-            password=pw
+            token=token
         )
     )
 
@@ -44,4 +44,4 @@ def send_email(subject, recipients, text_body, html_body, sender=""):
 
     msg.body = text_body
     msg.html = html_body
-    send_async_email(msg)
+    mail.send(msg)

@@ -9,8 +9,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-from wtforms import TextField, PasswordField, BooleanField, ValidationError
-from wtforms.validators import Required, Email, EqualTo, regexp
+from wtforms import TextField, PasswordField, BooleanField, HiddenField
+from wtforms.validators import Required, Email, EqualTo, regexp, ValidationError
 
 from flaskbb.user.models import User
 
@@ -68,20 +68,27 @@ class ReauthForm(Form):
     password = PasswordField('Password', [Required()])
 
 
+class ForgotPasswordForm(Form):
+    email = TextField('Email', validators = [
+        Required(message="Email reguired"),
+        Email()])
+
+
 class ResetPasswordForm(Form):
-    email = TextField("E-Mail", validators=[
-        Required(message="Email required"),
-        Email(message="This email is invalid")])
+    token = HiddenField('Token')
 
-    username = TextField("Username", validators=[
-        Required(message="Username required")])
+    email = TextField('Email', validators = [
+        Required(),
+        Email()])
 
-    def validate_username(self, field):
-        user = User.query.filter_by(username=field.data).first()
-        if not user:
-            raise ValidationError("Wrong username?")
+    password = PasswordField('Password', validators = [
+        Required()])
+
+    confirm_password = PasswordField('Confirm password', validators = [
+        Required(),
+        EqualTo('password', message = 'Passwords must match')])
 
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()
         if not email:
-            raise ValidationError("Wrong E-Mail?")
+            raise ValidationError("Wrong E-Mail.")

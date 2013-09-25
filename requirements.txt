@@ -6,3 +6,6 @@ Flask-Script
 Flask-Mail
 Flask-Cache
 Flask-Themes2
+Flask-Debugtoolbar
+itsdangerous
+passlib

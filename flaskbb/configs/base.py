@@ -45,8 +45,8 @@ class BaseConfig(object):
     SQLALCHEMY_ECHO = True
 
     # Protection against form post fraud
-    CSRF_ENABLED = True
-    CSRF_SESSION_KEY = "reallyhardtoguess"
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_SESSION_KEY = "reallyhardtoguess"
 
     # Auth
     LOGIN_VIEW = "auth.login"
@@ -58,14 +58,6 @@ class BaseConfig(object):
 
     # Recaptcha
     RECAPTCHA_ENABLE = False
-
-    # Mail
-    MAIL_SERVER = "localhost"
-    MAIL_PORT = 25
-    MAIL_USERNAME = "FlaskBB Service"
-    MAIL_PASSWORD = ""
-    DEFAULT_MAIL_SENDER = "noreply@flaskbb.org"
-    ADMINS = ["admin@flaskbb.org"]
 
     # Pagination
     POSTS_PER_PAGE = 10

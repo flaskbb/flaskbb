@@ -36,3 +36,4 @@ __pycache__
 *.pyc
 *.db
 .venv
+flaskbb/configs/flaskbb_dev.py
