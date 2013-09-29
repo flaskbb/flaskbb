@@ -17,7 +17,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 # Import the user blueprint
 from flaskbb.user.views import user
-from flaskbb.user.models import User
+from flaskbb.user.models import User, Guest
 # Import the auth blueprint
 from flaskbb.auth.views import auth
 # Import the admin blueprint
@@ -29,7 +29,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import *
 
 from flaskbb.extensions import db, login_manager, mail, cache #toolbar
-from flaskbb.utils import time_delta_format
+from flaskbb.helpers import time_delta_format, last_seen
 
 
 DEFAULT_BLUEPRINTS = (
@@ -98,6 +98,7 @@ def configure_extensions(app):
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
     login_manager.refresh_view = app.config["REAUTH_VIEW"]
+    login_manager.anonymous_user = Guest
 
     @login_manager.user_loader
     def load_user(id):
@@ -106,7 +107,7 @@ def configure_extensions(app):
         """
         return User.query.get(id)
 
-    login_manager.setup_app(app)
+    login_manager.init_app(app)
 
 
 def configure_blueprints(app, blueprints):
@@ -134,6 +135,53 @@ def configure_template_filters(app):
     def time_since(value):
         return time_delta_format(value)
 
+    @app.template_filter()
+    def is_online(user):
+        if user.lastseen >= last_seen():
+            return True
+        return False
+
+    @app.template_filter()
+    def is_current_user(user, post):
+        """
+        Check if the post is written by the user
+        """
+        return post.user_id == user.id
+
+    @app.template_filter()
+    def edit_post(user, post):
+        """
+        Check if the post can be edited by the user
+        """
+        if not user.is_authenticated():
+            return False
+        if user.permissions['super_mod'] or user.permissions['admin']:
+            return True
+        if post.user_id == user.id and user.permissions['editpost']:
+            return True
+        return False
+
+    @app.template_filter()
+    def delete_post(user, post):
+        """
+        Check if the post can be edited by the user
+        """
+        if not user.is_authenticated():
+            return False
+        if user.permissions['super_mod'] or user.permissions['admin']:
+            return True
+        if post.user_id == user.id and user.permissions['deletepost']:
+            return True
+        return False
+
+    @app.template_filter()
+    def post_reply(user):
+        if user.permissions['super_mod'] or user.permissions['admin']:
+            return True
+        if user.permissions['postreply']:
+            return True
+        return False
+
 
 def configure_before_handlers(app):
     """
@@ -149,6 +197,11 @@ def configure_before_handlers(app):
             current_user.lastseen = datetime.utcnow()
             db.session.add(current_user)
             db.session.commit()
+
+    @app.before_request
+    def get_user_permissions():
+        current_user.permissions = current_user.get_permissions()
+        current_user.moderate_all = current_user.permissions['admin'] or current_user.permissions['super_mod']
 
 
 def configure_errorhandlers(app):

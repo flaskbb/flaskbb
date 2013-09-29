@@ -11,13 +11,43 @@
 from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from itsdangerous import SignatureExpired, BadSignature
+from itsdangerous import SignatureExpired
 from werkzeug import generate_password_hash, check_password_hash
 from flask import current_app
-from flask.ext.login import UserMixin
-
-from flaskbb.extensions import db
+from flask.ext.login import UserMixin, AnonymousUserMixin
+from flaskbb.extensions import db, cache
 from flaskbb.forum.models import Post, Topic
+
+
+groups_users = db.Table('groups_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+        db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
+
+moderators = db.Table('moderators',
+        db.Column('forum_id', db.Integer(), db.ForeignKey('forums.id')),
+        db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
+
+
+class Group(db.Model):
+    __tablename__ = "groups"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+    description = db.Column(db.String(80))
+
+    admin = db.Column(db.Boolean)
+    super_mod = db.Column(db.Boolean)
+    mod = db.Column(db.Boolean)
+    guest = db.Column(db.Boolean)
+    banned = db.Column(db.Boolean)
+
+    editpost = db.Column(db.Boolean)
+    deletepost = db.Column(db.Boolean)
+    deletetopic = db.Column(db.Boolean)
+    posttopic = db.Column(db.Boolean)
+    postreply = db.Column(db.Boolean)
+    viewtopic = db.Column(db.Boolean)
+    viewprofile = db.Column(db.Boolean)
 
 
 class User(db.Model, UserMixin):
@@ -42,6 +72,16 @@ class User(db.Model, UserMixin):
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
 
     post_count = db.Column(db.Integer, default=0) # Bye bye normalization
+
+    primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
+
+    primary_group = db.relationship('Group', backref="user_group", uselist=False, foreign_keys=[primary_group_id])
+
+    groups = db.relationship('Group',
+                             secondary=groups_users,
+                             primaryjoin=(groups_users.c.user_id == id),
+                             backref=db.backref('users', lazy='dynamic'),
+                             lazy='dynamic')
 
     def __repr__(self):
         return "Username: %s" % self.username
@@ -130,6 +170,85 @@ class User(db.Model, UserMixin):
         return Post.query.filter(Post.user_id == self.id).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
+    def add_to_group(self, group):
+        """
+        Adds the user to the `group` if he isn't in it.
+        """
+        if not self.in_group(group):
+            self.groups.append(group)
+            return self
+
+    def in_group(self, group):
+        """
+        Returns True if the user is in the specified group
+        """
+        return self.groups.filter(
+            groups_users.c.group_id == group.id).count() > 0
+
+    @cache.memoize(60*5)
+    def get_permissions(self, exclude=None):
+        """
+        Returns a dictionary with all the permissions the user has.
+        """
+        exclude = exclude or []
+        exclude.extend(['id', 'name', 'description'])
+
+        perms = {}
+        # Iterate over all groups
+        for group in self.groups.all():
+            for c in group.__table__.columns:
+                # try if the permission already exists in the dictionary
+                # and if the permission is true, go to the next permission
+                try:
+                    if perms[c.name]:
+                        continue
+                # if the permission doesn't exist in the dictionary
+                # add it to the dictionary
+                except KeyError:
+                    # if the permission is in the exclude list,
+                    # skip to the next permission
+                    if c.name in exclude:
+                        continue
+                    perms[c.name] = getattr(group, c.name)
+        return perms
+
+    def has_perm(self, perm):
+        """
+        Returns True if the user has the specified permission.
+        """
+        permissions = self.get_permissions()
+        if permissions['admin'] or permissions['super_mod']:
+            return True
+
+        if permissions[perm]:
+            return True
+        return False
+
+    def has_one_perm(self, perms_list):
+        """
+        Returns True if the user has one of the provided permissions.
+        """
+        for perm in perms_list:
+            if self.has_perm(perm):
+                return True
+        return False
+
+    def has_perms(self, perms_list):
+        """
+        Returns True if the user has each of the specified permissions.
+        It is basically the same as has_perm but every permission in the
+        provided list needs to be True to return True.
+        """
+        # Iterate over the list with the permissions
+        for perm in perms_list:
+            if self.has_perm(perm):
+                # After checking the permission,
+                # we can remove the perm from the list
+                perms_list.remove(perm)
+            else:
+                return False
+        return True
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -139,3 +258,69 @@ class User(db.Model, UserMixin):
         db.session.delete(self)
         db.session.commit()
         return self
+
+
+class Guest(AnonymousUserMixin):
+    @cache.memoize(60*5)
+    def get_permissions(self, exclude=None):
+        """
+        Returns a dictionary with all permissions the user has
+        """
+        exclude = exclude or []
+        exclude.extend(['id', 'name', 'description'])
+
+        perms = {}
+        # Get the Guest group
+        group = Group.query.filter_by(guest=True).first()
+        for c in group.__table__.columns:
+            # try if the permission already exists in the dictionary
+            # and if the permission is true, go to the next permission
+            try:
+                if perms[c.name]:
+                    continue
+            # if the permission doesn't exist in the dictionary
+            # add it to the dictionary
+            except KeyError:
+                # if the permission is in the exclude list,
+                # skip to the next permission
+                if c.name in exclude:
+                    continue
+                perms[c.name] = getattr(group, c.name)
+        return perms
+
+    def has_perm(self, perm):
+        """
+        Returns True if the user has the specified permission.
+        """
+        group = Group.query.filter_by(guest=True).first()
+        if getattr(group, perm, True):
+            return True
+        return False
+
+    def has_one_perm(self, perms_list):
+        """
+        Returns True if the user has one of the provided permissions.
+        """
+        group = Group.query.filter_by(guest=True).first()
+        for perm in perms_list:
+            if getattr(group, perm, True):
+                return True
+        return False
+
+    def has_perms(self, perms_list):
+        """
+        Returns True if the user has each of the specified permissions.
+        It is basically the same as has_perm but every permission in the
+        provided list needs to be True to return True.
+        """
+        # Iterate overall groups
+        group = Group.query.filter_by(guest=True).first()
+        # Iterate over the list with the permissions
+        for perm in perms_list:
+            if getattr(group, perm, True):
+                # After checking the permission,
+                # we can remove the perm from the list
+                perms_list.remove(perm)
+            else:
+                return False
+        return True

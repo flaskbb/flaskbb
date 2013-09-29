@@ -9,7 +9,6 @@
     <li class="active">Memberlist</li>
 </ul>
 
-
   <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(users, url_for('forum.memberlist')) }}
   </div><!-- /.col-lg-6 -->
@@ -39,7 +38,7 @@
             <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
             <td>{{ user.post_count }}</td>
             <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-            <td>#TODO</td>
+            <td>{{ user.primary_group.name }}</td>
         </tr>
         {% endfor %}
     </tbody>

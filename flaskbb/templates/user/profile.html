@@ -13,10 +13,13 @@
     </thead>
     <tbody>
         <tr>
+
           <td width="200px">
             <table class="table table-borderless">
               <tbody>
+                {% if user.avatar %}
                 <tr><td><img src="{{ user.avatar }}" alt="Avatar" height="100" width="100"> </td></tr>
+                {% endif %}
                 <!-- TODO: Implement online status -->
                 <tr><td><b></b> <span class="label label-success">Online</span></td></tr>
                 <tr><td><a href="{{ url_for('user.view_all_topics', username=user.username) }}">All Topics</a></td></tr>
@@ -24,13 +27,21 @@
               </tbody>
             </table>
           </td>
-          <td>{{ user.notes }}</td>
+
+          <td>
+            {% if user.notes %}
+                {{ user.notes }}
+            {% else %}
+                User has not added any notes about him.
+            {% endif %}
+          </td>
+
           <td width="250px">
             <table class="table table-borderless">
               <tbody>
                 <tr>
                   <td align="right">Group:</td>
-                  <td><b>TODO: </b>Admin</td>
+                  <td>{{ user.primary_group.name }}</td>
                 </tr>
                 <tr>
                   <td align="right">Joined:</td>
@@ -68,6 +79,7 @@
               </tbody>
             </table>
           </td>
+
         </tr>
     </tbody>
 </table>

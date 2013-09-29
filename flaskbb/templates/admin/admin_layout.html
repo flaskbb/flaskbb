@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    This is the Admin Panel which is still a Work in Progress<br \><br \>
+    <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs nav-left">
+            {%- from 'macros.html' import navlink with context-%}
+            {{ navlink('admin.overview', 'Overview') }}
+            {{ navlink('admin.manage_users', 'Manage Users') }}
+            {{ navlink('admin.manage_posts', 'Manage Posts') }}
+            {{ navlink('admin.manage_pages', 'Manage Pages') }}
+        </ul>
+        <div class="tab-content">
+            {% block admin_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

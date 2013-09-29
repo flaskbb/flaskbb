@@ -48,6 +48,13 @@
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{ url_for('user.settings') }}"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+
+                                {% if current_user.permissions['admin'] %}
+                                <li class="divider"></li>
+                                <li><a href="{{ url_for('admin.overview') }}"><span class="glyphicon glyphicon-cog"></span> Admin Panel</a></li>
+                                <li class="divider"></li>
+                                {% endif %}
+
                                 <li><a href="{{ url_for('auth.logout') }}"><span class="glyphicon glyphicon-share-alt"></span> Logout</a></li>
                             </ul>
                         </div>

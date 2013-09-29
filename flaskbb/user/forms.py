@@ -16,7 +16,7 @@ from wtforms.validators import (Length, Required, Email, EqualTo, regexp,
 
 from flaskbb.user.models import User
 from flaskbb.extensions import db
-from flaskbb.utils import SelectDateWidget
+from flaskbb.helpers import SelectDateWidget
 
 IMG_RE = r'^[^/\\]\.(?:jpg|gif|png)'
 

@@ -14,6 +14,7 @@
         <tr>
             <td colspan="2">
                 <strong>Board Statistics</strong>
+                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">Who is online?</a>]
             </td>
         </tr>
     </thead>
@@ -26,18 +27,8 @@
             </td>
             <td>
                 Newest registered user: <a href="{{ url_for('user.profile', username=stats['newest_user']) }}">{{ stats['newest_user'] }}</a> <br />
-                <strong>#TODO</strong> Registered users online: <strong>2</strong> <br />
+                Registered users online: <strong>{{ stats['online_users'].count() }}</strong> <br />
                 <strong>#TODO</strong> Guests online: <strong>40</strong> <br />
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2"><strong>#TODO</strong> Who is online? [<a href="show_all_online_players.html" target="_blank">Full List</a>]</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <a href="profile.html"><span style="color: green;"><strong><em>test1</em></strong></span></a>,
-                <a href="profile.html"><span style=""><em>test2</em></span></a>
             </td>
         </tr>
 

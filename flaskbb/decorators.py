@@ -11,7 +11,7 @@
 from threading import Thread
 from functools import wraps
 
-from flask import url_for, redirect
+from flask import abort
 from flask.ext.login import current_user
 
 
@@ -29,8 +29,8 @@ def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if current_user.is_anonymous():
-            return redirect(url_for("frontend.index"))
-        if not current_user.is_admin():
-            return redirect(url_for("frontend.index"))
+            abort(403)
+        if not current_user.permissions['admin']:
+            abort(403)
         return f(*args, **kwargs)
     return decorated

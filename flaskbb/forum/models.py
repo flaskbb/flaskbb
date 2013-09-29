@@ -11,7 +11,7 @@
 from datetime import datetime
 
 from flaskbb.extensions import db
-
+from flaskbb.helpers import DenormalizedText
 
 class Post(db.Model):
     __tablename__ = "posts"
@@ -142,7 +142,6 @@ class Topic(db.Model):
         return self
 
     def delete(self, users=None):
-        # This will delete the whole topic
         topic = Topic.query.filter_by(forum_id=self.forum_id).\
             order_by(Topic.last_post_id.desc())
 
@@ -191,6 +190,18 @@ class Forum(db.Model):
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")
 
+    moderators = db.Column(DenormalizedText)
+
+    def is_moderator(self, user_id):
+        if user_id in self.moderators:
+            return True
+        return False
+
+    def add_moderator(self, user_id):
+        self.moderators.add(user_id)
+
+    def remove_moderator(self, user_id):
+        self.moderators.remove(user_id)
 
 
 class Category(db.Model):

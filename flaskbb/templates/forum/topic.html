@@ -16,14 +16,14 @@
     {{ render_pagination(posts, url_for('forum.view_topic', topic_id=topic.id)) }}
 </div> <!-- end span pagination -->
 
-{% if current_user.is_authenticated() %}
 <div class="pull-right" style="padding-bottom: 10px">
+    {% if current_user|post_reply() %}
     <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary">Reply</a>
-    {% if current_user.id == topic.user_id %}
+    {% endif %}
+    {% if current_user|delete_topic(topic) %}
     <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
     {% endif %}
 </div>
-{% endif %}
 
 <table class="table table-bordered">
     <tbody>
@@ -54,23 +54,25 @@
         <td>
             <table class="table table-borderless">
                 <tr>
-
+                    {% if post.user.avatar %}
                     <td width="1">
                         <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
                     </td>
-
+                    {% endif %}
                     <td>
                         <a href="{{ url_for('user.profile', username=post.user.username) }}"><span style="color: green;"><strong><em>{{ post.user.username }}</em></strong></span></a>
-                        <!-- TODO: Implement online status and groups -->
-                        <span class="label label-success">Online</span><br />
-                        Administrator<br />
+                        {% if post.user|is_online %}
+                        <span class="label label-success">Online</span>
+                        {% else %}
+                        <span class="label label-default">Offline</span>
+                        {% endif %}
+                        <br />
+                        {{ post.user.primary_group.name }}<br />
                     </td>
 
                     <td class="pull-right">
                         Posts: {{ post.user.post_count }}<br />
                         Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
-                        <!-- TODO: Implement Karma functionality -->
-                        Karma: <a href="#">124</a>
                     </td>
 
                 </tr>
@@ -94,17 +96,18 @@
         <tr>
             <td>
                 <span class="pull-left">
-                    <a href="{{ url_for('pms.new_message') }}?to_user={{ post.user.username }}">PM</a> | <a href="#">Website</a>
+                    <a href="{{ url_for('pms.new_message') }}?to_user={{ post.user.username }}">PM</a>
+                    {% if post.user.website %}| <a href="{{post.user.website}}">Website</a>{% endif %}
                 </span>
 
                 <span class="pull-right">
-                    {% if current_user.is_authenticated() and current_user.id == post.user_id %}
+                    {% if current_user|edit_post(post) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
+                    {% endif %}
+                    {% if current_user|delete_post(post) %}
                     <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                     {% endif %}
-                    <a href="#">Quote</a> |
-                    <a href="#">Report</a> |
-                    <a href="#">+1</a>
+                    <a href="#">Quote</a>
                 </span>
             </td>
         </tr>
@@ -113,7 +116,7 @@
     </tbody>
 </table>
 
-{% if current_user.is_authenticated() %}
+{% if current_user|post_reply() %}
 <form class="form" action="#" method="post">
     {{ form.hidden_tag() }}
     <div class="form-group">

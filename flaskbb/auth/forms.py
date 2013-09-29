@@ -8,6 +8,8 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from datetime import datetime
+
 from flask.ext.wtf import Form
 from wtforms import TextField, PasswordField, BooleanField, HiddenField
 from wtforms.validators import Required, Email, EqualTo, regexp, ValidationError
@@ -60,7 +62,8 @@ class RegisterForm(Form):
     def save(self):
         user = User(username=self.username.data,
                     email=self.email.data,
-                    password=self.password.data)
+                    password=self.password.data,
+                    date_joined=datetime.utcnow())
         return user.save()
 
 

@@ -63,3 +63,5 @@ class BaseConfig(object):
     POSTS_PER_PAGE = 10
     TOPICS_PER_PAGE = 10
     USERS_PER_PAGE = 10
+
+    LAST_SEEN = 15

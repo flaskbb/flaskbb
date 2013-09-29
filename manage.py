@@ -11,6 +11,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+from collections import OrderedDict
 
 from flask import current_app
 from flask.ext.script import Manager, Shell, Server
@@ -19,7 +20,7 @@ from flaskbb import create_app
 from flaskbb.configs.development import DevelopmentConfig, BaseConfig
 from flaskbb.extensions import db
 
-from flaskbb.user.models import User
+from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
 app = create_app(DevelopmentConfig)
@@ -58,11 +59,117 @@ def createall():
 
     db.create_all()
 
+    groups = OrderedDict((
+        ('Administrator', {
+             'description': 'The Administrator Group',
+             'admin': True,
+             'super_mod': False,
+             'mod': False,
+             'banned': False,
+             'guest': False,
+             'editpost': True,
+             'deletepost': True,
+             'deletetopic': True,
+             'posttopic': True,
+             'postreply': True,
+             'viewtopic': True,
+             'viewprofile': True
+             }),
+        ('Super Moderator', {
+             'description': 'The Super Moderator Group',
+             'admin': False,
+             'super_mod': True,
+             'mod': False,
+             'banned': False,
+             'guest': False,
+             'editpost': True,
+             'deletepost': True,
+             'deletetopic': True,
+             'posttopic': True,
+             'postreply': True,
+             'viewtopic': True,
+             'viewprofiles': True
+             }),
+        ('Moderator', {
+             'description': 'The Moderator Group',
+             'admin': False,
+             'super_mod': False,
+             'mod': True,
+             'banned': False,
+             'guest': False,
+             'editpost': True,
+             'deletepost': True,
+             'deletetopic': True,
+             'posttopic': True,
+             'postreply': True,
+             'viewtopic': True,
+             'viewprofile': True
+             }),
+        ('Member', {
+             'description': 'The Member Group',
+             'admin': False,
+             'super_mod': False,
+             'mod': False,
+             'banned': False,
+             'guest': False,
+             'editpost': True,
+             'deletepost': False,
+             'deletetopic': False,
+             'posttopic': True,
+             'postreply': True,
+             'viewtopic': True,
+             'viewprofile': True
+             }),
+        ('Banned', {
+             'description': 'The Banned Group',
+             'admin': False,
+             'super_mod': False,
+             'mod': False,
+             'banned': True,
+             'guest': False,
+             'editpost': False,
+             'deletepost': False,
+             'deletetopic': False,
+             'posttopic': False,
+             'postreply': False,
+             'viewtopic': False,
+             'viewprofile': False
+             }),
+        ('Guest', {
+             'description': 'The Guest Group',
+             'admin': False,
+             'super_mod': False,
+             'mod': False,
+             'banned': False,
+             'guest': True,
+             'editpost': False,
+             'deletepost': False,
+             'deletetopic': False,
+             'posttopic': False,
+             'postreply': False,
+             'viewtopic': False,
+             'viewprofile': False
+             })
+    ))
+
+    # create 5 groups
+    for key, value in groups.items():
+        group = Group(name=key)
+
+        for k, v in value.items():
+            setattr(group, k, v)
+
+        db.session.add(group)
+        db.session.commit()
+
     # create 5 users
+    groups = Group.query.all()
     for u in range(1, 6):
         username = "test%s" % u
         email = "test%s@example.org" % u
         user = User(username=username, password="test", email=email)
+        user.groups.append(groups[u-1])
+        user.primary_group_id = u
         db.session.add(user)
 
     # create 2 categories

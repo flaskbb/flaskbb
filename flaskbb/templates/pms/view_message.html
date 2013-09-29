@@ -7,15 +7,17 @@
             <table class="table table-borderless" border="0">
                 <tr>
 
+                    {% if message.from_user.avatar %}
                     <td width="1">
                         <img src="{{ message.from_user.avatar }}" alt="Avatar" height="100" width="100">
                     </td>
+                    {% endif %}
 
                     <td>
                         <a href="{{ url_for('user.profile', username=message.from_user.username) }}"><span style="color: green;"><strong><em>{{ message.from_user.username }}</em></strong></span></a>
                         <!-- TODO: Implement online status and groups -->
                         <span class="badge badge-success">Online</span><br />
-                        Administrator<br />
+                        {{ message.from_user.primary_group.name }}<br />
                     </td>
 
                     <td class="pull-right">

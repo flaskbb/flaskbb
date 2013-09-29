@@ -9,13 +9,14 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
+import datetime
 import math
 
 from flask import (Blueprint, render_template, redirect, url_for, current_app,
-                   request)
+                   request, flash)
 from flask.ext.login import login_required, current_user
 
+from flaskbb.helpers import last_seen
 from flaskbb.forum.models import Category, Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
@@ -34,11 +35,14 @@ def index():
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
 
+    online_users = User.query.filter(User.lastseen >= last_seen())
+
     return render_template("forum/index.html", categories=categories,
                            stats={'user_count': user_count,
                                   'topic_count': topic_count,
                                   'post_count': post_count,
-                                  'newest_user': newest_user.username})
+                                  'newest_user': newest_user.username,
+                                  'online_users': online_users})
 
 
 @forum.route("/category/<int:category_id>")
@@ -72,14 +76,16 @@ def view_topic(topic_id):
     topic.views += 1
     topic.save()
 
-    form = QuickreplyForm()
-    if form.validate_on_submit():
-        post = form.save(current_user, topic)
-        return view_post(post.id)
+    form = None
+    if current_user.permissions['postreply'] or current_user.can_moderate:
+        form = QuickreplyForm()
+        if form.validate_on_submit():
+            post = form.save(current_user, topic)
+            return view_post(post.id)
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
                            per_page=current_app.config['POSTS_PER_PAGE'],
-                           form=form)
+                           last_seen=last_seen(), form=form)
 
 
 @forum.route("/post/<int:post_id>")
@@ -99,14 +105,18 @@ def view_post(post_id):
 @forum.route("/forum/<int:forum_id>/topic/new", methods=["POST", "GET"])
 @login_required
 def new_topic(forum_id):
-    form = NewTopicForm()
     forum = Forum.query.filter_by(id=forum_id).first()
 
+    if not (current_user.permissions['posttopic'] or current_user.can_moderate):
+        flash("You do not have the permissions to create a new topic.")
+        return redirect(url_for('forum.view_forum', forum_id=forum.id))
+
+    form = NewTopicForm()
     if form.validate_on_submit():
         topic = form.save(current_user, forum)
 
         # redirect to the new topic
-        return redirect(url_for('forum.view_topic', topic=topic.id))
+        return redirect(url_for('forum.view_topic', topic_id=topic.id))
     return render_template("forum/new_topic.html", forum=forum, form=form)
 
 
@@ -114,6 +124,10 @@ def new_topic(forum_id):
 @login_required
 def delete_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
+    if not (current_user.permissions['deletetopic'] or current_user.can_moderate):
+        flash("You do not have the permissions to delete the topic")
+        return redirect(url_for("forum.view_forum", forum=topic.forum_id))
+
     involved_users = User.query.filter(Post.topic_id == topic.id,
                                        User.id == Post.user_id).all()
     topic.delete(users=involved_users)
@@ -123,9 +137,13 @@ def delete_topic(topic_id):
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
 @login_required
 def new_post(topic_id):
-    form = ReplyForm()
     topic = Topic.query.filter_by(id=topic_id).first()
 
+    if not (current_user.permissions['postreply'] or current_user.can_moderate):
+        flash("You do not have the permissions to delete the topic")
+        return redirect(url_for("forum.view_forum", forum=topic.forum_id))
+
+    form = ReplyForm()
     if form.validate_on_submit():
         post = form.save(current_user, topic)
         return view_post(post.id)
@@ -141,7 +159,7 @@ def edit_post(post_id):
     form = ReplyForm(obj=post)
     if form.validate_on_submit():
         form.populate_obj(post)
-        post.date_modified = datetime.utcnow()
+        post.date_modified = datetime.datetime.utcnow()
         post.save()
         return redirect(url_for('forum.view_topic', topic=post.topic.id))
     else:
@@ -164,6 +182,10 @@ def delete_post(post_id):
                                 forum=post.topic.forum_id))
     return redirect(url_for('forum.view_topic', topic=topic_id))
 
+
+@forum.route("/who_is_online")
+def who_is_online():
+    pass
 
 @forum.route("/memberlist")
 def memberlist():

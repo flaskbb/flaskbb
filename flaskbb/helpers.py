@@ -9,10 +9,18 @@
     :license: BSD, see LICENSE for more details.
 """
 import random
-from datetime import datetime
+import datetime
 
+from flask import current_app
+from sqlalchemy import types
+from sqlalchemy.ext.mutable import Mutable
 from wtforms.widgets.core import Select, HTMLString, html_params
 
+
+def last_seen():
+    now = datetime.datetime.utcnow()
+    diff = now - datetime.timedelta(minutes=current_app.config['LAST_SEEN'])
+    return diff
 
 def generate_random_pass(length=8):
     return "".join(chr(random.randint(33, 126)) for i in range(length))
@@ -28,7 +36,7 @@ def time_delta_format(dt, default=None):
     if default is None:
         default = 'just now'
 
-    now = datetime.utcnow()
+    now = datetime.datetime.utcnow()
     diff = now - dt
 
     periods = (
@@ -54,6 +62,43 @@ def time_delta_format(dt, default=None):
     return default
 
 
+class DenormalizedText(Mutable, types.TypeDecorator):
+    """
+    Stores denormalized primary keys that can be
+    accessed as a set.
+
+    :param coerce: coercion function that ensures correct
+                   type is returned
+
+    :param separator: separator character
+
+    Source: https://github.com/imwilsonxu/fbone/blob/master/fbone/user/models.py#L13-L45
+    """
+
+    impl = types.Text
+
+    def __init__(self, coerce=int, separator=" ", **kwargs):
+
+        self.coerce = coerce
+        self.separator = separator
+
+        super(DenormalizedText, self).__init__(**kwargs)
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            items = [str(item).strip() for item in value]
+            value = self.separator.join(item for item in items if item)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if not value:
+            return set()
+        return set(self.coerce(item) for item in value.split(self.separator))
+
+    def copy_value(self, value):
+        return set(value)
+
+
 class SelectDateWidget(object):
     """
     Renders a DateTime field with 3 selects.
@@ -70,7 +115,7 @@ class SelectDateWidget(object):
         '%Y': 'select_date_year'
     }
 
-    def __init__(self, years=range(1930, datetime.utcnow().year+1)):
+    def __init__(self, years=range(1930, datetime.datetime.utcnow().year+1)):
         super(SelectDateWidget, self).__init__()
         self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
 

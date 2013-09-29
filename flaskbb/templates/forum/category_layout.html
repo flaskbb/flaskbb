@@ -16,15 +16,16 @@
 
         {% for forum in category.forums %}
         <tr>
-            <td align="center" valign="center" width="1">INSERT IMAGE</td>
+            <td align="center" valign="center" width="1">
+                New </br> Posts
+            </td>
 
             <td valign="top">
                 <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
 
                 <div class="forum-description">
                     {{ forum.description }}<br />
-                    <!-- Moderators: <a href="#">FlaskBB Team</a><br />
-
+                    <!--
                     <strong>Sub Forums:</strong> <a href="#" title="">Subforum 1</a>, <a href="#" title="">Subforum 2</a>
                      -->
                 </div>
