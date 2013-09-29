@@ -61,13 +61,15 @@
 
                         <div class="btn-group navbar-btn navbar-right">
                             <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="glyphicon glyphicon-envelope"></span> <span class="badge">3</span>
+                                <span class="glyphicon glyphicon-envelope"></span> <span class="badge">{{ current_user.unread_count }}</span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{ url_for('pms.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
                                 <li><a href="{{ url_for('pms.new_message') }}"><span class="glyphicon glyphicon-pencil"></span> New Message</a></li>
+                                <!--
                                 <li class="divider"></li>
                                 <li><a href="{{ url_for('pms.view_message', id=1) }}"><strong>test1</strong> - <span class="muted">This is the message title1</span> </a></li>
+                                -->
                             </ul>
                         </div>
                     {% else %}

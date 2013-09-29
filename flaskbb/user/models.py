@@ -17,6 +17,7 @@ from flask import current_app
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
 from flaskbb.forum.models import Post, Topic
+from flaskbb.pms.models import PrivateMessage
 
 
 groups_users = db.Table('groups_users',
@@ -42,8 +43,6 @@ class Group(db.Model):
     deletetopic = db.Column(db.Boolean)
     posttopic = db.Column(db.Boolean)
     postreply = db.Column(db.Boolean)
-    viewtopic = db.Column(db.Boolean)
-    viewprofile = db.Column(db.Boolean)
 
 
 class User(db.Model, UserMixin):
@@ -78,6 +77,16 @@ class User(db.Model, UserMixin):
                              primaryjoin=(groups_users.c.user_id == id),
                              backref=db.backref('users', lazy='dynamic'),
                              lazy='dynamic')
+
+    @property
+    def unread_count(self):
+        count = PrivateMessage.query.filter(
+            PrivateMessage.user_id == self.id,
+            PrivateMessage.draft == False,
+            PrivateMessage.trash == False,
+            PrivateMessage.unread == True,
+            db.not_(PrivateMessage.from_user_id == self.id)).count()
+        return count
 
     def __repr__(self):
         return "Username: %s" % self.username
