@@ -79,8 +79,7 @@ def view_topic(topic_id):
     form = None
 
     if not topic.locked:
-        if check_perm(current_user, 'postreply') or \
-            can_moderate(current_user, topic.forum):
+        if check_perm(current_user, 'postreply', topic.forum):
 
             form = QuickreplyForm()
             if form.validate_on_submit():
@@ -130,8 +129,7 @@ def new_topic(forum_id):
 def delete_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
-    if not check_perm(current_user, 'deletetopic') or \
-        can_moderate(current_user, topic.forum):
+    if not check_perm(current_user, 'deletetopic', topic.forum):
         flash("You do not have the permissions to delete the topic")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
@@ -150,8 +148,7 @@ def new_post(topic_id):
         flash("The topic is locked.")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
-    if not check_perm(current_user, 'postreply') or \
-        can_moderate(current_user, topic.forum):
+    if not check_perm(current_user, 'postreply', topic.forum):
         flash("You do not have the permissions to delete the topic")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
@@ -168,9 +165,8 @@ def new_post(topic_id):
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
 
-    if not check_perm(current_user, 'editpost', post.user_id, own=True) or \
-        can_moderate(current_user, post.topic.forum):
-
+    if not check_perm(current_user, 'editpost', post.topic.forum,
+        post.user_id):
         flash("You do not have the permissions to edit this post")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
@@ -191,9 +187,8 @@ def edit_post(post_id):
 def delete_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
 
-    if not check_perm(current_user, 'deletepost', post.user_id, own=True) or \
-        can_moderate(current_user, post.topic.forum):
-
+    if not check_perm(current_user, 'deletepost', post.topic.forum,
+        post.user_id):
         flash("You do not have the permissions to edit this post")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 

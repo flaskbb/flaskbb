@@ -17,17 +17,13 @@ from sqlalchemy.ext.mutable import Mutable
 from wtforms.widgets.core import Select, HTMLString, html_params
 
 
-def own_post(user, post_user):
-    if user.id == post_user.id:
+def check_perm(user, perm, forum, post_user_id=None):
+    if post_user_id:
+        return user.permissions[perm] and user.id == post_user_id
+    else:
+        return user.permissions[perm]
+    if can_moderate(user, forum):
         return True
-    return False
-
-
-def check_perm(user, perm, post_user_id=None, own=False):
-    if user.permissions[perm]:
-        return True
-    if own:
-        return user.id == post_user_id
     return False
 
 
