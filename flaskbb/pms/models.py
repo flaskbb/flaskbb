@@ -25,8 +25,9 @@ class PrivateMessage(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     trash = db.Column(db.Boolean, nullable=False, default=False)
     draft = db.Column(db.Boolean, nullable=False, default=False)
+    unread = db.Column(db.Boolean, nullable=False, default=True)
 
-    user = db.relationship("User", lazy="joined", foreign_keys=[user_id])
+    user = db.relationship("User", backref="pms", lazy="joined", foreign_keys=[user_id])
     from_user = db.relationship("User", lazy="joined", foreign_keys=[from_user_id])
     to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
 

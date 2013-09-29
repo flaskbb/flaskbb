@@ -33,10 +33,12 @@ def inbox():
 
 
 @pms.route("/message/<int:id>")
-@pms.route("/message/<int:id>/view")
 @login_required
 def view_message(id):
     message = PrivateMessage.query.filter_by(id=id).first()
+    if message.unread:
+        message.unread=False
+        db.session.commit()
     return render_template("pms/view_message.html", message=message)
 
 
