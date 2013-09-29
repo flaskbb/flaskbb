@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app, request
 from flaskbb.decorators import admin_required
+from flaskbb.user.models import User, Group
+from flaskbb.forum.models import Forum, Category
+
 
 admin = Blueprint("admin", __name__)
 
@@ -9,17 +12,36 @@ admin = Blueprint("admin", __name__)
 def overview():
     return render_template("admin/overview.html")
 
+
 @admin.route("/users")
 @admin_required
-def manage_users():
-    pass
+def users():
+    page = request.args.get("page", 1, type=int)
 
-@admin.route("/posts")
-@admin_required
-def manage_posts():
-    pass
+    users = User.query.\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
 
-@admin.route("/pages")
+    return render_template("admin/users.html", users=users)
+
+
+@admin.route("/groups")
 @admin_required
-def manage_pages():
-    pass
+def groups():
+    page = request.args.get("page", 1, type=int)
+
+    groups = Group.query.\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+
+    return render_template("admin/groups.html", groups=groups)
+
+
+@admin.route("/categories")
+@admin_required
+def categories():
+    return render_template("admin/categories.html")
+
+
+@admin.route("/forums")
+@admin_required
+def forums():
+    return render_template("admin/forums.html")

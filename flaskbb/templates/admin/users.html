@@ -1,0 +1,26 @@
+{% extends "admin/admin_layout.html" %}
+{% block admin_content %}
+<legend>Manage Users</legend>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Posts</th>
+            <th>Date registered</th>
+            <th>Group</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users.items %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+            <td>{{ user.post_count }}</td>
+            <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+            <td>{{ user.primary_group.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

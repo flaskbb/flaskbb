@@ -1,0 +1,24 @@
+{% extends "admin/admin_layout.html" %}
+{% block admin_content %}
+<legend>Manage Groups</legend>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Group Name</th>
+            <th>Description</th>
+            <th>Members</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups.items %}
+        <tr>
+            <td>{{ group.id }}</td>
+            <td><a href="#">{{ group.name }}</a></td>
+            <td>{{ group.description }}</td>
+            <td>1</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "admin/admin_layout.html" %}
+{% block admin_content %}
+<legend>Manage Forums and Categories</legend>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Forum Name</th>
+            <th>Description</th>
+            <th>Posts/Topics</th>
+        </tr>
+    </thead>
+    <tbody>
+        {#
+        {% for group in groups.items %}
+        <tr>
+            <td>{{ group.id }}</td>
+            <td><a href="#">{{ group.name }}</a></td>
+            <td>{{ group.description }}</td>
+            <td>1</td>
+        </tr>
+        {% endfor %}
+        #}
+    </tbody>
+</table>
+{% endblock %}
