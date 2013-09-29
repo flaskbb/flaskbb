@@ -105,6 +105,8 @@ def configure_extensions(app):
         """
         Loads the user. Required by the `login` extension
         """
+        # TODO: Also load the permissions and
+        # the unread pm count with 1 big query
         return User.query.get(id)
 
     login_manager.init_app(app)
