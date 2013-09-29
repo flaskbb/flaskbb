@@ -192,11 +192,6 @@ class Forum(db.Model):
 
     moderators = db.Column(DenormalizedText)
 
-    def is_moderator(self, user_id):
-        if user_id in self.moderators:
-            return True
-        return False
-
     def add_moderator(self, user_id):
         self.moderators.add(user_id)
 

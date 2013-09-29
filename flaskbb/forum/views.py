@@ -16,7 +16,7 @@ from flask import (Blueprint, render_template, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
 
-from flaskbb.helpers import last_seen
+from flaskbb.helpers import last_seen, can_moderate, check_perm
 from flaskbb.forum.models import Category, Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
@@ -77,11 +77,15 @@ def view_topic(topic_id):
     topic.save()
 
     form = None
-    if current_user.permissions['postreply'] or current_user.can_moderate:
-        form = QuickreplyForm()
-        if form.validate_on_submit():
-            post = form.save(current_user, topic)
-            return view_post(post.id)
+
+    if not topic.locked:
+        if check_perm(current_user, 'postreply') or \
+            can_moderate(current_user, topic.forum):
+
+            form = QuickreplyForm()
+            if form.validate_on_submit():
+                post = form.save(current_user, topic)
+                return view_post(post.id)
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
                            per_page=current_app.config['POSTS_PER_PAGE'],
@@ -107,7 +111,8 @@ def view_post(post_id):
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
-    if not (current_user.permissions['posttopic'] or current_user.can_moderate):
+    if not check_perm(current_user, 'posttopic') or \
+        can_moderate(current_user, forum):
         flash("You do not have the permissions to create a new topic.")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
@@ -124,14 +129,16 @@ def new_topic(forum_id):
 @login_required
 def delete_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
-    if not (current_user.permissions['deletetopic'] or current_user.can_moderate):
+
+    if not check_perm(current_user, 'deletetopic') or \
+        can_moderate(current_user, topic.forum):
         flash("You do not have the permissions to delete the topic")
-        return redirect(url_for("forum.view_forum", forum=topic.forum_id))
+        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     involved_users = User.query.filter(Post.topic_id == topic.id,
                                        User.id == Post.user_id).all()
     topic.delete(users=involved_users)
-    return redirect(url_for("forum.view_forum", forum=topic.forum_id))
+    return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
@@ -139,9 +146,14 @@ def delete_topic(topic_id):
 def new_post(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
-    if not (current_user.permissions['postreply'] or current_user.can_moderate):
+    if topic.locked:
+        flash("The topic is locked.")
+        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+
+    if not check_perm(current_user, 'postreply') or \
+        can_moderate(current_user, topic.forum):
         flash("You do not have the permissions to delete the topic")
-        return redirect(url_for("forum.view_forum", forum=topic.forum_id))
+        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     form = ReplyForm()
     if form.validate_on_submit():
@@ -156,12 +168,18 @@ def new_post(topic_id):
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
 
+    if not check_perm(current_user, 'editpost', post.user_id, own=True) or \
+        can_moderate(current_user, post.topic.forum):
+
+        flash("You do not have the permissions to edit this post")
+        return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
+
     form = ReplyForm(obj=post)
     if form.validate_on_submit():
         form.populate_obj(post)
         post.date_modified = datetime.datetime.utcnow()
         post.save()
-        return redirect(url_for('forum.view_topic', topic=post.topic.id))
+        return redirect(url_for('forum.view_topic', topic_id=post.topic.id))
     else:
         form.content.data = post.content
 
@@ -172,6 +190,13 @@ def edit_post(post_id):
 @login_required
 def delete_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
+
+    if not check_perm(current_user, 'deletepost', post.user_id, own=True) or \
+        can_moderate(current_user, post.topic.forum):
+
+        flash("You do not have the permissions to edit this post")
+        return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
+
     topic_id = post.topic_id
 
     post.delete()
@@ -179,7 +204,7 @@ def delete_post(post_id):
     # If the post was the first post in the topic, redirect to the forums
     if post.first_post:
         return redirect(url_for('forum.view_forum',
-                                forum=post.topic.forum_id))
+                                forum_id=post.topic.forum_id))
     return redirect(url_for('forum.view_topic', topic=topic_id))
 
 

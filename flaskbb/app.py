@@ -29,7 +29,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import *
 
 from flaskbb.extensions import db, login_manager, mail, cache #toolbar
-from flaskbb.helpers import time_delta_format, last_seen
+from flaskbb.helpers import time_delta_format, last_seen, can_moderate
 
 
 DEFAULT_BLUEPRINTS = (
@@ -149,34 +149,39 @@ def configure_template_filters(app):
         return post.user_id == user.id
 
     @app.template_filter()
-    def edit_post(user, post):
+    def edit_post(user, post, forum):
         """
         Check if the post can be edited by the user
         """
-        if not user.is_authenticated():
-            return False
-        if user.permissions['super_mod'] or user.permissions['admin']:
+        if can_moderate(user, forum):
             return True
         if post.user_id == user.id and user.permissions['editpost']:
             return True
         return False
 
     @app.template_filter()
-    def delete_post(user, post):
+    def delete_post(user, post, forum):
         """
         Check if the post can be edited by the user
         """
-        if not user.is_authenticated():
-            return False
-        if user.permissions['super_mod'] or user.permissions['admin']:
+        if can_moderate(user, forum):
             return True
         if post.user_id == user.id and user.permissions['deletepost']:
             return True
         return False
 
     @app.template_filter()
-    def post_reply(user):
-        if user.permissions['super_mod'] or user.permissions['admin']:
+    def delete_topic(user, post, forum):
+        if can_moderate(user, forum):
+            return True
+        if post.user_id == user.id and user.permissions['deletetopic']:
+            return True
+        return False
+
+
+    @app.template_filter()
+    def post_reply(user, forum):
+        if can_moderate(user, forum):
             return True
         if user.permissions['postreply']:
             return True
@@ -201,7 +206,6 @@ def configure_before_handlers(app):
     @app.before_request
     def get_user_permissions():
         current_user.permissions = current_user.get_permissions()
-        current_user.moderate_all = current_user.permissions['admin'] or current_user.permissions['super_mod']
 
 
 def configure_errorhandlers(app):

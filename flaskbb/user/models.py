@@ -23,10 +23,6 @@ groups_users = db.Table('groups_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
         db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
-moderators = db.Table('moderators',
-        db.Column('forum_id', db.Integer(), db.ForeignKey('forums.id')),
-        db.Column('user_id', db.Integer(), db.ForeignKey('users.id')))
-
 
 class Group(db.Model):
     __tablename__ = "groups"

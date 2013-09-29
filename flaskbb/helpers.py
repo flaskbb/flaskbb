@@ -17,10 +17,35 @@ from sqlalchemy.ext.mutable import Mutable
 from wtforms.widgets.core import Select, HTMLString, html_params
 
 
+def own_post(user, post_user):
+    if user.id == post_user.id:
+        return True
+    return False
+
+
+def check_perm(user, perm, post_user_id=None, own=False):
+    if user.permissions[perm]:
+        return True
+    if own:
+        return user.id == post_user_id
+    return False
+
+
+def can_moderate(user, forum):
+    if not user.is_authenticated():
+        return False
+    if user.permissions['super_mod'] or user.permissions['admin']:
+        return True
+    if user.permissions['mod'] and user.id in forum.moderators:
+        return True
+    return False
+
+
 def last_seen():
     now = datetime.datetime.utcnow()
     diff = now - datetime.timedelta(minutes=current_app.config['LAST_SEEN'])
     return diff
+
 
 def generate_random_pass(length=8):
     return "".join(chr(random.randint(33, 126)) for i in range(length))

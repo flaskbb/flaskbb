@@ -17,10 +17,10 @@
 </div> <!-- end span pagination -->
 
 <div class="pull-right" style="padding-bottom: 10px">
-    {% if current_user|post_reply() %}
+    {% if current_user|post_reply(topic.forum) and not topic.locked %}
     <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary">Reply</a>
     {% endif %}
-    {% if current_user|delete_topic(topic) %}
+    {% if current_user|delete_topic(topic, topic.forum) %}
     <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
     {% endif %}
 </div>
@@ -101,10 +101,10 @@
                 </span>
 
                 <span class="pull-right">
-                    {% if current_user|edit_post(post) %}
+                    {% if current_user|edit_post(post, topic.forum) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
-                    {% if current_user|delete_post(post) %}
+                    {% if current_user|delete_post(post, topic.forum) %}
                     <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                     {% endif %}
                     <a href="#">Quote</a>
@@ -116,7 +116,7 @@
     </tbody>
 </table>
 
-{% if current_user|post_reply() %}
+{% if current_user|post_reply(topic.forum) and not topic.locked %}
 <form class="form" action="#" method="post">
     {{ form.hidden_tag() }}
     <div class="form-group">
