@@ -110,8 +110,7 @@ def view_post(post_id):
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
-    if not check_perm(current_user, 'posttopic') or \
-        can_moderate(current_user, forum):
+    if not check_perm(current_user, 'posttopic', forum):
         flash("You do not have the permissions to create a new topic.")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
