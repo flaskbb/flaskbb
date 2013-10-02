@@ -70,7 +70,9 @@ class User(db.Model, UserMixin):
 
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
-    primary_group = db.relationship('Group', backref="user_group", uselist=False, foreign_keys=[primary_group_id])
+    primary_group = db.relationship('Group', lazy="joined", backref="user_group", uselist=False, foreign_keys=[primary_group_id])
+
+    #pms = db.relationship("PrivateMessage", lazy="dynamic", primaryjoin=(PrivateMessage.user_id == id))
 
     groups = db.relationship('Group',
                              secondary=groups_users,
@@ -78,15 +80,8 @@ class User(db.Model, UserMixin):
                              backref=db.backref('users', lazy='dynamic'),
                              lazy='dynamic')
 
-    @property
-    def unread_count(self):
-        count = PrivateMessage.query.filter(
-            PrivateMessage.user_id == self.id,
-            PrivateMessage.draft == False,
-            PrivateMessage.trash == False,
-            PrivateMessage.unread == True,
-            db.not_(PrivateMessage.from_user_id == self.id)).count()
-        return count
+    unread_count = db.column_property(
+        db.select([db.func.count(PrivateMessage.id)]).where(PrivateMessage.user_id == id).where(PrivateMessage.unread == True).as_scalar())
 
     def __repr__(self):
         return "Username: %s" % self.username

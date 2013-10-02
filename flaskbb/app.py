@@ -139,9 +139,7 @@ def configure_template_filters(app):
 
     @app.template_filter()
     def is_online(user):
-        if user.lastseen >= last_seen():
-            return True
-        return False
+        return user.lastseen >= last_seen()
 
     @app.template_filter()
     def is_current_user(user, post):
@@ -157,8 +155,8 @@ def configure_template_filters(app):
         """
         if can_moderate(user, forum):
             return True
-        if post.user_id == user.id and user.permissions['editpost']:
-            return True
+        if user.is_authenticated():
+            return post.user_id == user.id and user.permissions['editpost']
         return False
 
     @app.template_filter()
@@ -168,16 +166,16 @@ def configure_template_filters(app):
         """
         if can_moderate(user, forum):
             return True
-        if post.user_id == user.id and user.permissions['deletepost']:
-            return True
+        if user.is_authenticated():
+            return post.user_id == user.id and user.permissions['deletepost']
         return False
 
     @app.template_filter()
     def delete_topic(user, post, forum):
         if can_moderate(user, forum):
             return True
-        if post.user_id == user.id and user.permissions['deletetopic']:
-            return True
+        if user.is_authenticated():
+            return post.user_id == user.id and user.permissions['deletetopic']
         return False
 
 
