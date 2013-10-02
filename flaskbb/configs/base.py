@@ -34,19 +34,20 @@ class BaseConfig(object):
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
 
+    # Default Database
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
+                              PROJECT + ".sqlite"
+    # sqlite for testing/debug.
+    SQLALCHEMY_ECHO = False
+
+    # Security
     # This is the secret key that is used for session signing.
     # You can generate a secure key with os.urandom(24)
     SECRET_KEY = 'secret key'
 
-    # SQLAlchemy connection options
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
-                              PROJECT + ".sqlite"
-    # sqlite for testing/debug.
-    SQLALCHEMY_ECHO = True
-
     # Protection against form post fraud
     WTF_CSRF_ENABLED = True
-    WTF_CSRF_SESSION_KEY = "reallyhardtoguess"
+    WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
     # Auth
     LOGIN_VIEW = "auth.login"
@@ -55,9 +56,6 @@ class BaseConfig(object):
     # Caching
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 60
-
-    # Recaptcha
-    RECAPTCHA_ENABLE = False
 
     # Pagination
     POSTS_PER_PAGE = 10

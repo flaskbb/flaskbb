@@ -32,6 +32,7 @@ using the micro framework Flask.
 
 * Create a virtualenv
 * Install the dependencies with `pip install -r requirements.txt`
+* Copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
 * Create the database with some example content `python manage.py createall`
 * Run the development server `python manage.py runserver`
 * Visit [localhost:8080](http://localhost:8080)

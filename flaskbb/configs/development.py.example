@@ -14,23 +14,31 @@ class DevelopmentConfig(BaseConfig):
 
     # Indicates that it is a dev environment
     DEBUG = True
-    SECRET_KEY = "SecretKeyForSessionSigning"
 
     # SQLAlchemy connection options
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + BaseConfig._basedir + '/' + \
                               BaseConfig.PROJECT + ".sqlite"
     SQLALCHEMY_ECHO = True
 
-    # Protection against form post fraud
-    CSRF_ENABLED = True
-    CSRF_SESSION_KEY = "reallyhardtoguess"
-
-    # Caching
-    CACHE_TYPE = "simple"
-    CACHE_DEFAULT_TIMEOUT = 60
+    # Security
+    SECRET_KEY = "SecretKeyForSessionSigning"
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
     # Recaptcha
+    # To get recaptcha, visit the link below:
+    # https://www.google.com/recaptcha/admin/create
+    RECAPTCHA_ENABLE = False
     RECAPTCHA_USE_SSL = False
-    RECAPTCHA_PUBLIC_KEY = "6LfUZ9YSAAAAANtDdyew22z2lnjz-K0Dx8M-gkey"
-    RECAPTCHA_PRIVATE_KEY = "6LfUZ9YSAAAAAHgDBflMFQTVdlTA3__yYx8CBGII"
+    RECAPTCHA_PUBLIC_KEY = "your_public_key"
+    RECAPTCHA_PRIVATE_KEY = "your_private_key"
     RECAPTCHA_OPTIONS = {"theme": "white"}
+
+    # Mail
+    MAIL_SERVER = "smtp.googlemail.com"
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = "flaskbb@gmail.com"
+    MAIL_PASSWORD = "your_password"
+    MAIL_DEFAULT_SENDER = "flaskbb.com"
+    ADMINS = ["flaskbb@gmail.com"]

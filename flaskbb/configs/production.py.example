@@ -1,0 +1,81 @@
+"""
+    flaskbb.configs.example
+    ~~~~~~~~~~~~~~~~~~~~
+
+    This is how a production configuration can look like.
+
+    :copyright: (c) 2013 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
+from flaskbb.configs.base import BaseConfig
+
+
+class ProductionConfig(BaseConfig):
+
+    ## Database
+    # If no SQL service is choosen, it will fallback to sqlite
+    # For PostgresSQL:
+    #SQLALCHEMY_DATABASE_URI = "postgresql://localhost/example"
+    # For SQLite:
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + BaseConfig._basedir + '/' + \
+    #                          BaseConfig.PROJECT + ".sqlite"
+
+    ## Security
+    # This is the secret key that is used for session signing.
+    # You can generate a secure key with os.urandom(24)
+    SECRET_KEY = 'secret key'
+
+    # You can generate the WTF_CSRF_SECRET_KEY the same way as you have
+    # generated the SECRET_KEY. If no WTF_CSRF_SECRET_KEY is provided, it will
+    # use the SECRET_KEY.
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
+
+
+    ## Caching
+    # See the Flask-Cache docs for more caching types
+    CACHE_TYPE = "simple"
+    CACHE_DEFAULT_TIMEOUT = 60
+
+
+    ## Captcha
+    # To get recaptcha, visit the link below:
+    # https://www.google.com/recaptcha/admin/create
+    RECAPTCHA_ENABLE = False
+    RECAPTCHA_USE_SSL = False
+    RECAPTCHA_PUBLIC_KEY = "your_public_recaptcha_key"
+    RECAPTCHA_PRIVATE_KEY = "your_private_recaptcha_key"
+    RECAPTCHA_OPTIONS = {"theme": "white"}
+
+
+    ## Mail
+    # Google Mail Example
+    MAIL_SERVER = "smtp.gmail.com"
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = "your_username@gmail.com"
+    MAIL_PASSWORD = "your_password"
+    MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
+    ADMINS = ["your_admin_user@gmail.com"]
+
+
+    ## Error/Info Logging
+    # If SEND_LOGS is set to True, the admins (see the mail configuration) will
+    # recieve the error logs per email.
+    SEND_LOGS = True
+
+    # The filename for the info and error logs. The logfiles are stored at
+    # flaskbb/logs
+    INFO_LOG = "info.log"
+    ERROR_LOG = "error.log"
+
+
+    ## FlaskBB Configs
+    # Pagination
+    POSTS_PER_PAGE = 10
+    TOPICS_PER_PAGE = 10
+    USERS_PER_PAGE = 10
+
+    # How long (in minutes) a user needs to be inactive
+    # to be shown as offline.
+    LAST_SEEN = 15
