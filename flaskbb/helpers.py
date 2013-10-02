@@ -18,26 +18,20 @@ from wtforms.widgets.core import Select, HTMLString, html_params
 
 
 def check_perm(user, perm, forum, post_user_id=None):
-    if post_user_id:
-        return user.permissions[perm] and user.id == post_user_id
-    else:
-        return user.permissions[perm]
     if can_moderate(user, forum):
         return True
-    return False
+    if post_user_id and user.is_authenticated():
+        return user.permissions[perm] and user.id == post_user_id
+    return user.permissions[perm]
 
 
 def can_moderate(user, forum):
-    if not user.is_authenticated():
-        return False
-    if user.permissions['super_mod'] or user.permissions['admin']:
-        return True
     if user.permissions['mod'] and user.id in forum.moderators:
         return True
-    return False
+    return user.permissions['super_mod'] or user.permissions['admin']
 
 
-def last_seen():
+def time_diff():
     now = datetime.datetime.utcnow()
     diff = now - datetime.timedelta(minutes=current_app.config['LAST_SEEN'])
     return diff

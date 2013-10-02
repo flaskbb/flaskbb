@@ -37,7 +37,7 @@
             <td valign="top" align="right" style="white-space: nowrap">
                 {% if forum.last_post_id %}
                 <a href="{{ url_for('forum.view_post', post_id=forum.last_post_id) }}" title="{{ forum.last_post.topic.title }}">
-                    <strong>{{ forum.last_post.topic.title|crop_topic_title() }}</strong>
+                    <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
                 </a>
                 <br />
                 {{ forum.last_post.date_created|time_since }}<br />

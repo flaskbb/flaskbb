@@ -29,8 +29,9 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import *
 
 from flaskbb.extensions import db, login_manager, mail, cache #toolbar
-from flaskbb.helpers import time_delta_format, last_seen, can_moderate
 
+from flaskbb.template_filters import (format_date, time_since, is_online,
+    edit_post, delete_post, delete_topic, post_reply, crop_title)
 
 DEFAULT_BLUEPRINTS = (
     (forum, ""),
@@ -125,75 +126,14 @@ def configure_template_filters(app):
     """
     Configures the template filters
     """
-
-    @app.template_filter()
-    def format_date(value, format='%Y-%m-%d'):
-        """
-        Returns a formatted time string
-        """
-        return value.strftime(format)
-
-    @app.template_filter()
-    def time_since(value):
-        return time_delta_format(value)
-
-    @app.template_filter()
-    def is_online(user):
-        return user.lastseen >= last_seen()
-
-    @app.template_filter()
-    def is_current_user(user, post):
-        """
-        Check if the post is written by the user
-        """
-        return post.user_id == user.id
-
-    @app.template_filter()
-    def edit_post(user, post, forum):
-        """
-        Check if the post can be edited by the user
-        """
-        if can_moderate(user, forum):
-            return True
-        if user.is_authenticated():
-            return post.user_id == user.id and user.permissions['editpost']
-        return False
-
-    @app.template_filter()
-    def delete_post(user, post, forum):
-        """
-        Check if the post can be edited by the user
-        """
-        if can_moderate(user, forum):
-            return True
-        if user.is_authenticated():
-            return post.user_id == user.id and user.permissions['deletepost']
-        return False
-
-    @app.template_filter()
-    def delete_topic(user, post, forum):
-        if can_moderate(user, forum):
-            return True
-        if user.is_authenticated():
-            return post.user_id == user.id and user.permissions['deletetopic']
-        return False
-
-
-    @app.template_filter()
-    def post_reply(user, forum):
-        if can_moderate(user, forum):
-            return True
-        if user.permissions['postreply']:
-            return True
-        return False
-
-
-    @app.template_filter()
-    def crop_topic_title(title):
-        if len(title) > 15:
-            return title[:15] + "..."
-        return title
-
+    app.jinja_env.filters['format_date'] = format_date
+    app.jinja_env.filters['time_since'] = time_since
+    app.jinja_env.filters['is_online'] = is_online
+    app.jinja_env.filters['edit_post'] = edit_post
+    app.jinja_env.filters['delete_post'] = delete_post
+    app.jinja_env.filters['delete_topic'] = delete_topic
+    app.jinja_env.filters['post_reply'] = post_reply
+    app.jinja_env.filters['crop_title'] = crop_title
 
 def configure_before_handlers(app):
     """

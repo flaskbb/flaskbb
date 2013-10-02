@@ -63,3 +63,4 @@ class BaseConfig(object):
     USERS_PER_PAGE = 10
 
     LAST_SEEN = 15
+    TITLE_LENGTH = 15

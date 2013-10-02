@@ -16,7 +16,7 @@ from flask import (Blueprint, render_template, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
 
-from flaskbb.helpers import last_seen, can_moderate, check_perm
+from flaskbb.helpers import time_diff, check_perm
 from flaskbb.forum.models import Category, Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
@@ -35,7 +35,7 @@ def index():
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
 
-    online_users = User.query.filter(User.lastseen >= last_seen())
+    online_users = User.query.filter(User.lastseen >= time_diff())
 
     return render_template("forum/index.html", categories=categories,
                            stats={'user_count': user_count,
@@ -88,7 +88,7 @@ def view_topic(topic_id):
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
                            per_page=current_app.config['POSTS_PER_PAGE'],
-                           last_seen=last_seen(), form=form)
+                           last_seen=time_diff(), form=form)
 
 
 @forum.route("/post/<int:post_id>")
