@@ -190,6 +190,13 @@ def configure_template_filters(app):
         return False
 
 
+    @app.template_filter()
+    def crop_topic_title(title):
+        if len(title) > 15:
+            return title[:15] + "..."
+        return title
+
+
 def configure_before_handlers(app):
     """
     Configures the before request handlers
