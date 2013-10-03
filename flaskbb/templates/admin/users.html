@@ -9,6 +9,7 @@
             <th>Posts</th>
             <th>Date registered</th>
             <th>Group</th>
+            <th>Manage</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,7 @@
             <td>{{ user.post_count }}</td>
             <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
             <td>{{ user.primary_group.name }}</td>
+            <td>Edit | Remove</td>
         </tr>
         {% endfor %}
     </tbody>

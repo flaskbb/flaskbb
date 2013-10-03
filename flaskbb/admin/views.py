@@ -38,10 +38,16 @@ def groups():
 @admin.route("/categories")
 @admin_required
 def categories():
-    return render_template("admin/categories.html")
+    page = request.args.get("page", 1, type=int)
+    categories = Category.query.\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+    return render_template("admin/categories.html", categories=categories)
 
 
 @admin.route("/forums")
 @admin_required
 def forums():
-    return render_template("admin/forums.html")
+    page = request.args.get("page", 1, type=int)
+    forums = Forum.query.\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+    return render_template("admin/forums.html", forums=forums)
