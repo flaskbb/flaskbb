@@ -204,7 +204,9 @@ def delete_post(post_id):
 
 @forum.route("/who_is_online")
 def who_is_online():
-    pass
+    online_users = User.query.filter(User.lastseen >= time_diff()).all()
+    return render_template("forum/online_users.html", online_users=online_users)
+
 
 @forum.route("/memberlist")
 def memberlist():
