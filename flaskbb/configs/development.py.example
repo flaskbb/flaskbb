@@ -7,17 +7,17 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flaskbb.configs.base import BaseConfig
+from flaskbb.configs.default import DefaultConfig
 
 
-class DevelopmentConfig(BaseConfig):
+class DevelopmentConfig(DefaultConfig):
 
     # Indicates that it is a dev environment
     DEBUG = True
 
     # SQLAlchemy connection options
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + BaseConfig._basedir + '/' + \
-                              BaseConfig.PROJECT + ".sqlite"
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
+                              DefaultConfig.PROJECT + ".sqlite"
     SQLALCHEMY_ECHO = True
 
     # Security

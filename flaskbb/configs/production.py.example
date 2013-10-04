@@ -7,18 +7,18 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flaskbb.configs.base import BaseConfig
+from flaskbb.configs.default import DefaultConfig
 
 
-class ProductionConfig(BaseConfig):
+class ProductionConfig(DefaultConfig):
 
     ## Database
     # If no SQL service is choosen, it will fallback to sqlite
     # For PostgresSQL:
     #SQLALCHEMY_DATABASE_URI = "postgresql://localhost/example"
     # For SQLite:
-    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + BaseConfig._basedir + '/' + \
-    #                          BaseConfig.PROJECT + ".sqlite"
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
+    #                          DefaultConfig.PROJECT + ".sqlite"
 
     ## Security
     # This is the secret key that is used for session signing.
@@ -72,10 +72,16 @@ class ProductionConfig(BaseConfig):
 
     ## FlaskBB Configs
     # Pagination
+    # How many posts per page are displayed
     POSTS_PER_PAGE = 10
+    # How many topics per page are displayed
     TOPICS_PER_PAGE = 10
+    # How many users per page are displayed.
+    # This affects mainly the memberlist
     USERS_PER_PAGE = 10
 
     # How long (in minutes) a user needs to be inactive
     # to be shown as offline.
     LAST_SEEN = 15
+    # The length of the topic title in characters on the index
+    TITLE_LENGTH = 15

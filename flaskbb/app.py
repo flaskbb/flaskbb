@@ -72,9 +72,9 @@ def configure_app(app, config):
 
     # Get the configuration file
     if config is None:
-        from flaskbb.configs.development import DevelopmentConfig
-        app.config.from_object(DevelopmentConfig)
-        app.logger.info("No configuration specified. Using Development config")
+        from flaskbb.configs.default import DefaultConfig
+        app.config.from_object(DefaultConfig)
+        app.logger.info("No configuration specified. Using the Default config")
     else:
         app.config.from_object(config)
 

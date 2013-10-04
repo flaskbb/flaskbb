@@ -12,7 +12,7 @@
 import os
 
 
-class BaseConfig(object):
+class DefaultConfig(object):
 
     # Get the app root path
     #            <_basedir>
@@ -57,10 +57,35 @@ class BaseConfig(object):
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 60
 
+
+    ## Captcha
+    RECAPTCHA_ENABLE = False
+    RECAPTCHA_USE_SSL = False
+    RECAPTCHA_PUBLIC_KEY = "your_public_recaptcha_key"
+    RECAPTCHA_PRIVATE_KEY = "your_private_recaptcha_key"
+    RECAPTCHA_OPTIONS = {"theme": "white"}
+
+    ## Mail
+    MAIL_SERVER = "localhost"
+    MAIL_PORT = 25
+    MAIL_USE_SSL = False
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = "noreply@example.org"
+    MAIL_PASSWORD = ""
+    MAIL_DEFAULT_SENDER = ("Default Sender", "noreply@example.org")
+    ADMINS = ["admin@example.org"]
+
+    ## App specific configs
     # Pagination
+    # How many posts per page are displayed
     POSTS_PER_PAGE = 10
+    # How many topics per page are displayed
     TOPICS_PER_PAGE = 10
+    # How many users per page are displayed.
+    # This affects mainly the memberlist
     USERS_PER_PAGE = 10
 
+    # How long the use can be inactive before he is marked as offline
     LAST_SEEN = 15
+    # The length of the topic title in characters on the index
     TITLE_LENGTH = 15

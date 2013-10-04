@@ -17,13 +17,18 @@ from flask import current_app
 from flask.ext.script import Manager, Shell, Server
 
 from flaskbb import create_app
-from flaskbb.configs.development import DevelopmentConfig, BaseConfig
 from flaskbb.extensions import db
 
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
-app = create_app(DevelopmentConfig)
+# Use the development configuration if available
+try:
+    from flaskbb.configs.development import DevelopmentConfig as Config
+except ImportError:
+    from flaskbb.configs.default import DefaultConfig as Config
+
+app = create_app(Config)
 manager = Manager(app)
 
 # Run local server
