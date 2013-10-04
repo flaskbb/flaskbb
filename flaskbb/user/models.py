@@ -81,7 +81,10 @@ class User(db.Model, UserMixin):
                              lazy='dynamic')
 
     unread_count = db.column_property(
-        db.select([db.func.count(PrivateMessage.id)]).where(PrivateMessage.user_id == id).where(PrivateMessage.unread == True).as_scalar())
+        db.select([db.func.count(PrivateMessage.id)]).\
+            where(PrivateMessage.user_id == id).\
+            where(PrivateMessage.unread == True).correlate("privatemessages").\
+            as_scalar())
 
     def __repr__(self):
         return "Username: %s" % self.username
