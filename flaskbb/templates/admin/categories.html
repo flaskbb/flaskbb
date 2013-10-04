@@ -1,6 +1,6 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-<legend>Manage Categories</legend>
+<legend>Manage Categories | <a href="{{ url_for('admin.add_category') }}">Add Category</a></legend>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -16,7 +16,10 @@
             <td>{{ category.id }}</td>
             <td><a href="#">{{ category.title }}</a></td>
             <td>{{ category.description }}</td>
-            <td>Edit | Remove</td>
+            <td>
+                <a href="{{ url_for('admin.edit_category', category_id = category.id) }}">Edit</a> |
+                <a href="{{ url_for('admin.delete_category', category_id = category.id) }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

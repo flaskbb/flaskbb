@@ -1,6 +1,6 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-<legend>Manage Groups</legend>
+<legend>Manage Groups | <a href="{{ url_for('admin.add_group') }}">Add Group</a></legend>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -16,7 +16,10 @@
             <td>{{ group.id }}</td>
             <td><a href="#">{{ group.name }}</a></td>
             <td>{{ group.description }}</td>
-            <td>Edit | Remove</td>
+            <td>
+                <a href="{{ url_for('admin.edit_group', group_id = group.id) }}">Edit</a> |
+                <a href="{{ url_for('admin.delete_group', group_id = group.id) }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

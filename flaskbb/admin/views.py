@@ -1,16 +1,30 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, current_app, request
+import sys
+
+from flask import (Blueprint, render_template, current_app, request,
+    __version__ as flask_version)
+
 from flaskbb.decorators import admin_required
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Forum, Category
-
+from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb import __version__ as flaskbb_version
 
 admin = Blueprint("admin", __name__)
 
 @admin.route("/")
 @admin_required
 def overview():
-    return render_template("admin/overview.html")
+    python_version = "%s.%s" % (sys.version_info[0], sys.version_info[1])
+    user_count = User.query.count()
+    topic_count = Topic.query.count()
+    post_count = Post.query.count()
+    return render_template("admin/overview.html",
+        python_version=python_version,
+        flask_version=flask_version,
+        flaskbb_version=flaskbb_version,
+        user_count=user_count,
+        topic_count=topic_count,
+        post_count=post_count)
 
 
 @admin.route("/users")
@@ -51,3 +65,103 @@ def forums():
     forums = Forum.query.\
         paginate(page, current_app.config['USERS_PER_PAGE'], False)
     return render_template("admin/forums.html", forums=forums)
+
+
+@admin.route("/users/<int:user_id>/edit")
+@admin_required
+def edit_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+
+    if user:
+        form = EditUserForm()
+        if form.validate_on_submit():
+            form.populate_obj(user)
+            user.save()
+        else:
+            form.username.data = user.username
+            form.email.data = user.email
+            form.password.data = user.password
+            form.birthday.data = user.birthday
+            form.gender.data = user.gender
+            form.website.data = user.website
+            form.location.data = user.location
+            form.signature.data= user.signature
+            form.avatar.data = user.avatar
+            form.notes.data = user.notes
+            form.primary_group.data = user.primary_group_id
+            form.secondary_groups.data = user.groups
+
+    flash("User successfully edited")
+    return redirect(url_for("admin.users"))
+
+
+@admin.route("/users/<int:user_id>/delete")
+@admin_required
+def delete_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    user.delete()
+    flash("User successfully deleted")
+    return redirect(url_for("admin.users"))
+
+
+@admin.route("/users/add")
+@admin_required
+def add_user():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = form.save()
+    return redirect(url_for("admin.users"))
+
+
+@admin.route("/groups/<int:group_id>/edit")
+@admin_required
+def edit_group(group_id):
+    group = Group.query.filter_by(id=group_id).first()
+
+    if group:
+        form = EditGroupForm()
+        if form.validate_on_submit():
+            pass
+        else:
+            pass
+
+@admin.route("/groups/<int:group_id>/delete")
+@admin_required
+def delete_group(group_id):
+    group = Group.query.filter.
+
+@admin.route("/groups/add")
+@admin_required
+def add_group():
+    pass
+
+
+@admin.route("/forums/<int:forum_id>/edit")
+@admin_required
+def edit_forum(forum_id):
+    pass
+
+@admin.route("/forums/<int:forum_id>/delete")
+@admin_required
+def delete_forum(forum_id):
+    pass
+
+@admin.route("/forums/add")
+@admin_required
+def add_forum():
+    pass
+
+@admin.route("/categories/<int:category_id>/edit")
+@admin_required
+def edit_category(category_id):
+    pass
+
+@admin.route("/categories/<int:category_id>/delete")
+@admin_required
+def delete_category(category_id):
+    pass
+
+@admin.route("/categories/add")
+@admin_required
+def add_category():
+    pass

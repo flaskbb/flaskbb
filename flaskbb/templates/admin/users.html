@@ -1,6 +1,6 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-<legend>Manage Users</legend>
+<legend>Manage Users | <a href="{{ url_for('admin.add_user') }}">Add User</a></legend>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -20,7 +20,10 @@
             <td>{{ user.post_count }}</td>
             <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
             <td>{{ user.primary_group.name }}</td>
-            <td>Edit | Remove</td>
+            <td>
+                <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
+                <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

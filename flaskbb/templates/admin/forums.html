@@ -1,6 +1,6 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-<legend>Manage Forums</legend>
+<legend>Manage Forums | <a href="{{ url_for('admin.add_forum') }}">Add Forum</a></legend>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -16,7 +16,10 @@
             <td>{{ forum.id }}</td>
             <td><a href="#">{{ forum.title }}</a></td>
             <td>{{ forum.description }}</td>
-            <td>Edit | Remove</td>
+            <td>
+                <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
+                <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

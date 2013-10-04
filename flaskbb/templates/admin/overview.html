@@ -1,29 +1,29 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-<table class="table">
+<table class="table table-bordered">
     <thead>
-        <tr class="success">
+        <tr>
             <th colspan="4">Global Statistics</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td><b>FlaskBB Version</b></td>
-            <td>0.1-dev</td>
+            <td>{{ flaskbb_version }}</td>
             <td><b>Posts</b></td>
-            <td>--</td>
+            <td>{{ post_count }}</td>
         </tr>
         <tr>
             <td><b>Python Version</b></td>
-            <td>2.7.5</td>
+            <td>{{ python_version }}</td>
             <td><b>Topics</b></td>
-            <td>--</td>
+            <td>{{ topic_count }}</td>
         </tr>
         <tr>
             <td><b>Flask Version</b></td>
-            <td>0.10.1</td>
-            <td><b>User</b></td>
-            <td>--</td>
+            <td>{{ flask_version }}</td>
+            <td><b>Users</b></td>
+            <td>{{ user_count }}</td>
         </tr>
     </tbody>
 </table>
