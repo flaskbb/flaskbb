@@ -57,7 +57,7 @@ def createall():
     """
 
     # Just for testing purposes
-    dbfile = os.path.join(BaseConfig._basedir, "flaskbb.sqlite")
+    dbfile = os.path.join(Config._basedir, "flaskbb.sqlite")
     if os.path.exists(dbfile):
         print "Removing old database file..."
         os.remove(dbfile)
@@ -66,95 +66,95 @@ def createall():
 
     groups = OrderedDict((
         ('Administrator', {
-             'description': 'The Administrator Group',
-             'admin': True,
-             'super_mod': False,
-             'mod': False,
-             'banned': False,
-             'guest': False,
-             'editpost': True,
-             'deletepost': True,
-             'deletetopic': True,
-             'posttopic': True,
-             'postreply': True,
-             'viewtopic': True,
-             'viewprofile': True
-             }),
+            'description': 'The Administrator Group',
+            'admin': True,
+            'super_mod': False,
+            'mod': False,
+            'banned': False,
+            'guest': False,
+            'editpost': True,
+            'deletepost': True,
+            'deletetopic': True,
+            'posttopic': True,
+            'postreply': True,
+            'viewtopic': True,
+            'viewprofile': True
+        }),
         ('Super Moderator', {
-             'description': 'The Super Moderator Group',
-             'admin': False,
-             'super_mod': True,
-             'mod': False,
-             'banned': False,
-             'guest': False,
-             'editpost': True,
-             'deletepost': True,
-             'deletetopic': True,
-             'posttopic': True,
-             'postreply': True,
-             'viewtopic': True,
-             'viewprofiles': True
-             }),
+            'description': 'The Super Moderator Group',
+            'admin': False,
+            'super_mod': True,
+            'mod': False,
+            'banned': False,
+            'guest': False,
+            'editpost': True,
+            'deletepost': True,
+            'deletetopic': True,
+            'posttopic': True,
+            'postreply': True,
+            'viewtopic': True,
+            'viewprofiles': True
+        }),
         ('Moderator', {
-             'description': 'The Moderator Group',
-             'admin': False,
-             'super_mod': False,
-             'mod': True,
-             'banned': False,
-             'guest': False,
-             'editpost': True,
-             'deletepost': True,
-             'deletetopic': True,
-             'posttopic': True,
-             'postreply': True,
-             'viewtopic': True,
-             'viewprofile': True
-             }),
+            'description': 'The Moderator Group',
+            'admin': False,
+            'super_mod': False,
+            'mod': True,
+            'banned': False,
+            'guest': False,
+            'editpost': True,
+            'deletepost': True,
+            'deletetopic': True,
+            'posttopic': True,
+            'postreply': True,
+            'viewtopic': True,
+            'viewprofile': True
+        }),
         ('Member', {
-             'description': 'The Member Group',
-             'admin': False,
-             'super_mod': False,
-             'mod': False,
-             'banned': False,
-             'guest': False,
-             'editpost': True,
-             'deletepost': False,
-             'deletetopic': False,
-             'posttopic': True,
-             'postreply': True,
-             'viewtopic': True,
-             'viewprofile': True
-             }),
+            'description': 'The Member Group',
+            'admin': False,
+            'super_mod': False,
+            'mod': False,
+            'banned': False,
+            'guest': False,
+            'editpost': True,
+            'deletepost': False,
+            'deletetopic': False,
+            'posttopic': True,
+            'postreply': True,
+            'viewtopic': True,
+            'viewprofile': True
+        }),
         ('Banned', {
-             'description': 'The Banned Group',
-             'admin': False,
-             'super_mod': False,
-             'mod': False,
-             'banned': True,
-             'guest': False,
-             'editpost': False,
-             'deletepost': False,
-             'deletetopic': False,
-             'posttopic': False,
-             'postreply': False,
-             'viewtopic': False,
-             'viewprofile': False
-             }),
+            'description': 'The Banned Group',
+            'admin': False,
+            'super_mod': False,
+            'mod': False,
+            'banned': True,
+            'guest': False,
+            'editpost': False,
+            'deletepost': False,
+            'deletetopic': False,
+            'posttopic': False,
+            'postreply': False,
+            'viewtopic': False,
+            'viewprofile': False
+        }),
         ('Guest', {
-             'description': 'The Guest Group',
-             'admin': False,
-             'super_mod': False,
-             'mod': False,
-             'banned': False,
-             'guest': True,
-             'editpost': False,
-             'deletepost': False,
-             'deletetopic': False,
-             'posttopic': False,
-             'postreply': False,
-             'viewtopic': False,
-             'viewprofile': False
-             })
+            'description': 'The Guest Group',
+            'admin': False,
+            'super_mod': False,
+            'mod': False,
+            'banned': False,
+            'guest': True,
+            'editpost': False,
+            'deletepost': False,
+            'deletetopic': False,
+            'posttopic': False,
+            'postreply': False,
+            'viewtopic': False,
+            'viewprofile': False
+        })
     ))
 
     # create 5 groups
@@ -180,7 +180,8 @@ def createall():
     # create 2 categories
     for i in range(1, 3):
         category_title = "Test Category %s" % i
-        category = Category(title=category_title, description="Test Description")
+        category = Category(title=category_title,
+                            description="Test Description")
         db.session.add(category)
 
         # create 2 forums in each category

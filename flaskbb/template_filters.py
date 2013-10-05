@@ -1,17 +1,21 @@
 from flask import current_app
 from flaskbb.helpers import time_diff, time_delta_format, check_perm
 
+
 def format_date(value, format='%Y-%m-%d'):
     """
     Returns a formatted time string
     """
     return value.strftime(format)
 
+
 def time_since(value):
     return time_delta_format(value)
 
+
 def is_online(user):
     return user.lastseen >= time_diff()
+
 
 def is_current_user(user, post):
     """
@@ -19,11 +23,13 @@ def is_current_user(user, post):
     """
     return post.user_id == user.id
 
+
 def edit_post(user, post, forum):
     """
     Check if the post can be edited by the user
     """
     return check_perm(user, 'deletepost', forum, post.user_id)
+
 
 def delete_post(user, post, forum):
     """

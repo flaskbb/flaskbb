@@ -21,8 +21,8 @@ from flaskbb.pms.models import PrivateMessage
 
 
 groups_users = db.Table('groups_users',
-        db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-        db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
 
 class Group(db.Model):
@@ -43,6 +43,16 @@ class Group(db.Model):
     deletetopic = db.Column(db.Boolean)
     posttopic = db.Column(db.Boolean)
     postreply = db.Column(db.Boolean)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
 
 
 class User(db.Model, UserMixin):
@@ -179,6 +189,14 @@ class User(db.Model, UserMixin):
         """
         if not self.in_group(group):
             self.groups.append(group)
+            return self
+
+    def remove_from_group(self, group):
+        """
+        Removes the user from the `group` if he is in it.
+        """
+        if self.in_group(group):
+            self.groups.pop(group)
             return self
 
     def in_group(self, group):

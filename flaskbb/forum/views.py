@@ -111,7 +111,7 @@ def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
     if not check_perm(current_user, 'posttopic', forum):
-        flash("You do not have the permissions to create a new topic.")
+        flash("You do not have the permissions to create a new topic.", "error")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
     form = NewTopicForm()
@@ -129,7 +129,7 @@ def delete_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
     if not check_perm(current_user, 'deletetopic', topic.forum):
-        flash("You do not have the permissions to delete the topic")
+        flash("You do not have the permissions to delete the topic", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     involved_users = User.query.filter(Post.topic_id == topic.id,
@@ -144,11 +144,11 @@ def new_post(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
     if topic.locked:
-        flash("The topic is locked.")
+        flash("The topic is locked.", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     if not check_perm(current_user, 'postreply', topic.forum):
-        flash("You do not have the permissions to delete the topic")
+        flash("You do not have the permissions to delete the topic", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     form = ReplyForm()
@@ -166,7 +166,7 @@ def edit_post(post_id):
 
     if not check_perm(current_user, 'editpost', post.topic.forum,
         post.user_id):
-        flash("You do not have the permissions to edit this post")
+        flash("You do not have the permissions to edit this post", "error")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
     form = ReplyForm(obj=post)
@@ -188,7 +188,7 @@ def delete_post(post_id):
 
     if not check_perm(current_user, 'deletepost', post.topic.forum,
         post.user_id):
-        flash("You do not have the permissions to edit this post")
+        flash("You do not have the permissions to edit this post", "error")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
     topic_id = post.topic_id

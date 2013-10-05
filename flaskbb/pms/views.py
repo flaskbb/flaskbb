@@ -85,6 +85,7 @@ def new_message():
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=current_user.id,
+                      unread=True,
                       as_draft=True)
 
             flash("Message saved!", "success")
@@ -96,12 +97,14 @@ def new_message():
             # Save the message in the current users inbox
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
-                      user_id=current_user.id)
+                      user_id=current_user.id,
+                      unread=False)
 
             # Save the message in the recievers inbox
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
-                      user_id=to_user.id)
+                      user_id=to_user.id,
+                      unread=True)
 
             flash("Message sent!", "success")
             return redirect(url_for("pms.sent"))

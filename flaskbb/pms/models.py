@@ -27,8 +27,10 @@ class PrivateMessage(db.Model):
     draft = db.Column(db.Boolean, nullable=False, default=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
 
-    user = db.relationship("User", backref="pms", lazy="joined", foreign_keys=[user_id])
-    from_user = db.relationship("User", lazy="joined", foreign_keys=[from_user_id])
+    user = db.relationship("User", backref="pms", lazy="joined",
+                           foreign_keys=[user_id])
+    from_user = db.relationship("User", lazy="joined",
+                                foreign_keys=[from_user_id])
     to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
 
     def save(self, from_user=None, to_user=None, user_id=None, draft=False):
@@ -41,9 +43,9 @@ class PrivateMessage(db.Model):
             self.draft = True
 
         # Add the message to the user's pm box
-        self.user_id=user_id
-        self.from_user_id=from_user
-        self.to_user_id=to_user
+        self.user_id = user_id
+        self.from_user_id = from_user
+        self.to_user_id = to_user
 
         db.session.add(self)
         db.session.commit()

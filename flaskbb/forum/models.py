@@ -13,11 +13,14 @@ from datetime import datetime
 from flaskbb.extensions import db
 from flaskbb.helpers import DenormalizedText
 
+
 class Post(db.Model):
     __tablename__ = "posts"
 
     id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id", use_alter=True, name="fk_topic_id", ondelete="CASCADE"))
+    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id", use_alter=True,
+                                                   name="fk_topic_id",
+                                                   ondelete="CASCADE"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     content = db.Column(db.Text)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
@@ -82,7 +85,8 @@ class Topic(db.Model):
     __tablename__ = "topics"
 
     id = db.Column(db.Integer, primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id", use_alter=True, name="fk_forum_id"))
+    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id", use_alter=True,
+                                                   name="fk_forum_id"))
     title = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
@@ -92,15 +96,22 @@ class Topic(db.Model):
     post_count = db.Column(db.Integer, default=0)
 
     # One-to-one (uselist=False) relationship between first_post and topic
-    first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id", ondelete="CASCADE"))
-    first_post = db.relationship("Post", backref="first_post", uselist=False, foreign_keys=[first_post_id])
+    first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
+                                                        ondelete="CASCADE"))
+    first_post = db.relationship("Post", backref="first_post", uselist=False,
+                                 foreign_keys=[first_post_id])
 
     # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id", ondelete="CASCADE", onupdate="CASCADE"))
-    last_post = db.relationship("Post", backref="last_post", uselist=False, foreign_keys=[last_post_id])
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
+                                                       ondelete="CASCADE",
+                                                       onupdate="CASCADE"))
+    last_post = db.relationship("Post", backref="last_post", uselist=False,
+                                foreign_keys=[last_post_id])
 
     # One-to-many
-    posts = db.relationship("Post", backref="topic", lazy="joined", primaryjoin="Post.topic_id == Topic.id", cascade="all, delete-orphan", post_update=True)
+    posts = db.relationship("Post", backref="topic", lazy="joined",
+                            primaryjoin="Post.topic_id == Topic.id",
+                            cascade="all, delete-orphan", post_update=True)
 
     def __init__(self, title=None):
         if title:
@@ -161,12 +172,18 @@ class Topic(db.Model):
 
         # Update the post counts
         if users:
-            # If someone knows a better method for this, feel free to improve it :)
+            # If someone knows a better method for this,
+            # feel free to improve it :)
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
                 db.session.commit()
-        forum.topic_count = Topic.query.filter_by(forum_id=self.forum_id).count()
-        forum.post_count = Post.query.filter(Post.topic_id == Topic.id, Topic.forum_id == self.forum_id).count()
+        forum.topic_count = Topic.query.filter_by(
+            forum_id=self.forum_id).count()
+
+        forum.post_count = Post.query.filter(
+            Post.topic_id == Topic.id,
+            Topic.forum_id == self.forum_id).count()
+
         db.session.commit()
 
         return self
@@ -179,13 +196,16 @@ class Forum(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     position = db.Column(db.Integer, default=0)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id", use_alter=True, name="fk_category_id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id",
+                                                      use_alter=True,
+                                                      name="fk_category_id"))
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
-    last_post = db.relationship("Post", backref="last_post_forum", uselist=False, foreign_keys=[last_post_id])
+    last_post = db.relationship("Post", backref="last_post_forum",
+                                uselist=False, foreign_keys=[last_post_id])
 
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")
@@ -198,6 +218,17 @@ class Forum(db.Model):
     def remove_moderator(self, user_id):
         self.moderators.remove(user_id)
 
+    def save(self, category):
+        self.category_id = category.id
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -208,4 +239,15 @@ class Category(db.Model):
     position = db.Column(db.Integer, default=0)
 
     # One-to-many
-    forums = db.relationship("Forum", backref="category", lazy="joined", primaryjoin="Forum.category_id == Category.id")
+    forums = db.relationship("Forum", backref="category", lazy="joined",
+                             primaryjoin="Forum.category_id == Category.id")
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self

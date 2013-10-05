@@ -43,7 +43,7 @@ class RegisterForm(Form):
     password = PasswordField("Password", validators=[
         Required(message="Password required")])
 
-    confirm_password = PasswordField("Confirm Password", [
+    confirm_password = PasswordField("Confirm Password", validators=[
         Required(message="Confirm Password required"),
         EqualTo("password", message="Passwords do not match")])
 
@@ -72,7 +72,7 @@ class ReauthForm(Form):
 
 
 class ForgotPasswordForm(Form):
-    email = TextField('Email', validators = [
+    email = TextField('Email', validators=[
         Required(message="Email reguired"),
         Email()])
 
@@ -80,16 +80,16 @@ class ForgotPasswordForm(Form):
 class ResetPasswordForm(Form):
     token = HiddenField('Token')
 
-    email = TextField('Email', validators = [
+    email = TextField('Email', validators=[
         Required(),
         Email()])
 
-    password = PasswordField('Password', validators = [
+    password = PasswordField('Password', validators=[
         Required()])
 
-    confirm_password = PasswordField('Confirm password', validators = [
+    confirm_password = PasswordField('Confirm password', validators=[
         Required(),
-        EqualTo('password', message = 'Passwords must match')])
+        EqualTo('password', message='Passwords must match')])
 
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()

@@ -1,7 +1,81 @@
-{%- macro inline_field(field, label_text='') -%}
+{%- macro field_label(field) -%}
+    <label for="{{ field.id }}">{{ field.label.text }}</label>
+{% endmacro %}
+
+
+{%- macro field_description(field) -%}
+    {% if field.description %}
+        <p class="help-block">{{ field.description }}</p>
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro field_errors(field) -%}
+    {% if field.errors %}
+        {%- for error in field.errors -%}
+        <span class="help-block">{{error}}</span>
+        {%- endfor -%}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_boolean_field(field, inline=False) -%}
+<label class="checkbox {%- if inline -%}inline{%- endif -%}">
+    {{ field(**kwargs) }}
+    {{ field_label(field) }}
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+</label>
+{%- endmacro -%}
+
+{%- macro render_select_field(field, div_class='') -%}
+<div class="form-group">
+    {% if div_class %}
+    <div class="{{ div_class }}">
+    {% else %}
+    <div class="col-lg-5">
+    {% endif %}
+        <label>{{ field.label.text }}</label>
+        {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
+            {{ field(multiple=True, class="form-control") }}
+        {% else %}
+            {{ field(class="form-control") }}
+        {%- endif -%}
+    </div>
+</div>
+{%- endmacro -%}
+
+{%- macro render_field(field, div_class='', rows='') -%}
+<div class="form-group">
+    {% if div_class %}
+    <div class="{{ div_class }}">
+    {% else %}
+    <div class="col-lg-5">
+    {% endif %}
+        <label>{{ field.label.text }}</label>
+        {%- if kwargs['required'] or field.flags.required -%}
+            {% if rows %}
+                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text) }}
+            {% else %}
+                {{ field(class="form-control", required="required", placeholder=field.label.text) }}
+            {% endif %}
+        {%- else -%}
+            {% if rows %}
+                {{ field(class="form-control", rows=rows, placeholder=field.label.text) }}
+            {% else %}
+                {{ field(class="form-control", placeholder=field.label.text) }}
+            {% endif %}
+        {%- endif -%}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro inline_field(field, label_text='', label_class='') -%}
 <div class="form-group {%- if field.errors %} has-error{%- endif %}">
     {{field.label(class="sr-only")}}
 
+    <div class="col-lg-4">
     {%- if kwargs['required'] or field.flags.required -%}
         {% if label_text %}
             {{field(class='form-control', placeholder=label_text, required="required", **kwargs)}}
@@ -23,6 +97,7 @@
     {%- elif field.description -%}
         <span class="help-block">{{field.description|safe}}</span>
     {%- endif %}
+    </div>
 </div>
 {%- endmacro -%}
 
@@ -61,60 +136,6 @@
 
     </div>
 </div>
-{%- endmacro -%}
-
-
-{# See https://gist.github.com/ligthyear/1284631 #}
-{%- macro form_field_label(field) -%}
-    <label for="{{ field.id }}">{{ field.label.text }}</label>
-{% endmacro %}
-
-
-{%- macro form_field_description(field) -%}
-    {% if field.description %}
-        <span class="help-block">{{ field.description }}</span>
-    {% endif %}
-{%- endmacro -%}
-
-
-{%- macro form_field_errors(field) -%}
-    {% if field.errors %}
-        {%- for error in field.errors -%}
-        <span class="label label-important">{{ error }}</span>
-        {%- endfor -%}
-    {% endif %}
-{%- endmacro -%}
-
-
-{%- macro form_field_boolean(field, inline=False) -%}
-    <label class="checkbox {%- if inline -%}inline{%- endif -%}">
-            {{ field(**kwargs) }}
-            {{ field.label.text }}
-            {{ form_field_description(field) }}
-            {{ form_field_errors(field) }}
-    </label>
-{%- endmacro -%}
-
-
-{%- macro form_field(field) -%}
-    {% if field.type == 'HiddenField' %}
-        {{ field() }}
-    {% else %}
-        {% if field.type == 'BooleanField' %}
-            {{ form_field_boolean(field, **kwargs) }}
-        {% else%}
-            {{ form_field_label(field) }}
-            <div class="input" id="{{field.id}}">
-            {% if field.type == 'RadioField' %}
-                {{ field(class='radio', **kwargs) }}
-            {% else %}
-                {{ field(**kwargs) }}
-            {% endif %}
-            {{ form_field_description(field) }}
-            {{ form_field_errors(field) }}
-            </div>
-        {% endif %}
-    {% endif %}
 {%- endmacro -%}
 
 

@@ -33,10 +33,11 @@ class NewMessage(Form):
         if user.id == current_user.id:
             raise ValidationError("You cannot send a PM to yourself.")
 
-    def save(self, from_user, to_user, user_id, as_draft=False):
+    def save(self, from_user, to_user, user_id, unread, as_draft=False):
         message = PrivateMessage(
             subject=self.subject.data,
-            message=self.message.data)
+            message=self.message.data,
+            unread=unread)
 
         if as_draft:
             return message.save(from_user, to_user, user_id, draft=True)

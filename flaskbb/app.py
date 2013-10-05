@@ -28,10 +28,11 @@ from flaskbb.pms.views import pms
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import *
 
-from flaskbb.extensions import db, login_manager, mail, cache #toolbar
+from flaskbb.extensions import db, login_manager, mail, cache
 
 from flaskbb.template_filters import (format_date, time_since, is_online,
-    edit_post, delete_post, delete_topic, post_reply, crop_title)
+                                      edit_post, delete_post, delete_topic,
+                                      post_reply, crop_title)
 
 DEFAULT_BLUEPRINTS = (
     (forum, ""),
@@ -134,6 +135,7 @@ def configure_template_filters(app):
     app.jinja_env.filters['delete_topic'] = delete_topic
     app.jinja_env.filters['post_reply'] = post_reply
     app.jinja_env.filters['crop_title'] = crop_title
+
 
 def configure_before_handlers(app):
     """
