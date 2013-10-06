@@ -24,6 +24,7 @@ from flaskbb.auth.views import auth
 from flaskbb.admin.views import admin
 # Import the PM blueprint
 from flaskbb.pms.views import pms
+from flaskbb.pms.models import PrivateMessage
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import *
@@ -107,9 +108,14 @@ def configure_extensions(app):
         """
         Loads the user. Required by the `login` extension
         """
-        # TODO: Also load the permissions and
-        # the unread pm count with 1 big query
-        return User.query.get(id)
+        unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
+            filter(PrivateMessage.unread == True,
+                   PrivateMessage.user_id == id).subquery()
+        u = db.session.query(User, unread_count).filter(User.id == id).first()
+
+        user, user.pm_unread = u
+
+        return user
 
     login_manager.init_app(app)
 

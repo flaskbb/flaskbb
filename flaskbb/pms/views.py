@@ -85,7 +85,7 @@ def new_message():
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=current_user.id,
-                      unread=True,
+                      unread=False,
                       as_draft=True)
 
             flash("Message saved!", "success")

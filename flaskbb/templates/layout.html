@@ -61,7 +61,7 @@
 
                         <div class="btn-group navbar-btn navbar-right">
                             <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="glyphicon glyphicon-envelope"></span> <span class="badge">{{ current_user.unread_count }}</span>
+                                <span class="glyphicon glyphicon-envelope"></span> <span class="badge">{{ current_user.pm_unread }}</span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{ url_for('pms.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
