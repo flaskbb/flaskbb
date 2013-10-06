@@ -169,7 +169,7 @@ def edit_post(post_id):
         flash("You do not have the permissions to edit this post", "error")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
-    form = ReplyForm(obj=post)
+    form = ReplyForm()
     if form.validate_on_submit():
         form.populate_obj(post)
         post.date_modified = datetime.datetime.utcnow()

@@ -5,7 +5,7 @@
 
 {%- macro field_description(field) -%}
     {% if field.description %}
-        <p class="help-block">{{ field.description }}</p>
+        <span class="help-block">{{ field.description|safe }}</span>
     {% endif %}
 {%- endmacro -%}
 
@@ -41,12 +41,15 @@
         {% else %}
             {{ field(class="form-control") }}
         {%- endif -%}
+
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
     </div>
 </div>
 {%- endmacro -%}
 
 {%- macro render_field(field, div_class='', rows='') -%}
-<div class="form-group">
+<div class="form-group{%- if field.errors %} has-error{%- endif %}">
     {% if div_class %}
     <div class="{{ div_class }}">
     {% else %}
@@ -66,6 +69,9 @@
                 {{ field(class="form-control", placeholder=field.label.text) }}
             {% endif %}
         {%- endif -%}
+
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
     </div>
 </div>
 {%- endmacro -%}
@@ -89,14 +95,8 @@
             {{field(class='form-control', placeholder=field.label.text, **kwargs)}}
         {% endif %}
     {%- endif -%}
-
-    {%- if field.errors %}
-        {%- for error in field.errors %}
-            <span class="help-block">{{error}}</span>
-        {%- endfor %}
-    {%- elif field.description -%}
-        <span class="help-block">{{field.description|safe}}</span>
-    {%- endif %}
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
     </div>
 </div>
 {%- endmacro -%}
@@ -126,14 +126,8 @@
         {% endif %}
     {%- endif -%}
 
-    {%- if field.errors %}
-        {%- for error in field.errors %}
-            <span class="help-block">{{error}}</span>
-        {%- endfor %}
-    {%- elif field.description -%}
-            <span class="help-block">{{field.description|safe}}</span>
-    {%- endif %}
-
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
     </div>
 </div>
 {%- endmacro -%}
