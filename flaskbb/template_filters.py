@@ -28,7 +28,7 @@ def edit_post(user, post, forum):
     """
     Check if the post can be edited by the user
     """
-    return check_perm(user, 'deletepost', forum, post.user_id)
+    return check_perm(user, 'editpost', forum, post.user_id)
 
 
 def delete_post(user, post, forum):
