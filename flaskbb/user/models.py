@@ -31,17 +31,17 @@ class Group(db.Model):
     name = db.Column(db.String, unique=True)
     description = db.Column(db.String(80))
 
-    admin = db.Column(db.Boolean)
-    super_mod = db.Column(db.Boolean)
-    mod = db.Column(db.Boolean)
-    guest = db.Column(db.Boolean)
-    banned = db.Column(db.Boolean)
+    admin = db.Column(db.Boolean, default=False)
+    super_mod = db.Column(db.Boolean, default=False)
+    mod = db.Column(db.Boolean, default=False)
+    guest = db.Column(db.Boolean, default=False)
+    banned = db.Column(db.Boolean, default=False)
 
-    editpost = db.Column(db.Boolean)
-    deletepost = db.Column(db.Boolean)
-    deletetopic = db.Column(db.Boolean)
-    posttopic = db.Column(db.Boolean)
-    postreply = db.Column(db.Boolean)
+    editpost = db.Column(db.Boolean, default=True)
+    deletepost = db.Column(db.Boolean, default=False)
+    deletetopic = db.Column(db.Boolean, default=False)
+    posttopic = db.Column(db.Boolean, default=True)
+    postreply = db.Column(db.Boolean, default=True)
 
     def save(self):
         db.session.add(self)
@@ -265,8 +265,15 @@ class User(db.Model, UserMixin):
 
     def save(self, groups=None):
         if groups:
+            # TODO: Only remove/add groups that are selected
+            all_groups = self.groups.all()
+            if all_groups:
+                for group in all_groups:
+                    self.groups.remove(group)
+                db.session.commit()
+
             for group in groups:
-                self.add_to_group(group)
+                self.groups.append(group)
         db.session.add(self)
         db.session.commit()
         return self

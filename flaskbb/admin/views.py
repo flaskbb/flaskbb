@@ -77,7 +77,9 @@ def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first()
 
     secondary_group_query = Group.query.filter(
-        db.not_(Group.id == user.primary_group_id))
+        db.not_(Group.id == user.primary_group_id),
+        db.not_(Group.banned == True),
+        db.not_(Group.guest == True))
 
     form = UserForm(user)
     form.secondary_groups.query = secondary_group_query
@@ -112,8 +114,7 @@ def edit_user(user_id):
         form.avatar.data = user.avatar
         form.notes.data = user.notes
         form.primary_group.data = user.primary_group
-        if
-        form.secondary_groups.query = secondary_group_query
+        form.secondary_groups.data = user.groups
 
     return render_template("admin/edit_user.html", form=form)
 

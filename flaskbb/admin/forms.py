@@ -13,8 +13,8 @@ from datetime import datetime
 from flask.ext.wtf import Form
 from wtforms import (TextField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField)
-from wtforms.validators import (Required, Optional, Email, EqualTo, regexp,
-                                ValidationError, URL, Length)
+from wtforms.validators import (Required, Optional, Email, regexp, Length, URL,
+                                ValidationError)
 
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
@@ -34,7 +34,7 @@ def selectable_categories():
 
 
 def select_primary_group():
-    return Group.query.order_by(Group.id)
+    return Group.query.filter(Group.guest == False).order_by(Group.id)
 
 
 class UserForm(Form):
