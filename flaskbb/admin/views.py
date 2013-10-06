@@ -114,7 +114,7 @@ def edit_user(user_id):
         form.avatar.data = user.avatar
         form.notes.data = user.notes
         form.primary_group.data = user.primary_group
-        form.secondary_groups.data = user.groups
+        form.secondary_groups.data = user.secondary_groups
 
     return render_template("admin/edit_user.html", form=form)
 

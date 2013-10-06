@@ -31,6 +31,7 @@ class Group(db.Model):
     name = db.Column(db.String, unique=True)
     description = db.Column(db.String(80))
 
+    # I bet there is a nicer way for this :P
     admin = db.Column(db.Boolean, default=False)
     super_mod = db.Column(db.Boolean, default=False)
     mod = db.Column(db.Boolean, default=False)
@@ -82,11 +83,12 @@ class User(db.Model, UserMixin):
                                     backref="user_group", uselist=False,
                                     foreign_keys=[primary_group_id])
 
-    groups = db.relationship('Group',
-                             secondary=groups_users,
-                             primaryjoin=(groups_users.c.user_id == id),
-                             backref=db.backref('users', lazy='dynamic'),
-                             lazy='dynamic')
+    secondary_groups = \
+        db.relationship('Group',
+                        secondary=groups_users,
+                        primaryjoin=(groups_users.c.user_id == id),
+                        backref=db.backref('users', lazy='dynamic'),
+                        lazy='dynamic')
 
     def __repr__(self):
         return "Username: %s" % self.username
@@ -180,7 +182,7 @@ class User(db.Model, UserMixin):
         Adds the user to the `group` if he isn't in it.
         """
         if not self.in_group(group):
-            self.groups.append(group)
+            self.secondary_groups.append(group)
             return self
 
     def remove_from_group(self, group):
@@ -188,14 +190,14 @@ class User(db.Model, UserMixin):
         Removes the user from the `group` if he is in it.
         """
         if self.in_group(group):
-            self.groups.pop(group)
+            self.secondary_groups.remove(group)
             return self
 
     def in_group(self, group):
         """
         Returns True if the user is in the specified group
         """
-        return self.groups.filter(
+        return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
     @cache.memoize(60*5)
@@ -208,7 +210,7 @@ class User(db.Model, UserMixin):
 
         perms = {}
         # Iterate over all groups
-        for group in self.groups.all():
+        for group in self.secondary_groups.all():
             for c in group.__table__.columns:
                 # try if the permission already exists in the dictionary
                 # and if the permission is true, set it to True
@@ -266,14 +268,14 @@ class User(db.Model, UserMixin):
     def save(self, groups=None):
         if groups:
             # TODO: Only remove/add groups that are selected
-            all_groups = self.groups.all()
+            all_groups = self.secondary_groups.all()
             if all_groups:
                 for group in all_groups:
-                    self.groups.remove(group)
+                    self.secondary_groups.remove(group)
                 db.session.commit()
 
             for group in groups:
-                self.groups.append(group)
+                self.secondary_groups.append(group)
         db.session.add(self)
         db.session.commit()
         return self
