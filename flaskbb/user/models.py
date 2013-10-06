@@ -63,7 +63,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, unique=True)
     _password = db.Column('password', db.String(80), nullable=False)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow())
-    post_count = db.Column(db.Integer, default=0)
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
     gender = db.Column(db.String)
@@ -71,30 +70,24 @@ class User(db.Model, UserMixin):
     location = db.Column(db.String)
     signature = db.Column(db.String)
     avatar = db.Column(db.String)
-    notes = db.Column(db.Text(5000), default="User has not added any notes about him.")
+    notes = db.Column(db.Text(5000))
 
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
 
-    post_count = db.Column(db.Integer, default=0) # Bye bye normalization
+    post_count = db.Column(db.Integer, default=0)
 
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
-    primary_group = db.relationship('Group', lazy="joined", backref="user_group", uselist=False, foreign_keys=[primary_group_id])
-
-    #pms = db.relationship("PrivateMessage", lazy="dynamic", primaryjoin=(PrivateMessage.user_id == id))
+    primary_group = db.relationship('Group', lazy="joined",
+                                    backref="user_group", uselist=False,
+                                    foreign_keys=[primary_group_id])
 
     groups = db.relationship('Group',
                              secondary=groups_users,
                              primaryjoin=(groups_users.c.user_id == id),
                              backref=db.backref('users', lazy='dynamic'),
                              lazy='dynamic')
-
-    unread_count = db.column_property(
-        db.select([db.func.count(PrivateMessage.id)]).\
-            where(PrivateMessage.user_id == id).\
-            where(PrivateMessage.unread == True).correlate("privatemessages").\
-            as_scalar())
 
     def __repr__(self):
         return "Username: %s" % self.username
