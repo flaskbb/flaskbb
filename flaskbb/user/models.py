@@ -17,7 +17,6 @@ from flask import current_app
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
 from flaskbb.forum.models import Post, Topic
-from flaskbb.pms.models import PrivateMessage
 
 
 groups_users = db.Table('groups_users',
@@ -212,10 +211,11 @@ class User(db.Model, UserMixin):
         for group in self.groups.all():
             for c in group.__table__.columns:
                 # try if the permission already exists in the dictionary
-                # and if the permission is true, go to the next permission
+                # and if the permission is true, set it to True
                 try:
-                    if perms[c.name]:
-                        continue
+                    if not perms[c.name] and getattr(group, c.name):
+                        perms[c.name] = True
+
                 # if the permission doesn't exist in the dictionary
                 # add it to the dictionary
                 except KeyError:
@@ -263,7 +263,10 @@ class User(db.Model, UserMixin):
                 return False
         return True
 
-    def save(self):
+    def save(self, groups=None):
+        if groups:
+            for group in groups:
+                self.add_to_group(group)
         db.session.add(self)
         db.session.commit()
         return self

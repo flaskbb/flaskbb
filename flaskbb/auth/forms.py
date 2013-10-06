@@ -65,6 +65,7 @@ class RegisterForm(Form):
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
                     primary_group=4)
+        user.groups.append(4)
         return user.save()
 
 

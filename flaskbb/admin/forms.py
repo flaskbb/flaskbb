@@ -20,6 +20,7 @@ from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
 
 from flaskbb.helpers import SelectDateWidget
+from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import User, Group
 
@@ -36,21 +37,17 @@ def select_primary_group():
     return Group.query.order_by(Group.id)
 
 
-def select_secondary_groups():
-    return Group.query.order_by(Group.id)
-
-
 class UserForm(Form):
     username = TextField("Username", validators=[
-        Required(message="Username required"),
+        Optional(),
         is_username])
 
     email = TextField("E-Mail", validators=[
-        Required(message="Email adress required"),
+        Optional(),
         Email(message="This email is invalid")])
 
     password = PasswordField("Password", validators=[
-        Required(message="Password required")])
+        Optional()])
 
     birthday = DateField("Birthday", format="%d %m %Y",
                          widget=SelectDateWidget(),
@@ -80,23 +77,30 @@ class UserForm(Form):
                                      query_factory=select_primary_group,
                                      get_label="name")
 
-    #secondary_groups = QuerySelectMultipleField(
-    #    "Secondary Groups", query_factory=select_secondary_groups,
-    #    allow_blank=True, get_label="name")
+    secondary_groups = QuerySelectMultipleField(
+        "Secondary Groups", allow_blank=True, get_label="name")
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        kwargs['obj'] = self.user
+        super(UserForm, self).__init__(*args, **kwargs)
 
     def validate_username(self, field):
-        user = User.query.filter_by(username=field.data).first()
+        user = User.query.filter(db.and_(
+                                 User.username.like(field.data),
+                                 db.not_(User.id == self.user.id))).first()
         if user:
             raise ValidationError("This username is taken")
 
     def validate_email(self, field):
-        email = User.query.filter_by(email=field.data).first()
-        if email:
+        user = User.query.filter(db.and_(
+                                 User.email.like(field.data),
+                                 db.not_(User.id == self.user.id))).first()
+        if user:
             raise ValidationError("This email is taken")
 
     def save(self):
-        user = User(date_joined=datetime.utcnow(),
-                    **self.data)
+        user = User(**self.data)
         return user.save()
 
 
@@ -141,12 +145,37 @@ class GroupForm(Form):
         group = Group(**self.data)
         return group.save()
 
+
+class EditGroupForm(GroupForm):
+    def __init__(self, group, *args, **kwargs):
+        self.group = group
+        kwargs['obj'] = self.group
+        super(GroupForm, self).__init__(*args, **kwargs)
+
     def validate_banned(self, field):
-        if Group.query.filter_by(banned=True).count >= 1:
+        group = Group.query.filter(
+            db.and_(Group.banned == True,
+                    db.not_(Group.id == self.group.id))).count()
+        if field.data and group > 0:
             raise ValidationError("There is already a Banned group")
 
     def validate_guest(self, field):
-        if Group.query.filter_by(guest=True).count() >= 1:
+        group = Group.query.filter(
+            db.and_(Group.guest == True,
+                    db.not_(Group.id == self.group.id))).count()
+        if field.data and group > 0:
+            raise ValidationError("There is already a Guest group")
+
+
+class AddGroupForm(GroupForm):
+    def validate_banned(self, field):
+        group = Group.query.filter_by(banned=True).count()
+        if field.data and group > 0:
+            raise ValidationError("There is already a Banned group")
+
+    def validate_guest(self, field):
+        group = Group.query.filter_by(guest=True).count()
+        if field.data and group > 0:
             raise ValidationError("There is already a Guest group")
 
 
@@ -164,9 +193,12 @@ class ForumForm(Form):
                                 query_factory=selectable_categories,
                                 get_label="title")
 
-    def save(self, category):
-        forum = Forum(**self.data)
-        return forum.save(category=category)
+    def save(self):
+        forum = Forum(title=self.title.data,
+                      description=self.description.data,
+                      position=self.position.data,
+                      category_id=self.category.data.id)
+        return forum.save()
 
 
 class CategoryForm(Form):

@@ -6,9 +6,10 @@ from flask import (Blueprint, render_template, current_app, request, redirect,
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.decorators import admin_required
+from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-from flaskbb.admin.forms import UserForm, GroupForm, ForumForm, CategoryForm
+from flaskbb.admin.forms import UserForm, AddGroupForm, EditGroupForm, ForumForm, CategoryForm
 
 
 admin = Blueprint("admin", __name__)
@@ -75,17 +76,34 @@ def forums():
 def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first()
 
-    form = UserForm()
+    secondary_group_query = Group.query.filter(
+        db.not_(Group.id == user.primary_group_id))
+
+    form = UserForm(user)
+    form.secondary_groups.query = secondary_group_query
     if form.validate_on_submit():
-        form.populate_obj(user)
-        user.save()
+        user.username = form.username.data
+        user.email = form.email.data
+        user.birthday = form.birthday.data
+        user.gender = form.gender.data
+        user.website = form.website.data
+        user.location = form.location.data
+        user.signature = form.signature.data
+        user.avatar = form.avatar.data
+        user.notes = form.notes.data
+        user.primary_group_id = form.primary_group.data.id
+
+       # Don't override the password
+        if form.password.data:
+            user.password = form.password.data
+
+        user.save(groups=form.secondary_groups.data)
 
         flash("User successfully edited", "success")
         return redirect(url_for("admin.edit_user", user_id=user.id))
     else:
         form.username.data = user.username
         form.email.data = user.email
-        form.password.data = user.password
         form.birthday.data = user.birthday
         form.gender.data = user.gender
         form.website.data = user.website
@@ -93,8 +111,9 @@ def edit_user(user_id):
         form.signature.data = user.signature
         form.avatar.data = user.avatar
         form.notes.data = user.notes
-        form.primary_group.data = user.primary_group_id
-        #form.secondary_groups.data = user.groups
+        form.primary_group.data = user.primary_group
+        if
+        form.secondary_groups.query = secondary_group_query
 
     return render_template("admin/edit_user.html", form=form)
 
@@ -125,13 +144,13 @@ def add_user():
 def edit_group(group_id):
     group = Group.query.filter_by(id=group_id).first()
 
-    form = GroupForm()
+    form = EditGroupForm(group)
     if form.validate_on_submit():
         form.populate_obj(group)
         group.save()
 
         flash("Group successfully edited.", "success")
-        return redirect(url_for("admin.edit_group", group_id=group.id))
+        return redirect(url_for("admin.groups", group_id=group.id))
     else:
         form.name.data = group.name
         form.description.data = group.description
@@ -161,7 +180,7 @@ def delete_group(group_id):
 @admin.route("/groups/add", methods=["GET", "POST"])
 @admin_required
 def add_group():
-    form = GroupForm()
+    form = AddGroupForm()
     if form.validate_on_submit():
         form.save()
         flash("Group successfully added.", "success")
@@ -177,7 +196,10 @@ def edit_forum(forum_id):
 
     form = ForumForm()
     if form.validate_on_submit():
-        form.populate_obj(forum)
+        forum.title = form.title.data
+        forum.description = form.description.data
+        forum.position = form.position.data
+        forum.category_id = form.category.data.id
         forum.save()
 
         flash("Forum successfully edited.", "success")
@@ -186,7 +208,7 @@ def edit_forum(forum_id):
         form.title.data = forum.title
         form.description.data = forum.description
         form.position.data = forum.position
-        form.category.data = forum.category_id
+        form.category.data = forum.category
         #form.moderators.data = forum.moderators
 
     return render_template("admin/edit_forum.html", form=form)
