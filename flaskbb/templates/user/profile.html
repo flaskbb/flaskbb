@@ -30,7 +30,9 @@
 
           <td>
             {% if user.notes %}
+                {% autoescape false %}
                 {{ user.notes }}
+                {% endautoescape %}
             {% else %}
                 User has not added any notes about him.
             {% endif %}

@@ -83,13 +83,15 @@
         <tr>
             <td>
                 <div class="post_body" id="pid{{ post.id }}">
-                    {{ post.content }}
+                {% autoescape false %}
+                    {{ post.content|markup }}
                     <!-- Signaure Begin -->
                     {% if post.user.signature %}
                     <hr>
-                    {{ post.user.signature }}
+                    {{ post.user.signature|markup }}
                     {% endif %}
                     <!-- Signaure End -->
+                {% endautoescape %}
                 </div>
             </td>
         </tr>

@@ -10,8 +10,8 @@
     {{ horizontal_field(form.location)}}
     {{ horizontal_field(form.website)}}
     {{ horizontal_field(form.avatar)}}
-    {{ horizontal_field(form.signature)}}
-    {{ horizontal_field(form.notes)}}
+    {{ horizontal_field(form.signature, rows=5, div_class="col-lg-9")}}
+    {{ horizontal_field(form.notes, rows=12, div_class="col-lg-9")}}
 
     <div class="form-group">
         <div class="col-lg-offset-3 col-lg-9">

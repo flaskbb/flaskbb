@@ -24,7 +24,10 @@
                 <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
 
                 <div class="forum-description">
-                    {{ forum.description }}<br />
+                    {% autoescape false %}
+                    {{ forum.description|markup }}
+                    {% endautoescape %}
+                    <br />
                     <!--
                     <strong>Sub Forums:</strong> <a href="#" title="">Subforum 1</a>, <a href="#" title="">Subforum 2</a>
                      -->

@@ -173,7 +173,7 @@ def createall():
         username = "test%s" % u
         email = "test%s@example.org" % u
         user = User(username=username, password="test", email=email)
-        user.groups.append(groups[u-1])
+        user.secondary_groups.append(groups[u-1])
         user.primary_group_id = u
         db.session.add(user)
 

@@ -33,7 +33,7 @@ from flaskbb.extensions import db, login_manager, mail, cache
 
 from flaskbb.template_filters import (format_date, time_since, is_online,
                                       edit_post, delete_post, delete_topic,
-                                      post_reply, crop_title)
+                                      post_reply, crop_title, render_markup)
 
 DEFAULT_BLUEPRINTS = (
     (forum, ""),
@@ -133,6 +133,7 @@ def configure_template_filters(app):
     """
     Configures the template filters
     """
+    app.jinja_env.filters['markup'] = render_markup
     app.jinja_env.filters['format_date'] = format_date
     app.jinja_env.filters['time_since'] = time_since
     app.jinja_env.filters['is_online'] = is_online

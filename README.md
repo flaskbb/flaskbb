@@ -8,10 +8,10 @@ using the micro framework Flask.
 
 * A Bulletin Board like FluxBB, DjangoBB in Flask
 * Private Messages
-* **TODO:** Markdown and/or BBCode support
-* **TODO:** Group based permissions
+* Admin Interface
+* Group based permissions
+* BBCode support
 * **TODO:** Themes
-* **TODO:** Admin Interface
 
 
 ## DEPENDENCIES

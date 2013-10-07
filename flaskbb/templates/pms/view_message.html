@@ -35,7 +35,13 @@
         <tr>
             <td>
                 <div class="message_body" id="mid{{ message.id }}">
-                    {% if message.message %}{{ message.message }}{% else %}(No Message){% endif %}
+                    {% if message.message %}
+                        {% autoescape false %}
+                        {{ message.message|markup }}
+                        {% endautoescape %}
+                    {% else %}
+                        (No Message)
+                    {% endif %}
                 </div>
             </td>
         </tr>

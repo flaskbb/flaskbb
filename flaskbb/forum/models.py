@@ -218,8 +218,7 @@ class Forum(db.Model):
     def remove_moderator(self, user_id):
         self.moderators.remove(user_id)
 
-    def save(self, category):
-        self.category_id = category.id
+    def save(self):
         db.session.add(self)
         db.session.commit()
         return self

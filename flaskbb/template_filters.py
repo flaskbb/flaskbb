@@ -1,4 +1,6 @@
 from flask import current_app
+from postmarkup import render_bbcode
+
 from flaskbb.helpers import time_diff, time_delta_format, check_perm
 
 
@@ -7,6 +9,10 @@ def format_date(value, format='%Y-%m-%d'):
     Returns a formatted time string
     """
     return value.strftime(format)
+
+
+def render_markup(text):
+    return render_bbcode(text)
 
 
 def time_since(value):
