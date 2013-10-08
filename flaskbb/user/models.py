@@ -209,8 +209,9 @@ class User(db.Model, UserMixin):
         exclude.extend(['id', 'name', 'description'])
 
         perms = {}
-        # Iterate over all groups
-        for group in self.secondary_groups.all():
+        groups = self.secondary_groups.all()
+        groups.append(self.primary_group)
+        for group in groups:
             for c in group.__table__.columns:
                 # try if the permission already exists in the dictionary
                 # and if the permission is true, set it to True
@@ -228,60 +229,20 @@ class User(db.Model, UserMixin):
                     perms[c.name] = getattr(group, c.name)
         return perms
 
-    def has_perm(self, perm):
-        """
-        Returns True if the user has the specified permission.
-        """
-        permissions = self.get_permissions()
-        if permissions['admin'] or permissions['super_mod']:
-            return True
-
-        if permissions[perm]:
-            return True
-        return False
-
-    def has_one_perm(self, perms_list):
-        """
-        Returns True if the user has one of the provided permissions.
-        """
-        for perm in perms_list:
-            if self.has_perm(perm):
-                return True
-        return False
-
-    def has_perms(self, perms_list):
-        """
-        Returns True if the user has each of the specified permissions.
-        It is basically the same as has_perm but every permission in the
-        provided list needs to be True to return True.
-        """
-        # Iterate over the list with the permissions
-        for perm in perms_list:
-            if self.has_perm(perm):
-                # After checking the permission,
-                # we can remove the perm from the list
-                perms_list.remove(perm)
-            else:
-                return False
-        return True
-
     def save(self, groups=None):
         if groups:
             # TODO: Only remove/add groups that are selected
-            all_groups = self.secondary_groups.all()
-            if all_groups:
-                for group in all_groups:
-                    self.secondary_groups.remove(group)
-                db.session.commit()
+            secondary_groups = self.secondary_groups.all()
+            for group in secondary_groups:
+                self.remove_from_group(group)
+            db.session.commit()
 
             for group in groups:
-                self.secondary_groups.append(group)
+                # Do not add the primary group to the secondary groups
+                if group.id == self.primary_group_id:
+                    continue
+                self.add_to_group(group)
         db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        db.session.delete(self)
         db.session.commit()
         return self
 
@@ -299,54 +260,7 @@ class Guest(AnonymousUserMixin):
         # Get the Guest group
         group = Group.query.filter_by(guest=True).first()
         for c in group.__table__.columns:
-            # try if the permission already exists in the dictionary
-            # and if the permission is true, go to the next permission
-            try:
-                if perms[c.name]:
-                    continue
-            # if the permission doesn't exist in the dictionary
-            # add it to the dictionary
-            except KeyError:
-                # if the permission is in the exclude list,
-                # skip to the next permission
-                if c.name in exclude:
-                    continue
-                perms[c.name] = getattr(group, c.name)
+            if c.name in exclude:
+                continue
+            perms[c.name] = getattr(group, c.name)
         return perms
-
-    def has_perm(self, perm):
-        """
-        Returns True if the user has the specified permission.
-        """
-        group = Group.query.filter_by(guest=True).first()
-        if getattr(group, perm, True):
-            return True
-        return False
-
-    def has_one_perm(self, perms_list):
-        """
-        Returns True if the user has one of the provided permissions.
-        """
-        group = Group.query.filter_by(guest=True).first()
-        for perm in perms_list:
-            if getattr(group, perm, True):
-                return True
-        return False
-
-    def has_perms(self, perms_list):
-        """
-        Returns True if the user has each of the specified permissions.
-        It is basically the same as has_perm but every permission in the
-        provided list needs to be True to return True.
-        """
-        # Iterate overall groups
-        group = Group.query.filter_by(guest=True).first()
-        # Iterate over the list with the permissions
-        for perm in perms_list:
-            if getattr(group, perm, True):
-                # After checking the permission,
-                # we can remove the perm from the list
-                perms_list.remove(perm)
-            else:
-                return False
-        return True
