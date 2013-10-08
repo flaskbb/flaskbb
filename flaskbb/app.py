@@ -10,6 +10,7 @@
 """
 import os
 import logging
+import datetime
 
 from flask import Flask, render_template
 from flask.ext.login import current_user
@@ -27,13 +28,13 @@ from flaskbb.pms.views import pms
 from flaskbb.pms.models import PrivateMessage
 # Import the forum blueprint
 from flaskbb.forum.views import forum
-from flaskbb.forum.models import *
 
 from flaskbb.extensions import db, login_manager, mail, cache
+from flaskbb.helpers import (format_date, time_since, is_online,
+                             perm_post_reply, perm_post_topic, perm_edit_post,
+                             perm_delete_topic, perm_delete_post, crop_title,
+                             render_markup)
 
-from flaskbb.template_filters import (format_date, time_since, is_online,
-                                      edit_post, delete_post, delete_topic,
-                                      post_reply, crop_title, render_markup)
 
 DEFAULT_BLUEPRINTS = (
     (forum, ""),
@@ -96,7 +97,7 @@ def configure_extensions(app):
     cache.init_app(app)
 
     # Flask-Debugtoolbar
-    toolbar = DebugToolbarExtension(app)
+    DebugToolbarExtension(app)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
@@ -137,11 +138,12 @@ def configure_template_filters(app):
     app.jinja_env.filters['format_date'] = format_date
     app.jinja_env.filters['time_since'] = time_since
     app.jinja_env.filters['is_online'] = is_online
-    app.jinja_env.filters['edit_post'] = edit_post
-    app.jinja_env.filters['delete_post'] = delete_post
-    app.jinja_env.filters['delete_topic'] = delete_topic
-    app.jinja_env.filters['post_reply'] = post_reply
     app.jinja_env.filters['crop_title'] = crop_title
+    app.jinja_env.filters['edit_post'] = perm_edit_post
+    app.jinja_env.filters['delete_post'] = perm_delete_post
+    app.jinja_env.filters['delete_topic'] = perm_delete_topic
+    app.jinja_env.filters['post_reply'] = perm_post_reply
+    app.jinja_env.filters['post_topic'] = perm_post_topic
 
 
 def configure_before_handlers(app):
@@ -155,7 +157,7 @@ def configure_before_handlers(app):
         Updates `lastseen` before every reguest if the user is authenticated
         """
         if current_user.is_authenticated():
-            current_user.lastseen = datetime.utcnow()
+            current_user.lastseen = datetime.datetime.utcnow()
             db.session.add(current_user)
             db.session.commit()
 

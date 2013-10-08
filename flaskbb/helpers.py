@@ -15,6 +15,7 @@ from flask import current_app
 from sqlalchemy import types
 from sqlalchemy.ext.mutable import Mutable
 from wtforms.widgets.core import Select, HTMLString, html_params
+from postmarkup import render_bbcode
 
 
 def check_perm(user, perm, forum, post_user_id=None):
@@ -31,14 +32,81 @@ def can_moderate(user, forum):
     return user.permissions['super_mod'] or user.permissions['admin']
 
 
+def perm_edit_post(user, post_user_id, forum):
+    """
+    Check if the post can be edited by the user
+    """
+    return check_perm(user=user, perm='editpost', forum=forum,
+                      post_user_id=post_user_id)
+
+
+def perm_delete_post(user, post_user_id, forum):
+    """
+    Check if the post can be deleted by the user
+    """
+    return check_perm(user=user, perm='deletepost', forum=forum,
+                      post_user_id=post_user_id)
+
+
+def perm_delete_topic(user, post_user_id, forum):
+    """
+    Check if the topic can be deleted by the user
+    """
+    return check_perm(user=user, perm='deletetopic', forum=forum,
+                      post_user_id=post_user_id)
+
+
+def perm_post_reply(user, forum):
+    """
+    Check if the user is allowed to post in the forum
+    """
+    return check_perm(user=user, perm='postreply', forum=forum)
+
+
+def perm_post_topic(user, forum):
+    """
+    Check if the user is allowed to create a new topic in the forum
+    """
+    return check_perm(user=user, perm='posttopic', forum=forum)
+
+
+def crop_title(title):
+    """
+    Crops the title to a specified length
+    """
+    length = current_app.config['TITLE_LENGTH']
+    if len(title) > length:
+        return title[:length] + "..."
+    return title
+
+
+def generate_random_pass(length=8):
+    return "".join(chr(random.randint(33, 126)) for i in range(length))
+
+
+def render_markup(text):
+    return render_bbcode(text)
+
+
+def is_online(user):
+    return user.lastseen >= time_diff()
+
+
 def time_diff():
     now = datetime.datetime.utcnow()
     diff = now - datetime.timedelta(minutes=current_app.config['LAST_SEEN'])
     return diff
 
 
-def generate_random_pass(length=8):
-    return "".join(chr(random.randint(33, 126)) for i in range(length))
+def format_date(value, format='%Y-%m-%d'):
+    """
+    Returns a formatted time string
+    """
+    return value.strftime(format)
+
+
+def time_since(value):
+    return time_delta_format(value)
 
 
 def time_delta_format(dt, default=None):
