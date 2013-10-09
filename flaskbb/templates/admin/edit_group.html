@@ -1,15 +1,15 @@
-{% set page_title = "Add Group" %}
+{% set page_title = "Edit Group" %}
 {% set active_forum_nav=True %}
 
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-{% from "macros.html" import render_field, render_boolean_field %}
+{% from "macros.html" import horizontal_field, render_boolean_field %}
 
 <form class="form-horizontal" role="form" method="post">
     {{ form.hidden_tag() }}
-    <legend class="">Add Group</legend>
-        {{ render_field(form.name) }}
-        {{ render_field(form.description) }}
+    <legend class="">Edit Group</legend>
+        {{ horizontal_field(form.name) }}
+        {{ horizontal_field(form.description) }}
 
         {{ render_boolean_field(form.admin) }}
         {{ render_boolean_field(form.super_mod) }}

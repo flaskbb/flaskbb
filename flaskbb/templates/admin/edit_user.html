@@ -1,29 +1,29 @@
-{% set page_title = "Add User" %}
+{% set page_title = "Edit User" %}
 {% set active_forum_nav=True %}
 
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-{% from "macros.html" import render_field, render_select_field %}
+{% from "macros.html" import horizontal_field %}
 
 <form class="form-horizontal" role="form" method="post">
     {{ form.hidden_tag() }}
-    <legend class="">Add User</legend>
-        {{ render_field(form.username) }}
-        {{ render_field(form.email) }}
-        {{ render_field(form.password) }}
-        {{ render_field(form.birthday) }}
-        {{ render_select_field(form.gender) }}
-        {{ render_field(form.location) }}
-        {{ render_field(form.website) }}
-        {{ render_field(form.avatar) }}
-        {{ render_select_field(form.primary_group) }}
-        {{ render_select_field(form.secondary_groups) }}
-        {{ render_field(form.signature, rows=5, div_class="col-lg-9") }}
-        {{ render_field(form.notes, rows=12, div_class="col-lg-9") }}
+    <legend class="">Edit User</legend>
+        {{ horizontal_field(form.username) }}
+        {{ horizontal_field(form.email) }}
+        {{ horizontal_field(form.password) }}
+        {{ horizontal_field(form.birthday) }}
+        {{ horizontal_field(form.gender) }}
+        {{ horizontal_field(form.location) }}
+        {{ horizontal_field(form.website) }}
+        {{ horizontal_field(form.avatar) }}
+        {{ horizontal_field(form.primary_group) }}
+        {{ horizontal_field(form.secondary_groups) }}
+        {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
+        {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
 
 
         <div class="form-group">
-            <div class="col-lg-offset-0 col-lg-9">
+            <div class="col-sm-offset-3 col-sm-9">
                 <button type="submit" class="btn btn-success">Save</button>
             </div>
         </div>

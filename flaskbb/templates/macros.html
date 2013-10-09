@@ -33,7 +33,7 @@
     {% if div_class %}
     <div class="{{ div_class }}">
     {% else %}
-    <div class="col-lg-5">
+    <div class="col-sm-5">
     {% endif %}
         <label>{{ field.label.text }}</label>
         {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
@@ -53,7 +53,7 @@
     {% if div_class %}
     <div class="{{ div_class }}">
     {% else %}
-    <div class="col-lg-5">
+    <div class="col-sm-5">
     {% endif %}
         <label>{{ field.label.text }}</label>
         {%- if kwargs['required'] or field.flags.required -%}
@@ -81,7 +81,7 @@
 <div class="form-group {%- if field.errors %} has-error{%- endif %}">
     {{field.label(class="sr-only")}}
 
-    <div class="col-lg-4">
+    <div class="col-sm-4">
     {%- if kwargs['required'] or field.flags.required -%}
         {% if label_text %}
             {{field(class='form-control', placeholder=label_text, required="required", **kwargs)}}
@@ -103,14 +103,14 @@
 
 
 {%- macro horizontal_field(field, label_text='', label_class='') -%}
-<div class="form-group {%- if field.errors %} has-error{%- endif %}">
+<div class="form-group row {%- if field.errors %} has-error{%- endif %}">
 
     {% if class %}
         {{ field.label(class=class) }}
     {% else %}
-        {{ field.label(class="col-lg-2 control-label") }}
+        {{ field.label(class="col-sm-3 control-label") }}
     {% endif %}
-    <div class="col-lg-3">
+    <div class="col-sm-9">
 
     {%- if kwargs['required'] or field.flags.required -%}
         {% if label_text %}

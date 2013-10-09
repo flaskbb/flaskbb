@@ -9,7 +9,7 @@
 </ul>
 
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
                 <li class="nav-header">Options | <small><a href="{{ url_for('pms.new_message') }}">New PM</a></small></li>
@@ -19,9 +19,9 @@
                 {{ navlink('pms.trash', 'Trash') }}
             </ul>
         </div><!--/.sidebar -->
-    </div><!--/.col-md-3 -->
-    <div class="col-md-9">
+    </div><!--/.col-sm-3 -->
+    <div class="col-sm-9">
         {% block pm_content %}{% endblock %}
-    </div><!--/.col-md-9 -->
+    </div><!--/.col-sm-9 -->
 </div><!--/.row -->
 {% endblock %}
