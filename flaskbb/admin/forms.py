@@ -77,9 +77,21 @@ class UserForm(Form):
                                      query_factory=select_primary_group,
                                      get_label="name")
 
-    secondary_groups = QuerySelectMultipleField(
-        "Secondary Groups", allow_blank=True, get_label="name")
+    secondary_groups = QuerySelectMultipleField("Secondary Groups",
+                                                query_factory=select_primary_group,  # TODO: Template rendering errors "NoneType is not callable" without this, figure out why.
+                                                allow_blank=True,
+                                                get_label="name")
 
+    def save(self):
+        user = User(**self.data)
+        return user.save()
+
+
+class AddUserForm(UserForm):
+    pass
+
+
+class EditUserForm(UserForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs['obj'] = self.user
@@ -98,10 +110,6 @@ class UserForm(Form):
                                  db.not_(User.id == self.user.id))).first()
         if user:
             raise ValidationError("This email is taken")
-
-    def save(self):
-        user = User(**self.data)
-        return user.save()
 
 
 class GroupForm(Form):
