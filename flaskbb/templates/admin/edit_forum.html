@@ -1,17 +1,17 @@
-{% set page_title = "Add Forum" %}
+{% set page_title = "Edit Forum" %}
 {% set active_forum_nav=True %}
 
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
-{% from "macros.html" import render_field, render_select_field %}
+{% from "macros.html" import horizontal_field %}
 
 <form class="form-horizontal" role="form" method="post">
     {{ form.hidden_tag() }}
-    <legend class="">Add Forum</legend>
-        {{ render_field(form.title) }}
-        {{ render_field(form.position) }}
-        {{ render_select_field(form.category) }}
-        {{ render_field(form.description, rows=5, div_class="col-lg-9") }}
+    <legend class="">Edit Forum</legend>
+        {{ horizontal_field(form.title) }}
+        {{ horizontal_field(form.position) }}
+        {{ horizontal_field(form.category) }}
+        {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
 
         <div class="form-group">
             <div class="col-lg-offset-0 col-lg-9">
