@@ -185,7 +185,7 @@ def add_group():
     if form.validate_on_submit():
         form.save()
         flash("Group successfully added.", "success")
-        return redirect(url_for("admin.users"))
+        return redirect(url_for("admin.groups"))
 
     return render_template("admin/edit_group.html", form=form)
 

@@ -39,11 +39,11 @@ def select_primary_group():
 
 class UserForm(Form):
     username = TextField("Username", validators=[
-        Optional(),
+        Required(),
         is_username])
 
     email = TextField("E-Mail", validators=[
-        Optional(),
+        Required(),
         Email(message="This email is invalid")])
 
     password = PasswordField("Password", validators=[
@@ -82,6 +82,33 @@ class UserForm(Form):
                                                 allow_blank=True,
                                                 get_label="name")
 
+    def validate_username(self, field):
+        if hasattr(self, "user"):
+            user = User.query.filter(
+                db.and_(User.username.like(field.data),
+                        db.not_(User.id == self.user.id)
+                        )
+            ).first()
+        else:
+            user = User.query.filter(User.username.like(field.data)).first()
+
+        if user:
+            raise ValidationError("This username is taken")
+
+    def validate_email(self, field):
+        if hasattr(self, "user"):
+            user = User.query.filter(
+                db.and_(User.email.like(field.data),
+                        db.not_(User.id == self.user.id)
+                        )
+            ).first()
+        else:
+            user = User.query.filter(User.email.like(field.data)).first()
+
+        if user:
+            raise ValidationError("This email is taken")
+
+
     def save(self):
         user = User(**self.data)
         return user.save()
@@ -96,20 +123,6 @@ class EditUserForm(UserForm):
         self.user = user
         kwargs['obj'] = self.user
         super(UserForm, self).__init__(*args, **kwargs)
-
-    def validate_username(self, field):
-        user = User.query.filter(db.and_(
-                                 User.username.like(field.data),
-                                 db.not_(User.id == self.user.id))).first()
-        if user:
-            raise ValidationError("This username is taken")
-
-    def validate_email(self, field):
-        user = User.query.filter(db.and_(
-                                 User.email.like(field.data),
-                                 db.not_(User.id == self.user.id))).first()
-        if user:
-            raise ValidationError("This email is taken")
 
 
 class GroupForm(Form):
@@ -149,6 +162,45 @@ class GroupForm(Form):
                              description="Check this is the users in this \
                                          group can post replies")
 
+    def validate_name(self, field):
+        if hasattr(self, "group"):
+            group = Group.query.filter(
+                db.and_(Group.name.like(field.data),
+                        db.not_(Group.id == self.group.id)
+                        )
+            ).first()
+        else:
+            group = Group.query.filter(Group.name.like(field.data)).first()
+
+        if group:
+            raise ValidationError("This name is taken")
+
+    def validate_banned(self, field):
+        if hasattr(self, "group"):
+            group = Group.query.filter(
+                db.and_(Group.banned == True,
+                        db.not_(Group.id == self.group.id)
+                        )
+            ).count()
+        else:
+            group = Group.query.filter_by(banned=True).count()
+
+        if field.data and group > 0:
+            raise ValidationError("There is already a Banned group")
+
+    def validate_guest(self, field):
+        if hasattr(self, "group"):
+            group = Group.query.filter(
+                db.and_(Group.guest == True,
+                        db.not_(Group.id == self.group.id)
+                        )
+            ).count()
+        else:
+            group = Group.query.filter_by(guest=True).count()
+
+        if field.data and group > 0:
+            raise ValidationError("There is already a Guest group")
+
     def save(self):
         group = Group(**self.data)
         return group.save()
@@ -160,31 +212,9 @@ class EditGroupForm(GroupForm):
         kwargs['obj'] = self.group
         super(GroupForm, self).__init__(*args, **kwargs)
 
-    def validate_banned(self, field):
-        group = Group.query.filter(
-            db.and_(Group.banned == True,
-                    db.not_(Group.id == self.group.id))).count()
-        if field.data and group > 0:
-            raise ValidationError("There is already a Banned group")
-
-    def validate_guest(self, field):
-        group = Group.query.filter(
-            db.and_(Group.guest == True,
-                    db.not_(Group.id == self.group.id))).count()
-        if field.data and group > 0:
-            raise ValidationError("There is already a Guest group")
-
 
 class AddGroupForm(GroupForm):
-    def validate_banned(self, field):
-        group = Group.query.filter_by(banned=True).count()
-        if field.data and group > 0:
-            raise ValidationError("There is already a Banned group")
-
-    def validate_guest(self, field):
-        group = Group.query.filter_by(guest=True).count()
-        if field.data and group > 0:
-            raise ValidationError("There is already a Guest group")
+    pass
 
 
 class ForumForm(Form):
