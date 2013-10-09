@@ -9,7 +9,7 @@ from flaskbb.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-from flaskbb.admin.forms import UserForm, AddGroupForm, EditGroupForm, ForumForm, CategoryForm
+from flaskbb.admin.forms import AddUserForm, EditUserForm, AddGroupForm, EditGroupForm, ForumForm, CategoryForm
 
 
 admin = Blueprint("admin", __name__)
@@ -81,7 +81,7 @@ def edit_user(user_id):
         db.not_(Group.banned == True),
         db.not_(Group.guest == True))
 
-    form = UserForm(user)
+    form = EditUserForm(user)
     form.secondary_groups.query = secondary_group_query
     if form.validate_on_submit():
         user.username = form.username.data
@@ -131,13 +131,13 @@ def delete_user(user_id):
 @admin.route("/users/add", methods=["GET", "POST"])
 @admin_required
 def add_user():
-    form = UserForm()
+    form = AddUserForm()
     if form.validate_on_submit():
         form.save()
         flash("User successfully added.", "success")
         return redirect(url_for("admin.users"))
 
-    return render_template("admin/add_user.html", form=form)
+    return render_template("admin/edit_user.html", form=form)
 
 
 @admin.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
@@ -185,9 +185,9 @@ def add_group():
     if form.validate_on_submit():
         form.save()
         flash("Group successfully added.", "success")
-        return redirect(url_for("admin.users"))
+        return redirect(url_for("admin.groups"))
 
-    return render_template("admin/add_group.html", form=form)
+    return render_template("admin/edit_group.html", form=form)
 
 
 @admin.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
@@ -234,7 +234,7 @@ def add_forum():
         flash("Forum successfully added.", "success")
         return redirect(url_for("admin.forums"))
 
-    return render_template("admin/add_forum.html", form=form)
+    return render_template("admin/edit_forum.html", form=form)
 
 
 @admin.route("/categories/<int:category_id>/edit", methods=["GET", "POST"])
@@ -275,4 +275,4 @@ def add_category():
         flash("Category successfully added.", "success")
         return redirect(url_for("admin.categories"))
 
-    return render_template("admin/add_category.html", form=form)
+    return render_template("admin/edit_category.html", form=form)

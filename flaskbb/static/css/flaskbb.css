@@ -17,14 +17,11 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
-#wrap > .container {
-  padding: 60px 15px 0;
-}
 .container .credit {
   margin: 20px 0;
 }
 #footer > .container {
-  margin-top: 15px;
+  margin: 0 auto 15px;
   padding-left: 15px;
   padding-right: 15px;
 }
