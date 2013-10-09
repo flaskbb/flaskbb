@@ -12,7 +12,7 @@ import os
 import logging
 import datetime
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask.ext.login import current_user
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -33,7 +33,7 @@ from flaskbb.extensions import db, login_manager, mail, cache
 from flaskbb.helpers import (format_date, time_since, is_online,
                              perm_post_reply, perm_post_topic, perm_edit_post,
                              perm_delete_topic, perm_delete_post, crop_title,
-                             render_markup)
+                             render_markup, mark_online)
 
 
 DEFAULT_BLUEPRINTS = (
@@ -164,6 +164,13 @@ def configure_before_handlers(app):
     @app.before_request
     def get_user_permissions():
         current_user.permissions = current_user.get_permissions()
+
+    @app.before_request
+    def mark_current_user_online():
+        if current_user.is_authenticated():
+            mark_online(current_user.username)
+        else:
+            mark_online(request.remote_addr, guest=True)
 
 
 def configure_errorhandlers(app):

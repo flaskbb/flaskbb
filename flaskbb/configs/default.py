@@ -86,6 +86,6 @@ class DefaultConfig(object):
     USERS_PER_PAGE = 10
 
     # How long the use can be inactive before he is marked as offline
-    LAST_SEEN = 15
+    ONLINE_LAST_MINUTES = 15
     # The length of the topic title in characters on the index
     TITLE_LENGTH = 15

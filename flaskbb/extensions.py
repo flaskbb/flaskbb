@@ -8,6 +8,7 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from redis import Redis
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
@@ -25,6 +26,9 @@ mail = Mail()
 
 # Caching
 cache = Cache()
+
+# Redis
+redis = Redis()
 
 # Debugtoolbar
 #toolbar = DebugToolbarExtension()

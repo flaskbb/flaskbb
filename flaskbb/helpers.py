@@ -9,7 +9,8 @@
     :license: BSD, see LICENSE for more details.
 """
 import random
-import datetime
+import time
+from datetime import datetime, timedelta
 
 from flask import current_app
 from sqlalchemy import types
@@ -17,8 +18,56 @@ from sqlalchemy.ext.mutable import Mutable
 from wtforms.widgets.core import Select, HTMLString, html_params
 from postmarkup import render_bbcode
 
+from flaskbb.extensions import redis
+
+
+def mark_online(user_id, guest=False):
+    """
+    Source: http://flask.pocoo.org/snippets/71/
+    """
+    now = int(time.time())
+    expires = now + (current_app.config['ONLINE_LAST_MINUTES'] * 60) + 10
+    if guest:
+        all_users_key = 'online-guests/%d' % (now // 60)
+        user_key = 'guest-activity/%s' % user_id
+    else:
+        all_users_key = 'online-users/%d' % (now // 60)
+        user_key = 'user-activity/%s' % user_id
+    p = redis.pipeline()
+    p.sadd(all_users_key, user_id)
+    p.set(user_key, now)
+    p.expireat(all_users_key, expires)
+    p.expireat(user_key, expires)
+    p.execute()
+
+
+def get_last_user_activity(user_id, guest=False):
+    if guest:
+        last_active = redis.get('guest-activity/%s' % user_id)
+    else:
+        last_active = redis.get('user-activity/%s' % user_id)
+
+    if last_active is None:
+        return None
+    return datetime.utcfromtimestamp(int(last_active))
+
+
+def get_online_users(guest=False):
+    current = int(time.time()) // 60
+    minutes = xrange(current_app.config['ONLINE_LAST_MINUTES'])
+    if guest:
+        return redis.sunion(['online-guests/%d' % (current - x)
+                             for x in minutes])
+    return redis.sunion(['online-users/%d' % (current - x)
+                         for x in minutes])
+
 
 def check_perm(user, perm, forum, post_user_id=None):
+    """
+    Checks if the `user` has a specified `perm` in the `forum`
+    If post_user_id is provided, it will also check if the user
+    has created the post
+    """
     if can_moderate(user, forum):
         return True
     if post_user_id and user.is_authenticated():
@@ -27,6 +76,11 @@ def check_perm(user, perm, forum, post_user_id=None):
 
 
 def can_moderate(user, forum):
+    """
+    Checks if a user can moderate a forum
+    He needs to be super moderator or a moderator of the
+    specified `forum`
+    """
     if user.permissions['mod'] and user.id in forum.moderators:
         return True
     return user.permissions['super_mod'] or user.permissions['admin']
@@ -80,10 +134,6 @@ def crop_title(title):
     return title
 
 
-def generate_random_pass(length=8):
-    return "".join(chr(random.randint(33, 126)) for i in range(length))
-
-
 def render_markup(text):
     return render_bbcode(text)
 
@@ -93,8 +143,8 @@ def is_online(user):
 
 
 def time_diff():
-    now = datetime.datetime.utcnow()
-    diff = now - datetime.timedelta(minutes=current_app.config['LAST_SEEN'])
+    now = datetime.utcnow()
+    diff = now - timedelta(minutes=current_app.config['ONLINE_LAST_MINUTES'])
     return diff
 
 
@@ -119,7 +169,7 @@ def time_delta_format(dt, default=None):
     if default is None:
         default = 'just now'
 
-    now = datetime.datetime.utcnow()
+    now = datetime.utcnow()
     diff = now - dt
 
     periods = (
@@ -198,7 +248,7 @@ class SelectDateWidget(object):
         '%Y': 'select_date_year'
     }
 
-    def __init__(self, years=range(1930, datetime.datetime.utcnow().year+1)):
+    def __init__(self, years=range(1930, datetime.utcnow().year+1)):
         super(SelectDateWidget, self).__init__()
         self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
 

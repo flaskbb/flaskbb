@@ -82,6 +82,6 @@ class ProductionConfig(DefaultConfig):
 
     # How long (in minutes) a user needs to be inactive
     # to be shown as offline.
-    LAST_SEEN = 15
+    ONLINE_LAST_MINUTES = 15
     # The length of the topic title in characters on the index
     TITLE_LENGTH = 15

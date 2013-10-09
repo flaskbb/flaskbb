@@ -18,7 +18,7 @@ from flask.ext.login import login_required, current_user
 
 from flaskbb.helpers import (time_diff, perm_post_reply, perm_post_topic,
                              perm_edit_post, perm_delete_topic,
-                             perm_delete_post)
+                             perm_delete_post, get_online_users)
 from flaskbb.forum.models import Category, Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
@@ -37,14 +37,14 @@ def index():
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
 
-    online_users = User.query.filter(User.lastseen >= time_diff())
-
     return render_template("forum/index.html", categories=categories,
-                           stats={'user_count': user_count,
-                                  'topic_count': topic_count,
-                                  'post_count': post_count,
-                                  'newest_user': newest_user.username,
-                                  'online_users': online_users})
+                           user_count=user_count,
+                           topic_count=topic_count,
+                           post_count=post_count,
+                           newest_user=newest_user.username,
+                           online_users=len(get_online_users()),
+                           online_guests=len(get_online_users(guest=True)))
+
 
 
 @forum.route("/category/<int:category_id>")
@@ -208,7 +208,7 @@ def delete_post(post_id):
 
 @forum.route("/who_is_online")
 def who_is_online():
-    online_users = User.query.filter(User.lastseen >= time_diff()).all()
+    online_users=get_online_users()
     return render_template("forum/online_users.html", online_users=online_users)
 
 

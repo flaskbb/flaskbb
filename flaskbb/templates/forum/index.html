@@ -21,14 +21,14 @@
     <tbody>
         <tr>
             <td>
-                Total number of registered users: <strong>{{ stats['user_count'] }}</strong> <br />
-                Total number of topics: <strong>{{ stats['topic_count'] }}</strong> <br />
-                Total number of posts: <strong>{{ stats['post_count'] }}</strong> <br />
+                Total number of registered users: <strong>{{ user_count }}</strong> <br />
+                Total number of topics: <strong>{{ topic_count }}</strong> <br />
+                Total number of posts: <strong>{{ post_count }}</strong> <br />
             </td>
             <td>
-                Newest registered user: <a href="{{ url_for('user.profile', username=stats['newest_user']) }}">{{ stats['newest_user'] }}</a> <br />
-                Registered users online: <strong>{{ stats['online_users'].count() }}</strong> <br />
-                <strong>#TODO</strong> Guests online: <strong>40</strong> <br />
+                Newest registered user: <a href="{{ url_for('user.profile', username=newest_user) }}">{{ newest_user }}</a> <br />
+                Registered users online: <strong>{{ online_users }}</strong> <br />
+                Guests online: <strong>{{ online_guests }}</strong> <br />
             </td>
         </tr>
 
