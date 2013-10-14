@@ -11,7 +11,17 @@ using the micro framework Flask.
 * Admin Interface
 * Group based permissions
 * BBCode support
-* **TODO:** Themes
+
+
+## TODO
+
+* Topic Tracker (in progress)
+* Track the unread posts and mark them as new
+* A own theme and make FlaskBB themable with Flask-Themes2
+* Localization (Babel)
+* Searching for members, posts,...
+* Subforums
+* Figure out how to integrate it in another app where you can use the models from flaskbb and so on..
 
 
 ## DEPENDENCIES

@@ -59,7 +59,6 @@ def createall():
     # Just for testing purposes
     dbfile = os.path.join(Config._basedir, "flaskbb.sqlite")
     if os.path.exists(dbfile):
-        print "Removing old database file..."
         os.remove(dbfile)
 
     db.create_all()

@@ -250,3 +250,36 @@ class Category(db.Model):
         db.session.delete(self)
         db.session.commit()
         return self
+
+
+"""
+A topic can be tracked by many users
+and a user can track many topics.. so it's a many-to-many relationship
+"""
+topictracker = db.Table('topictracker',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('topic_id', db.Integer(), db.ForeignKey('topics.id')))
+
+
+class Tracking(db.Model):
+    """
+    This model tracks the unread/read posts
+    Note: This functionality isn't implemented yet, but this will be the next
+    feature after the TopicTracker
+    """
+    __tablename__ = "tracking"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"))
+    last_read = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self

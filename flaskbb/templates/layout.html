@@ -48,10 +48,11 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url_for('user.settings') }}"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-
-                                {% if current_user.permissions['admin'] %}
+                                <li><a href="{{ url_for('forum.topic_tracker') }}"><span class="glyphicon glyphicon-book"></span> Topic Tracker</a></li>
                                 <li class="divider"></li>
+
+                                <li><a href="{{ url_for('user.settings') }}"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                                {% if current_user.permissions['admin'] %}
                                 <li><a href="{{ url_for('admin.overview') }}"><span class="glyphicon glyphicon-cog"></span> Admin Panel</a></li>
                                 <li class="divider"></li>
                                 {% endif %}
@@ -67,10 +68,6 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{ url_for('pms.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
                                 <li><a href="{{ url_for('pms.new_message') }}"><span class="glyphicon glyphicon-pencil"></span> New Message</a></li>
-                                <!--
-                                <li class="divider"></li>
-                                <li><a href="{{ url_for('pms.view_message', id=1) }}"><strong>test1</strong> - <span class="muted">This is the message title1</span> </a></li>
-                                -->
                             </ul>
                         </div>
                     {% else %}

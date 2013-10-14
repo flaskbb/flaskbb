@@ -108,7 +108,6 @@ class UserForm(Form):
         if user:
             raise ValidationError("This email is taken")
 
-
     def save(self):
         user = User(**self.data)
         return user.save()

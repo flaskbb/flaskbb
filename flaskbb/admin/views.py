@@ -9,7 +9,8 @@ from flaskbb.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-from flaskbb.admin.forms import AddUserForm, EditUserForm, AddGroupForm, EditGroupForm, ForumForm, CategoryForm
+from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
+                                 EditGroupForm, ForumForm, CategoryForm)
 
 
 admin = Blueprint("admin", __name__)

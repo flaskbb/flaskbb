@@ -46,7 +46,6 @@ def index():
                            online_guests=len(get_online_users(guest=True)))
 
 
-
 @forum.route("/category/<int:category_id>")
 def view_category(category_id):
     category = Category.query.filter_by(id=category_id).first()
@@ -208,8 +207,8 @@ def delete_post(post_id):
 
 @forum.route("/who_is_online")
 def who_is_online():
-    online_users=get_online_users()
-    return render_template("forum/online_users.html", online_users=online_users)
+    return render_template("forum/online_users.html",
+                           online_users=get_online_users())
 
 
 @forum.route("/memberlist")
@@ -222,3 +221,19 @@ def memberlist():
     return render_template("forum/memberlist.html",
                            users=users,
                            per_page=current_app.config['USERS_PER_PAGE'])
+
+
+@forum.route("/topictracker")
+def topic_tracker():
+    #return render_template("forum/topictracker.html", topics=topics)
+    pass
+
+
+@forum.route("/topictracker/<topic_id>/add")
+def add_to_topictrack(topic_id):
+    pass
+
+
+@forum.route("/topictracker/<topic_id>/delete")
+def remove_from_topictrack(topic_id):
+    pass

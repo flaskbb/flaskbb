@@ -8,7 +8,6 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import random
 import time
 from datetime import datetime, timedelta
 
