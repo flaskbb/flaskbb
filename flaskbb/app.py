@@ -114,9 +114,11 @@ def configure_extensions(app):
                    PrivateMessage.user_id == id).subquery()
         u = db.session.query(User, unread_count).filter(User.id == id).first()
 
-        user, user.pm_unread = u
-
-        return user
+        if u:
+            user, user.pm_unread = u
+            return user
+        else:
+            return None
 
     login_manager.init_app(app)
 
