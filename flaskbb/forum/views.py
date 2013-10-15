@@ -231,7 +231,7 @@ def topictracker():
 
 
 @forum.route("/topictracker/<topic_id>/add")
-def add_to_topictracker(topic_id):
+def track_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
     current_user.track_topic(topic)
     current_user.save()
@@ -239,7 +239,8 @@ def add_to_topictracker(topic_id):
 
 
 @forum.route("/topictracker/<topic_id>/delete")
-def remove_from_topictracker(topic_id):
+def untrack_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
-    current_user.untrack_topic.remove(topic)
-    return redirect(url_for("forum.topictracker"))
+    current_user.untrack_topic(topic)
+    current_user.save()
+    return redirect(url_for("forum.view_topic", topic_id=topic.id))

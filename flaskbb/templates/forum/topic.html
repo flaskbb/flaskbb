@@ -24,7 +24,11 @@
     <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
     {% endif %}
     {% if current_user.is_authenticated() %}
-    <a href="{{ url_for('forum.add_to_topictracker', topic_id=topic.id) }}" class="btn btn-primary">Track Topic</a>
+        {% if current_user.is_tracking_topic(topic) %}
+        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-primary">Untrack Topic</a>
+        {% else %}
+        <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-primary">Track Topic</a>
+        {% endif %}
     {% endif %}
 </div>
 

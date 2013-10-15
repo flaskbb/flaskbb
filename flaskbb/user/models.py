@@ -195,7 +195,7 @@ class User(db.Model, UserMixin):
         """
         Untracks the specified topic
         """
-        if self.is_following_topic(topic):
+        if self.is_tracking_topic(topic):
             self.tracked_topics.remove(topic)
             return self
 
