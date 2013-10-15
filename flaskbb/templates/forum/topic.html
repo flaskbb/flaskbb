@@ -126,11 +126,12 @@
 </table>
 
 {% if current_user|post_reply(topic.forum) and not topic.locked %}
+    {% from "macros.html" import render_field %}
 <form class="form" action="#" method="post">
     {{ form.hidden_tag() }}
-    <div class="form-group">
-    {{ form.content(rows="6", class="form-control") }}
-    </div>
+
+    {{ render_field(form.content, div_class="col-sm-12", rows=5) }}
+
     <button type="submit" class="btn btn-success">Reply!</button>
 </form>
 {% endif %}
