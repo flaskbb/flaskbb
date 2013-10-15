@@ -233,6 +233,16 @@ class Forum(db.Model):
     def get_categories(cls):
         return cls.query.filter(cls.is_category)
 
+    def get_breadcrumbs(self):
+        breadcrumbs = []
+        parent = self.parent
+        while parent is not None:
+            breadcrumbs.append(parent)
+            parent = parent.parent
+
+        breadcrumbs.reverse()
+        return breadcrumbs
+
 
 """
 A topic can be tracked by many users

@@ -45,14 +45,6 @@ def index():
                            online_users=len(get_online_users()),
                            online_guests=len(get_online_users(guest=True)))
 
-
-@forum.route("/category/<int:category_id>")
-def view_category(category_id):
-    category = Forum.get_categories().filter_by(id=category_id).first()
-
-    return render_template("forum/category.html", category=category)
-
-
 @forum.route("/forum/<int:forum_id>")
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
