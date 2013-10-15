@@ -20,7 +20,7 @@ from flaskbb import create_app
 from flaskbb.extensions import db
 
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb.forum.models import Post, Topic, Forum
 
 # Use the development configuration if available
 try:
@@ -179,7 +179,7 @@ def createall():
     # create 2 categories
     for i in range(1, 3):
         category_title = "Test Category %s" % i
-        category = Category(title=category_title,
+        category = Forum(is_category=True, title=category_title,
                             description="Test Description")
         db.session.add(category)
 
@@ -190,7 +190,7 @@ def createall():
 
             forum_title = "Test Forum %s %s" % (j, i)
             forum = Forum(title=forum_title, description="Test Description",
-                          category_id=i)
+                          parent_id=i)
             db.session.add(forum)
 
     # create 1 topic in each forum

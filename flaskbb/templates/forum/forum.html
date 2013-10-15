@@ -7,7 +7,7 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ url_for('forum.view_category', category_id=forum.category_id) }}">{{ forum.category.title }}</a></li>
+    <li><a href="{{ url_for('forum.view_category', category_id=forum.parent_id) }}">{{ forum.parent.title }}</a></li>
     <li class="active">{{ forum.title }}</li>
 </ol>
 

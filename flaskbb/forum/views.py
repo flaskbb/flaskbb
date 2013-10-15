@@ -19,7 +19,7 @@ from flask.ext.login import login_required, current_user
 from flaskbb.helpers import (time_diff, perm_post_reply, perm_post_topic,
                              perm_edit_post, perm_delete_topic,
                              perm_delete_post, get_online_users)
-from flaskbb.forum.models import Category, Forum, Topic, Post
+from flaskbb.forum.models import Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
 
@@ -29,7 +29,7 @@ forum = Blueprint("forum", __name__)
 
 @forum.route("/")
 def index():
-    categories = Category.query.all()
+    categories = Forum.get_categories().all()
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -48,7 +48,7 @@ def index():
 
 @forum.route("/category/<int:category_id>")
 def view_category(category_id):
-    category = Category.query.filter_by(id=category_id).first()
+    category = Forum.get_categories().filter_by(id=category_id).first()
 
     return render_template("forum/category.html", category=category)
 

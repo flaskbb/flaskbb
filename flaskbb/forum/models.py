@@ -196,12 +196,12 @@ class Forum(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     position = db.Column(db.Integer, default=0)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id",
-                                                      use_alter=True,
-                                                      name="fk_category_id"))
+    is_category = db.Column(db.Boolean, default=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey("forums.id"))
+
+    # TODO:  Remove post_count, topic_count, last_post_id, and last_post from Forum model.  They should be in cache layer, not database.
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
-
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
     last_post = db.relationship("Post", backref="last_post_forum",
@@ -209,6 +209,7 @@ class Forum(db.Model):
 
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")
+    children = db.relationship("Forum", backref=db.backref("parent", remote_side=[id]))
 
     moderators = db.Column(DenormalizedText)
 
@@ -228,28 +229,9 @@ class Forum(db.Model):
         db.session.commit()
         return self
 
-
-class Category(db.Model):
-    __tablename__ = "categories"
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
-    description = db.Column(db.String)
-    position = db.Column(db.Integer, default=0)
-
-    # One-to-many
-    forums = db.relationship("Forum", backref="category", lazy="joined",
-                             primaryjoin="Forum.category_id == Category.id")
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return self
+    @classmethod
+    def get_categories(cls):
+        return cls.query.filter(cls.is_category)
 
 
 """

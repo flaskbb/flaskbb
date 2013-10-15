@@ -21,7 +21,7 @@ from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
 
 from flaskbb.helpers import SelectDateWidget
 from flaskbb.extensions import db
-from flaskbb.forum.models import Category, Forum
+from flaskbb.forum.models import Forum
 from flaskbb.user.models import User, Group
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -29,8 +29,8 @@ is_username = regexp(USERNAME_RE,
                      message=("You can only use letters, numbers or dashes"))
 
 
-def selectable_categories():
-    return Category.query.order_by(Category.id)
+def selectable_forums():
+    return Forum.query.order_by(Forum.id)
 
 
 def select_primary_group():
@@ -217,6 +217,8 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(Form):
+    _id = None
+
     title = TextField("Forum Title", validators=[
         Required(message="Forum title required")])
 
@@ -226,28 +228,25 @@ class ForumForm(Form):
     position = IntegerField("Position", validators=[
         Required(message="Forum position required")])
 
-    category = QuerySelectField("Category",
-                                query_factory=selectable_categories,
-                                get_label="title")
+    parent = QuerySelectField("Parent",
+                              query_factory=selectable_forums,
+                              get_label="title",
+                              description="This field is not saved if this forum is a category (see \"Is a category?\" field below).")
+
+    is_category = BooleanField("Is a category?", description="Categories are root-level parents for forums.  They can not contain topics.")
+
+    def validate_parent(self, field):
+        if field.data.id == self._id:
+            raise ValidationError("A forum cannot be it's own parent!")
 
     def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
-                      position=self.position.data,
-                      category_id=self.category.data.id)
+                      position=self.position.data)
+
+        if self.is_category.data:
+            forum.is_category = True
+        else:
+            forum.parent_id = self.parent.data.id
+
         return forum.save()
-
-
-class CategoryForm(Form):
-    title = TextField("Category Title", validators=[
-        Required(message="Category title required")])
-
-    description = TextAreaField("Description", validators=[
-        Optional()])
-
-    position = IntegerField("Position", validators=[
-        Required(message="Forum position required")])
-
-    def save(self):
-        category = Category(**self.data)
-        return category.save()
