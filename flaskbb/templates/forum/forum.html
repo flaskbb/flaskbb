@@ -17,7 +17,7 @@
     {{ render_pagination(topics, url_for('forum.view_forum', forum_id=forum.id)) }}
 </div> <!-- end span pagination -->
 
-{% if current_user|post_topic(forum) %}
+{% if current_user|post_topic(forum) and not forum.is_category %}
 <div class="pull-right" style="padding-bottom: 10px">
     <a href="{{ url_for('forum.new_topic', forum_id=forum.id) }}" class="btn btn-primary">New Topic</a>
 </div>
@@ -88,6 +88,7 @@
 </table>
 {% endif %}
 
+{% if not forum.is_category %}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -138,5 +139,6 @@
 
     </tbody>
 </table>
+{% endif %}
 
 {% endblock %}

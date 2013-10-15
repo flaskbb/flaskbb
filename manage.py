@@ -194,7 +194,7 @@ def createall():
             db.session.add(forum)
 
     # create 1 topic in each forum
-    for k in range(1, 5):
+    for k in [2, 3, 5, 6]:  # Forum ids are not sequential because categories.
         topic = Topic()
         topic.first_post = Post()
 

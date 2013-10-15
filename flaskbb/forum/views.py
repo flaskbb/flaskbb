@@ -103,6 +103,10 @@ def view_post(post_id):
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
+    if forum.is_category:
+        flash("You cannot post a topic in a category.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=forum.id))
+
     if not perm_post_topic(user=current_user, forum=forum):
         flash("You do not have the permissions to create a new topic.", "error")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
