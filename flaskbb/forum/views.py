@@ -219,21 +219,27 @@ def memberlist():
         paginate(page, current_app.config['POSTS_PER_PAGE'], False)
 
     return render_template("forum/memberlist.html",
-                           users=users,
-                           per_page=current_app.config['USERS_PER_PAGE'])
+                           users=users)
 
 
 @forum.route("/topictracker")
-def topic_tracker():
-    #return render_template("forum/topictracker.html", topics=topics)
-    pass
+def topictracker():
+    page = request.args.get("page", 1, type=int)
+    topics = current_user.tracked_topics.\
+        paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+    return render_template("forum/topictracker.html", topics=topics)
 
 
 @forum.route("/topictracker/<topic_id>/add")
-def add_to_topictrack(topic_id):
-    pass
+def add_to_topictracker(topic_id):
+    topic = Topic.query.filter_by(id=topic_id).first()
+    current_user.track_topic(topic)
+    current_user.save()
+    return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
 
 @forum.route("/topictracker/<topic_id>/delete")
-def remove_from_topictrack(topic_id):
-    pass
+def remove_from_topictracker(topic_id):
+    topic = Topic.query.filter_by(id=topic_id).first()
+    current_user.untrack_topic.remove(topic)
+    return redirect(url_for("forum.topictracker"))

@@ -23,6 +23,9 @@
     {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
     <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
     {% endif %}
+    {% if current_user.is_authenticated() %}
+    <a href="{{ url_for('forum.add_to_topictracker', topic_id=topic.id) }}" class="btn btn-primary">Track Topic</a>
+    {% endif %}
 </div>
 
 <table class="table table-bordered">

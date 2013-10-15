@@ -16,7 +16,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask import current_app
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
-from flaskbb.forum.models import Post, Topic
+from flaskbb.forum.models import Post, Topic, topictracker
 
 
 groups_users = db.Table('groups_users',
@@ -89,6 +89,12 @@ class User(db.Model, UserMixin):
                         primaryjoin=(groups_users.c.user_id == id),
                         backref=db.backref('users', lazy='dynamic'),
                         lazy='dynamic')
+
+    tracked_topics = \
+        db.relationship("Topic", secondary=topictracker,
+                        primaryjoin=(topictracker.c.user_id == id),
+                        backref=db.backref("topicstracked", lazy="dynamic"),
+                        lazy="dynamic")
 
     def __repr__(self):
         return "Username: %s" % self.username
@@ -176,6 +182,29 @@ class User(db.Model, UserMixin):
         """
         return Post.query.filter(Post.user_id == self.id).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+
+    def track_topic(self, topic):
+        """
+        Tracks the specified topic
+        """
+        if not self.is_tracking_topic(topic):
+            self.tracked_topics.append(topic)
+            return self
+
+    def untrack_topic(self, topic):
+        """
+        Untracks the specified topic
+        """
+        if self.is_following_topic(topic):
+            self.tracked_topics.remove(topic)
+            return self
+
+    def is_tracking_topic(self, topic):
+        """
+        Checks if the user is already tracking this topic
+        """
+        return self.tracked_topics.filter(
+            topictracker.c.topic_id == topic.id).count() > 0
 
     def add_to_group(self, group):
         """
