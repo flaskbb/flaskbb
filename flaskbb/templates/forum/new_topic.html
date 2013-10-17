@@ -3,7 +3,7 @@
 
 {% extends "layout.html" %}
 {% block content %}
-{% from "macros.html" import inline_field %}
+{% from "macros.html" import render_field %}
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
@@ -15,15 +15,10 @@
 <form class="form" role="form" method="post">
     {{ form.hidden_tag() }}
     <h3>New Topic</h3>
-    <div class="form-group">
-        <label>Topic Title</label>
-        {{ form.title(class="form-control", placeholder="Topic Title") }}
-    </div>
 
-    <div class="form-group">
-        <label>Content</label>
-        {{ form.content(rows="12", class="form-control") }}
-    </div>
+    {{ render_field(form.title, div_class="col-sm-12") }}
+    {{ render_field(form.content, div_class="col-sm-12", rows=12) }}
+
     <button type="submit" class="btn btn-success">Reply!</button>
 </form>
 
