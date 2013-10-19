@@ -75,8 +75,6 @@ class User(db.Model, UserMixin):
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
 
-    post_count = db.Column(db.Integer, default=0)
-
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
     primary_group = db.relationship('Group', lazy="joined",
@@ -161,6 +159,15 @@ class User(db.Model, UserMixin):
         return expired, invalid, data
 
     @property
+    def post_count(self):
+        """
+        Returns the amount of posts within the current topic.
+        """
+        # TODO: Cache
+        return Post.query.filter(Post.user_id == self.id).\
+            count()
+
+    @property
     def last_post(self):
         """
         Returns the latest post from the user
@@ -173,7 +180,8 @@ class User(db.Model, UserMixin):
         Returns a paginated query result with all topics the user has created.
         """
         return Topic.query.filter(Topic.user_id == self.id).\
-            order_by(Topic.last_post_id.desc()).\
+            filter(Post.topic_id == Topic.id).\
+            order_by(Post.id.desc()).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
     def all_posts(self, page):

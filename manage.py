@@ -209,10 +209,11 @@ def createall():
         db.session.commit()
 
         # Update the post and topic count
-        topic.forum.topic_count += 1
-        topic.forum.post_count += 1
-        topic.post_count += 1
-        topic.first_post.user.post_count += 1
+        # TODO: Invalidate relevant caches
+        #topic.forum.topic_count += 1
+        #topic.forum.post_count += 1
+        #topic.post_count += 1
+        #topic.first_post.user.post_count += 1
 
         # create 2 additional posts for each topic
         for m in range(1, 3):
@@ -222,12 +223,13 @@ def createall():
             db.session.commit()
 
             # Update the post count
-            post.user.post_count += 1
-            topic.post_count += 1
-            topic.forum.post_count += 1
+            # TODO: Invalidate relevant caches
+            #post.user.post_count += 1
+            #topic.post_count += 1
+            #topic.forum.post_count += 1
 
-            topic.last_post_id = post.id
-            topic.forum.last_post_id = post.id
+            #topic.last_post_id = post.id
+            #topic.forum.last_post_id = post.id
 
             db.session.commit()
 

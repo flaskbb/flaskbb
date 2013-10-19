@@ -51,7 +51,8 @@ def view_forum(forum_id):
 
     forum = Forum.query.filter_by(id=forum_id).first()
     topics = Topic.query.filter_by(forum_id=forum.id).\
-        order_by(Topic.last_post_id.desc()).\
+        filter(Post.topic_id == Topic.id).\
+        order_by(Post.id.desc()).\
         paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
     return render_template("forum/forum.html", forum=forum, topics=topics)

@@ -12,6 +12,7 @@ from datetime import datetime
 
 from flaskbb.extensions import db
 from flaskbb.helpers import DenormalizedText
+from helpers import get_forum_ids
 
 
 class Post(db.Model):
@@ -44,13 +45,15 @@ class Post(db.Model):
             db.session.commit()
 
             # Now lets update the last post id
-            topic.last_post_id = self.id
-            topic.forum.last_post_id = self.id
+            # TODO: Invalidate relevant caches.
+            #topic.last_post_id = self.id
+            #topic.forum.last_post_id = self.id
 
             # Update the post counts
-            user.post_count += 1
-            topic.post_count += 1
-            topic.forum.post_count += 1
+            # TODO: Invalidate relevant caches.
+            #user.post_count += 1
+            #topic.post_count += 1
+            #topic.forum.post_count += 1
 
             # And commit it!
             db.session.add(topic)
@@ -64,16 +67,18 @@ class Post(db.Model):
             return self
 
         # Delete the last post
-        if self.topic.last_post_id == self.id:
+        if self.topic.last_post.id == self.id:
             # Now the second last post will be the last post
-            self.topic.last_post_id = self.topic.second_last_post
-            self.topic.forum.last_post_id = self.topic.second_last_post
+            # TODO: Invalidate relevant caches
+            #self.topic.last_post_id = self.topic.second_last_post
+            #self.topic.forum.last_post_id = self.topic.second_last_post
             db.session.commit()
 
         # Update the post counts
-        self.user.post_count -= 1
-        self.topic.post_count -= 1
-        self.topic.forum.post_count -= 1
+        # TODO: Invalidate relevant caches
+        #self.user.post_count -= 1
+        #self.topic.post_count -= 1
+        #self.topic.forum.post_count -= 1
 
         # Is there a better way to do this?
         db.session.delete(self)
@@ -93,20 +98,6 @@ class Topic(db.Model):
     locked = db.Column(db.Boolean, default=False)
     important = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
-    post_count = db.Column(db.Integer, default=0)
-
-    # One-to-one (uselist=False) relationship between first_post and topic
-    first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
-                                                        ondelete="CASCADE"))
-    first_post = db.relationship("Post", backref="first_post", uselist=False,
-                                 foreign_keys=[first_post_id])
-
-    # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
-                                                       ondelete="CASCADE",
-                                                       onupdate="CASCADE"))
-    last_post = db.relationship("Post", backref="last_post", uselist=False,
-                                foreign_keys=[last_post_id])
 
     # One-to-many
     posts = db.relationship("Post", backref="topic", lazy="joined",
@@ -116,6 +107,39 @@ class Topic(db.Model):
     def __init__(self, title=None):
         if title:
             self.title = title
+
+
+    @property
+    def post_count(self):
+        """
+        Returns the amount of posts within the current topic.
+        """
+        # TODO: Cache
+        return Post.query.\
+            filter(Post.topic_id == self.id).\
+            count()
+
+    @property
+    def first_post(self):
+        """
+        Returns the first post within the current topic.
+        """
+        # TODO: Cache this method.
+        return Post.query.\
+            filter(Post.topic_id == self.id).\
+            order_by(Post.date_created.asc()).\
+            first()
+
+    @property
+    def last_post(self):
+        """
+        Returns the latest post within the current topic.
+        """
+        # TODO: Cache this method.
+        return Post.query.\
+            filter(Post.topic_id == self.id).\
+            order_by(Post.date_created.desc()).\
+            first()
 
     @property
     def second_last_post(self):
@@ -147,21 +171,23 @@ class Topic(db.Model):
         post.save(user, self)
 
         # Update the first post id
-        self.first_post_id = post.id
+        # TODO: Invalidate first_post cache
+        #self.first_post_id = post.id
         db.session.commit()
 
         return self
 
     def delete(self, users=None):
-        topic = Topic.query.filter_by(forum_id=self.forum_id).\
-            order_by(Topic.last_post_id.desc())
-
-        if topic and topic[0].id == self.id:
-            try:
-                self.forum.last_post_id = topic[1].last_post_id
-            # Catch an IndexError when you delete the last topic in the forum
-            except IndexError:
-                self.forum.last_post_id = 0
+        # TODO: Invalidate forum last post caches
+        #topic = Topic.query.filter_by(forum_id=self.forum_id).\
+        #    order_by(Topic.last_post_id.desc())
+        #
+        #if topic and topic[0].id == self.id:
+        #    try:
+        #        self.forum.last_post_id = topic[1].last_post_id
+            #Catch an IndexError when you delete the last topic in the forum
+            #except IndexError:
+            #    self.forum.last_post_id = 0
 
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
@@ -171,18 +197,19 @@ class Topic(db.Model):
         db.session.commit()
 
         # Update the post counts
-        if users:
-            # If someone knows a better method for this,
-            # feel free to improve it :)
-            for user in users:
-                user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
-        forum.topic_count = Topic.query.filter_by(
-            forum_id=self.forum_id).count()
-
-        forum.post_count = Post.query.filter(
-            Post.topic_id == Topic.id,
-            Topic.forum_id == self.forum_id).count()
+        # TODO: Invalidate relevant caches
+        #if users:
+        #    If someone knows a better method for this,
+        #    feel free to improve it :)
+            #for user in users:
+            #    user.post_count = Post.query.filter_by(user_id=user.id).count()
+            #    db.session.commit()
+        #forum.topic_count = Topic.query.filter_by(
+        #    forum_id=self.forum_id).count()
+        #
+        #forum.post_count = Post.query.filter(
+        #    Post.topic_id == Topic.id,
+        #    Topic.forum_id == self.forum_id).count()
 
         db.session.commit()
 
@@ -199,19 +226,69 @@ class Forum(db.Model):
     is_category = db.Column(db.Boolean, default=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("forums.id"))
 
-    # TODO:  Remove post_count, topic_count, last_post_id, and last_post from Forum model.  They should be in cache layer, not database.
-    post_count = db.Column(db.Integer, default=0)
-    topic_count = db.Column(db.Integer, default=0)
-    # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
-    last_post = db.relationship("Post", backref="last_post_forum",
-                                uselist=False, foreign_keys=[last_post_id])
-
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")
     children = db.relationship("Forum", backref=db.backref("parent", remote_side=[id]))
 
-    moderators = db.Column(DenormalizedText)
+    moderators = db.Column(DenormalizedText)  # TODO: No forum_moderators column?
+
+    @property
+    def post_count(self, include_children=True):
+        """
+        Returns the amount of posts within the current forum or it's children.
+        Children can be excluded by setting the second parameter to 'false'.
+        """
+        # TODO: Cache
+
+        if include_children:
+            return Post.query.\
+                filter(Post.topic_id == Topic.id). \
+                filter(Topic.forum_id.in_(get_forum_ids(self))). \
+                count()
+        else:
+            return Post.query.\
+                filter(Post.topic_id == Topic.id).\
+                filter(Topic.forum_id == self.id).\
+                count()
+
+    @property
+    def topic_count(self, include_children=True):
+        """
+        Returns the amount of topics within the current forum or it's children.
+        Children can be excluded by setting the second parameter to 'false'.
+        """
+        # TODO: Cache
+
+        if include_children:
+            return Topic.query.\
+                filter(Topic.forum_id.in_(get_forum_ids(self))). \
+                count()
+        else:
+            return Topic.query.\
+                filter(Topic.forum_id == self.id).\
+                count()
+
+    @property
+    def last_post(self, include_children=True):
+        """
+        Returns the latest post within the current forum or it's children.
+        Children can be excluded by setting the second parameter to 'false'.
+        """
+        # TODO: Cache this method.
+
+        if include_children:
+            return Post.query.\
+                filter(Post.topic_id == Topic.id). \
+                filter(Topic.forum_id.in_(get_forum_ids(self))). \
+                order_by(Post.date_created.desc()). \
+                first()
+        else:
+            return Post.query.\
+                filter(Post.topic_id == Topic.id).\
+                filter(Topic.forum_id == self.id).\
+                order_by(Post.date_created.desc()).\
+                first()
+
 
     def add_moderator(self, user_id):
         self.moderators.add(user_id)

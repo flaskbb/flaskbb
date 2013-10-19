@@ -46,8 +46,8 @@
             <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
 
             <td valign="top" align="right" style="white-space: nowrap">
-                {% if forum.last_post_id %}
-                <a href="{{ url_for('forum.view_post', post_id=forum.last_post_id) }}" title="{{ forum.last_post.topic.title }}">
+                {% if forum.last_post %}
+                <a href="{{ url_for('forum.view_post', post_id=forum.last_post.id) }}" title="{{ forum.last_post.topic.title }}">
                     <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
                 </a>
                 <br />
