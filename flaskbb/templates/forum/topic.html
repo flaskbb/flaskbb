@@ -38,7 +38,7 @@
         <tr>
             <td >
                 <span class="pull-right">
-                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + posts.page * per_page }} {%- endif -%}</strong>
+                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + (posts.page - 1) * per_page }} {%- endif -%}</strong>
                 </span>
                 <span class="pull-left">
                     <a href="
