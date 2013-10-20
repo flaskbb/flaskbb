@@ -19,7 +19,7 @@ from flask.ext.login import login_required, current_user
 from flaskbb.helpers import (time_diff, perm_post_reply, perm_post_topic,
                              perm_edit_post, perm_delete_topic,
                              perm_delete_post, get_online_users)
-from flaskbb.forum.models import Category, Forum, Topic, Post
+from flaskbb.forum.models import Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.user.models import User
 
@@ -29,7 +29,7 @@ forum = Blueprint("forum", __name__)
 
 @forum.route("/")
 def index():
-    categories = Category.query.all()
+    categories = Forum.get_categories().all()
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -45,21 +45,14 @@ def index():
                            online_users=len(get_online_users()),
                            online_guests=len(get_online_users(guest=True)))
 
-
-@forum.route("/category/<int:category_id>")
-def view_category(category_id):
-    category = Category.query.filter_by(id=category_id).first()
-
-    return render_template("forum/category.html", category=category)
-
-
 @forum.route("/forum/<int:forum_id>")
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
     forum = Forum.query.filter_by(id=forum_id).first()
     topics = Topic.query.filter_by(forum_id=forum.id).\
-        order_by(Topic.last_post_id.desc()).\
+        filter(Post.topic_id == Topic.id).\
+        order_by(Post.id.desc()).\
         paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
     return render_template("forum/forum.html", forum=forum, topics=topics)
@@ -79,8 +72,10 @@ def view_topic(topic_id):
 
     form = None
 
-    if not topic.locked and perm_post_reply(user=current_user,
-                                            forum=topic.forum):
+    if not topic.locked \
+        and not topic.forum.locked \
+        and perm_post_reply(user=current_user,
+                            forum=topic.forum):
 
             form = QuickreplyForm()
             if form.validate_on_submit():
@@ -110,6 +105,10 @@ def view_post(post_id):
 @login_required
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
+
+    if forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
     if not perm_post_topic(user=current_user, forum=forum):
         flash("You do not have the permissions to create a new topic.", "error")
@@ -146,6 +145,10 @@ def delete_topic(topic_id):
 def new_post(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
+    if topic.forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=topic.forum.id))
+
     if topic.locked:
         flash("The topic is locked.", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
@@ -166,6 +169,14 @@ def new_post(topic_id):
 @login_required
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
+
+    if post.topic.forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=post.topic.forum.id))
+
+    if post.topic.locked:
+        flash("The topic is locked.", "error")
+        return redirect(url_for("forum.view_forum", forum_id=post.topic.forum_id))
 
     if not perm_edit_post(user=current_user, forum=post.topic.forum,
                           post_user_id=post.user_id):

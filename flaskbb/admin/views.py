@@ -8,9 +8,9 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb.forum.models import Post, Topic, Forum
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
-                                 EditGroupForm, ForumForm, CategoryForm)
+                                 EditGroupForm, ForumForm)
 
 
 admin = Blueprint("admin", __name__)
@@ -52,15 +52,6 @@ def groups():
         paginate(page, current_app.config['USERS_PER_PAGE'], False)
 
     return render_template("admin/groups.html", groups=groups)
-
-
-@admin.route("/categories")
-@admin_required
-def categories():
-    page = request.args.get("page", 1, type=int)
-    categories = Category.query.\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
-    return render_template("admin/categories.html", categories=categories)
 
 
 @admin.route("/forums")
@@ -197,11 +188,15 @@ def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
     form = ForumForm()
+    form._id = forum.id  # Used for validation only.
+
     if form.validate_on_submit():
         forum.title = form.title.data
         forum.description = form.description.data
         forum.position = form.position.data
-        forum.category_id = form.category.data.id
+        forum.parent_id = form.parent.data.id
+        forum.is_category = form.is_category.data
+        forum.locked = form.locked.data
         forum.save()
 
         flash("Forum successfully edited.", "success")
@@ -210,7 +205,9 @@ def edit_forum(forum_id):
         form.title.data = forum.title
         form.description.data = forum.description
         form.position.data = forum.position
-        form.category.data = forum.category
+        form.parent.data = forum.parent
+        form.is_category.data = forum.is_category
+        form.locked.data = forum.locked
         #form.moderators.data = forum.moderators
 
     return render_template("admin/edit_forum.html", form=form)
@@ -236,44 +233,3 @@ def add_forum():
         return redirect(url_for("admin.forums"))
 
     return render_template("admin/edit_forum.html", form=form)
-
-
-@admin.route("/categories/<int:category_id>/edit", methods=["GET", "POST"])
-@admin_required
-def edit_category(category_id):
-    category = Category.query.filter_by(id=category_id).first()
-
-    form = CategoryForm()
-    if form.validate_on_submit():
-        form.populate_obj(category)
-        category.save()
-        flash("Category successfully edited.", "success")
-        return redirect(url_for("admin.edit_category", category_id=category.id))
-    else:
-        form.title.data = category.title
-        form.description.data = category.description
-        form.position.data = category.position
-
-    return render_template("admin/edit_category.html", form=form)
-
-
-@admin.route("/categories/<int:category_id>/delete")
-@admin_required
-def delete_category(category_id):
-    category = Category.query.filter_by(id=category_id).first()
-    category.delete()
-    flash("Category successfully deleted.", "success")
-    return redirect(url_for("admin.categories"))
-
-
-@admin.route("/categories/add", methods=["GET", "POST"])
-@admin_required
-def add_category():
-    form = CategoryForm()
-
-    if form.validate_on_submit():
-        form.save()
-        flash("Category successfully added.", "success")
-        return redirect(url_for("admin.categories"))
-
-    return render_template("admin/edit_category.html", form=form)

@@ -20,7 +20,7 @@ from flaskbb import create_app
 from flaskbb.extensions import db
 
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb.forum.models import Post, Topic, Forum
 
 # Use the development configuration if available
 try:
@@ -179,7 +179,7 @@ def createall():
     # create 2 categories
     for i in range(1, 3):
         category_title = "Test Category %s" % i
-        category = Category(title=category_title,
+        category = Forum(is_category=True, title=category_title,
                             description="Test Description")
         db.session.add(category)
 
@@ -190,11 +190,11 @@ def createall():
 
             forum_title = "Test Forum %s %s" % (j, i)
             forum = Forum(title=forum_title, description="Test Description",
-                          category_id=i)
+                          parent_id=i)
             db.session.add(forum)
 
     # create 1 topic in each forum
-    for k in range(1, 5):
+    for k in [2, 3, 5, 6]:  # Forum ids are not sequential because categories.
         topic = Topic()
         topic.first_post = Post()
 
@@ -208,11 +208,9 @@ def createall():
         db.session.add(topic)
         db.session.commit()
 
-        # Update the post and topic count
-        topic.forum.topic_count += 1
-        topic.forum.post_count += 1
-        topic.post_count += 1
-        topic.first_post.user.post_count += 1
+        # Invalidate relevant caches
+        topic.invalidate_cache()
+        topic.forum.invalidate_cache()
 
         # create 2 additional posts for each topic
         for m in range(1, 3):
@@ -222,12 +220,9 @@ def createall():
             db.session.commit()
 
             # Update the post count
-            post.user.post_count += 1
-            topic.post_count += 1
-            topic.forum.post_count += 1
-
-            topic.last_post_id = post.id
-            topic.forum.last_post_id = post.id
+            post.user.invalidate_cache()
+            topic.invalidate_cache()
+            topic.forum.invalidate_cache()
 
             db.session.commit()
 

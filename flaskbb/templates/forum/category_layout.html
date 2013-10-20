@@ -2,7 +2,7 @@
     <thead class="categoryhead">
         <tr>
             <td colspan="5">
-                <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
+                <div><strong><a href="{{ url_for('forum.view_forum', forum_id=category.id) }}">{{ category.title }}</a></strong></div>
             </td>
         </tr>
     </thead>
@@ -14,7 +14,7 @@
             <td width="200" align="center" style="white-space: nowrap"><strong>Last Post</strong></td>
         </tr>
 
-        {% for forum in category.forums %}
+        {% for forum in category.children %}
         <tr>
             <td align="center" valign="center" width="1">
                 New </br> Posts
@@ -27,19 +27,27 @@
                     {% autoescape false %}
                     {{ forum.description|markup }}
                     {% endautoescape %}
-                    <br />
-                    <!--
-                    <strong>Sub Forums:</strong> <a href="#" title="">Subforum 1</a>, <a href="#" title="">Subforum 2</a>
-                     -->
                 </div>
+                {% if forum.children|length %}
+                <div class="forum-subforums">
+                    <ul class="list-inline">
+                        <li><strong>Subforums:</strong></li>
+                        {% for subforum in forum.children %}
+                        <li>
+                            <a href="{{ url_for('forum.view_forum', forum_id=subforum.id) }}">{{ subforum.title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
             </td>
 
             <td valign="top" align="center" style="white-space: nowrap">{{ forum.topic_count }}</td>
             <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
 
             <td valign="top" align="right" style="white-space: nowrap">
-                {% if forum.last_post_id %}
-                <a href="{{ url_for('forum.view_post', post_id=forum.last_post_id) }}" title="{{ forum.last_post.topic.title }}">
+                {% if forum.last_post %}
+                <a href="{{ url_for('forum.view_post', post_id=forum.last_post.id) }}" title="{{ forum.last_post.topic.title }}">
                     <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
                 </a>
                 <br />
