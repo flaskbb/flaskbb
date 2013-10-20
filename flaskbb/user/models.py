@@ -8,6 +8,7 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import sys
 from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -43,6 +44,14 @@ class Group(db.Model):
     deletetopic = db.Column(db.Boolean, default=False)
     posttopic = db.Column(db.Boolean, default=True)
     postreply = db.Column(db.Boolean, default=True)
+
+    # Methods
+    def __repr__(self):
+        """
+        Set to a unique key specific to the object in the database.
+        Required for cache.memoize() to work across requests.
+        """
+        return "<{} {})>".format(self.__class__.__name__, self.id)
 
     def save(self):
         db.session.add(self)
@@ -94,7 +103,31 @@ class User(db.Model, UserMixin):
                         backref=db.backref("topicstracked", lazy="dynamic"),
                         lazy="dynamic")
 
+    # Properties
+    @property
+    def post_count(self):
+        """
+        Property interface for get_post_count method.
+
+        Method seperate for easy invalidation of cache.
+        """
+        return self.get_post_count()
+
+    @property
+    def last_post(self):
+        """
+        Property interface for get_last_post method.
+
+        Method seperate for easy invalidation of cache.
+        """
+        return self.get_last_post()
+
+    # Methods
     def __repr__(self):
+        """
+        Set to a unique key specific to the object in the database.
+        Required for cache.memoize() to work across requests.
+        """
         return "Username: %s" % self.username
 
     def _get_password(self):
@@ -157,23 +190,6 @@ class User(db.Model, UserMixin):
         else:
             data = False
         return expired, invalid, data
-
-    @property
-    def post_count(self):
-        """
-        Returns the amount of posts within the current topic.
-        """
-        # TODO: Cache
-        return Post.query.filter(Post.user_id == self.id).\
-            count()
-
-    @property
-    def last_post(self):
-        """
-        Returns the latest post from the user
-        """
-        return Post.query.filter(Post.user_id == self.id).\
-            order_by(Post.date_created.desc()).first()
 
     def all_topics(self, page):
         """
@@ -282,6 +298,29 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
         return self
+
+    @cache.memoize(timeout=sys.maxint)
+    def get_post_count(self):
+        """
+        Returns the amount of posts within the current topic.
+        """
+        return Post.query.filter(Post.user_id == self.id).\
+            count()
+
+    # @cache.memoize(timeout=sys.maxint)  # TODO:  DetachedInstanceError if we return a Flask-SQLAlchemy model.
+    def get_last_post(self):
+        """
+        Returns the latest post from the user
+        """
+        return Post.query.filter(Post.user_id == self.id).\
+            order_by(Post.date_created.desc()).first()
+
+    def invalidate_cache(self):
+        """
+        Invalidates this objects cached metadata.
+        """
+        cache.delete_memoized(self.get_post_count, self)
+        #cache.delete_memoized(self.get_last_post, self) # TODO:  Cannot use til we can cache this object.
 
 
 class Guest(AnonymousUserMixin):
