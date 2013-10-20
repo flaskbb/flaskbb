@@ -197,33 +197,47 @@ class Topic(db.Model):
             filter(Post.topic_id == self.id).\
             count()
 
-    #@cache.memoize(timeout=sys.maxint)  # TODO:  DetachedInstanceError if we return a Flask-SQLAlchemy model.
+    @cache.memoize(timeout=sys.maxint)
     def get_first_post(self):
         """
         Returns the first post within the current topic.
         """
-        return Post.query.\
+
+        post = Post.query.\
             filter(Post.topic_id == self.id).\
             order_by(Post.date_created.asc()).\
             first()
 
-    #@cache.memoize(timeout=sys.maxint)  # TODO:  DetachedInstanceError if we return a Flask-SQLAlchemy model.
+        # Load the topic and user before we cache
+        post.topic
+        post.user
+
+        return post
+
+    @cache.memoize(timeout=sys.maxint)
     def get_last_post(self):
         """
         Returns the latest post within the current topic.
         """
-        return Post.query.\
+
+        post = Post.query.\
             filter(Post.topic_id == self.id).\
             order_by(Post.date_created.desc()).\
             first()
+
+        # Load the topic and user before we cache
+        post.topic
+        post.user
+
+        return post
 
     def invalidate_cache(self):
         """
         Invalidates this objects cached metadata.
         """
         cache.delete_memoized(self.get_post_count, self)
-        #cache.delete_memoized(self.get_first_post, self) # TODO:  Cannot use til we can cache this object.
-        #cache.delete_memoized(self.get_last_post, self) # TODO:  Cannot use til we can cache this object.
+        cache.delete_memoized(self.get_first_post, self)
+        cache.delete_memoized(self.get_last_post, self)
 
 
 class Forum(db.Model):
@@ -338,7 +352,7 @@ class Forum(db.Model):
                 filter(Topic.forum_id == self.id).\
                 count()
 
-    #@cache.memoize(timeout=sys.maxint)  # TODO:  DetachedInstanceError if we return a Flask-SQLAlchemy model.
+    @cache.memoize(timeout=sys.maxint)
     def get_last_post(self, include_children=True):
         """
         Returns the latest post within the current forum or it's children.
@@ -346,17 +360,23 @@ class Forum(db.Model):
         """
 
         if include_children:
-            return Post.query.\
+            post = Post.query.\
                 filter(Post.topic_id == Topic.id). \
                 filter(Topic.forum_id.in_(get_forum_ids(self))). \
                 order_by(Post.date_created.desc()). \
                 first()
         else:
-            return Post.query.\
+            post = Post.query.\
                 filter(Post.topic_id == Topic.id).\
                 filter(Topic.forum_id == self.id).\
                 order_by(Post.date_created.desc()).\
                 first()
+
+        # Load the topic and user before we cache
+        post.topic
+        post.user
+
+        return post
 
     def invalidate_cache(self):
         """
@@ -366,7 +386,7 @@ class Forum(db.Model):
         while _forum.parent:
             cache.delete_memoized(self.get_post_count, _forum)
             cache.delete_memoized(self.get_topic_count, _forum)
-            #cache.delete_memoized(self.get_last_post, _forum) # TODO:  Cannot use til we can cache this object.
+            cache.delete_memoized(self.get_last_post, _forum)
             _forum = _forum.parent
 
     # Class methods

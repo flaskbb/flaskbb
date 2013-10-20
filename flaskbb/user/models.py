@@ -307,20 +307,26 @@ class User(db.Model, UserMixin):
         return Post.query.filter(Post.user_id == self.id).\
             count()
 
-    # @cache.memoize(timeout=sys.maxint)  # TODO:  DetachedInstanceError if we return a Flask-SQLAlchemy model.
+    @cache.memoize(timeout=sys.maxint)
     def get_last_post(self):
         """
         Returns the latest post from the user
         """
-        return Post.query.filter(Post.user_id == self.id).\
+        post = Post.query.filter(Post.user_id == self.id).\
             order_by(Post.date_created.desc()).first()
+
+        # Load the topic and user before we cache
+        post.topic
+        post.user
+
+        return post
 
     def invalidate_cache(self):
         """
         Invalidates this objects cached metadata.
         """
         cache.delete_memoized(self.get_post_count, self)
-        #cache.delete_memoized(self.get_last_post, self) # TODO:  Cannot use til we can cache this object.
+        cache.delete_memoized(self.get_last_post, self)
 
 
 class Guest(AnonymousUserMixin):
