@@ -249,6 +249,7 @@ class Forum(db.Model):
     position = db.Column(db.Integer, default=0)
     is_category = db.Column(db.Boolean, default=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("forums.id"))
+    locked = db.Column(db.Boolean, default=False)
 
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")

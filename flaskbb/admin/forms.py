@@ -234,6 +234,7 @@ class ForumForm(Form):
                               description="This field is not saved if this forum is a category (see \"Is a category?\" field below).")
 
     is_category = BooleanField("Is a category?", description="Categories are root-level parents for forums.  They can not contain topics.")
+    locked = BooleanField("Locked?", description="Disable new posts and topics in this forum.")
 
     def validate_parent(self, field):
         if field.data.id == self._id:

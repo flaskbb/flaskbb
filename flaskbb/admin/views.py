@@ -196,6 +196,7 @@ def edit_forum(forum_id):
         forum.position = form.position.data
         forum.parent_id = form.parent.data.id
         forum.is_category = form.is_category.data
+        forum.locked = form.locked.data
         forum.save()
 
         flash("Forum successfully edited.", "success")
@@ -206,6 +207,7 @@ def edit_forum(forum_id):
         form.position.data = forum.position
         form.parent.data = forum.parent
         form.is_category.data = forum.is_category
+        form.locked.data = forum.locked
         #form.moderators.data = forum.moderators
 
     return render_template("admin/edit_forum.html", form=form)

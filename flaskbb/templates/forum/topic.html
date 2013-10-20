@@ -128,7 +128,7 @@
     </tbody>
 </table>
 
-{% if current_user|post_reply(topic.forum) and not topic.locked %}
+{% if form %}
     {% from "macros.html" import render_field %}
 <form class="form" action="#" method="post">
     {{ form.hidden_tag() }}

@@ -72,8 +72,10 @@ def view_topic(topic_id):
 
     form = None
 
-    if not topic.locked and perm_post_reply(user=current_user,
-                                            forum=topic.forum):
+    if not topic.locked \
+        and not topic.forum.locked \
+        and perm_post_reply(user=current_user,
+                            forum=topic.forum):
 
             form = QuickreplyForm()
             if form.validate_on_submit():
@@ -104,8 +106,8 @@ def view_post(post_id):
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
-    if forum.is_category:
-        flash("You cannot post a topic in a category.", "error")
+    if forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
     if not perm_post_topic(user=current_user, forum=forum):
@@ -143,6 +145,10 @@ def delete_topic(topic_id):
 def new_post(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
+    if topic.forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=topic.forum.id))
+
     if topic.locked:
         flash("The topic is locked.", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
@@ -163,6 +169,14 @@ def new_post(topic_id):
 @login_required
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
+
+    if post.topic.forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        return redirect(url_for('forum.view_forum', forum_id=post.topic.forum.id))
+
+    if post.topic.locked:
+        flash("The topic is locked.", "error")
+        return redirect(url_for("forum.view_forum", forum_id=post.topic.forum_id))
 
     if not perm_edit_post(user=current_user, forum=post.topic.forum,
                           post_user_id=post.user_id):
