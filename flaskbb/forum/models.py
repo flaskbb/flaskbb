@@ -188,6 +188,52 @@ class Topic(db.Model):
 
         return self
 
+    def update_read(self, user):
+        """
+        Update the topics read status if the user hasn't read the latest
+        post.
+        """
+        # Don't do anything if the user is a guest
+        if not user.is_authenticated():
+            return
+
+        topicread = TopicsRead.query.\
+            filter(TopicsRead.user_id == user.id,
+                   TopicsRead.topic_id == self.id).first()
+
+        # If the user has visited this topic already but hasn't read
+        # it for a while, mark the topic as read
+        if topicread and (topicread.last_read < self.last_post.date_created):
+            topicread.last_read = datetime.utcnow()
+            topicread.save()
+        # If the user hasn't read the topic, add him to the topicsread model
+        elif not topicread:
+            topicread = TopicsRead()
+            topicread.user_id = user.id
+            topicread.topic_id = self.id
+            topicread.forum_id = self.forum_id
+            topicread.last_read = datetime.utcnow()
+            topicread.save()
+
+    def is_unread(self, user):
+        """
+        Returns True if the user hasn't read the topic
+        """
+        if not user.is_authenticated():
+            return True
+
+        topicread = TopicsRead.query.\
+            filter(TopicsRead.user_id == user.id,
+                   TopicsRead.topic_id == self.id).first()
+
+        # If no entry is found, the user hasn't read the topic
+        if not topicread:
+            return True
+        # If the entry is older than the last post, the user hasn't read it
+        if topicread.last_read < self.last_post.date_created:
+            return True
+        return False
+
     @cache.memoize(timeout=sys.maxint)
     def get_post_count(self):
         """
@@ -319,6 +365,27 @@ class Forum(db.Model):
         breadcrumbs.reverse()
         return breadcrumbs
 
+    def is_unread(self, user):
+        """
+        Returns True if the user has read the topic
+        """
+        if not user.is_authenticated():
+            return True
+
+        # make a count, and if the count is > 0, there are still unread topics
+        # in the forum
+        topicsread = TopicsRead.query.\
+            filter(TopicsRead.forum_id == self.id). \
+            filter(TopicsRead.last_read < self.last_post.date_created).\
+            count()
+
+        # If no entry is found, return true
+        if not topicsread:
+            return True
+        if topicsread > 0:
+            return True
+        return False
+
     @cache.memoize(timeout=sys.maxint)
     def get_post_count(self, include_children=True):
         """
@@ -397,25 +464,25 @@ class Forum(db.Model):
 
 
 """
-A topic can be tracked by many users
-and a user can track many topics.. so it's a many-to-many relationship
+This model stores the tracked topics for each user
 """
-topictracker = db.Table('topictracker',
+topictracker = db.Table(
+    'topictracker',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('topic_id', db.Integer(), db.ForeignKey('topics.id')))
 
 
-class Tracking(db.Model):
+class TopicsRead(db.Model):
     """
     This model tracks the unread/read posts
-    Note: This functionality isn't implemented yet, but this will be the next
-    feature after the TopicTracker
     """
-    __tablename__ = "tracking"
+    __tablename__ = "topicsread"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
+                         primary_key=True)
+    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id"),
+                         primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
     def __repr__(self):

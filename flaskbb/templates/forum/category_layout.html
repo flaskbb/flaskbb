@@ -17,7 +17,11 @@
         {% for forum in category.children %}
         <tr>
             <td align="center" valign="center" width="1">
-                New </br> Posts
+            {% if forum.is_unread(current_user) %}
+                New posts
+            {% else %}
+                No new posts
+            {% endif %}
             </td>
 
             <td valign="top">

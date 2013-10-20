@@ -45,6 +45,7 @@ def index():
                            online_users=len(get_online_users()),
                            online_guests=len(get_online_users(guest=True)))
 
+
 @forum.route("/forum/<int:forum_id>")
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
@@ -68,6 +69,9 @@ def view_topic(topic_id):
 
     # Count the topic views
     topic.views += 1
+
+    # Update the topicsread status if he hasn't read it
+    topic.update_read(current_user)
     topic.save()
 
     form = None
