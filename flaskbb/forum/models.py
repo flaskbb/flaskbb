@@ -211,7 +211,6 @@ class Topic(db.Model):
             topicread = TopicsRead()
             topicread.user_id = user.id
             topicread.topic_id = self.id
-            topicread.forum_id = self.forum_id
             topicread.last_read = datetime.utcnow()
             topicread.save()
 
@@ -365,24 +364,33 @@ class Forum(db.Model):
         breadcrumbs.reverse()
         return breadcrumbs
 
-    def is_unread(self, user):
+    def is_unread(self, user, include_children=True):
         """
-        Returns True if the user has read the topic
+        Returns True if the user hasn't read the topic
         """
         if not user.is_authenticated():
             return True
 
-        # make a count, and if the count is > 0, there are still unread topics
-        # in the forum
-        topicsread = TopicsRead.query.\
-            filter(TopicsRead.forum_id == self.id). \
-            filter(TopicsRead.last_read < self.last_post.date_created).\
-            count()
+        if include_children:
+            topicread = TopicsRead.query.\
+                filter(TopicsRead.user_id == user.id). \
+                filter(TopicsRead.topic_id == Topic.id). \
+                filter(Topic.forum_id.in_(get_forum_ids(self))). \
+                order_by(TopicsRead.last_read.desc()). \
+                first()
+        else:
+            topicread = TopicsRead.query.\
+                filter(TopicsRead.user_id == user.id). \
+                filter(TopicsRead.topic_id == Topic.id). \
+                filter(Topic.forum_id == self.id). \
+                order_by(TopicsRead.last_read.desc()). \
+                first()
 
-        # If no entry is found, return true
-        if not topicsread:
+        # If no entry is found, the user hasn't read the topic
+        if not topicread:
             return True
-        if topicsread > 0:
+        # If the entry is older than the last post, the user hasn't read it
+        if topicread.last_read < self.last_post.date_created:
             return True
         return False
 
@@ -480,8 +488,6 @@ class TopicsRead(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
-                         primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 

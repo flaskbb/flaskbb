@@ -41,7 +41,7 @@ def index():
                            user_count=user_count,
                            topic_count=topic_count,
                            post_count=post_count,
-                           newest_user=newest_user.username,
+                           newest_user=newest_user,
                            online_users=len(get_online_users()),
                            online_guests=len(get_online_users(guest=True)))
 
