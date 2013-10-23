@@ -26,7 +26,7 @@
                 Total number of posts: <strong>{{ post_count }}</strong> <br />
             </td>
             <td>
-                Newest registered user: <a href="{{ url_for('user.profile', username=newest_user) }}">{{ newest_user }}</a> <br />
+                Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
                 Registered users online: <strong>{{ online_users }}</strong> <br />
                 Guests online: <strong>{{ online_guests }}</strong> <br />
             </td>
