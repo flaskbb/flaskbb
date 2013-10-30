@@ -1,5 +1,5 @@
-{% extends "pms/pm_layout.html" %}
-{% block pm_content %}
+{% extends "message/message_layout.html" %}
+{% block message_content %}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -13,10 +13,10 @@
         {% for message in messages %}
         <tr>
             <td><a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a></td>
-            <td><a href="{{ url_for('pms.view_message', id=message.id) }}">{{ message.subject }}</a></td>
+            <td><a href="{{ url_for('user.view_message', id=message.id) }}">{{ message.subject }}</a></td>
             <td>{{ message.date_created|time_since }}</td>
-            <td><a href="{{ url_for('pms.delete_message', id=message.id) }}">Delete</a> |
-                <a href="{{ url_for('pms.move_message', id=message.id) }}">Move</a></td>
+            <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a> |
+                <a href="{{ url_for('user.move_message', id=message.id) }}">Move</a></td>
         </tr>
         {% endfor %}
     </tbody>

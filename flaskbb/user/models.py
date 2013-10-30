@@ -20,7 +20,8 @@ from flaskbb.extensions import db, cache
 from flaskbb.forum.models import Post, Topic, topictracker
 
 
-groups_users = db.Table('groups_users',
+groups_users = db.Table(
+    'groups_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
@@ -84,6 +85,8 @@ class User(db.Model, UserMixin):
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
 
+    post_count = db.Column(db.Integer, default=0)
+
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
 
     primary_group = db.relationship('Group', lazy="joined",
@@ -102,25 +105,6 @@ class User(db.Model, UserMixin):
                         primaryjoin=(topictracker.c.user_id == id),
                         backref=db.backref("topicstracked", lazy="dynamic"),
                         lazy="dynamic")
-
-    # Properties
-    @property
-    def post_count(self):
-        """
-        Property interface for get_post_count method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_post_count()
-
-    @property
-    def last_post(self):
-        """
-        Property interface for get_last_post method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_last_post()
 
     # Methods
     def __repr__(self):
@@ -253,7 +237,7 @@ class User(db.Model, UserMixin):
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
-    @cache.memoize(60*5)
+    @cache.memoize(timeout=sys.maxint)
     def get_permissions(self, exclude=None):
         """
         Returns a dictionary with all the permissions the user has.
@@ -346,3 +330,47 @@ class Guest(AnonymousUserMixin):
                 continue
             perms[c.name] = getattr(group, c.name)
         return perms
+
+
+class PrivateMessage(db.Model):
+    __tablename__ = "privatemessages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    subject = db.Column(db.String)
+    message = db.Column(db.Text)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow())
+    trash = db.Column(db.Boolean, nullable=False, default=False)
+    draft = db.Column(db.Boolean, nullable=False, default=False)
+    unread = db.Column(db.Boolean, nullable=False, default=True)
+
+    user = db.relationship("User", backref="pms", lazy="joined",
+                           foreign_keys=[user_id])
+    from_user = db.relationship("User", lazy="joined",
+                                foreign_keys=[from_user_id])
+    to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
+
+    def save(self, from_user=None, to_user=None, user_id=None, draft=False):
+        if self.id:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        if draft:
+            self.draft = True
+
+        # Add the message to the user's pm box
+        self.user_id = user_id
+        self.from_user_id = from_user
+        self.to_user_id = to_user
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self

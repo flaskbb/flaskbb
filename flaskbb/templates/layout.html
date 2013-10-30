@@ -66,8 +66,8 @@
                                 <span class="glyphicon glyphicon-envelope"></span> <span class="badge">{{ current_user.pm_unread }}</span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url_for('pms.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
-                                <li><a href="{{ url_for('pms.new_message') }}"><span class="glyphicon glyphicon-pencil"></span> New Message</a></li>
+                                <li><a href="{{ url_for('user.inbox') }}"><span class="glyphicon glyphicon-envelope"></span> Inbox</a></li>
+                                <li><a href="{{ url_for('user.new_message') }}"><span class="glyphicon glyphicon-pencil"></span> New Message</a></li>
                             </ul>
                         </div>
                     {% else %}

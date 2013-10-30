@@ -36,5 +36,8 @@ __pycache__
 *.pyc
 *.db
 .venv
+*.sublime-workspace
+*.sublime-project
+*.egg-info
 flaskbb/configs/production.py
 flaskbb/configs/development.py

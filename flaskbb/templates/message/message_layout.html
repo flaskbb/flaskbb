@@ -12,16 +12,16 @@
     <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <li class="nav-header">Options | <small><a href="{{ url_for('pms.new_message') }}">New PM</a></small></li>
-                {{ navlink('pms.inbox', 'Inbox') }}
-                {{ navlink('pms.sent', 'Sent') }}
-                {{ navlink('pms.drafts', 'Drafts') }}
-                {{ navlink('pms.trash', 'Trash') }}
+                <li class="nav-header">Options | <small><a href="{{ url_for('user.new_message') }}">New PM</a></small></li>
+                {{ navlink('user.inbox', 'Inbox') }}
+                {{ navlink('user.sent', 'Sent') }}
+                {{ navlink('user.drafts', 'Drafts') }}
+                {{ navlink('user.trash', 'Trash') }}
             </ul>
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->
     <div class="col-sm-9">
-        {% block pm_content %}{% endblock %}
+        {% block message_content %}{% endblock %}
     </div><!--/.col-sm-9 -->
 </div><!--/.row -->
 {% endblock %}
