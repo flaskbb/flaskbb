@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils
+    flaskbb.utils.helpers
     ~~~~~~~~~~~~~~~~~~~~
 
-    A few utils that are used by flaskbb
+    A few helpers that are used by flaskbb
 
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
@@ -12,9 +12,6 @@ import time
 from datetime import datetime, timedelta
 
 from flask import current_app
-from sqlalchemy import types
-from sqlalchemy.ext.mutable import Mutable
-from wtforms.widgets.core import Select, HTMLString, html_params
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
@@ -41,6 +38,9 @@ def mark_online(user_id, guest=False):
 
 
 def get_last_user_activity(user_id, guest=False):
+    """
+    Returns the last active time from a given `user_id`.
+    """
     if guest:
         last_active = redis.get('guest-activity/%s' % user_id)
     else:
@@ -52,6 +52,9 @@ def get_last_user_activity(user_id, guest=False):
 
 
 def get_online_users(guest=False):
+    """
+    Returns all online users within a specified time range
+    """
     current = int(time.time()) // 60
     minutes = xrange(current_app.config['ONLINE_LAST_MINUTES'])
     if guest:
@@ -85,7 +88,7 @@ def can_moderate(user, forum):
     return user.permissions['super_mod'] or user.permissions['admin']
 
 
-def perm_edit_post(user, post_user_id, forum):
+def can_edit_post(user, post_user_id, forum):
     """
     Check if the post can be edited by the user
     """
@@ -93,7 +96,7 @@ def perm_edit_post(user, post_user_id, forum):
                       post_user_id=post_user_id)
 
 
-def perm_delete_post(user, post_user_id, forum):
+def can_delete_post(user, post_user_id, forum):
     """
     Check if the post can be deleted by the user
     """
@@ -101,7 +104,7 @@ def perm_delete_post(user, post_user_id, forum):
                       post_user_id=post_user_id)
 
 
-def perm_delete_topic(user, post_user_id, forum):
+def can_delete_topic(user, post_user_id, forum):
     """
     Check if the topic can be deleted by the user
     """
@@ -109,14 +112,14 @@ def perm_delete_topic(user, post_user_id, forum):
                       post_user_id=post_user_id)
 
 
-def perm_post_reply(user, forum):
+def can_post_reply(user, forum):
     """
     Check if the user is allowed to post in the forum
     """
     return check_perm(user=user, perm='postreply', forum=forum)
 
 
-def perm_post_topic(user, forum):
+def can_post_topic(user, forum):
     """
     Check if the user is allowed to create a new topic in the forum
     """
@@ -134,14 +137,25 @@ def crop_title(title):
 
 
 def render_markup(text):
+    """
+    Renders the given text as bbcode
+    """
     return render_bbcode(text)
 
 
 def is_online(user):
+    """
+    A simple check, to see if the user was online
+    within a specified time range
+    """
     return user.lastseen >= time_diff()
 
 
 def time_diff():
+    """
+    Calculates the time difference between `now` and the ONLINE_LAST_MINUTES
+    variable from the configuration.
+    """
     now = datetime.utcnow()
     diff = now - timedelta(minutes=current_app.config['ONLINE_LAST_MINUTES'])
     return diff
@@ -155,6 +169,9 @@ def format_date(value, format='%Y-%m-%d'):
 
 
 def time_since(value):
+    """
+    Just a interface for `time_delta_format`
+    """
     return time_delta_format(value)
 
 
@@ -192,101 +209,3 @@ def time_delta_format(dt, default=None):
             return u'%d %s ago' % (period, plural)
 
     return default
-
-
-class DenormalizedText(Mutable, types.TypeDecorator):
-    """
-    Stores denormalized primary keys that can be
-    accessed as a set.
-
-    :param coerce: coercion function that ensures correct
-                   type is returned
-
-    :param separator: separator character
-
-    Source: https://github.com/imwilsonxu/fbone/blob/master/fbone/user/models.py#L13-L45
-    """
-
-    impl = types.Text
-
-    def __init__(self, coerce=int, separator=" ", **kwargs):
-
-        self.coerce = coerce
-        self.separator = separator
-
-        super(DenormalizedText, self).__init__(**kwargs)
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            items = [str(item).strip() for item in value]
-            value = self.separator.join(item for item in items if item)
-        return value
-
-    def process_result_value(self, value, dialect):
-        if not value:
-            return set()
-        return set(self.coerce(item) for item in value.split(self.separator))
-
-    def copy_value(self, value):
-        return set(value)
-
-
-class SelectDateWidget(object):
-    """
-    Renders a DateTime field with 3 selects.
-    For more information see: http://stackoverflow.com/a/14664504
-    """
-    FORMAT_CHOICES = {
-        '%d': [(x, str(x)) for x in range(1, 32)],
-        '%m': [(x, str(x)) for x in range(1, 13)]
-    }
-
-    FORMAT_CLASSES = {
-        '%d': 'select_date_day',
-        '%m': 'select_date_month',
-        '%Y': 'select_date_year'
-    }
-
-    def __init__(self, years=range(1930, datetime.utcnow().year+1)):
-        super(SelectDateWidget, self).__init__()
-        self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
-
-    def __call__(self, field, **kwargs):
-        field_id = kwargs.pop('id', field.id)
-        html = []
-        allowed_format = ['%d', '%m', '%Y']
-
-        for format in field.format.split():
-            if (format in allowed_format):
-                choices = self.FORMAT_CHOICES[format]
-                id_suffix = format.replace('%', '-')
-                id_current = field_id + id_suffix
-
-                kwargs['class'] = self.FORMAT_CLASSES[format]
-                try:
-                    del kwargs['placeholder']
-                except:
-                    pass
-
-                html.append('<select %s>' % html_params(name=field.name,
-                                                        id=id_current,
-                                                        **kwargs))
-
-                if field.data:
-                    current_value = int(field.data.strftime(format))
-                else:
-                    current_value = None
-
-                for value, label in choices:
-                    selected = (value == current_value)
-                    html.append(Select.render_option(value, label, selected))
-                html.append('</select>')
-            else:
-                html.append(format)
-                html.append(
-                    """<input type="hidden" value="{}" {}></input>""".format(
-                        html_params(name=field.name, id=id_current, **kwargs)))
-
-            html.append(' ')
-
-        return HTMLString(''.join(html))
