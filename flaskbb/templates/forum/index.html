@@ -4,8 +4,78 @@
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
 </ol>
-{% for category in categories %}
-    {% include 'forum/category_layout.html' %}
+
+{% for category, forums in categories.items() %}
+<table class="table table-bordered">
+    <thead class="categoryhead">
+        <tr>
+            <td colspan="5">
+                <div><strong><a href="{{ url_for('forum.view_forum', forum_id=category.id) }}">{{ category.title }}</a></strong></div>
+            </td>
+        </tr>
+    </thead>
+    <tbody class="forumbody">
+        <tr class="forum_stats">
+            <td colspan="2"><strong>Forum</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>Topics</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>Posts</strong></td>
+            <td width="200" align="center" style="white-space: nowrap"><strong>Last Post</strong></td>
+        </tr>
+
+        {% for forum, subforums in forums.items() %}
+        <tr>
+            <td align="center" valign="center" width="4%">
+            {#
+            {% if forum.is_unread(current_user) %}
+                New posts
+            {% else %}
+                No new posts
+            {% endif %}
+            #}
+            </td>
+
+            <td valign="top">
+                <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
+
+                <div class="forum-description">
+                    {% autoescape false %}
+                    {{ forum.description|markup }}
+                    {% endautoescape %}
+                </div>
+                {% if subforums|length %}
+                <div class="forum-subforums">
+                    <ul class="list-inline">
+                        <li><strong>Subforums:</strong></li>
+                        {% for subforum in subforums %}
+                        <li>
+                            <a href="{{ url_for('forum.view_forum', forum_id=subforum.id) }}">{{ subforum.title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </td>
+
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum.topic_count }}</td>
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
+
+            <td valign="top" align="right" style="white-space: nowrap">
+                {% if forum.last_post_id %}
+                <a href="{{ url_for('forum.view_post', post_id=forum.last_post_id) }}" title="{{ forum.last_post.topic.title }}">
+                    <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
+                </a>
+                <br />
+                {{ forum.last_post.date_created|time_since }}<br />
+                by <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
+                {% else %}
+                No posts
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
 {% endfor %}
 
 <!-- Forum Stats -->
@@ -14,7 +84,9 @@
         <tr>
             <td colspan="2">
                 <strong>Board Statistics</strong>
+                {% if config["USE_REDIS"] %}
                 [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">Who is online?</a>]
+                {% endif %}
             </td>
         </tr>
     </thead>
@@ -27,8 +99,10 @@
             </td>
             <td>
                 Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
+                {% if config["USE_REDIS"] %}
                 Registered users online: <strong>{{ online_users }}</strong> <br />
                 Guests online: <strong>{{ online_guests }}</strong> <br />
+                {% endif %}
             </td>
         </tr>
 
