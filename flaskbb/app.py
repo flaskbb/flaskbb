@@ -18,29 +18,25 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 # Import the user blueprint
 from flaskbb.user.views import user
-from flaskbb.user.models import User, Guest
+from flaskbb.user.models import User, Guest, PrivateMessage
 # Import the auth blueprint
 from flaskbb.auth.views import auth
 # Import the admin blueprint
 from flaskbb.admin.views import admin
-# Import the PM blueprint
-from flaskbb.pms.views import pms
-from flaskbb.pms.models import PrivateMessage
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 
 from flaskbb.extensions import db, login_manager, mail, cache
-from flaskbb.helpers import (format_date, time_since, is_online,
-                             perm_post_reply, perm_post_topic, perm_edit_post,
-                             perm_delete_topic, perm_delete_post, crop_title,
-                             render_markup, mark_online)
+from flaskbb.utils.helpers import (format_date, time_since, crop_title,
+                                   can_post_reply, can_post_topic,
+                                   can_delete_topic, can_delete_post, is_online,
+                                   can_edit_post, render_markup, mark_online)
 
 
 DEFAULT_BLUEPRINTS = (
     (forum, ""),
     (auth, ""),
-    (user, "/u"),
-    (pms, "/pm"),
+    (user, "/user"),
     (admin, "/admin")
 )
 
@@ -141,11 +137,11 @@ def configure_template_filters(app):
     app.jinja_env.filters['time_since'] = time_since
     app.jinja_env.filters['is_online'] = is_online
     app.jinja_env.filters['crop_title'] = crop_title
-    app.jinja_env.filters['edit_post'] = perm_edit_post
-    app.jinja_env.filters['delete_post'] = perm_delete_post
-    app.jinja_env.filters['delete_topic'] = perm_delete_topic
-    app.jinja_env.filters['post_reply'] = perm_post_reply
-    app.jinja_env.filters['post_topic'] = perm_post_topic
+    app.jinja_env.filters['edit_post'] = can_edit_post
+    app.jinja_env.filters['delete_post'] = can_delete_post
+    app.jinja_env.filters['delete_topic'] = can_delete_topic
+    app.jinja_env.filters['post_reply'] = can_post_reply
+    app.jinja_env.filters['post_topic'] = can_post_topic
 
 
 def configure_before_handlers(app):
@@ -167,12 +163,13 @@ def configure_before_handlers(app):
     def get_user_permissions():
         current_user.permissions = current_user.get_permissions()
 
-    @app.before_request
-    def mark_current_user_online():
-        if current_user.is_authenticated():
-            mark_online(current_user.username)
-        else:
-            mark_online(request.remote_addr, guest=True)
+    if app.config["USE_REDIS"]:
+        @app.before_request
+        def mark_current_user_online():
+            if current_user.is_authenticated():
+                mark_online(current_user.username)
+            else:
+                mark_online(request.remote_addr, guest=True)
 
 
 def configure_errorhandlers(app):

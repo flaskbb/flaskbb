@@ -58,7 +58,6 @@ class DefaultConfig(object):
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 60
 
-
     ## Captcha
     RECAPTCHA_ENABLE = False
     RECAPTCHA_USE_SSL = False
@@ -90,3 +89,6 @@ class DefaultConfig(object):
     ONLINE_LAST_MINUTES = 15
     # The length of the topic title in characters on the index
     TITLE_LENGTH = 15
+
+    # This is really handy if do not have an redis instance like on windows
+    USE_REDIS = True
