@@ -8,8 +8,6 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
-
 from flask.ext.wtf import Form
 from wtforms import (TextField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField)
@@ -19,7 +17,7 @@ from wtforms.validators import (Required, Optional, Email, regexp, Length, URL,
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
 
-from flaskbb.helpers import SelectDateWidget
+from flaskbb.utils.helpers import SelectDateWidget
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum
 from flaskbb.user.models import User, Group
@@ -133,33 +131,33 @@ class GroupForm(Form):
 
     admin = BooleanField("Is Admin Group?",
                          description="With this option the group has access \
-                                     to the admin panel.")
+                                      to the admin panel.")
     super_mod = BooleanField("Is Super Moderator Group?",
                              description="Check this if the users in this \
-                                         group are allowed to moderate every \
-                                         forum")
+                                          group are allowed to moderate every \
+                                          forum")
     mod = BooleanField("Is Moderator Group?",
                        description="Check this if the users in this group are \
-                                   allowed to moderate specified forums")
+                                    allowed to moderate specified forums")
     banned = BooleanField("Is Banned Group?",
                           description="Only one Banned group is allowed")
     guest = BooleanField("Is Guest Group?",
                          description="Only one Guest group is allowed")
     editpost = BooleanField("Can edit posts",
                             description="Check this if the users in this \
-                                        group can edit posts")
+                                         group can edit posts")
     deletepost = BooleanField("Can delete posts",
                               description="Check this is the users in this \
-                                          group can delete posts")
+                                           group can delete posts")
     deletetopic = BooleanField("Can delete topics",
                                description="Check this is the users in this \
-                                           group can delete topics")
+                                            group can delete topics")
     posttopic = BooleanField("Can create topics",
                              description="Check this is the users in this \
-                                         group can create topics")
+                                          group can create topics")
     postreply = BooleanField("Can post replies",
                              description="Check this is the users in this \
-                                         group can post replies")
+                                          group can post replies")
 
     def validate_name(self, field):
         if hasattr(self, "group"):
