@@ -27,7 +27,7 @@
     <thead>
         <tr>
             <th colspan="5">
-                Subforums
+                Forums
             </th>
         </tr>
         <tr>
@@ -41,12 +41,14 @@
     <tbody>
         {% for subforum in forum.children %}
         <tr>
-            <td align="center" valign="center" width="1">
+            <td align="center" valign="center" width="4%">
+            {#
             {% if subforum.is_unread(current_user) %}
                 New posts
             {% else %}
                 No new posts
             {% endif %}
+            #}
             </td>
 
             <td valign="top">
@@ -116,11 +118,13 @@
         {% for topic in topics.items %}
         <tr>
             <td width="4%">
+            {#
             {% if topic.is_unread(current_user) %}
                 New
             {% else %}
                 Read
             {% endif %}
+            #}
             </td>
             <td>
                 <div>
