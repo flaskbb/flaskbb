@@ -16,11 +16,12 @@ from flask import (Blueprint, render_template, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
 
-from flaskbb.helpers import (time_diff, perm_post_reply, perm_post_topic,
-                             perm_edit_post, perm_delete_topic,
-                             perm_delete_post, get_online_users)
+from flaskbb.utils.helpers import (can_post_reply, can_delete_topic,
+                                   can_edit_post, can_post_topic,
+                                   can_delete_post, get_online_users, time_diff)
 from flaskbb.forum.models import Forum, Topic, Post
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
+from flaskbb.forum.helpers import get_forums
 from flaskbb.user.models import User
 
 
@@ -29,7 +30,7 @@ forum = Blueprint("forum", __name__)
 
 @forum.route("/")
 def index():
-    categories = Forum.get_categories().all()
+    categories = Forum.query.all()
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -37,13 +38,21 @@ def index():
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
 
-    return render_template("forum/index.html", categories=categories,
+    if not current_app.config["USE_REDIS"]:
+        online_users = User.query.filter(User.lastseen >= time_diff()).count()
+        online_guests = None
+    else:
+        online_users = len(get_online_users())
+        online_guests = len(get_online_users(guest=True))
+
+    return render_template("forum/index.html",
+                           categories=get_forums(categories),
                            user_count=user_count,
                            topic_count=topic_count,
                            post_count=post_count,
                            newest_user=newest_user,
-                           online_users=len(get_online_users()),
-                           online_guests=len(get_online_users(guest=True)))
+                           online_users=online_users,
+                           online_guests=online_guests)
 
 
 @forum.route("/forum/<int:forum_id>")
@@ -51,12 +60,15 @@ def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
     forum = Forum.query.filter_by(id=forum_id).first()
+    # TODO: Get all subforums with one query
+
     topics = Topic.query.filter_by(forum_id=forum.id).\
         filter(Post.topic_id == Topic.id).\
         order_by(Post.id.desc()).\
         paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
-    return render_template("forum/forum.html", forum=forum, topics=topics)
+    return render_template("forum/forum.html",
+                           forum=forum, topics=topics)
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
@@ -71,15 +83,15 @@ def view_topic(topic_id):
     topic.views += 1
 
     # Update the topicsread status if he hasn't read it
-    topic.update_read(current_user)
+    #topic.update_read(current_user)
     topic.save()
 
     form = None
 
     if not topic.locked \
         and not topic.forum.locked \
-        and perm_post_reply(user=current_user,
-                            forum=topic.forum):
+        and can_post_reply(user=current_user,
+                           forum=topic.forum):
 
             form = QuickreplyForm()
             if form.validate_on_submit():
@@ -111,10 +123,11 @@ def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
 
     if forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        flash("This forum is locked; you cannot submit new topics or posts.",
+              "error")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
-    if not perm_post_topic(user=current_user, forum=forum):
+    if not can_post_topic(user=current_user, forum=forum):
         flash("You do not have the permissions to create a new topic.", "error")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
@@ -132,8 +145,8 @@ def new_topic(forum_id):
 def delete_topic(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
-    if not perm_delete_topic(user=current_user, forum=topic.forum,
-                             post_user_id=topic.first_post.user_id):
+    if not can_delete_topic(user=current_user, forum=topic.forum,
+                            post_user_id=topic.first_post.user_id):
 
         flash("You do not have the permissions to delete the topic", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
@@ -150,14 +163,15 @@ def new_post(topic_id):
     topic = Topic.query.filter_by(id=topic_id).first()
 
     if topic.forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.", "error")
+        flash("This forum is locked; you cannot submit new topics or posts.",
+              "error")
         return redirect(url_for('forum.view_forum', forum_id=topic.forum.id))
 
     if topic.locked:
         flash("The topic is locked.", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
-    if not perm_post_reply(user=current_user, forum=topic.forum):
+    if not can_post_reply(user=current_user, forum=topic.forum):
         flash("You do not have the permissions to delete the topic", "error")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
@@ -175,15 +189,18 @@ def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
 
     if post.topic.forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.", "error")
-        return redirect(url_for('forum.view_forum', forum_id=post.topic.forum.id))
+        flash("This forum is locked; you cannot submit new topics or posts.",
+              "error")
+        return redirect(url_for("forum.view_forum",
+                                forum_id=post.topic.forum.id))
 
     if post.topic.locked:
         flash("The topic is locked.", "error")
-        return redirect(url_for("forum.view_forum", forum_id=post.topic.forum_id))
+        return redirect(url_for("forum.view_forum",
+                                forum_id=post.topic.forum_id))
 
-    if not perm_edit_post(user=current_user, forum=post.topic.forum,
-                          post_user_id=post.user_id):
+    if not can_edit_post(user=current_user, forum=post.topic.forum,
+                         post_user_id=post.user_id):
         flash("You do not have the permissions to edit this post", "error")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
@@ -192,7 +209,7 @@ def edit_post(post_id):
         form.populate_obj(post)
         post.date_modified = datetime.datetime.utcnow()
         post.save()
-        return redirect(url_for('forum.view_topic', topic_id=post.topic.id))
+        return redirect(url_for("forum.view_topic", topic_id=post.topic.id))
     else:
         form.content.data = post.content
 
@@ -204,8 +221,8 @@ def edit_post(post_id):
 def delete_post(post_id):
     post = Post.query.filter_by(id=post_id).first()
 
-    if not perm_delete_post(user=current_user, forum=post.topic.forum,
-                            post_user_id=post.user_id):
+    if not can_delete_post(user=current_user, forum=post.topic.forum,
+                           post_user_id=post.user_id):
         flash("You do not have the permissions to edit this post", "error")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
@@ -222,8 +239,12 @@ def delete_post(post_id):
 
 @forum.route("/who_is_online")
 def who_is_online():
+    if current_app.config['USE_REDIS']:
+        online_users = get_online_users()
+    else:
+        online_users = User.query.filter(User.lastseen >= time_diff()).all()
     return render_template("forum/online_users.html",
-                           online_users=get_online_users())
+                           online_users=online_users)
 
 
 @forum.route("/memberlist")

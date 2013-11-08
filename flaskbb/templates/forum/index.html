@@ -84,9 +84,7 @@
         <tr>
             <td colspan="2">
                 <strong>Board Statistics</strong>
-                {% if config["USE_REDIS"] %}
                 [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">Who is online?</a>]
-                {% endif %}
             </td>
         </tr>
     </thead>
@@ -99,8 +97,8 @@
             </td>
             <td>
                 Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
-                {% if config["USE_REDIS"] %}
                 Registered users online: <strong>{{ online_users }}</strong> <br />
+                {% if config["USE_REDIS"] %}>
                 Guests online: <strong>{{ online_guests }}</strong> <br />
                 {% endif %}
             </td>
