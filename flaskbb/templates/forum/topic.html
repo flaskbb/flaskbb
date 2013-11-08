@@ -110,17 +110,28 @@
         <tr>
             <td>
                 <span class="pull-left">
+                    {% if current_user.is_authenticated %}
                     <a href="{{ url_for('user.new_message') }}?to_user={{ post.user.username }}">PM</a>
-                    {% if post.user.website %}| <a href="{{post.user.website}}">Website</a>{% endif %}
+                    {% endif %}
+                    {% if post.user.website %}
+                    | <a href="{{post.user.website}}">Website</a>
+                    {% endif %}
                 </span>
 
                 <span class="pull-right">
                     {% if current_user|edit_post(post.user_id, topic.forum) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
-                    {% if current_user|delete_post(post.user_id, topic.forum) %}
-                    <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
+                    {% if topic.first_post_id == post.id %}
+                        {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
+                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}">Delete</a> |
+                        {% endif %}
+                    {% else %}
+                        {% if current_user|delete_post(post.user_id, topic.forum) %}
+                        <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
+                        {% endif %}
                     {% endif %}
+
                     <a href="#">Quote</a>
                 </span>
             </td>
