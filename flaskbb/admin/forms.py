@@ -17,7 +17,7 @@ from wtforms.validators import (Required, Optional, Email, regexp, Length, URL,
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
 
-from flaskbb.utils.helpers import SelectDateWidget
+from flaskbb.utils.widgets import SelectDateWidget
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum
 from flaskbb.user.models import User, Group
