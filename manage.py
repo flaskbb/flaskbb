@@ -17,7 +17,8 @@ from flask.ext.script import Manager, Shell, Server
 
 from flaskbb import create_app
 from flaskbb.extensions import db
-from flaskbb.utils import create_test_data
+from flaskbb.utils.populate import (create_test_data, create_admin_user,
+                                    create_welcome_forum, create_default_groups)
 
 # Use the development configuration if available
 try:
@@ -59,8 +60,26 @@ def createall():
         os.remove(dbfile)
 
     db.create_all()
-
     create_test_data()
+
+
+@manager.command
+def create_admin():
+    """
+    Creates the admin user
+    """
+    db.create_all()
+    create_admin_user()
+
+
+@manager.command
+def create_default_data():
+    """
+    This should be created by every flaskbb installation
+    """
+    db.create_all()
+    create_default_groups()
+    create_welcome_forum()
 
 
 if __name__ == "__main__":

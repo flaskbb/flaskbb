@@ -166,47 +166,35 @@ def create_test_data():
         email = "test%s@example.org" % u
         user = User(username=username, password="test", email=email)
         user.primary_group_id = u
-        db.session.add(user)
-        db.session.commit()
+        user.save()
 
-    # create 2 categories
+    # create a category
+    category = Forum(is_category=True, title="Test Category",
+                     description="Test Description")
+    category.save()
+
+    # create 2 forums in the category
     for i in range(1, 3):
-        category_title = "Test Category %s" % i
-        category = Forum(is_category=True, title=category_title,
-                         description="Test Description")
-        db.session.add(category)
+        forum_title = "Test Forum %s " % i
+        forum = Forum(title=forum_title, description="Test Description",
+                      parent_id=1)
+        forum.save()
 
-        # create 2 forums in each category
-        for j in range(1, 3):
-            if i == 2:
-                j += 2
+        # Create a subforum
+        subforum_title = "Test Subforum %s " % i
+        subforum = Forum(title=subforum_title,
+                         description="Test Description", parent_id=forum.id)
+        subforum.save()
 
-            forum_title = "Test Forum %s %s" % (j, i)
-            forum = Forum(title=forum_title, description="Test Description",
-                          parent_id=i)
-            db.session.add(forum)
-        db.session.commit()
+    user = User.query.filter_by(id=1).first()
 
     # create 1 topic in each forum
-    for k in [2, 3, 5, 6]:  # Forum ids are not sequential because categories.
+    for i in range(2, 6):  # Forum ids are not sequential because categories.
+        forum = Forum.query.filter_by(id=i).first()
+
         topic = Topic()
-        topic.first_post = Post()
+        post = Post()
 
-        topic.title = "Test Title %s" % k
-        topic.user_id = 1
-        topic.forum_id = k
-        topic.first_post.content = "Test Content"
-        topic.first_post.user_id = 1
-        topic.first_post.topic_id = topic.id
-
-        db.session.add(topic)
-        db.session.commit()
-
-        # Update the post and topic count
-        topic.forum.topic_count += 1
-        topic.forum.post_count += 1
-        topic.post_count += 1
-        topic.first_post.user.post_count += 1
-        db.session.commit()
-
-    db.session.commit()
+        topic.title = "Test Title %s" % (i-1)
+        post.content = "Test Content"
+        topic.save(user=user, forum=forum, post=post)
