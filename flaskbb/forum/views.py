@@ -13,13 +13,14 @@ import datetime
 import math
 
 from flask import (Blueprint, render_template, redirect, url_for, current_app,
-                   request, flash)
+                   request, flash, abort)
 from flask.ext.login import login_required, current_user
 
+from flaskbb.extensions import db
 from flaskbb.utils.helpers import (can_post_reply, can_delete_topic,
                                    can_edit_post, can_post_topic,
                                    can_delete_post, get_online_users, time_diff)
-from flaskbb.forum.models import Forum, Topic, Post
+from flaskbb.forum.models import Forum, Topic, Post, ForumsRead, TopicsRead
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.forum.helpers import get_forums
 from flaskbb.user.models import User
@@ -30,7 +31,18 @@ forum = Blueprint("forum", __name__)
 
 @forum.route("/")
 def index():
-    categories = Forum.query.all()
+    # Get the categories and forums
+    if current_user.is_authenticated():
+        categories_query = Forum.query.\
+            outerjoin(ForumsRead,
+                      db.and_(ForumsRead.forum_id == Forum.id,
+                              ForumsRead.user_id == current_user.id)).\
+            add_entity(ForumsRead).\
+            all()
+        categories = get_forums(categories_query, current_user=True)
+    else:
+        categories_query = Forum.query.all()
+        categories = get_forums(categories_query, current_user=False)
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -38,6 +50,7 @@ def index():
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
 
+    # Check if we use redis or not
     if not current_app.config["USE_REDIS"]:
         online_users = User.query.filter(User.lastseen >= time_diff()).count()
         online_guests = None
@@ -46,7 +59,7 @@ def index():
         online_guests = len(get_online_users(guest=True))
 
     return render_template("forum/index.html",
-                           categories=get_forums(categories),
+                           categories=categories,
                            user_count=user_count,
                            topic_count=topic_count,
                            post_count=post_count,
@@ -59,16 +72,40 @@ def index():
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
-    forum = Forum.query.filter_by(id=forum_id).first()
-    # TODO: Get all subforums with one query
+    if current_user.is_authenticated():
+        forum = Forum.query.filter(Forum.id == forum_id).first()
 
-    topics = Topic.query.filter_by(forum_id=forum.id).\
-        filter(Post.topic_id == Topic.id).\
-        order_by(Post.id.desc()).\
-        paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+        subforums = Forum.query.\
+            filter(Forum.parent_id == forum.id).\
+            outerjoin(ForumsRead,
+                      db.and_(ForumsRead.forum_id == Forum.id,
+                              ForumsRead.user_id == current_user.id)).\
+            add_entity(ForumsRead).\
+            all()
+
+        topics = Topic.query.filter_by(forum_id=forum.id).\
+            filter(Post.topic_id == Topic.id).\
+            outerjoin(TopicsRead,
+                      db.and_(TopicsRead.topic_id == Topic.id,
+                              TopicsRead.user_id == current_user.id)).\
+            add_entity(TopicsRead).\
+            order_by(Post.id.desc()).\
+            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
+    else:
+        forum = Forum.query.filter(Forum.id == forum_id).first()
+
+        subforums = Forum.query.filter(Forum.parent_id == forum.id).all()
+        # This isn't really nice imho, but "add_entity" (see above)
+        # makes a list with tuples
+        subforums = [(item, None) for item in subforums]
+
+        topics = Topic.query.filter_by(forum_id=forum.id).\
+            filter(Post.topic_id == Topic.id).\
+            order_by(Post.id.desc()).\
+            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, False)
 
     return render_template("forum/forum.html",
-                           forum=forum, topics=topics)
+                           forum=forum, topics=topics, subforums=subforums)
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
@@ -82,8 +119,8 @@ def view_topic(topic_id):
     # Count the topic views
     topic.views += 1
 
-    # Update the topicsread status if he hasn't read it
-    #topic.update_read(current_user)
+    # Update the topicsread status if the user hasn't read it
+    topic.update_read(current_user, topic.forum)
     topic.save()
 
     form = None
@@ -99,7 +136,6 @@ def view_topic(topic_id):
                 return view_post(post.id)
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
-                           per_page=current_app.config['POSTS_PER_PAGE'],
                            last_seen=time_diff(), form=form)
 
 

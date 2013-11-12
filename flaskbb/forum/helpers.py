@@ -27,8 +27,7 @@ def get_child_ids(forum):
 
 def get_parent_ids(forum):
     """
-    Returns a list of forum ids for the passed `forum` object and its
-    parent and child hierarchy.
+    Returns a list of parent forum ids for the passed `forum` object.
     """
     forum_ids = []
     parent = forum.parent
@@ -40,6 +39,10 @@ def get_parent_ids(forum):
 
 
 def get_forum_ids(forum):
+    """
+    Returns a list of forum ids for the passed `forum` object and its
+    parent and child hierarchy.
+    """
     forum_ids = []
     parent = forum.parent
     while parent is not None:
@@ -52,23 +55,26 @@ def get_forum_ids(forum):
     return set(forum_ids)
 
 
-def get_forums(forum_query):
+def get_forums(forum_query, current_user=False):
     """
     Pack all forum objects in a dict
     It looks like this:
       Category      Forum         Subforums
     {<Forum 1)>: {<Forum 2)>: [<Forum 5)>, <Forum 6)>]},
     """
+    if not current_user:
+        forum_query = [(item, None) for item in forum_query]
+
     forums = OrderedDict()
     for category in forum_query:
-        if category.is_category:
+        if category[0].is_category:
             forums[category] = OrderedDict()
 
             for forum in forum_query:
-                if forum.parent_id == category.id:
+                if forum[0].parent_id == category[0].id:
                     forums[category][forum] = []
 
                     for subforum in forum_query:
-                        if subforum.parent_id == forum.id:
+                        if subforum[0].parent_id == forum[0].id:
                             forums[category][forum].append(subforum)
     return forums

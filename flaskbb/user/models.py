@@ -106,6 +106,15 @@ class User(db.Model, UserMixin):
                         backref=db.backref("topicstracked", lazy="dynamic"),
                         lazy="dynamic")
 
+    # Properties
+    @property
+    def last_post(self):
+        """
+        Returns the latest post from the user
+        """
+        return Post.query.filter(Post.user_id == self.id).\
+            order_by(Post.date_created.desc()).first()
+
     # Methods
     def __repr__(self):
         """
@@ -282,35 +291,6 @@ class User(db.Model, UserMixin):
         db.session.add(self)
         db.session.commit()
         return self
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_post_count(self):
-        """
-        Returns the amount of posts within the current topic.
-        """
-        return Post.query.filter(Post.user_id == self.id).\
-            count()
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_last_post(self):
-        """
-        Returns the latest post from the user
-        """
-        post = Post.query.filter(Post.user_id == self.id).\
-            order_by(Post.date_created.desc()).first()
-
-        # Load the topic and user before we cache
-        post.topic
-        post.user
-
-        return post
-
-    def invalidate_cache(self):
-        """
-        Invalidates this objects cached metadata.
-        """
-        cache.delete_memoized(self.get_post_count, self)
-        cache.delete_memoized(self.get_last_post, self)
 
 
 class Guest(AnonymousUserMixin):

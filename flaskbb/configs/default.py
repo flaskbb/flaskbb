@@ -92,3 +92,7 @@ class DefaultConfig(object):
 
     # This is really handy if do not have an redis instance like on windows
     USE_REDIS = True
+
+    # The days for how long the forum should deal with unread topics
+    # 0 - Disable it
+    TRACKER_LENGTH = 0

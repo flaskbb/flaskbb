@@ -15,6 +15,22 @@ from flask import current_app
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
+from flaskbb.forum.models import ForumsRead, TopicsRead
+
+
+def is_unread(read_object, last_post):
+    if not (isinstance(read_object, ForumsRead) or
+            isinstance(read_object, TopicsRead) or not None):
+        raise TypeError("Must be a ForumsRead or TopicsRead object")
+
+    read_cutoff = datetime.utcnow() - timedelta(
+        days=current_app.config['TRACKER_LENGTH'])
+
+    if read_object is None:
+        return True
+    if read_cutoff < last_post.date_created:
+        return False
+    return read_object.last_read < last_post.date_created
 
 
 def mark_online(user_id, guest=False):

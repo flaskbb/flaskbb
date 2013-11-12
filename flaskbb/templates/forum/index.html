@@ -10,7 +10,7 @@
     <thead class="categoryhead">
         <tr>
             <td colspan="5">
-                <div><strong><a href="{{ url_for('forum.view_forum', forum_id=category.id) }}">{{ category.title }}</a></strong></div>
+                <div><strong><a href="{{ url_for('forum.view_forum', forum_id=category[0].id) }}">{{ category[0].title }}</a></strong></div>
             </td>
         </tr>
     </thead>
@@ -25,21 +25,21 @@
         {% for forum, subforums in forums.items() %}
         <tr>
             <td align="center" valign="center" width="4%">
-            {#
-            {% if forum.is_unread(current_user) %}
-                New posts
+
+            {% if forum[1]|is_unread(forum[0].last_post) %}
+                Unread
             {% else %}
-                No new posts
+                Read
             {% endif %}
-            #}
+
             </td>
 
             <td valign="top">
-                <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
+                <strong><a href="{{ url_for('forum.view_forum', forum_id=forum[0].id) }}">{{ forum[0].title }}</a></strong>
 
                 <div class="forum-description">
                     {% autoescape false %}
-                    {{ forum.description|markup }}
+                    {{ forum[0].description|markup }}
                     {% endautoescape %}
                 </div>
                 {% if subforums|length %}
@@ -48,7 +48,7 @@
                         <li><strong>Subforums:</strong></li>
                         {% for subforum in subforums %}
                         <li>
-                            <a href="{{ url_for('forum.view_forum', forum_id=subforum.id) }}">{{ subforum.title }}</a>
+                            <a href="{{ url_for('forum.view_forum', forum_id=subforum[0].id) }}">{{ subforum[0].title }}</a>
                         </li>
                         {% endfor %}
                     </ul>
@@ -56,17 +56,17 @@
                 {% endif %}
             </td>
 
-            <td valign="top" align="center" style="white-space: nowrap">{{ forum.topic_count }}</td>
-            <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum[0].topic_count }}</td>
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum[0].post_count }}</td>
 
             <td valign="top" align="right" style="white-space: nowrap">
-                {% if forum.last_post_id %}
-                <a href="{{ url_for('forum.view_post', post_id=forum.last_post_id) }}" title="{{ forum.last_post.topic.title }}">
-                    <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
+                {% if forum[0].last_post_id %}
+                <a href="{{ url_for('forum.view_post', post_id=forum[0].last_post_id) }}" title="{{ forum[0].last_post.topic.title }}">
+                    <strong>{{ forum[0].last_post.topic.title|crop_title }}</strong>
                 </a>
                 <br />
-                {{ forum.last_post.date_created|time_since }}<br />
-                by <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
+                {{ forum[0].last_post.date_created|time_since }}<br />
+                by <a href="{{ url_for('user.profile', username=forum[0].last_post.user.username) }}">{{ forum[0].last_post.user.username }}</a>
                 {% else %}
                 No posts
                 {% endif %}

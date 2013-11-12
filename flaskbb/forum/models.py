@@ -8,11 +8,11 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import sys
 from datetime import datetime
 
-from flaskbb.extensions import db, cache
-from flaskbb.helpers import DenormalizedText
+from flaskbb.extensions import db
+from flaskbb.utils.types import DenormalizedText
+from flaskbb.utils.query import TopicQuery
 from helpers import get_forum_ids
 
 
@@ -34,7 +34,7 @@ class Post(db.Model):
         Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {})>".format(self.__class__.__name__, self.id)
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self, user=None, topic=None):
         # update/edit the post
@@ -53,10 +53,22 @@ class Post(db.Model):
             db.session.add(self)
             db.session.commit()
 
-            # Invalidate relevant caches
-            user.invalidate_cache()
-            topic.invalidate_cache()
-            topic.forum.invalidate_cache()
+            # Now lets update the last post id
+            topic.last_post_id = self.id
+            topic.last_updated = datetime.utcnow()
+            topic.forum.last_post_id = self.id
+
+            # Update the post counts
+            user.post_count += 1
+            topic.post_count += 1
+            topic.forum.post_count += 1
+
+            # Update the parent forums
+            parent = topic.forum.parent
+            while parent is not None and not parent.is_category:
+                parent.last_post_id = self.id
+                parent.post_count += 1
+                parent = parent.parent
 
             # And commit it!
             db.session.add(topic)
@@ -69,12 +81,34 @@ class Post(db.Model):
             self.topic.delete()
             return self
 
-        # Invalidate relevant caches
-        self.user.invalidate_cache()
-        self.topic.invalidate_cache()
-        self.topic.forum.invalidate_cache()
+        # Delete the last post
+        if self.topic.last_post_id == self.id:
 
-        # Is there a better way to do this?
+            # Now the second last post will be the last post
+            self.topic.last_post_id = self.topic.second_last_post
+
+            # check if the last_post is also the last post in the forum
+            topic = Topic.query.\
+                filter(Topic.forum_id.in_(get_forum_ids(self.topic.forum))).\
+                order_by(Topic.last_post_id.desc()).first()
+
+            if self.topic.last_post_id == topic.last_post_id:
+                # Update the parent forums
+                forum = self.topic.forum
+                while forum is not None and not forum.is_category:
+                    forum.last_post_id = self.topic.second_last_post
+                    forum = forum.parent
+                db.session.commit()
+
+        # Update the post counts
+        forum = self.topic.forum
+        while forum is not None and not forum.is_category:
+            forum.post_count -= 1
+            forum = forum.parent
+
+        self.user.post_count -= 1
+        self.topic.post_count -= 1
+
         db.session.delete(self)
         db.session.commit()
         return self
@@ -83,15 +117,32 @@ class Post(db.Model):
 class Topic(db.Model):
     __tablename__ = "topics"
 
+    query_class = TopicQuery
+
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer, db.ForeignKey("forums.id", use_alter=True,
                                                    name="fk_forum_id"))
     title = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow())
     locked = db.Column(db.Boolean, default=False)
     important = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
+    post_count = db.Column(db.Integer, default=0)
+
+    # One-to-one (uselist=False) relationship between first_post and topic
+    first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
+                                                        ondelete="CASCADE"))
+    first_post = db.relationship("Post", backref="first_post", uselist=False,
+                                 foreign_keys=[first_post_id])
+
+    # One-to-one
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
+                                                       ondelete="CASCADE",
+                                                       onupdate="CASCADE"))
+    last_post = db.relationship("Post", backref="last_post", uselist=False,
+                                foreign_keys=[last_post_id])
 
     # One-to-many
     posts = db.relationship("Post", backref="topic", lazy="joined",
@@ -99,33 +150,6 @@ class Topic(db.Model):
                             cascade="all, delete-orphan", post_update=True)
 
     # Properties
-    @property
-    def post_count(self):
-        """
-        Property interface for get_post_count method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_post_count()
-
-    @property
-    def first_post(self):
-        """
-        Property interface for get_first_post method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_first_post()
-
-    @property
-    def last_post(self):
-        """
-        Property interface for get_last_post method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_last_post()
-
     @property
     def second_last_post(self):
         """
@@ -143,7 +167,7 @@ class Topic(db.Model):
         Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {})>".format(self.__class__.__name__, self.id)
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self, user=None, forum=None, post=None):
         # Updates the topic - Because the thread title (by intention)
@@ -164,31 +188,76 @@ class Topic(db.Model):
         # Create the topic post
         post.save(user, self)
 
-        # Invalidate relevant caches
-        self.invalidate_cache()
-        self.forum.invalidate_cache()
+        # Update the first post id
+        self.first_post_id = post.id
+
+        # Update the topic count
+        forum.topic_count += 1
+
+        # Update the parent forums
+        parent = forum.parent
+        while parent is not None and not parent.is_category:
+            # Update the topic and post count
+            parent.topic_count += 1
+            parent = parent.parent
 
         db.session.commit()
 
         return self
 
     def delete(self, users=None):
-        # Invalidate relevant caches
-        self.invalidate_cache()
-        self.forum.invalidate_cache()
+        # Grab the second last topic in the forum + parents/childs
+        topic = Topic.query.\
+            filter(Topic.forum_id.in_(get_forum_ids(self.forum))).\
+            order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
 
-        # Invalidate user post counts
-        if users:
-            for user in users:
-                user.invalidate_cache()
+        # check if the topic is the most recently one in this forum
+        try:
+            forum = self.forum
+            if self.id == topic[0].id:
+                # Now the second last post will be the last post
+                while forum is not None and not forum.is_category:
+                    forum.last_post_id = topic[1].last_post_id
+                    forum.save()
+                    forum = forum.parent
+            else:
+                forum.last_post_id = topic[1].last_post_id
+        # Catch an IndexError when you delete the last topic in the forum
+        except IndexError:
+            while forum is not None and not forum.is_category:
+                forum.last_post_id = 0
+                forum.save()
+                forum = forum.parent
+
+        # These things needs to be stored in a variable before they are deleted
+        forum = self.forum
 
         # Delete the topic
         db.session.delete(self)
         db.session.commit()
 
+        # Update the post counts
+        if users:
+            # If someone knows a better method for this,
+            # feel free to improve it :)
+            for user in users:
+                user.post_count = Post.query.filter_by(user_id=user.id).count()
+                db.session.commit()
+
+        while forum is not None and not forum.is_category:
+            forum.topic_count = Topic.query.filter_by(
+                forum_id=self.forum_id).count()
+
+            forum.post_count = Post.query.filter(
+                Post.topic_id == Topic.id,
+                Topic.forum_id == self.forum_id).count()
+
+            forum = forum.parent
+
+        db.session.commit()
         return self
 
-    def update_read(self, user):
+    def update_read(self, user, forum=None):
         """
         Update the topics read status if the user hasn't read the latest
         post.
@@ -214,75 +283,35 @@ class Topic(db.Model):
             topicread.last_read = datetime.utcnow()
             topicread.save()
 
-    def is_unread(self, user):
-        """
-        Returns True if the user hasn't read the topic
-        """
-        if not user.is_authenticated():
-            return True
+        if forum:
+            # fetch the unread posts in the forum
+            unread_count = Topic.query.\
+                outerjoin(TopicsRead,
+                          db.and_(TopicsRead.topic_id == Topic.id,
+                                  TopicsRead.user_id == user.id)).\
+                outerjoin(ForumsRead,
+                          db.and_(ForumsRead.forum_id == Topic.forum_id,
+                                  ForumsRead.user_id == user.id)).\
+                filter(Topic.forum_id == forum.id,
+                       db.or_(TopicsRead.last_read == None,
+                              TopicsRead.last_read < Topic.last_updated)).\
+                count()
+                # Why doesn't this work with when you pass an last_post object?
+                # Line 294 e.q.: TopicsRead.last_read < last_post.date_created
 
-        topicread = TopicsRead.query.\
-            filter(TopicsRead.user_id == user.id,
-                   TopicsRead.topic_id == self.id).first()
+            # Mark it as read if no unread topics are found
+            if unread_count == 0:
+                forumread = ForumsRead.query.\
+                    filter(ForumsRead.user_id == user.id,
+                           ForumsRead.forum_id == forum.id).first()
 
-        # If no entry is found, the user hasn't read the topic
-        if not topicread:
-            return True
-        # If the entry is older than the last post, the user hasn't read it
-        if topicread.last_read < self.last_post.date_created:
-            return True
-        return False
+                # If the user has never visited a topic in this forum
+                # create a new entry
+                if not forumread:
+                    forumread = ForumsRead(user_id=user.id, forum_id=forum.id)
 
-    @cache.memoize(timeout=sys.maxint)
-    def get_post_count(self):
-        """
-        Returns the amount of posts within the current topic.
-        """
-        return Post.query.\
-            filter(Post.topic_id == self.id).\
-            count()
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_first_post(self):
-        """
-        Returns the first post within the current topic.
-        """
-
-        post = Post.query.\
-            filter(Post.topic_id == self.id).\
-            order_by(Post.date_created.asc()).\
-            first()
-
-        # Load the topic and user before we cache
-        post.topic
-        post.user
-
-        return post
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_last_post(self):
-        """
-        Returns the latest post within the current topic.
-        """
-
-        post = Post.query.\
-            filter(Post.topic_id == self.id).\
-            order_by(Post.date_created.desc()).\
-            first()
-
-        # Load the topic and user before we cache
-        post.topic
-        post.user
-
-        return post
-
-    def invalidate_cache(self):
-        """
-        Invalidates this objects cached metadata.
-        """
-        cache.delete_memoized(self.get_post_count, self)
-        cache.delete_memoized(self.get_first_post, self)
-        cache.delete_memoized(self.get_last_post, self)
+                forumread.last_read = datetime.utcnow()
+                forumread.save()
 
 
 class Forum(db.Model):
@@ -296,39 +325,20 @@ class Forum(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey("forums.id"))
     locked = db.Column(db.Boolean, default=False)
 
+    post_count = db.Column(db.Integer, default=0)
+    topic_count = db.Column(db.Integer, default=0)
+
+    # One-to-one
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    last_post = db.relationship("Post", backref="last_post_forum",
+                                uselist=False, foreign_keys=[last_post_id])
+
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined")
-    children = db.relationship("Forum", backref=db.backref("parent", remote_side=[id]))
+    children = db.relationship("Forum",
+                               backref=db.backref("parent", remote_side=[id]))
 
-    moderators = db.Column(DenormalizedText)  # TODO: No forum_moderators column?
-
-    # Properties
-    @property
-    def post_count(self):
-        """
-        Property interface for get_post_count method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_post_count()
-
-    @property
-    def topic_count(self):
-        """
-        Property interface for get_topic_count method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_topic_count()
-
-    @property
-    def last_post(self):
-        """
-        Property interface for get_last_post method.
-
-        Method seperate for easy invalidation of cache.
-        """
-        return self.get_last_post()
+    moderators = db.Column(DenormalizedText)
 
     # Methods
     def __repr__(self):
@@ -336,7 +346,7 @@ class Forum(db.Model):
         Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {})>".format(self.__class__.__name__, self.id)
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def add_moderator(self, user_id):
         self.moderators.add(user_id)
@@ -364,116 +374,7 @@ class Forum(db.Model):
         breadcrumbs.reverse()
         return breadcrumbs
 
-    def is_unread(self, user, include_children=True):
-        """
-        Returns True if the user hasn't read the topic
-        """
-        if not user.is_authenticated():
-            return True
 
-        if include_children:
-            topicread = TopicsRead.query.\
-                filter(TopicsRead.user_id == user.id). \
-                filter(TopicsRead.topic_id == Topic.id). \
-                filter(Topic.forum_id.in_(get_forum_ids(self))). \
-                order_by(TopicsRead.last_read.desc()). \
-                first()
-        else:
-            topicread = TopicsRead.query.\
-                filter(TopicsRead.user_id == user.id). \
-                filter(TopicsRead.topic_id == Topic.id). \
-                filter(Topic.forum_id == self.id). \
-                order_by(TopicsRead.last_read.desc()). \
-                first()
-
-        # If no entry is found, the user hasn't read the topic
-        if not topicread:
-            return True
-        # If the entry is older than the last post, the user hasn't read it
-        if topicread.last_read < self.last_post.date_created:
-            return True
-        return False
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_post_count(self, include_children=True):
-        """
-        Returns the amount of posts within the current forum or it's children.
-        Children can be excluded by setting the second parameter to 'false'.
-        """
-
-        if include_children:
-            return Post.query.\
-                filter(Post.topic_id == Topic.id). \
-                filter(Topic.forum_id.in_(get_forum_ids(self))). \
-                count()
-        else:
-            return Post.query.\
-                filter(Post.topic_id == Topic.id).\
-                filter(Topic.forum_id == self.id).\
-                count()
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_topic_count(self, include_children=True):
-        """
-        Returns the amount of topics within the current forum or it's children.
-        Children can be excluded by setting the second parameter to 'false'.
-        """
-
-        if include_children:
-            return Topic.query.\
-                filter(Topic.forum_id.in_(get_forum_ids(self))). \
-                count()
-        else:
-            return Topic.query.\
-                filter(Topic.forum_id == self.id).\
-                count()
-
-    @cache.memoize(timeout=sys.maxint)
-    def get_last_post(self, include_children=True):
-        """
-        Returns the latest post within the current forum or it's children.
-        Children can be excluded by setting the second parameter to 'false'.
-        """
-
-        if include_children:
-            post = Post.query.\
-                filter(Post.topic_id == Topic.id). \
-                filter(Topic.forum_id.in_(get_forum_ids(self))). \
-                order_by(Post.date_created.desc()). \
-                first()
-        else:
-            post = Post.query.\
-                filter(Post.topic_id == Topic.id).\
-                filter(Topic.forum_id == self.id).\
-                order_by(Post.date_created.desc()).\
-                first()
-
-        # Load the topic and user before we cache
-        post.topic
-        post.user
-
-        return post
-
-    def invalidate_cache(self):
-        """
-        Invalidates this objects, and it's parents', cached metadata.
-        """
-        _forum = self
-        while _forum.parent:
-            cache.delete_memoized(self.get_post_count, _forum)
-            cache.delete_memoized(self.get_topic_count, _forum)
-            cache.delete_memoized(self.get_last_post, _forum)
-            _forum = _forum.parent
-
-    # Class methods
-    @classmethod
-    def get_categories(cls):
-        return cls.query.filter(cls.is_category)
-
-
-"""
-This model stores the tracked topics for each user
-"""
 topictracker = db.Table(
     'topictracker',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
@@ -481,22 +382,34 @@ topictracker = db.Table(
 
 
 class TopicsRead(db.Model):
-    """
-    This model tracks the unread/read posts
-    """
     __tablename__ = "topicsread"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    #topics = db.Column(MutableDict.as_mutable(JSONEncodedDict))
     topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
-        Required for cache.memoize() to work across requests.
-        """
-        return "<{} {})>".format(self.__class__.__name__, self.id)
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+
+class ForumsRead(db.Model):
+    __tablename__ = "forumsread"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    forum_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
+                         primary_key=True)
+    last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
     def save(self):
         db.session.add(self)

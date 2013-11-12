@@ -22,7 +22,7 @@
     <a href="{{ url_for('forum.new_topic', forum_id=forum.id) }}" class="btn btn-primary">New Topic</a>
 </div>
 {% endif %}
-{% if forum.children|length %}
+{% if subforums[0]|length %}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -39,16 +39,15 @@
     </thead>
 
     <tbody>
-        {% for subforum in forum.children %}
+        {% for subforum, forumread in subforums %}
         <tr>
             <td align="center" valign="center" width="4%">
-            {#
-            {% if subforum.is_unread(current_user) %}
-                New posts
+
+            {% if forumread|is_unread(subforum.last_post) %}
+                Unread
             {% else %}
-                No new posts
+                Read
             {% endif %}
-            #}
             </td>
 
             <td valign="top">
@@ -115,16 +114,16 @@
             <td>Last Post</td>
         </tr>
 
-        {% for topic in topics.items %}
+        {% for topic, topicread in topics.items %}
         <tr>
             <td width="4%">
-            {#
-            {% if topic.is_unread(current_user) %}
-                New
+
+            {% if topicread|is_unread(topic.last_post) %}
+                Unread
             {% else %}
                 Read
             {% endif %}
-            #}
+
             </td>
             <td>
                 <div>
