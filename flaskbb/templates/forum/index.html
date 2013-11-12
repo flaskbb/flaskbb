@@ -27,9 +27,9 @@
             <td align="center" valign="center" width="4%">
 
             {% if forum[1]|is_unread(forum[0].last_post) %}
-                Unread
+                <span class="fa fa-comments" style="font-size: 2em"></span>
             {% else %}
-                Read
+                <span class="fa fa-comments-o" style="font-size: 2em"></span>
             {% endif %}
 
             </td>

@@ -44,9 +44,9 @@
             <td align="center" valign="center" width="4%">
 
             {% if forumread|is_unread(subforum.last_post) %}
-                Unread
+                <span class="fa fa-comments" style="font-size: 2em"></span>
             {% else %}
-                Read
+                <span class="fa fa-comments-o" style="font-size: 2em"></span>
             {% endif %}
             </td>
 
@@ -119,9 +119,9 @@
             <td width="4%">
 
             {% if topicread|is_unread(topic.last_post) %}
-                Unread
+                <span class="fa fa-comment" style="font-size: 2em"></span>
             {% else %}
-                Read
+                <span class="fa fa-comment-o" style="font-size: 2em"></span>
             {% endif %}
 
             </td>

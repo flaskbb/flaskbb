@@ -26,7 +26,7 @@
     {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
     <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
     {% endif %}
-    {# Move this to the topictracker template
+
     {% if current_user.is_authenticated() %}
         {% if current_user.is_tracking_topic(topic) %}
         <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-primary">Untrack Topic</a>
@@ -34,7 +34,7 @@
         <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-primary">Track Topic</a>
         {% endif %}
     {% endif %}
-    #}
+
 </div>
 
 <table class="table table-bordered">

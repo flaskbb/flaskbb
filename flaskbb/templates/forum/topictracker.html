@@ -34,9 +34,17 @@
             <td>Last Post</td>
         </tr>
 
-        {% for topic in topics.items %}
+        {% for topic, topicread in topics.items %}
         <tr>
-            <td width="4%"></td>
+            <td width="4%">
+
+            {% if topicread|is_unread(topic.last_post) %}
+                <span class="fa fa-comment" style="font-size: 2em"></span>
+            {% else %}
+                <span class="fa fa-comment-o" style="font-size: 2em"></span>
+            {% endif %}
+
+            </td>
             <td>
                 <div>
                     <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a> <br />
@@ -50,7 +58,7 @@
                 {{ topic.views }}
             </td>
             <td>
-                <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}#pid{{topic.last_post.id}}">{{ topic.last_post.date_created|time_since }}</a><br />
+                <a href="{{ url_for('forum.view_post', post_id=topic.last_post.id) }}">{{ topic.last_post.date_created|time_since }}</a><br />
                 <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
             </td>
         </tr>
