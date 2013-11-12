@@ -386,7 +386,6 @@ class TopicsRead(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
-    #topics = db.Column(MutableDict.as_mutable(JSONEncodedDict))
     topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
