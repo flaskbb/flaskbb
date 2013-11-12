@@ -22,7 +22,7 @@ class Pagination(object):
     no longer work.
     """
 
-    def __init__(self, query, page, per_page, total, items, current_user):
+    def __init__(self, query, page, per_page, total, items, add_none):
         #: the unlimited query object that was used to create this
         #: pagination object.
         self.query = query
@@ -33,7 +33,7 @@ class Pagination(object):
         #: the total number of items matching the query
         self.total = total
         #: the items for the current page
-        if not current_user:
+        if add_none:
             self.items = [(item, None) for item in items]
         else:
             self.items = items
@@ -51,7 +51,8 @@ class Pagination(object):
         """Returns a :class:`Pagination` object for the previous page."""
         assert self.query is not None, 'a query object is required ' \
                                        'for this method to work'
-        return self.query.paginate(self.page - 1, self.per_page, error_out)
+        return self.query.paginate(self.page - 1, self.per_page, error_out,
+                                   add_none)
 
     @property
     def prev_num(self):
@@ -67,7 +68,8 @@ class Pagination(object):
         """Returns a :class:`Pagination` object for the next page."""
         assert self.query is not None, 'a query object is required ' \
                                        'for this method to work'
-        return self.query.paginate(self.page + 1, self.per_page, error_out)
+        return self.query.paginate(self.page + 1, self.per_page, error_out,
+                                   add_none)
 
     @property
     def has_next(self):
@@ -117,7 +119,7 @@ class Pagination(object):
 
 
 class TopicQuery(BaseQuery):
-    def paginate(self, page, per_page=20, error_out=True, current_user=False):
+    def paginate(self, page, per_page=20, error_out=True, add_none=False):
         """Returns `per_page` items from page `page`.  By default it will
         abort with 404 if no items were found and the page was larger than
         1.  This behavor can be disabled by setting `error_out` to `False`.
@@ -137,4 +139,4 @@ class TopicQuery(BaseQuery):
         else:
             total = self.order_by(None).count()
 
-        return Pagination(self, page, per_page, total, items, current_user)
+        return Pagination(self, page, per_page, total, items, add_none)

@@ -90,7 +90,7 @@ def view_forum(forum_id):
                               TopicsRead.user_id == current_user.id)).\
             add_entity(TopicsRead).\
             order_by(Post.id.desc()).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
+            paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
     else:
         forum = Forum.query.filter(Forum.id == forum_id).first()
 
@@ -102,7 +102,7 @@ def view_forum(forum_id):
         topics = Topic.query.filter_by(forum_id=forum.id).\
             filter(Post.topic_id == Topic.id).\
             order_by(Post.id.desc()).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, False)
+            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
 
     return render_template("forum/forum.html",
                            forum=forum, topics=topics, subforums=subforums)
@@ -298,7 +298,13 @@ def memberlist():
 def topictracker():
     page = request.args.get("page", 1, type=int)
     topics = current_user.tracked_topics.\
-        paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+        outerjoin(TopicsRead,
+                  db.and_(TopicsRead.topic_id == Topic.id,
+                          TopicsRead.user_id == current_user.id)).\
+        add_entity(TopicsRead).\
+        order_by(Post.id.desc()).\
+        paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
+
     return render_template("forum/topictracker.html", topics=topics)
 
 
