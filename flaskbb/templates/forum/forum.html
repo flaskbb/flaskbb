@@ -43,7 +43,7 @@
         <tr>
             <td align="center" valign="center" width="4%">
 
-            {% if forumread|is_unread(subforum.last_post) %}
+            {% if forumread|is_unread(subforum.last_post, subforum) %}
                 <span class="fa fa-comments" style="font-size: 2em"></span>
             {% else %}
                 <span class="fa fa-comments-o" style="font-size: 2em"></span>
