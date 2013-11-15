@@ -18,7 +18,7 @@ from flaskbb.extensions import redis
 from flaskbb.forum.models import ForumsRead, TopicsRead
 
 
-def is_unread(read_object, last_post):
+def is_unread(read_object, last_post, forum=None):
     if not (isinstance(read_object, ForumsRead) or
             isinstance(read_object, TopicsRead) or not None):
         raise TypeError("Must be a ForumsRead or TopicsRead object")
@@ -26,6 +26,8 @@ def is_unread(read_object, last_post):
     read_cutoff = datetime.utcnow() - timedelta(
         days=current_app.config['TRACKER_LENGTH'])
 
+    if forum and forum.topic_count == 0:
+        return False
     if read_object is None:
         return True
     if read_cutoff < last_post.date_created:
