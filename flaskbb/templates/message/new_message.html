@@ -6,7 +6,7 @@
     {{ form.hidden_tag() }}
     {{ wtf.horizontal_field(form.to_user)}}
     {{ wtf.horizontal_field(form.subject)}}
-    {{ wtf.horizontal_field(form.message)}}
+    {{ wtf.horizontal_field(form.message, rows=7)}}
 
     <div class="form-group row">
         <div class="col-sm-offset-3 col-lg-9">

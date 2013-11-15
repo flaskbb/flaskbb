@@ -19,7 +19,11 @@
 
 {% if current_user|post_topic(forum) and not forum.is_category %}
 <div class="pull-right" style="padding-bottom: 10px">
+    {% if forum.locked %}
+    <span class="btn btn-primary"><span class="fa fa-lock"></span> Locked</span>
+    {% else %}
     <a href="{{ url_for('forum.new_topic', forum_id=forum.id) }}" class="btn btn-primary">New Topic</a>
+    {% endif %}
 </div>
 {% endif %}
 {% if subforums[0]|length %}
