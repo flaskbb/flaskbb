@@ -5,25 +5,25 @@ using the micro framework Flask.
 
 
 I don't have a server at the moment, so the demo does not work at http://flaskbb.org
-
+but you can view a few picture [here](http://imgur.com/a/RdLGz).
 
 ## FEATURES
 
 * A Bulletin Board like FluxBB, DjangoBB in Flask
+    * with Subforums
 * Private Messages
 * Admin Interface
 * Group based permissions
 * BBCode support
+* Topic Tracker
+* Unread Topics/Forums
 
 
 ## TODO
 
-* Topic Tracker (in progress)
-* Track the unread posts and mark them as new
 * A own theme and make FlaskBB themable with Flask-Themes2
 * Localization (Babel)
 * Searching for members, posts,...
-* Subforums
 * Figure out how to integrate it in another app where you can use the models from flaskbb and so on..
 
 
