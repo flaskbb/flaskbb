@@ -98,7 +98,7 @@
             <td>
                 Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
                 Registered users online: <strong>{{ online_users }}</strong> <br />
-                {% if config["USE_REDIS"] %}>
+                {% if config["USE_REDIS"] %}
                 Guests online: <strong>{{ online_guests }}</strong> <br />
                 {% endif %}
             </td>
