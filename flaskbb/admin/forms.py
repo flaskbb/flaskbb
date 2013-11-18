@@ -223,16 +223,22 @@ class ForumForm(Form):
     description = TextAreaField("Description", validators=[
         Optional()])
 
-    position = IntegerField("Position", validators=[
+    position = IntegerField("Position", default=1, validators=[
         Required(message="Forum position required")])
 
     parent = QuerySelectField("Parent",
                               query_factory=selectable_forums,
                               get_label="title",
-                              description="This field is not saved if this forum is a category (see \"Is a category?\" field below).")
+                              description="This field is not saved if this \
+                                           forum is a category (see \"Is a \
+                                           category?\" field below).")
 
-    is_category = BooleanField("Is a category?", description="Categories are root-level parents for forums.  They can not contain topics.")
-    locked = BooleanField("Locked?", description="Disable new posts and topics in this forum.")
+    is_category = BooleanField("Is a category?",
+                               description="Categories are root-level parents \
+                               for forums. They can not contain topics.")
+
+    locked = BooleanField("Locked?", description="Disable new posts and topics \
+                                                  in this forum.")
 
     def validate_parent(self, field):
         if field.data.id == self._id:
