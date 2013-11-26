@@ -120,7 +120,7 @@ def inbox():
 def view_message(id):
     message = PrivateMessage.query.filter_by(id=id).first()
     if message.unread:
-        message.unread=False
+        message.unread = False
         db.session.commit()
     return render_template("message/view_message.html", message=message)
 
