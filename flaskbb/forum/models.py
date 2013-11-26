@@ -334,9 +334,11 @@ class Forum(db.Model):
                                 uselist=False, foreign_keys=[last_post_id])
 
     # One-to-many
-    topics = db.relationship("Topic", backref="forum", lazy="joined")
+    topics = db.relationship("Topic", backref="forum", lazy="joined",
+                             cascade="all, delete-orphan")
     children = db.relationship("Forum",
-                               backref=db.backref("parent", remote_side=[id]))
+                               backref=db.backref("parent", remote_side=[id]),
+                               cascade="all, delete-orphan")
 
     moderators = db.Column(DenormalizedText)
 
@@ -354,16 +356,6 @@ class Forum(db.Model):
     def remove_moderator(self, user_id):
         self.moderators.remove(user_id)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
     def get_breadcrumbs(self):
         breadcrumbs = []
         parent = self.parent
@@ -373,6 +365,42 @@ class Forum(db.Model):
 
         breadcrumbs.reverse()
         return breadcrumbs
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self, users=None):
+        # Delete the forum
+        db.session.delete(self)
+
+        # Also delete the child forums
+        if self.children:
+            for child in self.children:
+                db.session.delete(child)
+
+        # Update the parent forums if any
+        if self.parent:
+            forum = self.parent
+            while forum is not None and not forum.is_category:
+                forum.topic_count = Topic.query.filter_by(
+                    forum_id=forum.id).count()
+
+                forum.post_count = Post.query.filter(
+                    Post.topic_id == Topic.id,
+                    Topic.forum_id == forum.id).count()
+
+                forum = forum.parent
+
+        db.session.commit()
+
+        # Update the users post count
+        if users:
+            for user in users:
+                user.post_count = Post.query.filter_by(user_id=user.id).count()
+                db.session.commit()
+        return self
 
 
 topictracker = db.Table(

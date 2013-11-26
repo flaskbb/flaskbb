@@ -217,7 +217,12 @@ def edit_forum(forum_id):
 @admin_required
 def delete_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()
-    forum.delete()
+
+    involved_users = User.query.filter(Topic.forum_id == forum.id,
+                                       Post.user_id == User.id).all()
+
+    forum.delete(involved_users)
+
     flash("Forum successfully deleted.", "success")
     return redirect(url_for("admin.forums"))
 

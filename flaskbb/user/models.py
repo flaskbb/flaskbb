@@ -82,8 +82,10 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String)
     notes = db.Column(db.Text(5000))
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic")
+    posts = db.relationship("Post", backref="user", lazy="dynamic",
+                            cascade="all, delete-orphan")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic",
+                             cascade="all, delete-orphan")
 
     post_count = db.Column(db.Integer, default=0)
 
