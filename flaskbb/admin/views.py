@@ -194,10 +194,15 @@ def edit_forum(forum_id):
         forum.title = form.title.data
         forum.description = form.description.data
         forum.position = form.position.data
-        forum.parent_id = form.parent.data.id
         forum.is_category = form.is_category.data
         forum.locked = form.locked.data
         forum.moderators = form.moderators.data
+
+        if hasattr(form.parent.data, 'id'):
+            forum.parent_id = form.parent.data.id
+        else:
+            forum.parent_id = form.parent.data
+
         forum.save()
 
         flash("Forum successfully edited.", "success")
