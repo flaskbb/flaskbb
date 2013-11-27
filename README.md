@@ -4,9 +4,6 @@
 using the micro framework Flask.
 
 
-I don't have a server at the moment, so the demo does not work at http://flaskbb.org
-but you can view a few picture [here](http://imgur.com/a/RdLGz).
-
 ## FEATURES
 
 * A Bulletin Board like FluxBB, DjangoBB in Flask
