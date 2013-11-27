@@ -297,7 +297,7 @@ class Topic(db.Model):
                               TopicsRead.last_read < Topic.last_updated)).\
                 count()
                 # Why doesn't this work with when you pass an last_post object?
-                # Line 294 e.q.: TopicsRead.last_read < last_post.date_created
+                # e.q.: TopicsRead.last_read < last_post.date_created
 
             # Mark it as read if no unread topics are found
             if unread_count == 0:

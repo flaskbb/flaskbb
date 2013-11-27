@@ -294,6 +294,12 @@ class User(db.Model, UserMixin):
         db.session.commit()
         return self
 
+    def delete(self):
+        # TODO: Recount posts in the involved forums and topics
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
 
 class Guest(AnonymousUserMixin):
     @cache.memoize(60*5)
