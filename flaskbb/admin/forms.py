@@ -228,6 +228,7 @@ class ForumForm(Form):
 
     parent = QuerySelectField("Parent",
                               query_factory=selectable_forums,
+                              allow_blank=True,
                               get_label="title",
                               description="This field is not saved if this \
                                            forum is a category (see \"Is a \
@@ -235,14 +236,16 @@ class ForumForm(Form):
 
     is_category = BooleanField("Is a category?",
                                description="Categories are root-level parents \
-                               for forums. They can not contain topics.")
+                                            for forums. They can not contain \
+                                            topics.")
 
     locked = BooleanField("Locked?", description="Disable new posts and topics \
                                                   in this forum.")
 
     def validate_parent(self, field):
-        if field.data.id == self._id:
-            raise ValidationError("A forum cannot be it's own parent!")
+        if hasattr(field.data, "id"):
+            if field.data.id == self._id:
+                raise ValidationError("A forum cannot be it's own parent!")
 
     def save(self):
         forum = Forum(title=self.title.data,
@@ -251,6 +254,7 @@ class ForumForm(Form):
 
         if self.is_category.data:
             forum.is_category = True
+            forum.parent_id = None
         else:
             forum.parent_id = self.parent.data.id
 
