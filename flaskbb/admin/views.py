@@ -197,6 +197,7 @@ def edit_forum(forum_id):
         forum.parent_id = form.parent.data.id
         forum.is_category = form.is_category.data
         forum.locked = form.locked.data
+        forum.moderators = form.moderators.data
         forum.save()
 
         flash("Forum successfully edited.", "success")
@@ -208,7 +209,12 @@ def edit_forum(forum_id):
         form.parent.data = forum.parent
         form.is_category.data = forum.is_category
         form.locked.data = forum.locked
-        #form.moderators.data = forum.moderators
+
+        if forum.moderators:
+            mods = User.query.filter(User.id.in_(forum.moderators)).all()
+            form.moderators.data = ",".join([mod.username for mod in mods])
+        else:
+            form.moderators.data = None
 
     return render_template("admin/edit_forum.html", form=form)
 

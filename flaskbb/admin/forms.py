@@ -216,6 +216,7 @@ class AddGroupForm(GroupForm):
 
 class ForumForm(Form):
     _id = None
+    _moderators = set()
 
     title = TextField("Forum Title", validators=[
         Required(message="Forum title required")])
@@ -234,6 +235,11 @@ class ForumForm(Form):
                                            forum is a category (see \"Is a \
                                            category?\" field below).")
 
+    moderators = TextField("Moderators",
+                           description="Comma seperated usernames. Leave it \
+                                        blank if you do not want to set any \
+                                        moderators.")
+
     is_category = BooleanField("Is a category?",
                                description="Categories are root-level parents \
                                             for forums. They can not contain \
@@ -247,10 +253,30 @@ class ForumForm(Form):
             if field.data.id == self._id:
                 raise ValidationError("A forum cannot be it's own parent!")
 
+    def validate_moderators(self, field):
+        if field.data:
+            # Check if the usernames exist
+            for moderator in field.data.split(","):
+                user = User.query.filter_by(username=moderator).first()
+
+                # Check if the user has the permissions to moderate a forum
+                if user:
+                    if not user.get_permissions()["mod"]:
+                        raise ValidationError("The user is not in a moderators \
+                            group")
+                    else:
+                        self._moderators.add(user.id)
+                else:
+                    raise ValidationError("User not found")
+            field.data = self._moderators
+
     def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
                       position=self.position.data)
+
+        if self.moderators.data:
+            forum.moderators = self.moderators.data
 
         if self.is_category.data:
             forum.is_category = True
