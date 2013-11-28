@@ -252,6 +252,10 @@ class ForumForm(Form):
         if hasattr(field.data, "id"):
             if field.data.id == self._id:
                 raise ValidationError("A forum cannot be it's own parent!")
+        else:
+            if not self.is_category.data:
+                raise ValidationError("Please choose a parent or is it a \
+                                      category?")
 
     def validate_moderators(self, field):
         if field.data:
@@ -275,7 +279,7 @@ class ForumForm(Form):
                       description=self.description.data,
                       position=self.position.data)
 
-        if self.moderators.data:
+        if self.moderators.data and not self.is_category.data:
             forum.moderators = self.moderators.data
 
         if self.is_category.data:
@@ -283,5 +287,6 @@ class ForumForm(Form):
             forum.parent_id = None
         else:
             forum.parent_id = self.parent.data.id
+            forum.parents.add(self.parent.data.id)
 
         return forum.save()

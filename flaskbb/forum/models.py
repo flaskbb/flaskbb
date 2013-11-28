@@ -65,6 +65,9 @@ class Post(db.Model):
 
             # Update the parent forums
             parent = topic.forum.parent
+            # TODO: Improvement - store the parent forums in a list and then
+            # get all the forums with one query instead of firing up
+            # for each parent a own query
             while parent is not None and not parent.is_category:
                 parent.last_post_id = self.id
                 parent.post_count += 1
@@ -138,9 +141,8 @@ class Topic(db.Model):
                                  foreign_keys=[first_post_id])
 
     # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
-                                                       ondelete="CASCADE",
-                                                       onupdate="CASCADE"))
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+
     last_post = db.relationship("Post", backref="last_post", uselist=False,
                                 foreign_keys=[last_post_id])
 
@@ -214,14 +216,13 @@ class Topic(db.Model):
         # check if the topic is the most recently one in this forum
         try:
             forum = self.forum
+            # you want to delete the topic with the last post
             if self.id == topic[0].id:
                 # Now the second last post will be the last post
                 while forum is not None and not forum.is_category:
                     forum.last_post_id = topic[1].last_post_id
                     forum.save()
                     forum = forum.parent
-            else:
-                forum.last_post_id = topic[1].last_post_id
         # Catch an IndexError when you delete the last topic in the forum
         except IndexError:
             while forum is not None and not forum.is_category:
@@ -245,12 +246,8 @@ class Topic(db.Model):
                 db.session.commit()
 
         while forum is not None and not forum.is_category:
-            forum.topic_count = Topic.query.filter_by(
-                forum_id=self.forum_id).count()
-
-            forum.post_count = Post.query.filter(
-                Post.topic_id == Topic.id,
-                Topic.forum_id == self.forum_id).count()
+            forum.topic_count -= 1
+            forum.post_count -= 1
 
             forum = forum.parent
 
@@ -328,6 +325,11 @@ class Forum(db.Model):
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
 
+    moderators = db.Column(DenormalizedText)
+
+    # A set with all parent forums
+    parents = db.Column(DenormalizedText)
+
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
     last_post = db.relationship("Post", backref="last_post_forum",
@@ -339,8 +341,6 @@ class Forum(db.Model):
     children = db.relationship("Forum",
                                backref=db.backref("parent", remote_side=[id]),
                                cascade="all, delete-orphan")
-
-    moderators = db.Column(DenormalizedText)
 
     # Methods
     def __repr__(self):
