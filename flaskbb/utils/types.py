@@ -11,20 +11,16 @@
 from sqlalchemy import types
 from sqlalchemy.ext.mutable import Mutable
 import json
-import collections
 
 
-class DenormalizedText(Mutable, types.TypeDecorator):
+class SetType(types.TypeDecorator):
     """
-    Stores denormalized primary keys that can be
-    accessed as a set.
+    Represents an immutable set.
 
     :param coerce: coercion function that ensures correct
                    type is returned
 
     :param separator: separator character
-
-    Source: https://github.com/imwilsonxu/fbone/blob/master/fbone/user/models.py#L13-L45
     """
 
     impl = types.Text
@@ -34,7 +30,7 @@ class DenormalizedText(Mutable, types.TypeDecorator):
         self.coerce = coerce
         self.separator = separator
 
-        super(DenormalizedText, self).__init__(**kwargs)
+        super(SetType, self).__init__(**kwargs)
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -43,12 +39,40 @@ class DenormalizedText(Mutable, types.TypeDecorator):
         return value
 
     def process_result_value(self, value, dialect):
-        if not value:
-            return set()
-        return set(self.coerce(item) for item in value.split(self.separator))
+        if value is not None:
+            return set(self.coerce(item) for item in value.split(" "))
+        return set()
 
-    def copy_value(self, value):
-        return set(value)
+
+class MutableSet(Mutable, set):
+    @classmethod
+    def coerce(cls, key, value):
+        """
+        Convert plain sets to MutableSet.
+        """
+
+        if not isinstance(value, MutableSet):
+            if isinstance(value, set):
+                return MutableSet(value)
+
+            # this call will raise ValueError
+            return Mutable.coerce(key, value)
+        else:
+            return value
+
+    def add(self, value):
+        """
+        Detect set add events and emit change events.
+        """
+        set.add(self, value)
+        self.changed()
+
+    def remove(self, value):
+        """
+        Detect set remove events and emit change events.
+        """
+        set.remove(self, value)
+        self.changed()
 
 
 # http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/mutable.html

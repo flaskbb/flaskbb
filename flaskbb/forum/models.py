@@ -11,7 +11,7 @@
 from datetime import datetime
 
 from flaskbb.extensions import db
-from flaskbb.utils.types import DenormalizedText
+from flaskbb.utils.types import SetType, MutableSet
 from flaskbb.utils.query import TopicQuery
 from helpers import get_forum_ids
 
@@ -325,10 +325,10 @@ class Forum(db.Model):
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
 
-    moderators = db.Column(DenormalizedText)
+    moderators = db.Column(MutableSet.as_mutable(SetType))
 
     # A set with all parent forums
-    parents = db.Column(DenormalizedText)
+    parents = db.Column(MutableSet.as_mutable(SetType))
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
