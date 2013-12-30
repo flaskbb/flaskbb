@@ -20,8 +20,11 @@
                 {% if user.avatar %}
                 <tr><td><img src="{{ user.avatar }}" alt="Avatar" height="100" width="100"> </td></tr>
                 {% endif %}
-                <!-- TODO: Implement online status -->
-                <tr><td><b></b> <span class="label label-success">Online</span></td></tr>
+                {% if user|is_online %}
+                <tr><td><span class="label label-success">Online</span></td></tr>
+                {% else %}
+                <tr><td><span class="label label-default">Offline</span></td></tr>
+                {% endif %}
                 <tr><td><a href="{{ url_for('user.view_all_topics', username=user.username) }}">All Topics</a></td></tr>
                 <tr><td><a href="{{ url_for('user.view_all_posts', username=user.username) }}">All Posts</a></td></tr>
               </tbody>

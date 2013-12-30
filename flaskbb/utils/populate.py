@@ -177,7 +177,7 @@ def create_test_data():
     for i in range(1, 3):
         forum_title = "Test Forum %s " % i
         forum = Forum(title=forum_title, description="Test Description",
-                      parent_id=1)
+                      parent_id=category.id)
         forum.save()
 
         # Create a subforum

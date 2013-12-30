@@ -13,7 +13,7 @@ import datetime
 import math
 
 from flask import (Blueprint, render_template, redirect, url_for, current_app,
-                   request, flash, abort)
+                   request, flash)
 from flask.ext.login import login_required, current_user
 
 from flaskbb.extensions import db

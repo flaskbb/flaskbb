@@ -369,6 +369,18 @@ class Forum(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+        parent_ids = []
+        parent = self.parent
+        while parent and not parent.is_category:
+            parent_ids.append(parent.id)
+            parent = parent.parent
+
+        for parent_id in parent_ids:
+            self.parents.add(parent_id)
+
+        db.session.add(self)
+        db.session.commit()
         return self
 
     def delete(self, users=None):

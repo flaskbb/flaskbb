@@ -196,7 +196,9 @@ def edit_forum(forum_id):
         forum.position = form.position.data
         forum.is_category = form.is_category.data
         forum.locked = form.locked.data
-        forum.moderators = form.moderators.data
+
+        if form.moderators.data:
+            forum.moderators = form.moderators.data
 
         if hasattr(form.parent.data, 'id'):
             forum.parent_id = form.parent.data.id

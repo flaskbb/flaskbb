@@ -287,6 +287,5 @@ class ForumForm(Form):
             forum.parent_id = None
         else:
             forum.parent_id = self.parent.data.id
-            forum.parents.add(self.parent.data.id)
 
         return forum.save()

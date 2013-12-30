@@ -57,10 +57,18 @@ def get_forum_ids(forum):
 
 def get_forums(forum_query, current_user=False):
     """
-    Pack all forum objects in a dict
-    It looks like this:
+    Sort all forums
+    If current_user is `True` the `forum_query` will look like this:
+          Forum     ForumsRead
+        [(<Forum 1>, None),
+         (<Forum 2>, None),
+         (<Forum 3>, <flaskbb.forum.models.ForumsRead at 0x105319250>),
+         (<Forum 4>, None),
+         (<Forum 5>, None),
+         (<Forum 6>, <flaskbb.forum.models.ForumsRead at 0x105281090>)]
+    and it will return something like this:
       Category      Forum         Subforums
-    {<Forum 1)>: {<Forum 2)>: [<Forum 5)>, <Forum 6)>]},
+    {<Forum 1>: {<Forum 2>: [<Forum 5>, <Forum 6>]},
     """
     if not current_user:
         forum_query = [(item, None) for item in forum_query]

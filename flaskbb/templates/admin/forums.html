@@ -15,7 +15,7 @@
         <tr>
             <td>{{ forum.id }}</td>
             <td><a href="#">{{ forum.title }}</a></td>
-            <td>{{ forum.description }}</td>
+            <td>{{ forum.description }} | {{ forum.parents }}</td>
             <td>
                 <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
                 <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>

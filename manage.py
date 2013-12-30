@@ -10,8 +10,6 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import os
-
 from flask import current_app
 from flask.ext.script import Manager, Shell, Server
 
@@ -55,9 +53,7 @@ def createall():
     """
 
     # Just for testing purposes
-    dbfile = os.path.join(Config._basedir, "flaskbb.sqlite")
-    if os.path.exists(dbfile):
-        os.remove(dbfile)
+    db.drop_all()
 
     db.create_all()
     create_test_data()
