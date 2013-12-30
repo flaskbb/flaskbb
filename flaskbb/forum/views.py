@@ -38,6 +38,7 @@ def index():
                       db.and_(ForumsRead.forum_id == Forum.id,
                               ForumsRead.user_id == current_user.id)).\
             add_entity(ForumsRead).\
+            order_by(Forum.position.asc()).\
             all()
         categories = get_forums(categories_query, current_user=True)
     else:
