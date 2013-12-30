@@ -57,7 +57,7 @@ def get_forum_ids(forum):
 
 def get_forums(forum_query, current_user=False):
     """
-    Sort all forums
+    Assign each forum/category its appropriate (sub)forum
     If current_user is `True` the `forum_query` will look like this:
           Forum     ForumsRead
         [(<Forum 1>, None),
