@@ -1,6 +1,13 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
+{% from 'macros.html' import render_pagination %}
+
 <legend>Manage Groups | <a href="{{ url_for('admin.add_group') }}">Add Group</a></legend>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(groups, url_for('admin.groups')) }}
+</div>
+
 <table class="table table-bordered">
     <thead>
         <tr>

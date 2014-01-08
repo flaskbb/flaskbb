@@ -1,6 +1,13 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
+{% from 'macros.html' import render_pagination %}
+
 <legend>Manage Users | <a href="{{ url_for('admin.add_user') }}">Add User</a></legend>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(users, url_for('admin.users')) }}
+</div>
+
 <table class="table table-bordered">
     <thead>
         <tr>

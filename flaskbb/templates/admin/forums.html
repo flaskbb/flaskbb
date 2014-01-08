@@ -1,6 +1,13 @@
 {% extends "admin/admin_layout.html" %}
 {% block admin_content %}
+{% from 'macros.html' import render_pagination %}
+
 <legend>Manage Forums | <a href="{{ url_for('admin.add_forum') }}">Add Forum</a></legend>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(forums, url_for('admin.forums')) }}
+</div>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -15,7 +22,7 @@
         <tr>
             <td>{{ forum.id }}</td>
             <td><a href="#">{{ forum.title }}</a></td>
-            <td>{{ forum.description }} | {{ forum.parents }}</td>
+            <td>{{ forum.description }}</td>
             <td>
                 <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
                 <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>

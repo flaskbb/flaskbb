@@ -42,7 +42,7 @@ def index():
             all()
         categories = get_forums(categories_query, current_user=True)
     else:
-        categories_query = Forum.query.all()
+        categories_query = Forum.query.order_by(Forum.position.asc()).all()
         categories = get_forums(categories_query, current_user=False)
 
     # Fetch a few stats about the forum
