@@ -18,6 +18,12 @@
             <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a> |
                 <a href="{{ url_for('user.move_message', id=message.id) }}">Move</a></td>
         </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">
+                This message folder is empty.
+            </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>

@@ -17,6 +17,12 @@
             <td>{{ message.date_created|format_date }}</td>
             <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a></td>
         </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">
+                This message folder is empty.
+            </td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
