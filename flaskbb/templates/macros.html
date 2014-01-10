@@ -151,11 +151,7 @@
 
 {% macro render_pagination(page_obj, url) %}
 <ul class="pagination" style="margin: 0; float:right">
-    {% if page_obj.has_prev %}
-        <li class="disabled"><a href="{{ url }}?page={{ page_obj.prev_num }}">&laquo;</a></li>
-    {% else %}
-        <li class="active"><a href="#">&laquo;</a></li>
-    {% endif %}
+    <li><span class="pagination-text">Pages: </span></li>
     {%- for page in page_obj.iter_pages() %}
         {% if page %}
             {% if page != page_obj.page %}
@@ -166,9 +162,7 @@
         {% endif %}
     {%- endfor %}
     {% if page_obj.has_next %}
-        <li class="disabled"><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
-    {% else %}
-        <li class="active"><a href="#">&raquo;</a></li>
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
     {% endif %}
 </ul>
 {% endmacro %}

@@ -26,6 +26,12 @@ body {
   padding-right: 15px;
 }
 
+.pagination-text {
+  cursor: default;
+  background-color: #fff;
+  border-color: #ddd;
+}
+
 /*
  * Option to remove the borders from the table
  */
