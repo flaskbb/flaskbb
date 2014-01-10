@@ -20,21 +20,23 @@
 </div> <!-- end span pagination -->
 
 <div class="pull-right" style="padding-bottom: 10px">
-    {% if current_user|post_reply(topic.forum) and not (topic.locked or not topic.forum.locked) %}
-    <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary">Reply</a>
-    {% endif %}
     {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-    <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-primary">Delete Topic</a>
+    <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-danger"><span class="fa fa-trash-o"></span> Delete Topic</a>
     {% endif %}
 
     {% if current_user.is_authenticated() %}
-        {% if current_user.is_tracking_topic(topic) %}
-        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-primary">Untrack Topic</a>
-        {% else %}
-        <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-primary">Track Topic</a>
-        {% endif %}
-    {% endif %}
+        <div class="btn btn-group">
+            {% if current_user.is_tracking_topic(topic) %}
+            <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Untrack Topic</a>
+            {% else %}
+            <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Track Topic</a>
+            {% endif %}
 
+            {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+            <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> Reply</a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 
 <table class="table table-bordered">

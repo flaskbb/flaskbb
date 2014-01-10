@@ -13,19 +13,26 @@
     <li class="active">{{ forum.title }}</li>
 </ol>
 
+{% if forum.topics %}
 <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(topics, url_for('forum.view_forum', forum_id=forum.id)) }}
 </div> <!-- end span pagination -->
+{% endif %}
 
 {% if current_user|post_topic(forum) and not forum.is_category %}
 <div class="pull-right" style="padding-bottom: 10px">
-    {% if forum.locked %}
-    <span class="btn btn-primary"><span class="fa fa-lock"></span> Locked</span>
-    {% else %}
-    <a href="{{ url_for('forum.new_topic', forum_id=forum.id) }}" class="btn btn-primary">New Topic</a>
-    {% endif %}
+    <!-- star tick pencil -->
+    <div class="btn-group">
+        <a href="#" class="btn btn-default"><span class="fa fa-check"></span> Mark as Read</a>
+        {% if forum.locked %}
+        <span class="btn btn-primary"><span class="fa fa-lock"></span> Locked</span>
+        {% else %}
+        <a href="{{ url_for('forum.new_topic', forum_id=forum.id) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> New Topic</a>
+        {% endif %}
+    </div>
 </div>
 {% endif %}
+
 {% if subforums[0]|length %}
 <table class="table table-bordered">
     <thead>
