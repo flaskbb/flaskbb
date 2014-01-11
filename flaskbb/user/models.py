@@ -43,6 +43,8 @@ class Group(db.Model):
     editpost = db.Column(db.Boolean, default=True)
     deletepost = db.Column(db.Boolean, default=False)
     deletetopic = db.Column(db.Boolean, default=False)
+    locktopic = db.Column(db.Boolean, default=True)
+    movetopic = db.Column(db.Boolean, default=True)
     posttopic = db.Column(db.Boolean, default=True)
     postreply = db.Column(db.Boolean, default=True)
 

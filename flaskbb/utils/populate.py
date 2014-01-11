@@ -10,7 +10,6 @@
 """
 from collections import OrderedDict
 
-from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum
 
@@ -28,6 +27,8 @@ GROUPS = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
+        'locktopic': True,
+        'movetopic': True,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -43,6 +44,8 @@ GROUPS = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
+        'locktopic': True,
+        'movetopic': True,
         'viewtopic': True,
         'viewprofiles': True
     }),
@@ -58,6 +61,8 @@ GROUPS = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
+        'locktopic': True,
+        'movetopic': True,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -73,6 +78,8 @@ GROUPS = OrderedDict((
         'deletetopic': False,
         'posttopic': True,
         'postreply': True,
+        'locktopic': False,
+        'movetopic': False,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -88,6 +95,8 @@ GROUPS = OrderedDict((
         'deletetopic': False,
         'posttopic': False,
         'postreply': False,
+        'locktopic': False,
+        'movetopic': False,
         'viewtopic': False,
         'viewprofile': False
     }),
@@ -103,6 +112,8 @@ GROUPS = OrderedDict((
         'deletetopic': False,
         'posttopic': False,
         'postreply': False,
+        'locktopic': False,
+        'movetopic': False,
         'viewtopic': False,
         'viewprofile': False
     })

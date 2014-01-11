@@ -30,7 +30,8 @@ from flaskbb.extensions import (db, login_manager, mail, cache, redis,
 from flaskbb.utils.helpers import (format_date, time_since, crop_title,
                                    can_post_reply, can_post_topic,
                                    can_delete_topic, can_delete_post, is_online,
-                                   can_edit_post, render_markup, mark_online,
+                                   can_edit_post, can_lock_topic,
+                                   can_move_topic, render_markup, mark_online,
                                    is_unread)
 
 
@@ -130,6 +131,8 @@ def configure_template_filters(app):
     app.jinja_env.filters['edit_post'] = can_edit_post
     app.jinja_env.filters['delete_post'] = can_delete_post
     app.jinja_env.filters['delete_topic'] = can_delete_topic
+    app.jinja_env.filters['move_topic'] = can_move_topic
+    app.jinja_env.filters['lock_topic'] = can_lock_topic
     app.jinja_env.filters['post_reply'] = can_post_reply
     app.jinja_env.filters['post_topic'] = can_post_topic
 

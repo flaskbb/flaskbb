@@ -19,7 +19,8 @@ from flask.ext.login import login_required, current_user
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import (can_post_reply, can_delete_topic,
                                    can_edit_post, can_post_topic,
-                                   can_delete_post, get_online_users, time_diff)
+                                   can_delete_post, can_lock_topic,
+                                   get_online_users, time_diff)
 from flaskbb.forum.models import Forum, Topic, Post, ForumsRead, TopicsRead
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
 from flaskbb.forum.helpers import get_forums
@@ -192,6 +193,41 @@ def delete_topic(topic_id):
                                        User.id == Post.user_id).all()
     topic.delete(users=involved_users)
     return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+
+
+@forum.route("/topic/<int:topic_id>/lock")
+@login_required
+def lock_topic(topic_id):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
+    if not can_lock_topic(user=current_user, forum=topic.forum):
+        flash("Yo do not have the permissions to lock this topic", "danger")
+        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+    topic.locked = True
+    topic.save()
+    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+
+@forum.route("/topic/<int:topic_id>/unlock")
+@login_required
+def unlock_topic(topic_id):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
+    # Unlock is basically the same as lock
+    if not can_lock_topic(user=current_user, forum=topic.forum):
+        flash("Yo do not have the permissions to unlock this topic", "danger")
+        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+    topic.locked = False
+    topic.save()
+    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+
+@forum.route("/topic/<int:topic_id>/move")
+@login_required
+def move_topic(topic_id):
+    pass
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])

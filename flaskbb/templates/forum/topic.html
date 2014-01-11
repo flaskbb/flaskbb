@@ -20,22 +20,31 @@
 </div> <!-- end span pagination -->
 
 <div class="pull-right" style="padding-bottom: 10px">
+    <div class="btn btn-group">
     {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-    <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-danger"><span class="fa fa-trash-o"></span> Delete Topic</a>
+        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-danger"><span class="fa fa-trash-o"></span> Delete Topic</a>
     {% endif %}
+    {% if current_user|lock_topic(topic.forum) %}
+        {% if not topic.locked %}
+            <a href="{{ url_for('forum.lock_topic', topic_id=topic.id) }}" class="btn btn-warning"><span class="fa fa-lock"></span> Lock Topic</a>
+        {% else %}
+            <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id) }}" class="btn btn-warning"><span class="fa fa-unlock"></span> Unlock Topic</a>
+        {% endif %}
+    {% endif %}
+    </div>
 
     {% if current_user.is_authenticated() %}
-        <div class="btn btn-group">
-            {% if current_user.is_tracking_topic(topic) %}
-            <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Untrack Topic</a>
-            {% else %}
-            <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Track Topic</a>
-            {% endif %}
+    <div class="btn btn-group">
+        {% if current_user.is_tracking_topic(topic) %}
+        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Untrack Topic</a>
+        {% else %}
+        <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star"></span> Track Topic</a>
+        {% endif %}
 
-            {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
-            <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> Reply</a>
-            {% endif %}
-        </div>
+        {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+        <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> Reply</a>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 
@@ -45,7 +54,7 @@
         <tr>
             <td >
                 <span class="pull-right">
-                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + (posts.page - 1) * per_page }} {%- endif -%}</strong>
+                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + (posts.page - 1) * config["POSTS_PER_PAGE"] }} {%- endif -%}</strong>
                 </span>
                 <span class="pull-left">
                     <a href="

@@ -130,6 +130,20 @@ def can_delete_topic(user, post_user_id, forum):
                       post_user_id=post_user_id)
 
 
+def can_lock_topic(user, forum):
+    """
+    Check if the user is allowed to lock a topic in the forum
+    """
+    return check_perm(user=user, perm='locktopic', forum=forum)
+
+
+def can_move_topic(user, forum):
+    """
+    Check if the user is allowed to lock a topic in the forum
+    """
+    return check_perm(user=user, perm='movetopic', forum=forum)
+
+
 def can_post_reply(user, forum):
     """
     Check if the user is allowed to post in the forum
