@@ -47,12 +47,12 @@ class Pagination(object):
             pages = int(ceil(self.total / float(self.per_page)))
         return pages
 
-    def prev(self, error_out=False):
+    def prev(self, error_out=False, add_none=False):
         """Returns a :class:`Pagination` object for the previous page."""
         assert self.query is not None, 'a query object is required ' \
                                        'for this method to work'
         return self.query.paginate(self.page - 1, self.per_page, error_out,
-                                   add_none)
+                                   self.add_none)
 
     @property
     def prev_num(self):
@@ -64,12 +64,12 @@ class Pagination(object):
         """True if a previous page exists"""
         return self.page > 1
 
-    def next(self, error_out=False):
+    def next(self, error_out=False, add_none=False):
         """Returns a :class:`Pagination` object for the next page."""
         assert self.query is not None, 'a query object is required ' \
                                        'for this method to work'
         return self.query.paginate(self.page + 1, self.per_page, error_out,
-                                   add_none)
+                                   self.add_none)
 
     @property
     def has_next(self):

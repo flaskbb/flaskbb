@@ -3,7 +3,7 @@
 
 {% extends "layout.html" %}
 {% block content %}
-{% from 'macros.html' import render_pagination %}
+{% from 'macros.html' import render_pagination, topic_pages %}
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
@@ -128,17 +128,23 @@
         {% for topic, topicread in topics.items %}
         <tr>
             <td width="4%">
-
-            {% if topicread|is_unread(topic.last_post) %}
-                <span class="fa fa-comment" style="font-size: 2em"></span>
+            {% if topic.locked %}
+                <span class="fa fa-locked" style="font-size: 2em"></span>
             {% else %}
-                <span class="fa fa-comment-o" style="font-size: 2em"></span>
+                {% if topicread|is_unread(topic.last_post) %}
+                    <span class="fa fa-comment" style="font-size: 2em"></span>
+                {% else %}
+                    <span class="fa fa-comment-o" style="font-size: 2em"></span>
+                {% endif %}
             {% endif %}
 
             </td>
             <td>
                 <div>
-                    <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a> <br />
+                    <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a>
+                    <!-- Topic Pagination -->
+                    {{ topic_pages(topic, config["POSTS_PER_PAGE"]) }}
+                    <br />
                     <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
                 </div>
             </td>

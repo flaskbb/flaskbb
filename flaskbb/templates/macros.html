@@ -151,7 +151,7 @@
 
 {% macro render_pagination(page_obj, url) %}
 <ul class="pagination" style="margin: 0; float:right">
-    <li><span class="pagination-text">Pages: </span></li>
+    <li><span class="pages-label">Pages: </span></li>
     {%- for page in page_obj.iter_pages() %}
         {% if page %}
             {% if page != page_obj.page %}
@@ -166,3 +166,15 @@
     {% endif %}
 </ul>
 {% endmacro %}
+
+
+{%- macro topic_pages(topic_obj, per_page=10) -%}
+{% set topic_pages = (topic_obj.post_count / per_page)|round|int %}
+{%- if topic_pages >  1 -%}
+<small>[
+    {% for page in range(0, topic_pages) %}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }} </a>
+    {% endfor %}
+]</small>
+{%- endif -%}
+{%- endmacro -%}
