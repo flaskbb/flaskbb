@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.configs.base
-    ~~~~~~~~~~~~~~~~~~~~
+    flaskbb.configs.default
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
-    This is the base configuration for FlaskBB that every site should have.
+    This is the default configuration for FlaskBB that every site should have.
     You can override these configuration variables in another class.
 
     :copyright: (c) 2013 by the FlaskBB Team.
@@ -92,6 +92,9 @@ class DefaultConfig(object):
 
     # This is really handy if do not have an redis instance like on windows
     USE_REDIS = True
+    REDIS_HOST = 'localhost'
+    REDIS_PORT = 6379
+    REDIS_DB = 0
 
     # The days for how long the forum should deal with unread topics
     # 0 - Disable it

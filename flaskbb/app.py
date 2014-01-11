@@ -14,7 +14,6 @@ import datetime
 
 from flask import Flask, render_template, request
 from flask.ext.login import current_user
-from flask_debugtoolbar import DebugToolbarExtension
 
 # Import the user blueprint
 from flaskbb.user.views import user
@@ -26,7 +25,8 @@ from flaskbb.admin.views import admin
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 
-from flaskbb.extensions import db, login_manager, mail, cache
+from flaskbb.extensions import (db, login_manager, mail, cache, redis,
+                                debugtoolbar)
 from flaskbb.utils.helpers import (format_date, time_since, crop_title,
                                    can_post_reply, can_post_topic,
                                    can_delete_topic, can_delete_post, is_online,
@@ -53,30 +53,23 @@ def create_app(config=None, blueprints=None):
     # Initialize the app
     app = Flask("flaskbb")
 
-    configure_app(app, config)
+    # Use the default config and override it afterwards
+    app.config.from_object('flaskbb.configs.default.DefaultConfig')
+    # Update the config
+    app.config.from_object(config)
+    # try to update the config via the environment variable
+    app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
+
+    for blueprint, url_prefix in blueprints:
+        app.register_blueprint(blueprint, url_prefix=url_prefix)
+
     configure_extensions(app)
-    configure_blueprints(app, blueprints)
     configure_template_filters(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
 
     return app
-
-
-def configure_app(app, config):
-    """
-    Configures the app. If no configuration file is choosen,
-    the app will use the example configuration.
-    """
-
-    # Get the configuration file
-    if config is None:
-        from flaskbb.configs.default import DefaultConfig
-        app.config.from_object(DefaultConfig)
-        app.logger.info("No configuration specified. Using the Default config")
-    else:
-        app.config.from_object(config)
 
 
 def configure_extensions(app):
@@ -94,7 +87,10 @@ def configure_extensions(app):
     cache.init_app(app)
 
     # Flask-Debugtoolbar
-    DebugToolbarExtension(app)
+    debugtoolbar.init_app(app)
+
+    # Flask-And-Redis
+    redis.init_app(app)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
@@ -118,15 +114,6 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
-
-
-def configure_blueprints(app, blueprints):
-    """
-    Configures the blueprints
-    """
-
-    for blueprint, url_prefix in blueprints:
-        app.register_blueprint(blueprint, url_prefix=url_prefix)
 
 
 def configure_template_filters(app):

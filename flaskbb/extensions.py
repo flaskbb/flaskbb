@@ -8,12 +8,12 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from redis import Redis
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
 from flask.ext.cache import Cache
-#from flask.ext.debugtoolbar import DebugToolbarExtension
+from flask.ext.debugtoolbar import DebugToolbarExtension
+from flask.ext.redis import Redis
 
 # Database
 db = SQLAlchemy()
@@ -31,4 +31,4 @@ cache = Cache()
 redis = Redis()
 
 # Debugtoolbar
-#toolbar = DebugToolbarExtension()
+debugtoolbar = DebugToolbarExtension()
