@@ -11,7 +11,6 @@
 from flask import render_template
 from flask.ext.mail import Message
 from flaskbb.extensions import mail
-from flaskbb.decorators import async
 
 
 def send_reset_token(user, token):
@@ -29,11 +28,6 @@ def send_reset_token(user, token):
             token=token
         )
     )
-
-
-@async
-def send_async_email(msg):
-    mail.send(msg)
 
 
 def send_email(subject, recipients, text_body, html_body, sender=""):
