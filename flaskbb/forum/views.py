@@ -114,6 +114,10 @@ def view_forum(forum_id):
 @forum.route("/<int:forum_id>/markread")
 def markread(forum_id=None):
 
+    if not current_user.is_authenticated():
+        flash("We do not support cookie based unread forums yet.", "danger")
+        return redirect(url_for("forum.index"))
+
     # Mark a single forum as read
     if forum_id:
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -186,11 +190,12 @@ def new_topic(forum_id):
 
     if forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
-              "error")
+              "danger")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
     if not can_post_topic(user=current_user, forum=forum):
-        flash("You do not have the permissions to create a new topic.", "error")
+        flash("You do not have the permissions to create a new topic.",
+              "danger")
         return redirect(url_for('forum.view_forum', forum_id=forum.id))
 
     form = NewTopicForm()
@@ -210,7 +215,7 @@ def delete_topic(topic_id):
     if not can_delete_topic(user=current_user, forum=topic.forum,
                             post_user_id=topic.first_post.user_id):
 
-        flash("You do not have the permissions to delete the topic", "error")
+        flash("You do not have the permissions to delete the topic", "danger")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     involved_users = User.query.filter(Post.topic_id == topic.id,
@@ -261,15 +266,15 @@ def new_post(topic_id):
 
     if topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
-              "error")
+              "danger")
         return redirect(url_for('forum.view_forum', forum_id=topic.forum.id))
 
     if topic.locked:
-        flash("The topic is locked.", "error")
+        flash("The topic is locked.", "danger")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     if not can_post_reply(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to delete the topic", "error")
+        flash("You do not have the permissions to delete the topic", "danger")
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
     form = ReplyForm()
@@ -287,18 +292,18 @@ def edit_post(post_id):
 
     if post.topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
-              "error")
+              "danger")
         return redirect(url_for("forum.view_forum",
                                 forum_id=post.topic.forum.id))
 
     if post.topic.locked:
-        flash("The topic is locked.", "error")
+        flash("The topic is locked.", "danger")
         return redirect(url_for("forum.view_forum",
                                 forum_id=post.topic.forum_id))
 
     if not can_edit_post(user=current_user, forum=post.topic.forum,
                          post_user_id=post.user_id):
-        flash("You do not have the permissions to edit this post", "error")
+        flash("You do not have the permissions to edit this post", "danger")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
     form = ReplyForm()
@@ -320,7 +325,7 @@ def delete_post(post_id):
 
     if not can_delete_post(user=current_user, forum=post.topic.forum,
                            post_user_id=post.user_id):
-        flash("You do not have the permissions to edit this post", "error")
+        flash("You do not have the permissions to edit this post", "danger")
         return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
 
     topic_id = post.topic_id

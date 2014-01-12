@@ -111,7 +111,7 @@ def forgot_password():
             return redirect(url_for("auth.forgot_password"))
         else:
             flash(("You have entered an username or email that is not linked \
-                with your account"), "error")
+                with your account"), "danger")
     return render_template("auth/forgot_password.html", form=form)
 
 
@@ -130,11 +130,11 @@ def reset_password(token):
         expired, invalid, data = user.verify_reset_token(form.token.data)
 
         if invalid:
-            flash(("Your password token is invalid."), "error")
+            flash(("Your password token is invalid."), "danger")
             return redirect(url_for("auth.forgot_password"))
 
         if expired:
-            flash(("Your password is expired."), "error")
+            flash(("Your password is expired."), "danger")
             return redirect(url_for("auth.forgot_password"))
 
         if user and data:
