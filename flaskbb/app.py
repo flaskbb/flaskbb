@@ -36,8 +36,8 @@ from flaskbb.utils.helpers import (format_date, time_since, crop_title,
 
 
 DEFAULT_BLUEPRINTS = (
-    (forum, ""),
-    (auth, ""),
+    (forum, "/forum"),
+    (auth, "/auth"),
     (user, "/user"),
     (admin, "/admin")
 )

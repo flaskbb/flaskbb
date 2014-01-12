@@ -90,7 +90,7 @@ class DefaultConfig(object):
     # The length of the topic title in characters on the index
     TITLE_LENGTH = 15
 
-    # This is really handy if do not have an redis instance like on windows
+    # This is really handy if you do not have an redis instance like on windows
     USE_REDIS = True
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379

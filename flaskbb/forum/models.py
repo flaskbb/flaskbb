@@ -8,7 +8,9 @@
     :copyright: (c) 2013 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from flask import current_app
 
 from flaskbb.extensions import db
 from flaskbb.utils.types import SetType, MutableSet
@@ -260,7 +262,12 @@ class Topic(db.Model):
         post.
         """
         # Don't do anything if the user is a guest
-        if not user.is_authenticated():
+        # or the the last post is is too old - can be specified in the
+        # config via `TRACKER_LENGTH`
+        read_cutoff = datetime.utcnow() - timedelta(
+            days=current_app.config['TRACKER_LENGTH'])
+        if not user.is_authenticated() or \
+                read_cutoff > self.last_post.date_created:
             return
 
         topicread = TopicsRead.query.\
@@ -293,8 +300,6 @@ class Topic(db.Model):
                        db.or_(TopicsRead.last_read == None,
                               TopicsRead.last_read < Topic.last_updated)).\
                 count()
-                # Why doesn't this work with when you pass an last_post object?
-                # e.q.: TopicsRead.last_read < last_post.date_created
 
             # Mark it as read if no unread topics are found
             if unread_count == 0:

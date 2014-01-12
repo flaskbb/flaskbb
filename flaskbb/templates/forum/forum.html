@@ -23,7 +23,7 @@
 <div class="pull-right" style="padding-bottom: 10px">
     <!-- star tick pencil -->
     <div class="btn-group">
-        <a href="#" class="btn btn-default"><span class="fa fa-check"></span> Mark as Read</a>
+        <a href="{{ url_for('forum.markread', forum_id=forum.id) }}" class="btn btn-default"><span class="fa fa-check"></span> Mark as Read</a>
         {% if forum.locked %}
         <span class="btn btn-primary"><span class="fa fa-lock"></span> Locked</span>
         {% else %}
@@ -131,7 +131,7 @@
             {% if topic.locked %}
                 <span class="fa fa-locked" style="font-size: 2em"></span>
             {% else %}
-                {% if topicread|is_unread(topic.last_post) %}
+                {% if topicread|is_unread(topic.last_post, topic=topic) %}
                     <span class="fa fa-comment" style="font-size: 2em"></span>
                 {% else %}
                     <span class="fa fa-comment-o" style="font-size: 2em"></span>

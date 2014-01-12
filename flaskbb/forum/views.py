@@ -70,7 +70,7 @@ def index():
                            online_guests=online_guests)
 
 
-@forum.route("/forum/<int:forum_id>")
+@forum.route("/<int:forum_id>")
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
@@ -108,6 +108,30 @@ def view_forum(forum_id):
 
     return render_template("forum/forum.html",
                            forum=forum, topics=topics, subforums=subforums)
+
+
+@forum.route("/markread")
+@forum.route("/<int:forum_id>/markread")
+def markread(forum_id=None):
+
+    # Mark a single forum as read
+    if forum_id:
+        forum = Forum.query.filter_by(id=forum_id).first()
+        for topic in forum.topics:
+            topic.update_read(current_user, forum)
+        return redirect(url_for("forum.view_forum", forum_id=forum.id))
+
+    # Mark all forums as read
+    # TODO: Improve performance
+    forums = Forum.query.all()
+    for forum in forums:
+        if forum.is_category:
+            continue
+
+        for topic in forum.topics:
+            topic.update_read(current_user, forum)
+
+    return redirect(url_for("forum.index"))
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
@@ -155,7 +179,7 @@ def view_post(post_id):
                     "?page=%d#pid%s" % (page, post.id))
 
 
-@forum.route("/forum/<int:forum_id>/topic/new", methods=["POST", "GET"])
+@forum.route("/<int:forum_id>/topic/new", methods=["POST", "GET"])
 @login_required
 def new_topic(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first()

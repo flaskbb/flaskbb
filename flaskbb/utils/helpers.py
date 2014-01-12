@@ -18,7 +18,7 @@ from flaskbb.extensions import redis
 from flaskbb.forum.models import ForumsRead, TopicsRead
 
 
-def is_unread(read_object, last_post, forum=None):
+def is_unread(read_object, last_post, forum=None, topic=None):
     if not (isinstance(read_object, ForumsRead) or
             isinstance(read_object, TopicsRead) or not None):
         raise TypeError("Must be a ForumsRead or TopicsRead object")
@@ -28,6 +28,8 @@ def is_unread(read_object, last_post, forum=None):
 
     if forum and forum.topic_count == 0:
         return False
+    if topic and not read_object:
+        return read_cutoff > last_post.date_created
     if read_object is None:
         return True
     if read_cutoff < last_post.date_created:
