@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.decorators
-    ~~~~~~~~~~~~~~~~~~~~
+    flaskbb.utils.decorators
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
     A place for our decorators.
 

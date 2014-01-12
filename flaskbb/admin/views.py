@@ -14,7 +14,7 @@ from flask import (Blueprint, render_template, current_app, request, redirect,
                    url_for, flash, __version__ as flask_version)
 
 from flaskbb import __version__ as flaskbb_version
-from flaskbb.decorators import admin_required
+from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum
