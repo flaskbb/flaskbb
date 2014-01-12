@@ -7,7 +7,7 @@
     You can also run the development server with it.
     Just type `python manage.py` to see the full list of commands.
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 from flask import current_app

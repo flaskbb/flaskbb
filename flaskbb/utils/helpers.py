@@ -5,7 +5,7 @@
 
     A few helpers that are used by flaskbb
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 import time

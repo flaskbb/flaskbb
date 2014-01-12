@@ -6,7 +6,7 @@
     The user view handles the user profile
     and the user settings from a signed in user.
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime

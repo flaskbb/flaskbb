@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+    flaskbb.admin.views
+    ~~~~~~~~~~~~~~~~~~~
+
+    This module handles the admin views.
+
+    :copyright: (c) 2014 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 import sys
 
 from flask import (Blueprint, render_template, current_app, request, redirect,

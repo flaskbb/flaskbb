@@ -6,7 +6,7 @@
     This is the default configuration for FlaskBB that every site should have.
     You can override these configuration variables in another class.
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 import os

@@ -5,7 +5,7 @@
 
     A few helper functions that are used by the forum's module.
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 from collections import OrderedDict

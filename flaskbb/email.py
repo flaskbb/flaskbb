@@ -5,7 +5,7 @@
 
     This module adds the functionality to send emails
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 from flask import render_template

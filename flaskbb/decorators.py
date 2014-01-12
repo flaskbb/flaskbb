@@ -5,7 +5,7 @@
 
     A place for our decorators.
 
-    :copyright: (c) 2013 by the FlaskBB Team.
+    :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 from functools import wraps
