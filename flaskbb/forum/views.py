@@ -75,7 +75,7 @@ def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
     if current_user.is_authenticated():
-        forum = Forum.query.filter(Forum.id == forum_id).first()
+        forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
 
         subforums = Forum.query.\
             filter(Forum.parent_id == forum.id).\
@@ -94,7 +94,7 @@ def view_forum(forum_id):
             order_by(Post.id.desc()).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
     else:
-        forum = Forum.query.filter(Forum.id == forum_id).first()
+        forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
 
         subforums = Forum.query.filter(Forum.parent_id == forum.id).all()
         # This isn't really nice imho, but "add_entity" (see above)
@@ -116,7 +116,7 @@ def markread(forum_id=None):
 
     # Mark a single forum as read
     if forum_id:
-        forum = Forum.query.filter_by(id=forum_id).first()
+        forum = Forum.query.filter_by(id=forum_id).first_or_404()
         for topic in forum.topics:
             topic.update_read(current_user, forum)
         return redirect(url_for("forum.view_forum", forum_id=forum.id))
@@ -167,7 +167,7 @@ def view_topic(topic_id):
 
 @forum.route("/post/<int:post_id>")
 def view_post(post_id):
-    post = Post.query.filter_by(id=post_id).first()
+    post = Post.query.filter_by(id=post_id).first_or_404()
     count = post.topic.post_count
     page = math.ceil(count / current_app.config["POSTS_PER_PAGE"])
     if count > 10:
@@ -182,7 +182,7 @@ def view_post(post_id):
 @forum.route("/<int:forum_id>/topic/new", methods=["POST", "GET"])
 @login_required
 def new_topic(forum_id):
-    forum = Forum.query.filter_by(id=forum_id).first()
+    forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
     if forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
@@ -205,7 +205,7 @@ def new_topic(forum_id):
 @forum.route("/topic/<int:topic_id>/delete")
 @login_required
 def delete_topic(topic_id):
-    topic = Topic.query.filter_by(id=topic_id).first()
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_delete_topic(user=current_user, forum=topic.forum,
                             post_user_id=topic.first_post.user_id):
@@ -257,7 +257,7 @@ def move_topic(topic_id):
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
 @login_required
 def new_post(topic_id):
-    topic = Topic.query.filter_by(id=topic_id).first()
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
@@ -283,7 +283,7 @@ def new_post(topic_id):
 @forum.route("/post/<int:post_id>/edit", methods=["POST", "GET"])
 @login_required
 def edit_post(post_id):
-    post = Post.query.filter_by(id=post_id).first()
+    post = Post.query.filter_by(id=post_id).first_or_404()
 
     if post.topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
@@ -316,7 +316,7 @@ def edit_post(post_id):
 @forum.route("/post/<int:post_id>/delete")
 @login_required
 def delete_post(post_id):
-    post = Post.query.filter_by(id=post_id).first()
+    post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_delete_post(user=current_user, forum=post.topic.forum,
                            post_user_id=post.user_id):
@@ -371,7 +371,7 @@ def topictracker():
 
 @forum.route("/topictracker/<topic_id>/add")
 def track_topic(topic_id):
-    topic = Topic.query.filter_by(id=topic_id).first()
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.track_topic(topic)
     current_user.save()
     return redirect(url_for("forum.view_topic", topic_id=topic.id))
@@ -379,7 +379,7 @@ def track_topic(topic_id):
 
 @forum.route("/topictracker/<topic_id>/delete")
 def untrack_topic(topic_id):
-    topic = Topic.query.filter_by(id=topic_id).first()
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.untrack_topic(topic)
     current_user.save()
     return redirect(url_for("forum.view_topic", topic_id=topic.id))

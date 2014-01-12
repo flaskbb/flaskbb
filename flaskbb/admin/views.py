@@ -66,7 +66,7 @@ def forums():
 @admin.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first_or_404()
 
     secondary_group_query = Group.query.filter(
         db.not_(Group.id == user.primary_group_id),
@@ -114,7 +114,7 @@ def edit_user(user_id):
 @admin.route("/users/<int:user_id>/delete")
 @admin_required
 def delete_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(id=user_id).first_or_404()
     user.delete()
     flash("User successfully deleted", "success")
     return redirect(url_for("admin.users"))
@@ -135,7 +135,7 @@ def add_user():
 @admin.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_group(group_id):
-    group = Group.query.filter_by(id=group_id).first()
+    group = Group.query.filter_by(id=group_id).first_or_404()
 
     form = EditGroupForm(group)
     if form.validate_on_submit():
@@ -164,7 +164,7 @@ def edit_group(group_id):
 @admin.route("/groups/<int:group_id>/delete")
 @admin_required
 def delete_group(group_id):
-    group = Group.query.filter_by(id=group_id).first()
+    group = Group.query.filter_by(id=group_id).first_or_404()
     group.delete()
     flash("Group successfully deleted.", "success")
     return redirect(url_for("admin.groups"))
@@ -185,7 +185,7 @@ def add_group():
 @admin.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_forum(forum_id):
-    forum = Forum.query.filter_by(id=forum_id).first()
+    forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
     form = ForumForm()
     form._id = forum.id  # Used for validation only.
@@ -229,7 +229,7 @@ def edit_forum(forum_id):
 @admin.route("/forums/<int:forum_id>/delete")
 @admin_required
 def delete_forum(forum_id):
-    forum = Forum.query.filter_by(id=forum_id).first()
+    forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
     involved_users = User.query.filter(Topic.forum_id == forum.id,
                                        Post.user_id == User.id).all()

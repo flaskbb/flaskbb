@@ -200,7 +200,7 @@ def new_message():
 @user.route("/messages/<int:id>/move")
 @login_required
 def move_message(id):
-    message = PrivateMessage.query.filter_by(id=id).first()
+    message = PrivateMessage.query.filter_by(id=id).first_or_404()
     message.trash = True
     message.save()
     flash("Message moved to Trash!", "success")
@@ -210,7 +210,7 @@ def move_message(id):
 @user.route("/messages/<int:id>/delete")
 @login_required
 def delete_message(id):
-    message = PrivateMessage.query.filter_by(id=id).first()
+    message = PrivateMessage.query.filter_by(id=id).first_or_404()
     message.delete()
     flash("Message deleted!", "success")
     return redirect(url_for("user.inbox"))
