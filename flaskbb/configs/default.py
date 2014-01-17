@@ -98,4 +98,4 @@ class DefaultConfig(object):
 
     # The days for how long the forum should deal with unread topics
     # 0 - Disable it
-    TRACKER_LENGTH = 0
+    TRACKER_LENGTH = 7

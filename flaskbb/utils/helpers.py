@@ -18,22 +18,42 @@ from flaskbb.extensions import redis
 from flaskbb.forum.models import ForumsRead, TopicsRead
 
 
-def is_unread(read_object, last_post, forum=None, topic=None):
+def is_unread(read_object, last_post, forum=None, topic=None, user=None):
     if not (isinstance(read_object, ForumsRead) or
             isinstance(read_object, TopicsRead) or not None):
         raise TypeError("Must be a ForumsRead or TopicsRead object")
 
+    # TODO: Do a check if the forums is marked as read
+
+    # By default, for all unregistered users the posts are marked as read
+    if user and not user.is_authenticated():
+        return False
+
     read_cutoff = datetime.utcnow() - timedelta(
         days=current_app.config['TRACKER_LENGTH'])
 
+    # Forum object passed but topic_count is 0 - mark the forum as read
     if forum and forum.topic_count == 0:
         return False
-    if topic and not read_object:
-        return read_cutoff > last_post.date_created
-    if read_object is None:
+
+    # Forum object passed but read_object is None.
+    # That means that there is atleast one post that the user hasn't read
+    if forum and not read_object:
         return True
-    if read_cutoff < last_post.date_created:
+
+    # Topic object passed but read_object is None.
+    # Checking if the topic is older as the read_cutoff
+    if topic and not read_object and last_post.date_created > read_cutoff:
+        return True
+
+    # Didn't match any of the above conditions, so we just have to look
+    # if the last_post is older as the read_cutoff.
+    if last_post.date_created > read_cutoff:
         return False
+
+    # read_object and last_post object available. Checking if the user
+    # hasn't read the last post --> the read_object needs to be smaller than
+    # the last post to mark it as unread
     return read_object.last_read < last_post.date_created
 
 

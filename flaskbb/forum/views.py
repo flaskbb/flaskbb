@@ -127,13 +127,21 @@ def markread(forum_id=None):
 
     # Mark all forums as read
     # TODO: Improve performance
+
+    forumsread = ForumsRead.query.filter_by(user_id=current_user.id).delete()
+    user = current_user
     forums = Forum.query.all()
     for forum in forums:
         if forum.is_category:
             continue
 
-        for topic in forum.topics:
-            topic.update_read(current_user, forum)
+        forumsread = ForumsRead()
+        forumsread.user_id = user.id
+        forumsread.forum_id = forum.id
+        forumsread.last_read = datetime.datetime.utcnow()
+        forumsread.cleared = datetime.datetime.utcnow()
+        db.session.add(forumsread)
+    db.session.commit()
 
     return redirect(url_for("forum.index"))
 

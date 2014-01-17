@@ -261,11 +261,11 @@ class Topic(db.Model):
         Update the topics read status if the user hasn't read the latest
         post.
         """
-        # Don't do anything if the user is a guest
-        # or the the last post is is too old - can be specified in the
-        # config via `TRACKER_LENGTH`
         read_cutoff = datetime.utcnow() - timedelta(
             days=current_app.config['TRACKER_LENGTH'])
+
+        # Anonymous User or the post is too old for inserting it in the
+        # TopicsRead model
         if not user.is_authenticated() or \
                 read_cutoff > self.last_post.date_created:
             return
@@ -274,18 +274,22 @@ class Topic(db.Model):
             filter(TopicsRead.user_id == user.id,
                    TopicsRead.topic_id == self.id).first()
 
-        # If the user has visited this topic already but hasn't read
-        # it for a while, mark the topic as read
+        # A new post has been submitted that the user hasn't read.
+        # Updating...
         if topicread and (topicread.last_read < self.last_post.date_created):
             topicread.last_read = datetime.utcnow()
             topicread.save()
-        # If the user hasn't read the topic, add him to the topicsread model
+
+        # The user has not visited the topic before. Inserting him in
+        # the TopicsRead model.
         elif not topicread:
             topicread = TopicsRead()
             topicread.user_id = user.id
             topicread.topic_id = self.id
             topicread.last_read = datetime.utcnow()
             topicread.save()
+
+        # else: no unread posts
 
         if forum:
             # fetch the unread posts in the forum
@@ -301,19 +305,29 @@ class Topic(db.Model):
                               TopicsRead.last_read < Topic.last_updated)).\
                 count()
 
-            # Mark it as read if no unread topics are found
+            #No unread topics available - trying to mark the forum as read
             if unread_count == 0:
                 forumread = ForumsRead.query.\
                     filter(ForumsRead.user_id == user.id,
                            ForumsRead.forum_id == forum.id).first()
 
-                # If the user has never visited a topic in this forum
-                # create a new entry
-                if not forumread:
-                    forumread = ForumsRead(user_id=user.id, forum_id=forum.id)
+                # ForumsRead is already up-to-date.
+                if forumread and forumread.last_read > topicread.last_read:
+                    return
 
-                forumread.last_read = datetime.utcnow()
-                forumread.save()
+                # ForumRead Entry exists - Updating it because a new post
+                # has been submitted that the user hasn't read.
+                elif forumread:
+                    forumread.last_read = datetime.utcnow()
+                    forumread.save()
+
+                # No ForumRead Entry existing - creating one.
+                else:
+                    forumread = ForumsRead()
+                    forumread.user_id = user.id
+                    forumread.forum_id = forum.id
+                    forumread.last_read = datetime.utcnow()
+                    forumread.save()
 
 
 class Forum(db.Model):
@@ -454,6 +468,7 @@ class ForumsRead(db.Model):
     forum_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
+    cleared = db.Column(db.DateTime)
 
     def save(self):
         db.session.add(self)
