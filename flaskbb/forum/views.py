@@ -75,17 +75,23 @@ def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
     if current_user.is_authenticated():
-        forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
+        forum = Forum.query.\
+            filter(Forum.id == forum_id).\
+            outerjoin(ForumsRead,
+                      db.and_(ForumsRead.forum_id == Forum.id,
+                              ForumsRead.user_id == current_user.id)).\
+            add_entity(ForumsRead).\
+            first_or_404()
 
         subforums = Forum.query.\
-            filter(Forum.parent_id == forum.id).\
+            filter(Forum.parent_id == forum[0].id).\
             outerjoin(ForumsRead,
                       db.and_(ForumsRead.forum_id == Forum.id,
                               ForumsRead.user_id == current_user.id)).\
             add_entity(ForumsRead).\
             all()
 
-        topics = Topic.query.filter_by(forum_id=forum.id).\
+        topics = Topic.query.filter_by(forum_id=forum[0].id).\
             filter(Post.topic_id == Topic.id).\
             outerjoin(TopicsRead,
                       db.and_(TopicsRead.topic_id == Topic.id,
@@ -121,26 +127,36 @@ def markread(forum_id=None):
     # Mark a single forum as read
     if forum_id:
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
-        for topic in forum.topics:
-            topic.update_read(current_user, forum)
+        forumsread = ForumsRead.query.filter_by(forum_id=forum.id).first()
+
+        if not forumsread:
+            forumsread = ForumsRead()
+            forumsread.user_id = current_user.id
+            forumsread.forum_id = forum.id
+            forumsread.last_read = datetime.datetime.utcnow()
+
+        forumsread.cleared = datetime.datetime.utcnow()
+        db.session.add(forumsread)
+        db.session.commit()
+
         return redirect(url_for("forum.view_forum", forum_id=forum.id))
 
     # Mark all forums as read
-    # TODO: Improve performance
+    ForumsRead.query.filter_by(user_id=current_user.id).delete()
+    TopicsRead.query.filter_by(user_id=current_user.id).delete()
 
-    forumsread = ForumsRead.query.filter_by(user_id=current_user.id).delete()
-    user = current_user
     forums = Forum.query.all()
     for forum in forums:
         if forum.is_category:
             continue
 
         forumsread = ForumsRead()
-        forumsread.user_id = user.id
+        forumsread.user_id = current_user.id
         forumsread.forum_id = forum.id
         forumsread.last_read = datetime.datetime.utcnow()
         forumsread.cleared = datetime.datetime.utcnow()
         db.session.add(forumsread)
+
     db.session.commit()
 
     return redirect(url_for("forum.index"))

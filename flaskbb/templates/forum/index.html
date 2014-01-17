@@ -26,7 +26,7 @@
         <tr>
             <td align="center" valign="center" width="4%">
 
-            {% if forum[1]|is_unread(forum[0].last_post, forum[0]) %}
+            {% if forum[0]|forum_is_unread(forum[1], current_user) %}
                 <span class="fa fa-comments" style="font-size: 2em"></span>
             {% else %}
                 <span class="fa fa-comments-o" style="font-size: 2em"></span>

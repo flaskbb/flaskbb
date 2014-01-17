@@ -15,46 +15,71 @@ from flask import current_app
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
-from flaskbb.forum.models import ForumsRead, TopicsRead
 
 
-def is_unread(read_object, last_post, forum=None, topic=None, user=None):
-    if not (isinstance(read_object, ForumsRead) or
-            isinstance(read_object, TopicsRead) or not None):
-        raise TypeError("Must be a ForumsRead or TopicsRead object")
+def forum_is_unread(forum, forumsread, user):
+    """Checks if a forum is unread
 
-    # TODO: Do a check if the forums is marked as read
+    :param forum: The forum that should be checked if it is unread
 
-    # By default, for all unregistered users the posts are marked as read
-    if user and not user.is_authenticated():
+    :param forumsread: The forumsread object for the forum
+
+    :param user: The user who should be checked if he has read the forum
+    """
+
+    # If the user is not signed in, every forum is marked as read
+    if not user.is_authenticated():
         return False
 
     read_cutoff = datetime.utcnow() - timedelta(
-        days=current_app.config['TRACKER_LENGTH'])
+        days=current_app.config["TRACKER_LENGTH"])
 
-    # Forum object passed but topic_count is 0 - mark the forum as read
+    # If there are no topics in the forum, mark it as read
     if forum and forum.topic_count == 0:
         return False
 
-    # Forum object passed but read_object is None.
-    # That means that there is atleast one post that the user hasn't read
-    if forum and not read_object:
-        return True
+    # If the user hasn't visited a topic in the forum - therefore,
+    # forumsread is None and we need to check if it is still unread
+    if forum and not forumsread:
+        return forum.last_post.date_created > read_cutoff
 
-    # Topic object passed but read_object is None.
-    # Checking if the topic is older as the read_cutoff
-    if topic and not read_object and last_post.date_created > read_cutoff:
-        return True
+    # the user has visited a topic in this forum, check if there is a new post
+    return forumsread.last_read < forum.last_post.date_created
 
-    # Didn't match any of the above conditions, so we just have to look
-    # if the last_post is older as the read_cutoff.
-    if last_post.date_created > read_cutoff:
+
+def topic_is_unread(topic, topicsread, user, forumsread=None):
+    """Checks if a topic is unread
+
+    :param topic: The topic that should be checked if it is unread
+
+    :param topicsread: The topicsread object for the topic
+
+    :param user: The user who should be checked if he has read the topic
+
+    :param forumsread: The forumsread object in which the topic is. You do
+                       not have to pass this - only if you want to include the
+                       cleared attribute from the ForumsRead object.
+                       This will also check if the forum is marked as clear.
+    """
+    if not user.is_authenticated():
         return False
 
-    # read_object and last_post object available. Checking if the user
-    # hasn't read the last post --> the read_object needs to be smaller than
-    # the last post to mark it as unread
-    return read_object.last_read < last_post.date_created
+    read_cutoff = datetime.utcnow() - timedelta(
+        days=current_app.config["TRACKER_LENGTH"])
+
+    # topicsread is none if the user has marked the forum as read
+    # or if he hasn't visited yet
+    if topic and not topicsread and topic.last_post.date_created > read_cutoff:
+
+        # user has cleared the forum sometime ago - check if there is a new post
+        if forumsread and forumsread.cleared > topic.last_post.date_created:
+            return False
+
+        # user hasn't read the topic yet, or it has been cleared
+        return True
+
+    current_app.logger.debug("User has read it. check if there is a new post")
+    return topicsread.last_read < topic.last_post.date_created
 
 
 def mark_online(user_id, guest=False):

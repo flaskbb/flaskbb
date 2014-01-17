@@ -261,6 +261,9 @@ class Topic(db.Model):
         Update the topics read status if the user hasn't read the latest
         post.
         """
+
+        # TODO: check if a forum has been cleared
+
         read_cutoff = datetime.utcnow() - timedelta(
             days=current_app.config['TRACKER_LENGTH'])
 
