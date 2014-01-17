@@ -42,3 +42,5 @@ __pycache__
 *.egg-info
 flaskbb/configs/production.py
 flaskbb/configs/development.py
+
+*.rdb
