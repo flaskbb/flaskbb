@@ -101,13 +101,14 @@ def view_forum(forum_id):
             paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
     else:
         forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
+        forum = (forum, None)
 
-        subforums = Forum.query.filter(Forum.parent_id == forum.id).all()
+        subforums = Forum.query.filter(Forum.parent_id == forum[0].id).all()
         # This isn't really nice imho, but "add_entity" (see above)
         # makes a list with tuples
         subforums = [(item, None) for item in subforums]
 
-        topics = Topic.query.filter_by(forum_id=forum.id).\
+        topics = Topic.query.filter_by(forum_id=forum[0].id).\
             filter(Post.topic_id == Topic.id).\
             order_by(Post.id.desc()).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
@@ -128,6 +129,8 @@ def markread(forum_id=None):
     if forum_id:
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
         forumsread = ForumsRead.query.filter_by(forum_id=forum.id).first()
+        TopicsRead.query.filter_by(user_id=current_user.id,
+                                   forum_id=forum.id).delete()
 
         if not forumsread:
             forumsread = ForumsRead()
@@ -174,7 +177,13 @@ def view_topic(topic_id):
     topic.views += 1
 
     # Update the topicsread status if the user hasn't read it
-    topic.update_read(current_user, topic.forum)
+    forumsread = None
+    if current_user.is_authenticated():
+        forumsread = ForumsRead.query.\
+            filter_by(user_id=current_user.id,
+                      forum_id=topic.forum.id).first()
+
+    topic.update_read(current_user, topic.forum, forumsread)
     topic.save()
 
     form = None

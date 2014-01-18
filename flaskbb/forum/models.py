@@ -256,13 +256,11 @@ class Topic(db.Model):
         db.session.commit()
         return self
 
-    def update_read(self, user, forum=None):
+    def update_read(self, user, forum, forumsread=None):
         """
         Update the topics read status if the user hasn't read the latest
         post.
         """
-
-        # TODO: check if a forum has been cleared
 
         read_cutoff = datetime.utcnow() - timedelta(
             days=current_app.config['TRACKER_LENGTH'])
@@ -277,6 +275,12 @@ class Topic(db.Model):
             filter(TopicsRead.user_id == user.id,
                    TopicsRead.topic_id == self.id).first()
 
+        # Can be None if the user has never marked the forum as read. If this
+        # condition is false - we need to update the tracker
+        if forumsread and forumsread.cleared is not None and \
+                forumsread.cleared >= self.last_post.date_created:
+            return
+
         # A new post has been submitted that the user hasn't read.
         # Updating...
         if topicread and (topicread.last_read < self.last_post.date_created):
@@ -289,6 +293,7 @@ class Topic(db.Model):
             topicread = TopicsRead()
             topicread.user_id = user.id
             topicread.topic_id = self.id
+            topicread.forum_id = self.forum_id
             topicread.last_read = datetime.utcnow()
             topicread.save()
 
@@ -449,6 +454,8 @@ class TopicsRead(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
     topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
+                         primary_key=True)
+    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
