@@ -28,7 +28,7 @@ class DevelopmentConfig(DefaultConfig):
     # Recaptcha
     # To get recaptcha, visit the link below:
     # https://www.google.com/recaptcha/admin/create
-    RECAPTCHA_ENABLE = False
+    RECAPTCHA_ENABLED = False
     RECAPTCHA_USE_SSL = False
     RECAPTCHA_PUBLIC_KEY = "your_public_key"
     RECAPTCHA_PRIVATE_KEY = "your_private_key"

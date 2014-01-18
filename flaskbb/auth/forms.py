@@ -10,7 +10,7 @@
 """
 from datetime import datetime
 
-from flask.ext.wtf import Form
+from flask.ext.wtf import Form, RecaptchaField
 from wtforms import TextField, PasswordField, BooleanField, HiddenField
 from wtforms.validators import Required, Email, EqualTo, regexp, ValidationError
 
@@ -66,6 +66,10 @@ class RegisterForm(Form):
                     date_joined=datetime.utcnow(),
                     primary_group_id=4)
         return user.save()
+
+
+class RegisterRecaptchaForm(RegisterForm):
+    recaptcha = RecaptchaField("Captcha")
 
 
 class ReauthForm(Form):

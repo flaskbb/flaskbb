@@ -59,7 +59,7 @@ class DefaultConfig(object):
     CACHE_DEFAULT_TIMEOUT = 60
 
     ## Captcha
-    RECAPTCHA_ENABLE = False
+    RECAPTCHA_ENABLED = False
     RECAPTCHA_USE_SSL = False
     RECAPTCHA_PUBLIC_KEY = "your_public_recaptcha_key"
     RECAPTCHA_PRIVATE_KEY = "your_private_recaptcha_key"
@@ -91,7 +91,7 @@ class DefaultConfig(object):
     TITLE_LENGTH = 15
 
     # This is really handy if you do not have an redis instance like on windows
-    USE_REDIS = True
+    REDIS_ENABLED = True
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     REDIS_DB = 0
@@ -99,3 +99,8 @@ class DefaultConfig(object):
     # The days for how long the forum should deal with unread topics
     # 0 - Disable it
     TRACKER_LENGTH = 7
+
+    FORUM_URL_PREFIX = "/forum"
+    USER_URL_PREFIX = "/user"
+    AUTH_URL_PREFIX = "/auth"
+    ADMIN_URL_PREFIX = "/admin"

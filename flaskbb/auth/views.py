@@ -10,12 +10,12 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import (Blueprint, flash, redirect, render_template,
-                   url_for, request)
+                   url_for, request, current_app)
 from flask.ext.login import (current_user, login_user, login_required,
                              logout_user, confirm_login, login_fresh)
 from flaskbb.email import send_reset_token
-from flaskbb.auth.forms import (LoginForm, ReauthForm, RegisterForm,
-                                ForgotPasswordForm, ResetPasswordForm)
+from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
+                                ResetPasswordForm)
 from flaskbb.user.models import User
 
 auth = Blueprint("auth", __name__)
@@ -80,7 +80,13 @@ def register():
     if current_user is not None and current_user.is_authenticated():
         return redirect(url_for("user.profile"))
 
-    form = RegisterForm(request.form)
+    if current_app.config["RECAPTCHA_ENABLED"]:
+        from flaskbb.auth.forms import RegisterRecaptchaForm
+        form = RegisterRecaptchaForm(request.form)
+    else:
+        from flaskbb.auth.forms import RegisterForm
+        form = RegisterForm(request.form)
+
     if form.validate_on_submit():
         user = form.save()
         login_user(user)

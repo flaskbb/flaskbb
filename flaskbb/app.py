@@ -35,22 +35,10 @@ from flaskbb.utils.helpers import (format_date, time_since, crop_title,
                                    forum_is_unread, topic_is_unread)
 
 
-DEFAULT_BLUEPRINTS = (
-    (forum, "/forum"),
-    (auth, "/auth"),
-    (user, "/user"),
-    (admin, "/admin")
-)
-
-
-def create_app(config=None, blueprints=None):
+def create_app(config=None):
     """
     Creates the app.
     """
-
-    if blueprints is None:
-        blueprints = DEFAULT_BLUEPRINTS
-
     # Initialize the app
     app = Flask("flaskbb")
 
@@ -61,9 +49,7 @@ def create_app(config=None, blueprints=None):
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
-    for blueprint, url_prefix in blueprints:
-        app.register_blueprint(blueprint, url_prefix=url_prefix)
-
+    configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
     configure_before_handlers(app)
@@ -71,6 +57,13 @@ def create_app(config=None, blueprints=None):
     configure_logging(app)
 
     return app
+
+
+def configure_blueprints(app):
+    app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
+    app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
+    app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
+    app.register_blueprint(admin, url_prefix=app.config["ADMIN_URL_PREFIX"])
 
 
 def configure_extensions(app):
@@ -157,7 +150,7 @@ def configure_before_handlers(app):
     def get_user_permissions():
         current_user.permissions = current_user.get_permissions()
 
-    if app.config["USE_REDIS"]:
+    if app.config["REDIS_ENABLED"]:
         @app.before_request
         def mark_current_user_online():
             if current_user.is_authenticated():

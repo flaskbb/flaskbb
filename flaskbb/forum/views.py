@@ -53,7 +53,7 @@ def index():
     newest_user = User.query.order_by(User.id.desc()).first()
 
     # Check if we use redis or not
-    if not current_app.config["USE_REDIS"]:
+    if not current_app.config["REDIS_ENABLED"]:
         online_users = User.query.filter(User.lastseen >= time_diff()).count()
         online_guests = None
     else:
