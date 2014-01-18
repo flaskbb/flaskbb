@@ -39,6 +39,14 @@ class Post(db.Model):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self, user=None, topic=None):
+        """Saves a new post. If no parameters are passed we assume that
+        you will just update an existing post. It returns the object after the
+        operation was successful.
+
+        :param user: The user who has created the post
+
+        :param topic: The topic in which the post was created
+        """
         # update/edit the post
         if self.id:
             db.session.add(self)
@@ -81,6 +89,7 @@ class Post(db.Model):
             return self
 
     def delete(self):
+        """Deletes a post and returns self"""
         # This will delete the whole topic
         if self.topic.first_post_id == self.id:
             self.topic.delete()
@@ -156,9 +165,7 @@ class Topic(db.Model):
     # Properties
     @property
     def second_last_post(self):
-        """
-        Returns the second last post.
-        """
+        """Returns the second last post."""
         return self.posts[-2].id
 
     # Methods
@@ -174,8 +181,16 @@ class Topic(db.Model):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self, user=None, forum=None, post=None):
-        # Updates the topic - Because the thread title (by intention)
-        # isn't change able, so we are just going to update the post content
+        """Saves a topic and returns the topic object. If no parameters are
+        given, it will only update the topic.
+
+        :param user: The user who has created the topic
+
+        :param forum: The forum where the topic is stored
+
+        :param post: The post object which is connected to the topic
+        """
+        # Updates the topic
         if self.id:
             db.session.add(self)
             db.session.commit()
@@ -210,6 +225,11 @@ class Topic(db.Model):
         return self
 
     def delete(self, users=None):
+        """Deletes a topic with the corresponding posts. If a list with
+        user objects is passed it will also update their post counts
+
+        :param users: A list with user objects
+        """
         # Grab the second last topic in the forum + parents/childs
         topic = Topic.query.\
             filter(Topic.forum_id.in_(get_forum_ids(self.forum))).\
@@ -257,9 +277,16 @@ class Topic(db.Model):
         return self
 
     def update_read(self, user, forum, forumsread=None):
-        """
-        Update the topics read status if the user hasn't read the latest
+        """Update the topics read status if the user hasn't read the latest
         post.
+
+        :param user: The user for whom the readstracker should be updated
+
+        :param forum: The forum in which the topic is
+
+        :param forumsread: The forumsread object. It is used to check if there
+                           is a new post since the forum has been marked as
+                           read
         """
 
         read_cutoff = datetime.utcnow() - timedelta(
@@ -394,6 +421,7 @@ class Forum(db.Model):
         return breadcrumbs
 
     def save(self):
+        """Saves a forum"""
         db.session.add(self)
         db.session.commit()
 
@@ -411,6 +439,11 @@ class Forum(db.Model):
         return self
 
     def delete(self, users=None):
+        """Deletes forum. If a list with involved user objects is passed,
+        it will also update their post counts
+
+        :param users: A list with user objects
+        """
         # Delete the forum
         db.session.delete(self)
 
