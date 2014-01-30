@@ -122,7 +122,7 @@ def view_forum(forum_id):
 def markread(forum_id=None):
 
     if not current_user.is_authenticated():
-        flash("We do not support cookie based unread forums yet.", "danger")
+        flash("You need to be logged in for that feature.", "danger")
         return redirect(url_for("forum.index"))
 
     # Mark a single forum as read

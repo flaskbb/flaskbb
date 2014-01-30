@@ -12,6 +12,7 @@
 """
 from flask import current_app
 from flask.ext.script import Manager, Shell, Server
+from flask.ext.migrate import MigrateCommand
 
 from flaskbb import create_app
 from flaskbb.extensions import db
@@ -30,6 +31,9 @@ manager = Manager(app)
 # Run local server
 manager.add_command("runserver", Server("localhost", port=8080))
 
+# Migration commands
+manager.add_command('db', MigrateCommand)
+
 
 # Add interactive project shell
 def make_shell_context():
@@ -39,18 +43,21 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 @manager.command
 def initdb():
-    """
-    Creates the database.
-    """
+    """Creates the database."""
 
     db.create_all()
 
 
 @manager.command
+def dropdb():
+    """Deletes the database"""
+
+    db.drop_all()
+
+
+@manager.command
 def createall():
-    """
-    Creates the database with some example content.
-    """
+    """Creates the database with some example content."""
 
     # Just for testing purposes
     db.drop_all()
@@ -59,20 +66,19 @@ def createall():
     create_test_data()
 
 
+# TODO: Implement this...
 @manager.command
 def create_admin():
-    """
-    Creates the admin user
-    """
+    """Creates the admin user"""
+
     db.create_all()
     create_admin_user()
 
 
 @manager.command
 def create_default_data():
-    """
-    This should be created by every flaskbb installation
-    """
+    """This should be created by every flaskbb installation"""
+
     db.create_all()
     create_default_groups()
     create_welcome_forum()

@@ -26,7 +26,7 @@ from flaskbb.admin.views import admin
 from flaskbb.forum.views import forum
 
 from flaskbb.extensions import (db, login_manager, mail, cache, redis,
-                                debugtoolbar)
+                                debugtoolbar, migrate)
 from flaskbb.utils.helpers import (format_date, time_since, crop_title,
                                    can_post_reply, can_post_topic,
                                    can_delete_topic, can_delete_post, is_online,
@@ -73,6 +73,9 @@ def configure_extensions(app):
 
     # Flask-SQLAlchemy
     db.init_app(app)
+
+    # Flask-Migrate
+    migrate.init_app(app, db)
 
     # Flask-Mail
     mail.init_app(app)

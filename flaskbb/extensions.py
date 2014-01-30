@@ -14,6 +14,7 @@ from flask.ext.mail import Mail
 from flask.ext.cache import Cache
 from flask.ext.debugtoolbar import DebugToolbarExtension
 from flask.ext.redis import Redis
+from flask.ext.migrate import Migrate
 
 # Database
 db = SQLAlchemy()
@@ -32,3 +33,6 @@ redis = Redis()
 
 # Debugtoolbar
 debugtoolbar = DebugToolbarExtension()
+
+# Migrations
+migrate = Migrate()
