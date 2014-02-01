@@ -21,9 +21,10 @@ from flaskbb.utils.helpers import (can_post_reply, can_delete_topic,
                                    can_edit_post, can_post_topic,
                                    can_delete_post, can_lock_topic,
                                    get_online_users, time_diff)
-from flaskbb.forum.models import Forum, Topic, Post, ForumsRead, TopicsRead
+from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
+                                  TopicsRead)
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
-from flaskbb.forum.helpers import get_forums
+from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
 
@@ -34,17 +35,28 @@ forum = Blueprint("forum", __name__)
 def index():
     # Get the categories and forums
     if current_user.is_authenticated():
-        categories_query = Forum.query.\
+        forum_query = Category.query.\
+            join(Forum, Category.id == Forum.category_id).\
             outerjoin(ForumsRead,
                       db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == current_user.id)).\
+                              ForumsRead.user_id == 1)).\
+            add_entity(Forum).\
             add_entity(ForumsRead).\
-            order_by(Forum.position.asc()).\
+            order_by(Category.id, Category.position, Forum.position).\
             all()
-        categories = get_forums(categories_query, current_user=True)
     else:
-        categories_query = Forum.query.order_by(Forum.position.asc()).all()
-        categories = get_forums(categories_query, current_user=False)
+        # we do not need to join the ForumsRead because the user isn't
+        # signed in
+        forum_query = Category.query.\
+            join(Forum, Category.id == Forum.category_id).\
+            add_entity(Forum).\
+            order_by(Category.id, Category.position, Forum.position).\
+            all()
+
+        forum_query = [(category, forum, None)
+                       for category, forum in forum_query]
+
+    categories = get_forums(forum_query)
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -55,6 +67,9 @@ def index():
     # Check if we use redis or not
     if not current_app.config["REDIS_ENABLED"]:
         online_users = User.query.filter(User.lastseen >= time_diff()).count()
+
+        # Because we do not have server side sessions, we cannot check if there
+        # are online guests
         online_guests = None
     else:
         online_users = len(get_online_users())
@@ -70,7 +85,38 @@ def index():
                            online_guests=online_guests)
 
 
-@forum.route("/<int:forum_id>")
+@forum.route("/category/<int:category_id>")
+def view_category(category_id):
+    if current_user.is_authenticated():
+        forum_query = Category.query.\
+            filter(Category.id == category_id).\
+            join(Forum, Category.id == Forum.category_id).\
+            outerjoin(ForumsRead,
+                      db.and_(ForumsRead.forum_id == Forum.id,
+                              ForumsRead.user_id == 1)).\
+            add_entity(Forum).\
+            add_entity(ForumsRead).\
+            order_by(Forum.position).\
+            all()
+    else:
+        # we do not need to join the ForumsRead because the user isn't
+        # signed in
+
+        forum_query = Category.query.\
+            filter(Category.id == category_id).\
+            join(Forum, Category.id == Forum.category_id).\
+            add_entity(Forum).\
+            order_by(Forum.position).\
+            all()
+
+        forum_query = [(category, forum, None)
+                       for category, forum in forum_query]
+
+    category = get_forums(forum_query)
+    return render_template("forum/category.html", category=category)
+
+
+@forum.route("/forum/<int:forum_id>")
 def view_forum(forum_id):
     page = request.args.get('page', 1, type=int)
 
@@ -82,14 +128,6 @@ def view_forum(forum_id):
                               ForumsRead.user_id == current_user.id)).\
             add_entity(ForumsRead).\
             first_or_404()
-
-        subforums = Forum.query.\
-            filter(Forum.parent_id == forum[0].id).\
-            outerjoin(ForumsRead,
-                      db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == current_user.id)).\
-            add_entity(ForumsRead).\
-            all()
 
         topics = Topic.query.filter_by(forum_id=forum[0].id).\
             filter(Post.topic_id == Topic.id).\
@@ -103,18 +141,12 @@ def view_forum(forum_id):
         forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
         forum = (forum, None)
 
-        subforums = Forum.query.filter(Forum.parent_id == forum[0].id).all()
-        # This isn't really nice imho, but "add_entity" (see above)
-        # makes a list with tuples
-        subforums = [(item, None) for item in subforums]
-
         topics = Topic.query.filter_by(forum_id=forum[0].id).\
             filter(Post.topic_id == Topic.id).\
             order_by(Post.id.desc()).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
 
-    return render_template("forum/forum.html",
-                           forum=forum, topics=topics, subforums=subforums)
+    return render_template("forum/forum.html", forum=forum, topics=topics)
 
 
 @forum.route("/markread")
@@ -150,9 +182,6 @@ def markread(forum_id=None):
 
     forums = Forum.query.all()
     for forum in forums:
-        if forum.is_category:
-            continue
-
         forumsread = ForumsRead()
         forumsread.user_id = current_user.id
         forumsread.forum_id = forum.id

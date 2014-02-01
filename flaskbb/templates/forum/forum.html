@@ -7,9 +7,6 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    {% for breadcrumb_item in forum[0].get_breadcrumbs() %}
-        <li><a href="{{ url_for('forum.view_forum', forum_id=breadcrumb_item.id) }}">{{ breadcrumb_item.title }}</a></li>
-    {% endfor %}
     <li class="active">{{ forum[0].title }}</li>
 </ol>
 
@@ -33,77 +30,6 @@
 </div>
 {% endif %}
 
-{% if subforums[0]|length %}
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th colspan="5">
-                Forums
-            </th>
-        </tr>
-        <tr>
-            <th colspan="2">Forum</th>
-            <th width="85" align="center" style="white-space: nowrap">Topics</th>
-            <th width="85" align="center" style="white-space: nowrap">Posts</th>
-            <th width="200" align="center" style="white-space: nowrap">Last Post</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for subforum, forumread in subforums %}
-        <tr>
-            <td align="center" valign="center" width="4%">
-
-            {% if subforum|forum_is_unread(forumread, current_user) %}
-                <span class="fa fa-comments" style="font-size: 2em"></span>
-            {% else %}
-                <span class="fa fa-comments-o" style="font-size: 2em"></span>
-            {% endif %}
-            </td>
-
-            <td valign="top">
-                <strong><a href="{{ url_for('forum.view_forum', forum_id=subforum.id) }}">{{ subforum.title }}</a></strong>
-
-                <div class="forum-description">
-                    {% autoescape false %}
-                    {{ subforum.description|markup }}
-                    {% endautoescape %}
-                </div>
-                {% if subforum.children|length %}
-                <div class="forum-subforums">
-                    <ul class="list-inline">
-                        <li><strong>Subforums:</strong></li>
-                        {% for subforum2 in subforum.children %}
-                        <li>
-                            <a href="{{ url_for('forum.view_forum', forum_id=subforum2.id) }}">{{ subforum2.title }}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </td>
-
-            <td valign="top" align="center" style="white-space: nowrap">{{ subforum.topic_count }}</td>
-            <td valign="top" align="center" style="white-space: nowrap">{{ subforum.post_count }}</td>
-
-            <td valign="top" align="right" style="white-space: nowrap">
-                {% if subforum.last_post %}
-                <a href="{{ url_for('forum.view_post', post_id=subforum.last_post.id) }}" title="{{ subforum.last_post.topic.title }}">
-                    <strong>{{ subforum.last_post.topic.title|crop_title }}</strong>
-                </a>
-                <br />
-                {{ subforum.last_post.date_created|time_since }}<br />
-                by <a href="{{ url_for('user.profile', username=subforum.last_post.user.username) }}">{{ subforum.last_post.user.username }}</a>
-                {% else %}
-                No posts
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-
 {% if not forum[0].is_category %}
 <table class="table table-bordered">
     <thead>
@@ -116,7 +42,7 @@
 
     <tbody>
         <tr>
-            <td colspan="2">Thread</td>
+            <td colspan="2">Topic</td>
 
             <td>Posts</td>
 

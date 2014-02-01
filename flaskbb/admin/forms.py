@@ -274,7 +274,7 @@ class ForumForm(Form):
                     raise ValidationError("User not found")
             field.data = self._moderators
 
-    def save(self):
+    def save(self, category_id=None):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
                       position=self.position.data)

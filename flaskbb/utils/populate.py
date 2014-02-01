@@ -11,7 +11,7 @@
 from collections import OrderedDict
 
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum
+from flaskbb.forum.models import Post, Topic, Forum, Category
 
 
 GROUPS = OrderedDict((
@@ -179,33 +179,35 @@ def create_test_data():
         user.primary_group_id = u
         user.save()
 
-    # create a category
-    category = Forum(is_category=True, title="Test Category",
-                     description="Test Description")
-    category.save()
+    user1 = User.query.filter_by(id=1).first()
+    user2 = User.query.filter_by(id=2).first()
 
-    # create 2 forums in the category
+    # create 2 categories
     for i in range(1, 3):
-        forum_title = "Test Forum %s " % i
-        forum = Forum(title=forum_title, description="Test Description",
-                      parent_id=category.id)
-        forum.save()
+        category_title = "Test Category %s" % i
+        category = Category(title=category_title,
+                            description="Test Description")
+        category.save()
 
-        # Create a subforum
-        subforum_title = "Test Subforum %s " % i
-        subforum = Forum(title=subforum_title,
-                         description="Test Description", parent_id=forum.id)
-        subforum.save()
+        # create 2 forums in each category
+        for j in range(1, 3):
+            if i == 2:
+                j += 2
 
-    user = User.query.filter_by(id=1).first()
+            forum_title = "Test Forum %s %s" % (j, i)
+            forum = Forum(title=forum_title, description="Test Description",
+                          category_id=i)
+            forum.save()
 
-    # create 1 topic in each forum
-    for i in range(2, 6):  # Forum ids are not sequential because categories.
-        forum = Forum.query.filter_by(id=i).first()
+            # create a topic
+            topic = Topic()
+            post = Post()
 
-        topic = Topic()
-        post = Post()
+            topic.title = "Test Title %s" % j
+            post.content = "Test Content"
+            topic.save(post=post, user=user1, forum=forum)
 
-        topic.title = "Test Title %s" % (i-1)
-        post.content = "Test Content"
-        topic.save(user=user, forum=forum, post=post)
+            # create a second post in the forum
+            post = Post()
+            post.content = "Test Post"
+            post.save(user=user2, topic=topic)

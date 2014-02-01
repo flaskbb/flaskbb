@@ -3,9 +3,10 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li class="active">{{ category.keys()[0].title }}</li>
 </ol>
 
-{% for category in categories.iteritems() %}
+{% for category in category.iteritems() %}
 <table class="table table-bordered">
     <thead class="categoryhead">
         <tr>
@@ -65,34 +66,4 @@
     </tbody>
 </table>
 {% endfor %}
-
-<!-- Forum Stats -->
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <td colspan="2">
-                <strong>Board Statistics</strong>
-                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">Who is online?</a>]
-            </td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                Total number of registered users: <strong>{{ user_count }}</strong> <br />
-                Total number of topics: <strong>{{ topic_count }}</strong> <br />
-                Total number of posts: <strong>{{ post_count }}</strong> <br />
-            </td>
-            <td>
-                Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
-                Registered users online: <strong>{{ online_users }}</strong> <br />
-                {% if config["REDIS_ENABLED"] %}
-                Guests online: <strong>{{ online_guests }}</strong> <br />
-                {% endif %}
-            </td>
-        </tr>
-
-    </tbody>
-</table>
-
 {% endblock %}

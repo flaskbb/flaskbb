@@ -10,11 +10,34 @@
 """
 import time
 from datetime import datetime, timedelta
+from collections import OrderedDict
 
 from flask import current_app
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
+
+
+def get_forums(forum_query):
+    """Returns a dictionary where the key is the category and the values
+    are the forums with their forumsread status
+
+    :param forum_query: A list with all categories, forums and
+                        their forumsread object
+    """
+    forums = OrderedDict()
+    for category, forum, forumsread in forum_query:
+        try:
+            # if forums[category] has no list
+            if not isinstance(forums[category], list):
+                forums[category] = []
+        except KeyError:
+            forums[category] = []
+
+        forums[category]
+        forums[category].append((forum, forumsread))
+
+    return forums
 
 
 def forum_is_unread(forum, forumsread, user):
@@ -83,8 +106,14 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
 
 
 def mark_online(user_id, guest=False):
-    """
-    Source: http://flask.pocoo.org/snippets/71/
+    """Marks a user as online
+
+    :param user_id: The id from the user who should be marked as online
+
+    :param guest: If set to True, it will add the user to the guest activity
+                  instead of the user activity.
+
+    Ref: http://flask.pocoo.org/snippets/71/
     """
     now = int(time.time())
     expires = now + (current_app.config['ONLINE_LAST_MINUTES'] * 60) + 10
@@ -103,8 +132,11 @@ def mark_online(user_id, guest=False):
 
 
 def get_last_user_activity(user_id, guest=False):
-    """
-    Returns the last active time from a given `user_id`.
+    """Returns the last active time from a given user_id
+
+    :param user_id: The user id for whom you want to know the latest activity
+
+    :param guest: If the user is a guest (not signed in)
     """
     if guest:
         last_active = redis.get('guest-activity/%s' % user_id)
@@ -117,8 +149,9 @@ def get_last_user_activity(user_id, guest=False):
 
 
 def get_online_users(guest=False):
-    """
-    Returns all online users within a specified time range
+    """Returns all online users within a specified time range
+
+    :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
     minutes = xrange(current_app.config['ONLINE_LAST_MINUTES'])
@@ -130,10 +163,19 @@ def get_online_users(guest=False):
 
 
 def check_perm(user, perm, forum, post_user_id=None):
-    """
-    Checks if the `user` has a specified `perm` in the `forum`
+    """Checks if the `user` has a specified `perm` in the `forum`
     If post_user_id is provided, it will also check if the user
     has created the post
+
+    :param user: The user for whom we should check the permission
+
+    :param perm: The permission. You can find a full list of available
+                 permissions here: <INSERT LINK TO DOCS>
+
+    :param forum: The forum where we should check the permission against
+
+    :param post_user_id: If post_user_id is given, it will also perform an
+                         check if the user is the owner of this topic or post.
     """
     if can_moderate(user, forum):
         return True
@@ -143,10 +185,9 @@ def check_perm(user, perm, forum, post_user_id=None):
 
 
 def can_moderate(user, forum):
-    """
-    Checks if a user can moderate a forum
+    """Checks if a user can moderate a forum
     He needs to be super moderator or a moderator of the
-    specified `forum`
+    specified forum
     """
     if user.permissions['mod'] and user.id in forum.moderators:
         return True
@@ -154,60 +195,54 @@ def can_moderate(user, forum):
 
 
 def can_edit_post(user, post_user_id, forum):
-    """
-    Check if the post can be edited by the user
-    """
+    """Check if the post can be edited by the user"""
+
     return check_perm(user=user, perm='editpost', forum=forum,
                       post_user_id=post_user_id)
 
 
 def can_delete_post(user, post_user_id, forum):
-    """
-    Check if the post can be deleted by the user
-    """
+    """Check if the post can be deleted by the user"""
+
     return check_perm(user=user, perm='deletepost', forum=forum,
                       post_user_id=post_user_id)
 
 
 def can_delete_topic(user, post_user_id, forum):
-    """
-    Check if the topic can be deleted by the user
-    """
+    """Check if the topic can be deleted by the user"""
+
     return check_perm(user=user, perm='deletetopic', forum=forum,
                       post_user_id=post_user_id)
 
 
 def can_lock_topic(user, forum):
-    """
-    Check if the user is allowed to lock a topic in the forum
-    """
+    """ Check if the user is allowed to lock a topic in the forum"""
+
     return check_perm(user=user, perm='locktopic', forum=forum)
 
 
 def can_move_topic(user, forum):
-    """
-    Check if the user is allowed to lock a topic in the forum
-    """
+    """Check if the user is allowed to move a topic in the forum"""
+
     return check_perm(user=user, perm='movetopic', forum=forum)
 
 
 def can_post_reply(user, forum):
-    """
-    Check if the user is allowed to post in the forum
-    """
+    """Check if the user is allowed to post in the forum"""
+
     return check_perm(user=user, perm='postreply', forum=forum)
 
 
 def can_post_topic(user, forum):
-    """
-    Check if the user is allowed to create a new topic in the forum
-    """
+    """Checks if the user is allowed to create a new topic in the forum"""
+
     return check_perm(user=user, perm='posttopic', forum=forum)
 
 
 def crop_title(title):
-    """
-    Crops the title to a specified length
+    """Crops the title to a specified length
+
+    :param title: The title that should be cropped
     """
     length = current_app.config['TITLE_LENGTH']
     if len(title) > length:
@@ -216,23 +251,24 @@ def crop_title(title):
 
 
 def render_markup(text):
-    """
-    Renders the given text as bbcode
+    """Renders the given text as bbcode
+
+    :param text: The text that should be rendered as bbcode
     """
     return render_bbcode(text)
 
 
 def is_online(user):
-    """
-    A simple check, to see if the user was online
-    within a specified time range
+    """A simple check to see if the user was online within a specified
+    time range
+
+    :param user: The user who needs to be checked
     """
     return user.lastseen >= time_diff()
 
 
 def time_diff():
-    """
-    Calculates the time difference between `now` and the ONLINE_LAST_MINUTES
+    """Calculates the time difference between now and the ONLINE_LAST_MINUTES
     variable from the configuration.
     """
     now = datetime.utcnow()
@@ -241,24 +277,26 @@ def time_diff():
 
 
 def format_date(value, format='%Y-%m-%d'):
-    """
-    Returns a formatted time string
+    """Returns a formatted time string
+
+    :param value: The datetime object that should be formatted
+
+    :param format: How the result should look like. A full list of available
+                   directives is here: http://goo.gl/gNxMHE
     """
     return value.strftime(format)
 
 
 def time_since(value):
-    """
-    Just a interface for `time_delta_format`
-    """
+    """Just a interface for `time_delta_format`"""
     return time_delta_format(value)
 
 
 def time_delta_format(dt, default=None):
-    """
-    Returns string representing "time since" e.g.
-    3 days ago, 5 hours ago etc.
-    Ref: https://bitbucket.org/danjac/newsmeme/src/a281babb9ca3/newsmeme/
+    """Returns a string representing time since e.g. 3 days ago, 5 hours ago.
+    ref: https://bitbucket.org/danjac/newsmeme/src/a281babb9ca3/newsmeme/
+    note: when Babel1.0 is released, use format_timedelta/timedeltaformat
+          instead
     """
 
     if default is None:

@@ -17,7 +17,7 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum
+from flaskbb.forum.models import Post, Topic, Forum, Category
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
                                  EditGroupForm, ForumForm)
 
@@ -66,10 +66,8 @@ def groups():
 @admin.route("/forums")
 @admin_required
 def forums():
-    page = request.args.get("page", 1, type=int)
-    forums = Forum.query.\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
-    return render_template("admin/forums.html", forums=forums)
+    categories = Category.query.order_by(Category.position.asc()).all()
+    return render_template("admin/forums.html", categories=categories)
 
 
 @admin.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
@@ -250,13 +248,29 @@ def delete_forum(forum_id):
 
 
 @admin.route("/forums/add", methods=["GET", "POST"])
+@admin.route("/forums/<int:category_id>/add")
 @admin_required
-def add_forum():
+def add_forum(category_id=None):
     form = ForumForm()
 
     if form.validate_on_submit():
-        form.save()
+        form.save(category_id)
         flash("Forum successfully added.", "success")
         return redirect(url_for("admin.forums"))
 
     return render_template("admin/edit_forum.html", form=form)
+
+
+@admin.route("/category/add", methods=["GET", "POST"])
+def add_category():
+    pass
+
+
+@admin.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
+def edit_category(category_id):
+    pass
+
+
+@admin.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
+def delete_category(category_id):
+    pass

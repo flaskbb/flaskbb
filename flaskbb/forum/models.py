@@ -15,7 +15,6 @@ from flask import current_app
 from flaskbb.extensions import db
 from flaskbb.utils.types import SetType, MutableSet
 from flaskbb.utils.query import TopicQuery
-from helpers import get_forum_ids
 
 
 class Post(db.Model):
@@ -65,23 +64,12 @@ class Post(db.Model):
 
             # Now lets update the last post id
             topic.last_post_id = self.id
-            topic.last_updated = datetime.utcnow()
             topic.forum.last_post_id = self.id
 
             # Update the post counts
             user.post_count += 1
             topic.post_count += 1
             topic.forum.post_count += 1
-
-            # Update the parent forums
-            parent = topic.forum.parent
-            # TODO: Improvement - store the parent forums in a list and then
-            # get all the forums with one query instead of firing up
-            # for each parent a own query
-            while parent is not None and not parent.is_category:
-                parent.last_post_id = self.id
-                parent.post_count += 1
-                parent = parent.parent
 
             # And commit it!
             db.session.add(topic)
@@ -102,26 +90,15 @@ class Post(db.Model):
             self.topic.last_post_id = self.topic.second_last_post
 
             # check if the last_post is also the last post in the forum
-            topic = Topic.query.\
-                filter(Topic.forum_id.in_(get_forum_ids(self.topic.forum))).\
-                order_by(Topic.last_post_id.desc()).first()
-
-            if self.topic.last_post_id == topic.last_post_id:
-                # Update the parent forums
-                forum = self.topic.forum
-                while forum is not None and not forum.is_category:
-                    forum.last_post_id = self.topic.second_last_post
-                    forum = forum.parent
+            if self.topic.last_post_id == self.id:
+                self.topic.last_post_id = self.topic.second_last_post
+                self.topic.forum.last_post_id = self.topic.second_last_post
                 db.session.commit()
 
         # Update the post counts
-        forum = self.topic.forum
-        while forum is not None and not forum.is_category:
-            forum.post_count -= 1
-            forum = forum.parent
-
         self.user.post_count -= 1
         self.topic.post_count -= 1
+        self.topic.forum.post_count -= 1
 
         db.session.delete(self)
         db.session.commit()
@@ -212,14 +189,6 @@ class Topic(db.Model):
 
         # Update the topic count
         forum.topic_count += 1
-
-        # Update the parent forums
-        parent = forum.parent
-        while parent is not None and not parent.is_category:
-            # Update the topic and post count
-            parent.topic_count += 1
-            parent = parent.parent
-
         db.session.commit()
 
         return self
@@ -232,25 +201,17 @@ class Topic(db.Model):
         """
         # Grab the second last topic in the forum + parents/childs
         topic = Topic.query.\
-            filter(Topic.forum_id.in_(get_forum_ids(self.forum))).\
+            filter_by(forum_id=self.forum_id).\
             order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
 
-        # check if the topic is the most recently one in this forum
-        try:
-            forum = self.forum
-            # you want to delete the topic with the last post
-            if self.id == topic[0].id:
+        # do want to delete the topic with the last post?
+        if topic and topic[0].id == self.id:
+            try:
                 # Now the second last post will be the last post
-                while forum is not None and not forum.is_category:
-                    forum.last_post_id = topic[1].last_post_id
-                    forum.save()
-                    forum = forum.parent
-        # Catch an IndexError when you delete the last topic in the forum
-        except IndexError:
-            while forum is not None and not forum.is_category:
-                forum.last_post_id = 0
-                forum.save()
-                forum = forum.parent
+                self.forum.last_post_id = topic[1].last_post_id
+            # Catch an IndexError when you delete the last topic in the forum
+            except IndexError:
+                self.forum.last_post_id = None
 
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
@@ -261,17 +222,18 @@ class Topic(db.Model):
 
         # Update the post counts
         if users:
-            # If someone knows a better method for this,
-            # feel free to improve it :)
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
                 db.session.commit()
 
-        while forum is not None and not forum.is_category:
-            forum.topic_count -= 1
-            forum.post_count -= 1
+        forum.topic_count = Topic.query.\
+            filter_by(forum_id=self.forum_id).\
+            count()
 
-            forum = forum.parent
+        forum.post_count = Post.query.\
+            filter(Post.topic_id == Topic.id,
+                   Topic.forum_id == self.forum_id).\
+            count()
 
         db.session.commit()
         return self
@@ -369,20 +331,17 @@ class Forum(db.Model):
     __tablename__ = "forums"
 
     id = db.Column(db.Integer, primary_key=True)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     title = db.Column(db.String)
     description = db.Column(db.String)
     position = db.Column(db.Integer, default=0)
-    is_category = db.Column(db.Boolean, default=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey("forums.id"))
     locked = db.Column(db.Boolean, default=False)
 
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
 
+    # TODO: Make a own relation for this
     moderators = db.Column(MutableSet.as_mutable(SetType))
-
-    # A set with all parent forums
-    parents = db.Column(MutableSet.as_mutable(SetType))
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
@@ -392,14 +351,10 @@ class Forum(db.Model):
     # One-to-many
     topics = db.relationship("Topic", backref="forum", lazy="joined",
                              cascade="all, delete-orphan")
-    children = db.relationship("Forum",
-                               backref=db.backref("parent", remote_side=[id]),
-                               cascade="all, delete-orphan")
 
     # Methods
     def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
+        """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
@@ -410,30 +365,8 @@ class Forum(db.Model):
     def remove_moderator(self, user_id):
         self.moderators.remove(user_id)
 
-    def get_breadcrumbs(self):
-        breadcrumbs = []
-        parent = self.parent
-        while parent is not None:
-            breadcrumbs.append(parent)
-            parent = parent.parent
-
-        breadcrumbs.reverse()
-        return breadcrumbs
-
     def save(self):
         """Saves a forum"""
-        db.session.add(self)
-        db.session.commit()
-
-        parent_ids = []
-        parent = self.parent
-        while parent and not parent.is_category:
-            parent_ids.append(parent.id)
-            parent = parent.parent
-
-        for parent_id in parent_ids:
-            self.parents.add(parent_id)
-
         db.session.add(self)
         db.session.commit()
         return self
@@ -446,32 +379,55 @@ class Forum(db.Model):
         """
         # Delete the forum
         db.session.delete(self)
-
-        # Also delete the child forums
-        if self.children:
-            for child in self.children:
-                db.session.delete(child)
-
-        # Update the parent forums if any
-        if self.parent:
-            forum = self.parent
-            while forum is not None and not forum.is_category:
-                forum.topic_count = Topic.query.filter_by(
-                    forum_id=forum.id).count()
-
-                forum.post_count = Post.query.filter(
-                    Post.topic_id == Topic.id,
-                    Topic.forum_id == forum.id).count()
-
-                forum = forum.parent
-
         db.session.commit()
 
         # Update the users post count
-        if users:
-            for user in users:
-                user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
+        # Need to import it from here, because otherwise it would be
+        # a circular import
+        from flaskbb.user.models import User
+
+        users = User.query.\
+            filter(Topic.forum_id == self.id,
+                   Post.topic_id == Topic.id).\
+            all()
+
+        for user in users:
+            user.post_count = Post.query.filter_by(user_id=user.id).count()
+            db.session.commit()
+
+        return self
+
+
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    description = db.Column(db.String)
+    position = db.Column(db.Integer, default=0)
+
+    # One-to-many
+    forums = db.relationship("Forum", backref="category", lazy="dynamic",
+                             primaryjoin='Forum.category_id == Category.id',
+                             order_by='asc(Forum.position)')
+
+    def save(self):
+        """Saves a category"""
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        """Deletes a category"""
+
+        # Delete all the forums in the category
+        for forum in self.forums:
+            forum.delete()
+
+        # and finally delete the category itself
+        db.session.delete(self)
+        db.session.commit()
         return self
 
 
