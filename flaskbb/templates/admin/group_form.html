@@ -1,4 +1,4 @@
-{% set page_title = "Edit Group" %}
+{% set page_title = title %}
 {% set active_forum_nav=True %}
 
 {% extends "admin/admin_layout.html" %}
@@ -7,7 +7,7 @@
 
 <form class="form-horizontal" role="form" method="post">
     {{ form.hidden_tag() }}
-    <legend class="">Edit Group</legend>
+    <legend class="">{{ title }}</legend>
         {{ horizontal_field(form.name) }}
         {{ horizontal_field(form.description) }}
 

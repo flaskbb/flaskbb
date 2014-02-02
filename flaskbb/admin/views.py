@@ -19,7 +19,7 @@ from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
-                                 EditGroupForm, ForumForm)
+                                 EditGroupForm, ForumForm, CategoryForm)
 
 
 admin = Blueprint("admin", __name__)
@@ -115,7 +115,8 @@ def edit_user(user_id):
         form.primary_group.data = user.primary_group
         form.secondary_groups.data = user.secondary_groups
 
-    return render_template("admin/edit_user.html", form=form)
+    return render_template("admin/user_form.html", form=form,
+                           title="Edit User")
 
 
 @admin.route("/users/<int:user_id>/delete")
@@ -136,7 +137,8 @@ def add_user():
         flash("User successfully added.", "success")
         return redirect(url_for("admin.users"))
 
-    return render_template("admin/edit_user.html", form=form)
+    return render_template("admin/user_form.html", form=form,
+                           title="Add User")
 
 
 @admin.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
@@ -165,7 +167,8 @@ def edit_group(group_id):
         form.posttopic.data = group.posttopic
         form.postreply.data = group.postreply
 
-    return render_template("admin/edit_group.html", form=form)
+    return render_template("admin/group_form.html", form=form,
+                           title="Edit Group")
 
 
 @admin.route("/groups/<int:group_id>/delete")
@@ -186,7 +189,8 @@ def add_group():
         flash("Group successfully added.", "success")
         return redirect(url_for("admin.groups"))
 
-    return render_template("admin/edit_group.html", form=form)
+    return render_template("admin/group_form.html", form=form,
+                           title="Add Group")
 
 
 @admin.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
@@ -201,16 +205,11 @@ def edit_forum(forum_id):
         forum.title = form.title.data
         forum.description = form.description.data
         forum.position = form.position.data
-        forum.is_category = form.is_category.data
         forum.locked = form.locked.data
+        forum.category_id = form.category.data.id
 
         if form.moderators.data:
             forum.moderators = form.moderators.data
-
-        if hasattr(form.parent.data, 'id'):
-            forum.parent_id = form.parent.data.id
-        else:
-            forum.parent_id = form.parent.data
 
         forum.save()
 
@@ -220,8 +219,7 @@ def edit_forum(forum_id):
         form.title.data = forum.title
         form.description.data = forum.description
         form.position.data = forum.position
-        form.parent.data = forum.parent
-        form.is_category.data = forum.is_category
+        form.category.data = forum.category
         form.locked.data = forum.locked
 
         if forum.moderators:
@@ -230,7 +228,8 @@ def edit_forum(forum_id):
         else:
             form.moderators.data = None
 
-    return render_template("admin/edit_forum.html", form=form)
+    return render_template("admin/forum_form.html", form=form,
+                           title="Edit Forum")
 
 
 @admin.route("/forums/<int:forum_id>/delete")
@@ -248,29 +247,63 @@ def delete_forum(forum_id):
 
 
 @admin.route("/forums/add", methods=["GET", "POST"])
-@admin.route("/forums/<int:category_id>/add")
+@admin.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
 @admin_required
 def add_forum(category_id=None):
     form = ForumForm()
 
     if form.validate_on_submit():
-        form.save(category_id)
+        form.save()
         flash("Forum successfully added.", "success")
         return redirect(url_for("admin.forums"))
+    else:
+        if category_id:
+            category = Category.query.filter_by(id=category_id).first()
+            form.category.data = category
 
-    return render_template("admin/edit_forum.html", form=form)
+    return render_template("admin/forum_form.html", form=form,
+                           title="Add Forum")
 
 
 @admin.route("/category/add", methods=["GET", "POST"])
 def add_category():
-    pass
+    form = CategoryForm()
+
+    if form.validate_on_submit():
+        form.save()
+        flash("Category successfully created.", "success")
+        return redirect(url_for("admin.forums"))
+
+    return render_template("admin/category_form.html", form=form,
+                           title="Add Category")
 
 
 @admin.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
 def edit_category(category_id):
-    pass
+    category = Category.query.filter_by(id=category_id).first_or_404()
+
+    form = CategoryForm()
+
+    if form.validate_on_submit():
+        form.populate_obj(category)
+        category.save()
+    else:
+        form.title.data = category.title
+        form.description.data = category.description
+        form.position.data = category.position
+
+    return render_template("admin/category_form.html", form=form,
+                           title="Edit Category")
 
 
 @admin.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
 def delete_category(category_id):
-    pass
+    category = Category.query.filter_by(id=category_id).first_or_404()
+
+    involved_users = User.query.filter(Forum.category_id == category.id,
+                                       Topic.forum_id == Forum.id,
+                                       Post.user_id == User.id).all()
+
+    category.delete(involved_users)
+    flash("Category with all associated forums deleted.", "success")
+    return redirect(url_for("admin.forums"))

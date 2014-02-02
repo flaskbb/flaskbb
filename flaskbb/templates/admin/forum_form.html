@@ -1,0 +1,28 @@
+{% set page_title = title %}
+{% set active_forum_nav=True %}
+
+{% extends "admin/admin_layout.html" %}
+{% block admin_content %}
+{% from "macros.html" import horizontal_field, render_boolean_field %}
+
+<form class="form-horizontal" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <legend class="">{{ title }}</legend>
+        {{ horizontal_field(form.title) }}
+        {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
+
+        {{ horizontal_field(form.category) }}
+        {{ horizontal_field(form.position) }}
+
+        {{ horizontal_field(form.moderators) }}
+
+        {{ render_boolean_field(form.locked) }}
+
+        <div class="form-group">
+            <div class="col-lg-offset-0 col-lg-9">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </div>
+</form>
+
+{% endblock %}

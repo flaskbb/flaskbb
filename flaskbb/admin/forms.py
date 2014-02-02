@@ -19,7 +19,7 @@ from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
 
 from flaskbb.utils.widgets import SelectDateWidget
 from flaskbb.extensions import db
-from flaskbb.forum.models import Forum
+from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -28,7 +28,11 @@ is_username = regexp(USERNAME_RE,
 
 
 def selectable_forums():
-    return Forum.query.order_by(Forum.id)
+    return Forum.query.order_by(Forum.position)
+
+
+def selectable_categories():
+    return Category.query.order_by(Category.position)
 
 
 def select_primary_group():
@@ -215,47 +219,33 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(Form):
-    _id = None
     _moderators = set()
 
     title = TextField("Forum Title", validators=[
         Required(message="Forum title required")])
 
     description = TextAreaField("Description", validators=[
-        Optional()])
+        Optional()],
+        description="You can format your description with BBCode.")
 
     position = IntegerField("Position", default=1, validators=[
         Required(message="Forum position required")])
 
-    parent = QuerySelectField("Parent",
-                              query_factory=selectable_forums,
-                              allow_blank=True,
-                              get_label="title",
-                              description="This field is not saved if this \
-                                           forum is a category (see \"Is a \
-                                           category?\" field below).")
+    category = QuerySelectField(
+        "Category",
+        query_factory=selectable_categories,
+        allow_blank=False,
+        get_label="title",
+        description="The category that contains this forum."
+    )
 
     moderators = TextField("Moderators",
                            description="Comma seperated usernames. Leave it \
                                         blank if you do not want to set any \
                                         moderators.")
 
-    is_category = BooleanField("Is a category?",
-                               description="Categories are root-level parents \
-                                            for forums. They can not contain \
-                                            topics.")
-
     locked = BooleanField("Locked?", description="Disable new posts and topics \
                                                   in this forum.")
-
-    def validate_parent(self, field):
-        if hasattr(field.data, "id"):
-            if field.data.id == self._id:
-                raise ValidationError("A forum cannot be it's own parent!")
-        else:
-            if not self.is_category.data:
-                raise ValidationError("Please choose a parent or is it a \
-                                      category?")
 
     def validate_moderators(self, field):
         if field.data:
@@ -274,7 +264,7 @@ class ForumForm(Form):
                     raise ValidationError("User not found")
             field.data = self._moderators
 
-    def save(self, category_id=None):
+    def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
                       position=self.position.data)
@@ -282,10 +272,22 @@ class ForumForm(Form):
         if self.moderators.data and not self.is_category.data:
             forum.moderators = self.moderators.data
 
-        if self.is_category.data:
-            forum.is_category = True
-            forum.parent_id = None
-        else:
-            forum.parent_id = self.parent.data.id
+        forum.category_id = self.category.data.id
 
         return forum.save()
+
+
+class CategoryForm(Form):
+    title = TextField("Category title", validators=[
+        Required(message="Category title required")])
+
+    description = TextAreaField("Description", validators=[
+        Optional()],
+        description="You can format your description with BBCode.")
+
+    position = IntegerField("Position", default=1, validators=[
+        Required(message="Category position required")])
+
+    def save(self):
+        category = Category(**self.data)
+        return category.save()

@@ -382,18 +382,10 @@ class Forum(db.Model):
         db.session.commit()
 
         # Update the users post count
-        # Need to import it from here, because otherwise it would be
-        # a circular import
-        from flaskbb.user.models import User
-
-        users = User.query.\
-            filter(Topic.forum_id == self.id,
-                   Post.topic_id == Topic.id).\
-            all()
-
-        for user in users:
-            user.post_count = Post.query.filter_by(user_id=user.id).count()
-            db.session.commit()
+        if users:
+            for user in users:
+                user.post_count = Post.query.filter_by(user_id=user.id).count()
+                db.session.commit()
 
         return self
 
@@ -418,12 +410,22 @@ class Category(db.Model):
         db.session.commit()
         return self
 
-    def delete(self):
-        """Deletes a category"""
+    def delete(self, users=None):
+        """Deletes a category. If a list with involved user objects is passed,
+        it will also update their post counts
+
+        :param users: A list with user objects
+        """
 
         # Delete all the forums in the category
         for forum in self.forums:
             forum.delete()
+
+        # Update the users post count
+        if users:
+            for user in users:
+                user.post_count = Post.query.filter_by(user_id=user.id).count()
+                db.session.commit()
 
         # and finally delete the category itself
         db.session.delete(self)
