@@ -77,12 +77,13 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
 
     :param topicsread: The topicsread object for the topic
 
-    :param user: The user who should be checked if he has read the topic
+    :param user: The user who should be checked if he has read the last post
+                 in the topic
 
-    :param forumsread: The forumsread object in which the topic is. You do
-                       not have to pass this - only if you want to include the
-                       cleared attribute from the ForumsRead object.
-                       This will also check if the forum is marked as clear.
+    :param forumsread: The forumsread object in which the topic is. If you
+                       also want to check if the user has marked the forum as
+                       read, than you will also need to pass an forumsread
+                       object.
     """
     if not user.is_authenticated():
         return False

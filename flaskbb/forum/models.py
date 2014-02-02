@@ -25,7 +25,8 @@ class Post(db.Model):
                                                    name="fk_topic_id",
                                                    ondelete="CASCADE"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    content = db.Column(db.Text)
+    username = db.Column(db.String, nullable=False)
+    content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     date_modified = db.Column(db.DateTime)
 
@@ -55,6 +56,7 @@ class Post(db.Model):
         # Adding a new post
         if user and topic:
             self.user_id = user.id
+            self.username = user.username
             self.topic_id = topic.id
             self.date_created = datetime.utcnow()
 
@@ -115,6 +117,7 @@ class Topic(db.Model):
                                                    name="fk_forum_id"))
     title = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    username = db.Column(db.String, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     last_updated = db.Column(db.DateTime, default=datetime.utcnow())
     locked = db.Column(db.Boolean, default=False)
@@ -176,6 +179,7 @@ class Topic(db.Model):
         # Set the forum and user id
         self.forum_id = forum.id
         self.user_id = user.id
+        self.username = user.username
 
         # Insert and commit the topic
         db.session.add(self)

@@ -84,10 +84,8 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String)
     notes = db.Column(db.Text(5000))
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic",
-                            cascade="all, delete-orphan")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic",
-                             cascade="all, delete-orphan")
+    posts = db.relationship("Post", backref="user", lazy="dynamic")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic")
 
     post_count = db.Column(db.Integer, default=0)
 
@@ -296,10 +294,11 @@ class User(db.Model, UserMixin):
         db.session.commit()
         return self
 
-    def delete(self):
-        # TODO: Recount posts in the involved forums and topics
+    def delete(self, forums=None):
+        """Deletes the User."""
         db.session.delete(self)
         db.session.commit()
+
         return self
 
 

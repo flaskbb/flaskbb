@@ -69,7 +69,11 @@
                     <!-- Topic Pagination -->
                     {{ topic_pages(topic, config["POSTS_PER_PAGE"]) }}
                     <br />
+                    {% if topic.user_id %}
                     <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
+                    {% else %}
+                    <small>by {{ topic.username }}</small>
+                    {% endif %}
                 </div>
             </td>
             <td>
@@ -80,7 +84,12 @@
             </td>
             <td>
                 <a href="{{ url_for('forum.view_post', post_id=topic.last_post.id) }}">{{ topic.last_post.date_created|time_since }}</a><br />
+
+                {% if topic.last_post.user_id %}
                 <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
+                {% else %}
+                <small>{{ topic.last_post.username }}</small>
+                {% endif %}
             </td>
         </tr>
         {% else %}

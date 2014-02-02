@@ -60,7 +60,7 @@
                         {{ url_for('forum.view_topic', topic_id=topic.id) }}#pid{{ post.id }}
                     {% endif %}
                         ">{{ post.date_created|format_date('%d %B %Y') }}</a>
-                    {% if post.date_modified %}
+                    {% if post.user_id and post.date_modified %}
                     <small>
                         (Last modified: {{ post.date_modified|format_date }} by <a href="{{ url_for('user.profile', username=post.user.username) }}">{{ post.user.username }}</a>.)
                     </small>
@@ -73,6 +73,7 @@
         <td>
             <table class="table table-borderless">
                 <tr>
+                {% if post.user_id %}
                     {% if post.user.avatar %}
                     <td width="1">
                         <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
@@ -80,20 +81,27 @@
                     {% endif %}
                     <td>
                         <a href="{{ url_for('user.profile', username=post.user.username) }}"><span style="color: green;"><strong><em>{{ post.user.username }}</em></strong></span></a>
-                        {% if post.user|is_online %}
-                        <span class="label label-success">Online</span>
-                        {% else %}
-                        <span class="label label-default">Offline</span>
-                        {% endif %}
-                        <br />
-                        {{ post.user.primary_group.name }}<br />
+
+                            {% if post.user|is_online %}
+                            <span class="label label-success">Online</span>
+                            {% else %}
+                            <span class="label label-default">Offline</span>
+                            {% endif %}
+                            <br />
+                            {{ post.user.primary_group.name }}<br />
                     </td>
 
                     <td class="pull-right">
                         Posts: {{ post.user.post_count }}<br />
                         Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
                     </td>
-
+                {% else %}
+                    <td>
+                        <strong>{{ post.username }}</strong>
+                        <br />
+                        Guest
+                    </td>
+                {% endif %}
                 </tr>
             </table>
         </td>
@@ -105,7 +113,7 @@
                 {% autoescape false %}
                     {{ post.content|markup }}
                     <!-- Signaure Begin -->
-                    {% if post.user.signature %}
+                    {% if post.user_id and post.user.signature %}
                     <hr>
                     {{ post.user.signature|markup }}
                     {% endif %}
@@ -117,7 +125,7 @@
         <tr>
             <td>
                 <span class="pull-left">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_authenticated and post.user_id %}
                     <a href="{{ url_for('user.new_message') }}?to_user={{ post.user.username }}">PM</a>
                     {% endif %}
                     {% if post.user.website %}

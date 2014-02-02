@@ -38,7 +38,7 @@
         <tr>
             <td width="4%">
 
-            {% if topicread|is_unread(topic.last_post) %}
+            {% if topic|topic_is_unread(topicread, current_user) %}
                 <span class="fa fa-comment" style="font-size: 2em"></span>
             {% else %}
                 <span class="fa fa-comment-o" style="font-size: 2em"></span>
@@ -48,7 +48,11 @@
             <td>
                 <div>
                     <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a> <br />
+                    {% if topic.user_id %}
                     <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
+                    {% else %}
+                    <small>by {{ topic.username }}</small>
+                    {% endif %}
                 </div>
             </td>
             <td>
@@ -59,7 +63,11 @@
             </td>
             <td>
                 <a href="{{ url_for('forum.view_post', post_id=topic.last_post.id) }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                {% if topic.last_post.user_id %}
                 <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
+                {% else %}
+                {{ topic.last_post.username }}
+                {% endif %}
             </td>
         </tr>
         {% else %}

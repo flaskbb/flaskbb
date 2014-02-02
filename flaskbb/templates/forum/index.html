@@ -54,7 +54,13 @@
                 </a>
                 <br />
                 {{ forum[0].last_post.date_created|time_since }}<br />
-                by <a href="{{ url_for('user.profile', username=forum[0].last_post.user.username) }}">{{ forum[0].last_post.user.username }}</a>
+
+                    {% if forum[0].last_post.user_id %}
+                    by <a href="{{ url_for('user.profile', username=forum[0].last_post.user.username) }}">{{ forum[0].last_post.user.username }}</a>
+                    {% else %}
+                    {{ forum[0].last_post.username }}
+                    {% endif %}
+
                 {% else %}
                 No posts
                 {% endif %}
