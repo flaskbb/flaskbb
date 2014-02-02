@@ -10,11 +10,9 @@
     <li class="active">{{ forum[0].title }}</li>
 </ol>
 
-{% if forum.topics %}
 <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(topics, url_for('forum.view_forum', forum_id=forum[0].id)) }}
 </div> <!-- end span pagination -->
-{% endif %}
 
 {% if current_user|post_topic(forum[0]) and not forum[0].is_category %}
 <div class="pull-right" style="padding-bottom: 10px">

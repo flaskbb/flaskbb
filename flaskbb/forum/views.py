@@ -101,7 +101,6 @@ def view_category(category_id):
     else:
         # we do not need to join the ForumsRead because the user isn't
         # signed in
-
         forum_query = Category.query.\
             filter(Category.id == category_id).\
             join(Forum, Category.id == Forum.category_id).\
