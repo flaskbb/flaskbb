@@ -405,7 +405,8 @@ class Category(db.Model):
     # One-to-many
     forums = db.relationship("Forum", backref="category", lazy="dynamic",
                              primaryjoin='Forum.category_id == Category.id',
-                             order_by='asc(Forum.position)')
+                             order_by='asc(Forum.position)',
+                             cascade="all, delete-orphan")
 
     def save(self):
         """Saves a category"""
@@ -420,10 +421,6 @@ class Category(db.Model):
 
         :param users: A list with user objects
         """
-
-        # Delete all the forums in the category
-        for forum in self.forums:
-            forum.delete()
 
         # Update the users post count
         if users:

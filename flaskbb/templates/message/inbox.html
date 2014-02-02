@@ -12,7 +12,11 @@
     <tbody>
         {% for message in messages %}
         <tr>
+        {% if message.from_user %}
             <td><a href="{{ url_for('user.profile', username=message.from_user.username) }}">{{ message.from_user.username }}</a></td>
+        {% else %}
+            <td>[deleted]</td>
+        {% endif %}
             <td><a href="{{ url_for('user.view_message', id=message.id) }}">{{ message.subject }}</a></td>
             <td>{{ message.date_created|time_since }}</td>
             <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a> |

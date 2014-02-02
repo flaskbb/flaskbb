@@ -17,7 +17,8 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask import current_app
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
-from flaskbb.forum.models import Post, Topic, topictracker
+from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
+                                  ForumsRead)
 
 
 groups_users = db.Table(
@@ -294,8 +295,14 @@ class User(db.Model, UserMixin):
         db.session.commit()
         return self
 
-    def delete(self, forums=None):
+    def delete(self):
         """Deletes the User."""
+        groups_users.delete().where(groups_users.c.user_id == self.id)
+        topictracker.delete().where(topictracker.c.user_id == self.id)
+        PrivateMessage.query.filter_by(user_id=self.id).delete()
+        ForumsRead.query.filter_by(user_id=self.id).delete()
+        TopicsRead.query.filter_by(user_id=self.id).delete()
+
         db.session.delete(self)
         db.session.commit()
 
