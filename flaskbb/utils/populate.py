@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from datetime import datetime
 from collections import OrderedDict
 
 from flaskbb.user.models import User, Group
@@ -138,8 +139,8 @@ def create_admin_user(username, password, email):
     Creates the administrator user
     """
     admin_group = Group.query.filter_by(admin=True).first()
-    user = User(username=username, password=password, email=email)
-    user.primary_group_id = admin_group.id
+    user = User(username=username, password=password, email=email,
+                date_joined=datetime.utcnow(), primary_group_id=admin_group.id)
     user.save()
 
 
@@ -154,11 +155,11 @@ def create_welcome_forum():
 
     user = User.query.filter_by(id=1).first()
 
-    category = Forum(is_category=True, title="My Category")
+    category = Category(title="My Category", position=1)
     category.save()
 
     forum = Forum(title="Welcome", description="Your first forum",
-                  parent_id=category.id)
+                  category_id=category.id)
     forum.save()
 
     topic = Topic(title="Welcome!")

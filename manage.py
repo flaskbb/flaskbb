@@ -11,13 +11,13 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import current_app
-from flask.ext.script import Manager, Shell, Server
+from flask.ext.script import Manager, Shell, Server, prompt, prompt_pass
 from flask.ext.migrate import MigrateCommand
 
 from flaskbb import create_app
 from flaskbb.extensions import db
-from flaskbb.utils.populate import (create_test_data, create_admin_user,
-                                    create_welcome_forum, create_default_groups)
+from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
+                                    create_admin_user, create_default_groups)
 
 # Use the development configuration if available
 try:
@@ -57,7 +57,7 @@ def dropdb():
 
 @manager.command
 def createall():
-    """Creates the database with some example content."""
+    """Creates the database with some testing content."""
 
     # Just for testing purposes
     db.drop_all()
@@ -66,22 +66,43 @@ def createall():
     create_test_data()
 
 
-# TODO: Implement this...
-@manager.command
-def create_admin():
+@manager.option('-u', '--username', dest='username')
+@manager.option('-p', '--password', dest='password')
+@manager.option('-e', '--email', dest='email')
+def create_admin(username, password, email):
     """Creates the admin user"""
 
+    username = prompt("Username")
+    email = prompt("A valid email address")
+    password = prompt_pass("Password")
+
+    create_admin_user(username, email, password)
+
+
+@manager.option('-u', '--username', dest='username')
+@manager.option('-p', '--password', dest='password')
+@manager.option('-e', '--email', dest='email')
+@manager.option('-d', '--dropdb', dest='dropdb', default=False)
+def initflaskbb(username, password, email, dropdb=False):
+    """Initializes FlaskBB with all necessary data"""
+
+    if dropdb:
+        app.logger.info("Dropping previous database...")
+        db.drop_all()
+
+    app.logger.info("Creating tables...")
     db.create_all()
-    create_admin_user()
 
-
-@manager.command
-def create_default_data():
-    """This should be created by every flaskbb installation"""
-
-    db.create_all()
+    app.logger.info("Creating default groups...")
     create_default_groups()
+
+    app.logger.info("Creating admin user...")
+    create_admin(username, password, email)
+
+    app.logger.info("Creating welcome forum...")
     create_welcome_forum()
+
+    app.logger.info("Congratulations! FlaskBB has been successfully installed")
 
 
 if __name__ == "__main__":
