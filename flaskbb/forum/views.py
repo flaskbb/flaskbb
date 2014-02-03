@@ -39,7 +39,7 @@ def index():
             join(Forum, Category.id == Forum.category_id).\
             outerjoin(ForumsRead,
                       db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == 1)).\
+                              ForumsRead.user_id == current_user.id)).\
             add_entity(Forum).\
             add_entity(ForumsRead).\
             order_by(Category.id, Category.position, Forum.position).\
@@ -159,7 +159,8 @@ def markread(forum_id=None):
     # Mark a single forum as read
     if forum_id:
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
-        forumsread = ForumsRead.query.filter_by(forum_id=forum.id).first()
+        forumsread = ForumsRead.query.filter_by(user_id=current_user.id,
+                                                forum_id=forum.id).first()
         TopicsRead.query.filter_by(user_id=current_user.id,
                                    forum_id=forum.id).delete()
 
@@ -167,9 +168,10 @@ def markread(forum_id=None):
             forumsread = ForumsRead()
             forumsread.user_id = current_user.id
             forumsread.forum_id = forum.id
-            forumsread.last_read = datetime.datetime.utcnow()
 
+        forumsread.last_read = datetime.datetime.utcnow()
         forumsread.cleared = datetime.datetime.utcnow()
+
         db.session.add(forumsread)
         db.session.commit()
 
@@ -180,14 +182,16 @@ def markread(forum_id=None):
     TopicsRead.query.filter_by(user_id=current_user.id).delete()
 
     forums = Forum.query.all()
+    forumsread_list = []
     for forum in forums:
         forumsread = ForumsRead()
         forumsread.user_id = current_user.id
         forumsread.forum_id = forum.id
         forumsread.last_read = datetime.datetime.utcnow()
         forumsread.cleared = datetime.datetime.utcnow()
-        db.session.add(forumsread)
+        forumsread_list.append(forumsread)
 
+    db.session.add_all(forumsread_list)
     db.session.commit()
 
     return redirect(url_for("forum.index"))
