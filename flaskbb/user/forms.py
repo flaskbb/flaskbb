@@ -66,6 +66,7 @@ class ChangePasswordForm(Form):
 
 
 class ChangeUserDetailsForm(Form):
+    # TODO: Better birthday field
     birthday = DateField("Your Birthday", format="%d %m %Y",
                          widget=SelectDateWidget(), validators=[Optional()])
 

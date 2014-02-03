@@ -51,18 +51,19 @@ class Group(db.Model):
 
     # Methods
     def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
+        """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {})>".format(self.__class__.__name__, self.id)
 
     def save(self):
+        """Saves a group"""
         db.session.add(self)
         db.session.commit()
         return self
 
     def delete(self):
+        """Deletes a group"""
         db.session.delete(self)
         db.session.commit()
         return self
@@ -90,7 +91,8 @@ class User(db.Model, UserMixin):
 
     post_count = db.Column(db.Integer, default=0)
 
-    primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
+    primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'),
+                                 nullable=False)
 
     primary_group = db.relationship('Group', lazy="joined",
                                     backref="user_group", uselist=False,
@@ -112,24 +114,24 @@ class User(db.Model, UserMixin):
     # Properties
     @property
     def last_post(self):
-        """
-        Returns the latest post from the user
-        """
+        """Returns the latest post from the user"""
+
         return Post.query.filter(Post.user_id == self.id).\
             order_by(Post.date_created.desc()).first()
 
     # Methods
     def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
+        """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "Username: %s" % self.username
 
     def _get_password(self):
+        """Returns the hashed password"""
         return self._password
 
     def _set_password(self, password):
+        """Generates a password hash for the provided password"""
         self._password = generate_password_hash(password)
 
     # Hide password encryption by exposing password field only.
@@ -138,19 +140,22 @@ class User(db.Model, UserMixin):
                                               _set_password))
 
     def check_password(self, password):
-        """
-        Check passwords. If passwords match it returns true, else false
-        """
+        """Check passwords. If passwords match it returns true, else false"""
+
         if self.password is None:
             return False
         return check_password_hash(self.password, password)
 
     @classmethod
     def authenticate(cls, login, password):
-        """
-        A classmethod for authenticating users
+        """A classmethod for authenticating users
         It returns true if the user exists and has entered a correct password
+
+        :param login: This can be either a username or a email address.
+
+        :param password: The password that is connected to username and email.
         """
+
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
@@ -177,9 +182,20 @@ class User(db.Model, UserMixin):
         return expired, invalid, data
 
     def make_reset_token(self, expiration=3600):
+        """Creates a token. The duration can be configured through the
+        expiration parameter.
+
+        :param expiration: The time in seconds how long the token is valid.
+        """
         return self._make_token({'id': self.id, 'op': 'reset'}, expiration)
 
     def verify_reset_token(self, token):
+        """Verifies a reset token. It returns three boolean values based on
+        state of the token (expired, invalid, data)
+
+        :param token: The reset token that should be checked.
+        """
+
         expired, invalid, data = self._verify_token(token)
         if data and data.get('id') == self.id and data.get('op') == 'reset':
             data = True
@@ -188,72 +204,85 @@ class User(db.Model, UserMixin):
         return expired, invalid, data
 
     def all_topics(self, page):
-        """
-        Returns a paginated query result with all topics the user has created.
-        """
+        """Returns a paginated result with all topics the user has created."""
+
         return Topic.query.filter(Topic.user_id == self.id).\
             filter(Post.topic_id == Topic.id).\
             order_by(Post.id.desc()).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
     def all_posts(self, page):
-        """
-        Returns a paginated query result with all posts the user has created.
-        """
+        """Returns a paginated result with all posts the user has created."""
+
         return Post.query.filter(Post.user_id == self.id).\
             paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
 
     def track_topic(self, topic):
+        """Tracks the specified topic
+
+        :param topic: The topic which should be added to the topic tracker.
         """
-        Tracks the specified topic
-        """
+
         if not self.is_tracking_topic(topic):
             self.tracked_topics.append(topic)
             return self
 
     def untrack_topic(self, topic):
+        """Untracks the specified topic
+
+        :param topic: The topic which should be removed from the
+                      topic tracker.
         """
-        Untracks the specified topic
-        """
+
         if self.is_tracking_topic(topic):
             self.tracked_topics.remove(topic)
             return self
 
     def is_tracking_topic(self, topic):
+        """Checks if the user is already tracking this topic
+
+        :param topic: The topic which should be checked.
         """
-        Checks if the user is already tracking this topic
-        """
+
         return self.tracked_topics.filter(
             topictracker.c.topic_id == topic.id).count() > 0
 
     def add_to_group(self, group):
+        """Adds the user to the `group` if he isn't in it.
+
+        :param group: The group which should be added to the user.
         """
-        Adds the user to the `group` if he isn't in it.
-        """
+
         if not self.in_group(group):
             self.secondary_groups.append(group)
             return self
 
     def remove_from_group(self, group):
+        """Removes the user from the `group` if he is in it.
+
+        :param group: The group which should be removed from the user.
         """
-        Removes the user from the `group` if he is in it.
-        """
+
         if self.in_group(group):
             self.secondary_groups.remove(group)
             return self
 
     def in_group(self, group):
+        """Returns True if the user is in the specified group
+
+        :param group: The group which should be checked.
         """
-        Returns True if the user is in the specified group
-        """
+
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
     @cache.memoize(timeout=sys.maxint)
     def get_permissions(self, exclude=None):
+        """Returns a dictionary with all the permissions the user has.
+
+        :param exclude: a list with excluded permissions. default is None.
         """
-        Returns a dictionary with all the permissions the user has.
-        """
+
         exclude = exclude or []
         exclude.extend(['id', 'name', 'description'])
 
@@ -278,7 +307,19 @@ class User(db.Model, UserMixin):
                     perms[c.name] = getattr(group, c.name)
         return perms
 
+    def invalidate_cache(self):
+        """Invalidates this objects cached metadata."""
+
+        cache.delete_memoized(self.get_permissions, self)
+
     def save(self, groups=None):
+        """Saves a user. If a list with groups is provided, it will add those
+        to the secondary groups from the user.
+
+        :param groups: A list with groups that should be added to the
+                       secondary groups from user.
+        """
+
         if groups:
             # TODO: Only remove/add groups that are selected
             secondary_groups = self.secondary_groups.all()
@@ -291,12 +332,17 @@ class User(db.Model, UserMixin):
                 if group.id == self.primary_group_id:
                     continue
                 self.add_to_group(group)
+
+            self.invalidate_cache()
+
         db.session.add(self)
         db.session.commit()
         return self
 
     def delete(self):
         """Deletes the User."""
+
+        # This isn't done automatically...
         PrivateMessage.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()
         TopicsRead.query.filter_by(user_id=self.id).delete()
@@ -308,11 +354,8 @@ class User(db.Model, UserMixin):
 
 
 class Guest(AnonymousUserMixin):
-    @cache.memoize(60*5)
     def get_permissions(self, exclude=None):
-        """
-        Returns a dictionary with all permissions the user has
-        """
+        """Returns a dictionary with all permissions the user has"""
         exclude = exclude or []
         exclude.extend(['id', 'name', 'description'])
 
@@ -347,6 +390,17 @@ class PrivateMessage(db.Model):
     to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
 
     def save(self, from_user=None, to_user=None, user_id=None, draft=False):
+        """Saves a private message.
+
+        :param from_user: The user who has sent the message
+
+        :param to_user: The user who should recieve the message
+
+        :param user_id: The senders user id
+
+        :param draft: If the message is a draft
+        """
+
         if self.id:
             db.session.add(self)
             db.session.commit()
@@ -365,6 +419,8 @@ class PrivateMessage(db.Model):
         return self
 
     def delete(self):
+        """Deletes a private message"""
+
         db.session.delete(self)
         db.session.commit()
         return self

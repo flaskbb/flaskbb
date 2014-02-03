@@ -7,7 +7,6 @@ using the micro framework Flask.
 ## FEATURES
 
 * A Bulletin Board like FluxBB, DjangoBB in Flask
-    * with Subforums
 * Private Messages
 * Admin Interface
 * Group based permissions
@@ -71,17 +70,20 @@ using the micro framework Flask.
 
 * Install the dependencies
     * `pip install -r requirements.txt`
-* Create the development config
-    * `cp flaskbb/configs/development.py.example flaskbb/configs/development.py`
+* Configuration (_adjust them accordingly to your needs_)
+    * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
+    * For production copy `flaskbb/configs/production.py.example` to `flaskbb/configs/production.py`
 * Create the database with some example content
     * `python manage.py createall`
 * Run the development server
     * `python manage.py runserver`
 * Visit [localhost:8080](http://localhost:8080)
 
+
 ## LICENSE
 
 [BSD LICENSE](http://flask.pocoo.org/docs/license/#flask-license)
+
 
 ## ACKNOWLEDGEMENTS
 
