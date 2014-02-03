@@ -10,13 +10,17 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime
-from flask import Blueprint, render_template, flash, request, redirect, url_for
+
+from flask import Blueprint, flash, request, redirect, url_for
 from flask.ext.login import login_required, current_user
+from flask.ext.themes2 import get_themes_list
 
 from flaskbb.extensions import db
+from flaskbb.utils.helpers import render_template
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
-                                ChangeUserDetailsForm, NewMessage)
+                                ChangeUserDetailsForm, GeneralSettingsForm,
+                                NewMessage)
 
 
 user = Blueprint("user", __name__)
@@ -52,13 +56,26 @@ def view_all_posts(username):
     return render_template("user/all_posts.html", user=user, posts=posts)
 
 
-@user.route("/settings")
+@user.route("/settings/general")
 @login_required
 def settings():
-    return render_template("user/overview.html")
+    form = GeneralSettingsForm()
+
+    form.theme.choices = [(theme.identifier, theme.name)
+                          for theme in get_themes_list()]
+
+    if form.validate_on_submit():
+        current_user.theme = form.theme.data
+        current_user.save()
+
+        flash("Your settings have been updated!", "success")
+    else:
+        form.theme.data = current_user.theme
+
+    return render_template("user/general_settings.html", form=form)
 
 
-@user.route("/settings/change_password", methods=["POST", "GET"])
+@user.route("/settings/password", methods=["POST", "GET"])
 @login_required
 def change_password():
     form = ChangePasswordForm()
@@ -70,7 +87,7 @@ def change_password():
     return render_template("user/change_password.html", form=form)
 
 
-@user.route("/settings/change_email", methods=["POST", "GET"])
+@user.route("/settings/email", methods=["POST", "GET"])
 @login_required
 def change_email():
     form = ChangeEmailForm(current_user)
@@ -82,7 +99,7 @@ def change_email():
     return render_template("user/change_email.html", form=form)
 
 
-@user.route("/settings/change_user_details", methods=["POST", "GET"])
+@user.route("/settings/user-details", methods=["POST", "GET"])
 @login_required
 def change_user_details():
     form = ChangeUserDetailsForm()

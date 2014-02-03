@@ -104,3 +104,6 @@ class DefaultConfig(object):
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
+
+    # Default style
+    DEFAULT_THEME = "bootstrap3"

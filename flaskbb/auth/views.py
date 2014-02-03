@@ -9,10 +9,11 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask import (Blueprint, flash, redirect, render_template,
-                   url_for, request, current_app)
+from flask import Blueprint, flash, redirect, url_for, request, current_app
 from flask.ext.login import (current_user, login_user, login_required,
                              logout_user, confirm_login, login_fresh)
+
+from flaskbb.utils.helpers import render_template
 from flaskbb.email import send_reset_token
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm)

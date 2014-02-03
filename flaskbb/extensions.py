@@ -15,6 +15,7 @@ from flask.ext.cache import Cache
 from flask.ext.debugtoolbar import DebugToolbarExtension
 from flask.ext.redis import Redis
 from flask.ext.migrate import Migrate
+from flask.ext.themes2 import Themes
 
 # Database
 db = SQLAlchemy()
@@ -36,3 +37,6 @@ debugtoolbar = DebugToolbarExtension()
 
 # Migrations
 migrate = Migrate()
+
+# Themes
+themes = Themes()

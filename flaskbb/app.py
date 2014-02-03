@@ -12,7 +12,7 @@ import os
 import logging
 import datetime
 
-from flask import Flask, render_template, request
+from flask import Flask, request
 from flask.ext.login import current_user
 
 # Import the user blueprint
@@ -26,13 +26,11 @@ from flaskbb.admin.views import admin
 from flaskbb.forum.views import forum
 
 from flaskbb.extensions import (db, login_manager, mail, cache, redis,
-                                debugtoolbar, migrate)
-from flaskbb.utils.helpers import (format_date, time_since, crop_title,
-                                   can_post_reply, can_post_topic,
-                                   can_delete_topic, can_delete_post, is_online,
-                                   can_edit_post, can_lock_topic,
-                                   can_move_topic, render_markup, mark_online,
-                                   forum_is_unread, topic_is_unread)
+                                debugtoolbar, migrate, themes)
+from flaskbb.utils.helpers import format_date, time_since, crop_title, \
+    can_post_reply, can_post_topic, can_delete_topic, can_delete_post, \
+    is_online, can_edit_post, can_lock_topic, can_move_topic, render_markup, \
+    mark_online, forum_is_unread, topic_is_unread, render_template
 
 
 def create_app(config=None):
@@ -85,6 +83,9 @@ def configure_extensions(app):
 
     # Flask-Debugtoolbar
     debugtoolbar.init_app(app)
+
+    # Flask-Themes
+    themes.init_themes(app, app_identifier="flaskbb")
 
     # Flask-And-Redis
     redis.init_app(app)

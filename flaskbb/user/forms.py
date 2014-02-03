@@ -26,6 +26,13 @@ is_image = regexp(IMG_RE,
                   message=("Only jpg, jpeg, png and gifs are allowed!"))
 
 
+class GeneralSettingsForm(Form):
+    # The choices for those fields will be generated in the user view
+    # because we cannot access the current_app outside of the context
+    #language = SelectField("Language")
+    theme = SelectField("Theme")
+
+
 class ChangeEmailForm(Form):
     old_email = TextField("Old E-Mail Address", validators=[
         Required(message="Email adress required"),

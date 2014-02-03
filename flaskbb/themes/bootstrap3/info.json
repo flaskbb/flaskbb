@@ -1,0 +1,9 @@
+{
+    "application": "flaskbb",
+    "identifier": "bootstrap3",
+    "name": "Bootstrap3",
+    "author": "sh4nks",
+    "license": "BSD/Apache 2.0 (Bootstrap)",
+    "description": "The default Bootstrap3 theme",
+    "version": "1.0.0"
+}

@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{%- from 'macros.html' import navlink with context -%}
+{%- from theme('macros.html') import navlink with context -%}
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>

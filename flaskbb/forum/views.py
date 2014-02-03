@@ -12,7 +12,7 @@
 import datetime
 import math
 
-from flask import (Blueprint, render_template, redirect, url_for, current_app,
+from flask import (Blueprint, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
 
@@ -20,7 +20,7 @@ from flaskbb.extensions import db
 from flaskbb.utils.helpers import (can_post_reply, can_delete_topic,
                                    can_edit_post, can_post_topic,
                                    can_delete_post, can_lock_topic,
-                                   get_online_users, time_diff)
+                                   get_online_users, time_diff, render_template)
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm

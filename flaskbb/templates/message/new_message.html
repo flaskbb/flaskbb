@@ -1,12 +1,13 @@
-{% extends "message/message_layout.html" %}
+{% extends theme("message/message_layout.html") %}
+
 {% block message_content %}
-{% import "macros.html" as wtf %}
+{% from theme("macros.html") import horizontal_field %}
 <form class="form-horizontal" role="form" method="post" name="new">
     <legend>Compose Message</legend>
     {{ form.hidden_tag() }}
-    {{ wtf.horizontal_field(form.to_user)}}
-    {{ wtf.horizontal_field(form.subject)}}
-    {{ wtf.horizontal_field(form.message, rows=7)}}
+    {{ horizontal_field(form.to_user)}}
+    {{ horizontal_field(form.subject)}}
+    {{ horizontal_field(form.message, rows=7)}}
 
     <div class="form-group row">
         <div class="col-sm-offset-3 col-lg-9">

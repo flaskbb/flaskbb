@@ -1,9 +1,9 @@
 {% set page_title = title %}
 {% set active_forum_nav=True %}
 
-{% extends "admin/admin_layout.html" %}
+{% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from "macros.html" import horizontal_field %}
+{% from theme("macros.html") import horizontal_field %}
 
 <form class="form-horizontal" role="form" method="post">
     {{ form.hidden_tag() }}

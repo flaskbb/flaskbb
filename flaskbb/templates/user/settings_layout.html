@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{%- from 'macros.html' import navlink with context -%}
+{%- from theme('macros.html') import navlink with context -%}
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
@@ -13,7 +13,7 @@
         <div class="sidebar">
             <ul class="nav sidenav">
                 <li class="nav-header">Account Settings</li>
-                {{ navlink('user.settings', 'Overview') }}
+                {{ navlink('user.settings', 'General Settings') }}
                 {{ navlink('user.change_user_details', 'Change User Details') }}
                 {{ navlink('user.change_email', 'Change E-Mail Address') }}
                 {{ navlink('user.change_password', 'Change Password') }}

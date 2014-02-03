@@ -1,14 +1,14 @@
 {% set page_title = "Refresh Login" %}
 {% set active_forum_nav=True %}
 
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{% import "macros.html" as wtf %}
+{% from theme("macros.html") import form_input_field %}
 
 <form class="form-signin" action="" method="POST">
     <h2 class="form-signin-heading">Refresh Login</h2>
     {{ form.hidden_tag() }}
-    {{ wtf.form_input_field(form.password)}}
+    {{ form_input_field(form.password)}}
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 </form>
 

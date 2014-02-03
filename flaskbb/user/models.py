@@ -86,6 +86,8 @@ class User(db.Model, UserMixin):
     avatar = db.Column(db.String)
     notes = db.Column(db.Text(5000))
 
+    theme = db.Column(db.String)
+
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
 

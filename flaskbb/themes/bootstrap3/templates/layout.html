@@ -20,7 +20,7 @@
     <body>
         <div id="wrap">
         {% block navigation %}
-        {%- from themes("macros.html") import topnav with context -%}
+        {%- from "macros.html" import topnav with context -%}
         <!-- Navigation -->
             <nav class="navbar navbar-default navbar-static-top">
                 <div class="container">
@@ -98,7 +98,7 @@
 
             <div class="container">
                 {% block messages %}
-                    {% include theme('flashed_messages.html') %}
+                    {% include 'flashed_messages.html' %}
                 {% endblock %}
 
                 {% block content %}

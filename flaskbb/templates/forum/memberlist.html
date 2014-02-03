@@ -1,8 +1,8 @@
 {% set page_title = "Memberlist" %}
 
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{% from 'macros.html' import render_pagination %}
+{% from theme('macros.html') import render_pagination %}
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>

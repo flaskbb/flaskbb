@@ -1,11 +1,11 @@
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
 </ol>
 
-{% include "forum/category_layout.html" %}
+{% include theme("forum/category_layout.html") %}
 
 <!-- Forum Stats -->
 <table class="table table-bordered">

@@ -1,9 +1,9 @@
 {% set page_title = topic.title ~ " - Topic" %}
 {% set active_forum_nav=True %}
 
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{% from 'macros.html' import render_pagination, form_field %}
+{% from theme('macros.html') import render_pagination, form_field %}
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>

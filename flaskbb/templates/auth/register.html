@@ -1,8 +1,8 @@
 {% set page_title = "Register" %}
 
-{% extends "layout.html" %}
+{% extends theme("layout.html") %}
 {% block content %}
-{% from "macros.html" import horizontal_field %}
+{% from theme("macros.html") import horizontal_field %}
 
 <form class="form-horizontal" role="form" method="POST">
     <h2>Register</h2>
