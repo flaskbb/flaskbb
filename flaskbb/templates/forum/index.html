@@ -41,6 +41,14 @@
                     {% autoescape false %}
                     {{ forum[0].description|markup }}
                     {% endautoescape %}
+                    {% if forum[0].show_moderators %}
+                    <div class="forum-moderators">
+                        Moderators:
+                        {% for moderator in forum[0].moderators %}
+                        <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </td>
 

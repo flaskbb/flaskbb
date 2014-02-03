@@ -297,8 +297,6 @@ class User(db.Model, UserMixin):
 
     def delete(self):
         """Deletes the User."""
-        groups_users.delete().where(groups_users.c.user_id == self.id)
-        topictracker.delete().where(topictracker.c.user_id == self.id)
         PrivateMessage.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()
         TopicsRead.query.filter_by(user_id=self.id).delete()

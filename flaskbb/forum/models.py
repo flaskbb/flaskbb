@@ -13,8 +13,70 @@ from datetime import datetime, timedelta
 from flask import current_app
 
 from flaskbb.extensions import db
-from flaskbb.utils.types import SetType, MutableSet
 from flaskbb.utils.query import TopicQuery
+
+
+moderators = db.Table(
+    'moderators',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('forum_id', db.Integer(),
+              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id")))
+
+
+topictracker = db.Table(
+    'topictracker',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('topic_id', db.Integer(),
+              db.ForeignKey('topics.id', use_alter=True, name="fk_topic_id")))
+
+
+class TopicsRead(db.Model):
+    __tablename__ = "topicsread"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    topic_id = db.Column(db.Integer,
+                         db.ForeignKey("topics.id", use_alter=True,
+                                       name="fk_topic_id"),
+                         primary_key=True)
+    forum_id = db.Column(db.Integer,
+                         db.ForeignKey("forums.id", use_alter=True,
+                                       name="fk_tr_forum_id"),
+                         primary_key=True)
+    last_read = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+
+class ForumsRead(db.Model):
+    __tablename__ = "forumsread"
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    forum_id = db.Column(db.Integer,
+                         db.ForeignKey("topics.id", use_alter=True,
+                                       name="fk_forum_id"),
+                         primary_key=True)
+    last_read = db.Column(db.DateTime, default=datetime.utcnow())
+    cleared = db.Column(db.DateTime)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
 
 
 class Post(db.Model):
@@ -239,6 +301,8 @@ class Topic(db.Model):
                    Topic.forum_id == self.forum_id).\
             count()
 
+        TopicsRead.query.filter_by(topic_id=self.id).delete()
+
         db.session.commit()
         return self
 
@@ -338,14 +402,12 @@ class Forum(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     title = db.Column(db.String)
     description = db.Column(db.String)
-    position = db.Column(db.Integer, default=0)
+    position = db.Column(db.Integer, default=1)
     locked = db.Column(db.Boolean, default=False)
+    show_moderators = db.Column(db.Boolean, default=False)
 
     post_count = db.Column(db.Integer, default=0)
     topic_count = db.Column(db.Integer, default=0)
-
-    # TODO: Make a own relation for this
-    moderators = db.Column(MutableSet.as_mutable(SetType))
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
@@ -356,6 +418,12 @@ class Forum(db.Model):
     topics = db.relationship("Topic", backref="forum", lazy="joined",
                              cascade="all, delete-orphan")
 
+    moderators = \
+        db.relationship("User", secondary=moderators,
+                        primaryjoin=(moderators.c.forum_id == id),
+                        backref=db.backref("forummoderator", lazy="dynamic"),
+                        lazy="joined")
+
     # Methods
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
@@ -363,14 +431,17 @@ class Forum(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def add_moderator(self, user_id):
-        self.moderators.add(user_id)
-
-    def remove_moderator(self, user_id):
-        self.moderators.remove(user_id)
-
-    def save(self):
+    def save(self, moderators=None):
         """Saves a forum"""
+        if moderators is not None:
+            for moderator in self.moderators:
+                self.moderators.remove(moderator)
+            db.session.commit()
+
+            for moderator in moderators:
+                if moderator:
+                    self.moderators.append(moderator)
+
         db.session.add(self)
         db.session.commit()
         return self
@@ -385,11 +456,18 @@ class Forum(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+        # Delete all entries from the ForumsRead and TopicsRead relation
+        ForumsRead.query.filter_by(forum_id=self.id).delete()
+        TopicsRead.query.filter_by(forum_id=self.id).delete()
+
         # Update the users post count
         if users:
+            users_list = []
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
+                users_list.append(user)
+            db.session.add_all(users_list)
+            db.session.commit()
 
         return self
 
@@ -429,55 +507,6 @@ class Category(db.Model):
                 db.session.commit()
 
         # and finally delete the category itself
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-topictracker = db.Table(
-    'topictracker',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('topic_id', db.Integer(), db.ForeignKey('topics.id')))
-
-
-class TopicsRead(db.Model):
-    __tablename__ = "topicsread"
-
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                        primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
-                         primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id"),
-                         primary_key=True)
-    last_read = db.Column(db.DateTime, default=datetime.utcnow())
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-class ForumsRead(db.Model):
-    __tablename__ = "forumsread"
-
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                        primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("topics.id"),
-                         primary_key=True)
-    last_read = db.Column(db.DateTime, default=datetime.utcnow())
-    cleared = db.Column(db.DateTime)
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
         db.session.delete(self)
         db.session.commit()
         return self

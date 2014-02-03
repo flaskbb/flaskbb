@@ -199,7 +199,6 @@ def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
     form = ForumForm()
-    form._id = forum.id  # Used for validation only.
 
     if form.validate_on_submit():
         forum.title = form.title.data
@@ -207,11 +206,9 @@ def edit_forum(forum_id):
         forum.position = form.position.data
         forum.locked = form.locked.data
         forum.category_id = form.category.data.id
+        forum.show_moderators = form.show_moderators.data
 
-        if form.moderators.data:
-            forum.moderators = form.moderators.data
-
-        forum.save()
+        forum.save(moderators=form.moderators.data)
 
         flash("Forum successfully edited.", "success")
         return redirect(url_for("admin.edit_forum", forum_id=forum.id))
@@ -221,10 +218,11 @@ def edit_forum(forum_id):
         form.position.data = forum.position
         form.category.data = forum.category
         form.locked.data = forum.locked
+        form.show_moderators.data = forum.show_moderators
 
         if forum.moderators:
-            mods = User.query.filter(User.id.in_(forum.moderators)).all()
-            form.moderators.data = ",".join([mod.username for mod in mods])
+            form.moderators.data = ",".join([user.username
+                                            for user in forum.moderators])
         else:
             form.moderators.data = None
 

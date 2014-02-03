@@ -75,14 +75,18 @@ class UserForm(Form):
     notes = TextAreaField("Notes", validators=[
         Optional(), Length(min=0, max=5000)])
 
-    primary_group = QuerySelectField("Primary Group",
-                                     query_factory=select_primary_group,
-                                     get_label="name")
+    primary_group = QuerySelectField(
+        "Primary Group",
+        query_factory=select_primary_group,
+        get_label="name")
 
-    secondary_groups = QuerySelectMultipleField("Secondary Groups",
-                                                query_factory=select_primary_group,  # TODO: Template rendering errors "NoneType is not callable" without this, figure out why.
-                                                allow_blank=True,
-                                                get_label="name")
+    secondary_groups = QuerySelectMultipleField(
+        "Secondary Groups",
+        # TODO: Template rendering errors "NoneType is not callable"
+        #       without this, figure out why.
+        query_factory=select_primary_group,
+        allow_blank=True,
+        get_label="name")
 
     def validate_username(self, field):
         if hasattr(self, "user"):
@@ -133,35 +137,48 @@ class GroupForm(Form):
     description = TextAreaField("Description", validators=[
         Optional()])
 
-    admin = BooleanField("Is Admin Group?",
-                         description="With this option the group has access \
-                                      to the admin panel.")
-    super_mod = BooleanField("Is Super Moderator Group?",
-                             description="Check this if the users in this \
-                                          group are allowed to moderate every \
-                                          forum")
-    mod = BooleanField("Is Moderator Group?",
-                       description="Check this if the users in this group are \
-                                    allowed to moderate specified forums")
-    banned = BooleanField("Is Banned Group?",
-                          description="Only one Banned group is allowed")
-    guest = BooleanField("Is Guest Group?",
-                         description="Only one Guest group is allowed")
-    editpost = BooleanField("Can edit posts",
-                            description="Check this if the users in this \
-                                         group can edit posts")
-    deletepost = BooleanField("Can delete posts",
-                              description="Check this is the users in this \
-                                           group can delete posts")
-    deletetopic = BooleanField("Can delete topics",
-                               description="Check this is the users in this \
-                                            group can delete topics")
-    posttopic = BooleanField("Can create topics",
-                             description="Check this is the users in this \
-                                          group can create topics")
-    postreply = BooleanField("Can post replies",
-                             description="Check this is the users in this \
-                                          group can post replies")
+    admin = BooleanField(
+        "Is Admin Group?",
+        description="With this option the group has access to the admin panel."
+    )
+    super_mod = BooleanField(
+        "Is Super Moderator Group?",
+        description="Check this if the users in this group are allowed to \
+                     moderate every forum"
+    )
+    mod = BooleanField(
+        "Is Moderator Group?",
+        description="Check this if the users in this group are allowed to \
+                     moderate specified forums"
+    )
+    banned = BooleanField(
+        "Is Banned Group?",
+        description="Only one Banned group is allowed"
+    )
+    guest = BooleanField(
+        "Is Guest Group?",
+        description="Only one Guest group is allowed"
+    )
+    editpost = BooleanField(
+        "Can edit posts",
+        description="Check this if the users in this group can edit posts"
+    )
+    deletepost = BooleanField(
+        "Can delete posts",
+        description="Check this is the users in this group can delete posts"
+    )
+    deletetopic = BooleanField(
+        "Can delete topics",
+        description="Check this is the users in this group can delete topics"
+    )
+    posttopic = BooleanField(
+        "Can create topics",
+        description="Check this is the users in this group can create topics"
+    )
+    postreply = BooleanField(
+        "Can post replies",
+        description="Check this is the users in this group can post replies"
+    )
 
     def validate_name(self, field):
         if hasattr(self, "group"):
@@ -219,8 +236,6 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(Form):
-    _moderators = set()
-
     title = TextField("Forum Title", validators=[
         Required(message="Forum title required")])
 
@@ -239,37 +254,58 @@ class ForumForm(Form):
         description="The category that contains this forum."
     )
 
-    moderators = TextField("Moderators",
-                           description="Comma seperated usernames. Leave it \
-                                        blank if you do not want to set any \
-                                        moderators.")
+    moderators = TextField(
+        "Moderators",
+        description="Comma seperated usernames. Leave it blank if you do not \
+                     want to set any moderators."
+    )
 
-    locked = BooleanField("Locked?", description="Disable new posts and topics \
-                                                  in this forum.")
+    show_moderators = BooleanField(
+        "Show Moderators",
+        description="Do you want show the moderators on the index page?"
+    )
+
+    locked = BooleanField(
+        "Locked?",
+        description="Disable new posts and topics in this forum."
+    )
+
+    def validate_show_moderators(self, field):
+        if field.data and not self.moderators.data:
+            raise ValidationError("You also need to specify some moderators.")
 
     def validate_moderators(self, field):
+        approved_moderators = list()
+
         if field.data:
-            # Check if the usernames exist
-            for moderator in field.data.split(","):
+            # convert the CSV string in a list
+            moderators = field.data.split(",")
+            # remove leading and ending spaces
+            moderators = [mod.strip() for mod in moderators]
+            for moderator in moderators:
+                # Check if the usernames exist
                 user = User.query.filter_by(username=moderator).first()
 
                 # Check if the user has the permissions to moderate a forum
                 if user:
-                    if not user.get_permissions()["mod"]:
-                        raise ValidationError("The user is not in a moderators \
-                            group")
+                    if not (user.get_permissions()["mod"] or
+                            user.get_permissions()["admin"] or
+                            user.get_permissions()["super_mod"]):
+                        raise ValidationError("%s is not in a moderators \
+                            group" % user.username)
                     else:
-                        self._moderators.add(user.id)
+                        approved_moderators.append(user)
                 else:
-                    raise ValidationError("User not found")
-            field.data = self._moderators
+                    raise ValidationError("User %s not found" % moderator)
+            field.data = approved_moderators
 
     def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
                       position=self.position.data)
 
-        if self.moderators.data and not self.is_category.data:
+        if self.moderators.data:
+            # is already validated
             forum.moderators = self.moderators.data
 
         forum.category_id = self.category.data.id
