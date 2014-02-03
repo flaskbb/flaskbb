@@ -112,7 +112,7 @@ def view_category(category_id):
                        for category, forum in forum_query]
 
     category = get_forums(forum_query)
-    return render_template("forum/category.html", category=category)
+    return render_template("forum/category.html", categories=category)
 
 
 @forum.route("/forum/<int:forum_id>")
@@ -122,6 +122,7 @@ def view_forum(forum_id):
     if current_user.is_authenticated():
         forum = Forum.query.\
             filter(Forum.id == forum_id).\
+            options(db.joinedload("category")).\
             outerjoin(ForumsRead,
                       db.and_(ForumsRead.forum_id == Forum.id,
                               ForumsRead.user_id == current_user.id)).\

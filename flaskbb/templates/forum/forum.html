@@ -1,4 +1,4 @@
-{% set page_title = forum[0].title ~ " - Forum" %}
+{% set page_title = forum[0].title %}
 {% set active_forum_nav=True %}
 
 {% extends "layout.html" %}
@@ -7,6 +7,7 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.view_category', category_id=forum[0].category.id) }}">{{ forum[0].category.title }}</a></li>
     <li class="active">{{ forum[0].title }}</li>
 </ol>
 
@@ -14,7 +15,7 @@
     {{ render_pagination(topics, url_for('forum.view_forum', forum_id=forum[0].id)) }}
 </div> <!-- end span pagination -->
 
-{% if current_user|post_topic(forum[0]) and not forum[0].is_category %}
+{% if current_user|post_topic(forum[0]) %}
 <div class="pull-right" style="padding-bottom: 10px">
     <!-- star tick pencil -->
     <div class="btn-group">
@@ -28,7 +29,6 @@
 </div>
 {% endif %}
 
-{% if not forum[0].is_category %}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -102,6 +102,5 @@
 
     </tbody>
 </table>
-{% endif %}
 
 {% endblock %}
