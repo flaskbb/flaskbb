@@ -24,13 +24,17 @@ from flaskbb.auth.views import auth
 from flaskbb.admin.views import admin
 # Import the forum blueprint
 from flaskbb.forum.views import forum
-
-from flaskbb.extensions import (db, login_manager, mail, cache, redis,
-                                debugtoolbar, migrate, themes)
+# extenesions
+from flaskbb.extensions import db, login_manager, mail, cache, redis, \
+    debugtoolbar, migrate, themes
+# various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
-    can_post_reply, can_post_topic, can_delete_topic, can_delete_post, \
-    is_online, can_edit_post, can_lock_topic, can_move_topic, render_markup, \
-    mark_online, forum_is_unread, topic_is_unread, render_template
+    is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
+    render_template
+# permission checks (here they are used for the jinja filters)
+from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
+    can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
+    can_move_topic, can_moderate
 
 
 def create_app(config=None):
