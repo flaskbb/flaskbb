@@ -91,6 +91,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     date_modified = db.Column(db.DateTime)
+    modified_by = db.Column(db.String)
 
     # Methods
     def __repr__(self):

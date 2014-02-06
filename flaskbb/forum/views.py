@@ -377,6 +377,7 @@ def edit_post(post_id):
     if form.validate_on_submit():
         form.populate_obj(post)
         post.date_modified = datetime.datetime.utcnow()
+        post.modified_by = current_user.username
         post.save()
         return redirect(url_for("forum.view_topic", topic_id=post.topic.id))
     else:

@@ -17,14 +17,21 @@
 
 {% if current_user|post_topic(forum[0]) %}
 <div class="pull-right" style="padding-bottom: 10px">
-    <!-- star tick pencil -->
     <div class="btn-group">
-        <a href="{{ url_for('forum.markread', forum_id=forum[0].id) }}" class="btn btn-default"><span class="fa fa-check"></span> Mark as Read</a>
+        <a href="{{ url_for('forum.markread', forum_id=forum[0].id) }}" class="btn btn-default">
+            <span class="fa fa-check"></span> Mark as Read
+        </a>
+
         {% if forum.locked %}
-        <span class="btn btn-primary"><span class="fa fa-lock"></span> Locked</span>
+        <span class="btn btn-primary">
+            <span class="fa fa-lock"></span> Locked
+        </span>
         {% else %}
-        <a href="{{ url_for('forum.new_topic', forum_id=forum[0].id) }}" class="btn btn-primary"><span class="fa fa-pencil"></span> New Topic</a>
+        <a href="{{ url_for('forum.new_topic', forum_id=forum[0].id) }}" class="btn btn-primary">
+            <span class="fa fa-pencil"></span> New Topic
+        </a>
         {% endif %}
+
     </div>
 </div>
 {% endif %}
