@@ -20,6 +20,7 @@
         {% block css %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/code.css') }}">
         <link rel="stylesheet" href="{{ theme_static('css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ theme_static('css/bootstrap-theme.min.css') }}">
         <link rel="stylesheet" href="{{ theme_static('css/font-awesome.min.css') }}">
         <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
         {% endblock %}
@@ -30,7 +31,7 @@
         {% block navigation %}
         {%- from "macros.html" import topnav with context -%}
         <!-- Navigation -->
-            <nav class="navbar navbar-default navbar-static-top">
+            <nav class="navbar navbar-default navbar-inverse navbar-static-top">
                 <div class="container">
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
