@@ -16,8 +16,12 @@ class DevelopmentConfig(DefaultConfig):
     DEBUG = True
 
     # SQLAlchemy connection options
+    # This will create in the applications folder (where manage.py is)
+    # a database named flaskbb.sqlite.
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
-                              DefaultConfig.PROJECT + ".sqlite"
+                              'flaskbb.sqlite'
+
+    # This will print all SQL statements
     SQLALCHEMY_ECHO = True
 
     # Security
@@ -28,17 +32,19 @@ class DevelopmentConfig(DefaultConfig):
     # Recaptcha
     # To get recaptcha, visit the link below:
     # https://www.google.com/recaptcha/admin/create
-    RECAPTCHA_ENABLED = False
+    # Those keys are only going to work on localhost!
+    RECAPTCHA_ENABLED = True
     RECAPTCHA_USE_SSL = False
-    RECAPTCHA_PUBLIC_KEY = "your_public_key"
-    RECAPTCHA_PRIVATE_KEY = "your_private_key"
+    RECAPTCHA_PUBLIC_KEY = "6LcZB-0SAAAAAGIddBuSFU9aBpHKDa16p5gSqnxK"
+    RECAPTCHA_PRIVATE_KEY = "6LcZB-0SAAAAAPuPHhazscMJYa2mBe7MJSoWXrUu"
     RECAPTCHA_OPTIONS = {"theme": "white"}
 
     # Mail
+    # Google Mail example
     MAIL_SERVER = "smtp.googlemail.com"
     MAIL_PORT = 465
     MAIL_USE_SSL = True
     MAIL_USERNAME = "flaskbb@gmail.com"
     MAIL_PASSWORD = "your_password"
-    MAIL_DEFAULT_SENDER = "flaskbb.com"
+    MAIL_DEFAULT_SENDER = "flaskbb@gmail.com"
     ADMINS = ["flaskbb@gmail.com"]

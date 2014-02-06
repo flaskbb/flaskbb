@@ -20,7 +20,6 @@ class DefaultConfig(object):
     _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
                             os.path.dirname(__file__)))))
 
-    PROJECT = "flaskbb"
     DEBUG = False
     TESTING = False
 
@@ -36,7 +35,7 @@ class DefaultConfig(object):
 
     # Default Database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
-                              PROJECT + ".sqlite"
+                              'flaskbb.sqlite'
     # sqlite for testing/debug.
     SQLALCHEMY_ECHO = False
 
@@ -100,10 +99,14 @@ class DefaultConfig(object):
     # 0 - Disable it
     TRACKER_LENGTH = 7
 
-    FORUM_URL_PREFIX = "/forum"
+    FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
 
     # Default style
     DEFAULT_THEME = "bootstrap3"
+
+    # Your project name with a subtitle
+    PROJECT_TITLE = "FlaskBB"
+    PROJECT_SUBTITLE = "A lightweight forum software in flask"

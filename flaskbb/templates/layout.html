@@ -2,7 +2,15 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}{% if not page_title %}FlaskBB{% else %}{{ page_title }} - FlaskBB{% endif %}{% endblock %}</title>
+        <title>
+        {% block title %}
+            {%- if not page_title -%}
+                {{ config["PROJECT_TITLE"] }} - {{ config["PROJECT_SUBTITLE"] }}
+            {%- else -%}
+                {{ page_title }} - {{ config["PROJECT_TITLE"] }}
+            {%- endif -%}
+        {% endblock %}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="FlaskBB is a forum software written in Flask">
         <meta name="author" content="FlaskBB Team">
