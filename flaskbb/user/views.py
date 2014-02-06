@@ -56,7 +56,7 @@ def view_all_posts(username):
     return render_template("user/all_posts.html", user=user, posts=posts)
 
 
-@user.route("/settings/general")
+@user.route("/settings/general", methods=["POST", "GET"])
 @login_required
 def settings():
     form = GeneralSettingsForm()
