@@ -17,18 +17,16 @@ using the micro framework Flask.
 
 ## TODO
 
-* **High Priority**:
-    * Searching for members, posts,...
-    * Move the topic in another forum
-    * Fixing all bugs I encounter during development
-* **Medium Priority**:
-    * Database migrations
-    * A own theme and make FlaskBB themable with Flask-Themes2
-    * Localization (Babel)
-    * Polls - I definitely want this! :)
-* **Low Priority**:
-    * Learn how to create a Plugin API so other developers can create plugins for FlaskBB
-    * Figure out how to integrate it in another app
+* Searching for members, posts,...
+* "Link to"-Forum type
+* Move a topic in a other forum
+* Merging 2 topics together
+* Reporting posts
+* Userstyles (e.q.: colored username)
+* ~~Database migrations~~
+* A own theme ~~and make FlaskBB themable with Flask-Themes2~~
+* Localization (Babel)
+* Polls
 
 
 ## DEPENDENCIES
@@ -43,6 +41,9 @@ using the micro framework Flask.
 * [Flask-Login](http://flask-login.readthedocs.org/en/latest/)
 * [Flask-Mail](http://pythonhosted.org/flask-mail/)
 * [Flask-Script](http://flask-script.readthedocs.org/en/latest/)
+* [Flask-Themes2](http://flask-themes2.rtfd.org/)
+* [Flask-Migrate](http://flask-migrate.readthedocs.org/en/latest/)
+
 
 ### OPTIONAL DEPENDENCIES
 * [Pygmens](http://pygments.org/) - For code highlighting
