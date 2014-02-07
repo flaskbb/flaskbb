@@ -21,7 +21,7 @@ using the micro framework Flask.
 * ~~"Link to"-Forum type~~
 * ~~Move a topic in a other forum~~
 * Merging 2 topics together
-* Reporting posts
+* ~~Reporting posts~~
 * Userstyles (e.q.: colored username)
 * ~~Database migrations~~
 * A own theme ~~and make FlaskBB themable with Flask-Themes2~~

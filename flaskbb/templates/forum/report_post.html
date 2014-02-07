@@ -1,0 +1,16 @@
+{% set page_title = "Report Post" %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+{% from theme("macros.html") import render_field %}
+
+<form class="form" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <h3>Report Post</h3>
+
+    {{ render_field(form.reason) }}
+
+    <button type="submit" class="btn btn-success">Report</button>
+    <a class="btn btn-info" href="#" onclick="window.close();return false;">Close</a>
+</form>
+{% endblock %}

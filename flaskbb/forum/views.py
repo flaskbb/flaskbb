@@ -24,7 +24,8 @@ from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_move_topic)
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
-from flaskbb.forum.forms import QuickreplyForm, ReplyForm, NewTopicForm
+from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
+                                 ReportForm)
 from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
@@ -364,6 +365,19 @@ def delete_post(post_id):
         return redirect(url_for('forum.view_forum',
                                 forum_id=post.topic.forum_id))
     return redirect(url_for('forum.view_topic', topic_id=topic_id))
+
+
+@forum.route("/post/<int:post_id>/report", methods=["GET", "POST"])
+@login_required
+def report_post(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+
+    form = ReportForm()
+    if form.validate_on_submit():
+        form.save(current_user, post)
+        flash("Thanks for reporting!", "success")
+
+    return render_template("forum/report_post.html", form=form)
 
 
 @forum.route("/markread")

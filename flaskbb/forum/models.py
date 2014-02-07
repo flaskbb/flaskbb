@@ -83,6 +83,53 @@ class ForumsRead(db.Model):
         return self
 
 
+class Report(db.Model):
+    __tablename__ = "reports"
+
+    id = db.Column(db.Integer, primary_key=True)
+    reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                            nullable=False)
+    reported = db.Column(db.DateTime, default=datetime.utcnow())
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+    zapped = db.Column(db.DateTime)
+    zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
+    reason = db.Column(db.String)
+
+    post = db.relationship("Post", backref="report", lazy="joined")
+    reporter = db.relationship("User", lazy="joined",
+                               foreign_keys=[reporter_id])
+    zapper = db.relationship("User", lazy="joined", foreign_keys=[zapped_by])
+
+    def save(self, post=None, user=None):
+        """Saves a report.
+
+        :param post: The post that should be reported
+
+        :param user: The user who has reported the post
+
+        :param reason: The reason why the user has reported the post
+        """
+
+        if self.id:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        if post and user:
+            self.reporter_id = user.id
+            self.reported = datetime.utcnow()
+            self.post_id = post.id
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+
 class Post(db.Model):
     __tablename__ = "posts"
 

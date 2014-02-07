@@ -152,6 +152,9 @@
                 </span>
 
                 <span class="pull-right">
+                    <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">
+                        Report
+                    </a> |
                     {% if current_user|edit_post(post.user_id, topic.forum) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
