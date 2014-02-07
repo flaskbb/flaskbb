@@ -18,7 +18,7 @@ using the micro framework Flask.
 ## TODO
 
 * Searching for members, posts,...
-* "Link to"-Forum type
+* ~~"Link to"-Forum type~~
 * ~~Move a topic in a other forum~~
 * Merging 2 topics together
 * Reporting posts

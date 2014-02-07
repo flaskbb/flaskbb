@@ -445,6 +445,7 @@ class Forum(db.Model):
     position = db.Column(db.Integer, default=1, nullable=False)
     locked = db.Column(db.Boolean, default=False, nullable=False)
     show_moderators = db.Column(db.Boolean, default=False, nullable=False)
+    external = db.Column(db.String)
 
     post_count = db.Column(db.Integer, default=0, nullable=False)
     topic_count = db.Column(db.Integer, default=0, nullable=False)

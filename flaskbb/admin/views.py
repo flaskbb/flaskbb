@@ -20,7 +20,8 @@ from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
-                                 EditGroupForm, ForumForm, CategoryForm)
+                                 EditGroupForm, EditForumForm, AddForumForm,
+                                 CategoryForm)
 
 
 admin = Blueprint("admin", __name__)
@@ -199,16 +200,9 @@ def add_group():
 def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
-    form = ForumForm()
-
+    form = EditForumForm(forum)
     if form.validate_on_submit():
-        forum.title = form.title.data
-        forum.description = form.description.data
-        forum.position = form.position.data
-        forum.locked = form.locked.data
-        forum.category_id = form.category.data.id
-        forum.show_moderators = form.show_moderators.data
-
+        form.populate_obj(forum)
         forum.save(moderators=form.moderators.data)
 
         flash("Forum successfully edited.", "success")
@@ -218,6 +212,7 @@ def edit_forum(forum_id):
         form.description.data = forum.description
         form.position.data = forum.position
         form.category.data = forum.category
+        form.external.data = forum.external
         form.locked.data = forum.locked
         form.show_moderators.data = forum.show_moderators
 
@@ -249,7 +244,7 @@ def delete_forum(forum_id):
 @admin.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
 @admin_required
 def add_forum(category_id=None):
-    form = ForumForm()
+    form = AddForumForm()
 
     if form.validate_on_submit():
         form.save()
