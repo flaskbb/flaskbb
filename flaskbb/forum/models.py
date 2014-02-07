@@ -18,16 +18,20 @@ from flaskbb.utils.query import TopicQuery
 
 moderators = db.Table(
     'moderators',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+              nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id")))
+              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+              nullable=False))
 
 
 topictracker = db.Table(
     'topictracker',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+              nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id', use_alter=True, name="fk_topic_id")))
+              db.ForeignKey('topics.id', use_alter=True, name="fk_topic_id"),
+              nullable=False))
 
 
 class TopicsRead(db.Model):
@@ -83,10 +87,13 @@ class Post(db.Model):
     __tablename__ = "posts"
 
     id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id", use_alter=True,
-                                                   name="fk_topic_id",
-                                                   ondelete="CASCADE"))
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    topic_id = db.Column(db.Integer,
+                         db.ForeignKey("topics.id",
+                                       use_alter=True,
+                                       name="fk_topic_id",
+                                       ondelete="CASCADE"),
+                         nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     username = db.Column(db.String, nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
@@ -176,9 +183,12 @@ class Topic(db.Model):
     query_class = TopicQuery
 
     id = db.Column(db.Integer, primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id", use_alter=True,
-                                                   name="fk_forum_id"))
-    title = db.Column(db.String)
+    forum_id = db.Column(db.Integer,
+                         db.ForeignKey("forums.id",
+                                       use_alter=True,
+                                       name="fk_forum_id"),
+                         nullable=False)
+    title = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     username = db.Column(db.String, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
@@ -400,15 +410,16 @@ class Forum(db.Model):
     __tablename__ = "forums"
 
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
-    title = db.Column(db.String)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
+                            nullable=False)
+    title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
-    position = db.Column(db.Integer, default=1)
-    locked = db.Column(db.Boolean, default=False)
-    show_moderators = db.Column(db.Boolean, default=False)
+    position = db.Column(db.Integer, default=1, nullable=False)
+    locked = db.Column(db.Boolean, default=False, nullable=False)
+    show_moderators = db.Column(db.Boolean, default=False, nullable=False)
 
-    post_count = db.Column(db.Integer, default=0)
-    topic_count = db.Column(db.Integer, default=0)
+    post_count = db.Column(db.Integer, default=0, nullable=False)
+    topic_count = db.Column(db.Integer, default=0, nullable=False)
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
@@ -477,9 +488,9 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
+    title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
-    position = db.Column(db.Integer, default=0)
+    position = db.Column(db.Integer, default=1, nullable=False)
 
     # One-to-many
     forums = db.relationship("Forum", backref="category", lazy="dynamic",
