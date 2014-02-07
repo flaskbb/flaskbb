@@ -233,6 +233,34 @@ class Topic(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    def move(self, forum):
+        """Moves a topic to the given forum.
+        Returns True if it could successfully move the topic to forum.
+
+        :param forum: The new forum for the topic
+        """
+
+        # if the target forum is the current forum, abort
+        if self.forum_id == forum.id:
+            return False
+
+        old_forum = self.forum
+        self.forum.post_count -= self.post_count
+        self.forum.topic_count -= 1
+        self.forum_id = forum.id
+
+        forum.post_count += self.post_count
+        forum.topic_count += 1
+
+        db.session.commit()
+
+        forum.update_last_post()
+        old_forum.update_last_post()
+
+        TopicsRead.query.filter_by(topic_id=self.id).delete()
+
+        return True
+
     def save(self, user=None, forum=None, post=None):
         """Saves a topic and returns the topic object. If no parameters are
         given, it will only update the topic.
@@ -442,6 +470,29 @@ class Forum(db.Model):
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    def update_last_post(self):
+        """Updates the last post. This is useful if you move a topic
+        in another forum
+        """
+        last_post = Post.query.\
+            filter(Post.topic_id == Topic.id,
+                   Topic.forum_id == self.id).\
+            order_by(Post.date_created.desc()).\
+            first()
+
+        # Last post is none when there are no topics in the forum
+        if last_post is not None:
+
+            # a new last post was found in the forum
+            if not last_post.id == self.last_post_id:
+                self.last_post_id = last_post.id
+
+        # No post found..
+        else:
+            self.last_post_id = 0
+
+        db.session.commit()
 
     def save(self, moderators=None):
         """Saves a forum"""

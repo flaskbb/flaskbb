@@ -150,55 +150,6 @@ def view_forum(forum_id):
     return render_template("forum/forum.html", forum=forum, topics=topics)
 
 
-@forum.route("/markread")
-@forum.route("/<int:forum_id>/markread")
-def markread(forum_id=None):
-
-    if not current_user.is_authenticated():
-        flash("You need to be logged in for that feature.", "danger")
-        return redirect(url_for("forum.index"))
-
-    # Mark a single forum as read
-    if forum_id:
-        forum = Forum.query.filter_by(id=forum_id).first_or_404()
-        forumsread = ForumsRead.query.filter_by(user_id=current_user.id,
-                                                forum_id=forum.id).first()
-        TopicsRead.query.filter_by(user_id=current_user.id,
-                                   forum_id=forum.id).delete()
-
-        if not forumsread:
-            forumsread = ForumsRead()
-            forumsread.user_id = current_user.id
-            forumsread.forum_id = forum.id
-
-        forumsread.last_read = datetime.datetime.utcnow()
-        forumsread.cleared = datetime.datetime.utcnow()
-
-        db.session.add(forumsread)
-        db.session.commit()
-
-        return redirect(url_for("forum.view_forum", forum_id=forum.id))
-
-    # Mark all forums as read
-    ForumsRead.query.filter_by(user_id=current_user.id).delete()
-    TopicsRead.query.filter_by(user_id=current_user.id).delete()
-
-    forums = Forum.query.all()
-    forumsread_list = []
-    for forum in forums:
-        forumsread = ForumsRead()
-        forumsread.user_id = current_user.id
-        forumsread.forum_id = forum.id
-        forumsread.last_read = datetime.datetime.utcnow()
-        forumsread.cleared = datetime.datetime.utcnow()
-        forumsread_list.append(forumsread)
-
-    db.session.add_all(forumsread_list)
-    db.session.commit()
-
-    return redirect(url_for("forum.index"))
-
-
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
 def view_topic(topic_id):
     page = request.args.get('page', 1, type=int)
@@ -320,10 +271,18 @@ def unlock_topic(topic_id):
     return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
 
-@forum.route("/topic/<int:topic_id>/move")
+@forum.route("/topic/<int:topic_id>/move/<int:forum_id>")
 @login_required
-def move_topic(topic_id):
-    pass
+def move_topic(topic_id, forum_id):
+    forum = Forum.query.filter_by(id=forum_id).first_or_404()
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
+    if not topic.move(forum):
+        flash("Could not move the topic to forum %s" % forum.title, "danger")
+        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+    flash("Topic was moved to forum %s" % forum.title, "success")
+    return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
@@ -405,6 +364,55 @@ def delete_post(post_id):
         return redirect(url_for('forum.view_forum',
                                 forum_id=post.topic.forum_id))
     return redirect(url_for('forum.view_topic', topic_id=topic_id))
+
+
+@forum.route("/markread")
+@forum.route("/<int:forum_id>/markread")
+def markread(forum_id=None):
+
+    if not current_user.is_authenticated():
+        flash("You need to be logged in for that feature.", "danger")
+        return redirect(url_for("forum.index"))
+
+    # Mark a single forum as read
+    if forum_id:
+        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+        forumsread = ForumsRead.query.filter_by(user_id=current_user.id,
+                                                forum_id=forum.id).first()
+        TopicsRead.query.filter_by(user_id=current_user.id,
+                                   forum_id=forum.id).delete()
+
+        if not forumsread:
+            forumsread = ForumsRead()
+            forumsread.user_id = current_user.id
+            forumsread.forum_id = forum.id
+
+        forumsread.last_read = datetime.datetime.utcnow()
+        forumsread.cleared = datetime.datetime.utcnow()
+
+        db.session.add(forumsread)
+        db.session.commit()
+
+        return redirect(url_for("forum.view_forum", forum_id=forum.id))
+
+    # Mark all forums as read
+    ForumsRead.query.filter_by(user_id=current_user.id).delete()
+    TopicsRead.query.filter_by(user_id=current_user.id).delete()
+
+    forums = Forum.query.all()
+    forumsread_list = []
+    for forum in forums:
+        forumsread = ForumsRead()
+        forumsread.user_id = current_user.id
+        forumsread.forum_id = forum.id
+        forumsread.last_read = datetime.datetime.utcnow()
+        forumsread.cleared = datetime.datetime.utcnow()
+        forumsread_list.append(forumsread)
+
+    db.session.add_all(forumsread_list)
+    db.session.commit()
+
+    return redirect(url_for("forum.index"))
 
 
 @forum.route("/who_is_online")

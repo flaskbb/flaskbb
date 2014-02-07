@@ -19,7 +19,7 @@ using the micro framework Flask.
 
 * Searching for members, posts,...
 * "Link to"-Forum type
-* Move a topic in a other forum
+* ~~Move a topic in a other forum~~
 * Merging 2 topics together
 * Reporting posts
 * Userstyles (e.q.: colored username)
