@@ -72,11 +72,26 @@ using the micro framework Flask.
 * Configuration (_adjust them accordingly to your needs_)
     * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
     * For production copy `flaskbb/configs/production.py.example` to `flaskbb/configs/production.py`
-* Create the database with some example content
-    * `python manage.py createall`
+* Database creation
+    * **Development:** Create the database with some example content
+        * `python manage.py createall`
+    * **Production:** Create the database and the admin user
+        * `python manage.py initflaskbb`
 * Run the development server
     * `python manage.py runserver`
 * Visit [localhost:8080](http://localhost:8080)
+
+
+## Upgrading
+
+* Upgrading from a previous installation
+    * Pull the latest changes from the repository
+    * `git pull`
+* See if the example config has changed and adjust the settings to your needs
+    * `diff flaskbb/configs/production.py flaskbb/configs/production.py.example`
+    * `$EDITOR flaskbb/configs/production.py`
+* Upgrade the database to the latest revision
+    * `python manage.py db upgrade head`
 
 
 ## LICENSE
