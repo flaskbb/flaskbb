@@ -46,6 +46,7 @@ using the micro framework Flask.
 
 
 ### OPTIONAL DEPENDENCIES
+
 * [Pygmens](http://pygments.org/) - For code highlighting
 * [Redis](http://redis.io/) - For counting the online guests
 
@@ -55,22 +56,19 @@ using the micro framework Flask.
 * Create a virtualenv
     * Install virtualenvwrapper with your package manager or via
         * `sudo pip install virtualenvwrapper`
-
     * Add these lines to your `.bashrc`
-
             export WORKON_HOME=$HOME/.virtualenvs  # Location for your virtualenvs
             source /usr/local/bin/virtualenvwrapper.sh
-
     * Create a new virtualenv
         * `mkvirtualenv -a /path/to/flaskbb -p $(which python2) flaskbb`
-
     * and finally activate it
         * `workon flaskbb`
-
     * For more options visit the documentation [here](http://virtualenvwrapper.readthedocs.org/en/latest/index.html).
+
 
 * Install the dependencies
     * `pip install -r requirements.txt`
+    * **NOTE**: If you are using pip 1.5 you need to add these parameters: ``--allow-external postmarkup --allow-unverified postmarkup``
 * Configuration (_adjust them accordingly to your needs_)
     * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
     * For production copy `flaskbb/configs/production.py.example` to `flaskbb/configs/production.py`
