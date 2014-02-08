@@ -57,8 +57,10 @@ using the micro framework Flask.
     * Install virtualenvwrapper with your package manager or via
         * `sudo pip install virtualenvwrapper`
     * Add these lines to your `.bashrc`
+
             export WORKON_HOME=$HOME/.virtualenvs  # Location for your virtualenvs
             source /usr/local/bin/virtualenvwrapper.sh
+
     * Create a new virtualenv
         * `mkvirtualenv -a /path/to/flaskbb -p $(which python2) flaskbb`
     * and finally activate it
