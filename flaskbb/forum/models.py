@@ -30,7 +30,8 @@ topictracker = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
               nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id', use_alter=True, name="fk_topic_id"),
+              db.ForeignKey('topics.id',
+                            use_alter=True, name="fk_tracker_topic_id"),
               nullable=False))
 
 
@@ -41,7 +42,7 @@ class TopicsRead(db.Model):
                         primary_key=True)
     topic_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_topic_id"),
+                                       name="fk_tr_topic_id"),
                          primary_key=True)
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
@@ -67,7 +68,7 @@ class ForumsRead(db.Model):
                         primary_key=True)
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_forum_id"),
+                                       name="fk_fr_forum_id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
     cleared = db.Column(db.DateTime)
@@ -93,7 +94,7 @@ class Report(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     zapped = db.Column(db.DateTime)
     zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
-    reason = db.Column(db.String)
+    reason = db.Column(db.String(63))
 
     post = db.relationship("Post", backref="report", lazy="joined")
     reporter = db.relationship("User", lazy="joined",
@@ -137,15 +138,15 @@ class Post(db.Model):
     topic_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id",
                                        use_alter=True,
-                                       name="fk_topic_id",
+                                       name="fk_post_topic_id",
                                        ondelete="CASCADE"),
                          nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    username = db.Column(db.String, nullable=False)
+    username = db.Column(db.String(15), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     date_modified = db.Column(db.DateTime)
-    modified_by = db.Column(db.String)
+    modified_by = db.Column(db.String(15))
 
     # Methods
     def __repr__(self):
@@ -233,11 +234,11 @@ class Topic(db.Model):
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id",
                                        use_alter=True,
-                                       name="fk_forum_id"),
+                                       name="fk_topic_forum_id"),
                          nullable=False)
-    title = db.Column(db.String, nullable=False)
+    title = db.Column(db.String(63), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    username = db.Column(db.String, nullable=False)
+    username = db.Column(db.String(15), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     last_updated = db.Column(db.DateTime, default=datetime.utcnow())
     locked = db.Column(db.Boolean, default=False)
@@ -456,7 +457,7 @@ class Topic(db.Model):
                               TopicsRead.last_read < Topic.last_updated)).\
                 count()
 
-            #No unread topics available - trying to mark the forum as read
+            # No unread topics available - trying to mark the forum as read
             if unread_count == 0:
                 forumread = ForumsRead.query.\
                     filter(ForumsRead.user_id == user.id,
@@ -487,12 +488,12 @@ class Forum(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
                             nullable=False)
-    title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String)
+    title = db.Column(db.String(15), nullable=False)
+    description = db.Column(db.String(255))
     position = db.Column(db.Integer, default=1, nullable=False)
     locked = db.Column(db.Boolean, default=False, nullable=False)
     show_moderators = db.Column(db.Boolean, default=False, nullable=False)
-    external = db.Column(db.String)
+    external = db.Column(db.String(63))
 
     post_count = db.Column(db.Integer, default=0, nullable=False)
     topic_count = db.Column(db.Integer, default=0, nullable=False)
@@ -587,8 +588,8 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String)
+    title = db.Column(db.String(63), nullable=False)
+    description = db.Column(db.String(255))
     position = db.Column(db.Integer, default=1, nullable=False)
 
     # One-to-many
