@@ -72,6 +72,7 @@ class DefaultConfig(object):
     MAIL_USERNAME = "noreply@example.org"
     MAIL_PASSWORD = ""
     MAIL_DEFAULT_SENDER = ("Default Sender", "noreply@example.org")
+    # Where to logger should send the emails to
     ADMINS = ["admin@example.org"]
 
     ## App specific configs
