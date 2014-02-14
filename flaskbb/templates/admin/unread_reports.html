@@ -1,0 +1,43 @@
+{% extends theme("admin/admin_layout.html") %}
+{% block admin_content %}
+{% from theme('macros.html') import render_pagination %}
+
+<legend>Manage Reports | <a href="{{ url_for('admin.reports') }}">All Reports</a></legend>
+
+<div class="pull-left" style="padding-bottom: 10px">
+    {{ render_pagination(reports, url_for('admin.unread_reports')) }}
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Poster</th>
+            <th>Topic</th>
+            <th>Reporter</th>
+            <th>Reason</th>
+            <th>Reported</th>
+            <th><a href="{{ url_for('admin.report_markread') }}">Mark all as Read</a></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports.items %}
+        <tr>
+            <td>{{ report.id }}</td>
+            <td>{{ report.post.user.username }}</td>
+            <td>{{ report.post.topic.title }}</td>
+            <td>{{ report.reporter.username }}</td>
+            <td>{{ report.reason }}</td>
+            <td>{{ report.reported|time_since }}</td>
+            <td>
+                <a href="{{ url_for('admin.report_markread', report_id=report.id) }}">Mark as Read</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7">No unread reports.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

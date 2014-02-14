@@ -12,7 +12,7 @@ from flask.ext.wtf import Form
 from wtforms import TextAreaField, TextField
 from wtforms.validators import Required
 
-from flaskbb.forum.models import Topic, Post
+from flaskbb.forum.models import Topic, Post, Report
 
 
 class QuickreplyForm(Form):
@@ -43,3 +43,14 @@ class NewTopicForm(ReplyForm):
         topic = Topic(title=self.title.data)
         post = Post(content=self.content.data)
         return topic.save(user=user, forum=forum, post=post)
+
+
+class ReportForm(Form):
+    reason = TextAreaField("Reason", validators=[
+        Required(message="Please insert a reason why you want to report this \
+                          post")
+    ])
+
+    def save(self, user, post):
+        report = Report(**self.data)
+        return report.save(user, post)

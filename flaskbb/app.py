@@ -223,7 +223,7 @@ def configure_logging(app):
     if app.config["SEND_LOGS"]:
         mail_handler = \
             SMTPHandler(app.config['MAIL_SERVER'],
-                        app.config['DEFAULT_MAIL_SENDER'],
+                        app.config['MAIL_DEFAULT_SENDER'],
                         app.config['ADMINS'],
                         'application error, no admins specified',
                         (

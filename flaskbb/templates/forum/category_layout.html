@@ -19,7 +19,29 @@
         <tr>
             <td align="center" valign="center" width="4%">
 
-            {% if forum[0]|forum_is_unread(forum[1], current_user) %}
+            {% if forum[0].external %}
+                <span class="fa fa-external-link" style="font-size: 2em"></span>
+            </td>
+
+            <td valign="top">
+                <strong><a href="{{ forum[0].external }}">{{ forum[0].title }}</a></strong>
+
+                <div class="forum-description">
+                    {% autoescape false %}
+                    {{ forum[0].description|markup }}
+                    {% endautoescape %}
+                </div>
+            </td>
+
+            <td valign="top" align="center" style="white-space: nowrap">-</td>
+            <td valign="top" align="center" style="white-space: nowrap">-</td>
+            <td valign="top" align="right" style="white-space: nowrap">-</td>
+            <!-- End external -->
+            {% else %}
+
+            {% if forum[0].locked %}
+                <span class="fa fa-lock" style="font-size: 2em"></span>
+            {% elif forum[0]|forum_is_unread(forum[1], current_user) %}
                 <span class="fa fa-comments" style="font-size: 2em"></span>
             {% else %}
                 <span class="fa fa-comments-o" style="font-size: 2em"></span>
@@ -65,6 +87,7 @@
                 {% else %}
                 No posts
                 {% endif %}
+            {% endif %}
             </td>
         </tr>
         {% endfor %}

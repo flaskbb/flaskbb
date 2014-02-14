@@ -9,18 +9,21 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
+from flask.ext.login import current_user
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
-from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
-                                 EditGroupForm, ForumForm, CategoryForm)
+                                 EditGroupForm, EditForumForm, AddForumForm,
+                                 CategoryForm)
 
 
 admin = Blueprint("admin", __name__)
@@ -71,6 +74,62 @@ def forums():
     return render_template("admin/forums.html", categories=categories)
 
 
+@admin.route("/reports")
+@admin_required
+def reports():
+    page = request.args.get("page", 1, type=int)
+    reports = Report.query.\
+        order_by(Report.id.asc()).\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+
+    return render_template("admin/reports.html", reports=reports)
+
+
+@admin.route("/reports/unread")
+@admin_required
+def unread_reports():
+    page = request.args.get("page", 1, type=int)
+    reports = Report.query.\
+        filter(Report.zapped == None).\
+        order_by(Report.id.desc()).\
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+
+    return render_template("admin/unread_reports.html", reports=reports)
+
+
+@admin.route("/reports/<int:report_id>/markread")
+@admin.route("/reports/markread")
+@admin_required
+def report_markread(report_id=None):
+    # mark single report as read
+    if report_id:
+
+        report = Report.query.filter_by(id=report_id).first_or_404()
+        if report.zapped:
+            flash("Report %s is already marked as read" % report.id, "success")
+            return redirect(url_for("admin.reports"))
+
+        report.zapped_by = current_user.id
+        report.zapped = datetime.utcnow()
+        report.save()
+        flash("Report %s marked as read" % report.id, "success")
+        return redirect(url_for("admin.reports"))
+
+    # mark all as read
+    reports = Report.query.filter(Report.zapped == None).all()
+    report_list = []
+    for report in reports:
+        report.zapped_by = current_user.id
+        report.zapped = datetime.utcnow()
+        report_list.append(report)
+
+    db.session.add_all(report_list)
+    db.session.commit()
+
+    flash("All reports were marked as read", "success")
+    return redirect(url_for("admin.reports"))
+
+
 @admin.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_user(user_id):
@@ -84,15 +143,7 @@ def edit_user(user_id):
     form = EditUserForm(user)
     form.secondary_groups.query = secondary_group_query
     if form.validate_on_submit():
-        user.username = form.username.data
-        user.email = form.email.data
-        user.birthday = form.birthday.data
-        user.gender = form.gender.data
-        user.website = form.website.data
-        user.location = form.location.data
-        user.signature = form.signature.data
-        user.avatar = form.avatar.data
-        user.notes = form.notes.data
+        form.populate_obj(user)
         user.primary_group_id = form.primary_group.data.id
 
        # Don't override the password
@@ -199,16 +250,9 @@ def add_group():
 def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
-    form = ForumForm()
-
+    form = EditForumForm(forum)
     if form.validate_on_submit():
-        forum.title = form.title.data
-        forum.description = form.description.data
-        forum.position = form.position.data
-        forum.locked = form.locked.data
-        forum.category_id = form.category.data.id
-        forum.show_moderators = form.show_moderators.data
-
+        form.populate_obj(forum)
         forum.save(moderators=form.moderators.data)
 
         flash("Forum successfully edited.", "success")
@@ -218,6 +262,7 @@ def edit_forum(forum_id):
         form.description.data = forum.description
         form.position.data = forum.position
         form.category.data = forum.category
+        form.external.data = forum.external
         form.locked.data = forum.locked
         form.show_moderators.data = forum.show_moderators
 
@@ -249,7 +294,7 @@ def delete_forum(forum_id):
 @admin.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
 @admin_required
 def add_forum(category_id=None):
-    form = ForumForm()
+    form = AddForumForm()
 
     if form.validate_on_submit():
         form.save()
@@ -265,6 +310,7 @@ def add_forum(category_id=None):
 
 
 @admin.route("/category/add", methods=["GET", "POST"])
+@admin_required
 def add_category():
     form = CategoryForm()
 
@@ -278,6 +324,7 @@ def add_category():
 
 
 @admin.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
+@admin_required
 def edit_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
@@ -296,6 +343,7 @@ def edit_category(category_id):
 
 
 @admin.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
+@admin_required
 def delete_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 

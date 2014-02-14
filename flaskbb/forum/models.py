@@ -18,16 +18,21 @@ from flaskbb.utils.query import TopicQuery
 
 moderators = db.Table(
     'moderators',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+              nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id")))
+              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+              nullable=False))
 
 
 topictracker = db.Table(
     'topictracker',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+              nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id', use_alter=True, name="fk_topic_id")))
+              db.ForeignKey('topics.id',
+                            use_alter=True, name="fk_tracker_topic_id"),
+              nullable=False))
 
 
 class TopicsRead(db.Model):
@@ -37,7 +42,7 @@ class TopicsRead(db.Model):
                         primary_key=True)
     topic_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_topic_id"),
+                                       name="fk_tr_topic_id"),
                          primary_key=True)
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
@@ -63,7 +68,7 @@ class ForumsRead(db.Model):
                         primary_key=True)
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_forum_id"),
+                                       name="fk_fr_forum_id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
     cleared = db.Column(db.DateTime)
@@ -79,19 +84,69 @@ class ForumsRead(db.Model):
         return self
 
 
+class Report(db.Model):
+    __tablename__ = "reports"
+
+    id = db.Column(db.Integer, primary_key=True)
+    reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                            nullable=False)
+    reported = db.Column(db.DateTime, default=datetime.utcnow())
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
+    zapped = db.Column(db.DateTime)
+    zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
+    reason = db.Column(db.String(63))
+
+    post = db.relationship("Post", backref="report", lazy="joined")
+    reporter = db.relationship("User", lazy="joined",
+                               foreign_keys=[reporter_id])
+    zapper = db.relationship("User", lazy="joined", foreign_keys=[zapped_by])
+
+    def save(self, post=None, user=None):
+        """Saves a report.
+
+        :param post: The post that should be reported
+
+        :param user: The user who has reported the post
+
+        :param reason: The reason why the user has reported the post
+        """
+
+        if self.id:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        if post and user:
+            self.reporter_id = user.id
+            self.reported = datetime.utcnow()
+            self.post_id = post.id
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+
 class Post(db.Model):
     __tablename__ = "posts"
 
     id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey("topics.id", use_alter=True,
-                                                   name="fk_topic_id",
-                                                   ondelete="CASCADE"))
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    username = db.Column(db.String, nullable=False)
+    topic_id = db.Column(db.Integer,
+                         db.ForeignKey("topics.id",
+                                       use_alter=True,
+                                       name="fk_post_topic_id",
+                                       ondelete="CASCADE"),
+                         nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    username = db.Column(db.String(15), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     date_modified = db.Column(db.DateTime)
-    modified_by = db.Column(db.String)
+    modified_by = db.Column(db.String(15))
 
     # Methods
     def __repr__(self):
@@ -176,11 +231,14 @@ class Topic(db.Model):
     query_class = TopicQuery
 
     id = db.Column(db.Integer, primary_key=True)
-    forum_id = db.Column(db.Integer, db.ForeignKey("forums.id", use_alter=True,
-                                                   name="fk_forum_id"))
-    title = db.Column(db.String)
+    forum_id = db.Column(db.Integer,
+                         db.ForeignKey("forums.id",
+                                       use_alter=True,
+                                       name="fk_topic_forum_id"),
+                         nullable=False)
+    title = db.Column(db.String(63), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    username = db.Column(db.String, nullable=False)
+    username = db.Column(db.String(15), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     last_updated = db.Column(db.DateTime, default=datetime.utcnow())
     locked = db.Column(db.Boolean, default=False)
@@ -222,6 +280,34 @@ class Topic(db.Model):
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    def move(self, forum):
+        """Moves a topic to the given forum.
+        Returns True if it could successfully move the topic to forum.
+
+        :param forum: The new forum for the topic
+        """
+
+        # if the target forum is the current forum, abort
+        if self.forum_id == forum.id:
+            return False
+
+        old_forum = self.forum
+        self.forum.post_count -= self.post_count
+        self.forum.topic_count -= 1
+        self.forum_id = forum.id
+
+        forum.post_count += self.post_count
+        forum.topic_count += 1
+
+        db.session.commit()
+
+        forum.update_last_post()
+        old_forum.update_last_post()
+
+        TopicsRead.query.filter_by(topic_id=self.id).delete()
+
+        return True
 
     def save(self, user=None, forum=None, post=None):
         """Saves a topic and returns the topic object. If no parameters are
@@ -371,7 +457,7 @@ class Topic(db.Model):
                               TopicsRead.last_read < Topic.last_updated)).\
                 count()
 
-            #No unread topics available - trying to mark the forum as read
+            # No unread topics available - trying to mark the forum as read
             if unread_count == 0:
                 forumread = ForumsRead.query.\
                     filter(ForumsRead.user_id == user.id,
@@ -400,15 +486,17 @@ class Forum(db.Model):
     __tablename__ = "forums"
 
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
-    title = db.Column(db.String)
-    description = db.Column(db.String)
-    position = db.Column(db.Integer, default=1)
-    locked = db.Column(db.Boolean, default=False)
-    show_moderators = db.Column(db.Boolean, default=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
+                            nullable=False)
+    title = db.Column(db.String(15), nullable=False)
+    description = db.Column(db.String(255))
+    position = db.Column(db.Integer, default=1, nullable=False)
+    locked = db.Column(db.Boolean, default=False, nullable=False)
+    show_moderators = db.Column(db.Boolean, default=False, nullable=False)
+    external = db.Column(db.String(63))
 
-    post_count = db.Column(db.Integer, default=0)
-    topic_count = db.Column(db.Integer, default=0)
+    post_count = db.Column(db.Integer, default=0, nullable=False)
+    topic_count = db.Column(db.Integer, default=0, nullable=False)
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
@@ -431,6 +519,29 @@ class Forum(db.Model):
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    def update_last_post(self):
+        """Updates the last post. This is useful if you move a topic
+        in another forum
+        """
+        last_post = Post.query.\
+            filter(Post.topic_id == Topic.id,
+                   Topic.forum_id == self.id).\
+            order_by(Post.date_created.desc()).\
+            first()
+
+        # Last post is none when there are no topics in the forum
+        if last_post is not None:
+
+            # a new last post was found in the forum
+            if not last_post.id == self.last_post_id:
+                self.last_post_id = last_post.id
+
+        # No post found..
+        else:
+            self.last_post_id = 0
+
+        db.session.commit()
 
     def save(self, moderators=None):
         """Saves a forum"""
@@ -477,9 +588,9 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
-    description = db.Column(db.String)
-    position = db.Column(db.Integer, default=0)
+    title = db.Column(db.String(63), nullable=False)
+    description = db.Column(db.String(255))
+    position = db.Column(db.Integer, default=1, nullable=False)
 
     # One-to-many
     forums = db.relationship("Forum", backref="category", lazy="dynamic",

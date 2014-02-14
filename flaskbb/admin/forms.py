@@ -254,6 +254,10 @@ class ForumForm(Form):
         description="The category that contains this forum."
     )
 
+    external = TextField("External link", validators=[
+        Optional(), URL()],
+        description="A link to a website i.e. 'http://flaskbb.org'")
+
     moderators = TextField(
         "Moderators",
         description="Comma seperated usernames. Leave it blank if you do not \
@@ -269,6 +273,12 @@ class ForumForm(Form):
         "Locked?",
         description="Disable new posts and topics in this forum."
     )
+
+    def validate_external(self, field):
+        if hasattr(self, "forum"):
+            if self.forum.topics:
+                raise ValidationError("You cannot convert a forum that \
+                                       contain topics in a external link")
 
     def validate_show_moderators(self, field):
         if field.data and not self.moderators.data:
@@ -299,10 +309,16 @@ class ForumForm(Form):
                     raise ValidationError("User %s not found" % moderator)
             field.data = approved_moderators
 
+        else:
+            field.data = approved_moderators
+
     def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
-                      position=self.position.data)
+                      position=self.position.data,
+                      external=self.external.data,
+                      show_moderators=self.show_moderators.data,
+                      locked=self.locked.data)
 
         if self.moderators.data:
             # is already validated
@@ -311,6 +327,17 @@ class ForumForm(Form):
         forum.category_id = self.category.data.id
 
         return forum.save()
+
+
+class EditForumForm(ForumForm):
+    def __init__(self, forum, *args, **kwargs):
+        self.forum = forum
+        kwargs['obj'] = self.forum
+        super(ForumForm, self).__init__(*args, **kwargs)
+
+
+class AddForumForm(ForumForm):
+    pass
 
 
 class CategoryForm(Form):

@@ -10,9 +10,13 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import sys
+
 from flask import current_app
-from flask.ext.script import Manager, Shell, Server, prompt, prompt_pass
-from flask.ext.migrate import MigrateCommand
+from sqlalchemy.exc import IntegrityError, OperationalError
+from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
+                              prompt_bool)
+from flask.ext.migrate import MigrateCommand, upgrade as db_upgrade
 
 from flaskbb import create_app
 from flaskbb.extensions import db
@@ -56,13 +60,21 @@ def dropdb():
 
 
 @manager.command
-def createall():
-    """Creates the database with some testing content."""
+def createall(dropdb=False, createdb=False):
+    """Creates the database with some testing content.
+    If you do not want to drop or create the db add
+    '-c' (to not create the db) and '-d' (to not drop the db)
+    """
 
-    # Just for testing purposes
-    db.drop_all()
+    if not dropdb:
+        app.logger.info("Dropping database...")
+        db.drop_all()
 
-    db.create_all()
+    if not createdb:
+        app.logger.info("Creating database...")
+        db.create_all()
+
+    app.logger.info("Creating test data...")
     create_test_data()
 
 
@@ -72,9 +84,10 @@ def createall():
 def create_admin(username, password, email):
     """Creates the admin user"""
 
-    username = prompt("Username")
-    email = prompt("A valid email address")
-    password = prompt_pass("Password")
+    if not (username and password and email):
+        username = prompt("Username")
+        email = prompt("A valid email address")
+        password = prompt_pass("Password")
 
     create_admin_user(username, email, password)
 
@@ -82,22 +95,35 @@ def create_admin(username, password, email):
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-@manager.option('-d', '--dropdb', dest='dropdb', default=False)
-def initflaskbb(username, password, email, dropdb=False):
+def initflaskbb(username, password, email):
     """Initializes FlaskBB with all necessary data"""
 
-    if dropdb:
-        app.logger.info("Dropping previous database...")
-        db.drop_all()
-
-    app.logger.info("Creating tables...")
-    db.create_all()
-
     app.logger.info("Creating default groups...")
-    create_default_groups()
+    try:
+        create_default_groups()
+    except IntegrityError:
+        app.logger.error("Couldn't create the default groups because they are already exist!")
+        if prompt_bool("Do you want to recreate the database? (y/n)"):
+            db.session.rollback()
+            db.drop_all()
+            db.create_all()
+            create_default_groups()
+        else:
+            sys.exit(0)
+    except OperationalError:
+        app.logger.error("No database found.")
+        if prompt_bool("Do you want to create the database? (y/n)"):
+            db.session.rollback()
+            db.create_all()
+            create_default_groups()
+        else:
+            sys.exit(0)
 
     app.logger.info("Creating admin user...")
-    create_admin(username, password, email)
+    if username and password and email:
+        create_admin_user(username, password, email)
+    else:
+        create_admin(username, password, email)
 
     app.logger.info("Creating welcome forum...")
     create_welcome_forum()

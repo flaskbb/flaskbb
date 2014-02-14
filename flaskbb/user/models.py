@@ -31,23 +31,23 @@ class Group(db.Model):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String(63), unique=True, nullable=False)
     description = db.Column(db.String(80))
 
     # I bet there is a nicer way for this :P
-    admin = db.Column(db.Boolean, default=False)
-    super_mod = db.Column(db.Boolean, default=False)
-    mod = db.Column(db.Boolean, default=False)
-    guest = db.Column(db.Boolean, default=False)
-    banned = db.Column(db.Boolean, default=False)
+    admin = db.Column(db.Boolean, default=False, nullable=False)
+    super_mod = db.Column(db.Boolean, default=False, nullable=False)
+    mod = db.Column(db.Boolean, default=False, nullable=False)
+    guest = db.Column(db.Boolean, default=False, nullable=False)
+    banned = db.Column(db.Boolean, default=False, nullable=False)
 
-    editpost = db.Column(db.Boolean, default=True)
-    deletepost = db.Column(db.Boolean, default=False)
-    deletetopic = db.Column(db.Boolean, default=False)
-    locktopic = db.Column(db.Boolean, default=True)
-    movetopic = db.Column(db.Boolean, default=True)
-    posttopic = db.Column(db.Boolean, default=True)
-    postreply = db.Column(db.Boolean, default=True)
+    editpost = db.Column(db.Boolean, default=True, nullable=False)
+    deletepost = db.Column(db.Boolean, default=False, nullable=False)
+    deletetopic = db.Column(db.Boolean, default=False, nullable=False)
+    locktopic = db.Column(db.Boolean, default=True, nullable=False)
+    movetopic = db.Column(db.Boolean, default=True, nullable=False)
+    posttopic = db.Column(db.Boolean, default=True, nullable=False)
+    postreply = db.Column(db.Boolean, default=True, nullable=False)
 
     # Methods
     def __repr__(self):
@@ -73,20 +73,20 @@ class User(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True)
-    email = db.Column(db.String, unique=True)
+    username = db.Column(db.String(15), unique=True, nullable=False)
+    email = db.Column(db.String(63), unique=True, nullable=False)
     _password = db.Column('password', db.String(80), nullable=False)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow())
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
-    gender = db.Column(db.String)
-    website = db.Column(db.String)
-    location = db.Column(db.String)
-    signature = db.Column(db.String)
-    avatar = db.Column(db.String)
+    gender = db.Column(db.String(1))
+    website = db.Column(db.String(63))
+    location = db.Column(db.String(63))
+    signature = db.Column(db.String(255))
+    avatar = db.Column(db.String(63))
     notes = db.Column(db.Text(5000))
 
-    theme = db.Column(db.String)
+    theme = db.Column(db.String(15))
 
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
@@ -378,7 +378,7 @@ class PrivateMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    subject = db.Column(db.String)
+    subject = db.Column(db.String(63))
     message = db.Column(db.Text)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     trash = db.Column(db.Boolean, nullable=False, default=False)

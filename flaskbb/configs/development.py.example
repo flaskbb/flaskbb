@@ -47,4 +47,5 @@ class DevelopmentConfig(DefaultConfig):
     MAIL_USERNAME = "flaskbb@gmail.com"
     MAIL_PASSWORD = "your_password"
     MAIL_DEFAULT_SENDER = "flaskbb@gmail.com"
+    # Where to logger should send the emails to
     ADMINS = ["flaskbb@gmail.com"]
