@@ -309,6 +309,9 @@ class ForumForm(Form):
                     raise ValidationError("User %s not found" % moderator)
             field.data = approved_moderators
 
+        else:
+            field.data = approved_moderators
+
     def save(self):
         forum = Forum(title=self.title.data,
                       description=self.description.data,
