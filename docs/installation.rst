@@ -141,7 +141,7 @@ Google Mail
     MAIL_USERNAME = "your_username@gmail.com"
     MAIL_PASSWORD = "your_password"
     MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
-    # Where to logger should send the emails to
+    # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
 
 Local SMTP Server
@@ -155,7 +155,7 @@ Local SMTP Server
     MAIL_USERNAME = ""
     MAIL_PASSWORD = ""
     MAIL_DEFAULT_SENDER = "noreply@example.org"
-    # Where to logger should send the emails to
+    # The user who should recieve the error logs
     ADMINS = ["your_admin_user@example.org"]
 
 
@@ -177,11 +177,135 @@ To test if everything worked, run the development server with
 Deploying
 =========
 
+I prefer to use supervisor, uWSGI and nginx to deploy my apps, but if you have
+figured out how to deploy it in another way, please let me know, so I
+(or you if you create a pull request) can add it to the documentation.
+
+**NOTE:** I have only used Debian to deploy it, if someone is using a other
+distribution, could you let me know if that works too? Thanks!
+
+
 Supervisor
 ~~~~~~~~~~
+
+`Supervisor is a client/server system that allows its users to monitor and
+control a number of processes on UNIX-like operating systems.`
+
+To install `supervisor` on Debian, you need to install it with
+::
+
+    $ sudo apt-get install supervisor
+
+There are two ways to configure supervisor. The first one is, you just put
+the configuration to the end of the ``/etc/supervisor/supervisord.conf`` file.
+
+The second way would be to create a new file in the ``/etc/supervisor/conf.d/``
+directory. For example, such a file could be named "uwsgi.conf".
+
+After you have choosen the you way you like, simply put this snippet in the
+configuration file.
+
+::
+
+    [program:uwsgi]
+    command=/usr/bin/uwsgi --emperor /etc/uwsgi/apps-enabled
+    user=apps
+    stopsignal=QUIT
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+
 
 uWSGI
 ~~~~~
 
+`uWSGI is a web application solution with batteries included.`
+
+To get started with uWSGI, you need to install it first.
+You'll also need the python plugin to serve python apps.
+This can be done with:
+
+::
+
+    $ sudo apt-get install uwsgi uwsgi-plugins-python
+
+For the configuration, you need to create a file in the
+``/etc/uwsgi/apps-available`` directory. In this example, I will call the
+file ``flaskbb.ini``. After that, you can start with configuring it.
+My config looks like this for `flaskbb.org` (see below). As you might have noticed, I'm
+using a own user for my apps whose home directory is located at `/var/apps/`.
+In this directory there are living all my Flask apps.
+
+::
+
+    [uwsgi]
+    base = /var/apps/flaskbb
+    home = /var/apps/.virtualenvs/flaskbb/
+    pythonpath = %(base)
+    socket = 127.0.0.1:30002
+    module = wsgi
+    callable = flaskbb
+    uid = apps
+    gid = apps
+    logto = /var/apps/flaskbb/logs/uwsgi.log
+    plugins = python
+
+
+===============  ==========================  ===============
+**base**         /path/to/flaskbb            The folder where your flaskbb application lives
+**home**         /path/to/virtualenv/folder  The virtualenv folder for your flaskbb application
+**pythonpath**   /path/to/flaskbb            The same as base
+**socket**       socket                      This can be either a ip or the path to a socket (don't forget to change that in your nginx config)
+**module**       wsgi.py                     This is the file located in the root directory from flaskbb (where manage.py lives).
+**callable**     flaskbb                     The callable is application you have created in the ``wsgi.py`` file
+**uid**          your_user                   The user who should be used. **NEVER** use root!
+**gid**          your_group                  The group who should be used.
+**logto**        /path/to/log/file           The path to your uwsgi logfile
+**plugins**      python                      We need the python plugin
+===============  ==========================  ===============
+
 nginx
 ~~~~~
+
+`nginx [engine x] is an HTTP and reverse proxy server,
+as well as a mail proxy server, written by Igor Sysoev.`
+
+The nginx config is pretty straightforward. Again, this is how I use it for
+`FlaskBB`. Just copy the snippet below and paste it to, for example
+``/etc/nginx/sites-available/flaskbb``.
+The only thing left is, that you need to adjust the ``server_name`` to your
+domain and the paths in ``access_log``, ``error_log``. Also, don't forget to
+adjust the paths in the ``alias`` es, as well as the socket adress in ``uwsgi_pass``.
+
+::
+
+    server {
+        listen 80;
+        server_name forums.flaskbb.org;
+
+        access_log /var/log/nginx/access.forums.flaskbb.log;
+        error_log /var/log/nginx/error.forums.flaskbb.log;
+
+        location / {
+            try_files $uri @flaskbb;
+        }
+
+        # Static files
+        location /static {
+           alias /var/apps/flaskbb/flaskbb/static/;
+        }
+
+        location ~ ^/_themes/([^/]+)/(.*)$ {
+            alias /var/apps/flaskbb/flaskbb/themes/$1/static/$2;
+        }
+
+        # robots.txt
+        location /robots.txt {
+            alias /var/apps/flaskbb/flaskbb/static/robots.txt;
+        }
+
+        location @flaskbb {
+            uwsgi_pass 127.0.0.1:30002;
+            include uwsgi_params;
+        }
+    }
