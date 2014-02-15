@@ -431,7 +431,7 @@ def markread(forum_id=None):
 
 @forum.route("/who_is_online")
 def who_is_online():
-    if current_app.config['USE_REDIS']:
+    if current_app.config['REDIS_ENABLED']:
         online_users = get_online_users()
     else:
         online_users = User.query.filter(User.lastseen >= time_diff()).all()
