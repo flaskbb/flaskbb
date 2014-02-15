@@ -107,8 +107,7 @@ For development, you need to copy ``flaskbb/configs/development.py.example`` to
 
     cp flaskbb/configs/development.py.example flaskbb/configs/development.py
 
-The reCAPTCHA keys should work fine on localhost. If you don't want to use
-Google Mail, see `Mail Examples <#mail-examples>`_ for more options.
+The reCAPTCHA keys should work fine on localhost.
 
 
 Production
@@ -123,12 +122,12 @@ the moment, because it's still in development), you need to copy
 
 Now open ``flaskbb/configs/production.py`` with your favourite editor and adjust
 the config variables to your needs.
-If you don't want to use
-Google Mail, see `Mail Examples <#mail-examples>`_ for more options.
 
 
 Mail Examples
 ~~~~~~~~~~~~~
+
+Both methods are included in the example configs.
 
 Google Mail
 -----------
@@ -141,8 +140,6 @@ Google Mail
     MAIL_USERNAME = "your_username@gmail.com"
     MAIL_PASSWORD = "your_password"
     MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
-    # The user who should recieve the error logs
-    ADMINS = ["your_admin_user@gmail.com"]
 
 Local SMTP Server
 -----------------
@@ -155,8 +152,6 @@ Local SMTP Server
     MAIL_USERNAME = ""
     MAIL_PASSWORD = ""
     MAIL_DEFAULT_SENDER = "noreply@example.org"
-    # The user who should recieve the error logs
-    ADMINS = ["your_admin_user@example.org"]
 
 
 Installation
@@ -182,7 +177,8 @@ figured out how to deploy it in another way, please let me know, so I
 (or you if you create a pull request) can add it to the documentation.
 
 **NOTE:** I have only used Debian to deploy it, if someone is using a other
-distribution, could you let me know if that works too? Thanks!
+distribution, could you let me know if that works too? `Also, if you have better
+configurations for uWSGI, supervisor or nginx let me know that too.`
 
 
 Supervisor
@@ -191,18 +187,18 @@ Supervisor
 `Supervisor is a client/server system that allows its users to monitor and
 control a number of processes on UNIX-like operating systems.`
 
-To install `supervisor` on Debian, you need to install it with
+To install `supervisor` on Debian, you need to fire up this command:
 ::
 
     $ sudo apt-get install supervisor
 
 There are two ways to configure supervisor. The first one is, you just put
-the configuration to the end of the ``/etc/supervisor/supervisord.conf`` file.
+the configuration to the end in the ``/etc/supervisor/supervisord.conf`` file.
 
 The second way would be to create a new file in the ``/etc/supervisor/conf.d/``
-directory. For example, such a file could be named "uwsgi.conf".
+directory. For example, such a file could be named ``uwsgi.conf``.
 
-After you have choosen the you way you like, simply put this snippet in the
+After you have choosen the you way you like, simply put the snippet below in the
 configuration file.
 
 ::
@@ -264,6 +260,13 @@ In this directory there are living all my Flask apps.
 **plugins**      python                      We need the python plugin
 ===============  ==========================  ===============
 
+Don't forget to create a symlink to ``/etc/uwsgi/apps-enabled``.
+
+::
+
+    ln -s /etc/uwsgi/apps-available/flaskbb /etc/uwsgi/apps-enabled/flaskbb
+
+
 nginx
 ~~~~~
 
@@ -309,3 +312,7 @@ adjust the paths in the ``alias`` es, as well as the socket adress in ``uwsgi_pa
             include uwsgi_params;
         }
     }
+
+
+Like in the `uWSGI <#uwsgi>`_ chapter, don't forget to create a symlink to
+``/etc/nginx/sites-enabled/``.
