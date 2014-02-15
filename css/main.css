@@ -77,3 +77,32 @@ body {
     margin-top: 120px;
   }
 }
+
+
+/*
+ * Homepage
+ *
+ * Tweaks to the custom homepage and the masthead (main jumbotron).
+ */
+
+/* Share masthead with page headers */
+.masthead {
+  position: relative;
+  padding: 30px 15px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.1);
+  background-color: #3276b1;
+  background-image: -webkit-linear-gradient(top, #285e8e 0%, #3276b1 100%);
+  background-image: linear-gradient(to bottom, #285e8e 0%, #3276b1 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#285e8e', endColorstr='#3276b1', GradientType=0);
+
+}
+
+
+
+.masthead small {
+  font-size: 80%;
+  color: #ccc;
+}
