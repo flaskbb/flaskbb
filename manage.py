@@ -81,7 +81,7 @@ def createall(dropdb=False, createdb=False):
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-def create_admin(username, password, email):
+def create_admin(username=None, password=None, email=None):
     """Creates the admin user"""
 
     if not (username and password and email):
@@ -89,13 +89,13 @@ def create_admin(username, password, email):
         email = prompt("A valid email address")
         password = prompt_pass("Password")
 
-    create_admin_user(username, email, password)
+    create_admin_user(username=username, password=password, email=email)
 
 
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-def initflaskbb(username, password, email):
+def initflaskbb(username=None, password=None, email=None):
     """Initializes FlaskBB with all necessary data"""
 
     app.logger.info("Creating default groups...")
@@ -121,9 +121,9 @@ def initflaskbb(username, password, email):
 
     app.logger.info("Creating admin user...")
     if username and password and email:
-        create_admin_user(username, password, email)
+        create_admin_user(username=username, password=password, email=email)
     else:
-        create_admin(username, password, email)
+        create_admin()
 
     app.logger.info("Creating welcome forum...")
     create_welcome_forum()
