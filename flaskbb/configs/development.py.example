@@ -40,12 +40,21 @@ class DevelopmentConfig(DefaultConfig):
     RECAPTCHA_OPTIONS = {"theme": "white"}
 
     # Mail
-    # Google Mail example
-    MAIL_SERVER = "smtp.googlemail.com"
+    # Local SMTP Server
+    #MAIL_SERVER = "localhost"
+    #MAIL_PORT = 25
+    #MAIL_USE_SSL = False
+    #MAIL_USERNAME = ""
+    #MAIL_PASSWORD = ""
+    #MAIL_DEFAULT_SENDER = "noreply@example.org"
+
+    # Google Mail Example
+    MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_USERNAME = "flaskbb@gmail.com"
+    MAIL_USERNAME = "your_username@gmail.com"
     MAIL_PASSWORD = "your_password"
-    MAIL_DEFAULT_SENDER = "flaskbb@gmail.com"
-    # Where to logger should send the emails to
-    ADMINS = ["flaskbb@gmail.com"]
+    MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
+
+    # The user who should recieve the error logs
+    ADMINS = ["your_admin_user@gmail.com"]
