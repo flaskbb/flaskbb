@@ -9,7 +9,7 @@ body {
 }
 
 #github {
-  display: block;
+  display: none;
   position: absolute;
   width: 150px;
   height: 150px;
@@ -69,6 +69,15 @@ body {
 
   .featurette-heading {
     font-size: 50px;
+  }
+  #github {
+    display: block;
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    top: 0;
+    right: 0;
+    z-index: 1050;
   }
 }
 
