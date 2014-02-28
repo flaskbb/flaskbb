@@ -8,7 +8,9 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import re
 import time
+from unicodedata import normalize
 from datetime import datetime, timedelta
 from collections import OrderedDict
 
@@ -19,6 +21,23 @@ from flask.ext.login import current_user
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
+
+_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+
+
+def slugify(text, delim=u'-'):
+    """Generates an slightly worse ASCII-only slug.
+    Taken from the Flask Snippets page.
+
+   :param text: The text which should be slugified
+   :param delim: Default "-". The delimeter for whitespace
+    """
+    result = []
+    for word in _punct_re.split(text.lower()):
+        word = normalize('NFKD', word).encode('ascii', 'ignore')
+        if word:
+            result.append(word)
+    return unicode(delim.join(result))
 
 
 def render_template(template, **context):

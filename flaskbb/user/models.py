@@ -14,7 +14,7 @@ from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from werkzeug import generate_password_hash, check_password_hash
-from flask import current_app
+from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -120,6 +120,11 @@ class User(db.Model, UserMixin):
 
         return Post.query.filter(Post.user_id == self.id).\
             order_by(Post.date_created.desc()).first()
+
+    @property
+    def url(self):
+        """Returns the url for the user"""
+        return url_for("user.profile", username=self.username)
 
     # Methods
     def __repr__(self):

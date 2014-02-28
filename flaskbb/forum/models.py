@@ -10,10 +10,11 @@
 """
 from datetime import datetime, timedelta
 
-from flask import current_app
+from flask import current_app, url_for
 
 from flaskbb.extensions import db
 from flaskbb.utils.query import TopicQuery
+from flaskbb.utils.helpers import slugify
 
 
 moderators = db.Table(
@@ -148,6 +149,12 @@ class Post(db.Model):
     date_modified = db.Column(db.DateTime)
     modified_by = db.Column(db.String(15))
 
+    # Properties
+    @property
+    def url(self):
+        """Returns the url for the post"""
+        return url_for("forum.view_post", post_id=self.id)
+
     # Methods
     def __repr__(self):
         """
@@ -268,6 +275,16 @@ class Topic(db.Model):
     def second_last_post(self):
         """Returns the second last post."""
         return self.posts[-2].id
+
+    @property
+    def slug(self):
+        """Returns a slugified version from the topic title"""
+        return slugify(self.title)
+
+    @property
+    def url(self):
+        """Returns the url for the topic"""
+        return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     # Methods
     def __init__(self, title=None):
@@ -507,11 +524,23 @@ class Forum(db.Model):
     topics = db.relationship("Topic", backref="forum", lazy="joined",
                              cascade="all, delete-orphan")
 
+    # Many-to-many
     moderators = \
         db.relationship("User", secondary=moderators,
                         primaryjoin=(moderators.c.forum_id == id),
                         backref=db.backref("forummoderator", lazy="dynamic"),
                         lazy="joined")
+
+    # Properties
+    @property
+    def slug(self):
+        """Returns a slugified version from the forum title"""
+        return slugify(self.title)
+
+    @property
+    def url(self):
+        """Returns the url for the forum"""
+        return url_for("forum.view_forum", forum_id=self.id, slug=self.slug)
 
     # Methods
     def __repr__(self):
@@ -598,6 +627,19 @@ class Category(db.Model):
                              order_by='asc(Forum.position)',
                              cascade="all, delete-orphan")
 
+    # Properties
+    @property
+    def slug(self):
+        """Returns a slugified version from the category title"""
+        return slugify(self.title)
+
+    @property
+    def url(self):
+        """Returns the url for the category"""
+        return url_for("forum.view_category", category_id=self.id,
+                       slug=self.slug)
+
+    # Methods
     def save(self):
         """Saves a category"""
 

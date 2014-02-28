@@ -7,7 +7,7 @@
 
 <table class="table table-bordered">
     <thead>
-      <th><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></th>
+      <th><a href="{{ user.url }}">{{ user.username }}</a></th>
       <th>Info</th>
       <th>User Stats</th>
     </thead>
@@ -63,7 +63,7 @@
                 <tr>
                   <td align="right">Last post:</td>
                   <td>{%- if user.last_post -%}
-                      <a href="{{ url_for('forum.view_post', post_id=user.last_post.id) }}">{{ user.last_post.date_created|time_since }}</a>
+                      <a href="{{ user.last_post.url }}">{{ user.last_post.date_created|time_since }}</a>
                       {%- else -%}
                         Never
                       {%- endif -%}

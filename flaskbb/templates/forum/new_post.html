@@ -7,8 +7,8 @@
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ url_for('forum.view_forum', forum_id=topic.forum.id) }}">{{ topic.forum.title }}</a></li>
-    <li><a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }} </a></li>
+    <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+    <li><a href="{{ topic.url }}">{{ topic.title }} </a></li>
     <li class="active">New Post</li>
 </ul>
 

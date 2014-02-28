@@ -25,7 +25,7 @@
                 Total number of posts: <strong>{{ post_count }}</strong> <br />
             </td>
             <td>
-                Newest registered user: {% if newest_user %}<a href="{{ url_for('user.profile', username=newest_user.username) }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
+                Newest registered user: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
                 Registered users online: <strong>{{ online_users }}</strong> <br />
                 {% if config["REDIS_ENABLED"] %}
                 Guests online: <strong>{{ online_guests }}</strong> <br />

@@ -35,7 +35,7 @@
         {% for user in users.items %}
         <tr>
             <td>{{ user.id }}</td>
-            <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+            <td><a href="{{ user.url }}">{{ user.username }}</a></td>
             <td>{{ user.post_count }}</td>
             <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
             <td>{{ user.primary_group.name }}</td>

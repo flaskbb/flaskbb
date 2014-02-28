@@ -7,18 +7,18 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ url_for('forum.view_category', category_id=forum[0].category.id) }}">{{ forum[0].category.title }}</a></li>
+    <li><a href="{{ forum[0].category.url }}">{{ forum[0].category.title }}</a></li>
     <li class="active">{{ forum[0].title }}</li>
 </ol>
 
 <div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(topics, url_for('forum.view_forum', forum_id=forum[0].id)) }}
+    {{ render_pagination(topics, forum[0].url) }}
 </div> <!-- end span pagination -->
 
 {% if current_user|post_topic(forum[0]) %}
 <div class="pull-right" style="padding-bottom: 10px">
     <div class="btn-group">
-        <a href="{{ url_for('forum.markread', forum_id=forum[0].id) }}" class="btn btn-default">
+        <a href="{{ url_for('forum.markread', forum_id=forum[0].id, slug=forum[0].slug) }}" class="btn btn-default">
             <span class="fa fa-check"></span> Mark as Read
         </a>
 
@@ -27,7 +27,7 @@
             <span class="fa fa-lock"></span> Locked
         </span>
         {% else %}
-        <a href="{{ url_for('forum.new_topic', forum_id=forum[0].id) }}" class="btn btn-primary">
+        <a href="{{ url_for('forum.new_topic', forum_id=forum[0].id, slug=forum[0].slug) }}" class="btn btn-primary">
             <span class="fa fa-pencil"></span> New Topic
         </a>
         {% endif %}
@@ -72,12 +72,12 @@
             </td>
             <td>
                 <div>
-                    <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a>
+                    <a href="{{ topic.url }}">{{ topic.title }}</a>
                     <!-- Topic Pagination -->
                     {{ topic_pages(topic, config["POSTS_PER_PAGE"]) }}
                     <br />
                     {% if topic.user_id %}
-                    <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
+                    <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
                     {% else %}
                     <small>by {{ topic.username }}</small>
                     {% endif %}
@@ -90,10 +90,10 @@
                 {{ topic.views }}
             </td>
             <td>
-                <a href="{{ url_for('forum.view_post', post_id=topic.last_post.id) }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
 
                 {% if topic.last_post.user_id %}
-                <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
+                <small>by <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a></small>
                 {% else %}
                 <small>{{ topic.last_post.username }}</small>
                 {% endif %}

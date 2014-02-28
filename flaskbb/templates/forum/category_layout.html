@@ -3,7 +3,7 @@
     <thead class="categoryhead">
         <tr>
             <td colspan="5">
-                <div><strong><a href="{{ url_for('forum.view_category', category_id=category[0].id) }}">{{ category[0].title }}</a></strong></div>
+                <div><strong><a href="{{ category[0].url }}">{{ category[0].title }}</a></strong></div>
             </td>
         </tr>
     </thead>
@@ -50,7 +50,7 @@
             </td>
 
             <td valign="top">
-                <strong><a href="{{ url_for('forum.view_forum', forum_id=forum[0].id) }}">{{ forum[0].title }}</a></strong>
+                <strong><a href="{{ forum[0].url }}">{{ forum[0].title }}</a></strong>
 
                 <div class="forum-description">
                     {% autoescape false %}
@@ -72,7 +72,7 @@
 
             <td valign="top" align="right" style="white-space: nowrap">
                 {% if forum[0].last_post_id %}
-                <a href="{{ url_for('forum.view_post', post_id=forum[0].last_post_id) }}" title="{{ forum[0].last_post.topic.title }}">
+                <a href="{{ forum[0].last_post.url }}" title="{{ forum[0].last_post.topic.title }}">
                     <strong>{{ forum[0].last_post.topic.title|crop_title }}</strong>
                 </a>
                 <br />

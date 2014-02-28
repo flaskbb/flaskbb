@@ -37,8 +37,8 @@
             <td width="4%"></td>
             <td>
                 <div>
-                    <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}">{{ topic.title }}</a> <br />
-                    <small>by <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a></small>
+                    <a href="{{ topic.url }}">{{ topic.title }}</a> <br />
+                    <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
                 </div>
             </td>
             <td>
@@ -48,8 +48,8 @@
                 {{ topic.views }}
             </td>
             <td>
-                <a href="{{ url_for('forum.view_topic', topic_id=topic.id) }}#pid{{topic.last_post.id}}">{{ topic.last_post.date_created|time_since }}</a><br />
-                <small>by <a href="{{ url_for('user.profile', username=topic.last_post.user.username) }}">{{ topic.last_post.user.username }}</a></small>
+                <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                <small>by <a href="{{ topic.last_post.user.username }}">{{ topic.last_post.user.username }}</a></small>
             </td>
         </tr>
         {% else %}

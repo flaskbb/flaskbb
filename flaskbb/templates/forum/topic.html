@@ -7,29 +7,29 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ url_for('forum.view_category', category_id=topic.forum.category.id) }}">{{ topic.forum.category.title }}</a></li>
-    <li><a href="{{ url_for('forum.view_forum', forum_id=topic.forum.id) }}">{{ topic.forum.title }}</a></li>
+    <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
+    <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
     <li class="active">{{ topic.title }}</li>
 </ol>
 
 <div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(posts, url_for('forum.view_topic', topic_id=topic.id)) }}
+    {{ render_pagination(posts, topic.url) }}
 </div> <!-- end span pagination -->
 
 <div class="pull-right" style="padding-bottom: 10px">
     <div class="btn btn-group">
     {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" class="btn btn-danger">
+        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-danger">
             <span class="fa fa-trash-o"></span> Delete Topic
         </a>
     {% endif %}
     {% if current_user|lock_topic(topic.forum) %}
         {% if not topic.locked %}
-            <a href="{{ url_for('forum.lock_topic', topic_id=topic.id) }}" class="btn btn-warning">
+            <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
                 <span class="fa fa-lock"></span> Lock Topic
             </a>
         {% else %}
-            <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id) }}" class="btn btn-warning">
+            <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
                 <span class="fa fa-unlock"></span> Unlock Topic
             </a>
         {% endif %}
@@ -39,17 +39,17 @@
     {% if current_user.is_authenticated() %}
     <div class="btn btn-group">
         {% if current_user.is_tracking_topic(topic) %}
-        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id) }}" class="btn btn-default"><span class="fa fa-star">
+        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default"><span class="fa fa-star">
             </span> Untrack Topic
         </a>
         {% else %}
-        <a href="{{ url_for('forum.track_topic', topic_id=topic.id) }}" class="btn btn-default">
+        <a href="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default">
             <span class="fa fa-star"></span> Track Topic
         </a>
         {% endif %}
 
         {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
-        <a href="{{ url_for('forum.new_post', topic_id=topic.id) }}" class="btn btn-primary">
+        <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
             <span class="fa fa-pencil"></span> Reply
         </a>
         {% endif %}
@@ -68,15 +68,15 @@
                 <span class="pull-left">
                     <a href="
                     {%- if posts.page > 1 -%}
-                        {{ url_for('forum.view_topic', topic_id=topic.id) }}?page={{ posts.page }}#pid{{ post.id }}
+                        {{ topic.url }}?page={{ posts.page }}#pid{{ post.id }}
                     {%- else -%}
-                        {{ url_for('forum.view_topic', topic_id=topic.id) }}#pid{{ post.id }}
+                        {{ topic.url }}#pid{{ post.id }}
                     {%- endif -%}
                         ">{{ post.date_created|format_date('%d %B %Y') }}</a>
                     {% if post.user_id and post.date_modified %}
                     <small>
                         (Last modified: {{ post.date_modified|format_date }} by
-                        <a href="{{ url_for('user.profile', username=post.user.username) }}">
+                        <a href="{{ url_for('user.profile', username=post.modified_by) }}">
                             {{ post.modified_by }}
                         </a>.)
                     </small>
@@ -96,7 +96,7 @@
                     </td>
                     {% endif %}
                     <td>
-                        <a href="{{ url_for('user.profile', username=post.user.username) }}">
+                        <a href="{{ post.user.url }}">
                             <span style="font-weight:bold">{{ post.user.username }}</span> <!-- TODO: Implement userstyles -->
                         </a>
                             {%- if post.user|is_online %}
@@ -160,7 +160,7 @@
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
                         {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id) }}">Delete</a> |
+                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">Delete</a> |
                         {% endif %}
                     {% else %}
                         {% if current_user|delete_post(post.user_id, topic.forum) %}

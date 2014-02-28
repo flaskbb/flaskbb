@@ -4,7 +4,7 @@
 {% block content %}
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li ><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></li>
+    <li ><a href="{{ user.url }}">{{ user.username }}</a></li>
     <li class="active">All Posts</li>
 </ul>
 
@@ -16,8 +16,8 @@
     {% for post in posts.items %}
         <tr>
             <td>
-                <strong><a href="{{ url_for('forum.view_topic', topic_id=post.topic.id)}}">{{ post.topic.title }}</a></strong>
-                in <a href="{{ url_for('forum.view_forum', forum_id=post.topic.forum.id) }}">{{ post.topic.forum.title }}</a>
+                <strong><a href="{{ post.topic.url }}">{{ post.topic.title }}</a></strong>
+                in <a href="{{ post.topic.forum.url }}">{{ post.topic.forum.title }}</a>
                 <span class="divider"> - </span>
                 <small>{{ post.date_created|time_since }}</small>
             </td>

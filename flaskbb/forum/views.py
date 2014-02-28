@@ -88,7 +88,8 @@ def index():
 
 
 @forum.route("/category/<int:category_id>")
-def view_category(category_id):
+@forum.route("/category/<int:category_id>-<slug>")
+def view_category(category_id, slug=None):
     if current_user.is_authenticated():
         forum_query = Category.query.\
             filter(Category.id == category_id).\
@@ -118,7 +119,8 @@ def view_category(category_id):
 
 
 @forum.route("/forum/<int:forum_id>")
-def view_forum(forum_id):
+@forum.route("/forum/<int:forum_id>-<slug>")
+def view_forum(forum_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
     if current_user.is_authenticated():
@@ -152,7 +154,8 @@ def view_forum(forum_id):
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
-def view_topic(topic_id):
+@forum.route("/topic/<int:topic_id>-<slug>", methods=["POST", "GET"])
+def view_topic(topic_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
     topic = Topic.query.filter_by(id=topic_id).first()
@@ -198,24 +201,24 @@ def view_post(post_id):
     else:
         page = 1
 
-    return redirect(url_for("forum.view_topic", topic_id=post.topic.id) +
-                    "?page=%d#pid%s" % (page, post.id))
+    return redirect(post.topic.url + "?page=%d#pid%s" % (page, post.id))
 
 
 @forum.route("/<int:forum_id>/topic/new", methods=["POST", "GET"])
+@forum.route("/<int:forum_id>-<slug>/topic/new", methods=["POST", "GET"])
 @login_required
-def new_topic(forum_id):
+def new_topic(forum_id, slug=None):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
     if forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
               "danger")
-        return redirect(url_for('forum.view_forum', forum_id=forum.id))
+        return redirect(forum.url)
 
     if not can_post_topic(user=current_user, forum=forum):
         flash("You do not have the permissions to create a new topic.",
               "danger")
-        return redirect(url_for('forum.view_forum', forum_id=forum.id))
+        return redirect(forum.url)
 
     form = NewTopicForm()
     if form.validate_on_submit():
@@ -227,15 +230,16 @@ def new_topic(forum_id):
 
 
 @forum.route("/topic/<int:topic_id>/delete")
+@forum.route("/topic/<int:topic_id>-<slug>/delete")
 @login_required
-def delete_topic(topic_id):
+def delete_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_delete_topic(user=current_user, forum=topic.forum,
                             post_user_id=topic.first_post.user_id):
 
         flash("You do not have the permissions to delete the topic", "danger")
-        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+        return redirect(topic.forum.url)
 
     involved_users = User.query.filter(Post.topic_id == topic.id,
                                        User.id == Post.user_id).all()
@@ -244,65 +248,69 @@ def delete_topic(topic_id):
 
 
 @forum.route("/topic/<int:topic_id>/lock")
+@forum.route("/topic/<int:topic_id>-<slug>/lock")
 @login_required
-def lock_topic(topic_id):
+def lock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_lock_topic(user=current_user, forum=topic.forum):
         flash("Yo do not have the permissions to lock this topic", "danger")
-        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+        return redirect(topic.url)
 
     topic.locked = True
     topic.save()
-    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+    return redirect(topic.url)
 
 
 @forum.route("/topic/<int:topic_id>/unlock")
+@forum.route("/topic/<int:topic_id>-<slug>/unlock")
 @login_required
-def unlock_topic(topic_id):
+def unlock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     # Unlock is basically the same as lock
     if not can_lock_topic(user=current_user, forum=topic.forum):
         flash("Yo do not have the permissions to unlock this topic", "danger")
-        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+        return redirect(topic.url)
 
     topic.locked = False
     topic.save()
-    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+    return redirect(topic.url)
 
 
 @forum.route("/topic/<int:topic_id>/move/<int:forum_id>")
+@forum.route("/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>")
 @login_required
-def move_topic(topic_id, forum_id):
+def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not topic.move(forum):
         flash("Could not move the topic to forum %s" % forum.title, "danger")
-        return redirect(url_for("forum.view_topic", topic_id=topic.id))
+        return redirect(topic.url)
 
     flash("Topic was moved to forum %s" % forum.title, "success")
-    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+    return redirect(topic.url)
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
+@forum.route("/topic/<int:topic_id>-<slug>/post/new", methods=["POST", "GET"])
 @login_required
-def new_post(topic_id):
+def new_post(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
               "danger")
-        return redirect(url_for('forum.view_forum', forum_id=topic.forum.id))
+        return redirect(topic.forum.url)
 
     if topic.locked:
         flash("The topic is locked.", "danger")
-        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+        return redirect(topic.forum.url)
 
     if not can_post_reply(user=current_user, forum=topic.forum):
         flash("You do not have the permissions to delete the topic", "danger")
-        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+        return redirect(topic.forum.url)
 
     form = ReplyForm()
     if form.validate_on_submit():
@@ -320,18 +328,16 @@ def edit_post(post_id):
     if post.topic.forum.locked:
         flash("This forum is locked; you cannot submit new topics or posts.",
               "danger")
-        return redirect(url_for("forum.view_forum",
-                                forum_id=post.topic.forum.id))
+        return redirect(post.topic.forum.url)
 
     if post.topic.locked:
         flash("The topic is locked.", "danger")
-        return redirect(url_for("forum.view_forum",
-                                forum_id=post.topic.forum_id))
+        return redirect(post.topic.forum.url)
 
     if not can_edit_post(user=current_user, forum=post.topic.forum,
                          post_user_id=post.user_id):
         flash("You do not have the permissions to edit this post", "danger")
-        return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
+        return redirect(post.topic.url)
 
     form = ReplyForm()
     if form.validate_on_submit():
@@ -339,7 +345,7 @@ def edit_post(post_id):
         post.date_modified = datetime.datetime.utcnow()
         post.modified_by = current_user.username
         post.save()
-        return redirect(url_for("forum.view_topic", topic_id=post.topic.id))
+        return redirect(post.topic.url)
     else:
         form.content.data = post.content
 
@@ -348,13 +354,13 @@ def edit_post(post_id):
 
 @forum.route("/post/<int:post_id>/delete")
 @login_required
-def delete_post(post_id):
+def delete_post(post_id, slug=None):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_delete_post(user=current_user, forum=post.topic.forum,
                            post_user_id=post.user_id):
         flash("You do not have the permissions to edit this post", "danger")
-        return redirect(url_for('forum.view_topic', topic_id=post.topic_id))
+        return redirect(post.topic.url)
 
     topic_id = post.topic_id
 
@@ -362,8 +368,7 @@ def delete_post(post_id):
 
     # If the post was the first post in the topic, redirect to the forums
     if post.first_post:
-        return redirect(url_for('forum.view_forum',
-                                forum_id=post.topic.forum_id))
+        return redirect(post.topic.url)
     return redirect(url_for('forum.view_topic', topic_id=topic_id))
 
 
@@ -382,7 +387,8 @@ def report_post(post_id):
 
 @forum.route("/markread")
 @forum.route("/<int:forum_id>/markread")
-def markread(forum_id=None):
+@forum.route("/<int:forum_id>-<slug>/markread")
+def markread(forum_id=None, slug=None):
 
     if not current_user.is_authenticated():
         flash("You need to be logged in for that feature.", "danger")
@@ -407,7 +413,7 @@ def markread(forum_id=None):
         db.session.add(forumsread)
         db.session.commit()
 
-        return redirect(url_for("forum.view_forum", forum_id=forum.id))
+        return redirect(forum.url)
 
     # Mark all forums as read
     ForumsRead.query.filter_by(user_id=current_user.id).delete()
@@ -465,16 +471,18 @@ def topictracker():
 
 
 @forum.route("/topictracker/<topic_id>/add")
-def track_topic(topic_id):
+@forum.route("/topictracker/<topic_id>-<slug>/add")
+def track_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.track_topic(topic)
     current_user.save()
-    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+    return redirect(topic.url)
 
 
 @forum.route("/topictracker/<topic_id>/delete")
-def untrack_topic(topic_id):
+@forum.route("/topictracker/<topic_id>-<slug>/delete")
+def untrack_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.untrack_topic(topic)
     current_user.save()
-    return redirect(url_for("forum.view_topic", topic_id=topic.id))
+    return redirect(topic.url)
