@@ -326,6 +326,31 @@ class Topic(db.Model):
 
         return True
 
+    def merge(self, topic):
+        """Merges a topic with another topic together
+
+        :param topic: The new topic for the posts in this topic
+        """
+
+        # You can only merge a topic with a differrent topic in the same forum
+        if self.id == topic.id or not self.forum_id == topic.forum_id:
+            return False
+
+        # Update the topic id
+        Post.query.filter_by(topic_id=self.id).\
+            update({Post.topic_id: topic.id})
+
+        # Increase the post and views count
+        topic.post_count += self.post_count
+        topic.views += self.views
+
+        topic.save()
+
+        # Finally delete the old topic
+        Topic.query.filter_by(id=self.id).delete()
+
+        return True
+
     def save(self, user=None, forum=None, post=None):
         """Saves a topic and returns the topic object. If no parameters are
         given, it will only update the topic.

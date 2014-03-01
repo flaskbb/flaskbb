@@ -30,6 +30,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
+        'mergetopic': True,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -47,6 +48,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
+        'mergetopic': True,
         'viewtopic': True,
         'viewprofiles': True
     }),
@@ -64,6 +66,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
+        'mergetopic': True,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -81,6 +84,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': False,
         'movetopic': False,
+        'mergetopic': False,
         'viewtopic': True,
         'viewprofile': True
     }),
@@ -98,6 +102,7 @@ GROUPS = OrderedDict((
         'postreply': False,
         'locktopic': False,
         'movetopic': False,
+        'mergetopic': False,
         'viewtopic': False,
         'viewprofile': False
     }),
@@ -115,6 +120,7 @@ GROUPS = OrderedDict((
         'postreply': False,
         'locktopic': False,
         'movetopic': False,
+        'mergetopic': False,
         'viewtopic': False,
         'viewprofile': False
     })

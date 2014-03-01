@@ -293,6 +293,21 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/<int:old_id>/merge/<int:new_id>")
+@forum.route("/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>")
+@login_required
+def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
+    old_topic = Topic.query.filter_by(id=old_id).first_or_404()
+    new_topic = Topic.query.filter_by(id=new_id).first_or_404()
+
+    if not old_topic.merge(new_topic):
+        flash("Could not merge the topic.", "danger")
+        return redirect(old_topic.url)
+
+    flash("Topic succesfully merged.", "success")
+    return redirect(new_topic.url)
+
+
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
 @forum.route("/topic/<int:topic_id>-<slug>/post/new", methods=["POST", "GET"])
 @login_required
