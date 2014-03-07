@@ -129,13 +129,12 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     if topic and not topicsread and topic.last_post.date_created > read_cutoff:
 
         # user has cleared the forum sometime ago - check if there is a new post
-        if forumsread and forumsread.cleared > topic.last_post.date_created:
-            return False
+        if forumsread and forumsread.cleared is not None:
+            return forumsread.cleared < topic.last_post.date_created
 
         # user hasn't read the topic yet, or it has been cleared
         return True
 
-    current_app.logger.debug("User has read it. check if there is a new post")
     return topicsread.last_read < topic.last_post.date_created
 
 
