@@ -226,6 +226,7 @@ class Post(db.Model):
         self.user.post_count -= 1
         self.topic.post_count -= 1
         self.topic.forum.post_count -= 1
+        db.session.commit()
 
         db.session.delete(self)
         db.session.commit()
