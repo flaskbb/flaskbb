@@ -64,7 +64,8 @@ class RegisterForm(Form):
                     email=self.email.data,
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
-                    primary_group_id=4)
+                    primary_group_id=4,
+                    avatar="/static/img/avatar_default_120x120.gif")
         return user.save()
 
 
