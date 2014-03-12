@@ -25,7 +25,7 @@ from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
-                                 ReportForm)
+                                 ReportForm, SearchForm)
 from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
