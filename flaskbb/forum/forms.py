@@ -9,10 +9,12 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-from wtforms import TextAreaField, TextField
+import flask.ext.whooshalchemy
+from wtforms import TextAreaField, TextField, BooleanField, FormField, SelectMultipleField
 from wtforms.validators import Required
 
 from flaskbb.forum.models import Topic, Post, Report
+from flaskbb.user.models import User
 
 
 class QuickreplyForm(Form):
@@ -54,3 +56,24 @@ class ReportForm(Form):
     def save(self, user, post):
         report = Report(**self.data)
         return report.save(user, post)
+
+
+class SearchForm(Form):
+    search_types = SelectMultipleField("Search Types", validators=[
+        Required("Please insert at least one search type")], choices=[
+        ('user', 'User'), ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('category', 'Category')
+    ])
+    search_query = TextField("Search Query", validators=[
+        Required(message="Please insert a search query")
+    ])
+
+    def fetch_types(self):
+        return self.search_types.data
+
+    def fetch_results(self):
+        results = {}
+        types = self.fetch_types()
+        for type in types:
+            if type == 'user':
+                results['user'] = User.query.whoosh_search(self.search_query)
+        print(results)

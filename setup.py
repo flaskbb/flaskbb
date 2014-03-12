@@ -58,6 +58,7 @@ setup(
         'itsdangerous==0.23',
         'postmarkup==1.2.0',
         'wsgiref==0.1.2',
+        'Flask-WhooshAlchemy==0.55'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

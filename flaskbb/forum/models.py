@@ -134,6 +134,7 @@ class Report(db.Model):
 
 class Post(db.Model):
     __tablename__ = "posts"
+    __searchable__ = ['content', 'username']
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
@@ -234,6 +235,7 @@ class Post(db.Model):
 
 class Topic(db.Model):
     __tablename__ = "topics"
+    __searchable__ = ['title', 'username']
 
     query_class = TopicQuery
 
@@ -526,6 +528,7 @@ class Topic(db.Model):
 
 class Forum(db.Model):
     __tablename__ = "forums"
+    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
@@ -640,6 +643,7 @@ class Forum(db.Model):
 
 class Category(db.Model):
     __tablename__ = "categories"
+    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(63), nullable=False)

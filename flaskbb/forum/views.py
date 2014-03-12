@@ -25,7 +25,7 @@ from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
-                                 ReportForm)
+                                 ReportForm, SearchForm)
 from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
@@ -501,3 +501,21 @@ def untrack_topic(topic_id, slug=None):
     current_user.untrack_topic(topic)
     current_user.save()
     return redirect(topic.url)
+
+
+@forum.route("/search", methods=['GET', 'POST'])
+def search_forum():
+
+    if not current_user.is_authenticated():
+        flash("You need to be logged in for that feature.", "danger")
+        return redirect(url_for("forum.index"))
+
+    form = SearchForm()
+    if form.validate_on_submit():
+        result_type = form.fetch_types()
+        result_list = form.fetch_results()
+        return render_template("forum/search_result.html",
+                               type=result_type,
+                               results=result_list)
+    else:
+        return render_template("forum/search.html", form=form)
