@@ -13,7 +13,7 @@ import flask.ext.whooshalchemy
 from wtforms import TextAreaField, TextField, BooleanField, FormField, SelectMultipleField
 from wtforms.validators import Required
 
-from flaskbb.forum.models import Topic, Post, Report
+from flaskbb.forum.models import Topic, Post, Report, Forum, Category
 from flaskbb.user.models import User
 
 
@@ -73,7 +73,16 @@ class SearchForm(Form):
     def fetch_results(self):
         results = {}
         types = self.fetch_types()
+        query = self.search_query.data
         for type in types:
             if type == 'user':
-                results['user'] = User.query.whoosh_search(self.search_query)
-        print(results)
+                results['user'] = User.query.whoosh_search(query).all()
+            elif type == 'post':
+                results['post'] = Post.query.whoosh_search(query).all()
+            elif type == 'topic':
+                results['topic'] = Topic.query.whoosh_search(query).all()
+            elif type == 'forum':
+                results['forum'] = Forum.query.whoosh_search(query).all()
+            elif type == 'category':
+                results['category'] = Category.query.whoosh_search(query).all()
+        return results

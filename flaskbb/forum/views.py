@@ -514,8 +514,8 @@ def search_forum():
     if form.validate_on_submit():
         result_type = form.fetch_types()
         result_list = form.fetch_results()
+        print(result_list)
         return render_template("forum/search_result.html",
-                               type=result_type,
                                results=result_list)
     else:
         return render_template("forum/search.html", form=form)
