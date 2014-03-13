@@ -1,11 +1,20 @@
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
 {% from theme('macros.html') import render_pagination %}
+{% from theme("macros.html") import render_field, inline_field %}
 
 <legend>Manage Users | <a href="{{ url_for('admin.add_user') }}">Add User</a></legend>
 
 <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(users, url_for('admin.users')) }}
+</div>
+
+<div style="padding-bottom: 10px">
+    <form class="form" role="form" method="post">
+        {{ search_form.hidden_tag() }}
+        {{ inline_field(search_form.search_query, div_class="col-sm-12", rows=12) }}
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
 </div>
 
 <table class="table table-bordered">
@@ -20,19 +29,27 @@
         </tr>
     </thead>
     <tbody>
-        {% for user in users.items %}
+        {% if not users.items %}
         <tr>
-            <td>{{ user.id }}</td>
-            <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
-            <td>{{ user.post_count }}</td>
-            <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-            <td>{{ user.primary_group.name }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
-                <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
+            <td colspan="6">
+                No users found matching your search query
             </td>
         </tr>
-        {% endfor %}
+        {% else %}
+            {% for user in users.items %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+                <td>{{ user.post_count }}</td>
+                <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                <td>{{ user.primary_group.name }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
+                    <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
     </tbody>
 </table>
 {% endblock %}

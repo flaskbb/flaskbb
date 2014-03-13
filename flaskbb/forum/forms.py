@@ -59,30 +59,29 @@ class ReportForm(Form):
 
 
 class SearchForm(Form):
-    search_types = SelectMultipleField("Search Types", validators=[
-        Required("Please insert at least one search type")], choices=[
-        ('user', 'User'), ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('category', 'Category')
-    ])
-    search_query = TextField("Search Query", validators=[
-        Required(message="Please insert a search query")
-    ])
 
-    def fetch_types(self):
-        return self.search_types.data
+    def __init__(self, search_types=list()):
+        super(SearchForm, self).__init__()
+        self.search_types = search_types
 
-    def fetch_results(self):
+    search_query = TextField("Search Query")
+
+    def get_types(self):
+        return self.search_types
+
+    def get_results(self):
         results = {}
-        types = self.fetch_types()
+        types = self.get_types()
         query = self.search_query.data
         for type in types:
             if type == 'user':
-                results['user'] = User.query.whoosh_search(query).all()
+                results['user'] = User.query.whoosh_search(query)
             elif type == 'post':
-                results['post'] = Post.query.whoosh_search(query).all()
+                results['post'] = Post.query.whoosh_search(query)
             elif type == 'topic':
-                results['topic'] = Topic.query.whoosh_search(query).all()
+                results['topic'] = Topic.query.whoosh_search(query)
             elif type == 'forum':
-                results['forum'] = Forum.query.whoosh_search(query).all()
+                results['forum'] = Forum.query.whoosh_search(query)
             elif type == 'category':
-                results['category'] = Category.query.whoosh_search(query).all()
+                results['category'] = Category.query.whoosh_search(query)
         return results

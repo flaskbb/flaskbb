@@ -16,6 +16,7 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
 from flask.ext.login import current_user
 
 from flaskbb import __version__ as flaskbb_version
+from flaskbb.forum.forms import SearchForm
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
@@ -45,15 +46,21 @@ def overview():
                            post_count=post_count)
 
 
-@admin.route("/users")
+@admin.route("/users", methods=['GET', 'POST'])
 @admin_required
 def users():
     page = request.args.get("page", 1, type=int)
+    search_form = SearchForm(search_types=['user'])
 
-    users = User.query.\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+    if search_form.validate():
+        users = search_form.get_results()['user'].paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("admin/users.html", users=users, search_form=search_form)
+    else:
+        users = User.query. \
+            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("admin/users.html", users=users, search_form=search_form)
 
-    return render_template("admin/users.html", users=users)
+
 
 
 @admin.route("/groups")
