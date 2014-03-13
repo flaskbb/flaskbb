@@ -102,6 +102,29 @@
 {%- endmacro -%}
 
 
+{%- macro group_field(field, label_text='', label_class='') -%}
+    <div class="form-group {%- if field.errors %} has-error{%- endif %}" style="margin-bottom: 0px;">
+        {{field.label(class="sr-only")}}
+
+        {%- if kwargs['required'] or field.flags.required -%}
+            {% if label_text %}
+                {{field(class='form-control form-grouped', placeholder=label_text, required="required", **kwargs)}}
+            {% else %}
+                {{field(class='form-control form-grouped', placeholder=field.label.text, required="required", **kwargs)}}
+            {% endif %}
+        {%- else -%}
+            {% if label_text %}
+                {{field(class='form-control form-grouped', placeholder=label_text, **kwargs)}}
+            {% else %}
+                {{field(class='form-control form-grouped', placeholder=field.label.text, **kwargs)}}
+            {% endif %}
+        {%- endif -%}
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+{%- endmacro -%}
+
+
 {%- macro horizontal_field(field, label_text='', label_class='') -%}
 <div class="form-group row {%- if field.errors %} has-error{%- endif %}">
 

@@ -460,15 +460,19 @@ def who_is_online():
                            online_users=online_users)
 
 
-@forum.route("/memberlist")
+@forum.route("/memberlist", methods=['GET', 'POST'])
 def memberlist():
     page = request.args.get('page', 1, type=int)
 
-    users = User.query.order_by(User.id).\
-        paginate(page, current_app.config['POSTS_PER_PAGE'], False)
+    search_form = SearchForm(search_types=['user'])
 
-    return render_template("forum/memberlist.html",
-                           users=users)
+    if search_form.validate():
+        users = search_form.get_results()['user'].paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("forum/memberlist.html", users=users, search_form=search_form)
+    else:
+        users = User.query. \
+            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("forum/memberlist.html", users=users, search_form=search_form)
 
 
 @forum.route("/topictracker")
