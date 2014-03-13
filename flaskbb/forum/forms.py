@@ -11,7 +11,7 @@
 from flask.ext.wtf import Form
 import flask.ext.whooshalchemy
 from wtforms import TextAreaField, TextField, BooleanField, FormField, SelectMultipleField
-from wtforms.validators import Required
+from wtforms.validators import Required, Optional, Length
 
 from flaskbb.forum.models import Topic, Post, Report, Forum, Category
 from flaskbb.user.models import User
@@ -64,7 +64,7 @@ class SearchForm(Form):
         super(SearchForm, self).__init__()
         self.search_types = search_types
 
-    search_query = TextField("Search Query")
+    search_query = TextField("Search", validators=[Optional(), Length(min=3, max=50)])
 
     def get_types(self):
         return self.search_types
