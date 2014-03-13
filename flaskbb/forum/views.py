@@ -501,21 +501,3 @@ def untrack_topic(topic_id, slug=None):
     current_user.untrack_topic(topic)
     current_user.save()
     return redirect(topic.url)
-
-
-@forum.route("/search", methods=['GET', 'POST'])
-def search_forum():
-
-    if not current_user.is_authenticated():
-        flash("You need to be logged in for that feature.", "danger")
-        return redirect(url_for("forum.index"))
-
-    form = SearchForm()
-    if form.validate_on_submit():
-        result_type = form.get_types()
-        result_list = form.get_results()
-        print(result_list)
-        return render_template("forum/search_result.html",
-                               results=result_list)
-    else:
-        return render_template("forum/search.html", form=form)
