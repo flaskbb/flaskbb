@@ -91,7 +91,7 @@ class DefaultConfig(object):
     TITLE_LENGTH = 15
 
     # This is really handy if you do not have an redis instance like on windows
-    REDIS_ENABLED = False
+    REDIS_ENABLED = True
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     REDIS_DB = 0
