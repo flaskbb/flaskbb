@@ -65,6 +65,7 @@ class UserSearchForm(Form):
         query = self.search_query.data
         return User.query.whoosh_search(query)
 
+
 class SearchPageForm(Form):
     search_query = TextField("Search", validators=[Required(), Length(min=3, max=50)])
     search_types = SelectMultipleField("Content", validators=[Required()], choices=[
