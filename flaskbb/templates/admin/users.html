@@ -32,14 +32,7 @@
         </tr>
     </thead>
     <tbody>
-        {% if not users.items %}
-        <tr>
-            <td colspan="6">
-                No users found matching your search query
-            </td>
-        </tr>
-        {% else %}
-            {% for user in users.items %}
+        {% for user in users.items %}
             <tr>
                 <td>{{ user.id }}</td>
                 <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
@@ -51,8 +44,13 @@
                     <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
                 </td>
             </tr>
-            {% endfor %}
-        {% endif %}
+        {% else %}
+            <tr>
+                <td colspan="6">
+                    No users found matching your search query
+                </td>
+            </tr>
+        {% endfor %}
     </tbody>
 </table>
 {% endblock %}

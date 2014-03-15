@@ -516,4 +516,3 @@ def search():
         return render_template('forum/search_result.html', form=form, result=result)
 
     return render_template('forum/search_form.html', form=form)
-
