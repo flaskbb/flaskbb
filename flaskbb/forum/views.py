@@ -513,7 +513,7 @@ def search():
 
     if form.validate_on_submit():
         result = form.get_results()
-        return render_template('forum/search_result.html', form=form, result=results)
+        return render_template('forum/search_result.html', form=form, result=result)
 
     return render_template('forum/search_form.html', form=form)
 

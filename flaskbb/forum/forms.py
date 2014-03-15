@@ -9,8 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-import flask.ext.whooshalchemy
-from wtforms import TextAreaField, TextField, BooleanField, FormField, SelectMultipleField
+from wtforms import TextAreaField, TextField, SelectMultipleField
 from wtforms.validators import Required, Optional, Length
 
 from flaskbb.forum.models import Topic, Post, Report, Forum, Category
@@ -67,9 +66,9 @@ class UserSearchForm(Form):
 
 
 class SearchPageForm(Form):
-    search_query = TextField("Search", validators=[Required(), Length(min=3, max=50)])
+    search_query = TextField("Criteria", validators=[Required(), Length(min=3, max=50)])
     search_types = SelectMultipleField("Content", validators=[Required()], choices=[
-        ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('category', 'Category'), ('user', 'Users')])
+        ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('user', 'Users')])
 
     def get_results(self):
         # Because the DB is not yet initialized when this form is loaded, the query objects cannot be instantiated
@@ -78,7 +77,6 @@ class SearchPageForm(Form):
             'post': Post.query.whoosh_search,
             'topic': Topic.query.whoosh_search,
             'forum': Forum.query.whoosh_search,
-            'category': Category.query.whoosh_search,
             'user': User.query.whoosh_search
         }
 

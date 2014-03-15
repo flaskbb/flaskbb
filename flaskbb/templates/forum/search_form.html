@@ -1,23 +1,26 @@
 {% set page_title = "Search" %}
 
 {% extends theme("layout.html") %}
-
-{% block navigation %}
-{% endblock %}
-
+{% from theme("macros.html") import horizontal_field %}
 {% block content %}
-    {% from theme("macros.html") import render_field %}
 
-    <form class="form" role="form" method="post">
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+        <li class="active">Search</li>
+    </ul>
+
+    <form class="form-horizontal" role="form" method="post">
+        <h2>Search</h2>
+        <hr>
         {{ form.hidden_tag() }}
-        <h3>Search</h3>
-        <div class="row">
-            {{ render_field(form.search_types) }}
-        </div>
-        <div class="row">
-            {{ render_field(form.search_query) }}
-        </div>
+        {{ horizontal_field(form.search_types)}}
+        {{ horizontal_field(form.search_query)}}
 
-        <button type="submit" class="btn btn-success">Search</button>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <button type="submit" class="btn btn-success">Search</button>
+            </div>
+        </div>
     </form>
+
 {% endblock %}
