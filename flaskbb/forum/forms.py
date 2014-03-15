@@ -58,30 +58,35 @@ class ReportForm(Form):
         return report.save(user, post)
 
 
-class SearchForm(Form):
-
-    def __init__(self, search_types=list()):
-        super(SearchForm, self).__init__()
-        self.search_types = search_types
-
+class UserSearchForm(Form):
     search_query = TextField("Search", validators=[Optional(), Length(min=3, max=50)])
 
-    def get_types(self):
-        return self.search_types
+    def get_results(self):
+        query = self.search_query.data
+        return User.query.whoosh_search(query)
+
+class SearchPageForm(Form):
+    search_query = TextField("Search", validators=[Required(), Length(min=3, max=50)])
+    search_types = SelectMultipleField("Content", validators=[Required()], choices=[
+        ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('category', 'Category'), ('user', 'Users')])
 
     def get_results(self):
-        results = {}
-        types = self.get_types()
+        # Because the DB is not yet initialized when this form is loaded, the query objects cannot be instantiated
+        # in the class itself
+        search_actions = {
+            'post': Post.query.whoosh_search,
+            'topic': Topic.query.whoosh_search,
+            'forum': Forum.query.whoosh_search,
+            'category': Category.query.whoosh_search,
+            'user': User.query.whoosh_search
+        }
+
         query = self.search_query.data
-        for type in types:
-            if type == 'user':
-                results['user'] = User.query.whoosh_search(query)
-            elif type == 'post':
-                results['post'] = Post.query.whoosh_search(query)
-            elif type == 'topic':
-                results['topic'] = Topic.query.whoosh_search(query)
-            elif type == 'forum':
-                results['forum'] = Forum.query.whoosh_search(query)
-            elif type == 'category':
-                results['category'] = Category.query.whoosh_search(query)
+        types = self.search_types.data
+        results = {}
+
+        for type in search_actions.keys():
+            if type in types:
+                results[type] = search_actions[type](query)
+
         return results

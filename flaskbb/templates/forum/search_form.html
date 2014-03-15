@@ -1,0 +1,23 @@
+{% set page_title = "Search" %}
+
+{% extends theme("layout.html") %}
+
+{% block navigation %}
+{% endblock %}
+
+{% block content %}
+    {% from theme("macros.html") import render_field %}
+
+    <form class="form" role="form" method="post">
+        {{ form.hidden_tag() }}
+        <h3>Search</h3>
+        <div class="row">
+            {{ render_field(form.search_types) }}
+        </div>
+        <div class="row">
+            {{ render_field(form.search_query) }}
+        </div>
+
+        <button type="submit" class="btn btn-success">Search</button>
+    </form>
+{% endblock %}

@@ -25,7 +25,7 @@ from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
-                                 ReportForm, SearchForm)
+                                 ReportForm, UserSearchForm, SearchPageForm)
 from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
@@ -464,10 +464,10 @@ def who_is_online():
 def memberlist():
     page = request.args.get('page', 1, type=int)
 
-    search_form = SearchForm(search_types=['user'])
+    search_form = UserSearchForm()
 
     if search_form.validate():
-        users = search_form.get_results()['user'].paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        users = search_form.get_results().paginate(page, current_app.config['USERS_PER_PAGE'], False)
         return render_template("forum/memberlist.html", users=users, search_form=search_form)
     else:
         users = User.query. \
@@ -505,3 +505,15 @@ def untrack_topic(topic_id, slug=None):
     current_user.untrack_topic(topic)
     current_user.save()
     return redirect(topic.url)
+
+
+@forum.route("/search", methods=['GET', 'POST'])
+def search():
+    form = SearchPageForm()
+
+    if form.validate_on_submit():
+        result = form.get_results()
+        return render_template('forum/search_result.html', form=form, result=results)
+
+    return render_template('forum/search_form.html', form=form)
+
