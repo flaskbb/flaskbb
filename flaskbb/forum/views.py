@@ -335,6 +335,35 @@ def new_post(topic_id, slug=None):
     return render_template("forum/new_post.html", topic=topic, form=form)
 
 
+@forum.route("/topic/<int:topic_id>/post/<int:post_id>/reply", methods=["POST", "GET"])
+@login_required
+def reply_post(topic_id, post_id):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    post = Post.query.filter_by(id=post_id).first_or_404()
+
+    if post.topic.forum.locked:
+        flash("This forum is locked; you cannot submit new topics or posts.",
+              "danger")
+        return redirect(post.topic.forum.url)
+
+    if post.topic.locked:
+        flash("The topic is locked.", "danger")
+        return redirect(post.topic.forum.url)
+
+    if not can_post_reply(user=current_user, forum=topic.forum):
+        flash("You do not have the permissions to post in this topic", "danger")
+        return redirect(topic.forum.url)
+
+    form = ReplyForm()
+    if form.validate_on_submit():
+        form.save(current_user, topic)
+        return redirect(post.topic.url)
+    else:
+        form.content.data = '[quote]{}[/quote]'.format(post.content)
+
+    return render_template("forum/new_post.html", topic=post.topic, form=form)
+
+
 @forum.route("/post/<int:post_id>/edit", methods=["POST", "GET"])
 @login_required
 def edit_post(post_id):

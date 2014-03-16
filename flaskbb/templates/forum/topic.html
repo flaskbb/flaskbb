@@ -1,7 +1,7 @@
+{% extends theme("layout.html") %}
 {% set page_title = topic.title ~ " - Topic" %}
 {% set active_forum_nav=True %}
 
-{% extends theme("layout.html") %}
 {% block content %}
 {% from theme('macros.html') import render_pagination, form_field %}
 
@@ -130,12 +130,14 @@
                 <div class="post_body" id="pid{{ post.id }}">
                 {% autoescape false %}
                     {{ post.content|markup }}
-                    <!-- Signaure Begin -->
+                    <!-- Signature Begin -->
                     {% if post.user_id and post.user.signature %}
-                    <hr>
-                    {{ post.user.signature|markup }}
+                    <div class="signature">
+                        <hr>
+                        {{ post.user.signature|markup }}
+                    </div>
                     {% endif %}
-                    <!-- Signaure End -->
+                    <!-- Signature End -->
                 {% endautoescape %}
                 </div>
             </td>
@@ -167,25 +169,32 @@
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}
-
-                    <a href="#">Quote</a>
+                    {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+                        <!-- Quick quote -->
+                        <a href="#" class="quote_btn" data-post-id="pid{{ post.id }}">Quote</a> |
+                        <!-- Full quote/reply -->
+                        <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">Reply</a>
+                    {% endif %}
                 </span>
             </td>
         </tr>
         {% endfor %}
-
     </tbody>
 </table>
 
 {% if form %}
     {% from "macros.html" import render_field %}
-<form class="form" action="#" method="post">
-    {{ form.hidden_tag() }}
+    <form class="form" action="#" method="post">
+        {{ form.hidden_tag() }}
 
-    {{ render_field(form.content, div_class="col-sm-12", rows=5) }}
+        {{ render_field(form.content, div_class="col-sm-12 reply-content", rows=5) }}
 
-    <button type="submit" class="btn btn-success">Reply!</button>
-</form>
+        <button type="submit" class="btn btn-success">Reply!</button>
+    </form>
 {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
 {% endblock %}
