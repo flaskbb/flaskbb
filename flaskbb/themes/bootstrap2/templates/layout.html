@@ -47,6 +47,7 @@
                             {# active_forum_nav is set in {forum, category, topic}.html and new_{topic, post}.html #}
                             {{ topnav(endpoint='forum.index', name='Forum', icon='fa fa-comment', active=active_forum_nav) }}
                             {{ topnav(endpoint='forum.memberlist', name='Memberlist', icon='fa fa-user') }}
+                            {{ topnav(endpoint='forum.search', name='Search', icon='fa fa-search') }}
                         </ul>
 
                     {% if current_user and current_user.is_authenticated() %}
@@ -94,11 +95,6 @@
                             </ul>
                         </div>
                     {% endif %}
-                        <form class="navbar-form navbar-right" role="search">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search">
-                            </div>
-                        </form>
                     </div><!-- nav-collapse -->
                 </div><!-- container -->
             </nav> <!-- navbar navbar-inverse -->

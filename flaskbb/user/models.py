@@ -44,8 +44,9 @@ class Group(db.Model):
     editpost = db.Column(db.Boolean, default=True, nullable=False)
     deletepost = db.Column(db.Boolean, default=False, nullable=False)
     deletetopic = db.Column(db.Boolean, default=False, nullable=False)
-    locktopic = db.Column(db.Boolean, default=True, nullable=False)
-    movetopic = db.Column(db.Boolean, default=True, nullable=False)
+    locktopic = db.Column(db.Boolean, default=False, nullable=False)
+    movetopic = db.Column(db.Boolean, default=False, nullable=False)
+    mergetopic = db.Column(db.Boolean, default=False, nullable=False)
     posttopic = db.Column(db.Boolean, default=True, nullable=False)
     postreply = db.Column(db.Boolean, default=True, nullable=False)
 
@@ -71,6 +72,7 @@ class Group(db.Model):
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
+    __searchable__ = ['username', 'email']
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)

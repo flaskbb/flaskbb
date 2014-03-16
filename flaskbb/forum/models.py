@@ -134,6 +134,7 @@ class Report(db.Model):
 
 class Post(db.Model):
     __tablename__ = "posts"
+    __searchable__ = ['content', 'username']
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
@@ -235,6 +236,7 @@ class Post(db.Model):
 
 class Topic(db.Model):
     __tablename__ = "topics"
+    __searchable__ = ['title', 'username']
 
     query_class = TopicQuery
 
@@ -324,6 +326,31 @@ class Topic(db.Model):
         old_forum.update_last_post()
 
         TopicsRead.query.filter_by(topic_id=self.id).delete()
+
+        return True
+
+    def merge(self, topic):
+        """Merges a topic with another topic together
+
+        :param topic: The new topic for the posts in this topic
+        """
+
+        # You can only merge a topic with a differrent topic in the same forum
+        if self.id == topic.id or not self.forum_id == topic.forum_id:
+            return False
+
+        # Update the topic id
+        Post.query.filter_by(topic_id=self.id).\
+            update({Post.topic_id: topic.id})
+
+        # Increase the post and views count
+        topic.post_count += self.post_count
+        topic.views += self.views
+
+        topic.save()
+
+        # Finally delete the old topic
+        Topic.query.filter_by(id=self.id).delete()
 
         return True
 
@@ -502,6 +529,7 @@ class Topic(db.Model):
 
 class Forum(db.Model):
     __tablename__ = "forums"
+    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
@@ -616,6 +644,7 @@ class Forum(db.Model):
 
 class Category(db.Model):
     __tablename__ = "categories"
+    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(63), nullable=False)

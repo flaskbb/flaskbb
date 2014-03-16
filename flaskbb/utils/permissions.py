@@ -79,6 +79,12 @@ def can_move_topic(user, forum):
     return check_perm(user=user, perm='movetopic', forum=forum)
 
 
+def can_merge_topic(user, forum):
+    """Check if the user is allowed to merge a topic in the forum"""
+
+    return check_perm(user=user, perm='mergetopic', forum=forum)
+
+
 def can_post_reply(user, forum):
     """Check if the user is allowed to post in the forum"""
 

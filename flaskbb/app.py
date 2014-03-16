@@ -24,9 +24,11 @@ from flaskbb.auth.views import auth
 from flaskbb.admin.views import admin
 # Import the forum blueprint
 from flaskbb.forum.views import forum
+from flaskbb.forum.models import Post, Topic, Category, Forum
 # extenesions
 from flaskbb.extensions import db, login_manager, mail, cache, redis, \
     debugtoolbar, migrate, themes
+from flask.ext.whooshalchemy import whoosh_index
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -93,6 +95,14 @@ def configure_extensions(app):
 
     # Flask-And-Redis
     redis.init_app(app)
+
+    # Flask-WhooshAlchemy
+    with app.app_context():
+        whoosh_index(app, Post)
+        whoosh_index(app, Topic)
+        whoosh_index(app, Forum)
+        whoosh_index(app, Category)
+        whoosh_index(app, User)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]

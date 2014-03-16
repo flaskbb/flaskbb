@@ -25,7 +25,7 @@ from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
-                                 ReportForm)
+                                 ReportForm, UserSearchForm, SearchPageForm)
 from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
@@ -293,6 +293,21 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/<int:old_id>/merge/<int:new_id>")
+@forum.route("/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>")
+@login_required
+def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
+    old_topic = Topic.query.filter_by(id=old_id).first_or_404()
+    new_topic = Topic.query.filter_by(id=new_id).first_or_404()
+
+    if not old_topic.merge(new_topic):
+        flash("Could not merge the topic.", "danger")
+        return redirect(old_topic.url)
+
+    flash("Topic succesfully merged.", "success")
+    return redirect(new_topic.url)
+
+
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
 @forum.route("/topic/<int:topic_id>-<slug>/post/new", methods=["POST", "GET"])
 @login_required
@@ -443,15 +458,19 @@ def who_is_online():
                            online_users=online_users)
 
 
-@forum.route("/memberlist")
+@forum.route("/memberlist", methods=['GET', 'POST'])
 def memberlist():
     page = request.args.get('page', 1, type=int)
 
-    users = User.query.order_by(User.id).\
-        paginate(page, current_app.config['POSTS_PER_PAGE'], False)
+    search_form = UserSearchForm()
 
-    return render_template("forum/memberlist.html",
-                           users=users)
+    if search_form.validate():
+        users = search_form.get_results().paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("forum/memberlist.html", users=users, search_form=search_form)
+    else:
+        users = User.query. \
+            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("forum/memberlist.html", users=users, search_form=search_form)
 
 
 @forum.route("/topictracker")
@@ -484,3 +503,14 @@ def untrack_topic(topic_id, slug=None):
     current_user.untrack_topic(topic)
     current_user.save()
     return redirect(topic.url)
+
+
+@forum.route("/search", methods=['GET', 'POST'])
+def search():
+    form = SearchPageForm()
+
+    if form.validate_on_submit():
+        result = form.get_results()
+        return render_template('forum/search_result.html', form=form, result=result)
+
+    return render_template('forum/search_form.html', form=form)

@@ -1,11 +1,23 @@
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
 {% from theme('macros.html') import render_pagination %}
+{% from theme("macros.html") import render_field, group_field %}
 
 <legend>Manage Users | <a href="{{ url_for('admin.add_user') }}">Add User</a></legend>
 
 <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(users, url_for('admin.users')) }}
+</div>
+<div class="pull-right" style="padding-bottom: 10px">
+    <form role="form" method="post">
+        <div class="input-group">
+            {{ search_form.hidden_tag() }}
+            {{ group_field(search_form.search_query) }}
+      <span class="input-group-btn">
+        <button class="btn btn-primary" type="button">Search</button>
+      </span>
+        </div>
+    </form>
 </div>
 
 <table class="table table-bordered">
@@ -21,17 +33,23 @@
     </thead>
     <tbody>
         {% for user in users.items %}
-        <tr>
-            <td>{{ user.id }}</td>
-            <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
-            <td>{{ user.post_count }}</td>
-            <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-            <td>{{ user.primary_group.name }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
-                <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
-            </td>
-        </tr>
+            <tr>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+                <td>{{ user.post_count }}</td>
+                <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                <td>{{ user.primary_group.name }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
+                    <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">
+                    No users found matching your search query
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>
