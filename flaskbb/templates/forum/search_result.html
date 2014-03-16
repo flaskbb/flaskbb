@@ -1,0 +1,269 @@
+{% set page_title = "Search" %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+    {% from theme('macros.html') import render_pagination, group_field, topic_pages %}
+
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+        <li class="active">Search</li>
+    </ul>
+
+    {% if result['post'] %}
+        <h3>Posts</h3>
+
+        <table class="table table-bordered">
+            <tbody>
+            {% for post in result['post'].all() %}
+            <tr>
+                <td>
+                    <table class="table table-borderless">
+                        <tr>
+                            {% if post.user_id %}
+                                {% if post.user.avatar %}
+                                    <td width="1">
+                                        <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    <a href="{{ post.user.url }}">
+                                        <span style="font-weight:bold">{{ post.user.username }}</span> <!-- TODO: Implement userstyles -->
+                                    </a>
+                                    {%- if post.user|is_online %}
+                                        <span class="label label-success">Online</span>
+                                    {%- else %}
+                                        <span class="label label-default">Offline</span>
+                                    {%- endif %}
+                                    <div class="profile primary-group">
+                                        {{ post.user.primary_group.name }}
+                                    </div>
+                                </td>
+
+                                <td class="pull-right">
+                                    Posts: {{ post.user.post_count }}<br />
+                                    Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
+                                </td>
+                            {% else %}
+                                <td>
+                                    <strong>{{ post.username }}</strong>
+                                    <br />
+                                    Guest
+                                </td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="post_body" id="pid{{ post.id }}">
+                        {% autoescape false %}
+                        {{ post.content|markup }}
+                        {% endautoescape %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td>No posts found matching your search criteria</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if result['user'] %}
+        <h3>Users</h3>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Posts</th>
+                <th>Date registered</th>
+                <th>Group</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in result['user'].all() %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><a href="{{ user.url }}">{{ user.username }}</a></td>
+                    <td>{{ user.post_count }}</td>
+                    <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                    <td>{{ user.primary_group.name }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">No users found matching your search criteria</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if result['topic'] %}
+        <h3>Topics</h3>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th colspan="2">Topic</th>
+
+                <th>Posts</th>
+
+                <th>Views</th>
+
+                <th>Last Post</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for topic in result['topic'].all() %}
+                <tr>
+                    <td width="4%">
+                        {% if topic.locked %}
+                            <span class="fa fa-locked" style="font-size: 2em"></span>
+                        {% else %}
+                            <span class="fa fa-comment-o" style="font-size: 2em"></span>
+                        {% endif %}
+
+                    </td>
+                    <td>
+                        <div>
+                            <a href="{{ topic.url }}">{{ topic.title }}</a>
+                            <!-- Topic Pagination -->
+                            {{ topic_pages(topic, config["POSTS_PER_PAGE"]) }}
+                            <br />
+                            {% if topic.user_id %}
+                                <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
+                            {% else %}
+                                <small>by {{ topic.username }}</small>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {{ topic.post_count }}
+                    </td>
+                    <td>
+                        {{ topic.views }}
+                    </td>
+                    <td>
+                        <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+
+                        {% if topic.last_post.user_id %}
+                            <small>by <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a></small>
+                        {% else %}
+                            <small>{{ topic.last_post.username }}</small>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">No topics found matching your search criteria</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if result['forum'] %}
+        <h3>Forums</h3>
+
+        <table class="table table-bordered">
+            <thead class="categoryhead">
+            <tr>
+                <th colspan="2"><strong>Forum</strong></th>
+                <th width="85" align="center" style="white-space: nowrap"><strong>Topics</strong></th>
+                <th width="85" align="center" style="white-space: nowrap"><strong>Posts</strong></th>
+                <th width="200" align="center" style="white-space: nowrap"><strong>Last Post</strong></th>
+            </tr>
+            </thead>
+            <tbody class="forumbody">
+            {% for forum in result['forum'].all() %}
+            <tr>
+                <td align="center" valign="center" width="4%">
+
+                    {% if forum.external %}
+                    <span class="fa fa-external-link" style="font-size: 2em"></span>
+                </td>
+
+                <td valign="top">
+                    <strong><a href="{{ forum.external }}">{{ forum.title }}</a></strong>
+
+                    <div class="forum-description">
+                        {% autoescape false %}
+                        {{ forum.description|markup }}
+                        {% endautoescape %}
+                    </div>
+                </td>
+
+                <td valign="top" align="center" style="white-space: nowrap">-</td>
+                <td valign="top" align="center" style="white-space: nowrap">-</td>
+                <td valign="top" align="right" style="white-space: nowrap">-</td>
+                <!-- End external -->
+                {% else %}
+
+                {% if forum.locked %}
+                    <span class="fa fa-lock" style="font-size: 2em"></span>
+                {% else %}
+                    <span class="fa fa-comments-o" style="font-size: 2em"></span>
+                {% endif %}
+
+                </td>
+
+                <td valign="top">
+                    <strong><a href="{{ forum.url }}">{{ forum.title }}</a></strong>
+
+                    <div class="forum-description">
+                        {% autoescape false %}
+                        {{ forum.description|markup }}
+                        {% endautoescape %}
+                        {% if forum.show_moderators %}
+                            <div class="forum-moderators">
+                                Moderators:
+                                {% for moderator in forum.moderators %}
+                                    <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </td>
+
+                <td valign="top" align="center" style="white-space: nowrap">{{ forum.topic_count }}</td>
+                <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
+
+                <td valign="top" align="right" style="white-space: nowrap">
+                    {% if forum.last_post_id %}
+                        <a href="{{ forum.last_post.url }}" title="{{ forum.last_post.topic.title }}">
+                            <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
+                        </a>
+                        <br />
+                        {{ forum.last_post.date_created|time_since }}<br />
+
+                        {% if forum.last_post.user_id %}
+                            by <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
+                        {% else %}
+                            {{ forum.last_post.username }}
+                        {% endif %}
+
+                    {% else %}
+                        No posts
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">
+                    No forums found matching your search criteria
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}
