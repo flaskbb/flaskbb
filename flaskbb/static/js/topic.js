@@ -2,7 +2,6 @@
  * Topic.js
  */
 $(document).ready(function () {
-    console.log("document ready")
         $(".quote_btn").click(function (event) {
             event.preventDefault();
 
