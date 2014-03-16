@@ -89,3 +89,4 @@ class SearchPageForm(Form):
                 results[type] = search_actions[type](query)
 
         return results
+
