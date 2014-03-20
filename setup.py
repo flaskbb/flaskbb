@@ -61,14 +61,15 @@ setup(
         'alembic==0.6.3',
         'blinker==1.3',
         'itsdangerous==0.23',
-        'postmarkup==1.2.0',
         'redis==2.9.1',
         'simplejson==3.3.3',
         'wsgiref==0.1.2',
-        'Flask-WhooshAlchemy'
+        'Flask-WhooshAlchemy',
+        'postmarkup'
     ],
     dependency_links=[
-        'http://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg=Flask-WhooshAlchemy'
+        'https://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg=Flask-WhooshAlchemy',
+        'https://github.com/frol/postmarkup/tarball/master#egg=postmarkup'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
