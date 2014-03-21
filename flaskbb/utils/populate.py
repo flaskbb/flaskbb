@@ -30,9 +30,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
-        'mergetopic': True,
-        'viewtopic': True,
-        'viewprofile': True
+        'mergetopic': True
     }),
     ('Super Moderator', {
         'description': 'The Super Moderator Group',
@@ -48,9 +46,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
-        'mergetopic': True,
-        'viewtopic': True,
-        'viewprofiles': True
+        'mergetopic': True
     }),
     ('Moderator', {
         'description': 'The Moderator Group',
@@ -66,9 +62,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': True,
         'movetopic': True,
-        'mergetopic': True,
-        'viewtopic': True,
-        'viewprofile': True
+        'mergetopic': True
     }),
     ('Member', {
         'description': 'The Member Group',
@@ -84,9 +78,7 @@ GROUPS = OrderedDict((
         'postreply': True,
         'locktopic': False,
         'movetopic': False,
-        'mergetopic': False,
-        'viewtopic': True,
-        'viewprofile': True
+        'mergetopic': False
     }),
     ('Banned', {
         'description': 'The Banned Group',
@@ -102,9 +94,7 @@ GROUPS = OrderedDict((
         'postreply': False,
         'locktopic': False,
         'movetopic': False,
-        'mergetopic': False,
-        'viewtopic': False,
-        'viewprofile': False
+        'mergetopic': False
     }),
     ('Guest', {
         'description': 'The Guest Group',
@@ -120,9 +110,7 @@ GROUPS = OrderedDict((
         'postreply': False,
         'locktopic': False,
         'movetopic': False,
-        'mergetopic': False,
-        'viewtopic': False,
-        'viewprofile': False
+        'mergetopic': False
     })
 ))
 

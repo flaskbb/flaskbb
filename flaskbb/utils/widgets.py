@@ -28,7 +28,7 @@ class SelectDateWidget(object):
         '%Y': 'select_date_year'
     }
 
-    def __init__(self, years=range(1930, datetime.utcnow().year+1)):
+    def __init__(self, years=range(1930, datetime.utcnow().year + 1)):
         super(SelectDateWidget, self).__init__()
         self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
 

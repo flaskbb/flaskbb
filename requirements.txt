@@ -25,3 +25,8 @@ redis==2.9.1
 simplejson==3.3.3
 wsgiref==0.1.2
 http://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg=Flask-WhooshAlchemy
+
+
+# Testing
+pytest==2.5.2
+pytest-random==0.02
