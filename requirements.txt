@@ -23,5 +23,11 @@ itsdangerous==0.23
 redis==2.9.1
 simplejson==3.3.3
 wsgiref==0.1.2
+
+
 https://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg=Flask-WhooshAlchemy
 https://github.com/frol/postmarkup/tarball/master#egg=postmarkup
+
+# Testing
+pytest==2.5.2
+pytest-random==0.02

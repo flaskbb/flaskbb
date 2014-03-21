@@ -16,7 +16,7 @@ from flask import current_app
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
                               prompt_bool)
-from flask.ext.migrate import MigrateCommand, upgrade as db_upgrade
+from flask.ext.migrate import MigrateCommand
 
 from flaskbb import create_app
 from flaskbb.extensions import db
