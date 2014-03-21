@@ -21,8 +21,8 @@ def application():
 
 @pytest.fixture()
 def default_groups():
-    """By default we'll always want create the default groups."""
-    create_default_groups()
+    """Creates the default groups"""
+    return create_default_groups()
 
 
 @pytest.yield_fixture()

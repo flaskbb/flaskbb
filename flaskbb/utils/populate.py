@@ -119,6 +119,7 @@ def create_default_groups():
     """
     This will create the 5 default groups
     """
+    result = []
     for key, value in GROUPS.items():
         group = Group(name=key)
 
@@ -126,6 +127,8 @@ def create_default_groups():
             setattr(group, k, v)
 
         group.save()
+        result.append(group)
+    return result
 
 
 def create_admin_user(username, password, email):

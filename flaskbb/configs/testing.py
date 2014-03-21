@@ -2,7 +2,7 @@
     flaskbb.configs.testing
     ~~~~~~~~~~~~~~~~~~~~
 
-    This is the FlaskBB's development config.
+    This is the FlaskBB's testing config.
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
@@ -12,7 +12,7 @@ from flaskbb.configs.default import DefaultConfig
 
 class TestingConfig(DefaultConfig):
 
-    # Indicates that it is a dev environment
+    # Indicates that it is a testing environment
     DEBUG = False
     TESTING = True
 
@@ -24,7 +24,7 @@ class TestingConfig(DefaultConfig):
     )
 
     # This will print all SQL statements
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
     # Security
     SECRET_KEY = "SecretKeyForSessionSigning"

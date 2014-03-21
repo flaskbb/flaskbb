@@ -7,7 +7,7 @@ from flaskbb.user.models import Group
 @pytest.fixture()
 def default_groups():
     """Overwrite for the default fixture, in this case we don't want the default groups created."""
-    pass
+    return []
 
 
 def test_create_default_groups(database):
