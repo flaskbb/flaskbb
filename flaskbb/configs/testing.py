@@ -20,7 +20,7 @@ class TestingConfig(DefaultConfig):
     # This will create in the applications folder (where manage.py is)
     # a database named flaskbb.sqlite.
     SQLALCHEMY_DATABASE_URI = (
-        'sqlite:///' + DefaultConfig._basedir + '/' + 'flaskbb_testing.sqlite'
+        'sqlite://'
     )
 
     # This will print all SQL statements
