@@ -26,7 +26,7 @@ def default_groups():
 
 
 @pytest.yield_fixture()
-def database(default_groups):
+def database():
     """database setup."""
     db.create_all()  # Maybe use migration instead?
 
