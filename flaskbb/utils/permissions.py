@@ -32,7 +32,7 @@ def check_perm(user, perm, forum, post_user_id=None):
     return user.permissions[perm]
 
 
-def can_moderate(user, forum):
+def can_moderate(user, forum, perm=None):
     """Checks if a user can moderate a forum
     He needs to be super moderator or a moderator of the
     specified forum
@@ -40,9 +40,19 @@ def can_moderate(user, forum):
     :param user: The user for whom we should check the permission.
 
     :param forum: The forum that should be checked.
+
+    :param perm: Optional - Check if the user also has the permission to do
+                 certain things in the forum. There are a few permissions
+                 where you need to be at least a moderator (or anything higher)
+                 in the forum and therefore you can pass a permission and
+                 it will check if the user has it. Those special permissions
+                 are documented here: <INSERT LINK TO DOCS>
     """
     if user.permissions['mod'] and user in forum.moderators:
+        if perm is not None:
+            return user.permissions[perm]
         return True
+
     return user.permissions['super_mod'] or user.permissions['admin']
 
 
@@ -67,24 +77,6 @@ def can_delete_topic(user, post_user_id, forum):
                       post_user_id=post_user_id)
 
 
-def can_lock_topic(user, forum):
-    """ Check if the user is allowed to lock a topic in the forum"""
-
-    return check_perm(user=user, perm='locktopic', forum=forum)
-
-
-def can_move_topic(user, forum):
-    """Check if the user is allowed to move a topic in the forum"""
-
-    return check_perm(user=user, perm='movetopic', forum=forum)
-
-
-def can_merge_topic(user, forum):
-    """Check if the user is allowed to merge a topic in the forum"""
-
-    return check_perm(user=user, perm='mergetopic', forum=forum)
-
-
 def can_post_reply(user, forum):
     """Check if the user is allowed to post in the forum"""
 
@@ -95,3 +87,29 @@ def can_post_topic(user, forum):
     """Checks if the user is allowed to create a new topic in the forum"""
 
     return check_perm(user=user, perm='posttopic', forum=forum)
+
+
+def can_lock_topic(user, forum):
+    """Check if the user is allowed to lock a topic in the forum
+    Returns True if the user can moderate the forum and has the permission
+    to do it.
+    """
+
+    return can_moderate(user, forum, "locktopic")
+
+
+def can_move_topic(user, forum):
+    """Check if the user is allowed to move a topic in the forum
+    Returns True if the user can moderate the forum and has the permission
+    to do it."""
+
+    return can_moderate(user, forum, "movetopic")
+
+
+def can_merge_topic(user, forum):
+    """Check if the user is allowed to merge a topic in the forum.
+    Returns True if the user can moderate the forum and has the permission
+    to do it.
+    """
+
+    return can_moderate(user, forum, "mergetopic")
