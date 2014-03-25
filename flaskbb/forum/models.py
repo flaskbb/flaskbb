@@ -141,8 +141,7 @@ class Post(db.Model):
                          db.ForeignKey("topics.id",
                                        use_alter=True,
                                        name="fk_post_topic_id",
-                                       ondelete="CASCADE"),
-                         nullable=False)
+                                       ondelete="CASCADE"))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     username = db.Column(db.String(15), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -579,8 +578,8 @@ class Forum(db.Model):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def update_last_post(self):
-        """Updates the last post. This is useful if you move a topic
-        in another forum
+        """Updates the last post in the forum.
+        This is useful if you move a topic in another forum.
         """
         last_post = Post.query.\
             filter(Post.topic_id == Topic.id,

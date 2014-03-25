@@ -23,6 +23,8 @@ class TestingConfig(DefaultConfig):
         'sqlite://'
     )
 
+    SERVER_NAME = "localhost:5000"
+
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
 
