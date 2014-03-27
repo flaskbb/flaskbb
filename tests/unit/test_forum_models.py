@@ -10,12 +10,32 @@ def test_category_save(database):
 
 
 def test_category_delete(category):
-    # TODO: Test user post counts
     category.delete()
 
     category = Category.query.filter_by(id=category.id).first()
 
     assert category is None
+
+
+def test_category_delete_with_user(topic_normal):
+    user = topic_normal.user
+    forum = topic_normal.forum
+    category = topic_normal.forum.category
+
+    assert user.post_count == 1
+    assert forum.post_count == 1
+    assert forum.topic_count == 1
+
+    category.delete([user])
+
+    assert user.post_count == 0
+
+    category = Category.query.filter_by(id=category.id).first()
+    topic = Topic.query.filter_by(id=topic_normal.id).first()
+
+    assert category is None
+    # The topic should also be deleted
+    assert topic is None
 
 
 def test_category_delete_with_forum(forum):
@@ -40,12 +60,10 @@ def test_forum_save(category, moderator_user):
     # Test with adding a moderator
     forum.save([moderator_user])
 
-    for moderator in forum.moderators:
-        assert moderator == moderator_user
+    assert forum.moderators == [moderator_user]
 
 
 def test_forum_delete(forum):
-    # TODO: Test user post counts
     forum.delete()
 
     forum = Forum.query.filter_by(id=forum.id).first()
@@ -99,6 +117,11 @@ def test_topic_save(forum, normal_user):
 
     assert topic.title == "Test Title"
 
+    topic.title = "Test Edit Title"
+    topic.save()
+
+    assert topic.title == "Test Edit Title"
+
     # The first post in the topic is also the last post
     assert topic.first_post_id == post.id
     assert topic.last_post_id == post.id
@@ -124,10 +147,13 @@ def test_topic_delete(topic_normal):
     assert user.post_count == 0
     assert forum.topic_count == 0
     assert forum.post_count == 0
+    assert forum.last_post_id is None
 
 
 def test_topic_merge(topic_normal, topic_moderator):
     assert topic_normal.merge(topic_moderator)
+
+    # TODO: Test last post
 
     topic_normal = Topic.query.filter_by(id=topic_normal.id).first()
     assert topic_normal is None
@@ -155,13 +181,73 @@ def test_topic_move(topic_normal):
     assert topic_normal.move(forum_other)
 
     assert forum_old.topics == []
+    assert forum_old.last_post_id == 0
 
     assert forum_old.topic_count == 0
     assert forum_old.post_count == 0
 
+    assert forum_other.last_post_id == topic_normal.last_post_id
     assert forum_other.topic_count == 1
     assert forum_other.post_count == 1
 
 
 def test_topic_move_same_forum(topic_normal):
     assert not topic_normal.move(topic_normal.forum)
+
+
+def test_topic_update_read():
+    # TODO: Refactor it, to make it easier to test it
+    pass
+
+
+def test_topic_url(topic_normal):
+    assert topic_normal.url == "http://localhost:5000/topic/1-test-topic-normal"
+
+
+def test_topic_slug(topic_normal):
+    assert topic_normal.slug == "test-topic-normal"
+
+
+def test_post_save(topic_normal, normal_user):
+    post = Post(content="Test Content")
+    post.save(topic=topic_normal, user=normal_user)
+
+    assert post.content == "Test Content"
+
+    post.content = "Test Edit Content"
+    post.save()
+
+    assert post.content == "Test Edit Content"
+
+    assert topic_normal.user.post_count == 2
+    assert topic_normal.post_count == 2
+    assert topic_normal.last_post == post
+    assert topic_normal.forum.post_count == 2
+
+
+def test_post_delete(topic_normal):
+    post_middle = Post(content="Test Content Middle")
+    post_middle.save(topic=topic_normal, user=topic_normal.user)
+
+    post_last = Post(content="Test Content Last")
+    post_last.save(topic=topic_normal, user=topic_normal.user)
+
+    assert topic_normal.post_count == 3
+    assert topic_normal.forum.post_count == 3
+    assert topic_normal.user.post_count == 3
+
+    post_middle.delete()
+
+    # Check the last posts
+    assert topic_normal.last_post == post_last
+    assert topic_normal.forum.last_post == post_last
+
+    post_last.delete()
+
+    # That was a bit trickier..
+    assert topic_normal.post_count == 1
+    assert topic_normal.forum.post_count == 1
+    assert topic_normal.user.post_count == 1
+    assert topic_normal.first_post_id == topic_normal.last_post_id
+
+    assert topic_normal.forum.last_post_id == topic_normal.last_post_id
