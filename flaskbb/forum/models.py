@@ -213,14 +213,29 @@ class Post(db.Model):
         # Delete the last post
         if self.topic.last_post_id == self.id:
 
-            # Now the second last post will be the last post
-            self.topic.last_post_id = self.topic.second_last_post
+            # update the last post in the forum
+            if self.topic.last_post_id == self.topic.forum.last_post_id:
+                # We need the second last post in the forum here,
+                # because the last post will be deleted
+                second_last_post = Post.query.\
+                    filter(Post.topic_id == Topic.id,
+                           Topic.forum_id == self.topic.forum.id).\
+                    order_by(Post.id.desc()).limit(2).offset(0).\
+                    all()
 
-            # check if the last_post is also the last post in the forum
-            if self.topic.last_post_id == self.id:
+                second_last_post = second_last_post[1]
+
+                self.topic.forum.last_post_id = second_last_post.id
+
+            # check if there is a second last post, else it is the first post
+            if self.topic.second_last_post:
+                # Now the second last post will be the last post
                 self.topic.last_post_id = self.topic.second_last_post
-                self.topic.forum.last_post_id = self.topic.second_last_post
-                db.session.commit()
+
+            # there is no second last post, now the last post is also the
+            # first post
+            else:
+                self.topic.last_post_id = self.topic.first_post_id
 
         # Update the post counts
         self.user.post_count -= 1
@@ -407,8 +422,9 @@ class Topic(db.Model):
                 # Now the second last post will be the last post
                 self.forum.last_post_id = topic[1].last_post_id
             # Catch an IndexError when you delete the last topic in the forum
+            # There is no second last post
             except IndexError:
-                self.forum.last_post_id = None
+                self.forum.last_post_id = 0
 
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
@@ -439,7 +455,7 @@ class Topic(db.Model):
 
     def update_read(self, user, forum, forumsread=None):
         """Update the topics read status if the user hasn't read the latest
-        post.
+        post. Returns True if the tracker has been updated.
 
         :param user: The user for whom the readstracker should be updated
 
@@ -578,9 +594,7 @@ class Forum(db.Model):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def update_last_post(self):
-        """Updates the last post in the forum.
-        This is useful if you move a topic in another forum.
-        """
+        """Updates the last post in the forum."""
         last_post = Post.query.\
             filter(Post.topic_id == Topic.id,
                    Topic.forum_id == self.id).\
@@ -683,13 +697,14 @@ class Category(db.Model):
         :param users: A list with user objects
         """
 
+        # and finally delete the category itself
+        db.session.delete(self)
+        db.session.commit()
+
         # Update the users post count
         if users:
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
                 db.session.commit()
 
-        # and finally delete the category itself
-        db.session.delete(self)
-        db.session.commit()
         return self
