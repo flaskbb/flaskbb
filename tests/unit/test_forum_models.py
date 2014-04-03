@@ -150,14 +150,23 @@ def test_topic_delete(topic_normal):
     assert forum.last_post_id is None
 
 
-def test_topic_merge(topic_normal, topic_moderator):
-    assert topic_normal.merge(topic_moderator)
+def test_topic_merge(topic_normal):
+    topic_other = Topic(title="Test Topic Merge")
+    post = Post(content="Test Content Merge")
+    topic_other.save(post=post, user=topic_normal.user, forum=topic_normal.forum)
 
-    # TODO: Test last post
+    # Save the last_post_id in another variable because topic_other will be
+    # overwritten later
+    last_post_other = topic_other.last_post_id
 
-    topic_normal = Topic.query.filter_by(id=topic_normal.id).first()
-    assert topic_normal is None
-    assert topic_moderator.post_count == 2
+    assert topic_other.merge(topic_normal)
+
+    # I just want to be sure that the topic is deleted
+    topic_other = Topic.query.filter_by(id=topic_other.id).first()
+    assert topic_other is None
+
+    assert topic_normal.post_count == 2
+    assert topic_normal.last_post_id == last_post_other
 
 
 def test_topic_merge_other_forum(topic_normal):

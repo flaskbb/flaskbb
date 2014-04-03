@@ -344,7 +344,7 @@ class Topic(db.Model):
         return True
 
     def merge(self, topic):
-        """Merges a topic with another topic together
+        """Merges a topic with another topic
 
         :param topic: The new topic for the posts in this topic
         """
@@ -356,6 +356,10 @@ class Topic(db.Model):
         # Update the topic id
         Post.query.filter_by(topic_id=self.id).\
             update({Post.topic_id: topic.id})
+
+        # Update the last post
+        if topic.last_post.date_created < self.last_post.date_created:
+            topic.last_post_id = self.last_post_id
 
         # Increase the post and views count
         topic.post_count += self.post_count
