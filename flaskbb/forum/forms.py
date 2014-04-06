@@ -89,8 +89,8 @@ class SearchPageForm(Form):
         types = self.search_types.data
         results = {}
 
-        for type in search_actions.keys():
-            if type in types:
-                results[type] = search_actions[type](query)
+        for search_type in search_actions.keys():
+            if search_type in types:
+                results[search_type] = search_actions[search_type](query)
 
         return results
