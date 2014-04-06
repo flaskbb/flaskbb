@@ -459,6 +459,9 @@ class Topic(db.Model):
 
     def tracker_needs_update(self, forumsread, topicsread):
         """Returns True if the tracker needs an update.
+        Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
+        topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
+
         TODO: Couldn't think of a better name for this method - ideas?
 
         :param forumsread: The ForumsRead object is needed because we also
@@ -495,8 +498,6 @@ class Topic(db.Model):
     def update_read(self, user, forum, forumsread):
         """Updates the topicsread and forumsread tracker for a specified user,
         if the topic contains new posts or the user hasn't read the topic.
-        Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
-        topics that are newer than the ``TRACKER_LENGTH`` (days) as unread.
         Returns True if the tracker has been updated.
 
         :param user: The user for whom the readstracker should be updated.
