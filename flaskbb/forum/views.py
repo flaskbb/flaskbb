@@ -494,12 +494,15 @@ def memberlist():
     search_form = UserSearchForm()
 
     if search_form.validate():
-        users = search_form.get_results().paginate(page, current_app.config['USERS_PER_PAGE'], False)
-        return render_template("forum/memberlist.html", users=users, search_form=search_form)
-    else:
-        users = User.query. \
+        users = search_form.get_results().\
             paginate(page, current_app.config['USERS_PER_PAGE'], False)
-        return render_template("forum/memberlist.html", users=users, search_form=search_form)
+        return render_template("forum/memberlist.html", users=users,
+                               search_form=search_form)
+    else:
+        users = User.query.\
+            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        return render_template("forum/memberlist.html", users=users,
+                               search_form=search_form)
 
 
 @forum.route("/topictracker")
@@ -540,6 +543,7 @@ def search():
 
     if form.validate_on_submit():
         result = form.get_results()
-        return render_template('forum/search_result.html', form=form, result=result)
+        return render_template('forum/search_result.html', form=form,
+                               result=result)
 
     return render_template('forum/search_form.html', form=form)

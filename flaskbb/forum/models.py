@@ -458,7 +458,7 @@ class Topic(db.Model):
         return self
 
     def tracker_needs_update(self, forumsread, topicsread):
-        """Returns True if the tracker needs an update.
+        """Returns True if the topicsread tracker needs an update.
         Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
         topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
 

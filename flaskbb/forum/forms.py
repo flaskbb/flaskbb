@@ -12,7 +12,7 @@ from flask.ext.wtf import Form
 from wtforms import TextAreaField, TextField, SelectMultipleField
 from wtforms.validators import Required, Optional, Length
 
-from flaskbb.forum.models import Topic, Post, Report, Forum, Category
+from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User
 
 
@@ -58,7 +58,9 @@ class ReportForm(Form):
 
 
 class UserSearchForm(Form):
-    search_query = TextField("Search", validators=[Optional(), Length(min=3, max=50)])
+    search_query = TextField("Search", validators=[
+        Optional(), Length(min=3, max=50)
+    ])
 
     def get_results(self):
         query = self.search_query.data
@@ -66,13 +68,16 @@ class UserSearchForm(Form):
 
 
 class SearchPageForm(Form):
-    search_query = TextField("Criteria", validators=[Required(), Length(min=3, max=50)])
-    search_types = SelectMultipleField("Content", validators=[Required()], choices=[
-        ('post', 'Post'), ('topic', 'Topic'), ('forum', 'Forum'), ('user', 'Users')])
+    search_query = TextField("Criteria", validators=[
+        Required(), Length(min=3, max=50)])
+
+    search_types = SelectMultipleField("Content", validators=[
+        Required()], choices=[('post', 'Post'), ('topic', 'Topic'),
+                              ('forum', 'Forum'), ('user', 'Users')])
 
     def get_results(self):
-        # Because the DB is not yet initialized when this form is loaded, the query objects cannot be instantiated
-        # in the class itself
+        # Because the DB is not yet initialized when this form is loaded,
+        # the query objects cannot be instantiated in the class itself
         search_actions = {
             'post': Post.query.whoosh_search,
             'topic': Topic.query.whoosh_search,
@@ -89,4 +94,3 @@ class SearchPageForm(Form):
                 results[type] = search_actions[type](query)
 
         return results
-
