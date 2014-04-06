@@ -1,4 +1,10 @@
-from flaskbb.forum.models import Category, Forum, Topic, Post
+from datetime import datetime
+
+from flask import current_app
+from flask.ext.login import login_user, current_user, logout_user
+
+from flaskbb.forum.models import Category, Forum, Topic, Post, ForumsRead, \
+    TopicsRead
 from flaskbb.user.models import User
 
 
@@ -95,6 +101,81 @@ def test_forum_update_last_post(topic_normal, normal_user):
     topic_normal.forum.update_last_post()
 
     assert topic_normal.forum.last_post == topic_normal.first_post
+
+
+def test_forum_update_read(database, normal_user, topic_normal):
+    forumsread = ForumsRead.query.\
+        filter(ForumsRead.user_id == normal_user.id,
+               ForumsRead.forum_id == topic_normal.forum_id).first()
+
+    topicsread = TopicsRead.query.\
+        filter(TopicsRead.user_id == normal_user.id,
+               TopicsRead.topic_id == topic_normal.id).first()
+
+    forum = topic_normal.forum
+
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(normal_user)
+
+        # Should return False because topicsread is None
+        assert not forum.update_read(current_user, forumsread, topicsread)
+
+        # This is the first time the user visits the topic
+        topicsread = TopicsRead()
+        topicsread.user_id = normal_user.id
+        topicsread.topic_id = topic_normal.id
+        topicsread.forum_id = topic_normal.forum_id
+        topicsread.last_read = datetime.utcnow()
+        topicsread.save()
+
+        # hence, we also need to create a new entry
+        assert forum.update_read(current_user, forumsread, topicsread)
+
+        forumsread = ForumsRead.query.\
+            filter(ForumsRead.user_id == normal_user.id,
+                   ForumsRead.forum_id == topic_normal.forum_id).first()
+
+        # everything should be up-to-date now
+        assert not forum.update_read(current_user, forumsread, topicsread)
+
+        post = Post(content="Test Content")
+        post.save(user=normal_user, topic=topic_normal)
+
+        # Updating the topicsread tracker
+        topicsread.last_read = datetime.utcnow()
+        topicsread.save()
+
+        # now the forumsread tracker should also need an update
+        assert forum.update_read(current_user, forumsread, topicsread)
+
+        logout_user()
+        # should fail because the user is logged out
+        assert not forum.update_read(current_user, forumsread, topicsread)
+
+
+def test_forum_update_read_two_topics(database, normal_user, topic_normal,
+                                      topic_moderator):
+    forumsread = ForumsRead.query.\
+        filter(ForumsRead.user_id == normal_user.id,
+               ForumsRead.forum_id == topic_normal.forum_id).first()
+
+    forum = topic_normal.forum
+
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(normal_user)
+
+        # This is the first time the user visits the topic
+        topicsread = TopicsRead()
+        topicsread.user_id = normal_user.id
+        topicsread.topic_id = topic_normal.id
+        topicsread.forum_id = topic_normal.forum_id
+        topicsread.last_read = datetime.utcnow()
+        topicsread.save()
+
+        # will not create a entry because there is still one unread topic
+        assert not forum.update_read(current_user, forumsread, topicsread)
 
 
 def test_forum_url(forum):
@@ -204,9 +285,104 @@ def test_topic_move_same_forum(topic_normal):
     assert not topic_normal.move(topic_normal.forum)
 
 
-def test_topic_update_read():
-    # TODO: Refactor it, to make it easier to test it
-    pass
+def test_topic_tracker_needs_update(database, normal_user, topic_normal):
+    forumsread = ForumsRead.query.\
+        filter(ForumsRead.user_id == normal_user.id,
+               ForumsRead.forum_id == topic_normal.forum_id).first()
+
+    topicsread = TopicsRead.query.\
+        filter(TopicsRead.user_id == normal_user.id,
+               TopicsRead.topic_id == topic_normal.id).first()
+
+    with current_app.test_request_context():
+        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+
+        # Update the tracker
+        topicsread = TopicsRead()
+        topicsread.user_id = normal_user.id
+        topicsread.topic_id = topic_normal.id
+        topicsread.forum_id = topic_normal.forum_id
+        topicsread.last_read = datetime.utcnow()
+        topicsread.save()
+
+        forumsread = ForumsRead()
+        forumsread.user_id = normal_user.id
+        forumsread.forum_id = topic_normal.forum_id
+        forumsread.last_read = datetime.utcnow()
+        forumsread.save()
+
+        # Now the topic should be read
+        assert not topic_normal.tracker_needs_update(forumsread, topicsread)
+
+        post = Post(content="Test Content")
+        post.save(topic=topic_normal, user=normal_user)
+
+        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+
+
+def test_topic_tracker_needs_update_cleared(database, normal_user, topic_normal):
+    forumsread = ForumsRead.query.\
+        filter(ForumsRead.user_id == normal_user.id,
+               ForumsRead.forum_id == topic_normal.forum_id).first()
+
+    topicsread = TopicsRead.query.\
+        filter(TopicsRead.user_id == normal_user.id,
+               TopicsRead.topic_id == topic_normal.id).first()
+
+    with current_app.test_request_context():
+        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+
+        # Update the tracker
+        forumsread = ForumsRead()
+        forumsread.user_id = normal_user.id
+        forumsread.forum_id = topic_normal.forum_id
+        forumsread.last_read = datetime.utcnow()
+        forumsread.cleared = datetime.utcnow()
+        forumsread.save()
+
+        # Now the topic should be read
+        assert not topic_normal.tracker_needs_update(forumsread, topicsread)
+
+
+def test_topic_update_read(database, normal_user, topic_normal):
+    forumsread = ForumsRead.query.\
+        filter(ForumsRead.user_id == normal_user.id,
+               ForumsRead.forum_id == topic_normal.forum_id).first()
+
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(normal_user)
+        assert current_user.is_authenticated()
+
+        # Update the tracker
+        assert topic_normal.update_read(current_user, topic_normal.forum,
+                                        forumsread)
+        # Because the tracker is already up-to-date, it shouldn't update it
+        # again.
+        assert not topic_normal.update_read(current_user, topic_normal.forum,
+                                            forumsread)
+
+        # Adding a new post - now the tracker shouldn't be up-to-date anymore.
+        post = Post(content="Test Content")
+        post.save(topic=topic_normal, user=normal_user)
+
+        forumsread = ForumsRead.query.\
+            filter(ForumsRead.user_id == normal_user.id,
+                   ForumsRead.forum_id == topic_normal.forum_id).first()
+
+        # Test tracker length
+        current_app.config["TRACKER_LENGTH"] = 0
+        assert not topic_normal.update_read(current_user, topic_normal.forum,
+                                            forumsread)
+        current_app.config["TRACKER_LENGTH"] = 1
+        assert topic_normal.update_read(current_user, topic_normal.forum,
+                                        forumsread)
+
+        # Test with logged out user
+        logout_user()
+        assert not current_user.is_authenticated()
+        assert not topic_normal.update_read(current_user, topic_normal.forum,
+                                            forumsread)
 
 
 def test_topic_url(topic_normal):

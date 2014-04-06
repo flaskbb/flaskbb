@@ -457,35 +457,47 @@ class Topic(db.Model):
         db.session.commit()
         return self
 
-    def is_unread(self, user, forumsread):
-        """Returns True if the topic is unread for the user.
-
-        :param user: The user whom should be checked if he has read the topic.
+    def tracker_needs_update(self, forumsread, topicsread):
+        """Returns True if the tracker needs an update.
+        TODO: Couldn't think of a better name for this method - ideas?
 
         :param forumsread: The ForumsRead object is needed because we also
-                           need to check if the topic is below or above the
-                           read_cutoff.
-        """
-        read_cutoff = datetime.utcnow() - timedelta(
-            days=current_app.config['TRACKER_LENGTH'])
+                           need to check if the forum has been cleared
+                           sometime ago.
 
-        # Anonymous User or the post is too old for inserting it in the
-        # TopicsRead model
-        if not user.is_authenticated() or \
-                read_cutoff > self.last_post.date_created:
+        :param topicsread: The topicsread object is used to check if there is
+                           a new post in the topic.
+        """
+        read_cutoff = None
+        if current_app.config['TRACKER_LENGTH'] > 0:
+            read_cutoff = datetime.utcnow() - timedelta(
+                days=current_app.config['TRACKER_LENGTH'])
+
+        # The tracker is disabled - abort
+        if read_cutoff is None:
             return False
 
-        # Can be None if the user has never marked the forum as read. If this
-        # condition is false - we need to update the tracker
+        # Else the topic is still below the read_cutoff
+        elif read_cutoff > self.last_post.date_created:
+            return False
+
+        # Can be None (cleared) if the user has never marked the forum as read.
+        # If this condition is false - we need to update the tracker
         if forumsread and forumsread.cleared is not None and \
                 forumsread.cleared >= self.last_post.date_created:
+            return False
+
+        if topicsread and topicsread.last_read >= self.last_post.date_created:
             return False
 
         return True
 
     def update_read(self, user, forum, forumsread):
-        """Update the topics read status if the user hasn't read the latest
-        post. Returns True if the tracker has been updated.
+        """Updates the topicsread and forumsread tracker for a specified user,
+        if the topic contains new posts or the user hasn't read the topic.
+        Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
+        topics that are newer than the ``TRACKER_LENGTH`` (days) as unread.
+        Returns True if the tracker has been updated.
 
         :param user: The user for whom the readstracker should be updated.
 
@@ -495,12 +507,16 @@ class Topic(db.Model):
                            is a new post since the forum has been marked as
                            read.
         """
-        if not self.is_unread(user, forumsread):
+        # User is not logged in - abort
+        if not user.is_authenticated():
             return False
 
         topicsread = TopicsRead.query.\
             filter(TopicsRead.user_id == user.id,
                    TopicsRead.topic_id == self.id).first()
+
+        if not self.tracker_needs_update(forumsread, topicsread):
+            return False
 
         # Because we return True/False if the trackers have been
         # updated, we need to store the status in a temporary variable
@@ -508,7 +524,7 @@ class Topic(db.Model):
 
         # A new post has been submitted that the user hasn't read.
         # Updating...
-        if topicsread and (topicsread.last_read < self.last_post.date_created):
+        if topicsread:
             topicsread.last_read = datetime.utcnow()
             topicsread.save()
             updated = True
@@ -528,8 +544,8 @@ class Topic(db.Model):
         else:
             updated = False
 
-        if forum:
-            updated = forum.update_read(user, forumsread, topicsread)
+        # Save True/False if the forums tracker has been updated.
+        updated = forum.update_read(user, forumsread, topicsread)
 
         return updated
 
@@ -606,19 +622,28 @@ class Forum(db.Model):
 
         db.session.commit()
 
-    def is_unread(self, user, forumsread, topicsread):
-        """Returns True if the forum is unread for the specified user.
+    def update_read(self, user, forumsread, topicsread):
+        """Updates the ForumsRead status for the user. In order to work
+        correctly, be sure that `topicsread is **not** `None`.
 
-        :param user: The user who should be checked if he has read the forum.
+        :param user: The user for whom we should check if he has read the
+                     forum.
 
-        :param forumsread: The forumsread object is needed because we are
-                           going to check if the forum is unread.
+        :param forumsread: The forumsread object. It is needed to check if
+                           if the forum is unread. If `forumsread` is `None`
+                           and the forum is unread, it will create a new entry
+                           in the `ForumsRead` relation, else (and the forum
+                           is still unread) we are just going to update the
+                           entry in the `ForumsRead` relation.
 
         :param topicsread: The topicsread object is used in combination
                            with the forumsread object to check if the
                            forumsread relation should be updated and
                            therefore is unread.
         """
+        if not user.is_authenticated() or topicsread is None:
+            return False
+
         # fetch the unread posts in the forum
         unread_count = Topic.query.\
             outerjoin(TopicsRead,
@@ -632,43 +657,29 @@ class Forum(db.Model):
                           TopicsRead.last_read < Topic.last_updated)).\
             count()
 
-
         # No unread topics available - trying to mark the forum as read
         if unread_count == 0:
-            # ForumsRead is already up-to-date.
-            # This condition is used to prevent updating the forumsread
-            # everytime you visit a topic in the forum
+
             if forumsread and forumsread.last_read > topicsread.last_read:
                 return False
 
-            # else the forum is unread
-            return True
+            # ForumRead Entry exists - Updating it because a new post
+            # has been submitted that the user hasn't read.
+            elif forumsread:
+                forumsread.last_read = datetime.utcnow()
+                forumsread.save()
+                return True
 
-        # if > 0 unread topics - the forum is unread
-        return True
-
-    def update_read(self, user, forumsread, topicsread):
-        """Updates the ForumsRead status for the user
-
-        :param user: The user whom should be checked if he has read the forum.
-        """
-        if not self.is_unread(user, forumsread, topicsread):
-            return False
-
-        # ForumRead Entry exists - Updating it because a new post
-        # has been submitted that the user hasn't read.
-        if forumsread:
+            # No ForumRead Entry existing - creating one.
+            forumsread = ForumsRead()
+            forumsread.user_id = user.id
+            forumsread.forum_id = self.id
             forumsread.last_read = datetime.utcnow()
             forumsread.save()
             return True
 
-        # No ForumRead Entry existing - creating one.
-        forumsread = ForumsRead()
-        forumsread.user_id = user.id
-        forumsread.forum_id = self.id
-        forumsread.last_read = datetime.utcnow()
-        forumsread.save()
-        return True
+        # Nothing updated, because there are still more than 0 unread topics
+        return False
 
     def save(self, moderators=None):
         """Saves a forum"""
