@@ -8,20 +8,6 @@ from flaskbb.forum.models import Topic, Post
 from flaskbb.utils.permissions import *
 
 
-@pytest.fixture
-def topic_moderator(forum, moderator_user):
-    topic = Topic(title="Test Topic Moderator")
-    post = Post(content="Test Content Moderator")
-    return topic.save(forum=forum, user=moderator_user, post=post)
-
-
-@pytest.fixture
-def topic_normal(forum, normal_user):
-    topic = Topic(title="Test Topic Normal")
-    post = Post(content="Test Content Normal")
-    return topic.save(forum=forum, user=normal_user, post=post)
-
-
 def test_moderator_permissions_in_forum(
         forum, moderator_user, topic_normal, topic_moderator):
     """Test that the default groups are created correctly."""
