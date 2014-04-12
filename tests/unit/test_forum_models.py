@@ -9,6 +9,7 @@ from flaskbb.user.models import User
 
 
 def test_category_save(database):
+    """Test the save category method."""
     category = Category(title="Test Category")
     category.save()
 
@@ -16,6 +17,7 @@ def test_category_save(database):
 
 
 def test_category_delete(category):
+    """Test the delete category method."""
     category.delete()
 
     category = Category.query.filter_by(id=category.id).first()
@@ -24,6 +26,7 @@ def test_category_delete(category):
 
 
 def test_category_delete_with_user(topic_normal):
+    """Test the delete category method with recounting the users post counts."""
     user = topic_normal.user
     forum = topic_normal.forum
     category = topic_normal.forum.category
@@ -45,6 +48,7 @@ def test_category_delete_with_user(topic_normal):
 
 
 def test_category_delete_with_forum(forum):
+    """When deleting a category, all of his forums should also be deleted."""
     forum.category.delete()
 
     assert forum is not None
@@ -58,6 +62,7 @@ def test_category_delete_with_forum(forum):
 
 
 def test_forum_save(category, moderator_user):
+    """Test the save forum method"""
     forum = Forum(title="Test Forum", category_id=category.id)
     forum.save()
 
@@ -70,6 +75,7 @@ def test_forum_save(category, moderator_user):
 
 
 def test_forum_delete(forum):
+    """Test the delete forum method."""
     forum.delete()
 
     forum = Forum.query.filter_by(id=forum.id).first()
@@ -77,8 +83,8 @@ def test_forum_delete(forum):
     assert forum is None
 
 
-def test_forum_delete_with_user(topic_normal, normal_user):
-
+def test_forum_delete_with_user_and_topic(topic_normal, normal_user):
+    """Now test the delete forum method with a topic inside."""
     assert normal_user.post_count == 1
 
     topic_normal.forum.delete([normal_user])
@@ -91,6 +97,7 @@ def test_forum_delete_with_user(topic_normal, normal_user):
 
 
 def test_forum_update_last_post(topic_normal, normal_user):
+    """Test the update last post method."""
     post = Post(content="Test Content 2")
     post.save(topic=topic_normal, user=normal_user)
 
@@ -104,6 +111,7 @@ def test_forum_update_last_post(topic_normal, normal_user):
 
 
 def test_forum_update_read(database, normal_user, topic_normal):
+    """Test the update read method."""
     forumsread = ForumsRead.query.\
         filter(ForumsRead.user_id == normal_user.id,
                ForumsRead.forum_id == topic_normal.forum_id).first()
@@ -129,7 +137,7 @@ def test_forum_update_read(database, normal_user, topic_normal):
         topicsread.last_read = datetime.utcnow()
         topicsread.save()
 
-        # hence, we also need to create a new entry
+        # hence, we also need to create a new forumsread entry
         assert forum.update_read(current_user, forumsread, topicsread)
 
         forumsread = ForumsRead.query.\
@@ -146,7 +154,7 @@ def test_forum_update_read(database, normal_user, topic_normal):
         topicsread.last_read = datetime.utcnow()
         topicsread.save()
 
-        # now the forumsread tracker should also need an update
+        # now the forumsread tracker should also need a update
         assert forum.update_read(current_user, forumsread, topicsread)
 
         logout_user()
@@ -156,6 +164,9 @@ def test_forum_update_read(database, normal_user, topic_normal):
 
 def test_forum_update_read_two_topics(database, normal_user, topic_normal,
                                       topic_moderator):
+    """Test if the ForumsRead tracker will be updated if there are two topics
+    and where one is unread and the other is read.
+    """
     forumsread = ForumsRead.query.\
         filter(ForumsRead.user_id == normal_user.id,
                ForumsRead.forum_id == topic_normal.forum_id).first()
@@ -187,6 +198,7 @@ def test_forum_slugify(forum):
 
 
 def test_topic_save(forum, normal_user):
+    """Test the save topic method with creating and editing a topic."""
     post = Post(content="Test Content")
     topic = Topic(title="Test Title")
 
@@ -213,6 +225,7 @@ def test_topic_save(forum, normal_user):
 
 
 def test_topic_delete(topic_normal):
+    """Test the delete topic method"""
     assert topic_normal.user.post_count == 1
     assert topic_normal.post_count == 1
     assert topic_normal.forum.topic_count == 1
@@ -232,6 +245,7 @@ def test_topic_delete(topic_normal):
 
 
 def test_topic_merge(topic_normal):
+    """Tests the topic merge method."""
     topic_other = Topic(title="Test Topic Merge")
     post = Post(content="Test Content Merge")
     topic_other.save(post=post, user=topic_normal.user, forum=topic_normal.forum)
@@ -251,7 +265,7 @@ def test_topic_merge(topic_normal):
 
 
 def test_topic_merge_other_forum(topic_normal):
-    """You cannot merge a topic with a topic from another forum"""
+    """You cannot merge a topic with a topic from another forum."""
     forum_other = Forum(title="Test Forum 2", category_id=1)
     forum_other.save()
 
@@ -263,6 +277,7 @@ def test_topic_merge_other_forum(topic_normal):
 
 
 def test_topic_move(topic_normal):
+    """Tests the topic move method."""
     forum_other = Forum(title="Test Forum 2", category_id=1)
     forum_other.save()
 
@@ -282,10 +297,14 @@ def test_topic_move(topic_normal):
 
 
 def test_topic_move_same_forum(topic_normal):
+    """You cannot move a topic within the same forum."""
     assert not topic_normal.move(topic_normal.forum)
 
 
 def test_topic_tracker_needs_update(database, normal_user, topic_normal):
+    """Tests if the topicsread tracker needs an update if a new post has been
+    submitted.
+    """
     forumsread = ForumsRead.query.\
         filter(ForumsRead.user_id == normal_user.id,
                ForumsRead.forum_id == topic_normal.forum_id).first()
@@ -321,6 +340,9 @@ def test_topic_tracker_needs_update(database, normal_user, topic_normal):
 
 
 def test_topic_tracker_needs_update_cleared(database, normal_user, topic_normal):
+    """Tests if the topicsread needs an update if the forum has been marked
+    as cleared.
+    """
     forumsread = ForumsRead.query.\
         filter(ForumsRead.user_id == normal_user.id,
                ForumsRead.forum_id == topic_normal.forum_id).first()
@@ -345,6 +367,7 @@ def test_topic_tracker_needs_update_cleared(database, normal_user, topic_normal)
 
 
 def test_topic_update_read(database, normal_user, topic_normal):
+    """Tests the update read method if the topic is unread/read."""
     forumsread = ForumsRead.query.\
         filter(ForumsRead.user_id == normal_user.id,
                ForumsRead.forum_id == topic_normal.forum_id).first()
@@ -394,6 +417,7 @@ def test_topic_slug(topic_normal):
 
 
 def test_post_save(topic_normal, normal_user):
+    """Tests the save post method."""
     post = Post(content="Test Content")
     post.save(topic=topic_normal, user=normal_user)
 
@@ -411,6 +435,12 @@ def test_post_save(topic_normal, normal_user):
 
 
 def test_post_delete(topic_normal):
+    """Tests the delete post method with three different post types.
+    The three types are:
+        * First Post
+        * A post between the first and last post (middle)
+        * Last Post
+    """
     post_middle = Post(content="Test Content Middle")
     post_middle.save(topic=topic_normal, user=topic_normal.user)
 
@@ -439,6 +469,8 @@ def test_post_delete(topic_normal):
 
 
 def test_report(topic_normal, normal_user):
+    """Tests if the reports can be saved/edited and deleted with the
+    implemented save and delete methods."""
     report = Report(reason="Test Report")
     report.save(user=normal_user, post=topic_normal.first_post)
     assert report.reason == "Test Report"
@@ -453,6 +485,8 @@ def test_report(topic_normal, normal_user):
 
 
 def test_forumsread(topic_normal, normal_user):
+    """Tests if the forumsread tracker can be saved/edited and deleted with the
+    implemented save and delete methods."""
     forumsread = ForumsRead()
     forumsread.user_id = normal_user.id
     forumsread.forum_id = topic_normal.forum_id
@@ -466,6 +500,8 @@ def test_forumsread(topic_normal, normal_user):
 
 
 def test_topicsread(topic_normal, normal_user):
+    """Tests if the topicsread trakcer can be saved/edited and deleted with the
+    implemented save and delete methods."""
     topicsread = TopicsRead()
     topicsread.user_id = normal_user.id
     topicsread.topic_id = topic_normal.id

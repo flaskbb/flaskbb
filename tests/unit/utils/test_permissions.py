@@ -10,7 +10,9 @@ from flaskbb.utils.permissions import *
 
 def test_moderator_permissions_in_forum(
         forum, moderator_user, topic_normal, topic_moderator):
-    """Test that the default groups are created correctly."""
+    """Test the moderator permissions in a forum where the user is a
+    moderator.
+    """
 
     moderator_user.permissions = moderator_user.get_permissions()
 
@@ -31,6 +33,10 @@ def test_moderator_permissions_in_forum(
 
 def test_moderator_permissions_without_forum(
         forum, moderator_user, topic_normal, topic_moderator):
+    """Test the moderator permissions in a forum where the user is not a
+    moderator.
+    """
+
     forum.moderators.remove(moderator_user)
     moderator_user.permissions = moderator_user.get_permissions()
 
@@ -55,7 +61,7 @@ def test_moderator_permissions_without_forum(
 
 
 def test_normal_permissions(forum, normal_user, topic_normal):
-
+    """Test the permissions for a normal user."""
     normal_user.permissions = normal_user.get_permissions()
 
     assert not can_moderate(normal_user, forum)
@@ -73,6 +79,7 @@ def test_normal_permissions(forum, normal_user, topic_normal):
 
 
 def test_admin_permissions(forum, admin_user, topic_normal):
+    """Test the permissions for a admin user."""
     admin_user.permissions = admin_user.get_permissions()
 
     assert can_moderate(admin_user, forum)
@@ -90,6 +97,7 @@ def test_admin_permissions(forum, admin_user, topic_normal):
 
 
 def test_super_moderator_permissions(forum, super_moderator_user, topic_normal):
+    """Test the permissions for a super moderator user."""
     super_moderator_user.permissions = super_moderator_user.get_permissions()
 
     assert can_moderate(super_moderator_user, forum)
