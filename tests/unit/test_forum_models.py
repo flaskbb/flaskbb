@@ -4,7 +4,7 @@ from flask import current_app
 from flask.ext.login import login_user, current_user, logout_user
 
 from flaskbb.forum.models import Category, Forum, Topic, Post, ForumsRead, \
-    TopicsRead
+    TopicsRead, Report
 from flaskbb.user.models import User
 
 
@@ -436,3 +436,44 @@ def test_post_delete(topic_normal):
     assert topic_normal.first_post_id == topic_normal.last_post_id
 
     assert topic_normal.forum.last_post_id == topic_normal.last_post_id
+
+
+def test_report(topic_normal, normal_user):
+    report = Report(reason="Test Report")
+    report.save(user=normal_user, post=topic_normal.first_post)
+    assert report.reason == "Test Report"
+
+    report.reason = "Test Report Edited"
+    report.save()
+    assert report.reason == "Test Report Edited"
+
+    report.delete()
+    report = Report.query.filter_by(id=report.id).first()
+    assert report is None
+
+
+def test_forumsread(topic_normal, normal_user):
+    forumsread = ForumsRead()
+    forumsread.user_id = normal_user.id
+    forumsread.forum_id = topic_normal.forum_id
+    forumsread.last_read = datetime.utcnow()
+    forumsread.save()
+    assert forumsread is not None
+
+    forumsread.delete()
+    forumsread = ForumsRead.query.filter_by(forum_id=forumsread.forum_id).first()
+    assert forumsread is None
+
+
+def test_topicsread(topic_normal, normal_user):
+    topicsread = TopicsRead()
+    topicsread.user_id = normal_user.id
+    topicsread.topic_id = topic_normal.id
+    topicsread.forum_id = topic_normal.forum_id
+    topicsread.last_read = datetime.utcnow()
+    topicsread.save()
+    assert topicsread is not None
+
+    topicsread.delete()
+    topicsread = TopicsRead.query.filter_by(topic_id=topicsread.topic_id).first()
+    assert topicsread is None

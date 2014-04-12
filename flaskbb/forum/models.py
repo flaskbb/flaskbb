@@ -52,11 +52,13 @@ class TopicsRead(db.Model):
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
     def save(self):
+        """Saves a TopicsRead entry."""
         db.session.add(self)
         db.session.commit()
         return self
 
     def delete(self):
+        """Deletes a TopicsRead entry."""
         db.session.delete(self)
         db.session.commit()
         return self
@@ -75,11 +77,13 @@ class ForumsRead(db.Model):
     cleared = db.Column(db.DateTime)
 
     def save(self):
+        """Saves a ForumsRead entry."""
         db.session.add(self)
         db.session.commit()
         return self
 
     def delete(self):
+        """Deletes a ForumsRead entry."""
         db.session.delete(self)
         db.session.commit()
         return self
@@ -127,6 +131,7 @@ class Report(db.Model):
         return self
 
     def delete(self):
+        """Deletes a report."""
         db.session.delete(self)
         db.session.commit()
         return self
