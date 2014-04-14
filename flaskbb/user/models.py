@@ -86,7 +86,7 @@ class User(db.Model, UserMixin):
     location = db.Column(db.String(63))
     signature = db.Column(db.String(255))
     avatar = db.Column(db.String(63))
-    notes = db.Column(db.Text(5000))
+    notes = db.Column(db.Text)
 
     theme = db.Column(db.String(15))
 
@@ -191,7 +191,7 @@ class User(db.Model, UserMixin):
         return expired, invalid, data
 
     def make_reset_token(self, expiration=3600):
-        """Creates a token. The duration can be configured through the
+        """Creates a reset token. The duration can be configured through the
         expiration parameter.
 
         :param expiration: The time in seconds how long the token is valid.
@@ -200,7 +200,7 @@ class User(db.Model, UserMixin):
 
     def verify_reset_token(self, token):
         """Verifies a reset token. It returns three boolean values based on
-        state of the token (expired, invalid, data)
+        the state of the token (expired, invalid, data)
 
         :param token: The reset token that should be checked.
         """

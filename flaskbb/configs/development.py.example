@@ -18,6 +18,7 @@ class DevelopmentConfig(DefaultConfig):
     # SQLAlchemy connection options
     # This will create in the applications folder (where manage.py is)
     # a database named flaskbb.sqlite.
+    #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
                               'flaskbb.sqlite'
 

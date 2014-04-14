@@ -70,7 +70,7 @@ class ForumsRead(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id", use_alter=True,
+                         db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
@@ -438,6 +438,8 @@ class Topic(db.Model):
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
 
+        TopicsRead.query.filter_by(topic_id=self.id).delete()
+
         # Delete the topic
         db.session.delete(self)
         db.session.commit()
@@ -456,8 +458,6 @@ class Topic(db.Model):
             filter(Post.topic_id == Topic.id,
                    Topic.forum_id == self.forum_id).\
             count()
-
-        TopicsRead.query.filter_by(topic_id=self.id).delete()
 
         db.session.commit()
         return self
@@ -712,7 +712,8 @@ class Forum(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-        # Delete all entries from the ForumsRead and TopicsRead relation
+        # Delete the entries for the forum in the ForumsRead and TopicsRead
+        # relation
         ForumsRead.query.filter_by(forum_id=self.id).delete()
         TopicsRead.query.filter_by(forum_id=self.id).delete()
 
