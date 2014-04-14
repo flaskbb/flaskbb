@@ -134,7 +134,7 @@ class TopicQuery(BaseQuery):
 
         # No need to count if we're on the first page and there are fewer
         # items than we expected.
-        if page == 1 and len(items) < per_page:
+        if page == 1 and len(self.all()) < per_page:
             total = len(items)
         else:
             total = self.order_by(None).count()
