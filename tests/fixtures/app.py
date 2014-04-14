@@ -20,7 +20,7 @@ def application():
 
 
 @pytest.fixture()
-def default_groups():
+def default_groups(database):
     """Creates the default groups"""
     return create_default_groups()
 

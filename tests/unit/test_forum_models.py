@@ -25,11 +25,11 @@ def test_category_delete(category):
     assert category is None
 
 
-def test_category_delete_with_user(topic_normal):
+def test_category_delete_with_user(topic):
     """Test the delete category method with recounting the users post counts."""
-    user = topic_normal.user
-    forum = topic_normal.forum
-    category = topic_normal.forum.category
+    user = topic.user
+    forum = topic.forum
+    category = topic.forum.category
 
     assert user.post_count == 1
     assert forum.post_count == 1
@@ -40,7 +40,7 @@ def test_category_delete_with_user(topic_normal):
     assert user.post_count == 0
 
     category = Category.query.filter_by(id=category.id).first()
-    topic = Topic.query.filter_by(id=topic_normal.id).first()
+    topic = Topic.query.filter_by(id=topic.id).first()
 
     assert category is None
     # The topic should also be deleted
@@ -83,57 +83,57 @@ def test_forum_delete(forum):
     assert forum is None
 
 
-def test_forum_delete_with_user_and_topic(topic_normal, normal_user):
+def test_forum_delete_with_user_and_topic(topic, user):
     """Now test the delete forum method with a topic inside."""
-    assert normal_user.post_count == 1
+    assert user.post_count == 1
 
-    topic_normal.forum.delete([normal_user])
+    topic.forum.delete([user])
 
-    forum = Forum.query.filter_by(id=topic_normal.forum_id).first()
+    forum = Forum.query.filter_by(id=topic.forum_id).first()
 
     assert forum is None
 
-    assert normal_user.post_count == 0
+    assert user.post_count == 0
 
 
-def test_forum_update_last_post(topic_normal, normal_user):
+def test_forum_update_last_post(topic, user):
     """Test the update last post method."""
     post = Post(content="Test Content 2")
-    post.save(topic=topic_normal, user=normal_user)
+    post.save(topic=topic, user=user)
 
-    assert topic_normal.forum.last_post == post
+    assert topic.forum.last_post == post
 
     post.delete()
 
-    topic_normal.forum.update_last_post()
+    topic.forum.update_last_post()
 
-    assert topic_normal.forum.last_post == topic_normal.first_post
+    assert topic.forum.last_post == topic.first_post
 
 
-def test_forum_update_read(database, normal_user, topic_normal):
+def test_forum_update_read(database, user, topic):
     """Test the update read method."""
     forumsread = ForumsRead.query.\
-        filter(ForumsRead.user_id == normal_user.id,
-               ForumsRead.forum_id == topic_normal.forum_id).first()
+        filter(ForumsRead.user_id == user.id,
+               ForumsRead.forum_id == topic.forum_id).first()
 
     topicsread = TopicsRead.query.\
-        filter(TopicsRead.user_id == normal_user.id,
-               TopicsRead.topic_id == topic_normal.id).first()
+        filter(TopicsRead.user_id == user.id,
+               TopicsRead.topic_id == topic.id).first()
 
-    forum = topic_normal.forum
+    forum = topic.forum
 
     with current_app.test_request_context():
         # Test with logged in user
-        login_user(normal_user)
+        login_user(user)
 
         # Should return False because topicsread is None
         assert not forum.update_read(current_user, forumsread, topicsread)
 
         # This is the first time the user visits the topic
         topicsread = TopicsRead()
-        topicsread.user_id = normal_user.id
-        topicsread.topic_id = topic_normal.id
-        topicsread.forum_id = topic_normal.forum_id
+        topicsread.user_id = user.id
+        topicsread.topic_id = topic.id
+        topicsread.forum_id = topic.forum_id
         topicsread.last_read = datetime.utcnow()
         topicsread.save()
 
@@ -141,14 +141,14 @@ def test_forum_update_read(database, normal_user, topic_normal):
         assert forum.update_read(current_user, forumsread, topicsread)
 
         forumsread = ForumsRead.query.\
-            filter(ForumsRead.user_id == normal_user.id,
-                   ForumsRead.forum_id == topic_normal.forum_id).first()
+            filter(ForumsRead.user_id == user.id,
+                   ForumsRead.forum_id == topic.forum_id).first()
 
         # everything should be up-to-date now
         assert not forum.update_read(current_user, forumsread, topicsread)
 
         post = Post(content="Test Content")
-        post.save(user=normal_user, topic=topic_normal)
+        post.save(user=user, topic=topic)
 
         # Updating the topicsread tracker
         topicsread.last_read = datetime.utcnow()
@@ -162,26 +162,25 @@ def test_forum_update_read(database, normal_user, topic_normal):
         assert not forum.update_read(current_user, forumsread, topicsread)
 
 
-def test_forum_update_read_two_topics(database, normal_user, topic_normal,
-                                      topic_moderator):
+def test_forum_update_read_two_topics(database, user, topic, topic_moderator):
     """Test if the ForumsRead tracker will be updated if there are two topics
     and where one is unread and the other is read.
     """
     forumsread = ForumsRead.query.\
-        filter(ForumsRead.user_id == normal_user.id,
-               ForumsRead.forum_id == topic_normal.forum_id).first()
+        filter(ForumsRead.user_id == user.id,
+               ForumsRead.forum_id == topic.forum_id).first()
 
-    forum = topic_normal.forum
+    forum = topic.forum
 
     with current_app.test_request_context():
         # Test with logged in user
-        login_user(normal_user)
+        login_user(user)
 
         # This is the first time the user visits the topic
         topicsread = TopicsRead()
-        topicsread.user_id = normal_user.id
-        topicsread.topic_id = topic_normal.id
-        topicsread.forum_id = topic_normal.forum_id
+        topicsread.user_id = user.id
+        topicsread.topic_id = topic.id
+        topicsread.forum_id = topic.forum_id
         topicsread.last_read = datetime.utcnow()
         topicsread.save()
 
@@ -197,7 +196,7 @@ def test_forum_slugify(forum):
     assert forum.slug == "test-forum"
 
 
-def test_topic_save(forum, normal_user):
+def test_topic_save(forum, user):
     """Test the save topic method with creating and editing a topic."""
     post = Post(content="Test Content")
     topic = Topic(title="Test Title")
@@ -206,7 +205,7 @@ def test_topic_save(forum, normal_user):
     assert forum.post_count == 0
     assert forum.topic_count == 0
 
-    topic.save(forum=forum, post=post, user=normal_user)
+    topic.save(forum=forum, post=post, user=user)
 
     assert topic.title == "Test Title"
 
@@ -224,66 +223,66 @@ def test_topic_save(forum, normal_user):
     assert forum.topic_count == 1
 
 
-def test_topic_delete(topic_normal):
+def test_topic_delete(topic):
     """Test the delete topic method"""
-    assert topic_normal.user.post_count == 1
-    assert topic_normal.post_count == 1
-    assert topic_normal.forum.topic_count == 1
-    assert topic_normal.forum.post_count == 1
+    assert topic.user.post_count == 1
+    assert topic.post_count == 1
+    assert topic.forum.topic_count == 1
+    assert topic.forum.post_count == 1
 
-    topic_normal.delete(users=[topic_normal.user])
+    topic.delete(users=[topic.user])
 
-    forum = Forum.query.filter_by(id=topic_normal.forum_id).first()
-    user = User.query.filter_by(id=topic_normal.user_id).first()
-    topic_normal = Topic.query.filter_by(id=topic_normal.id).first()
+    forum = Forum.query.filter_by(id=topic.forum_id).first()
+    user = User.query.filter_by(id=topic.user_id).first()
+    topic = Topic.query.filter_by(id=topic.id).first()
 
-    assert topic_normal is None
+    assert topic is None
     assert user.post_count == 0
     assert forum.topic_count == 0
     assert forum.post_count == 0
     assert forum.last_post_id is None
 
 
-def test_topic_merge(topic_normal):
+def test_topic_merge(topic):
     """Tests the topic merge method."""
     topic_other = Topic(title="Test Topic Merge")
     post = Post(content="Test Content Merge")
-    topic_other.save(post=post, user=topic_normal.user, forum=topic_normal.forum)
+    topic_other.save(post=post, user=topic.user, forum=topic.forum)
 
     # Save the last_post_id in another variable because topic_other will be
     # overwritten later
     last_post_other = topic_other.last_post_id
 
-    assert topic_other.merge(topic_normal)
+    assert topic_other.merge(topic)
 
     # I just want to be sure that the topic is deleted
     topic_other = Topic.query.filter_by(id=topic_other.id).first()
     assert topic_other is None
 
-    assert topic_normal.post_count == 2
-    assert topic_normal.last_post_id == last_post_other
+    assert topic.post_count == 2
+    assert topic.last_post_id == last_post_other
 
 
-def test_topic_merge_other_forum(topic_normal):
+def test_topic_merge_other_forum(topic):
     """You cannot merge a topic with a topic from another forum."""
     forum_other = Forum(title="Test Forum 2", category_id=1)
     forum_other.save()
 
     topic_other = Topic(title="Test Topic 2")
     post_other = Post(content="Test Content 2")
-    topic_other.save(user=topic_normal.user, forum=forum_other, post=post_other)
+    topic_other.save(user=topic.user, forum=forum_other, post=post_other)
 
-    assert not topic_normal.merge(topic_other)
+    assert not topic.merge(topic_other)
 
 
-def test_topic_move(topic_normal):
+def test_topic_move(topic):
     """Tests the topic move method."""
     forum_other = Forum(title="Test Forum 2", category_id=1)
     forum_other.save()
 
-    forum_old = Forum.query.filter_by(id=topic_normal.forum_id).first()
+    forum_old = Forum.query.filter_by(id=topic.forum_id).first()
 
-    assert topic_normal.move(forum_other)
+    assert topic.move(forum_other)
 
     assert forum_old.topics == []
     assert forum_old.last_post_id == 0
@@ -291,135 +290,130 @@ def test_topic_move(topic_normal):
     assert forum_old.topic_count == 0
     assert forum_old.post_count == 0
 
-    assert forum_other.last_post_id == topic_normal.last_post_id
+    assert forum_other.last_post_id == topic.last_post_id
     assert forum_other.topic_count == 1
     assert forum_other.post_count == 1
 
 
-def test_topic_move_same_forum(topic_normal):
+def test_topic_move_same_forum(topic):
     """You cannot move a topic within the same forum."""
-    assert not topic_normal.move(topic_normal.forum)
+    assert not topic.move(topic.forum)
 
 
-def test_topic_tracker_needs_update(database, normal_user, topic_normal):
+def test_topic_tracker_needs_update(database, user, topic):
     """Tests if the topicsread tracker needs an update if a new post has been
     submitted.
     """
     forumsread = ForumsRead.query.\
-        filter(ForumsRead.user_id == normal_user.id,
-               ForumsRead.forum_id == topic_normal.forum_id).first()
+        filter(ForumsRead.user_id == user.id,
+               ForumsRead.forum_id == topic.forum_id).first()
 
     topicsread = TopicsRead.query.\
-        filter(TopicsRead.user_id == normal_user.id,
-               TopicsRead.topic_id == topic_normal.id).first()
+        filter(TopicsRead.user_id == user.id,
+               TopicsRead.topic_id == topic.id).first()
 
     with current_app.test_request_context():
-        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+        assert topic.tracker_needs_update(forumsread, topicsread)
 
         # Update the tracker
         topicsread = TopicsRead()
-        topicsread.user_id = normal_user.id
-        topicsread.topic_id = topic_normal.id
-        topicsread.forum_id = topic_normal.forum_id
+        topicsread.user_id = user.id
+        topicsread.topic_id = topic.id
+        topicsread.forum_id = topic.forum_id
         topicsread.last_read = datetime.utcnow()
         topicsread.save()
 
         forumsread = ForumsRead()
-        forumsread.user_id = normal_user.id
-        forumsread.forum_id = topic_normal.forum_id
+        forumsread.user_id = user.id
+        forumsread.forum_id = topic.forum_id
         forumsread.last_read = datetime.utcnow()
         forumsread.save()
 
         # Now the topic should be read
-        assert not topic_normal.tracker_needs_update(forumsread, topicsread)
+        assert not topic.tracker_needs_update(forumsread, topicsread)
 
         post = Post(content="Test Content")
-        post.save(topic=topic_normal, user=normal_user)
+        post.save(topic=topic, user=user)
 
-        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+        assert topic.tracker_needs_update(forumsread, topicsread)
 
 
-def test_topic_tracker_needs_update_cleared(database, normal_user, topic_normal):
+def test_topic_tracker_needs_update_cleared(database, user, topic):
     """Tests if the topicsread needs an update if the forum has been marked
     as cleared.
     """
     forumsread = ForumsRead.query.\
-        filter(ForumsRead.user_id == normal_user.id,
-               ForumsRead.forum_id == topic_normal.forum_id).first()
+        filter(ForumsRead.user_id == user.id,
+               ForumsRead.forum_id == topic.forum_id).first()
 
     topicsread = TopicsRead.query.\
-        filter(TopicsRead.user_id == normal_user.id,
-               TopicsRead.topic_id == topic_normal.id).first()
+        filter(TopicsRead.user_id == user.id,
+               TopicsRead.topic_id == topic.id).first()
 
     with current_app.test_request_context():
-        assert topic_normal.tracker_needs_update(forumsread, topicsread)
+        assert topic.tracker_needs_update(forumsread, topicsread)
 
         # Update the tracker
         forumsread = ForumsRead()
-        forumsread.user_id = normal_user.id
-        forumsread.forum_id = topic_normal.forum_id
+        forumsread.user_id = user.id
+        forumsread.forum_id = topic.forum_id
         forumsread.last_read = datetime.utcnow()
         forumsread.cleared = datetime.utcnow()
         forumsread.save()
 
         # Now the topic should be read
-        assert not topic_normal.tracker_needs_update(forumsread, topicsread)
+        assert not topic.tracker_needs_update(forumsread, topicsread)
 
 
-def test_topic_update_read(database, normal_user, topic_normal):
+def test_topic_update_read(database, user, topic):
     """Tests the update read method if the topic is unread/read."""
     forumsread = ForumsRead.query.\
-        filter(ForumsRead.user_id == normal_user.id,
-               ForumsRead.forum_id == topic_normal.forum_id).first()
+        filter(ForumsRead.user_id == user.id,
+               ForumsRead.forum_id == topic.forum_id).first()
 
     with current_app.test_request_context():
         # Test with logged in user
-        login_user(normal_user)
+        login_user(user)
         assert current_user.is_authenticated()
 
         # Update the tracker
-        assert topic_normal.update_read(current_user, topic_normal.forum,
-                                        forumsread)
+        assert topic.update_read(current_user, topic.forum, forumsread)
         # Because the tracker is already up-to-date, it shouldn't update it
         # again.
-        assert not topic_normal.update_read(current_user, topic_normal.forum,
-                                            forumsread)
+        assert not topic.update_read(current_user, topic.forum, forumsread)
 
         # Adding a new post - now the tracker shouldn't be up-to-date anymore.
         post = Post(content="Test Content")
-        post.save(topic=topic_normal, user=normal_user)
+        post.save(topic=topic, user=user)
 
         forumsread = ForumsRead.query.\
-            filter(ForumsRead.user_id == normal_user.id,
-                   ForumsRead.forum_id == topic_normal.forum_id).first()
+            filter(ForumsRead.user_id == user.id,
+                   ForumsRead.forum_id == topic.forum_id).first()
 
         # Test tracker length
         current_app.config["TRACKER_LENGTH"] = 0
-        assert not topic_normal.update_read(current_user, topic_normal.forum,
-                                            forumsread)
+        assert not topic.update_read(current_user, topic.forum, forumsread)
         current_app.config["TRACKER_LENGTH"] = 1
-        assert topic_normal.update_read(current_user, topic_normal.forum,
-                                        forumsread)
+        assert topic.update_read(current_user, topic.forum, forumsread)
 
         # Test with logged out user
         logout_user()
         assert not current_user.is_authenticated()
-        assert not topic_normal.update_read(current_user, topic_normal.forum,
-                                            forumsread)
+        assert not topic.update_read(current_user, topic.forum, forumsread)
 
 
-def test_topic_url(topic_normal):
-    assert topic_normal.url == "http://localhost:5000/topic/1-test-topic-normal"
+def test_topic_url(topic):
+    assert topic.url == "http://localhost:5000/topic/1-test-topic-normal"
 
 
-def test_topic_slug(topic_normal):
-    assert topic_normal.slug == "test-topic-normal"
+def test_topic_slug(topic):
+    assert topic.slug == "test-topic-normal"
 
 
-def test_post_save(topic_normal, normal_user):
+def test_post_save(topic, user):
     """Tests the save post method."""
     post = Post(content="Test Content")
-    post.save(topic=topic_normal, user=normal_user)
+    post.save(topic=topic, user=user)
 
     assert post.content == "Test Content"
 
@@ -428,13 +422,13 @@ def test_post_save(topic_normal, normal_user):
 
     assert post.content == "Test Edit Content"
 
-    assert topic_normal.user.post_count == 2
-    assert topic_normal.post_count == 2
-    assert topic_normal.last_post == post
-    assert topic_normal.forum.post_count == 2
+    assert topic.user.post_count == 2
+    assert topic.post_count == 2
+    assert topic.last_post == post
+    assert topic.forum.post_count == 2
 
 
-def test_post_delete(topic_normal):
+def test_post_delete(topic):
     """Tests the delete post method with three different post types.
     The three types are:
         * First Post
@@ -442,37 +436,37 @@ def test_post_delete(topic_normal):
         * Last Post
     """
     post_middle = Post(content="Test Content Middle")
-    post_middle.save(topic=topic_normal, user=topic_normal.user)
+    post_middle.save(topic=topic, user=topic.user)
 
     post_last = Post(content="Test Content Last")
-    post_last.save(topic=topic_normal, user=topic_normal.user)
+    post_last.save(topic=topic, user=topic.user)
 
-    assert topic_normal.post_count == 3
-    assert topic_normal.forum.post_count == 3
-    assert topic_normal.user.post_count == 3
+    assert topic.post_count == 3
+    assert topic.forum.post_count == 3
+    assert topic.user.post_count == 3
 
     post_middle.delete()
 
     # Check the last posts
-    assert topic_normal.last_post == post_last
-    assert topic_normal.forum.last_post == post_last
+    assert topic.last_post == post_last
+    assert topic.forum.last_post == post_last
 
     post_last.delete()
 
     # That was a bit trickier..
-    assert topic_normal.post_count == 1
-    assert topic_normal.forum.post_count == 1
-    assert topic_normal.user.post_count == 1
-    assert topic_normal.first_post_id == topic_normal.last_post_id
+    assert topic.post_count == 1
+    assert topic.forum.post_count == 1
+    assert topic.user.post_count == 1
+    assert topic.first_post_id == topic.last_post_id
 
-    assert topic_normal.forum.last_post_id == topic_normal.last_post_id
+    assert topic.forum.last_post_id == topic.last_post_id
 
 
-def test_report(topic_normal, normal_user):
+def test_report(topic, user):
     """Tests if the reports can be saved/edited and deleted with the
     implemented save and delete methods."""
     report = Report(reason="Test Report")
-    report.save(user=normal_user, post=topic_normal.first_post)
+    report.save(user=user, post=topic.first_post)
     assert report.reason == "Test Report"
 
     report.reason = "Test Report Edited"
@@ -484,12 +478,12 @@ def test_report(topic_normal, normal_user):
     assert report is None
 
 
-def test_forumsread(topic_normal, normal_user):
+def test_forumsread(topic, user):
     """Tests if the forumsread tracker can be saved/edited and deleted with the
     implemented save and delete methods."""
     forumsread = ForumsRead()
-    forumsread.user_id = normal_user.id
-    forumsread.forum_id = topic_normal.forum_id
+    forumsread.user_id = user.id
+    forumsread.forum_id = topic.forum_id
     forumsread.last_read = datetime.utcnow()
     forumsread.save()
     assert forumsread is not None
@@ -499,13 +493,13 @@ def test_forumsread(topic_normal, normal_user):
     assert forumsread is None
 
 
-def test_topicsread(topic_normal, normal_user):
+def test_topicsread(topic, user):
     """Tests if the topicsread trakcer can be saved/edited and deleted with the
     implemented save and delete methods."""
     topicsread = TopicsRead()
-    topicsread.user_id = normal_user.id
-    topicsread.topic_id = topic_normal.id
-    topicsread.forum_id = topic_normal.forum_id
+    topicsread.user_id = user.id
+    topicsread.topic_id = topic.id
+    topicsread.forum_id = topic.forum_id
     topicsread.last_read = datetime.utcnow()
     topicsread.save()
     assert topicsread is not None
