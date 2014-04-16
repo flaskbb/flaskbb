@@ -320,6 +320,99 @@ class Topic(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    def tracker_needs_update(self, forumsread, topicsread):
+        """Returns True if the topicsread tracker needs an update.
+        Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
+        topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
+
+        TODO: Couldn't think of a better name for this method - ideas?
+
+        :param forumsread: The ForumsRead object is needed because we also
+                           need to check if the forum has been cleared
+                           sometime ago.
+
+        :param topicsread: The topicsread object is used to check if there is
+                           a new post in the topic.
+        """
+        read_cutoff = None
+        if current_app.config['TRACKER_LENGTH'] > 0:
+            read_cutoff = datetime.utcnow() - timedelta(
+                days=current_app.config['TRACKER_LENGTH'])
+
+        # The tracker is disabled - abort
+        if read_cutoff is None:
+            return False
+
+        # Else the topic is still below the read_cutoff
+        elif read_cutoff > self.last_post.date_created:
+            return False
+
+        # Can be None (cleared) if the user has never marked the forum as read.
+        # If this condition is false - we need to update the tracker
+        if forumsread and forumsread.cleared is not None and \
+                forumsread.cleared >= self.last_post.date_created:
+            return False
+
+        if topicsread and topicsread.last_read >= self.last_post.date_created:
+            return False
+
+        return True
+
+    def update_read(self, user, forum, forumsread):
+        """Updates the topicsread and forumsread tracker for a specified user,
+        if the topic contains new posts or the user hasn't read the topic.
+        Returns True if the tracker has been updated.
+
+        :param user: The user for whom the readstracker should be updated.
+
+        :param forum: The forum in which the topic is.
+
+        :param forumsread: The forumsread object. It is used to check if there
+                           is a new post since the forum has been marked as
+                           read.
+        """
+        # User is not logged in - abort
+        if not user.is_authenticated():
+            return False
+
+        topicsread = TopicsRead.query.\
+            filter(TopicsRead.user_id == user.id,
+                   TopicsRead.topic_id == self.id).first()
+
+        if not self.tracker_needs_update(forumsread, topicsread):
+            return False
+
+        # Because we return True/False if the trackers have been
+        # updated, we need to store the status in a temporary variable
+        updated = False
+
+        # A new post has been submitted that the user hasn't read.
+        # Updating...
+        if topicsread:
+            topicsread.last_read = datetime.utcnow()
+            topicsread.save()
+            updated = True
+
+        # The user has not visited the topic before. Inserting him in
+        # the TopicsRead model.
+        elif not topicsread:
+            topicsread = TopicsRead()
+            topicsread.user_id = user.id
+            topicsread.topic_id = self.id
+            topicsread.forum_id = self.forum_id
+            topicsread.last_read = datetime.utcnow()
+            topicsread.save()
+            updated = True
+
+        # No unread posts
+        else:
+            updated = False
+
+        # Save True/False if the forums tracker has been updated.
+        updated = forum.update_read(user, forumsread, topicsread)
+
+        return updated
+
     def move(self, forum):
         """Moves a topic to the given forum.
         Returns True if it could successfully move the topic to forum.
@@ -461,99 +554,6 @@ class Topic(db.Model):
 
         db.session.commit()
         return self
-
-    def tracker_needs_update(self, forumsread, topicsread):
-        """Returns True if the topicsread tracker needs an update.
-        Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
-        topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
-
-        TODO: Couldn't think of a better name for this method - ideas?
-
-        :param forumsread: The ForumsRead object is needed because we also
-                           need to check if the forum has been cleared
-                           sometime ago.
-
-        :param topicsread: The topicsread object is used to check if there is
-                           a new post in the topic.
-        """
-        read_cutoff = None
-        if current_app.config['TRACKER_LENGTH'] > 0:
-            read_cutoff = datetime.utcnow() - timedelta(
-                days=current_app.config['TRACKER_LENGTH'])
-
-        # The tracker is disabled - abort
-        if read_cutoff is None:
-            return False
-
-        # Else the topic is still below the read_cutoff
-        elif read_cutoff > self.last_post.date_created:
-            return False
-
-        # Can be None (cleared) if the user has never marked the forum as read.
-        # If this condition is false - we need to update the tracker
-        if forumsread and forumsread.cleared is not None and \
-                forumsread.cleared >= self.last_post.date_created:
-            return False
-
-        if topicsread and topicsread.last_read >= self.last_post.date_created:
-            return False
-
-        return True
-
-    def update_read(self, user, forum, forumsread):
-        """Updates the topicsread and forumsread tracker for a specified user,
-        if the topic contains new posts or the user hasn't read the topic.
-        Returns True if the tracker has been updated.
-
-        :param user: The user for whom the readstracker should be updated.
-
-        :param forum: The forum in which the topic is.
-
-        :param forumsread: The forumsread object. It is used to check if there
-                           is a new post since the forum has been marked as
-                           read.
-        """
-        # User is not logged in - abort
-        if not user.is_authenticated():
-            return False
-
-        topicsread = TopicsRead.query.\
-            filter(TopicsRead.user_id == user.id,
-                   TopicsRead.topic_id == self.id).first()
-
-        if not self.tracker_needs_update(forumsread, topicsread):
-            return False
-
-        # Because we return True/False if the trackers have been
-        # updated, we need to store the status in a temporary variable
-        updated = False
-
-        # A new post has been submitted that the user hasn't read.
-        # Updating...
-        if topicsread:
-            topicsread.last_read = datetime.utcnow()
-            topicsread.save()
-            updated = True
-
-        # The user has not visited the topic before. Inserting him in
-        # the TopicsRead model.
-        elif not topicsread:
-            topicsread = TopicsRead()
-            topicsread.user_id = user.id
-            topicsread.topic_id = self.id
-            topicsread.forum_id = self.forum_id
-            topicsread.last_read = datetime.utcnow()
-            topicsread.save()
-            updated = True
-
-        # No unread posts
-        else:
-            updated = False
-
-        # Save True/False if the forums tracker has been updated.
-        updated = forum.update_read(user, forumsread, topicsread)
-
-        return updated
 
 
 class Forum(db.Model):
