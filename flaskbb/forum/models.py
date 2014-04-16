@@ -10,11 +10,11 @@
 """
 from datetime import datetime, timedelta
 
-from flask import current_app, url_for
+from flask import current_app, url_for, abort
 
 from flaskbb.extensions import db
 from flaskbb.utils.query import TopicQuery
-from flaskbb.utils.helpers import slugify
+from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
 
 
 moderators = db.Table(
@@ -161,6 +161,10 @@ class Post(db.Model):
         return url_for("forum.view_post", post_id=self.id)
 
     # Methods
+    def __init__(self, content=None):
+        if content:
+            self.content = content
+
     def __repr__(self):
         """
         Set to a unique key specific to the object in the database.
@@ -555,6 +559,17 @@ class Topic(db.Model):
         db.session.commit()
         return self
 
+    # Classmethods
+    @classmethod
+    def get_posts(cls, topic_id, per_page):
+        """Returns the posts for this topic.
+
+        :param topic_id: The topic id
+
+        :param per_page: How many posts per page should be displayed
+        """
+        pass
+
 
 class Forum(db.Model):
     __tablename__ = "forums"
@@ -728,6 +743,31 @@ class Forum(db.Model):
 
         return self
 
+    # Classmethods
+    @classmethod
+    def get_forum(cls, forum_id, user):
+        """Returns the forum with the forumsread object for the user.
+
+        :param forum_id: The forum id
+
+        :param user: The user object
+        """
+        pass
+
+    @classmethod
+    def get_topics(cls, forum_id, user, per_page=20):
+        """Get the topics for the forum. If the user is logged in,
+        it will perform an outerjoin for the topics with the topicsread and
+        forumsread relation to check if it is read or unread.
+
+        :param category_id: The category id
+
+        :param user: The user object
+        """
+        # Do pagination stuff here, so that we can get rid of the TopicQuery
+        # class
+        pass
+
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -757,6 +797,12 @@ class Category(db.Model):
                        slug=self.slug)
 
     # Methods
+    def __repr__(self):
+        """Set to a unique key specific to the object in the database.
+        Required for cache.memoize() to work across requests.
+        """
+        return "<{} {}>".format(self.__class__.__name__, self.id)
+
     def save(self):
         """Saves a category"""
 
@@ -782,3 +828,67 @@ class Category(db.Model):
                 db.session.commit()
 
         return self
+
+    # Classmethods
+    @classmethod
+    def get_all(cls, user):
+        """Get all categories with all associated forums. If the user is
+        logged in, it will perform an outerjoin for the forum with the
+        forumsread relation.
+        It returns a list with tuples. The tuples are containing the entities
+        from Category, Forum, ForumsRead.last_read and ForumsRead.cleared.
+
+        :param user: The user object
+        """
+        if user.is_authenticated():
+            forums = cls.query.\
+                join(Forum, cls.id == Forum.category_id).\
+                outerjoin(ForumsRead,
+                          db.and_(ForumsRead.forum_id == Forum.id,
+                                  ForumsRead.user_id == user.id)).\
+                add_entity(Forum).\
+                add_entity(ForumsRead).\
+                all()
+        else:
+            # Get all the forums
+            forums = cls.query.\
+                join(Forum, cls.id == Forum.category_id).\
+                add_entity(Forum).\
+                all()
+
+        return get_categories_and_forums(forums, user)
+
+    @classmethod
+    def get_forums(cls, category_id, user):
+        """Get the forums for the category. If the user is logged in,
+        it will perform an outerjoin for the forum with the forumsread relation.
+        It returns a dict with the category as the key and the values are
+        lists which are containing the forums for each category.
+
+        :param category_id: The category id
+
+        :param user: The user object
+        """
+        if user.is_authenticated():
+            forums = cls.query.\
+                filter(cls.id == category_id).\
+                join(Forum, cls.id == Forum.category_id).\
+                outerjoin(ForumsRead,
+                          db.and_(ForumsRead.forum_id == Forum.id,
+                                  ForumsRead.user_id == user.id)).\
+                add_entity(Forum).\
+                add_entity(ForumsRead).\
+                order_by(Forum.position).\
+                all()
+        else:
+            forums = cls.query.\
+                filter(cls.id == category_id).\
+                join(Forum, cls.id == Forum.category_id).\
+                add_entity(Forum).\
+                order_by(Forum.position).\
+                all()
+
+        if not forums:
+            abort(404)
+
+        return get_forums(forums, user)

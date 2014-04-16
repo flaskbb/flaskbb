@@ -26,7 +26,6 @@ from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
-from flaskbb.utils.helpers import get_forums
 from flaskbb.user.models import User
 
 
@@ -35,30 +34,7 @@ forum = Blueprint("forum", __name__)
 
 @forum.route("/")
 def index():
-    # Get the categories and forums
-    if current_user.is_authenticated():
-        forum_query = Category.query.\
-            join(Forum, Category.id == Forum.category_id).\
-            outerjoin(ForumsRead,
-                      db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == current_user.id)).\
-            add_entity(Forum).\
-            add_entity(ForumsRead).\
-            order_by(Category.id, Category.position, Forum.position).\
-            all()
-    else:
-        # we do not need to join the ForumsRead because the user isn't
-        # signed in
-        forum_query = Category.query.\
-            join(Forum, Category.id == Forum.category_id).\
-            add_entity(Forum).\
-            order_by(Category.id, Category.position, Forum.position).\
-            all()
-
-        forum_query = [(category, forum, None)
-                       for category, forum in forum_query]
-
-    categories = get_forums(forum_query)
+    categories = Category.get_all(user=current_user)
 
     # Fetch a few stats about the forum
     user_count = User.query.count()
@@ -90,32 +66,11 @@ def index():
 @forum.route("/category/<int:category_id>")
 @forum.route("/category/<int:category_id>-<slug>")
 def view_category(category_id, slug=None):
-    if current_user.is_authenticated():
-        forum_query = Category.query.\
-            filter(Category.id == category_id).\
-            join(Forum, Category.id == Forum.category_id).\
-            outerjoin(ForumsRead,
-                      db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == 1)).\
-            add_entity(Forum).\
-            add_entity(ForumsRead).\
-            order_by(Forum.position).\
-            all()
-    else:
-        # we do not need to join the ForumsRead because the user isn't
-        # signed in
-        forum_query = Category.query.\
-            filter(Category.id == category_id).\
-            join(Forum, Category.id == Forum.category_id).\
-            add_entity(Forum).\
-            order_by(Forum.position).\
-            all()
+    category, forums = Category.\
+        get_forums(category_id=category_id, user=current_user)
 
-        forum_query = [(category, forum, None)
-                       for category, forum in forum_query]
-
-    category = get_forums(forum_query)
-    return render_template("forum/category.html", categories=category)
+    return render_template("forum/category.html", forums=forums,
+                           category=category)
 
 
 @forum.route("/forum/<int:forum_id>")

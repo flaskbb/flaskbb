@@ -5,7 +5,9 @@
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
 </ol>
 
-{% include theme("forum/category_layout.html") %}
+{% for category, forums in categories %}
+    {% include theme("forum/category_layout.html") %}
+{% endfor %}
 
 <!-- Forum Stats -->
 <table class="table table-bordered">

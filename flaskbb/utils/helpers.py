@@ -10,9 +10,10 @@
 """
 import re
 import time
+import itertools
+import operator
 from unicodedata import normalize
 from datetime import datetime, timedelta
-from collections import OrderedDict
 
 from flask import current_app, session
 from flask.ext.themes2 import render_theme_template
@@ -51,24 +52,74 @@ def render_template(template, **context):
     return render_theme_template(theme, template, **context)
 
 
-def get_forums(forum_query):
-    """Returns a dictionary where the key is the category and the values
-    are the forums with their forumsread status
+def get_categories_and_forums(query_result, user):
+    """Returns a list with categories. Every category has a list for all
+    their associated forums.
 
-    :param forum_query: A list with all categories, forums and
-                        their forumsread object
+    The structure looks like this::
+        [(<Category 1>,
+          [(<Forum 1>, None),
+           (<Forum 2>, <flaskbb.forum.models.ForumsRead at 0x38fdb50>)]),
+         (<Category 2>,
+          [(<Forum 3>, None),
+          (<Forum 4>, None)])]
+
+    and to unpack the values you can do this::
+        In [110]: for category, forums in x:
+           .....:     print category
+           .....:     for forum, forumsread in forums:
+           .....:         print "\t", forum, forumsread
+
+   This will print something this:
+        <Category 1>
+            <Forum 1> None
+            <Forum 2> <flaskbb.forum.models.ForumsRead object at 0x38fdb50>
+        <Category 2>
+            <Forum 3> None
+            <Forum 4> None
+
+    :param result: A tuple (KeyedTuple) with all categories and forums
+
+    :param user: The user object is needed because a signed out user does not
+                 have the ForumsRead relation joined.
     """
-    forums = OrderedDict()
-    for category, forum, forumsread in forum_query:
-        try:
-            # if forums[category] has no list
-            if not isinstance(forums[category], list):
-                forums[category] = []
-        except KeyError:
-            forums[category] = []
+    it = itertools.groupby(query_result, operator.itemgetter(0))
 
-        forums[category]
-        forums[category].append((forum, forumsread))
+    forums = []
+
+    if user.is_authenticated():
+        for key, value in it:
+            forums.append((key, [(item[1], item[2]) for item in value]))
+    else:
+        for key, value in it:
+            forums.append((key, [(item[1], None) for item in value]))
+
+    return forums
+
+
+def get_forums(query_result, user):
+    """Returns a tuple which contains the category and the forums as list.
+    This is the counterpart for get_categories_and_forums and especially
+    usefull when you just need the forums for one category.
+
+    For example::
+        (<Category 2>,
+          [(<Forum 3>, None),
+          (<Forum 4>, None)])
+
+    :param result: A tuple (KeyedTuple) with all categories and forums
+
+    :param user: The user object is needed because a signed out user does not
+                 have the ForumsRead relation joined.
+    """
+    it = itertools.groupby(query_result, operator.itemgetter(0))
+
+    if user.is_authenticated():
+        for key, value in it:
+            forums = key, [(item[1], item[2]) for item in value]
+    else:
+        for key, value in it:
+            forums = key, [(item[1], None) for item in value]
 
     return forums
 

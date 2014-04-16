@@ -1,4 +1,4 @@
-{% set page_title = categories.keys()[0].title %}
+{% set page_title = category.title %}
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
@@ -6,7 +6,7 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li class="active">{{ categories.keys()[0].title }}</li>
+    <li class="active">{{ category.title }}</li>
 </ol>
 
 {% include "forum/category_layout.html" %}
