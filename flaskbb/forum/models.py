@@ -51,7 +51,7 @@ class TopicsRead(db.Model):
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
     def __repr__(self):
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return "<{}>".format(self.__class__.__name__)
 
     def save(self):
         """Saves a TopicsRead entry."""
@@ -79,7 +79,7 @@ class ForumsRead(db.Model):
     cleared = db.Column(db.DateTime)
 
     def __repr__(self):
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return "<{}>".format(self.__class__.__name__)
 
     def save(self):
         """Saves a ForumsRead entry."""
@@ -565,17 +565,6 @@ class Topic(db.Model):
         db.session.commit()
         return self
 
-    # Classmethods
-    @classmethod
-    def get_posts(cls, topic_id, per_page):
-        """Returns the posts for this topic.
-
-        :param topic_id: The topic id
-
-        :param per_page: How many posts per page should be displayed
-        """
-        pass
-
 
 class Forum(db.Model):
     __tablename__ = "forums"
@@ -756,7 +745,8 @@ class Forum(db.Model):
 
         :param forum_id: The forum id
 
-        :param user: The user object
+        :param user: The user object is needed to check if we also need their
+                     forumsread object.
         """
         if user.is_authenticated():
             forum, forumsread = Forum.query.\
@@ -779,9 +769,13 @@ class Forum(db.Model):
         it will perform an outerjoin for the topics with the topicsread and
         forumsread relation to check if it is read or unread.
 
-        :param category_id: The category id
+        :param forum_id: The forum id
 
         :param user: The user object
+
+        :param page: The page whom should be loaded
+
+        :param per_page: How many topics per page should be shown
         """
         if user.is_authenticated():
             topics = Topic.query.filter_by(forum_id=forum_id).\
@@ -866,13 +860,16 @@ class Category(db.Model):
     # Classmethods
     @classmethod
     def get_all(cls, user):
-        """Get all categories with all associated forums. If the user is
-        logged in, it will perform an outerjoin for the forum with the
-        forumsread relation.
-        It returns a list with tuples. The tuples are containing the entities
-        from Category, Forum, ForumsRead.last_read and ForumsRead.cleared.
+        """Get all categories with all associated forums.
+        It returns a list with tuples. Those tuples are containing the category
+        and their associated forums (whose are stored in a list).
 
-        :param user: The user object
+        For example::
+            [(<Category 1>, [(<Forum 2>, <ForumsRead>), (<Forum 1>, None)]),
+             (<Category 2>, [(<Forum 3>, None), (<Forum 4>, None)])]
+
+        :param user: The user object is needed to check if we also need their
+                     forumsread object.
         """
         if user.is_authenticated():
             forums = cls.query.\
@@ -896,14 +893,17 @@ class Category(db.Model):
 
     @classmethod
     def get_forums(cls, category_id, user):
-        """Get the forums for the category. If the user is logged in,
-        it will perform an outerjoin for the forum with the forumsread relation.
-        It returns a dict with the category as the key and the values are
-        lists which are containing the forums for each category.
+        """Get the forums for the category.
+        It returns a tuple with the category and the forums with their
+        forumsread object are stored in a list.
+
+        A return value can look like this for a category with two forums::
+            (<Category 1>, [(<Forum 1>, None), (<Forum 2>, None)])
 
         :param category_id: The category id
 
-        :param user: The user object
+        :param user: The user object is needed to check if we also need their
+                     forumsread object.
         """
         if user.is_authenticated():
             forums = cls.query.\
