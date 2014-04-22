@@ -1,4 +1,4 @@
-{% set page_title = forum[0].title %}
+{% set page_title = forum.title %}
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
@@ -7,27 +7,27 @@
 
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li><a href="{{ forum[0].category.url }}">{{ forum[0].category.title }}</a></li>
-    <li class="active">{{ forum[0].title }}</li>
+    <li><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
+    <li class="active">{{ forum.title }}</li>
 </ol>
 
 <div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(topics, forum[0].url) }}
+    {{ render_pagination(topics, forum.url) }}
 </div> <!-- end span pagination -->
 
-{% if current_user|post_topic(forum[0]) %}
+{% if current_user|post_topic(forum) %}
 <div class="pull-right" style="padding-bottom: 10px">
     <div class="btn-group">
-        <a href="{{ url_for('forum.markread', forum_id=forum[0].id, slug=forum[0].slug) }}" class="btn btn-default">
+        <a href="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-default">
             <span class="fa fa-check"></span> Mark as Read
         </a>
 
-        {% if forum[0].locked %}
+        {% if forum.locked %}
         <span class="btn btn-primary">
             <span class="fa fa-lock"></span> Locked
         </span>
         {% else %}
-        <a href="{{ url_for('forum.new_topic', forum_id=forum[0].id, slug=forum[0].slug) }}" class="btn btn-primary">
+        <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-primary">
             <span class="fa fa-pencil"></span> New Topic
         </a>
         {% endif %}
@@ -40,7 +40,7 @@
     <thead>
         <tr>
             <th colspan="5">
-                {{ forum[0].title }}
+                {{ forum.title }}
             </th>
         </tr>
     </thead>
@@ -62,7 +62,7 @@
             {% if topic.locked %}
                 <span class="fa fa-locked" style="font-size: 2em"></span>
             {% else %}
-                {% if topic|topic_is_unread(topicread, current_user, forum[1]) %}
+                {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
                     <span class="fa fa-comment" style="font-size: 2em"></span>
                 {% else %}
                     <span class="fa fa-comment-o" style="font-size: 2em"></span>

@@ -261,8 +261,6 @@ class Topic(db.Model):
     __tablename__ = "topics"
     __searchable__ = ['title', 'username']
 
-    query_class = TopicQuery
-
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id",
@@ -746,16 +744,29 @@ class Forum(db.Model):
     # Classmethods
     @classmethod
     def get_forum(cls, forum_id, user):
-        """Returns the forum with the forumsread object for the user.
+        """Returns the forum and forumsread object as a tuple for the user.
 
         :param forum_id: The forum id
 
         :param user: The user object
         """
-        pass
+        if user.is_authenticated():
+            forum, forumsread = Forum.query.\
+                filter(Forum.id == forum_id).\
+                options(db.joinedload("category")).\
+                outerjoin(ForumsRead,
+                          db.and_(ForumsRead.forum_id == Forum.id,
+                                  ForumsRead.user_id == user.id)).\
+                add_entity(ForumsRead).\
+                first_or_404()
+        else:
+            forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
+            forumsread = None
+
+        return forum, forumsread
 
     @classmethod
-    def get_topics(cls, forum_id, user, per_page=20):
+    def get_topics(cls, forum_id, user, page=1, per_page=20):
         """Get the topics for the forum. If the user is logged in,
         it will perform an outerjoin for the topics with the topicsread and
         forumsread relation to check if it is read or unread.
@@ -764,9 +775,24 @@ class Forum(db.Model):
 
         :param user: The user object
         """
-        # Do pagination stuff here, so that we can get rid of the TopicQuery
-        # class
-        pass
+        if user.is_authenticated():
+            topics = Topic.query.filter_by(forum_id=forum_id).\
+                filter(Post.topic_id == Topic.id).\
+                outerjoin(TopicsRead,
+                          db.and_(TopicsRead.topic_id == Topic.id,
+                                  TopicsRead.user_id == user.id)).\
+                add_entity(TopicsRead).\
+                order_by(Post.id.desc()).\
+                paginate(page, per_page, True)
+        else:
+            topics = Topic.query.filter_by(forum_id=forum_id).\
+                filter(Post.topic_id == Topic.id).\
+                order_by(Post.id.desc()).\
+                paginate(page, per_page, True)
+
+            topics.items = [(topic, None) for topic in topics.items]
+
+        return topics
 
 
 class Category(db.Model):
@@ -848,12 +874,14 @@ class Category(db.Model):
                                   ForumsRead.user_id == user.id)).\
                 add_entity(Forum).\
                 add_entity(ForumsRead).\
+                order_by(Category.id, Category.position, Forum.position).\
                 all()
         else:
             # Get all the forums
             forums = cls.query.\
                 join(Forum, cls.id == Forum.category_id).\
                 add_entity(Forum).\
+                order_by(Category.id, Category.position, Forum.position).\
                 all()
 
         return get_categories_and_forums(forums, user)

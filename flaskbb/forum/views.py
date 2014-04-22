@@ -78,34 +78,12 @@ def view_category(category_id, slug=None):
 def view_forum(forum_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
-    if current_user.is_authenticated():
-        forum = Forum.query.\
-            filter(Forum.id == forum_id).\
-            options(db.joinedload("category")).\
-            outerjoin(ForumsRead,
-                      db.and_(ForumsRead.forum_id == Forum.id,
-                              ForumsRead.user_id == current_user.id)).\
-            add_entity(ForumsRead).\
-            first_or_404()
+    forum, forumsread = Forum.get_forum(forum_id=forum_id, user=current_user)
+    topics = Forum.get_topics(forum_id=forum.id, user=current_user, page=page,
+                              per_page=current_app.config["TOPICS_PER_PAGE"])
 
-        topics = Topic.query.filter_by(forum_id=forum[0].id).\
-            filter(Post.topic_id == Topic.id).\
-            outerjoin(TopicsRead,
-                      db.and_(TopicsRead.topic_id == Topic.id,
-                              TopicsRead.user_id == current_user.id)).\
-            add_entity(TopicsRead).\
-            order_by(Post.id.desc()).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
-    else:
-        forum = Forum.query.filter(Forum.id == forum_id).first_or_404()
-        forum = (forum, None)
-
-        topics = Topic.query.filter_by(forum_id=forum[0].id).\
-            filter(Post.topic_id == Topic.id).\
-            order_by(Post.id.desc()).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], True, True)
-
-    return render_template("forum/forum.html", forum=forum, topics=topics)
+    return render_template("forum/forum.html", forum=forum, topics=topics,
+                           forumsread=forumsread,)
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
