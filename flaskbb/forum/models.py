@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 from flask import current_app, url_for, abort
 
 from flaskbb.extensions import db
-from flaskbb.utils.query import TopicQuery
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
 
 
@@ -51,6 +50,9 @@ class TopicsRead(db.Model):
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
+    def __repr__(self):
+        return "<{} {}>".format(self.__class__.__name__, self.id)
+
     def save(self):
         """Saves a TopicsRead entry."""
         db.session.add(self)
@@ -75,6 +77,9 @@ class ForumsRead(db.Model):
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
     cleared = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self):
         """Saves a ForumsRead entry."""
@@ -105,6 +110,9 @@ class Report(db.Model):
     reporter = db.relationship("User", lazy="joined",
                                foreign_keys=[reporter_id])
     zapper = db.relationship("User", lazy="joined", foreign_keys=[zapped_by])
+
+    def __repr__(self):
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self, post=None, user=None):
         """Saves a report.

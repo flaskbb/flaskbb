@@ -61,6 +61,64 @@ def test_category_delete_with_forum(forum):
     assert category is None
 
 
+def test_category_get_forums(forum, user):
+    category = forum.category
+
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(user)
+        assert current_user.is_authenticated()
+        cat, forums = Category.get_forums(category.id, current_user)
+
+        # Check if it is a list because in a category there are normally more
+        # than one forum in it (not in these tests)
+        assert isinstance(forums, list) is True
+
+        assert forums == [(forum, None)]
+        assert cat == category
+
+        # Test the same thing with a logged out user
+        logout_user()
+        assert not current_user.is_authenticated()
+        cat, forums = Category.get_forums(category.id, current_user)
+
+        # Check if it is a list because in a category there are normally more
+        # than one forum in it (not in these tests)
+        assert isinstance(forums, list) is True
+
+        assert forums == [(forum, None)]
+        assert cat == category
+
+
+def test_category_get_all(forum, user):
+    category = forum.category
+
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(user)
+        assert current_user.is_authenticated()
+        categories = Category.get_all(current_user)
+
+        # All categories are stored in a list
+        assert isinstance(categories, list)
+        # The forums for a category are also stored in a list
+        assert isinstance(categories[0][1], list)
+
+        assert categories == [(category, [(forum, None)])]
+
+        # Test with logged out user
+        logout_user()
+        assert not current_user.is_authenticated()
+        categories = Category.get_all(current_user)
+
+        # All categories are stored in a list
+        assert isinstance(categories, list)
+        # The forums for a category are also stored in a list
+        assert isinstance(categories[0][1], list)
+
+        assert categories == [(category, [(forum, None)])]
+
+
 def test_forum_save(category, moderator_user):
     """Test the save forum method"""
     forum = Forum(title="Test Forum", category_id=category.id)
@@ -194,6 +252,43 @@ def test_forum_url(forum):
 
 def test_forum_slugify(forum):
     assert forum.slug == "test-forum"
+
+
+def test_forum_get_forum(forum, user):
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(user)
+
+        forum_with_forumsread = \
+            Forum.get_forum(forum_id=forum.id, user=current_user)
+
+        assert forum_with_forumsread == (forum, None)
+
+        # Test with logged out user
+        logout_user()
+
+        forum_with_forumsread = \
+            Forum.get_forum(forum_id=forum.id, user=current_user)
+
+        assert forum_with_forumsread == (forum, None)
+
+
+def test_forum_get_topics(topic, user):
+    forum = topic.forum
+    with current_app.test_request_context():
+        # Test with logged in user
+        login_user(user)
+
+        topics = Forum.get_topics(forum_id=forum.id, user=current_user)
+
+        assert topics.items == [(topic, None)]
+
+        # Test with logged out user
+        logout_user()
+
+        topics = Forum.get_topics(forum_id=forum.id, user=current_user)
+
+        assert topics.items == [(topic, None)]
 
 
 def test_topic_save(forum, user):
