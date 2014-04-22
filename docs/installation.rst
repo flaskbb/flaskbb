@@ -157,16 +157,36 @@ Local SMTP Server
 Installation
 ============
 
+
+Development
+~~~~~~~~~~~
+
+For development you can create the database with the command below. This will
+additional to the database also create a few users with some example content.
+::
+
+    python manage.py createall
+
+To test if everything has worked, run the development server with
+``python manage.py runserver``.
+
+Production
+~~~~~~~~~~
+
 Now, you should be able to install `FlaskBB` and can run therefore
 ::
 
     python manage.py initflaskbb
 
-Here you are asked about what your username is, which email adress you use
-and last but not least, which password your admin user has (please choose a secure one).
+There you are going to be asked about your username, your email adress
+and which password you want to use for your admin user
+(please choose a secure one).
 
-To test if everything worked, run the development server with
-``python manage.py runserver``.
+
+Upgrading
+=========
+
+`A upgrade guide will be written when first stable version is released.`
 
 
 Deploying
