@@ -538,6 +538,9 @@ class Topic(db.Model):
             except IndexError:
                 self.forum.last_post_id = 0
 
+            # Commit the changes
+            db.session.commit()
+
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
 
