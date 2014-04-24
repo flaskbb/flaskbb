@@ -183,6 +183,8 @@
                 <li class="active"><a href="#">{{ page }}</a></li>
             {% endif %}
         {% endif %}
+    {%- else -%}
+        <li class="active"><a href="#">1</a></li>
     {%- endfor %}
     {% if page_obj.has_next %}
         <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
