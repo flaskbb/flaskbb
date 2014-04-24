@@ -53,14 +53,16 @@ def users():
     search_form = UserSearchForm()
 
     if search_form.validate():
-        users = search_form.get_results().paginate(page, current_app.config['USERS_PER_PAGE'], False)
-        return render_template("admin/users.html", users=users, search_form=search_form)
-    else:
-        users = User.query. \
+        users = search_form.get_results().\
             paginate(page, current_app.config['USERS_PER_PAGE'], False)
-        return render_template("admin/users.html", users=users, search_form=search_form)
+        return render_template("admin/users.html", users=users,
+                               search_form=search_form)
 
+    users = User.query. \
+        paginate(page, current_app.config['USERS_PER_PAGE'], False)
 
+    return render_template("admin/users.html", users=users,
+                           search_form=search_form)
 
 
 @admin.route("/groups")

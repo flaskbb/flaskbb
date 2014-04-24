@@ -102,7 +102,8 @@ def initflaskbb(username=None, password=None, email=None):
     try:
         create_default_groups()
     except IntegrityError:
-        app.logger.error("Couldn't create the default groups because they are already exist!")
+        app.logger.error("Couldn't create the default groups because they are\
+                          already exist!")
         if prompt_bool("Do you want to recreate the database? (y/n)"):
             db.session.rollback()
             db.drop_all()
