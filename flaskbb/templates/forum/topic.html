@@ -154,7 +154,7 @@
                 </span>
 
                 <span class="pull-right">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_authenticated() %}
                     <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">
                         Report
                     </a> |
