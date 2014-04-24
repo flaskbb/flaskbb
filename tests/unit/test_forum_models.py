@@ -335,7 +335,7 @@ def test_topic_delete(topic):
     assert user.post_count == 0
     assert forum.topic_count == 0
     assert forum.post_count == 0
-    assert forum.last_post_id == 0
+    assert forum.last_post_id is None
 
 
 def test_topic_merge(topic):
@@ -380,7 +380,7 @@ def test_topic_move(topic):
     assert topic.move(forum_other)
 
     assert forum_old.topics == []
-    assert forum_old.last_post_id == 0
+    assert forum_old.last_post_id is None
 
     assert forum_old.topic_count == 0
     assert forum_old.post_count == 0

@@ -536,7 +536,7 @@ class Topic(db.Model):
             # Catch an IndexError when you delete the last topic in the forum
             # There is no second last post
             except IndexError:
-                self.forum.last_post_id = 0
+                self.forum.last_post_id = None
 
             # Commit the changes
             db.session.commit()
@@ -637,7 +637,7 @@ class Forum(db.Model):
 
         # No post found..
         else:
-            self.last_post_id = 0
+            self.last_post_id = None
 
         db.session.commit()
 
