@@ -422,6 +422,7 @@ class PrivateMessage(db.Model):
         self.user_id = user_id
         self.from_user_id = from_user
         self.to_user_id = to_user
+        self.date_created = datetime.utcnow()
 
         db.session.add(self)
         db.session.commit()

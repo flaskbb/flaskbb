@@ -868,6 +868,7 @@ class Category(db.Model):
         and their associated forums (whose are stored in a list).
 
         For example::
+
             [(<Category 1>, [(<Forum 2>, <ForumsRead>), (<Forum 1>, None)]),
              (<Category 2>, [(<Forum 3>, None), (<Forum 4>, None)])]
 
@@ -901,6 +902,7 @@ class Category(db.Model):
         forumsread object are stored in a list.
 
         A return value can look like this for a category with two forums::
+
             (<Category 1>, [(<Forum 1>, None), (<Forum 2>, None)])
 
         :param category_id: The category id
