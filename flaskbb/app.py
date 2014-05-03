@@ -36,7 +36,8 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
-    can_move_topic, can_moderate
+    can_move_topic
+from flaskbb.plugins.manager import PluginManager
 
 
 def create_app(config=None):
@@ -59,6 +60,17 @@ def create_app(config=None):
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
+
+    app.logger.debug("Loading plugins...")
+
+    plugin_manager = PluginManager(app)
+    plugin_manager.load_plugins()
+
+    app.logger.debug(
+        "({}) {} Plugins loaded."
+        .format(len(plugin_manager.plugins),
+                plugin_manager.plugins)
+    )
 
     return app
 

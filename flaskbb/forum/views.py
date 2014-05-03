@@ -27,7 +27,7 @@ from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
 from flaskbb.user.models import User
-
+from flaskbb.plugins import hooks
 
 forum = Blueprint("forum", __name__)
 
@@ -41,6 +41,9 @@ def index():
     topic_count = Topic.query.count()
     post_count = Post.query.count()
     newest_user = User.query.order_by(User.id.desc()).first()
+
+    current_app.logger.debug("Runnnig beforeIndex hook...")
+    hooks.runHook(hooks.registered.beforeIndex)
 
     # Check if we use redis or not
     if not current_app.config["REDIS_ENABLED"]:

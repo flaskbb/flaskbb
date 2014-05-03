@@ -24,30 +24,49 @@ class Plugin(object):
     #: in here.
     models = []
 
-    #: The name of the plugin
-    #: E.g. "Example Plugin"
-    name = None
+    @property
+    def name(self):
+        return self.__class__.__name__
 
-    #: A small description of the plugin
-    description = None
+    @property
+    def description(self):
+        return ""
 
-    def install(self, app=None):
+    @property
+    def version(self):
+        return "0.0.0"
+
+    def enable(self):
+        """Enable the plugin."""
+        #raise NotImplemented()
+        # Just temporary
+        self.install()
+
+    def disable(self):  # pragma: no cover
+        """Disable the plugin."""
+        #pass
+        # Just temporary
+        self.uninstall()
+
+    def install(self):
         """The plugin should specify here what needs to be installed.
         For example, create the database and register the hooks."""
-        raise NotImplementedError
+        raise NotImplemented()
 
-    def uninstall(self, app=None):
+    def uninstall(self):
         """Uninstalls the plugin and deletes the things that
         the plugin has installed."""
-        raise NotImplementedError
+        raise NotImplemented()
 
+    # Some helpers
     def create_table(self, model, db):
         """Creates the table for the model
 
         :param model: The Model which should be created
         :param db: The database instance.
         """
-        model.__table__.create(bind=db.engine)
+        if not model.__table__.exists(bind=db.engine):
+            model.__table__.create(bind=db.engine)
 
     def drop_table(self, model, db):
         """Drops the table for the bounded model.
