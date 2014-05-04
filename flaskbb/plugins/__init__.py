@@ -107,7 +107,29 @@ class Plugin(object):
 
 
 class HookManager(object):
-    """Manages all available hooks."""
+    """Manages all available hooks.
+
+    A new hook can be created either that way::
+
+        hooks.new("testHook")
+
+    or like this::
+
+        hooks.add("testHook", test_callback)
+
+    If you want to use the last method, you'd also need to pass a callback over
+    to the ``add`` method.
+    Then you might want to add somewhere in your code the ``caller`` where all
+    registered callbacks for the specified hook are going to be called.
+    For example::
+
+        def hello():
+            do_stuff_here()
+
+            hooks.call("testHook")
+
+            do_more_stuff_here()
+    """
 
     def __init__(self):
         self.hooks = {}
