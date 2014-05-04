@@ -14,12 +14,22 @@ class PortalPlugin(Plugin):
     models = [PortalModel]
 
     @property
+    def name(self):
+        return "Portal Plugin"
+
+    @property
     def description(self):
         return "A simple portal plugin"
 
     @property
     def version(self):
         return "0.0.1"
+
+    def enable(self):
+        pass
+
+    def disable(self):
+        pass
 
     def install(self):
         self.create_all_tables(db)

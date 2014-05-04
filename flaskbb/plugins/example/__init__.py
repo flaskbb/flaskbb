@@ -1,7 +1,6 @@
 from flask import flash
 from flaskbb.plugins import Plugin, hooks
 
-
 #: The name of your plugin class
 __plugin__ = "ExamplePlugin"
 
@@ -19,9 +18,14 @@ class ExamplePlugin(Plugin):
     def version(self):
         return "1.0.0"
 
+    def enable(self):
+        hooks.add("beforeIndex", hello_world)
+
+    def disable(self):
+        hooks.remove("beforeIndex", hello_world)
+
     def install(self):
-        # register hooks and blueprints/routes here
-        hooks.registered.beforeIndex.append(hello_world)
+        pass
 
     def uninstall(self):
         pass

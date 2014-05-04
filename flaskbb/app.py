@@ -64,7 +64,9 @@ def create_app(config=None):
     app.logger.debug("Loading plugins...")
 
     plugin_manager = PluginManager(app)
-    plugin_manager.load_plugins()
+
+    # Just a temporary solution to enable the plugins.
+    plugin_manager.enable_plugins()
 
     app.logger.debug(
         "({}) {} Plugins loaded."

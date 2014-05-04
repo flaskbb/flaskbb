@@ -43,7 +43,7 @@ def index():
     newest_user = User.query.order_by(User.id.desc()).first()
 
     current_app.logger.debug("Runnnig beforeIndex hook...")
-    hooks.runHook(hooks.registered.beforeIndex)
+    hooks.call("beforeIndex")
 
     # Check if we use redis or not
     if not current_app.config["REDIS_ENABLED"]:
