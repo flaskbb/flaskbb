@@ -14,8 +14,7 @@ from werkzeug.utils import import_string
 
 class PluginManager(object):
 
-    def __init__(self, app=None, plugin_folder="plugins",
-                 base_plugin_package="plugins"):
+    def __init__(self, app=None, **kwargs):
         """Initializes the PluginManager. It is also possible to initialize the
         PluginManager via a factory. For example::
 
@@ -32,7 +31,7 @@ class PluginManager(object):
                                     same like the plugin_folder.
         """
         if app is not None:
-            self.init_app(app, plugin_folder, base_plugin_package)
+            self.init_app(app, **kwargs)
 
         # All loaded plugins
         self._plugins = []
@@ -40,10 +39,13 @@ class PluginManager(object):
         # All found plugins
         self._found_plugins = []
 
-    def init_app(self, app, plugin_folder, base_plugin_package):
+    def init_app(self, app, plugin_folder="plugins",
+                 base_plugin_package="plugins"):
         self.app = app
-        self.plugin_folder = os.path.join(self.app.root_path, "plugins")
-        self.base_plugin_package = ".".join([self.app.name, "plugins"])
+        self.plugin_folder = os.path.join(self.app.root_path, plugin_folder)
+        self.base_plugin_package = ".".join(
+            [self.app.name, base_plugin_package]
+        )
 
     @property
     def plugins(self):

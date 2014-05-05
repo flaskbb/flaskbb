@@ -38,6 +38,7 @@ from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
     can_move_topic
 from flaskbb.plugins.manager import PluginManager
+from flaskbb.plugins import hooks
 
 
 def create_app(config=None):
@@ -73,6 +74,8 @@ def create_app(config=None):
         .format(len(plugin_manager.plugins),
                 plugin_manager.plugins)
     )
+
+    app.jinja_env.globals.update(hooks=hooks)
 
     return app
 

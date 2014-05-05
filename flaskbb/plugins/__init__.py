@@ -109,11 +109,11 @@ class Plugin(object):
 class HookManager(object):
     """Manages all available hooks.
 
-    A new hook can be created either that way::
+    A new hook can be created like this::
 
         hooks.new("testHook")
 
-    or like this::
+    To add a callback to the hook you need to do that::
 
         hooks.add("testHook", test_callback)
 
@@ -134,25 +134,21 @@ class HookManager(object):
     def __init__(self):
         self.hooks = {}
 
-    def new(self, name):
+    def new(self, name, hook):
         """Creates a new hook.
 
         :param name: The name of the hook.
         """
         if name not in self.hooks:
-            self.hooks[name] = Hook()
+            self.hooks[name] = hook
 
     def add(self, name, callback):
-        """Adds a callback to the hook. If the hook doesn't exist, it will
-        create a new one and add than the callback will be added.
+        """Adds a callback to the hook.
 
         :param name: The name of the hook.
 
         :param callback: The callback which should be added to the hook.
         """
-        if name not in self.hooks:
-            self.new(name)
-
         return self.hooks[name].add(callback)
 
     def remove(self, name, callback):
@@ -192,6 +188,8 @@ class Hook(object):
     def call(self, *args, **kwargs):
         """Runs all callbacks for the hook."""
         for callback in self.callbacks:
-            callback(*args, **kwargs)
+            return callback(*args, **kwargs)
 
 hooks = HookManager()
+hooks.new("beforeIndex", Hook())
+hooks.new("beforeBreadcrumb", Hook())
