@@ -19,7 +19,7 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
-from flaskbb.extensions import db
+from flaskbb.extensions import db, plugin_manager
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
@@ -92,6 +92,12 @@ def reports():
         paginate(page, current_app.config['USERS_PER_PAGE'], False)
 
     return render_template("admin/reports.html", reports=reports)
+
+
+@admin.route("/plugins")
+@admin_required
+def plugins():
+    return render_template("admin/plugins.html", plugins=plugin_manager.plugins)
 
 
 @admin.route("/reports/unread")

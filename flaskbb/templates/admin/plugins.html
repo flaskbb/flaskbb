@@ -1,0 +1,30 @@
+{% extends theme("admin/admin_layout.html") %}
+{% block admin_content %}
+{% from theme('macros.html') import render_pagination %}
+
+<legend>Manage Plugins</legend>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Plugin</th>
+            <th>Information</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plugin in plugins %}
+        <tr>
+            <td><a href="#">{{ plugin.name }}</a></td>
+            <td>
+                {{ plugin.version }} <br />
+                {{ plugin.description }} <br />
+                {{ plugin.author }}
+            </td>
+            <td>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -17,6 +17,9 @@ from flask.ext.redis import Redis
 from flask.ext.migrate import Migrate
 from flask.ext.themes2 import Themes
 
+from flaskbb.plugins.manager import PluginManager
+
+
 # Database
 db = SQLAlchemy()
 
@@ -40,3 +43,7 @@ migrate = Migrate()
 
 # Themes
 themes = Themes()
+
+
+# PluginManager
+plugin_manager = PluginManager()

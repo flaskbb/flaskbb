@@ -27,7 +27,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extenesions
 from flaskbb.extensions import db, login_manager, mail, cache, redis, \
-    debugtoolbar, migrate, themes
+    debugtoolbar, migrate, themes, plugin_manager
 from flask.ext.whooshalchemy import whoosh_index
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
@@ -37,7 +37,6 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
     can_move_topic
-from flaskbb.plugins.manager import PluginManager
 from flaskbb.plugins import hooks
 
 
@@ -64,8 +63,7 @@ def create_app(config=None):
 
     app.logger.debug("Loading plugins...")
 
-    plugin_manager = PluginManager(app)
-
+    plugin_manager.init_app(app)
     # Just a temporary solution to enable the plugins.
     plugin_manager.enable_plugins()
 
