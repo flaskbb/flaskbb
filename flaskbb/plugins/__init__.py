@@ -24,20 +24,20 @@ class Plugin(object):
     #: in here.
     models = []
 
-    @property
-    def name(self):
-        """If not overridden, it will use the classname as the plugin name."""
-        return self.__class__.__name__
+    #: The plugin name
+    name = None
 
-    @property
-    def description(self):
-        """Returns a small description of the plugin."""
-        return ""
+    #: The author of the plugin
+    author = None
 
-    @property
-    def version(self):
-        """Returns the version of the plugin"""
-        return "0.0.0"
+    #: The license of the plugin
+    license = None
+
+    #: A small description of the plugin.
+    description = None
+
+    #: The version of the plugin"""
+    version = "0.0.0"
 
     def enable(self):
         """Enable the plugin."""
