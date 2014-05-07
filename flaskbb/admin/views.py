@@ -14,12 +14,13 @@ from datetime import datetime
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
+from flask.ext.plugins import get_plugins_list
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
-from flaskbb.extensions import db, plugin_manager
+from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
@@ -97,7 +98,7 @@ def reports():
 @admin.route("/plugins")
 @admin_required
 def plugins():
-    return render_template("admin/plugins.html", plugins=plugin_manager.plugins)
+    return render_template("admin/plugins.html", plugins=get_plugins_list())
 
 
 @admin.route("/reports/unread")

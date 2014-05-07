@@ -37,7 +37,7 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
     can_move_topic
-from flaskbb.plugins import hooks
+from flaskbb.hooks import hooks
 
 
 def create_app(config=None):
@@ -54,26 +54,13 @@ def create_app(config=None):
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
+    configure_hooks(app)
     configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
-
-    app.logger.debug("Loading plugins...")
-
-    plugin_manager.init_app(app)
-    # Just a temporary solution to enable the plugins.
-    plugin_manager.enable_plugins()
-
-    app.logger.debug(
-        "({}) {} Plugins loaded."
-        .format(len(plugin_manager.plugins),
-                plugin_manager.plugins)
-    )
-
-    app.jinja_env.globals.update(hooks=hooks)
 
     return app
 
@@ -141,6 +128,16 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
+
+    app.logger.debug("Loading plugins...")
+    plugin_manager.init_app(app)
+
+    # Register the blueprints before the app is serving requests.
+    plugin_manager.setup_plugins()
+
+
+def configure_hooks(app):
+    app.jinja_env.globals.update(hooks=hooks)
 
 
 def configure_template_filters(app):

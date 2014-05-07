@@ -27,7 +27,7 @@ from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
 from flaskbb.user.models import User
-from flaskbb.plugins import hooks
+from flaskbb.hooks import hooks
 
 forum = Blueprint("forum", __name__)
 

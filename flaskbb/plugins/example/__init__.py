@@ -1,5 +1,7 @@
 from flask import flash
-from flaskbb.plugins import Plugin, hooks
+from flask.ext.plugins import Plugin
+
+from flaskbb.hooks import hooks
 
 #: The name of your plugin class
 __version__ = "1.0.0"

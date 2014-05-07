@@ -16,8 +16,7 @@ from flask.ext.debugtoolbar import DebugToolbarExtension
 from flask.ext.redis import Redis
 from flask.ext.migrate import Migrate
 from flask.ext.themes2 import Themes
-
-from flaskbb.plugins.manager import PluginManager
+from flask.ext.plugins import PluginManager
 
 
 # Database
@@ -43,7 +42,6 @@ migrate = Migrate()
 
 # Themes
 themes = Themes()
-
 
 # PluginManager
 plugin_manager = PluginManager()
