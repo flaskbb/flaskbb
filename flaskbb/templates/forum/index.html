@@ -1,8 +1,6 @@
 {% extends theme("layout.html") %}
 {% block content %}
 
-    {{ hooks.call("beforeBreadcrumb") | safe }}
-
 <ol class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
 </ol>

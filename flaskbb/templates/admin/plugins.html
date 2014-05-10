@@ -22,6 +22,8 @@
                 {{ plugin.author }}
             </td>
             <td>
+                <a href="{{ url_for('admin.enable_plugin', plugin=plugin.name) }}">Enable</a> |
+                <a href="{{ url_for('admin.disable_plugin', plugin=plugin.name) }}">Disable</a>
             </td>
         </tr>
         {% endfor %}
