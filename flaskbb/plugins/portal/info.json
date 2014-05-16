@@ -1,0 +1,8 @@
+{
+    "identifier": "portal",
+    "name": "Portal",
+    "author": "sh4nks",
+    "license": "BSD",
+    "description": "A Portal Plugin for FlaskBB",
+    "version": "0.1"
+}
