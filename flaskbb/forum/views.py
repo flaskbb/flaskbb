@@ -28,7 +28,6 @@ from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
 from flaskbb.user.models import User
 
-
 forum = Blueprint("forum", __name__)
 
 

@@ -14,6 +14,7 @@ from datetime import datetime
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
+from flask.ext.plugins import get_plugins_list, get_plugin
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
@@ -92,6 +93,26 @@ def reports():
         paginate(page, current_app.config['USERS_PER_PAGE'], False)
 
     return render_template("admin/reports.html", reports=reports)
+
+
+@admin.route("/plugins")
+@admin_required
+def plugins():
+    return render_template("admin/plugins.html", plugins=get_plugins_list())
+
+
+@admin.route("/plugins/enable/<plugin>")
+def enable_plugin(plugin):
+    plugin = get_plugin(plugin)
+    current_app.plugin_manager.enable_plugins([plugin])
+    return redirect(url_for("admin.plugins"))
+
+
+@admin.route("/plugins/disable/<plugin>")
+def disable_plugin(plugin):
+    plugin = get_plugin(plugin)
+    current_app.plugin_manager.disable_plugins([plugin])
+    return redirect(url_for("admin.plugins"))
 
 
 @admin.route("/reports/unread")

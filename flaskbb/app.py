@@ -25,9 +25,9 @@ from flaskbb.admin.views import admin
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
-# extenesions
+# extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis, \
-    debugtoolbar, migrate, themes
+    debugtoolbar, migrate, themes, plugin_manager
 from flask.ext.whooshalchemy import whoosh_index
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
@@ -36,7 +36,7 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
-    can_move_topic, can_moderate
+    can_move_topic
 
 
 def create_app(config=None):
@@ -74,6 +74,9 @@ def configure_extensions(app):
     """
     Configures the extensions
     """
+
+    # Flask-Plugins
+    plugin_manager.init_app(app)
 
     # Flask-SQLAlchemy
     db.init_app(app)

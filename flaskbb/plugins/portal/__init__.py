@@ -1,23 +1,24 @@
-from flaskbb.extensions import db
-from flaskbb.plugins import Plugin
+from flask.ext.plugins import connect_event
 
-from .portal import PortalModel
+from flaskbb.plugins import FlaskBBPlugin
+from .views import portal, inject_portal_link
 
-
-#: The name of your plugin class
+__version__ = "0.1"
 __plugin__ = "PortalPlugin"
 
 
-class PortalPlugin(Plugin):
-    models = [PortalModel]
+class PortalPlugin(FlaskBBPlugin):
 
     name = "Portal Plugin"
-    description = "A simple Portal"
 
-    def install(self):
-        self.create_all_tables(db)
-        #
-        # register hooks and blueprints/routes here
+    description = ("This Plugin provides a simple portal for FlaskBB.")
 
-    def uninstall(self):
-        self.drop_all_tables(db)
+    author = "sh4nks"
+
+    license = "BSD"
+
+    version = __version__
+
+    def setup(self):
+        self.register_blueprint(portal, url_prefix="/portal")
+        connect_event("before-first-navigation-element", inject_portal_link)
