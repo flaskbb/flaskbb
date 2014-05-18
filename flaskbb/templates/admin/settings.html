@@ -4,4 +4,42 @@
 
 <legend>Settings</legend>
 
+<form class="form-horizontal" role="form">
+
+  <div class="form-group">
+    <label for="projectTitle" class="col-sm-2 control-label">Project title</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="projectTitle">
+      <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="projectDescription" class="col-sm-2 control-label">Project description</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="projectDescription">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="projectTitle" class="col-sm-2 control-label">Simple yes/no</label>
+    <div class="col-sm-10">
+      <label class="radio-inline">
+        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> Yes
+      </label>
+      <label class="radio-inline">
+        <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"> No
+      </label>
+      <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Save</button>
+    </div>
+  </div>
+
+</form>
+
 {% endblock %}
