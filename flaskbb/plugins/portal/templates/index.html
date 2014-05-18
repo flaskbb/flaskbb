@@ -85,7 +85,8 @@
           <div class="panel-heading">
             <h3 class="panel-title">News</h3>
           </div>
-          <div class="panel-body">
+          <div class="panel-body" style="padding-top: 0px">
+
           {% for topic in news %}
             <h1><a href="{{ topic.url }}">{{ topic.title }}</a></h1>
             <ul class="portal-info">
@@ -96,7 +97,6 @@
             <div class="portal-content">
                 {{ topic.first_post.content | markup | safe }}<br />
             </div>
-
             {% if not loop.last %}<hr>{% endif %}
           {% endfor %}
 

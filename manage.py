@@ -21,7 +21,8 @@ from flask.ext.migrate import MigrateCommand
 from flaskbb import create_app
 from flaskbb.extensions import db
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
-                                    create_admin_user, create_default_groups)
+                                    create_admin_user, create_default_groups,
+                                    create_default_settings)
 
 # Use the development configuration if available
 try:
@@ -76,6 +77,7 @@ def createall(dropdb=False, createdb=False):
 
     app.logger.info("Creating test data...")
     create_test_data()
+    create_default_settings()
 
 
 @manager.option('-u', '--username', dest='username')

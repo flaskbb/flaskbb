@@ -47,6 +47,12 @@ def overview():
                            post_count=post_count)
 
 
+@admin.route("/settings")
+@admin_required
+def settings():
+    return render_template("admin/settings.html")
+
+
 @admin.route("/users", methods=['GET', 'POST'])
 @admin_required
 def users():

@@ -11,9 +11,9 @@
 from datetime import datetime
 from collections import OrderedDict
 
+from flaskbb.admin.models import Settings
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-
 
 GROUPS = OrderedDict((
     ('Administrator', {
@@ -113,6 +113,25 @@ GROUPS = OrderedDict((
         'mergetopic': False
     })
 ))
+
+
+DEFAULT_SETTINGS = {
+    "project_title": "FlaskBB",
+    "project_subtitle": "A lightweight forum software in flask",
+    "default_theme": "bootstrap4",
+    "tracker_length": 7,
+    "title_length": 15,
+    "online_last_minutes": 15,
+    "users_per_page": 10,
+    "topics_per_page": 10,
+    "posts_per_page": 10
+}
+
+
+def create_default_settings():
+    for key, value in DEFAULT_SETTINGS.items():
+            setting = Settings(key=key, value=value)
+            setting.save()
 
 
 def create_default_groups():
