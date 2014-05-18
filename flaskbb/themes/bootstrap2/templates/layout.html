@@ -44,14 +44,14 @@
                     </div>
                     <div class="collapse navbar-collapse navbar-ex1-collapse">
                         <ul class="nav navbar-nav">
-                            {{ emit_event("before-first-navigation-element") }}
+                            {{ emit_event("before-first-navigation-element") | safe }}
 
                             {# active_forum_nav is set in {forum, category, topic}.html and new_{topic, post}.html #}
                             {{ topnav(endpoint='forum.index', name='Forum', icon='fa fa-comment', active=active_forum_nav) }}
                             {{ topnav(endpoint='forum.memberlist', name='Memberlist', icon='fa fa-user') }}
                             {{ topnav(endpoint='forum.search', name='Search', icon='fa fa-search') }}
 
-                            {{ emit_event("after-last-navigation-element") }}
+                            {{ emit_event("after-last-navigation-element") | safe }}
                         </ul>
 
                     {% if current_user and current_user.is_authenticated() %}
