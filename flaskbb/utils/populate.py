@@ -118,7 +118,7 @@ GROUPS = OrderedDict((
 DEFAULT_SETTINGS = {
     "project_title": "FlaskBB",
     "project_subtitle": "A lightweight forum software in flask",
-    "default_theme": "bootstrap4",
+    "default_theme": "bootstrap3",
     "tracker_length": 7,
     "title_length": 15,
     "online_last_minutes": 15,
