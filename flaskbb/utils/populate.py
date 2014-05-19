@@ -116,21 +116,21 @@ GROUPS = OrderedDict((
 
 
 DEFAULT_SETTINGS = {
-    "project_title": "FlaskBB",
-    "project_subtitle": "A lightweight forum software in flask",
-    "default_theme": "bootstrap3",
-    "tracker_length": 7,
-    "title_length": 15,
-    "online_last_minutes": 15,
-    "users_per_page": 10,
-    "topics_per_page": 10,
-    "posts_per_page": 10
+    "project_title": ("FlaskBB", "text"),
+    "project_subtitle": ("A lightweight forum software in flask", "text"),
+    "default_theme": ("bootstrap3", "text"),
+    "tracker_length": (7, "int"),
+    "title_length": (15, "int"),
+    "online_last_minutes": (15, "int"),
+    "users_per_page": (10, "int"),
+    "topics_per_page": (10, "int"),
+    "posts_per_page": (10, "int")
 }
 
 
 def create_default_settings():
     for key, value in DEFAULT_SETTINGS.items():
-            setting = Settings(key=key, value=value)
+            setting = Settings(key=key, value=value[0], value_type=value[1])
             setting.save()
 
 
