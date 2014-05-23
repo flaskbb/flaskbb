@@ -4,25 +4,80 @@
 
 <legend>Settings</legend>
 
-<form class="form-horizontal" role="form">
+<form class="form-horizontal" role="form" method="post">
 
   <div class="form-group">
-    <label for="projectTitle" class="col-sm-2 control-label">Project title</label>
+    <label for="project_title" class="col-sm-2 control-label">Project title</label>
     <div class="col-sm-10">
-      <input type="email" class="form-control" id="projectTitle">
-      <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+      <input type="text" class="form-control" name="project_title", id="project_title", value="{{ config['PROJECT_TITLE'] }}">
+      <span class="help-block">The name of your project</span>
     </div>
   </div>
 
   <div class="form-group">
-    <label for="projectDescription" class="col-sm-2 control-label">Project description</label>
+    <label for="project_subtitle" class="col-sm-2 control-label">Project subtitle</label>
     <div class="col-sm-10">
-      <input type="email" class="form-control" id="projectDescription">
+      <input type="text" class="form-control" name="project_subtitle", id="project_subtitle", value="{{ config['PROJECT_SUBTITLE'] }}">
+      <span class="help-block">The subtitle of your project (if any).</span>
     </div>
   </div>
 
   <div class="form-group">
-    <label for="projectTitle" class="col-sm-2 control-label">Simple yes/no</label>
+    <label class="col-sm-2 control-label" for="default_theme">Default theme</label>
+    <div class="col-sm-10">
+      <select class="form-control" id="default_theme" name="default_theme">
+        <option selected value="{{ config['DEFAULT_THEME'].identifier }}">{{ config['DEFAULT_THEME'].name }}</option>
+        {% for theme in themes %}
+          <option value="{{ theme.identifier }}">{{ theme.name }}</option>
+        {% endfor %}
+      </select>
+      <span class="help-block">The default theme for FlaskBB.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="tracker_length">Tracker length</label>
+    <div class="col-sm-10">
+    <input type="text" class="form-control" name="tracker_length" id="tracker_length", value="{{ config['TRACKER_LENGTH'] }}">
+      <span class="help-block">The tracker length defines how long the topics will stay as unread. <b>0</b> to disable it.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="users_per_page">Users Per Page</label>
+    <div class="col-sm-10">
+    <input type="text" class="form-control" name="users_per_page" id="users_per_page", value="{{ config['USERS_PER_PAGE'] }}">
+      <span class="help-block">How many users per page are displayed.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="topics_per_page">Topics Per Page</label>
+    <div class="col-sm-10">
+    <input type="text" class="form-control" name="topics_per_page" id="topics_per_page", value="{{ config['TOPICS_PER_PAGE'] }}">
+      <span class="help-block">How many topics per page are displayed.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="posts_per_page">Posts Per Page</label>
+    <div class="col-sm-10">
+    <input type="text" class="form-control" name="posts_per_page" id="posts_per_page", value="{{ config['POSTS_PER_PAGE'] }}">
+      <span class="help-block">How many posts per page are displayed.</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="col-sm-2 control-label" for="online_last_minutes">Online Last Minutes</label>
+    <div class="col-sm-10">
+    <input type="text" class="form-control" name="online_last_minutes" id="online_last_minutes", value="{{ config['ONLINE_LAST_MINUTES'] }}">
+      <span class="help-block">How long the use can be inactive before he is marked as offline.</span>
+    </div>
+  </div>
+
+  <!--
+  <div class="form-group">
+    <label for="optionsRadio" class="col-sm-2 control-label">Simple yes/no</label>
     <div class="col-sm-10">
       <label class="radio-inline">
         <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> Yes
@@ -33,6 +88,7 @@
       <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
     </div>
   </div>
+  -->
 
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
