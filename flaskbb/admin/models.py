@@ -1,5 +1,7 @@
+import sys
+
 from flask import current_app
-from flaskbb.extensions import db
+from flaskbb.extensions import db, cache
 
 
 def convert_to(value, value_type="text"):
@@ -49,53 +51,45 @@ def convert_to(value, value_type="text"):
                              .format(value_type))
 
 
-class Settings(db.Model):
+class SettingsGroup(db.Model):
+    __tablename__ = "settingsgroup"
+
+    key = db.Column(db.String, primary_key=True)
+    value = db.Column(db.String)
+    description = db.Column(db.String)
+
+
+class Setting(db.Model):
     __tablename__ = "settings"
 
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String, unique=True)
+    key = db.Column(db.String, primary_key=True)
     value = db.Column(db.String)
+    group = db.Column(db.String, db.ForeignKey('settingsgroup', use_alter=True,
+                                               name="fk_settingsgroup"))
+
+    # The name (displayed in the form)
+    name = db.Column(db.String)
+
+    # The description (displayed in the form)
+    description = db.Column(db.String)
 
     # Available types: string, int, boolean
     value_type = db.Column(db.String)
+
+    # Available types: text, choice, yesno
+    input_type = db.Column(db.String)
+
+    # Extra attributes like, validation things (min, max length...)
+    extra = db.Column(db.String)
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
     @classmethod
-    def update(cls, configs):
-        """Updates the current_app's config and stores the changes in the
-        database.
-
-        :param config: A dictionary with configuration items.
-        """
-        result = []
-        updated_configs = {}
-        for key, value in configs.iteritems():
-            config = cls.query.filter(Settings.key == key.lower()).first()
-
-            value = convert_to(value, config.value_type)
-            config.value = value
-
-            updated_configs[config.key.upper()] = config.value
-            result.append(config)
-
-            print "{}: {}".format(config.key, config.value)
-            db.session.add(config)
-            db.session.commit()
-
-        print updated_configs
-        current_app.config.update(updated_configs)
-
-    @classmethod
+    @cache.memoize(timeout=sys.maxint)
     def get_all(cls):
-        """Returns all settings as a dictionary
-        The key is the same as in the config files.
-        """
-        settings = {}
-        all_settings = cls.query.all()
-        for setting in all_settings:
-            settings[setting.key.upper()] = setting.value
+        pass
 
-        return settings
+    def invalidate_cache(self):
+        cache.delete_memoized(self.get_all, self)

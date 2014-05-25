@@ -77,7 +77,7 @@ def createall(dropdb=False, createdb=False):
 
     app.logger.info("Creating test data...")
     create_test_data()
-    create_default_settings()
+    #create_default_settings()
 
 
 @manager.option('-u', '--username', dest='username')

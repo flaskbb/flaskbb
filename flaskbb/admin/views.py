@@ -15,11 +15,8 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
 from flask.ext.plugins import get_plugins_list, get_plugin
-from flask.ext.themes2 import get_themes_list
 
 from flaskbb import __version__ as flaskbb_version
-from flaskbb.admin.models import Settings
-from flaskbb.configs.default import DefaultConfig
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
@@ -53,41 +50,7 @@ def overview():
 @admin.route("/settings", methods=["GET", "POST"])
 @admin_required
 def settings():
-    default_config = {}
-
-    config_obj = DefaultConfig()
-    for key in dir(config_obj):
-        if key.isupper():
-            default_config[key] = getattr(config_obj, key)
-
-    config = Settings.get_all()
-
-    # I also need the name (not only the identifier) for
-    # the current default theme
-    current_theme = None
-    themes = []
-    for theme in get_themes_list():
-        if theme.identifier == config["DEFAULT_THEME"]:
-            current_theme = theme
-        else:
-            themes.append(theme)
-
-    config["DEFAULT_THEME"] = current_theme
-
-    if request.method == "POST":
-        form_items = request.form.to_dict()
-        print form_items
-
-        for key, value in form_items.iteritems():
-            config[key.upper()] = value
-
-        print config
-        Settings.update(config)
-        return redirect(url_for("admin.settings"))
-
-    return render_template("admin/settings.html", config=config,
-                           default_config=default_config,
-                           themes=themes)
+    return render_template("admin/settings.html", themes=[])
 
 
 @admin.route("/users", methods=['GET', 'POST'])

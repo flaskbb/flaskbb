@@ -11,7 +11,7 @@
 from datetime import datetime
 from collections import OrderedDict
 
-from flaskbb.admin.models import Settings
+from flaskbb.admin.models import Setting
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
@@ -130,7 +130,7 @@ DEFAULT_SETTINGS = {
 
 def create_default_settings():
     for key, value in DEFAULT_SETTINGS.items():
-            setting = Settings(key=key, value=value[0], value_type=value[1])
+            setting = Setting(key=key, value=value[0], value_type=value[1])
             setting.save()
 
 
