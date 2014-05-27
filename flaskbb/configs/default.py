@@ -75,6 +75,12 @@ class DefaultConfig(object):
     # Where to logger should send the emails to
     ADMINS = ["admin@example.org"]
 
+    ## Flask-And-Redis
+    REDIS_ENABLED = False
+    REDIS_HOST = 'localhost'
+    REDIS_PORT = 6379
+    REDIS_DB = 0
+
     ## App specific configs
     # Pagination
     # How many posts per page are displayed
@@ -89,12 +95,6 @@ class DefaultConfig(object):
     ONLINE_LAST_MINUTES = 15
     # The length of the topic title in characters on the index
     TITLE_LENGTH = 15
-
-    # This is really handy if you do not have an redis instance like on windows
-    REDIS_ENABLED = True
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
-    REDIS_DB = 0
 
     # The days for how long the forum should deal with unread topics
     # 0 - Disable it
