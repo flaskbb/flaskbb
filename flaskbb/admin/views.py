@@ -23,6 +23,7 @@ from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
+from flaskbb.admin.models import Setting, SettingsGroup
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
                                  EditGroupForm, EditForumForm, AddForumForm,
                                  CategoryForm)
@@ -48,9 +49,26 @@ def overview():
 
 
 @admin.route("/settings", methods=["GET", "POST"])
+@admin.route("/settings/<path:slug>", methods=["GET", "POST"])
 @admin_required
-def settings():
-    return render_template("admin/settings.html", themes=[])
+def settings(slug=None):
+    # Get all settinggroups so that we can build the settings navigation
+    settingsgroup = SettingsGroup.query.all()
+
+    if slug is not None:
+        form = Setting.get_form(slug)
+    else:
+        # or should we display an index with all available settingsgroups?
+        form = Setting.get_form("general")
+
+    if form.validate_on_submit():
+        # update the db rows
+        # invalidate the cache
+        # update the app config
+        pass
+
+    return render_template("admin/settings.html", form=form,
+                           settingsgroup=settingsgroup)
 
 
 @admin.route("/users", methods=['GET', 'POST'])

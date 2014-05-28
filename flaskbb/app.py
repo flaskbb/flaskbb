@@ -22,6 +22,7 @@ from flaskbb.user.models import User, Guest, PrivateMessage
 from flaskbb.auth.views import auth
 # Import the admin blueprint
 from flaskbb.admin.views import admin
+from flaskbb.admin.models import Setting
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
@@ -59,6 +60,7 @@ def create_app(config=None):
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
+    update_settings_from_db(app)
 
     return app
 
@@ -129,6 +131,11 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
+
+
+def update_settings_from_db(app):
+    with app.app_context():
+        app.config.update(Setting.config())
 
 
 def configure_template_filters(app):
