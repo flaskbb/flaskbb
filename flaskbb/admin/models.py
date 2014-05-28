@@ -48,35 +48,40 @@ class SettingsGroup(db.Model):
     __tablename__ = "settingsgroup"
 
     key = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String)
-    description = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
+    settings = db.relationship("Setting", lazy="dynamic", backref="group")
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class Setting(db.Model):
     __tablename__ = "settings"
 
     key = db.Column(db.String, primary_key=True)
-    _value = db.Column("value", db.String)
-    group = db.Column(db.String, db.ForeignKey('settingsgroup', use_alter=True,
-                                               name="fk_settingsgroup"))
+    _value = db.Column("value", db.String, nullable=False)
+    settingsgroup = db.Column(db.String,
+                              db.ForeignKey('settingsgroup.key',
+                                            use_alter=True,
+                                            name="fk_settingsgroup"),
+                              nullable=False)
 
     # The name (displayed in the form)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
 
     # The description (displayed in the form)
-    description = db.Column(db.String)
+    description = db.Column(db.String, nullable=False)
 
     # Available types: string, integer, boolean, array, float
-    value_type = db.Column(db.String)
+    value_type = db.Column(db.String, nullable=False)
 
-    # Available types: text, choice, yesno
-    input_type = db.Column(db.String)
+    # Available types: text, choice, yesno (used for the form creation process)
+    input_type = db.Column(db.String, nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     _extra = db.Column("extra", db.String)
-
-    settings_group = db.relationship("SettingsGroup", lazy="dynamic",
-                                     backref="setting")
 
     @property
     def value(self):

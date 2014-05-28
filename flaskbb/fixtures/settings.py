@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 
-settings_fixture = (
+fixture = (
     # Settings Group
     ('general', {
         'name': "General Settings",
