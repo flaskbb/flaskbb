@@ -56,14 +56,16 @@ def settings(slug=None):
     settingsgroup = SettingsGroup.query.all()
 
     if slug is not None:
-        form = Setting.get_form(slug)
+        SettingsForm = Setting.get_form(slug)
     else:
         # or should we display an index with all available settingsgroups?
-        form = Setting.get_form("general")
+        SettingsForm = Setting.get_form("general")
 
     # TODO: Only get those settings from the group
     #old_settings = Setting.as_dict()
     #new_settings = {}
+
+    form = SettingsForm()
 
     if form.validate_on_submit():
         print "Passed"

@@ -7,16 +7,19 @@
 <form class="form-horizontal" role="form" method="post">
 
     {#
-    Form validation does work when doing it this way
+    Doesn't work
+    {{ form.hidden_tag() }}
     {{ render_field(form.project_title) }}
     {{ render_field(form.project_subtitle) }}
     {{ render_field(form.posts_per_page) }}
+
+    {{ form.errors }}
+
     #}
+
+    {#
     {% for field in form %}
-        {# Form validation doesn't work when doing it this way #}
-        {% if field.type in ["HiddenField", "CSRFTokenField"] %}
-            {{ field() }}
-        {% endif %}
+        Also doesn't work
         {% if field.type not in ["TextField", "IntegerField"] %}
             {% if field.type == "BooleanField" %}
                 {{ render_boolean_field(field) }}
@@ -28,8 +31,9 @@
         {% else %}
             {{ render_field(field) }}
         {% endif %}
+        {{ field.errors }}
     {%  endfor %}
-
+    #}
     <button type="submit" class="btn btn-default">Save</button>
 
 </form>

@@ -155,14 +155,14 @@ class Setting(db.Model):
                 if setting.value_type == "integer":
                     setattr(
                         SettingsForm, setting.key,
-                        IntegerField(setting.name, field_validators,
+                        IntegerField(setting.name, validators=field_validators,
                                      description=setting.description)
                     )
                 # FloatField
                 elif setting.value_type == "float":
                     setattr(
                         SettingsForm, setting.key,
-                        FloatField(setting.name, field_validators,
+                        FloatField(setting.name, validators=field_validators,
                                    description=setting.description)
                     )
 
@@ -170,7 +170,7 @@ class Setting(db.Model):
             if setting.input_type == "text":
                 setattr(
                     SettingsForm, setting.key,
-                    TextField(setting.name, field_validators,
+                    TextField(setting.name, validators=field_validators,
                               description=setting.description)
                 )
 
@@ -189,7 +189,7 @@ class Setting(db.Model):
                     BooleanField(setting.name, description=setting.description)
                 )
 
-        return SettingsForm()
+        return SettingsForm
 
     @classmethod
     def get_all(cls):
