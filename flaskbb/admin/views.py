@@ -61,11 +61,14 @@ def settings(slug=None):
         # or should we display an index with all available settingsgroups?
         form = Setting.get_form("general")
 
+    # TODO: Only get those settings from the group
+    #old_settings = Setting.as_dict()
+    #new_settings = {}
+
     if form.validate_on_submit():
-        # update the db rows
-        # invalidate the cache
-        # update the app config
-        pass
+        print "Passed"
+    else:
+        print "Not passed"
 
     return render_template("admin/settings.html", form=form,
                            settingsgroup=settingsgroup)

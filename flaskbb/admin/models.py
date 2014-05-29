@@ -1,4 +1,3 @@
-import sys
 import base64
 try:
     import cPickle as pickle
@@ -8,7 +7,7 @@ except ImportError:
 from wtforms import (TextField, IntegerField, BooleanField, SelectField,
                      FloatField, validators)
 from flask.ext.wtf import Form
-from flaskbb.extensions import db, cache
+from flaskbb.extensions import db
 
 
 def normalize_to(value, value_type, reverse=False):
@@ -106,21 +105,6 @@ class Setting(db.Model):
         )
 
     @classmethod
-    @cache.memoize(timeout=sys.maxint)
-    def config(self):
-        """Returns the configs as a dict (only self.key and self.value).
-        If a value/key has changed, you need to invalidate the cache."""
-        settings = {}
-        for setting in self.get_all():
-            settings[setting.key.upper()] = setting.value
-
-        return settings
-
-    @classmethod
-    def get_all(cls):
-        return cls.query.all()
-
-    @classmethod
     def get_form(cls, group):
         """Returns a Form for all settings found in :class:`SettingsGroup`.
 
@@ -171,51 +155,83 @@ class Setting(db.Model):
                 if setting.value_type == "integer":
                     setattr(
                         SettingsForm, setting.key,
-                        IntegerField(setting.name, field_validators)
+                        IntegerField(setting.name, field_validators,
+                                     description=setting.description)
                     )
                 # FloatField
                 elif setting.value_type == "float":
                     setattr(
                         SettingsForm, setting.key,
-                        FloatField(setting.name, field_validators)
+                        FloatField(setting.name, field_validators,
+                                   description=setting.description)
                     )
 
             # TextField
             if setting.input_type == "text":
                 setattr(
                     SettingsForm, setting.key,
-                    TextField(setting.name, field_validators)
+                    TextField(setting.name, field_validators,
+                              description=setting.description)
                 )
 
             # SelectField
             if setting.input_type == "choice" and "choices" in setting.extra:
                 setattr(
                     SettingsForm, setting.key,
-                    SelectField(setting.name, choices=setting.extra['choices'])
+                    SelectField(setting.name, choices=setting.extra['choices'],
+                                description=setting.description)
                 )
 
             # BooleanField
             if setting.input_type == "yesno":
                 setattr(
                     SettingsForm, setting.key,
-                    BooleanField(setting.name)
+                    BooleanField(setting.name, description=setting.description)
                 )
 
         return SettingsForm()
 
     @classmethod
-    def update(self, app):
-        """Updates the config for the app
+    def get_all(cls):
+        return cls.query.all()
 
-        :param app: The application.
+    @classmethod
+    def update(cls, settings, app=None):
+        """Updates the current_app's config and stores the changes in the
+        database.
+
+        :param config: A dictionary with configuration items.
         """
-        self.invalidate_cache()
+        updated_settings = {}
+        for key, value in settings.iteritems():
+            setting = cls.query.filter(Setting.key == key.lower()).first()
 
-        app.config.update(self.config())
+            setting.value = value
+
+            updated_settings[setting.key.upper()] = setting.value
+
+            db.session.add(setting)
+            db.session.commit()
+
+        if app is not None:
+            app.config.update(updated_settings)
+
+    @classmethod
+    def as_dict(cls, upper=False):
+        """Returns the settings key and value as a dict.
+
+        :param upper: If upper is ``True``, the key will use upper-case
+                      letters. Defaults to ``False``.
+        """
+        settings = {}
+        for setting in cls.query.all():
+            if upper:
+                settings[setting.key.upper()] = setting.value
+            else:
+                settings[setting.key] = setting.value
+
+        return settings
 
     def save(self):
         db.session.add(self)
         db.session.commit()
-
-    def invalidate_cache(self):
-        cache.delete_memoized(self.config, self)
