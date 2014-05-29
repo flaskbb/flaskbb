@@ -52,12 +52,14 @@ def overview():
 @admin.route("/settings/<path:slug>", methods=["GET", "POST"])
 @admin_required
 def settings(slug=None):
-    # Get all settinggroups so that we can build the settings navigation
-    settingsgroup = SettingsGroup.query.all()
-
     slug = slug if slug else "general"
 
-    SettingsForm = Setting.get_form(slug)
+    # get the currently active group
+    active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
+    # get all groups - used to build the navigation
+    all_groups = SettingsGroup.query.all()
+
+    SettingsForm = Setting.get_form(active_group)
 
     old_settings = Setting.as_dict(from_group=slug)
     new_settings = {}
@@ -72,7 +74,7 @@ def settings(slug=None):
                     continue
                 else:
                     new_settings[key] = form.__dict__[key].data
-            except (KeyError, ValueError):
+            except KeyError:
                 pass
 
         Setting.update(settings=new_settings, app=current_app)
@@ -84,7 +86,7 @@ def settings(slug=None):
                 pass
 
     return render_template("admin/settings.html", form=form,
-                           settingsgroup=settingsgroup)
+                           all_groups=all_groups, active_group=active_group)
 
 
 @admin.route("/users", methods=['GET', 'POST'])

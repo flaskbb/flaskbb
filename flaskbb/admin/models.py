@@ -109,16 +109,14 @@ class Setting(db.Model):
         """Returns a Form for all settings found in :class:`SettingsGroup`.
 
         :param group: The settingsgroup name. It is used to get the settings
-                      which are in the specified group. Aborts with 404 if the
-                      group is found.
+                      which are in the specified group.
         """
-        settings = SettingsGroup.query.filter_by(key=group).first_or_404()
 
         class SettingsForm(Form):
             pass
 
         # now parse that shit
-        for setting in settings.settings:
+        for setting in group.settings:
             field_validators = []
 
             # generate the validators
