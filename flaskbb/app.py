@@ -134,8 +134,9 @@ def configure_extensions(app):
 
 
 def update_settings_from_db(app):
-    with app.app_context():
-        app.config.update(Setting.as_dict(upper=True))
+    if not app.config["TESTING"]:
+        with app.app_context():
+            app.config.update(Setting.as_dict(upper=True))
 
 
 def configure_template_filters(app):
