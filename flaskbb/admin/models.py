@@ -4,9 +4,9 @@ try:
 except ImportError:
     import pickle
 
-from wtforms import (Form, TextField, IntegerField, BooleanField, SelectField,
+from wtforms import (TextField, IntegerField, BooleanField, SelectField,
                      FloatField, validators)
-
+from flask.ext.wtf import Form
 from flaskbb.extensions import db
 
 

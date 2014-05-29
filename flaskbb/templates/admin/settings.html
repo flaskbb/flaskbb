@@ -6,7 +6,7 @@
 
 <form class="form-horizontal" role="form" method="post">
 
-    {{ form.csrf_field }}
+    {{ form.hidden_tag() }}
     {% for field in form %}
         {% if field.type not in ["TextField", "IntegerField"] %}
             {% if field.type == "BooleanField" %}

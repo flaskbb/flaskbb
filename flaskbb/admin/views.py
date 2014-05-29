@@ -69,9 +69,9 @@ def settings(slug=None):
 
     if request.method == "POST":
         if form.validate():
-            print "Passed"
+            print form.data
         else:
-            print "Not passed"
+            print form.errors
 
     return render_template("admin/settings.html", form=form,
                            settingsgroup=settingsgroup)
