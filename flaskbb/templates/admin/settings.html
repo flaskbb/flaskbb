@@ -6,20 +6,8 @@
 
 <form class="form-horizontal" role="form" method="post">
 
-    {#
-    Doesn't work
-    {{ form.hidden_tag() }}
-    {{ render_field(form.project_title) }}
-    {{ render_field(form.project_subtitle) }}
-    {{ render_field(form.posts_per_page) }}
-
-    {{ form.errors }}
-
-    #}
-
-    {#
+    {{ form.csrf_field }}
     {% for field in form %}
-        Also doesn't work
         {% if field.type not in ["TextField", "IntegerField"] %}
             {% if field.type == "BooleanField" %}
                 {{ render_boolean_field(field) }}
@@ -31,9 +19,8 @@
         {% else %}
             {{ render_field(field) }}
         {% endif %}
-        {{ field.errors }}
     {%  endfor %}
-    #}
+
     <button type="submit" class="btn btn-default">Save</button>
 
 </form>

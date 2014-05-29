@@ -67,10 +67,11 @@ def settings(slug=None):
 
     form = SettingsForm()
 
-    if form.validate_on_submit():
-        print "Passed"
-    else:
-        print "Not passed"
+    if request.method == "POST":
+        if form.validate():
+            print "Passed"
+        else:
+            print "Not passed"
 
     return render_template("admin/settings.html", form=form,
                            settingsgroup=settingsgroup)
