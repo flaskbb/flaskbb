@@ -55,23 +55,33 @@ def settings(slug=None):
     # Get all settinggroups so that we can build the settings navigation
     settingsgroup = SettingsGroup.query.all()
 
-    if slug is not None:
-        SettingsForm = Setting.get_form(slug)
-    else:
-        # or should we display an index with all available settingsgroups?
-        SettingsForm = Setting.get_form("general")
+    slug = slug if slug else "general"
 
-    # TODO: Only get those settings from the group
-    #old_settings = Setting.as_dict()
-    #new_settings = {}
+    SettingsForm = Setting.get_form(slug)
+
+    old_settings = Setting.as_dict(from_group=slug)
+    new_settings = {}
 
     form = SettingsForm()
 
-    if request.method == "POST":
-        if form.validate():
-            print form.data
-        else:
-            print form.errors
+    if form.validate_on_submit():
+        for key, value in old_settings.iteritems():
+            try:
+                # check if the value has changed
+                if value == form.__dict__[key].data:
+                    continue
+                else:
+                    new_settings[key] = form.__dict__[key].data
+            except (KeyError, ValueError):
+                pass
+
+        Setting.update(settings=new_settings, app=current_app)
+    else:
+        for key, value in old_settings.iteritems():
+            try:
+                form.__dict__[key].data = value
+            except (KeyError, ValueError):
+                pass
 
     return render_template("admin/settings.html", form=form,
                            settingsgroup=settingsgroup)

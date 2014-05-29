@@ -217,14 +217,23 @@ class Setting(db.Model):
             app.config.update(updated_settings)
 
     @classmethod
-    def as_dict(cls, upper=False):
+    def as_dict(cls, from_group=None, upper=False):
         """Returns the settings key and value as a dict.
 
+        :param from_group: Returns only the settings from the group as a dict.
         :param upper: If upper is ``True``, the key will use upper-case
                       letters. Defaults to ``False``.
         """
         settings = {}
-        for setting in cls.query.all():
+        result = None
+        if from_group is not None:
+            result = SettingsGroup.query.filter_by(key=from_group).\
+                first_or_404()
+            result = result.settings
+        else:
+            result = cls.query.all()
+
+        for setting in result:
             if upper:
                 settings[setting.key.upper()] = setting.value
             else:
