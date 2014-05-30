@@ -15,6 +15,7 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
 from flask.ext.plugins import get_plugins_list, get_plugin
+from flask.ext.themes2 import get_themes_list
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
@@ -65,6 +66,11 @@ def settings(slug=None):
     new_settings = {}
 
     form = SettingsForm()
+
+    if active_group.key == "themes":
+        # get the list with all available themes
+        form.default_theme.choices = [(theme.identifier, theme.name)
+                                      for theme in get_themes_list()]
 
     if form.validate_on_submit():
         for key, value in old_settings.iteritems():

@@ -87,10 +87,16 @@ fixture = (
     }),
     ('themes', {
         'name': "Theme Settings",
-        "description": "Change the appearance from your forum.",
+        "description": "Change the appearance for your forum.",
         "settings": (
-            # No settings for changing the theme because we are getting them
-            #  from the extension
-        )
+            ('default_theme', {
+                'value':        "bootstrap3",
+                'value_type':   "text",
+                'input_type':   "choice",
+                'extra':        {'choices': None},
+                'name':         "Default theme",
+                'description':  "Change the default theme for your forum."
+            }),
+        ),
     }),
 )
