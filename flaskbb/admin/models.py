@@ -21,7 +21,7 @@ def normalize_to(value, value_type, reverse=False):
     """
     if reverse:
         if value_type == 'array':
-            return value.split(',')
+            return value
         if value_type == 'integer':
             return int(value)
         if value_type == 'float':
@@ -33,7 +33,7 @@ def normalize_to(value, value_type, reverse=False):
         return value
     else:
         if value_type == 'array':
-            return ",".join(value)
+            return value.replace(" ", "").strip(",")
         if value_type == 'integer':
             return int(value)
         if value_type == 'float':
@@ -51,10 +51,17 @@ class SettingsGroup(db.Model):
     key = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    settings = db.relationship("Setting", lazy="dynamic", backref="group")
+    settings = db.relationship("Setting", lazy="dynamic", backref="group",
+                               cascade="all, delete-orphan")
 
     def save(self):
+        """Saves a settingsgroup."""
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Deletes a settingsgroup."""
+        db.session.delete(self)
         db.session.commit()
 
 
@@ -172,6 +179,13 @@ class Setting(db.Model):
                               description=setting.description)
                 )
 
+            if setting.input_type == "array":
+                setattr(
+                    SettingsForm, setting.key,
+                    TextField(setting.name, validators=field_validators,
+                              description=setting.description)
+                )
+
             # SelectField
             if setting.input_type == "choice" and "choices" in setting.extra:
                 setattr(
@@ -240,5 +254,11 @@ class Setting(db.Model):
         return settings
 
     def save(self):
+        """Saves a setting"""
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Deletes a setting"""
+        db.session.delete(self)
         db.session.commit()

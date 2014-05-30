@@ -22,8 +22,20 @@
                 {{ plugin.author }}
             </td>
             <td>
-                <a href="{{ url_for('admin.enable_plugin', plugin=plugin.name) }}">Enable</a> |
-                <a href="{{ url_for('admin.disable_plugin', plugin=plugin.name) }}">Disable</a>
+                {% if not plugin.enabled %}
+                <a href="{{ url_for('admin.enable_plugin', plugin=plugin.identifier) }}">Enable</a>
+                {% else %}
+                <a href="{{ url_for('admin.disable_plugin', plugin=plugin.identifier) }}">Disable</a>
+                {% endif %}
+
+                {% set uninstallable = plugin.uninstallable %}
+                {% if plugin.installable and not uninstallable %}
+                <br />
+                <a href="{{ url_for('admin.install_plugin', plugin=plugin.identifier) }}">Install</a>
+                {% endif %}
+                {% if uninstallable %}
+                <a href="{{ url_for('admin.uninstall_plugin', plugin=plugin.identifier) }}">Uninstall</a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

@@ -15,11 +15,18 @@ from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
 
-def create_default_settings():
-    from flaskbb.fixtures.settings import fixture
-
+def delete_settings_from_fixture(fixture):
     for settingsgroup in fixture:
+        group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
 
+        for settings in settingsgroup[1]['settings']:
+            setting = Setting.query.filter_by(key=settings[0]).first()
+            setting.delete()
+        group.delete()
+
+
+def create_settings_from_fixture(fixture):
+    for settingsgroup in fixture:
         group = SettingsGroup(
             key=settingsgroup[0],
             name=settingsgroup[1]['name'],
@@ -41,6 +48,11 @@ def create_default_settings():
                 settingsgroup=group.key
             )
             setting.save()
+
+
+def create_default_settings():
+    from flaskbb.fixtures.settings import fixture
+    create_settings_from_fixture(fixture)
 
 
 def create_default_groups():

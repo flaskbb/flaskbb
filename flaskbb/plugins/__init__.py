@@ -1,8 +1,29 @@
 from flask.ext.plugins import Plugin
 from flask import current_app
 
+from flaskbb.admin.models import SettingsGroup
+
 
 class FlaskBBPlugin(Plugin):
+
+    #: Set this to true if the plugin needs to install additional things
+    settings_key = None
+
+    @property
+    def installable(self):
+        if self.settings_key is not None:
+            return True
+        return False
+
+    @property
+    def uninstallable(self):
+        if self.installable:
+            group = SettingsGroup.query.filter_by(key=self.settings_key).first()
+            if group and len(group.settings.all()) > 0:
+                return True
+            return False
+        return False
+
         # Some helpers
     def register_blueprint(self, blueprint, **kwargs):
         """Registers a blueprint."""

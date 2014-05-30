@@ -9,12 +9,13 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+import os
 from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
-from flask.ext.plugins import get_plugins_list, get_plugin
+from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask.ext.themes2 import get_themes_list
 
 from flaskbb import __version__ as flaskbb_version
@@ -146,20 +147,81 @@ def reports():
 @admin.route("/plugins")
 @admin_required
 def plugins():
-    return render_template("admin/plugins.html", plugins=get_plugins_list())
+    plugins = get_all_plugins()
+    return render_template("admin/plugins.html", plugins=plugins)
 
 
 @admin.route("/plugins/enable/<plugin>")
 def enable_plugin(plugin):
-    plugin = get_plugin(plugin)
-    current_app.plugin_manager.enable_plugins([plugin])
+    plugin = get_plugin_from_all(plugin)
+    if not plugin.enabled:
+        plugin_dir = os.path.join(
+            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+            "plugins", plugin.identifier
+        )
+
+        disabled_file = os.path.join(plugin_dir, "DISABLED")
+
+        os.remove(disabled_file)
+
+        flash("Plugin should be enabled. Please reload your app.", "success")
+
+        flash("If you are using a host which doesn't support writting on the "
+              "disk, this won't work - than you need to delete the "
+              "'DISABLED' file by yourself.", "info")
+    else:
+        flash("Plugin is not enabled", "danger")
+
     return redirect(url_for("admin.plugins"))
 
 
 @admin.route("/plugins/disable/<plugin>")
 def disable_plugin(plugin):
-    plugin = get_plugin(plugin)
-    current_app.plugin_manager.disable_plugins([plugin])
+    try:
+        plugin = get_plugin(plugin)
+    except KeyError:
+        flash("Plugin {} not found".format(plugin), "danger")
+        return redirect(url_for("admin.plugins"))
+
+    plugin_dir = os.path.join(
+        os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+        "plugins", plugin.identifier
+    )
+
+    disabled_file = os.path.join(plugin_dir, "DISABLED")
+
+    open(disabled_file, "a").close()
+
+    flash("Plugin should be disabled. Please reload your app.", "success")
+
+    flash("If you are using a host which doesn't "
+          "support writting on the disk, this won't work - than you need to "
+          "create a 'DISABLED' file by yourself.", "info")
+
+    return redirect(url_for("admin.plugins"))
+
+
+@admin.route("/plugins/uninstall/<plugin>")
+def uninstall_plugin(plugin):
+    plugin = get_plugin_from_all(plugin)
+    if plugin.uninstallable:
+        plugin.uninstall()
+        flash("Plugin {} has been uninstalled.".format(plugin.name), "success")
+    else:
+        flash("Cannot uninstall Plugin {}".format(plugin.name), "danger")
+
+    return redirect(url_for("admin.plugins"))
+
+
+@admin.route("/plugins/install/<plugin>")
+def install_plugin(plugin):
+    plugin = get_plugin_from_all(plugin)
+    if plugin.installable and not plugin.uninstallable:
+        plugin.install()
+        flash("Plugin {} has been installed.".format(plugin.name), "success")
+    else:
+        flash("Cannot install Plugin {}".format(plugin.name), "danger")
+
     return redirect(url_for("admin.plugins"))
 
 
