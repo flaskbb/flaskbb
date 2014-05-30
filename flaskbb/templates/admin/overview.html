@@ -1,30 +1,33 @@
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th colspan="4">Global Statistics</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><b>FlaskBB Version</b></td>
-            <td>{{ flaskbb_version }}</td>
-            <td><b>Posts</b></td>
-            <td>{{ post_count }}</td>
-        </tr>
-        <tr>
-            <td><b>Python Version</b></td>
-            <td>{{ python_version }}</td>
-            <td><b>Topics</b></td>
-            <td>{{ topic_count }}</td>
-        </tr>
-        <tr>
-            <td><b>Flask Version</b></td>
-            <td>{{ flask_version }}</td>
-            <td><b>Users</b></td>
-            <td>{{ user_count }}</td>
-        </tr>
-    </tbody>
-</table>
+
+<div class="col-md-12">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th colspan="4">Global Statistics</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>FlaskBB Version</b></td>
+                <td>{{ flaskbb_version }}</td>
+                <td><b>Posts</b></td>
+                <td>{{ post_count }}</td>
+            </tr>
+            <tr>
+                <td><b>Python Version</b></td>
+                <td>{{ python_version }}</td>
+                <td><b>Topics</b></td>
+                <td>{{ topic_count }}</td>
+            </tr>
+            <tr>
+                <td><b>Flask Version</b></td>
+                <td>{{ flask_version }}</td>
+                <td><b>Users</b></td>
+                <td>{{ user_count }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% endblock %}

@@ -1,34 +1,43 @@
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from theme('macros.html') import render_pagination %}
+{% from theme('macros.html') import render_pagination, navlink with context %}
 
-<legend>Manage Groups | <a href="{{ url_for('admin.add_group') }}">Add Group</a></legend>
-
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(groups, url_for('admin.groups')) }}
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {{ navlink('admin.groups', "Manage Groups") }}
+        {{ navlink('admin.add_group', "Add Group") }}
+    </ul>
 </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Group Name</th>
-            <th>Description</th>
-            <th>Manage</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for group in groups.items %}
-        <tr>
-            <td>{{ group.id }}</td>
-            <td><a href="#">{{ group.name }}</a></td>
-            <td>{{ group.description }}</td>
-            <td>
-                <a href="{{ url_for('admin.edit_group', group_id = group.id) }}">Edit</a> |
-                <a href="{{ url_for('admin.delete_group', group_id = group.id) }}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="col-md-9">
+    <legend>Manage Groups</legend>
+
+    <div class="pull-left" style="padding-bottom: 10px">
+        {{ render_pagination(groups, url_for('admin.groups')) }}
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Group Name</th>
+                <th>Description</th>
+                <th>Manage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups.items %}
+            <tr>
+                <td>{{ group.id }}</td>
+                <td><a href="#">{{ group.name }}</a></td>
+                <td>{{ group.description }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_group', group_id = group.id) }}">Edit</a> |
+                    <a href="{{ url_for('admin.delete_group', group_id = group.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

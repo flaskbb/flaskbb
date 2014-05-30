@@ -1,53 +1,64 @@
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from theme('macros.html') import render_pagination %}
+{% from theme('macros.html') import render_pagination, navlink with context %}
 
-<legend>Manage Forums | <a href="{{ url_for('admin.add_forum') }}">Add Forum</a> | <a href="{{ url_for('admin.add_category') }}">Add Category</a></legend>
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {{ navlink('admin.forums', "Manage Forums") }}
+        {{ navlink('admin.add_forum', "Add Forum") }}
+        {{ navlink('admin.add_category', "Add Category") }}
+    </ul>
+</div>
 
-{% for category in categories %}
-<table class="table table-bordered">
-    <thead class="categoryhead">
-        <tr>
-            <td colspan="2">
-                <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
-            </td>
-            <td valign="top" align="center" style="white-space: nowrap">
-                <a href="{{ url_for('admin.add_forum', category_id=category.id) }}">Add Forum</a> |
-                <a href="{{ url_for('admin.edit_category', category_id = category.id) }}">Edit</a> |
-                <a href="{{ url_for('admin.delete_category', category_id = category.id) }}">Delete</a>
-            </td>
-        </tr>
-    </thead>
-    <tbody class="forumbody">
-        <tr class="forum_stats">
-            <td colspan="2"><strong>Forum</strong></td>
-            <td width="85" align="center" style="white-space: nowrap"><strong>Management</strong></td>
-        </tr>
 
-        {% for forum in category.forums %}
-        <tr>
-            <td align="center" valign="center" width="4%">
+<div class="col-md-9">
+    <legend>Manage Forums</legend>
 
-            </td>
+    {% for category in categories %}
+    <table class="table table-bordered">
+        <thead class="categoryhead">
+            <tr>
+                <td colspan="2">
+                    <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
+                </td>
+                <td valign="top" align="center" style="white-space: nowrap">
+                    <a href="{{ url_for('admin.add_forum', category_id=category.id) }}">Add Forum</a> |
+                    <a href="{{ url_for('admin.edit_category', category_id = category.id) }}">Edit</a> |
+                    <a href="{{ url_for('admin.delete_category', category_id = category.id) }}">Delete</a>
+                </td>
+            </tr>
+        </thead>
+        <tbody class="forumbody">
+            <tr class="forum_stats">
+                <td colspan="2"><strong>Forum</strong></td>
+                <td width="85" align="center" style="white-space: nowrap"><strong>Management</strong></td>
+            </tr>
 
-            <td valign="top">
-                <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
+            {% for forum in category.forums %}
+            <tr>
+                <td align="center" valign="center" width="4%">
 
-                <div class="forum-description">
-                    {% autoescape false %}
-                    {{ forum.description|markup }}
-                    {% endautoescape %}
-                </div>
-            </td>
+                </td>
 
-            <td valign="top" align="center" style="white-space: nowrap">
-                <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
-                <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
+                <td valign="top">
+                    <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
 
-    </tbody>
-</table>
-{% endfor %}
+                    <div class="forum-description">
+                        {% autoescape false %}
+                        {{ forum.description|markup }}
+                        {% endautoescape %}
+                    </div>
+                </td>
+
+                <td valign="top" align="center" style="white-space: nowrap">
+                    <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
+                    <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+    {% endfor %}
+</div>
 {% endblock %}

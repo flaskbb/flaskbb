@@ -1,23 +1,19 @@
 {% extends theme("layout.html") %}
 {% block content %}
-{%- from theme('macros.html') import navlink with context-%}
+{%- from theme('macros.html') import navlink with context -%}
 
-<div class="row">
-    <div class="col-sm-3">
-        <div class="sidebar">
-            <ul class="nav sidenav">
-                <li class="nav-header">Options</li>
-                {{ navlink('admin.overview', 'Overview') }}
-                {{ navlink('admin.users', 'Users') }}
-                {{ navlink('admin.groups', 'Groups') }}
-                {{ navlink('admin.forums', 'Forums') }}
-                {{ navlink('admin.unread_reports', 'Reports') }}
-                {{ navlink('admin.plugins', 'Plugins') }}
-            </ul>
-        </div><!--/.sidebar -->
-    </div><!--/.col-sm-3 -->
-    <div class="col-sm-9">
-        {% block admin_content %}{% endblock %}
-    </div><!--/.col-sm-9 -->
-</div><!--/.row -->
+<div class="col-md-12" style="padding-bottom: 10px">
+    <ul class="nav nav-tabs nav-justified">
+        {{ navlink('admin.overview', 'Overview') }}
+        {{ navlink('admin.settings', 'Settings') }}
+        {{ navlink('admin.users', 'Users', active=active_admin_user_nav) }}
+        {{ navlink('admin.groups', 'Groups', active=active_admin_group_nav) }}
+        {{ navlink('admin.forums', 'Forums', active=active_admin_forum_nav) }}
+        {{ navlink('admin.unread_reports', 'Reports', active=active_admin_report_nav) }}
+        {{ navlink('admin.plugins', 'Plugins') }}
+    </ul>
+</div>
+
+{% block admin_content %}{% endblock %}
+
 {% endblock %}

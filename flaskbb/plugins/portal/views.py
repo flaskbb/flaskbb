@@ -1,11 +1,10 @@
-from flask import Blueprint, current_app
+# -*- coding: utf-8 -*-
+from flask import Blueprint, current_app, flash
 from flaskbb.utils.helpers import render_template
 from flaskbb.forum.models import Topic, Post
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_diff, get_online_users
 
-
-FORUM_IDS = [1, 2]
 
 portal = Blueprint("portal", __name__, template_folder="templates")
 
@@ -16,7 +15,14 @@ def inject_portal_link():
 
 @portal.route("/")
 def index():
-    news = Topic.query.filter(Topic.forum_id.in_(FORUM_IDS)).all()
+    try:
+        forum_ids = current_app.config["PLUGIN_PORTAL_FORUM_IDS"]
+    except KeyError:
+        forum_ids = [1]
+        flash("Please install the plugin first to configure the forums "
+              "which should be displayed", "warning")
+
+    news = Topic.query.filter(Topic.forum_id.in_(forum_ids)).all()
     recent_topics = Topic.query.order_by(Topic.date_created).limit(5).offset(0)
 
     user_count = User.query.count()

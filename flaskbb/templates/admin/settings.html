@@ -1,0 +1,41 @@
+{% extends theme("admin/admin_layout.html") %}
+{% block admin_content %}
+{% from theme('macros.html') import render_boolean_field, render_select_field, render_field, navlink with context %}
+
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {% for group in all_groups %}
+            {% if group.key == active_group.key %}
+                <li class="active"><a href="{{ url_for('admin.settings', slug=group.key) }}">{{ group.name }}</a></li>
+            {% else %}
+                <li><a href="{{ url_for('admin.settings', slug=group.key) }}">{{ group.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div><!--/.col-md-3 -->
+
+<div class="col-md-9">
+<legend>{{ active_group.name }}</legend>
+
+<form class="form-horizontal" role="form" method="post">
+
+    {{ form.hidden_tag() }}
+    {% for field in form %}
+        {% if field.type not in ["TextField", "IntegerField"] %}
+            {% if field.type == "BooleanField" %}
+                {{ render_boolean_field(field) }}
+            {% endif %}
+
+            {% if field.type in ["SelectField", "SelectMultipleField"] %}
+                {{ render_select_field(field) }}
+            {% endif %}
+        {% else %}
+            {{ render_field(field) }}
+        {% endif %}
+    {%  endfor %}
+
+    <button type="submit" class="btn btn-success">Save</button>
+
+</form>
+</div>
+{% endblock %}

@@ -1,35 +1,43 @@
 {% set page_title = title %}
-{% set active_forum_nav=True %}
+{% set active_admin_group_nav=True %}
 
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from theme("macros.html") import horizontal_field, render_boolean_field %}
+{% from theme("macros.html") import horizontal_field, render_boolean_field, navlink with context %}
 
-<form class="form-horizontal" role="form" method="post">
-    {{ form.hidden_tag() }}
-    <legend class="">{{ title }}</legend>
-        {{ horizontal_field(form.name) }}
-        {{ horizontal_field(form.description) }}
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {{ navlink('admin.groups', "Manage Groups") }}
+        {{ navlink('admin.add_group', "Add Group") }}
+    </ul>
+</div>
 
-        {{ render_boolean_field(form.admin) }}
-        {{ render_boolean_field(form.super_mod) }}
+<div class="col-md-9">
+    <form class="form-horizontal" role="form" method="post">
+        {{ form.hidden_tag() }}
+        <legend class="">{{ title }}</legend>
+            {{ horizontal_field(form.name) }}
+            {{ horizontal_field(form.description) }}
+
+            {{ render_boolean_field(form.admin) }}
+            {{ render_boolean_field(form.super_mod) }}
 
 
-        {{ render_boolean_field(form.mod) }}
-        {{ render_boolean_field(form.banned) }}
-        {{ render_boolean_field(form.guest) }}
+            {{ render_boolean_field(form.mod) }}
+            {{ render_boolean_field(form.banned) }}
+            {{ render_boolean_field(form.guest) }}
 
-        {{ render_boolean_field(form.editpost) }}
-        {{ render_boolean_field(form.deletepost) }}
-        {{ render_boolean_field(form.deletetopic) }}
-        {{ render_boolean_field(form.posttopic) }}
-        {{ render_boolean_field(form.postreply) }}
+            {{ render_boolean_field(form.editpost) }}
+            {{ render_boolean_field(form.deletepost) }}
+            {{ render_boolean_field(form.deletetopic) }}
+            {{ render_boolean_field(form.posttopic) }}
+            {{ render_boolean_field(form.postreply) }}
 
-        <div class="form-group">
-            <div class="col-lg-offset-0 col-lg-9">
-                <button type="submit" class="btn btn-success">Save</button>
+            <div class="form-group">
+                <div class="col-lg-offset-0 col-lg-9">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
             </div>
-        </div>
-</form>
-
+    </form>
+</div>
 {% endblock %}

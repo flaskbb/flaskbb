@@ -354,3 +354,7 @@ class CategoryForm(Form):
     def save(self):
         category = Category(**self.data)
         return category.save()
+
+
+class SettingsForm(Form):
+    pass

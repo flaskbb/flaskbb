@@ -15,6 +15,7 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
 from flask.ext.plugins import get_plugins_list, get_plugin
+from flask.ext.themes2 import get_themes_list
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
@@ -23,6 +24,7 @@ from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
+from flaskbb.admin.models import Setting, SettingsGroup
 from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
                                  EditGroupForm, EditForumForm, AddForumForm,
                                  CategoryForm)
@@ -45,6 +47,52 @@ def overview():
                            user_count=user_count,
                            topic_count=topic_count,
                            post_count=post_count)
+
+
+@admin.route("/settings", methods=["GET", "POST"])
+@admin.route("/settings/<path:slug>", methods=["GET", "POST"])
+@admin_required
+def settings(slug=None):
+    slug = slug if slug else "general"
+
+    # get the currently active group
+    active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
+    # get all groups - used to build the navigation
+    all_groups = SettingsGroup.query.all()
+
+    SettingsForm = Setting.get_form(active_group)
+
+    old_settings = Setting.as_dict(from_group=slug)
+    new_settings = {}
+
+    form = SettingsForm()
+
+    if active_group.key == "themes":
+        # get the list with all available themes
+        form.default_theme.choices = [(theme.identifier, theme.name)
+                                      for theme in get_themes_list()]
+
+    if form.validate_on_submit():
+        for key, value in old_settings.iteritems():
+            try:
+                # check if the value has changed
+                if value == form.__dict__[key].data:
+                    continue
+                else:
+                    new_settings[key] = form.__dict__[key].data
+            except KeyError:
+                pass
+
+        Setting.update(settings=new_settings, app=current_app)
+    else:
+        for key, value in old_settings.iteritems():
+            try:
+                form.__dict__[key].data = value
+            except (KeyError, ValueError):
+                pass
+
+    return render_template("admin/settings.html", form=form,
+                           all_groups=all_groups, active_group=active_group)
 
 
 @admin.route("/users", methods=['GET', 'POST'])

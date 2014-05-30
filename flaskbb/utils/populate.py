@@ -9,118 +9,47 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime
-from collections import OrderedDict
 
+from flaskbb.admin.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
 
-GROUPS = OrderedDict((
-    ('Administrator', {
-        'description': 'The Administrator Group',
-        'admin': True,
-        'super_mod': False,
-        'mod': False,
-        'banned': False,
-        'guest': False,
-        'editpost': True,
-        'deletepost': True,
-        'deletetopic': True,
-        'posttopic': True,
-        'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
-    }),
-    ('Super Moderator', {
-        'description': 'The Super Moderator Group',
-        'admin': False,
-        'super_mod': True,
-        'mod': False,
-        'banned': False,
-        'guest': False,
-        'editpost': True,
-        'deletepost': True,
-        'deletetopic': True,
-        'posttopic': True,
-        'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
-    }),
-    ('Moderator', {
-        'description': 'The Moderator Group',
-        'admin': False,
-        'super_mod': False,
-        'mod': True,
-        'banned': False,
-        'guest': False,
-        'editpost': True,
-        'deletepost': True,
-        'deletetopic': True,
-        'posttopic': True,
-        'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
-    }),
-    ('Member', {
-        'description': 'The Member Group',
-        'admin': False,
-        'super_mod': False,
-        'mod': False,
-        'banned': False,
-        'guest': False,
-        'editpost': True,
-        'deletepost': False,
-        'deletetopic': False,
-        'posttopic': True,
-        'postreply': True,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
-    }),
-    ('Banned', {
-        'description': 'The Banned Group',
-        'admin': False,
-        'super_mod': False,
-        'mod': False,
-        'banned': True,
-        'guest': False,
-        'editpost': False,
-        'deletepost': False,
-        'deletetopic': False,
-        'posttopic': False,
-        'postreply': False,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
-    }),
-    ('Guest', {
-        'description': 'The Guest Group',
-        'admin': False,
-        'super_mod': False,
-        'mod': False,
-        'banned': False,
-        'guest': True,
-        'editpost': False,
-        'deletepost': False,
-        'deletetopic': False,
-        'posttopic': False,
-        'postreply': False,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
-    })
-))
+def create_default_settings():
+    from flaskbb.fixtures.settings import fixture
+
+    for settingsgroup in fixture:
+
+        group = SettingsGroup(
+            key=settingsgroup[0],
+            name=settingsgroup[1]['name'],
+            description=settingsgroup[1]['description']
+        )
+
+        group.save()
+
+        for settings in settingsgroup[1]['settings']:
+            setting = Setting(
+                key=settings[0],
+                value=settings[1]['value'],
+                value_type=settings[1]['value_type'],
+                input_type=settings[1]['input_type'],
+                name=settings[1]['name'],
+                description=settings[1]['description'],
+                extra=settings[1].get('extra', ""),     # Optional field
+
+                settingsgroup=group.key
+            )
+            setting.save()
 
 
 def create_default_groups():
     """
     This will create the 5 default groups
     """
+    from flaskbb.fixtures.groups import fixture
     result = []
-    for key, value in GROUPS.items():
+    for key, value in fixture.items():
         group = Group(name=key)
 
         for k, v in value.items():
@@ -168,6 +97,7 @@ def create_welcome_forum():
 def create_test_data():
 
     create_default_groups()
+    create_default_settings()
 
     # create 5 users
     for u in range(1, 6):

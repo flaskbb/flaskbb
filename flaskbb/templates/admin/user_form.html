@@ -1,32 +1,40 @@
 {% set page_title = title %}
-{% set active_forum_nav=True %}
+{% set active_admin_user_nav=True %}
 
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from theme("macros.html") import horizontal_field %}
+{% from theme("macros.html") import horizontal_field, navlink with context %}
 
-<form class="form-horizontal" role="form" method="post">
-    {{ form.hidden_tag() }}
-    <legend class="">{{ title }}</legend>
-        {{ horizontal_field(form.username) }}
-        {{ horizontal_field(form.email) }}
-        {{ horizontal_field(form.password) }}
-        {{ horizontal_field(form.birthday) }}
-        {{ horizontal_field(form.gender) }}
-        {{ horizontal_field(form.location) }}
-        {{ horizontal_field(form.website) }}
-        {{ horizontal_field(form.avatar) }}
-        {{ horizontal_field(form.primary_group) }}
-        {{ horizontal_field(form.secondary_groups) }}
-        {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
-        {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {{ navlink('admin.users', "Manage Users") }}
+        {{ navlink('admin.add_user', "Add User") }}
+    </ul>
+</div><!--/.col-md-3 -->
+
+<div class="col-md-9">
+    <form class="form-horizontal" role="form" method="post">
+        {{ form.hidden_tag() }}
+        <legend class="">{{ title }}</legend>
+            {{ horizontal_field(form.username) }}
+            {{ horizontal_field(form.email) }}
+            {{ horizontal_field(form.password) }}
+            {{ horizontal_field(form.birthday) }}
+            {{ horizontal_field(form.gender) }}
+            {{ horizontal_field(form.location) }}
+            {{ horizontal_field(form.website) }}
+            {{ horizontal_field(form.avatar) }}
+            {{ horizontal_field(form.primary_group) }}
+            {{ horizontal_field(form.secondary_groups) }}
+            {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
+            {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
 
 
-        <div class="form-group">
-            <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-success">Save</button>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
             </div>
-        </div>
-</form>
-
+    </form>
+</div>
 {% endblock %}
