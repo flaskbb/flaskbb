@@ -1,39 +1,50 @@
+{% set active_admin_report_nav=True %}
+
 {% extends theme("admin/admin_layout.html") %}
 {% block admin_content %}
-{% from theme('macros.html') import render_pagination %}
+{% from theme('macros.html') import render_pagination, navlink with context %}
 
-<legend>Manage Reports | <a href="{{ url_for('admin.unread_reports') }}">Unread Reports</a></legend>
-
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(reports, url_for('admin.reports')) }}
+<div class="col-md-3">
+    <ul class="nav nav-pills nav-stacked">
+        {{ navlink('admin.unread_reports', "Show unread reports") }}
+        {{ navlink('admin.reports', "Show all reports") }}
+    </ul>
 </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Poster</th>
-            <th>Topic</th>
-            <th>Reporter</th>
-            <th>Reason</th>
-            <th>Reported</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for report in reports.items %}
-        <tr>
-            <td>{{ report.id }}</td>
-            <td>{{ report.post.user.username }}</td>
-            <td>{{ report.post.topic.title }}</td>
-            <td>{{ report.reporter.username }}</td>
-            <td>{{ report.reason }}</td>
-            <td>{{ report.reported|time_since }}</td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6">No reports.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="col-md-9">
+    <legend>All Reports</legend>
+
+    <div class="pull-left" style="padding-bottom: 10px">
+        {{ render_pagination(reports, url_for('admin.reports')) }}
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Poster</th>
+                <th>Topic</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Reported</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports.items %}
+            <tr>
+                <td>{{ report.id }}</td>
+                <td>{{ report.post.user.username }}</td>
+                <td>{{ report.post.topic.title }}</td>
+                <td>{{ report.reporter.username }}</td>
+                <td>{{ report.reason }}</td>
+                <td>{{ report.reported|time_since }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">No reports.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
