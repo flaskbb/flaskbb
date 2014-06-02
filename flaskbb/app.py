@@ -15,6 +15,8 @@ import datetime
 from flask import Flask, request
 from flask.ext.login import current_user
 
+from sqlalchemy.exc import OperationalError
+
 # Import the user blueprint
 from flaskbb.user.views import user
 from flaskbb.user.models import User, Guest, PrivateMessage
@@ -134,9 +136,12 @@ def configure_extensions(app):
 
 
 def update_settings_from_db(app):
-    if not app.config["TESTING"]:
-        with app.app_context():
-            app.config.update(Setting.as_dict(upper=True))
+    try:
+        if not app.config["TESTING"]:
+            with app.app_context():
+                app.config.update(Setting.as_dict(upper=True))
+    except OperationalError:
+        pass
 
 
 def configure_template_filters(app):
