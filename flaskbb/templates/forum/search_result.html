@@ -135,7 +135,7 @@
                         <div>
                             <a href="{{ topic.url }}">{{ topic.title }}</a>
                             <!-- Topic Pagination -->
-                            {{ topic_pages(topic, config["POSTS_PER_PAGE"]) }}
+                            {{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}
                             <br />
                             {% if topic.user_id %}
                                 <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>

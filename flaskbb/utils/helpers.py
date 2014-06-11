@@ -22,6 +22,7 @@ from flask.ext.login import current_user
 from postmarkup import render_bbcode
 
 from flaskbb.extensions import redis
+from flaskbb.utils.settings import flaskbb_config
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -48,7 +49,7 @@ def render_template(template, **context):
     if current_user.is_authenticated() and current_user.theme:
         theme = current_user.theme
     else:
-        theme = session.get('theme', current_app.config['DEFAULT_THEME'])
+        theme = session.get('theme', flaskbb_config['DEFAULT_THEME'])
     return render_theme_template(theme, template, **context)
 
 
@@ -139,7 +140,7 @@ def forum_is_unread(forum, forumsread, user):
         return False
 
     read_cutoff = datetime.utcnow() - timedelta(
-        days=current_app.config["TRACKER_LENGTH"])
+        days=flaskbb_config["TRACKER_LENGTH"])
 
     # If there are no topics in the forum, mark it as read
     if forum and forum.topic_count == 0:
@@ -173,7 +174,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
         return False
 
     read_cutoff = datetime.utcnow() - timedelta(
-        days=current_app.config["TRACKER_LENGTH"])
+        days=flaskbb_config["TRACKER_LENGTH"])
 
     # topicsread is none if the user has marked the forum as read
     # or if he hasn't visited yet
@@ -238,7 +239,7 @@ def get_online_users(guest=False):
     :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
-    minutes = xrange(current_app.config['ONLINE_LAST_MINUTES'])
+    minutes = xrange(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
         return redis.sunion(['online-guests/%d' % (current - x)
                              for x in minutes])
@@ -251,7 +252,7 @@ def crop_title(title):
 
     :param title: The title that should be cropped
     """
-    length = current_app.config['TITLE_LENGTH']
+    length = flaskbb_config['TITLE_LENGTH']
     if len(title) > length:
         return title[:length] + "..."
     return title
@@ -279,7 +280,7 @@ def time_diff():
     variable from the configuration.
     """
     now = datetime.utcnow()
-    diff = now - timedelta(minutes=current_app.config['ONLINE_LAST_MINUTES'])
+    diff = now - timedelta(minutes=flaskbb_config['ONLINE_LAST_MINUTES'])
     return diff
 
 

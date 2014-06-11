@@ -14,6 +14,7 @@ from flask import current_app, url_for, abort
 
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
+from flaskbb.utils.settings import flaskbb_config
 
 
 moderators = db.Table(
@@ -345,9 +346,9 @@ class Topic(db.Model):
                            a new post in the topic.
         """
         read_cutoff = None
-        if current_app.config['TRACKER_LENGTH'] > 0:
+        if ['TRACKER_LENGTH'] > 0:
             read_cutoff = datetime.utcnow() - timedelta(
-                days=current_app.config['TRACKER_LENGTH'])
+                days=flaskbb_config['TRACKER_LENGTH'])
 
         # The tracker is disabled - abort
         if read_cutoff is None:

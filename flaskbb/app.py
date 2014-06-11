@@ -15,8 +15,6 @@ import datetime
 from flask import Flask, request
 from flask.ext.login import current_user
 
-from sqlalchemy.exc import OperationalError
-
 # Import the user blueprint
 from flaskbb.user.views import user
 from flaskbb.user.models import User, Guest, PrivateMessage
@@ -24,7 +22,6 @@ from flaskbb.user.models import User, Guest, PrivateMessage
 from flaskbb.auth.views import auth
 # Import the admin blueprint
 from flaskbb.admin.views import admin
-from flaskbb.admin.models import Setting
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
@@ -40,6 +37,8 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
     can_move_topic
+# app specific configurations
+from flaskbb.utils.settings import flaskbb_config
 
 
 def create_app(config=None):
@@ -59,10 +58,10 @@ def create_app(config=None):
     configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
+    configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
-    update_settings_from_db(app)
 
     return app
 
@@ -135,15 +134,6 @@ def configure_extensions(app):
     login_manager.init_app(app)
 
 
-def update_settings_from_db(app):
-    try:
-        if not app.config["TESTING"]:
-            with app.app_context():
-                app.config.update(Setting.as_dict(upper=True))
-    except OperationalError:
-        pass
-
-
 def configure_template_filters(app):
     """
     Configures the template filters
@@ -163,6 +153,18 @@ def configure_template_filters(app):
     app.jinja_env.filters['lock_topic'] = can_lock_topic
     app.jinja_env.filters['post_reply'] = can_post_reply
     app.jinja_env.filters['post_topic'] = can_post_topic
+
+
+def configure_context_processors(app):
+    """
+    Configures the context processors
+    """
+    @app.context_processor
+    def inject_flaskbb_config():
+        """
+        Injects the ``flaskbb_config`` config variable into the templates.
+        """
+        return dict(flaskbb_config=flaskbb_config)
 
 
 def configure_before_handlers(app):

@@ -17,6 +17,7 @@ from flask import (Blueprint, redirect, url_for, current_app,
 from flask.ext.login import login_required, current_user
 
 from flaskbb.extensions import db
+from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import get_online_users, time_diff, render_template
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
@@ -79,7 +80,7 @@ def view_forum(forum_id, slug=None):
 
     forum, forumsread = Forum.get_forum(forum_id=forum_id, user=current_user)
     topics = Forum.get_topics(forum_id=forum.id, user=current_user, page=page,
-                              per_page=current_app.config["TOPICS_PER_PAGE"])
+                              per_page=flaskbb_config["TOPICS_PER_PAGE"])
 
     return render_template("forum/forum.html", forum=forum, topics=topics,
                            forumsread=forumsread,)
@@ -92,7 +93,7 @@ def view_topic(topic_id, slug=None):
 
     topic = Topic.query.filter_by(id=topic_id).first()
     posts = Post.query.filter_by(topic_id=topic.id).\
-        paginate(page, current_app.config['POSTS_PER_PAGE'], False)
+        paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
     # Count the topic views
     topic.views += 1
@@ -127,7 +128,7 @@ def view_topic(topic_id, slug=None):
 def view_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
     count = post.topic.post_count
-    page = math.ceil(count / current_app.config["POSTS_PER_PAGE"])
+    page = math.ceil(count / flaskbb_config["POSTS_PER_PAGE"])
     if count > 10:
         page += 1
     else:
@@ -427,12 +428,12 @@ def memberlist():
 
     if search_form.validate():
         users = search_form.get_results().\
-            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
         return render_template("forum/memberlist.html", users=users,
                                search_form=search_form)
     else:
         users = User.query.\
-            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
         return render_template("forum/memberlist.html", users=users,
                                search_form=search_form)
 
@@ -446,7 +447,7 @@ def topictracker():
                           TopicsRead.user_id == current_user.id)).\
         add_entity(TopicsRead).\
         order_by(Post.id.desc()).\
-        paginate(page, current_app.config['TOPICS_PER_PAGE'], True)
+        paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
 
     return render_template("forum/topictracker.html", topics=topics)
 

@@ -1,7 +1,8 @@
+import sys
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form
-from flaskbb.extensions import db
+from flaskbb.extensions import db, cache
 
 
 class SettingsGroup(db.Model):
@@ -164,26 +165,21 @@ class Setting(db.Model):
 
     @classmethod
     def update(cls, settings, app=None):
-        """Updates the current_app's config and stores the changes in the
+        """Updates the cache and stores the changes in the
         database.
 
         :param settings: A dictionary with setting items.
         """
-        updated_settings = {}
+        # update the database
         for key, value in settings.iteritems():
             setting = cls.query.filter(Setting.key == key.lower()).first()
 
             setting.value = value
 
-            updated_settings[setting.key.upper()] = setting.value
-
             db.session.add(setting)
             db.session.commit()
 
-        # update cache here
-
-        if app is not None:
-            app.config.update(updated_settings)
+        cls.invalidate_cache()
 
     @classmethod
     def get_settings(cls, from_group=None):
@@ -212,8 +208,10 @@ class Setting(db.Model):
         return settings
 
     @classmethod
-    def as_dict(cls, from_group=None, upper=False):
-        """Returns all settings as a dict
+    @cache.memoize(timeout=sys.maxint)
+    def as_dict(cls, from_group=None, upper=True):
+        """Returns all settings as a dict. This method is cached. If you want
+        to invalidate the cache, simply execute ``self.invalidate_cache()``.
 
         :param from_group: Returns only the settings from the group as a dict.
         :param upper: If upper is ``True``, the key will use upper-case
@@ -238,6 +236,11 @@ class Setting(db.Model):
             settings[setting_key] = setting.value
 
         return settings
+
+    @classmethod
+    def invalidate_cache(cls):
+        """Invalidates this objects cached metadata."""
+        cache.delete_memoized(cls.as_dict, cls)
 
     def save(self):
         """Saves a setting"""

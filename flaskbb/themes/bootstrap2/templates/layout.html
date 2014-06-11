@@ -5,9 +5,9 @@
         <title>
         {% block title %}
             {%- if not page_title -%}
-                {{ config["PROJECT_TITLE"] }} - {{ config["PROJECT_SUBTITLE"] }}
+                {{ flaskbb_config["PROJECT_TITLE"] }} - {{ flaskbb_config["PROJECT_SUBTITLE"] }}
             {%- else -%}
-                {{ page_title }} - {{ config["PROJECT_TITLE"] }}
+                {{ page_title }} - {{ flaskbb_config["PROJECT_TITLE"] }}
             {%- endif -%}
         {% endblock %}
         </title>

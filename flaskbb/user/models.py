@@ -17,6 +17,7 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
+from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
                                   ForumsRead)
 
@@ -218,13 +219,13 @@ class User(db.Model, UserMixin):
         return Topic.query.filter(Topic.user_id == self.id).\
             filter(Post.topic_id == Topic.id).\
             order_by(Post.id.desc()).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     def all_posts(self, page):
         """Returns a paginated result with all posts the user has created."""
 
         return Post.query.filter(Post.user_id == self.id).\
-            paginate(page, current_app.config['TOPICS_PER_PAGE'], False)
+            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     def track_topic(self, topic):
         """Tracks the specified topic

@@ -4,7 +4,7 @@ from flaskbb.utils.helpers import render_template
 from flaskbb.forum.models import Topic, Post
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_diff, get_online_users
-
+from flaskbb.utils.settings import flaskbb_config
 
 portal = Blueprint("portal", __name__, template_folder="templates")
 
@@ -16,7 +16,7 @@ def inject_portal_link():
 @portal.route("/")
 def index():
     try:
-        forum_ids = current_app.config["PLUGIN_PORTAL_FORUM_IDS"]
+        forum_ids = flaskbb_config["PLUGIN_PORTAL_FORUM_IDS"]
     except KeyError:
         forum_ids = [1]
         flash("Please install the plugin first to configure the forums "
