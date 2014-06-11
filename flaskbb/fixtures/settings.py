@@ -18,21 +18,18 @@ fixture = (
             ('project_title', {
                 'value':        "FlaskBB",
                 'value_type':   "string",
-                'input_type':   "text",
                 'name':         "Project title",
                 'description':  "The title of the project.",
             }),
             ('project_subtitle', {
                 'value':        "A lightweight forum software in Flask",
                 'value_type':   "string",
-                'input_type':   "text",
                 'name':         "Project subtitle",
                 'description':  "A short description of the project.",
             }),
             ('posts_per_page', {
                 'value':        10,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 5},
                 'name':         "Posts per page",
                 'description':  "Number of posts displayed per page.",
@@ -40,7 +37,6 @@ fixture = (
             ('topics_per_page', {
                 'value':        10,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 5},
                 'name':         "Topics per page",
                 'description':  "Number of topics displayed per page.",
@@ -48,7 +44,6 @@ fixture = (
             ('users_per_page', {
                 'value':        10,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 5},
                 'name':         "Users per page",
                 'description':  "Number of users displayed per page.",
@@ -62,7 +57,6 @@ fixture = (
             ('online_last_minutes', {
                 'value':        15,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 0},
                 'name':         "Online last minutes",
                 'description':  "How long a user can be inactive before he is marked as offline. 0 to disable it.",
@@ -70,7 +64,6 @@ fixture = (
             ('title_length', {
                 'value':        15,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 0},
                 'name':         "Topic title length",
                 'description':  "The length of the topic title shown on the index."
@@ -78,7 +71,6 @@ fixture = (
             ('tracker_length', {
                 'value':        7,
                 'value_type':   "integer",
-                'input_type':   "number",
                 'extra':        {'min': 0},
                 'name':         "Tracker length",
                 'description':  "The days for how long the forum should deal with unread topics. 0 to disable it."
@@ -91,8 +83,7 @@ fixture = (
         "settings": (
             ('default_theme', {
                 'value':        "bootstrap3",
-                'value_type':   "text",
-                'input_type':   "choice",
+                'value_type':   "select",
                 'extra':        {'choices': None},
                 'name':         "Default theme",
                 'description':  "Change the default theme for your forum."

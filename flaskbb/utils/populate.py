@@ -40,7 +40,6 @@ def create_settings_from_fixture(fixture):
                 key=settings[0],
                 value=settings[1]['value'],
                 value_type=settings[1]['value_type'],
-                input_type=settings[1]['input_type'],
                 name=settings[1]['name'],
                 description=settings[1]['description'],
                 extra=settings[1].get('extra', ""),     # Optional field

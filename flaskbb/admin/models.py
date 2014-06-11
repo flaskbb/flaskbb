@@ -1,5 +1,5 @@
-from wtforms import (TextField, IntegerField, BooleanField, SelectField,
-                     FloatField, validators)
+from wtforms import (TextField, IntegerField, FloatField, BooleanField,
+                     SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form
 from flaskbb.extensions import db
 
@@ -76,12 +76,8 @@ class Setting(db.Model):
     # The description (displayed in the form)
     description = db.Column(db.String, nullable=False)
 
-    # Available types: string, integer, boolean, array, float
+    # Available types: string, integer, float, boolean, select, selectmultiple
     value_type = db.Column(db.String, nullable=False)
-
-    # Available types: text, number, choice, yesno
-    # They are used in the form creation process
-    input_type = db.Column(db.String, nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     extra = db.Column(db.PickleType)
@@ -138,40 +134,43 @@ class Setting(db.Model):
                         validators.Length(max=setting.extra["max"])
                     )
 
-            # Generate the fields based on input_type and value_type
-            if setting.input_type == "number":
-                # IntegerField
-                if setting.value_type == "integer":
-                    setattr(
-                        SettingsForm, setting.key,
-                        IntegerField(setting.name, validators=field_validators,
-                                     description=setting.description)
-                    )
-                # FloatField
-                elif setting.value_type == "float":
-                    setattr(
-                        SettingsForm, setting.key,
-                        FloatField(setting.name, validators=field_validators,
-                                   description=setting.description)
-                    )
+            # Generate the fields based on value_type
+            # IntegerField
+            if setting.value_type == "integer":
+                setattr(
+                    SettingsForm, setting.key,
+                    IntegerField(setting.name, validators=field_validators,
+                                 description=setting.description)
+                )
+            # FloatField
+            elif setting.value_type == "float":
+                setattr(
+                    SettingsForm, setting.key,
+                    FloatField(setting.name, validators=field_validators,
+                               description=setting.description)
+                )
 
             # TextField
-            if setting.input_type == "text":
+            if setting.value_type == "string":
                 setattr(
                     SettingsForm, setting.key,
                     TextField(setting.name, validators=field_validators,
                               description=setting.description)
                 )
 
-            if setting.input_type == "array":
+            # SelectMultipleField
+            if setting.value_type == "selectmultiple":
                 setattr(
                     SettingsForm, setting.key,
-                    TextField(setting.name, validators=field_validators,
-                              description=setting.description)
+                    SelectMultipleField(
+                        setting.name,
+                        choices=setting.extra['choices'],
+                        description=setting.description
+                    )
                 )
 
             # SelectField
-            if setting.input_type == "choice" and "choices" in setting.extra:
+            if setting.value_type == "select":
                 setattr(
                     SettingsForm, setting.key,
                     SelectField(setting.name, choices=setting.extra['choices'],
@@ -179,7 +178,7 @@ class Setting(db.Model):
                 )
 
             # BooleanField
-            if setting.input_type == "yesno":
+            if setting.value_type == "boolean":
                 setattr(
                     SettingsForm, setting.key,
                     BooleanField(setting.name, description=setting.description)
