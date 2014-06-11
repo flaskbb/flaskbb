@@ -167,7 +167,7 @@ class Setting(db.Model):
         """Updates the current_app's config and stores the changes in the
         database.
 
-        :param config: A dictionary with configuration items.
+        :param settings: A dictionary with setting items.
         """
         updated_settings = {}
         for key, value in settings.iteritems():
@@ -180,17 +180,46 @@ class Setting(db.Model):
             db.session.add(setting)
             db.session.commit()
 
+        # update cache here
+
         if app is not None:
             app.config.update(updated_settings)
 
     @classmethod
+    def get_settings(cls, from_group=None):
+        """This will return all settings with the key as the key for the dict
+        and the values are packed again in a dict which contains
+        the remaining attributes.
+
+        :param from_group: Optionally - Returns only the settings from a group.
+        """
+        result = None
+        if from_group is not None:
+            result = from_group.settings
+        else:
+            result = cls.query.all()
+
+        settings = {}
+        for setting in result:
+            settings[setting.key] = {
+                'name': setting.name,
+                'description': setting.description,
+                'value': setting.value,
+                'value_type': setting.value_type,
+                'extra': setting.extra
+            }
+
+        return settings
+
+    @classmethod
     def as_dict(cls, from_group=None, upper=False):
-        """Returns the settings key and value as a dict.
+        """Returns all settings as a dict
 
         :param from_group: Returns only the settings from the group as a dict.
         :param upper: If upper is ``True``, the key will use upper-case
                       letters. Defaults to ``False``.
         """
+
         settings = {}
         result = None
         if from_group is not None:
@@ -202,9 +231,11 @@ class Setting(db.Model):
 
         for setting in result:
             if upper:
-                settings[setting.key.upper()] = setting.value
+                setting_key = setting.key.upper()
             else:
-                settings[setting.key] = setting.value
+                setting_key = setting.key
+
+            settings[setting_key] = setting.value
 
         return settings
 
