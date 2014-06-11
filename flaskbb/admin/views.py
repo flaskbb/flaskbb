@@ -16,7 +16,6 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
 from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
-from flask.ext.themes2 import get_themes_list
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
@@ -63,32 +62,27 @@ def settings(slug=None):
 
     SettingsForm = Setting.get_form(active_group)
 
-    old_settings = Setting.as_dict(from_group=slug)
+    old_settings = Setting.get_settings(active_group)
     new_settings = {}
 
     form = SettingsForm()
 
-    if active_group.key == "themes":
-        # get the list with all available themes
-        form.default_theme.choices = [(theme.identifier, theme.name)
-                                      for theme in get_themes_list()]
-
     if form.validate_on_submit():
-        for key, value in old_settings.iteritems():
+        for key, values in old_settings.iteritems():
             try:
                 # check if the value has changed
-                if value == form.__dict__[key].data:
+                if values['value'] == form[key].data:
                     continue
                 else:
-                    new_settings[key] = form.__dict__[key].data
+                    new_settings[key] = form[key].data
             except KeyError:
                 pass
 
         Setting.update(settings=new_settings, app=current_app)
     else:
-        for key, value in old_settings.iteritems():
+        for key, values in old_settings.iteritems():
             try:
-                form.__dict__[key].data = value
+                form[key].data = values['value']
             except (KeyError, ValueError):
                 pass
 
