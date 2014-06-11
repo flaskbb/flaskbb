@@ -3,7 +3,8 @@ import pytest
 from flaskbb import create_app
 from flaskbb.extensions import db
 from flaskbb.configs.testing import TestingConfig as Config
-from flaskbb.utils.populate import create_default_groups
+from flaskbb.utils.populate import create_default_groups, \
+    create_default_settings
 
 
 @pytest.yield_fixture(autouse=True)
@@ -23,6 +24,12 @@ def application():
 def default_groups(database):
     """Creates the default groups"""
     return create_default_groups()
+
+
+@pytest.fixture()
+def default_settings(database):
+    """Creates the default settings"""
+    return create_default_settings()
 
 
 @pytest.yield_fixture()

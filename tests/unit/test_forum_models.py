@@ -6,6 +6,7 @@ from flask.ext.login import login_user, current_user, logout_user
 from flaskbb.forum.models import Category, Forum, Topic, Post, ForumsRead, \
     TopicsRead, Report
 from flaskbb.user.models import User
+from flaskbb.utils.settings import flaskbb_config
 
 
 def test_category_save(database):
@@ -486,9 +487,9 @@ def test_topic_update_read(database, user, topic):
                    ForumsRead.forum_id == topic.forum_id).first()
 
         # Test tracker length
-        current_app.config["TRACKER_LENGTH"] = 0
+        flaskbb_config["TRACKER_LENGTH"] = 0
         assert not topic.update_read(current_user, topic.forum, forumsread)
-        current_app.config["TRACKER_LENGTH"] = 1
+        flaskbb_config["TRACKER_LENGTH"] = 1
         assert topic.update_read(current_user, topic.forum, forumsread)
 
         # Test with logged out user

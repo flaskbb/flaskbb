@@ -12,7 +12,7 @@ def category(database):
 
 
 @pytest.fixture
-def forum(category):
+def forum(category, default_settings):
     """A single forum in a category."""
     forum = Forum(title="Test Forum", category_id=category.id)
     forum.save()
