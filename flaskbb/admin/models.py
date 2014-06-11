@@ -4,41 +4,6 @@ from flask.ext.wtf import Form
 from flaskbb.extensions import db
 
 
-def normalize_to(value, value_type, reverse=False):
-    """Converts a value to a specified value type.
-    Available value types are: string, integer, boolean and array.
-    A boolean type is handled as 0 for false and 1 for true.
-
-    :param value: The value which should be converted.
-    :param value_type: The value_type.
-    :param reverse: If the value should be converted back
-    """
-    if reverse:
-        if value_type == 'array':
-            return value
-        if value_type == 'integer':
-            return int(value)
-        if value_type == 'float':
-            return float(value)
-        if value_type == 'boolean':
-            return value == "1"
-
-        # text
-        return value
-    else:
-        if value_type == 'array':
-            return value.replace(" ", "").strip(",")
-        if value_type == 'integer':
-            return int(value)
-        if value_type == 'float':
-            return float(value)
-        if value_type == 'boolean':
-            return 1 if value else 0
-
-        # text
-        return value
-
-
 class SettingsGroup(db.Model):
     __tablename__ = "settingsgroup"
 
@@ -63,7 +28,7 @@ class Setting(db.Model):
     __tablename__ = "settings"
 
     key = db.Column(db.String, primary_key=True)
-    _value = db.Column("value", db.String, nullable=False)
+    value = db.Column(db.PickleType, nullable=False)
     settingsgroup = db.Column(db.String,
                               db.ForeignKey('settingsgroup.key',
                                             use_alter=True,
@@ -80,16 +45,8 @@ class Setting(db.Model):
     value_type = db.Column(db.String, nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
+    # For Select*Fields required: choices
     extra = db.Column(db.PickleType)
-
-    # Properties
-    @property
-    def value(self):
-        return normalize_to(self._value, self.value_type)
-
-    @value.setter
-    def value(self, value):
-        self._value = normalize_to(value, self.value_type, reverse=True)
 
     @classmethod
     def get_form(cls, group):
@@ -102,12 +59,11 @@ class Setting(db.Model):
         class SettingsForm(Form):
             pass
 
-        # now parse that shit
+        # now parse the settings in this group
         for setting in group.settings:
             field_validators = []
 
             # generate the validators
-            # TODO: Do this in another function
             if "min" in setting.extra:
                 # Min number validator
                 if setting.value_type in ("integer", "float"):
@@ -116,7 +72,7 @@ class Setting(db.Model):
                     )
 
                 # Min text length validator
-                elif setting.value_type in ("string", "array"):
+                elif setting.value_type in ("string"):
                     field_validators.append(
                         validators.Length(min=setting.extra["min"])
                     )
@@ -129,7 +85,7 @@ class Setting(db.Model):
                     )
 
                 # Max text length validator
-                elif setting.value_type in ("string", "array"):
+                elif setting.value_type in ("string"):
                     field_validators.append(
                         validators.Length(max=setting.extra["max"])
                     )
