@@ -116,21 +116,37 @@ class Setting(db.Model):
 
             # SelectMultipleField
             if setting.value_type == "selectmultiple":
+                # if no coerce is found, it will fallback to unicode
+                if "coerce" in setting.extra:
+                    coerce_to = setting.extra['coerce']
+                else:
+                    coerce_to = unicode
+
                 setattr(
                     SettingsForm, setting.key,
                     SelectMultipleField(
                         setting.name,
-                        choices=setting.extra['choices'],
+                        choices=setting.extra['choices'](),
+                        coerce=coerce_to,
                         description=setting.description
                     )
                 )
 
             # SelectField
             if setting.value_type == "select":
+                # if no coerce is found, it will fallback to unicode
+                if "coerce" in setting.extra:
+                    coerce_to = setting.extra['coerce']
+                else:
+                    coerce_to = unicode
+
                 setattr(
                     SettingsForm, setting.key,
-                    SelectField(setting.name, choices=setting.extra['choices'],
-                                description=setting.description)
+                    SelectField(
+                        setting.name,
+                        coerce=coerce_to,
+                        choices=setting.extra['choices'](),
+                        description=setting.description)
                 )
 
             # BooleanField
