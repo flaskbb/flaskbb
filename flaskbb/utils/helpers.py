@@ -201,7 +201,7 @@ def mark_online(user_id, guest=False):
     Ref: http://flask.pocoo.org/snippets/71/
     """
     now = int(time.time())
-    expires = now + (current_app.config['ONLINE_LAST_MINUTES'] * 60) + 10
+    expires = now + (flaskbb_config['ONLINE_LAST_MINUTES'] * 60) + 10
     if guest:
         all_users_key = 'online-guests/%d' % (now // 60)
         user_key = 'guest-activity/%s' % user_id

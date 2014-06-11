@@ -10,7 +10,7 @@
 """
 from datetime import datetime, timedelta
 
-from flask import current_app, url_for, abort
+from flask import url_for, abort
 
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
@@ -346,7 +346,7 @@ class Topic(db.Model):
                            a new post in the topic.
         """
         read_cutoff = None
-        if ['TRACKER_LENGTH'] > 0:
+        if flaskbb_config['TRACKER_LENGTH'] > 0:
             read_cutoff = datetime.utcnow() - timedelta(
                 days=flaskbb_config['TRACKER_LENGTH'])
 
