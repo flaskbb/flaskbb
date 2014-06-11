@@ -72,7 +72,7 @@ class ProductionConfig(DefaultConfig):
     ## Error/Info Logging
     # If SEND_LOGS is set to True, the admins (see the mail configuration) will
     # recieve the error logs per email.
-    SEND_LOGS = True
+    SEND_LOGS = False
 
     # The filename for the info and error logs. The logfiles are stored at
     # flaskbb/logs
@@ -80,41 +80,13 @@ class ProductionConfig(DefaultConfig):
     ERROR_LOG = "error.log"
 
     # Redis
-    REDIS_ENABLED = True
+    REDIS_ENABLED = False
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     REDIS_DB = 0
 
-    ## FlaskBB Configs
-    # Default style
-    DEFAULT_THEME = "bootstrap3"
-
-    # Your project name with a subtitle
-    PROJECT_TITLE = "FlaskBB"
-    PROJECT_SUBTITLE = "A lightweight forum software in flask"
-
-    # Pagination
-    # How many posts per page are displayed
-    POSTS_PER_PAGE = 10
-    # How many topics per page are displayed
-    TOPICS_PER_PAGE = 10
-    # How many users per page are displayed.
-    # This affects mainly the memberlist
-    USERS_PER_PAGE = 10
-
-    # How long (in minutes) a user needs to be inactive
-    # to be shown as offline.
-    ONLINE_LAST_MINUTES = 15
-    # The length of the topic title in characters on the index
-    TITLE_LENGTH = 15
-
-    # The days for how long the forum should deal with unread topics
-    # 0 - Disable it
-    TRACKER_LENGTH = 7
-
-    # URL Prefixes. For example if you do not want a prefix for your forum,
-    # you can easily change "FORUM_URL_PREFIX" to "/"
-    FORUM_URL_PREFIX = "/forum"
+    # URL Prefixes.
+    FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"

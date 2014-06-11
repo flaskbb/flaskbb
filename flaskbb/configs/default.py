@@ -81,33 +81,7 @@ class DefaultConfig(object):
     REDIS_PORT = 6379
     REDIS_DB = 0
 
-    ## App specific configs
-    # Pagination
-    # How many posts per page are displayed
-    POSTS_PER_PAGE = 10
-    # How many topics per page are displayed
-    TOPICS_PER_PAGE = 10
-    # How many users per page are displayed.
-    # This affects mainly the memberlist
-    USERS_PER_PAGE = 10
-
-    # How long the use can be inactive before he is marked as offline
-    ONLINE_LAST_MINUTES = 15
-    # The length of the topic title in characters on the index
-    TITLE_LENGTH = 15
-
-    # The days for how long the forum should deal with unread topics
-    # 0 - Disable it
-    TRACKER_LENGTH = 7
-
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
-
-    # Default style
-    DEFAULT_THEME = "bootstrap3"
-
-    # Your project name with a subtitle
-    PROJECT_TITLE = "FlaskBB"
-    PROJECT_SUBTITLE = "A lightweight forum software in flask"
