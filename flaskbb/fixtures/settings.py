@@ -8,6 +8,11 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flask.ext.themes2 import get_themes_list
+
+
+def available_themes():
+    return [(theme.identifier, theme.name) for theme in get_themes_list()]
 
 fixture = (
     # Settings Group
@@ -84,7 +89,7 @@ fixture = (
             ('default_theme', {
                 'value':        "bootstrap3",
                 'value_type':   "select",
-                'extra':        {'choices': None},
+                'extra':        {'choices': available_themes},
                 'name':         "Default theme",
                 'description':  "Change the default theme for your forum."
             }),

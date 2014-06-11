@@ -3,10 +3,17 @@ from flask.ext.plugins import connect_event
 from flaskbb.plugins import FlaskBBPlugin
 from flaskbb.utils.populate import (create_settings_from_fixture,
                                     delete_settings_from_fixture)
+from flaskbb.forum.models import Forum
+
 from .views import portal, inject_portal_link
 
 __version__ = "0.1"
 __plugin__ = "PortalPlugin"
+
+
+def available_forums():
+    forums = Forum.query.order_by(Forum.id.asc()).all()
+    return [(forum.id, forum.title) for forum in forums]
 
 fixture = (
     ('plugin_portal', {
@@ -14,11 +21,11 @@ fixture = (
         "description": "Configure the portal",
         "settings": (
             ('plugin_portal_forum_ids', {
-                'value':        "1",
-                'value_type':   "array",
-                'input_type':   "array",
+                'value':        [1],
+                'value_type':   "selectmultiple",
                 'name':         "Forum IDs",
-                'description':  "The forum ids from which forums the posts should be displayed on the portal."
+                'description':  "The forum ids from which forums the posts should be displayed on the portal.",
+                'extra': {"choices": available_forums, "coerce": int}
             }),
         ),
     }),
