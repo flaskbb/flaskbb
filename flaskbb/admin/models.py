@@ -1,9 +1,3 @@
-import base64
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 from wtforms import (TextField, IntegerField, BooleanField, SelectField,
                      FloatField, validators)
 from flask.ext.wtf import Form
@@ -90,7 +84,7 @@ class Setting(db.Model):
     input_type = db.Column(db.String, nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
-    _extra = db.Column("extra", db.String)
+    extra = db.Column(db.PickleType)
 
     # Properties
     @property
@@ -100,16 +94,6 @@ class Setting(db.Model):
     @value.setter
     def value(self, value):
         self._value = normalize_to(value, self.value_type, reverse=True)
-
-    @property
-    def extra(self):
-        return pickle.loads(base64.decodestring(self._extra))
-
-    @extra.setter
-    def extra(self, extra):
-        self._extra = base64.encodestring(
-            pickle.dumps((extra), pickle.HIGHEST_PROTOCOL)
-        )
 
     @classmethod
     def get_form(cls, group):
