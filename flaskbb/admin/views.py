@@ -201,6 +201,8 @@ def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.uninstallable:
         plugin.uninstall()
+        Setting.invalidate_cache()
+
         flash("Plugin {} has been uninstalled.".format(plugin.name), "success")
     else:
         flash("Cannot uninstall Plugin {}".format(plugin.name), "danger")
@@ -213,6 +215,7 @@ def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.installable and not plugin.uninstallable:
         plugin.install()
+        Setting.invalidate_cache()
         flash("Plugin {} has been installed.".format(plugin.name), "success")
     else:
         flash("Cannot install Plugin {}".format(plugin.name), "danger")
