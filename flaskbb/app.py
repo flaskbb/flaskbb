@@ -21,7 +21,7 @@ from flaskbb.user.models import User, Guest, PrivateMessage
 # Import the auth blueprint
 from flaskbb.auth.views import auth
 # Import the admin blueprint
-from flaskbb.admin.views import admin
+from flaskbb.management.views import management
 # Import the forum blueprint
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
@@ -70,7 +70,7 @@ def configure_blueprints(app):
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
     app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
-    app.register_blueprint(admin, url_prefix=app.config["ADMIN_URL_PREFIX"])
+    app.register_blueprint(management, url_prefix=app.config["ADMIN_URL_PREFIX"])
 
 
 def configure_extensions(app):

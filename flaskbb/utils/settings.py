@@ -11,7 +11,7 @@
 """
 import collections
 
-from flaskbb.admin.models import Setting
+from flaskbb.management.models import Setting
 
 
 class FlaskBBConfig(collections.MutableMapping):

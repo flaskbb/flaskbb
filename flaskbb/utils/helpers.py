@@ -15,7 +15,7 @@ import operator
 from unicodedata import normalize
 from datetime import datetime, timedelta
 
-from flask import current_app, session
+from flask import session
 from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 

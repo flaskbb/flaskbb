@@ -1,5 +1,5 @@
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme('macros.html') import render_pagination %}
 
 <legend>Manage Plugins</legend>
@@ -23,18 +23,18 @@
             </td>
             <td>
                 {% if not plugin.enabled %}
-                <a href="{{ url_for('admin.enable_plugin', plugin=plugin.identifier) }}">Enable</a>
+                <a href="{{ url_for('management.enable_plugin', plugin=plugin.identifier) }}">Enable</a>
                 {% else %}
-                <a href="{{ url_for('admin.disable_plugin', plugin=plugin.identifier) }}">Disable</a>
+                <a href="{{ url_for('management.disable_plugin', plugin=plugin.identifier) }}">Disable</a>
                 {% endif %}
 
                 {% set uninstallable = plugin.uninstallable %}
                 {% if plugin.installable and not uninstallable %}
                 <br />
-                <a href="{{ url_for('admin.install_plugin', plugin=plugin.identifier) }}">Install</a>
+                <a href="{{ url_for('management.install_plugin', plugin=plugin.identifier) }}">Install</a>
                 {% endif %}
                 {% if uninstallable %}
-                <a href="{{ url_for('admin.uninstall_plugin', plugin=plugin.identifier) }}">Uninstall</a>
+                <a href="{{ url_for('management.uninstall_plugin', plugin=plugin.identifier) }}">Uninstall</a>
                 {% endif %}
             </td>
         </tr>

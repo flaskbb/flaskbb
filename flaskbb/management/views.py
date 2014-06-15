@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.admin.views
-    ~~~~~~~~~~~~~~~~~~~
+    flaskbb.management.views
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module handles the admin views.
+    This module handles the management views.
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
@@ -25,23 +25,23 @@ from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
-from flaskbb.admin.models import Setting, SettingsGroup
-from flaskbb.admin.forms import (AddUserForm, EditUserForm, AddGroupForm,
-                                 EditGroupForm, EditForumForm, AddForumForm,
-                                 CategoryForm)
+from flaskbb.management.models import Setting, SettingsGroup
+from flaskbb.management.forms import (AddUserForm, EditUserForm, AddGroupForm,
+                                      EditGroupForm, EditForumForm,
+                                      AddForumForm, CategoryForm)
 
 
-admin = Blueprint("admin", __name__)
+management = Blueprint("management", __name__)
 
 
-@admin.route("/")
+@management.route("/")
 @admin_required
 def overview():
     python_version = "%s.%s" % (sys.version_info[0], sys.version_info[1])
     user_count = User.query.count()
     topic_count = Topic.query.count()
     post_count = Post.query.count()
-    return render_template("admin/overview.html",
+    return render_template("management/overview.html",
                            python_version=python_version,
                            flask_version=flask_version,
                            flaskbb_version=flaskbb_version,
@@ -50,8 +50,8 @@ def overview():
                            post_count=post_count)
 
 
-@admin.route("/settings", methods=["GET", "POST"])
-@admin.route("/settings/<path:slug>", methods=["GET", "POST"])
+@management.route("/settings", methods=["GET", "POST"])
+@management.route("/settings/<path:slug>", methods=["GET", "POST"])
 @admin_required
 def settings(slug=None):
     slug = slug if slug else "general"
@@ -87,11 +87,11 @@ def settings(slug=None):
             except (KeyError, ValueError):
                 pass
 
-    return render_template("admin/settings.html", form=form,
+    return render_template("management/settings.html", form=form,
                            all_groups=all_groups, active_group=active_group)
 
 
-@admin.route("/users", methods=['GET', 'POST'])
+@management.route("/users", methods=['GET', 'POST'])
 @admin_required
 def users():
     page = request.args.get("page", 1, type=int)
@@ -100,17 +100,17 @@ def users():
     if search_form.validate():
         users = search_form.get_results().\
             paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-        return render_template("admin/users.html", users=users,
+        return render_template("management/users.html", users=users,
                                search_form=search_form)
 
     users = User.query. \
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-    return render_template("admin/users.html", users=users,
+    return render_template("management/users.html", users=users,
                            search_form=search_form)
 
 
-@admin.route("/groups")
+@management.route("/groups")
 @admin_required
 def groups():
     page = request.args.get("page", 1, type=int)
@@ -118,17 +118,17 @@ def groups():
     groups = Group.query.\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-    return render_template("admin/groups.html", groups=groups)
+    return render_template("management/groups.html", groups=groups)
 
 
-@admin.route("/forums")
+@management.route("/forums")
 @admin_required
 def forums():
     categories = Category.query.order_by(Category.position.asc()).all()
-    return render_template("admin/forums.html", categories=categories)
+    return render_template("management/forums.html", categories=categories)
 
 
-@admin.route("/reports")
+@management.route("/reports")
 @admin_required
 def reports():
     page = request.args.get("page", 1, type=int)
@@ -136,17 +136,17 @@ def reports():
         order_by(Report.id.asc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-    return render_template("admin/reports.html", reports=reports)
+    return render_template("management/reports.html", reports=reports)
 
 
-@admin.route("/plugins")
+@management.route("/plugins")
 @admin_required
 def plugins():
     plugins = get_all_plugins()
-    return render_template("admin/plugins.html", plugins=plugins)
+    return render_template("management/plugins.html", plugins=plugins)
 
 
-@admin.route("/plugins/enable/<plugin>")
+@management.route("/plugins/enable/<plugin>")
 def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if not plugin.enabled:
@@ -167,16 +167,16 @@ def enable_plugin(plugin):
     else:
         flash("Plugin is not enabled", "danger")
 
-    return redirect(url_for("admin.plugins"))
+    return redirect(url_for("management.plugins"))
 
 
-@admin.route("/plugins/disable/<plugin>")
+@management.route("/plugins/disable/<plugin>")
 def disable_plugin(plugin):
     try:
         plugin = get_plugin(plugin)
     except KeyError:
         flash("Plugin {} not found".format(plugin), "danger")
-        return redirect(url_for("admin.plugins"))
+        return redirect(url_for("management.plugins"))
 
     plugin_dir = os.path.join(
         os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
@@ -193,10 +193,10 @@ def disable_plugin(plugin):
           "support writting on the disk, this won't work - than you need to "
           "create a 'DISABLED' file by yourself.", "info")
 
-    return redirect(url_for("admin.plugins"))
+    return redirect(url_for("management.plugins"))
 
 
-@admin.route("/plugins/uninstall/<plugin>")
+@management.route("/plugins/uninstall/<plugin>")
 def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.uninstallable:
@@ -207,23 +207,24 @@ def uninstall_plugin(plugin):
     else:
         flash("Cannot uninstall Plugin {}".format(plugin.name), "danger")
 
-    return redirect(url_for("admin.plugins"))
+    return redirect(url_for("management.plugins"))
 
 
-@admin.route("/plugins/install/<plugin>")
+@management.route("/plugins/install/<plugin>")
 def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.installable and not plugin.uninstallable:
         plugin.install()
         Setting.invalidate_cache()
+
         flash("Plugin {} has been installed.".format(plugin.name), "success")
     else:
         flash("Cannot install Plugin {}".format(plugin.name), "danger")
 
-    return redirect(url_for("admin.plugins"))
+    return redirect(url_for("management.plugins"))
 
 
-@admin.route("/reports/unread")
+@management.route("/reports/unread")
 @admin_required
 def unread_reports():
     page = request.args.get("page", 1, type=int)
@@ -232,11 +233,11 @@ def unread_reports():
         order_by(Report.id.desc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-    return render_template("admin/unread_reports.html", reports=reports)
+    return render_template("management/unread_reports.html", reports=reports)
 
 
-@admin.route("/reports/<int:report_id>/markread")
-@admin.route("/reports/markread")
+@management.route("/reports/<int:report_id>/markread")
+@management.route("/reports/markread")
 @admin_required
 def report_markread(report_id=None):
     # mark single report as read
@@ -245,13 +246,13 @@ def report_markread(report_id=None):
         report = Report.query.filter_by(id=report_id).first_or_404()
         if report.zapped:
             flash("Report %s is already marked as read" % report.id, "success")
-            return redirect(url_for("admin.reports"))
+            return redirect(url_for("management.reports"))
 
         report.zapped_by = current_user.id
         report.zapped = datetime.utcnow()
         report.save()
         flash("Report %s marked as read" % report.id, "success")
-        return redirect(url_for("admin.reports"))
+        return redirect(url_for("management.reports"))
 
     # mark all as read
     reports = Report.query.filter(Report.zapped == None).all()
@@ -265,10 +266,10 @@ def report_markread(report_id=None):
     db.session.commit()
 
     flash("All reports were marked as read", "success")
-    return redirect(url_for("admin.reports"))
+    return redirect(url_for("management.reports"))
 
 
-@admin.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@management.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
@@ -291,7 +292,7 @@ def edit_user(user_id):
         user.save(groups=form.secondary_groups.data)
 
         flash("User successfully edited", "success")
-        return redirect(url_for("admin.edit_user", user_id=user.id))
+        return redirect(url_for("management.edit_user", user_id=user.id))
     else:
         form.username.data = user.username
         form.email.data = user.email
@@ -305,33 +306,33 @@ def edit_user(user_id):
         form.primary_group.data = user.primary_group
         form.secondary_groups.data = user.secondary_groups
 
-    return render_template("admin/user_form.html", form=form,
+    return render_template("management/user_form.html", form=form,
                            title="Edit User")
 
 
-@admin.route("/users/<int:user_id>/delete")
+@management.route("/users/<int:user_id>/delete")
 @admin_required
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     user.delete()
     flash("User successfully deleted", "success")
-    return redirect(url_for("admin.users"))
+    return redirect(url_for("management.users"))
 
 
-@admin.route("/users/add", methods=["GET", "POST"])
+@management.route("/users/add", methods=["GET", "POST"])
 @admin_required
 def add_user():
     form = AddUserForm()
     if form.validate_on_submit():
         form.save()
         flash("User successfully added.", "success")
-        return redirect(url_for("admin.users"))
+        return redirect(url_for("management.users"))
 
-    return render_template("admin/user_form.html", form=form,
+    return render_template("management/user_form.html", form=form,
                            title="Add User")
 
 
-@admin.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
+@management.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
@@ -342,7 +343,7 @@ def edit_group(group_id):
         group.save()
 
         flash("Group successfully edited.", "success")
-        return redirect(url_for("admin.groups", group_id=group.id))
+        return redirect(url_for("management.groups", group_id=group.id))
     else:
         form.name.data = group.name
         form.description.data = group.description
@@ -357,33 +358,33 @@ def edit_group(group_id):
         form.posttopic.data = group.posttopic
         form.postreply.data = group.postreply
 
-    return render_template("admin/group_form.html", form=form,
+    return render_template("management/group_form.html", form=form,
                            title="Edit Group")
 
 
-@admin.route("/groups/<int:group_id>/delete")
+@management.route("/groups/<int:group_id>/delete")
 @admin_required
 def delete_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
     group.delete()
     flash("Group successfully deleted.", "success")
-    return redirect(url_for("admin.groups"))
+    return redirect(url_for("management.groups"))
 
 
-@admin.route("/groups/add", methods=["GET", "POST"])
+@management.route("/groups/add", methods=["GET", "POST"])
 @admin_required
 def add_group():
     form = AddGroupForm()
     if form.validate_on_submit():
         form.save()
         flash("Group successfully added.", "success")
-        return redirect(url_for("admin.groups"))
+        return redirect(url_for("management.groups"))
 
-    return render_template("admin/group_form.html", form=form,
+    return render_template("management/group_form.html", form=form,
                            title="Add Group")
 
 
-@admin.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
+@management.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -394,7 +395,7 @@ def edit_forum(forum_id):
         forum.save(moderators=form.moderators.data)
 
         flash("Forum successfully edited.", "success")
-        return redirect(url_for("admin.edit_forum", forum_id=forum.id))
+        return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         form.title.data = forum.title
         form.description.data = forum.description
@@ -410,11 +411,11 @@ def edit_forum(forum_id):
         else:
             form.moderators.data = None
 
-    return render_template("admin/forum_form.html", form=form,
+    return render_template("management/forum_form.html", form=form,
                            title="Edit Forum")
 
 
-@admin.route("/forums/<int:forum_id>/delete")
+@management.route("/forums/<int:forum_id>/delete")
 @admin_required
 def delete_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -425,11 +426,11 @@ def delete_forum(forum_id):
     forum.delete(involved_users)
 
     flash("Forum successfully deleted.", "success")
-    return redirect(url_for("admin.forums"))
+    return redirect(url_for("management.forums"))
 
 
-@admin.route("/forums/add", methods=["GET", "POST"])
-@admin.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
+@management.route("/forums/add", methods=["GET", "POST"])
+@management.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
 @admin_required
 def add_forum(category_id=None):
     form = AddForumForm()
@@ -437,17 +438,17 @@ def add_forum(category_id=None):
     if form.validate_on_submit():
         form.save()
         flash("Forum successfully added.", "success")
-        return redirect(url_for("admin.forums"))
+        return redirect(url_for("management.forums"))
     else:
         if category_id:
             category = Category.query.filter_by(id=category_id).first()
             form.category.data = category
 
-    return render_template("admin/forum_form.html", form=form,
+    return render_template("management/forum_form.html", form=form,
                            title="Add Forum")
 
 
-@admin.route("/category/add", methods=["GET", "POST"])
+@management.route("/category/add", methods=["GET", "POST"])
 @admin_required
 def add_category():
     form = CategoryForm()
@@ -455,13 +456,13 @@ def add_category():
     if form.validate_on_submit():
         form.save()
         flash("Category successfully created.", "success")
-        return redirect(url_for("admin.forums"))
+        return redirect(url_for("management.forums"))
 
-    return render_template("admin/category_form.html", form=form,
+    return render_template("management/category_form.html", form=form,
                            title="Add Category")
 
 
-@admin.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
+@management.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
@@ -476,11 +477,11 @@ def edit_category(category_id):
         form.description.data = category.description
         form.position.data = category.position
 
-    return render_template("admin/category_form.html", form=form,
+    return render_template("management/category_form.html", form=form,
                            title="Edit Category")
 
 
-@admin.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
+@management.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
 @admin_required
 def delete_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
@@ -491,4 +492,4 @@ def delete_category(category_id):
 
     category.delete(involved_users)
     flash("Category with all associated forums deleted.", "success")
-    return redirect(url_for("admin.forums"))
+    return redirect(url_for("management.forums"))

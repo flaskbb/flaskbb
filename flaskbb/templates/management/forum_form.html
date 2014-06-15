@@ -1,15 +1,15 @@
 {% set page_title = title %}
 {% set active_admin_forum_nav=True %}
 
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme("macros.html") import horizontal_field, render_boolean_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('admin.forums', "Manage Forums") }}
-        {{ navlink('admin.add_forum', "Add Forum") }}
-        {{ navlink('admin.add_category', "Add Category") }}
+        {{ navlink('management.forums', "Manage Forums") }}
+        {{ navlink('management.add_forum', "Add Forum") }}
+        {{ navlink('management.add_category', "Add Category") }}
     </ul>
 </div>
 
@@ -20,7 +20,15 @@
             {{ horizontal_field(form.title) }}
             {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
 
+            {{ horizontal_field(form.category) }}
             {{ horizontal_field(form.position) }}
+
+            {{ horizontal_field(form.external) }}
+
+            {{ horizontal_field(form.moderators) }}
+            {{ render_boolean_field(form.show_moderators) }}
+
+            {{ render_boolean_field(form.locked) }}
 
             <div class="form-group">
                 <div class="col-lg-offset-0 col-lg-9">
@@ -29,5 +37,4 @@
             </div>
     </form>
 </div>
-
 {% endblock %}

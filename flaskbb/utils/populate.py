@@ -10,7 +10,7 @@
 """
 from datetime import datetime
 
-from flaskbb.admin.models import Setting, SettingsGroup
+from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 

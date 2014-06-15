@@ -1,13 +1,13 @@
 {% set active_admin_report_nav=True %}
 
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme('macros.html') import render_pagination, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('admin.unread_reports', "Show unread reports") }}
-        {{ navlink('admin.reports', "Show all reports") }}
+        {{ navlink('management.unread_reports', "Show unread reports") }}
+        {{ navlink('management.reports', "Show all reports") }}
     </ul>
 </div>
 
@@ -15,7 +15,7 @@
     <legend>Unread Reports</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
-        {{ render_pagination(reports, url_for('admin.unread_reports')) }}
+        {{ render_pagination(reports, url_for('management.unread_reports')) }}
     </div>
 
     <table class="table table-bordered">
@@ -27,7 +27,7 @@
                 <th>Reporter</th>
                 <th>Reason</th>
                 <th>Reported</th>
-                <th><a href="{{ url_for('admin.report_markread') }}">Mark all as Read</a></th>
+                <th><a href="{{ url_for('management.report_markread') }}">Mark all as Read</a></th>
             </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
                 <td>{{ report.reason }}</td>
                 <td>{{ report.reported|time_since }}</td>
                 <td>
-                    <a href="{{ url_for('admin.report_markread', report_id=report.id) }}">Mark as Read</a>
+                    <a href="{{ url_for('management.report_markread', report_id=report.id) }}">Mark as Read</a>
                 </td>
             </tr>
             {% else %}

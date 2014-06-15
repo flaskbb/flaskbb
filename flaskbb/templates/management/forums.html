@@ -1,12 +1,12 @@
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme('macros.html') import render_pagination, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('admin.forums', "Manage Forums") }}
-        {{ navlink('admin.add_forum', "Add Forum") }}
-        {{ navlink('admin.add_category', "Add Category") }}
+        {{ navlink('management.forums', "Manage Forums") }}
+        {{ navlink('management.add_forum', "Add Forum") }}
+        {{ navlink('management.add_category', "Add Category") }}
     </ul>
 </div>
 
@@ -22,9 +22,9 @@
                     <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
                 </td>
                 <td valign="top" align="center" style="white-space: nowrap">
-                    <a href="{{ url_for('admin.add_forum', category_id=category.id) }}">Add Forum</a> |
-                    <a href="{{ url_for('admin.edit_category', category_id = category.id) }}">Edit</a> |
-                    <a href="{{ url_for('admin.delete_category', category_id = category.id) }}">Delete</a>
+                    <a href="{{ url_for('management.add_forum', category_id=category.id) }}">Add Forum</a> |
+                    <a href="{{ url_for('management.edit_category', category_id = category.id) }}">Edit</a> |
+                    <a href="{{ url_for('management.delete_category', category_id = category.id) }}">Delete</a>
                 </td>
             </tr>
         </thead>
@@ -51,8 +51,8 @@
                 </td>
 
                 <td valign="top" align="center" style="white-space: nowrap">
-                    <a href="{{ url_for('admin.edit_forum', forum_id = forum.id) }}">Edit</a> |
-                    <a href="{{ url_for('admin.delete_forum', forum_id = forum.id) }}">Delete</a>
+                    <a href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">Edit</a> |
+                    <a href="{{ url_for('management.delete_forum', forum_id = forum.id) }}">Delete</a>
                 </td>
             </tr>
             {% endfor %}

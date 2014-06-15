@@ -1,11 +1,11 @@
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme('macros.html') import render_pagination, render_field, group_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('admin.users', "Manage Users") }}
-        {{ navlink('admin.add_user', "Add User") }}
+        {{ navlink('management.users', "Manage Users") }}
+        {{ navlink('management.add_user', "Add User") }}
     </ul>
 </div><!--/.col-md-3 -->
 
@@ -13,7 +13,7 @@
     <legend>Manage Users</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
-        {{ render_pagination(users, url_for('admin.users')) }}
+        {{ render_pagination(users, url_for('management.users')) }}
     </div>
     <div class="pull-right" style="padding-bottom: 10px">
         <form role="form" method="post">
@@ -47,8 +47,8 @@
                     <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
                     <td>{{ user.primary_group.name }}</td>
                     <td>
-                        <a href="{{ url_for('admin.edit_user', user_id = user.id) }}">Edit</a> |
-                        <a href="{{ url_for('admin.delete_user', user_id = user.id) }}">Delete</a>
+                        <a href="{{ url_for('management.edit_user', user_id = user.id) }}">Edit</a> |
+                        <a href="{{ url_for('management.delete_user', user_id = user.id) }}">Delete</a>
                     </td>
                 </tr>
             {% else %}

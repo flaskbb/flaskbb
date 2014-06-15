@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.admin.forms
+    flaskbb.management.forms
     ~~~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the admin views.
+    It provides the forms that are needed for the management views.
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.

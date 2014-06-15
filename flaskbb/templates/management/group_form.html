@@ -1,14 +1,14 @@
 {% set page_title = title %}
 {% set active_admin_group_nav=True %}
 
-{% extends theme("admin/admin_layout.html") %}
-{% block admin_content %}
+{% extends theme("management/management_layout.html") %}
+{% block management_content %}
 {% from theme("macros.html") import horizontal_field, render_boolean_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('admin.groups', "Manage Groups") }}
-        {{ navlink('admin.add_group', "Add Group") }}
+        {{ navlink('management.groups', "Manage Groups") }}
+        {{ navlink('management.add_group', "Add Group") }}
     </ul>
 </div>
 
