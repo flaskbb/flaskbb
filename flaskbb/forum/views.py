@@ -21,8 +21,7 @@ from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import get_online_users, time_diff, render_template
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
-                                       can_edit_post, can_lock_topic,
-                                       can_move_topic)
+                                       can_edit_post)
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
@@ -186,7 +185,9 @@ def delete_topic(topic_id, slug=None):
 def lock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_lock_topic(user=current_user, forum=topic.forum):
+    # TODO: Bulk lock
+
+    if not can_moderate(user=current_user, forum=topic.forum):
         flash("Yo do not have the permissions to lock this topic", "danger")
         return redirect(topic.url)
 
@@ -201,8 +202,10 @@ def lock_topic(topic_id, slug=None):
 def unlock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
+    # TODO: Bulk unlock
+
     # Unlock is basically the same as lock
-    if not can_lock_topic(user=current_user, forum=topic.forum):
+    if not can_moderate(user=current_user, forum=topic.forum):
         flash("Yo do not have the permissions to unlock this topic", "danger")
         return redirect(topic.url)
 
@@ -218,6 +221,12 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
+    # TODO: Bulk move
+
+    if not can_moderate(user=current_user, forum=topic.forum):
+        flash("Yo do not have the permissions to move this topic", "danger")
+        return redirect(forum.url)
+
     if not topic.move(forum):
         flash("Could not move the topic to forum %s" % forum.title, "danger")
         return redirect(topic.url)
@@ -232,6 +241,12 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
 def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
     old_topic = Topic.query.filter_by(id=old_id).first_or_404()
     new_topic = Topic.query.filter_by(id=new_id).first_or_404()
+
+    # TODO: Bulk merge
+
+    if not can_moderate(user=current_user, forum=topic.forum):
+        flash("Yo do not have the permissions to merge this topic", "danger")
+        return redirect(old_topic.url)
 
     if not old_topic.merge(new_topic):
         flash("Could not merge the topic.", "danger")
@@ -334,6 +349,8 @@ def edit_post(post_id):
 def delete_post(post_id, slug=None):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
+    # TODO: Bulk delete
+
     if not can_delete_post(user=current_user, forum=post.topic.forum,
                            post_user_id=post.user_id):
         flash("You do not have the permissions to edit this post", "danger")
@@ -363,12 +380,8 @@ def report_post(post_id):
 @forum.route("/markread")
 @forum.route("/<int:forum_id>/markread")
 @forum.route("/<int:forum_id>-<slug>/markread")
+@login_required
 def markread(forum_id=None, slug=None):
-
-    if not current_user.is_authenticated():
-        flash("You need to be logged in for that feature.", "danger")
-        return redirect(url_for("forum.index"))
-
     # Mark a single forum as read
     if forum_id:
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -439,6 +452,7 @@ def memberlist():
 
 
 @forum.route("/topictracker")
+@login_required
 def topictracker():
     page = request.args.get("page", 1, type=int)
     topics = current_user.tracked_topics.\
@@ -454,6 +468,7 @@ def topictracker():
 
 @forum.route("/topictracker/<topic_id>/add")
 @forum.route("/topictracker/<topic_id>-<slug>/add")
+@login_required
 def track_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.track_topic(topic)
@@ -463,6 +478,7 @@ def track_topic(topic_id, slug=None):
 
 @forum.route("/topictracker/<topic_id>/delete")
 @forum.route("/topictracker/<topic_id>-<slug>/delete")
+@login_required
 def untrack_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     current_user.untrack_topic(topic)
