@@ -19,6 +19,7 @@ from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.forum.forms import UserSearchForm
+from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required
 from flaskbb.extensions import db
@@ -98,12 +99,12 @@ def users():
 
     if search_form.validate():
         users = search_form.get_results().\
-            paginate(page, current_app.config['USERS_PER_PAGE'], False)
+            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
         return render_template("admin/users.html", users=users,
                                search_form=search_form)
 
     users = User.query. \
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("admin/users.html", users=users,
                            search_form=search_form)
@@ -115,7 +116,7 @@ def groups():
     page = request.args.get("page", 1, type=int)
 
     groups = Group.query.\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("admin/groups.html", groups=groups)
 
@@ -133,7 +134,7 @@ def reports():
     page = request.args.get("page", 1, type=int)
     reports = Report.query.\
         order_by(Report.id.asc()).\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("admin/reports.html", reports=reports)
 
@@ -200,6 +201,8 @@ def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.uninstallable:
         plugin.uninstall()
+        Setting.invalidate_cache()
+
         flash("Plugin {} has been uninstalled.".format(plugin.name), "success")
     else:
         flash("Cannot uninstall Plugin {}".format(plugin.name), "danger")
@@ -212,6 +215,7 @@ def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.installable and not plugin.uninstallable:
         plugin.install()
+        Setting.invalidate_cache()
         flash("Plugin {} has been installed.".format(plugin.name), "success")
     else:
         flash("Cannot install Plugin {}".format(plugin.name), "danger")
@@ -226,7 +230,7 @@ def unread_reports():
     reports = Report.query.\
         filter(Report.zapped == None).\
         order_by(Report.id.desc()).\
-        paginate(page, current_app.config['USERS_PER_PAGE'], False)
+        paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("admin/unread_reports.html", reports=reports)
 

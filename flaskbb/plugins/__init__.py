@@ -6,17 +6,20 @@ from flaskbb.management.models import SettingsGroup
 
 class FlaskBBPlugin(Plugin):
 
-    #: Set this to true if the plugin needs to install additional things
+    #: This is the :class:`SettingsGroup` key - if your the plugin needs to install
+    #: additional things you must set it, else it won't install anything.
     settings_key = None
 
     @property
     def installable(self):
+        """Is ``True`` if the Plugin can be installed."""
         if self.settings_key is not None:
             return True
         return False
 
     @property
     def uninstallable(self):
+        """Is ``True`` if the Plugin can be uninstalled."""
         if self.installable:
             group = SettingsGroup.query.filter_by(key=self.settings_key).first()
             if group and len(group.settings.all()) > 0:
