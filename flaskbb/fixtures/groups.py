@@ -25,9 +25,8 @@ fixture = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
+        'mod_edituser': True,
+        'mod_banuser': True,
     }),
     ('Super Moderator', {
         'description': 'The Super Moderator Group',
@@ -41,9 +40,8 @@ fixture = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
+        'mod_edituser': True,
+        'mod_banuser': True,
     }),
     ('Moderator', {
         'description': 'The Moderator Group',
@@ -57,9 +55,8 @@ fixture = OrderedDict((
         'deletetopic': True,
         'posttopic': True,
         'postreply': True,
-        'locktopic': True,
-        'movetopic': True,
-        'mergetopic': True
+        'mod_edituser': True,
+        'mod_banuser': True,
     }),
     ('Member', {
         'description': 'The Member Group',
@@ -73,9 +70,8 @@ fixture = OrderedDict((
         'deletetopic': False,
         'posttopic': True,
         'postreply': True,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
+        'mod_edituser': False,
+        'mod_banuser': False,
     }),
     ('Banned', {
         'description': 'The Banned Group',
@@ -89,9 +85,8 @@ fixture = OrderedDict((
         'deletetopic': False,
         'posttopic': False,
         'postreply': False,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
+        'mod_edituser': False,
+        'mod_banuser': False,
     }),
     ('Guest', {
         'description': 'The Guest Group',
@@ -105,8 +100,7 @@ fixture = OrderedDict((
         'deletetopic': False,
         'posttopic': False,
         'postreply': False,
-        'locktopic': False,
-        'movetopic': False,
-        'mergetopic': False
+        'mod_edituser': False,
+        'mod_banuser': False,
     })
 ))

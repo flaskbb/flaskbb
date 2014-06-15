@@ -1,3 +1,5 @@
+{% set page_title = active_group.name %}
+
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
 {% from theme('macros.html') import render_boolean_field, render_select_field, render_field, navlink with context %}

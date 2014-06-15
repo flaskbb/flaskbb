@@ -1,5 +1,5 @@
 {% set page_title = title %}
-{% set active_admin_user_nav=True %}
+{% set active_management_user_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
@@ -8,7 +8,11 @@
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
         {{ navlink('management.users', "Manage Users") }}
-        {{ navlink('management.add_user', "Add User") }}
+        {{ navlink('management.banned_users', 'Banned Users') }}
+
+        {% if current_user|is_admin %}
+            {{ navlink('management.add_user', "Add User") }}
+        {% endif %}
     </ul>
 </div><!--/.col-md-3 -->
 

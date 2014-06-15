@@ -1,4 +1,4 @@
-{% set page_title = "Users" %}
+{% set page_title = "Banned Users" %}
 {% set active_management_user_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
@@ -17,11 +17,11 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-    <legend>Manage Users</legend>
+    <legend>Banned Users</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
         {{ render_pagination(users, url_for('management.users')) }}
-    </div><!-- /.col-pull-left -->
+    </div>
     <div class="pull-right" style="padding-bottom: 10px">
         <form role="form" method="post">
             <div class="input-group">
@@ -54,12 +54,12 @@
                     <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
                     <td>{{ user.primary_group.name }}</td>
                     <td>
-                        {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
-                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">Edit</a>
+                        {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                            <a href="{{ url_for('management.ban_user', user_id = user.id) }}">Ban</a>
                         {% endif %}
 
-                        {% if current_user|is_admin %}
-                            | <a href="{{ url_for('management.delete_user', user_id = user.id) }}">Delete</a>
+                        {% if current_user|can_ban_user and user.permissions['banned'] %}
+                            <a href="{{ url_for('management.unban_user', user_id = user.id) }}">Unban</a>
                         {% endif %}
                     </td>
                 </tr>

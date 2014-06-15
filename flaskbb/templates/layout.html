@@ -66,7 +66,7 @@
                                 <li class="divider"></li>
 
                                 <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs"></span> Settings</a></li>
-                                {% if current_user.permissions['admin'] %}
+                                {% if current_user|is_admin_or_moderator %}
                                 <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog"></span>Management</a></li>
                                 <li class="divider"></li>
                                 {% endif %}

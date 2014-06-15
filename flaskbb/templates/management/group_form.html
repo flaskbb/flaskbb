@@ -1,5 +1,5 @@
 {% set page_title = title %}
-{% set active_admin_group_nav=True %}
+{% set active_management_group_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
@@ -26,6 +26,9 @@
             {{ render_boolean_field(form.mod) }}
             {{ render_boolean_field(form.banned) }}
             {{ render_boolean_field(form.guest) }}
+
+            {{ render_boolean_field(form.mod_edituser) }}
+            {{ render_boolean_field(form.mod_banuser) }}
 
             {{ render_boolean_field(form.editpost) }}
             {{ render_boolean_field(form.deletepost) }}

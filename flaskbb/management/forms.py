@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.management.forms
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
     It provides the forms that are needed for the management views.
 
@@ -178,6 +178,17 @@ class GroupForm(Form):
     postreply = BooleanField(
         "Can post replies",
         description="Check this is the users in this group can post replies"
+    )
+
+    mod_edituser = BooleanField(
+        "Moderators can edit user profiles",
+        description=("Allow moderators to edit a another users profile "
+                     "including password and email changes.")
+    )
+
+    mod_banuser = BooleanField(
+        "Moderators can ban users",
+        description="Allow moderators to ban other users"
     )
 
     def validate_name(self, field):

@@ -35,8 +35,8 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     render_template
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
-    can_delete_topic, can_delete_post, can_edit_post, can_lock_topic, \
-    can_move_topic
+    can_delete_topic, can_delete_post, can_edit_post, can_edit_user, \
+    can_ban_user, is_admin, is_moderator, is_admin_or_moderator
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
@@ -149,10 +149,15 @@ def configure_template_filters(app):
     app.jinja_env.filters['edit_post'] = can_edit_post
     app.jinja_env.filters['delete_post'] = can_delete_post
     app.jinja_env.filters['delete_topic'] = can_delete_topic
-    app.jinja_env.filters['move_topic'] = can_move_topic
-    app.jinja_env.filters['lock_topic'] = can_lock_topic
     app.jinja_env.filters['post_reply'] = can_post_reply
     app.jinja_env.filters['post_topic'] = can_post_topic
+    # Moderator permission filters
+    app.jinja_env.filters['is_admin'] = is_admin
+    app.jinja_env.filters['is_moderator'] = is_moderator
+    app.jinja_env.filters['is_admin_or_moderator'] = is_admin_or_moderator
+
+    app.jinja_env.filters['can_edit_user'] = can_edit_user
+    app.jinja_env.filters['can_ban_user'] = can_ban_user
 
 
 def configure_context_processors(app):
@@ -181,10 +186,6 @@ def configure_before_handlers(app):
             current_user.lastseen = datetime.datetime.utcnow()
             db.session.add(current_user)
             db.session.commit()
-
-    @app.before_request
-    def get_user_permissions():
-        current_user.permissions = current_user.get_permissions()
 
     if app.config["REDIS_ENABLED"]:
         @app.before_request

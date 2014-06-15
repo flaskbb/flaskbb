@@ -4,13 +4,16 @@
 
 <div class="col-md-12" style="padding-bottom: 10px">
     <ul class="nav nav-tabs nav-justified">
-        {{ navlink('management.overview', 'Overview') }}
+    {{ navlink('management.overview', 'Overview') }}
+    {{ navlink('management.users', 'Users', active=active_management_user_nav) }}
+    {{ navlink('management.unread_reports', 'Reports', active=active_management_report_nav) }}
+
+    {% if current_user|is_admin %}
         {{ navlink('management.settings', 'Settings') }}
-        {{ navlink('management.users', 'Users', active=active_admin_user_nav) }}
-        {{ navlink('management.groups', 'Groups', active=active_admin_group_nav) }}
-        {{ navlink('management.forums', 'Forums', active=active_admin_forum_nav) }}
-        {{ navlink('management.unread_reports', 'Reports', active=active_admin_report_nav) }}
+        {{ navlink('management.groups', 'Groups', active=active_management_group_nav) }}
+        {{ navlink('management.forums', 'Forums', active=active_management_forum_nav) }}
         {{ navlink('management.plugins', 'Plugins') }}
+    {% endif %}
     </ul>
 </div>
 

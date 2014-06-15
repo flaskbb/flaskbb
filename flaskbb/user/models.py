@@ -35,19 +35,21 @@ class Group(db.Model):
     name = db.Column(db.String(63), unique=True, nullable=False)
     description = db.Column(db.String(80))
 
-    # I bet there is a nicer way for this :P
+    # Group types
     admin = db.Column(db.Boolean, default=False, nullable=False)
     super_mod = db.Column(db.Boolean, default=False, nullable=False)
     mod = db.Column(db.Boolean, default=False, nullable=False)
     guest = db.Column(db.Boolean, default=False, nullable=False)
     banned = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Moderator permissions (only available when the user a moderator)
+    mod_edituser = db.Column(db.Boolean, default=False, nullable=False)
+    mod_banuser = db.Column(db.Boolean, default=False, nullable=False)
+
+    # User permissions
     editpost = db.Column(db.Boolean, default=True, nullable=False)
     deletepost = db.Column(db.Boolean, default=False, nullable=False)
     deletetopic = db.Column(db.Boolean, default=False, nullable=False)
-    locktopic = db.Column(db.Boolean, default=False, nullable=False)
-    movetopic = db.Column(db.Boolean, default=False, nullable=False)
-    mergetopic = db.Column(db.Boolean, default=False, nullable=False)
     posttopic = db.Column(db.Boolean, default=True, nullable=False)
     postreply = db.Column(db.Boolean, default=True, nullable=False)
 
@@ -56,7 +58,7 @@ class Group(db.Model):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {})>".format(self.__class__.__name__, self.id)
+        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     def save(self):
         """Saves a group"""
@@ -129,12 +131,16 @@ class User(db.Model, UserMixin):
         """Returns the url for the user"""
         return url_for("user.profile", username=self.username)
 
+    @property
+    def permissions(self):
+        return self.get_permissions()
+
     # Methods
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "Username: %s" % self.username
+        return "<{} {}>".format(self.__class__.__name__, self.username)
 
     def _get_password(self):
         """Returns the hashed password"""
@@ -321,6 +327,38 @@ class User(db.Model, UserMixin):
         """Invalidates this objects cached metadata."""
 
         cache.delete_memoized(self.get_permissions, self)
+
+    def ban(self):
+        """Bans the user. Returns True upon success."""
+
+        if not self.get_permissions()['banned']:
+            banned_group = Group.query.filter(
+                Group.banned == True
+            ).first()
+
+            self.primary_group_id = banned_group.id
+            self.save()
+            self.invalidate_cache()
+            return True
+        return False
+
+    def unban(self):
+        """Unbans the user. Returns True upon success."""
+
+        if self.get_permissions()['banned']:
+            member_group = Group.query.filter(
+                Group.admin == False,
+                Group.super_mod == False,
+                Group.mod == False,
+                Group.guest == False,
+                Group.banned == False
+            ).first()
+
+            self.primary_group_id = member_group.id
+            self.save()
+            self.invalidate_cache()
+            return True
+        return False
 
     def save(self, groups=None):
         """Saves a user. If a list with groups is provided, it will add those

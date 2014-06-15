@@ -23,3 +23,18 @@ def admin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated
+
+
+def moderator_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if current_user.is_anonymous():
+            abort(403)
+
+        if not any([current_user.permissions['admin'],
+                    current_user.permissions['super_mod'],
+                    current_user.permissions['mod']]):
+            abort(403)
+
+        return f(*args, **kwargs)
+    return decorated
