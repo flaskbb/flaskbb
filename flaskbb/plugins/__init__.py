@@ -6,8 +6,9 @@ from flaskbb.management.models import SettingsGroup
 
 class FlaskBBPlugin(Plugin):
 
-    #: This is the :class:`SettingsGroup` key - if your the plugin needs to install
-    #: additional things you must set it, else it won't install anything.
+    #: This is the :class:`SettingsGroup` key - if your the plugin needs to
+    #: install additional things you must set it, else it won't install
+    #: anything.
     settings_key = None
 
     @property
