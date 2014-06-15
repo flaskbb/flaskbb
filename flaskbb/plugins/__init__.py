@@ -1,7 +1,7 @@
 from flask.ext.plugins import Plugin
 from flask import current_app
 
-from flaskbb.admin.models import SettingsGroup
+from flaskbb.management.models import SettingsGroup
 
 
 class FlaskBBPlugin(Plugin):
