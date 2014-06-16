@@ -58,6 +58,11 @@
                             <a href="{{ url_for('management.edit_user', user_id = user.id) }}">Edit</a>
                         {% endif %}
 
+                        {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                            | <a href="{{ url_for('management.ban_user', user_id = user.id) }}">Ban</a>
+                        {% endif %}
+
+
                         {% if current_user|is_admin %}
                             | <a href="{{ url_for('management.delete_user', user_id = user.id) }}">Delete</a>
                         {% endif %}
