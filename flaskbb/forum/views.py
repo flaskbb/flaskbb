@@ -466,8 +466,8 @@ def topictracker():
     return render_template("forum/topictracker.html", topics=topics)
 
 
-@forum.route("/topictracker/<topic_id>/add")
-@forum.route("/topictracker/<topic_id>-<slug>/add")
+@forum.route("/topictracker/<int:topic_id>/add")
+@forum.route("/topictracker/<int:topic_id>-<slug>/add")
 @login_required
 def track_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -476,8 +476,8 @@ def track_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topictracker/<topic_id>/delete")
-@forum.route("/topictracker/<topic_id>-<slug>/delete")
+@forum.route("/topictracker/<int:topic_id>/delete")
+@forum.route("/topictracker/<int:topic_id>-<slug>/delete")
 @login_required
 def untrack_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
