@@ -23,7 +23,7 @@
             <span class="fa fa-trash-o"></span> Delete Topic
         </a>
     {% endif %}
-    {% if current_user|lock_topic(topic.forum) %}
+    {% if current_user|can_moderate(topic.forum) %}
         {% if not topic.locked %}
             <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
                 <span class="fa fa-lock"></span> Lock Topic

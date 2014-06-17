@@ -36,7 +36,7 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_edit_user, \
-    can_ban_user, is_admin, is_moderator, is_admin_or_moderator
+    can_ban_user, can_moderate, is_admin, is_moderator, is_admin_or_moderator
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
@@ -155,6 +155,7 @@ def configure_template_filters(app):
     app.jinja_env.filters['is_admin'] = is_admin
     app.jinja_env.filters['is_moderator'] = is_moderator
     app.jinja_env.filters['is_admin_or_moderator'] = is_admin_or_moderator
+    app.jinja_env.filters['can_moderate'] = can_moderate
 
     app.jinja_env.filters['can_edit_user'] = can_edit_user
     app.jinja_env.filters['can_ban_user'] = can_ban_user
