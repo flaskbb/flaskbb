@@ -1,3 +1,5 @@
+{% set page_title = "Trash" %}
+
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
 <table class="table table-bordered">
@@ -13,9 +15,12 @@
         {% for message in messages %}
         <tr>
             <td>{% if message.to_user %}<a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a>{% else %} (No User) {% endif %}</td>
-            <td><a href="{{ url_for('user.view_message', id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}(No Subject){% endif %}</a></td>
+            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}(No Subject){% endif %}</a></td>
             <td>{{ message.date_created|format_date }}</td>
-            <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a></td>
+            <td>
+                <a href="{{ url_for('user.restore_message', message_id=message.id) }}">Restore</a> |
+                <a href="{{ url_for('user.delete_message', message_id=message.id) }}">Delete</a>
+            </td>
         </tr>
         {% else %}
         <tr>

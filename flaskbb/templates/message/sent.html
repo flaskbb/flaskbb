@@ -1,3 +1,5 @@
+{% set page_title = "Sent Messages" %}
+
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
 <table class="table table-bordered">
@@ -17,10 +19,9 @@
         {% else %}
             <td>[deleted]</td>
         {% endif %}
-            <td><a href="{{ url_for('user.view_message', id=message.id) }}">{{ message.subject }}</a></td>
+            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{{ message.subject }}</a></td>
             <td>{{ message.date_created|time_since }}</td>
-            <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a> |
-                <a href="{{ url_for('user.move_message', id=message.id) }}">Move</a></td>
+            <td><a href="{{ url_for('user.move_message', message_id=message.id) }}">Delete</a></td>
         </tr>
         {% else %}
         <tr>

@@ -1,3 +1,5 @@
+{% set page_title = "Drafts" %}
+
 {% extends "message/message_layout.html" %}
 {% block message_content %}
 <table class="table table-bordered">
@@ -13,10 +15,12 @@
         {% for message in messages %}
         <tr>
             <td><a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a></td>
-            <td><a href="{{ url_for('user.view_message', id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}(No Subject){% endif %}</a></td>
+            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}(No Subject){% endif %}</a></td>
             <td>{{ message.date_created|format_date('%d %B %Y') }}</td>
-            <td><a href="{{ url_for('user.delete_message', id=message.id) }}">Delete</a> |
-                <a href="{{ url_for('user.move_message', id=message.id) }}">Move</a></td>
+            <td>
+                <a href="{{ url_for('user.edit_message', message_id=message.id) }}">Edit</a> |
+                <a href="{{ url_for('user.move_message', message_id=message.id) }}">Delete</a>
+            </td>
         </tr>
         {% else %}
         <tr>

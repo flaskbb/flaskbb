@@ -1,9 +1,11 @@
+{% set page_title = title %}
+
 {% extends theme("message/message_layout.html") %}
 
 {% block message_content %}
 {% from theme("macros.html") import horizontal_field %}
 <form class="form-horizontal" role="form" method="post" name="new">
-    <legend>Compose Message</legend>
+    <legend>{{ title }}</legend>
     {{ form.hidden_tag() }}
     {{ horizontal_field(form.to_user)}}
     {{ horizontal_field(form.subject)}}

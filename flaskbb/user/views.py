@@ -20,7 +20,7 @@ from flaskbb.utils.helpers import render_template
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
                                 ChangeUserDetailsForm, GeneralSettingsForm,
-                                NewMessage)
+                                NewMessageForm, EditMessageForm)
 
 
 user = Blueprint("user", __name__)
@@ -132,10 +132,10 @@ def inbox():
     return render_template("message/inbox.html", messages=messages)
 
 
-@user.route("/messages/<int:id>/view")
+@user.route("/messages/<int:message_id>/view")
 @login_required
-def view_message(id):
-    message = PrivateMessage.query.filter_by(id=id).first()
+def view_message(message_id):
+    message = PrivateMessage.query.filter_by(id=message_id).first()
     if message.unread:
         message.unread = False
         db.session.commit()
@@ -175,7 +175,7 @@ def drafts():
 @user.route("/messages/new", methods=["POST", "GET"])
 @login_required
 def new_message():
-    form = NewMessage()
+    form = NewMessageForm()
     to_user = request.args.get("to_user")
 
     if request.method == "POST":
@@ -211,23 +211,82 @@ def new_message():
     else:
         form.to_user.data = to_user
 
-    return render_template("message/new_message.html", form=form)
+    return render_template("message/message_form.html", form=form,
+                           title="Compose Message")
 
 
-@user.route("/messages/<int:id>/move")
+@user.route("/messages/<int:message_id>/edit", methods=["POST", "GET"])
 @login_required
-def move_message(id):
-    message = PrivateMessage.query.filter_by(id=id).first_or_404()
+def edit_message(message_id):
+    message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
+
+    if not message.draft:
+        flash("You cannot edit a sent message", "danger")
+        return redirect(url_for("user.inbox"))
+
+    form = EditMessageForm()
+
+    if request.method == "POST":
+        if "save_message" in request.form:
+            to_user = User.query.filter_by(username=form.to_user.data).first()
+
+            # Move the message from ``Drafts`` to ``Sent``.
+            message.draft = False
+            message.to_user = to_user.id
+            message.save()
+
+            flash("Message saved!", "success")
+            return redirect(url_for("user.drafts"))
+
+        if "send_message" in request.form and form.validate():
+            to_user = User.query.filter_by(username=form.to_user.data).first()
+            # Save the message in the recievers inbox
+            form.save(from_user=current_user.id,
+                      to_user=to_user.id,
+                      user_id=to_user.id,
+                      unread=True)
+
+            # Move the message from ``Drafts`` to ``Sent``.
+            message.draft = False
+            message.to_user = to_user
+            message.date_created = datetime.utcnow()
+            message.save()
+
+            flash("Message sent!", "success")
+            return redirect(url_for("user.sent"))
+    else:
+        form.to_user.data = message.to_user.username
+        form.subject.data = message.subject
+        form.message.data = message.message
+
+    return render_template("message/message_form.html", form=form,
+                           title="Edit Message")
+
+
+@user.route("/messages/<int:message_id>/move")
+@login_required
+def move_message(message_id):
+    message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.trash = True
     message.save()
     flash("Message moved to Trash!", "success")
     return redirect(url_for("user.inbox"))
 
 
-@user.route("/messages/<int:id>/delete")
+@user.route("/messages/<int:message_id>/restore")
 @login_required
-def delete_message(id):
-    message = PrivateMessage.query.filter_by(id=id).first_or_404()
+def restore_message(message_id):
+    message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
+    message.trash = False
+    message.save()
+    flash("Message restored from Trash!", "success")
+    return redirect(url_for("user.inbox"))
+
+
+@user.route("/messages/<int:message_id>/delete")
+@login_required
+def delete_message(message_id):
+    message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.delete()
     flash("Message deleted!", "success")
     return redirect(url_for("user.inbox"))

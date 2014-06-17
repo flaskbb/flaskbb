@@ -444,9 +444,10 @@ class PrivateMessage(db.Model):
 
         :param to_user: The user who should recieve the message
 
-        :param user_id: The senders user id
+        :param user_id: The senders user id - This is the id to which user the
+                        Inbox belongs.
 
-        :param draft: If the message is a draft
+        :param draft: If the message is a draft. Defaults to ``False``.
         """
 
         if self.id:
@@ -454,8 +455,8 @@ class PrivateMessage(db.Model):
             db.session.commit()
             return self
 
-        if draft:
-            self.draft = True
+        # Defaults to ``False``.
+        self.draft = draft
 
         # Add the message to the user's pm box
         self.user_id = user_id
