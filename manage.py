@@ -77,7 +77,6 @@ def createall(dropdb=False, createdb=False):
 
     app.logger.info("Creating test data...")
     create_test_data()
-    #create_default_settings()
 
 
 @manager.option('-u', '--username', dest='username')
@@ -100,25 +99,28 @@ def create_admin(username=None, password=None, email=None):
 def initflaskbb(username=None, password=None, email=None):
     """Initializes FlaskBB with all necessary data"""
 
-    app.logger.info("Creating default groups...")
+    app.logger.info("Creating default data...")
     try:
         create_default_groups()
+        create_default_settings()
     except IntegrityError:
-        app.logger.error("Couldn't create the default groups because they are\
-                          already exist!")
+        app.logger.error("Couldn't create the default data because it already "
+                         "exist!")
         if prompt_bool("Do you want to recreate the database? (y/n)"):
             db.session.rollback()
             db.drop_all()
             db.create_all()
             create_default_groups()
+            create_default_settings()
         else:
             sys.exit(0)
     except OperationalError:
         app.logger.error("No database found.")
-        if prompt_bool("Do you want to create the database? (y/n)"):
+        if prompt_bool("Do you want to create the database now? (y/n)"):
             db.session.rollback()
             db.create_all()
             create_default_groups()
+            create_default_settings()
         else:
             sys.exit(0)
 
