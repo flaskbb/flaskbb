@@ -36,7 +36,8 @@ class DefaultConfig(object):
     # Default Database
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
                               'flaskbb.sqlite'
-    # sqlite for testing/debug.
+
+    # This will print all SQL statements
     SQLALCHEMY_ECHO = False
 
     # Security
@@ -47,6 +48,9 @@ class DefaultConfig(object):
     # Protection against form post fraud
     WTF_CSRF_ENABLED = True
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
+
+    # Searching
+    WHOOSH_BASE = os.path.join(_basedir, "whoosh_index")
 
     # Auth
     LOGIN_VIEW = "auth.login"

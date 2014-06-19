@@ -33,7 +33,8 @@ class ProductionConfig(DefaultConfig):
 
 
     ## Caching
-    # See the Flask-Cache docs for more caching types
+    # For all available caching types, take a look at the Flask-Cache docs
+    # https://pythonhosted.org/Flask-Cache/#configuring-flask-cache
     CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 60
 
