@@ -402,6 +402,10 @@ class User(db.Model, UserMixin):
 
 
 class Guest(AnonymousUserMixin):
+    @property
+    def permissions(self):
+        return self.get_permissions()
+
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
         exclude = exclude or []
