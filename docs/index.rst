@@ -1,7 +1,7 @@
 :orphan:
 
-Welcome to FlaskBB's documentation!
-===================================
+Welcome to FlaskBB
+==================
 
 FlaskBB is a lightweight forum software in Flask.
 
