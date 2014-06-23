@@ -17,11 +17,17 @@
     <tbody>
         {% for plugin in plugins %}
         <tr>
-            <td><a href="#">{{ plugin.name }}</a></td>
+          <td>
+            {% if plugin.website %}
+              <a href="{{ plugin.website }}">{{ plugin.name }}</a>
+            {% else %}
+              {{ plugin.name }}
+            {% endif %}
+            </td>
             <td>
-                {{ plugin.version }} <br />
+                Version: <i>{{ plugin.version }}</i> <br />
                 {{ plugin.description }} <br />
-                {{ plugin.author }}
+                by  <i>{{ plugin.author }}</i> 
             </td>
             <td>
                 {% if not plugin.enabled %}

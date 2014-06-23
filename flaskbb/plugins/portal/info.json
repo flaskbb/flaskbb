@@ -2,6 +2,7 @@
     "identifier": "portal",
     "name": "Portal",
     "author": "sh4nks",
+    "website": "http://flaskbb.org",
     "license": "BSD",
     "description": "A Portal Plugin for FlaskBB",
     "version": "0.1"
