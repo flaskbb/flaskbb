@@ -1,3 +1,8 @@
+.. _permissions:
+
+Permission (WIP)
+================
+
 a moderator is allowed to do the following things:
 
     enter the management panel

@@ -316,7 +316,7 @@ class Topic(db.Model):
 
     @property
     def url(self):
-        """Returns the url for the topic"""
+        """Returns the slugified url for the topic"""
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     # Methods
@@ -611,7 +611,7 @@ class Forum(db.Model):
 
     @property
     def url(self):
-        """Returns the url for the forum"""
+        """Returns the slugified url for the forum"""
         return url_for("forum.view_forum", forum_id=self.id, slug=self.slug)
 
     # Methods
@@ -824,7 +824,7 @@ class Category(db.Model):
 
     @property
     def url(self):
-        """Returns the url for the category"""
+        """Returns the slugified url for the category"""
         return url_for("forum.view_category", category_id=self.id,
                        slug=self.slug)
 

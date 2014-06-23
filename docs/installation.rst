@@ -8,7 +8,7 @@ Installation
 
 
 Basic Setup
-===========
+-----------
 
 Virtualenv Setup
 ~~~~~~~~~~~~~~~~
@@ -39,11 +39,11 @@ and you should be switched automatically to your newly created virtualenv.
 To deactivate it you just have to type ``deactivate`` and if you want to work
 on it again, you need to type ``workon flaskbb``.
 
+
 Required Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
 Now you can install the required dependencies.
-
 ::
 
      $ pip install -r requirements.txt
@@ -57,9 +57,7 @@ If you want to use it, be sure that a redis-server is running. If you decide
 to use redis, the `online guests` and `online users` are being tracked by redis,
 else it will only track the `online users` via a simple SQL query.
 
-On Archlinux
-------------
-
+**On Archlinux**
 ::
 
     # Install redis
@@ -74,9 +72,7 @@ On Archlinux
     # Optional: Start redis everytime you boot your machine
     $ sudo systemctl enable redis
 
-On Debian 7.0 (Wheezy)
-----------------------
-
+**On Debian 7.0 (Wheezy)**
 ::
 
     # Install redis
@@ -94,9 +90,10 @@ On Debian 7.0 (Wheezy)
 
 
 Configuration
-=============
+-------------
 
 Before you can start, you need to configure `FlaskBB`.
+
 
 Development
 ~~~~~~~~~~~
@@ -129,9 +126,7 @@ Mail Examples
 
 Both methods are included in the example configs.
 
-Google Mail
------------
-
+**Google Mail**
 ::
 
     MAIL_SERVER = "smtp.gmail.com"
@@ -141,9 +136,7 @@ Google Mail
     MAIL_PASSWORD = "your_password"
     MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
 
-Local SMTP Server
------------------
-
+**Local SMTP Server**
 ::
 
     MAIL_SERVER = "localhost"
@@ -155,7 +148,7 @@ Local SMTP Server
 
 
 Installation
-============
+------------
 
 
 Development
@@ -184,13 +177,13 @@ and which password you want to use for your admin user
 
 
 Upgrading
-=========
+---------
 
 `A upgrade guide will be written when first stable version is released.`
 
 
 Deploying
-=========
+---------
 
 I prefer to use supervisor, uWSGI and nginx to deploy my apps, but if you have
 figured out how to deploy it in another way, please let me know, so I

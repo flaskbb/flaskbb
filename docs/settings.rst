@@ -1,3 +1,8 @@
+.. _settings:
+
+Settings (WIP)
+==============
+
 extra fields:
     min
     max

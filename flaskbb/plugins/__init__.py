@@ -30,7 +30,10 @@ class FlaskBBPlugin(Plugin):
 
         # Some helpers
     def register_blueprint(self, blueprint, **kwargs):
-        """Registers a blueprint."""
+        """Registers a blueprint.
+
+        :param blueprint: The blueprint which should be registered.
+        """
         current_app.register_blueprint(blueprint, **kwargs)
 
     def create_table(self, model, db):

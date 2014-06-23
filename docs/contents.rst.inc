@@ -5,5 +5,10 @@ Contents
    :maxdepth: 2
 
    installation
-   models
    plugins
+   plugin_tutorial/index
+   events
+   theming
+   settings
+   permissions
+   models

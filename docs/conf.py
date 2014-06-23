@@ -110,7 +110,7 @@ html_theme = 'flask'
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ['_themes']
 html_theme_options = {
-    'index_logo': False,
+    'index_logo': "../_static/logo-full.png",
 }
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -268,3 +268,5 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+autodoc_member_order = 'bysource'
