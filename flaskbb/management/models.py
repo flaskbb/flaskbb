@@ -18,9 +18,9 @@ from flaskbb.extensions import db, cache
 class SettingsGroup(db.Model):
     __tablename__ = "settingsgroup"
 
-    key = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    key = db.Column(db.String(255), primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=False)
     settings = db.relationship("Setting", lazy="dynamic", backref="group",
                                cascade="all, delete-orphan")
 
@@ -38,7 +38,7 @@ class SettingsGroup(db.Model):
 class Setting(db.Model):
     __tablename__ = "settings"
 
-    key = db.Column(db.String, primary_key=True)
+    key = db.Column(db.String(255), primary_key=True)
     value = db.Column(db.PickleType, nullable=False)
     settingsgroup = db.Column(db.String,
                               db.ForeignKey('settingsgroup.key',
@@ -47,13 +47,13 @@ class Setting(db.Model):
                               nullable=False)
 
     # The name (displayed in the form)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(200), nullable=False)
 
     # The description (displayed in the form)
-    description = db.Column(db.String, nullable=False)
+    description = db.Column(db.Text, nullable=False)
 
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.String, nullable=False)
+    value_type = db.Column(db.String(20), nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices

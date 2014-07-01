@@ -32,8 +32,8 @@ class Group(db.Model):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63), unique=True, nullable=False)
-    description = db.Column(db.String(80))
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    description = db.Column(db.Text)
 
     # Group types
     admin = db.Column(db.Boolean, default=False, nullable=False)
@@ -78,17 +78,17 @@ class User(db.Model, UserMixin):
     __searchable__ = ['username', 'email']
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(15), unique=True, nullable=False)
-    email = db.Column(db.String(63), unique=True, nullable=False)
-    _password = db.Column('password', db.String(80), nullable=False)
+    username = db.Column(db.String(200), unique=True, nullable=False)
+    email = db.Column(db.String(200), unique=True, nullable=False)
+    _password = db.Column('password', db.String(120), nullable=False)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow())
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
-    gender = db.Column(db.String(1))
-    website = db.Column(db.String(63))
-    location = db.Column(db.String(63))
-    signature = db.Column(db.String(255))
-    avatar = db.Column(db.String(63))
+    gender = db.Column(db.String(10))
+    website = db.Column(db.String(200))
+    location = db.Column(db.String(100))
+    signature = db.Column(db.Text)
+    avatar = db.Column(db.String(200))
     notes = db.Column(db.Text)
 
     theme = db.Column(db.String(15))
@@ -428,7 +428,7 @@ class PrivateMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    subject = db.Column(db.String(63))
+    subject = db.Column(db.String(255))
     message = db.Column(db.Text)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     trash = db.Column(db.Boolean, nullable=False, default=False)
