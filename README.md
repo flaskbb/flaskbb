@@ -6,6 +6,9 @@
 using the micro framework Flask.
 
 
+**_Note:_** Do not expect too much activity during the summer holidays - I hope you can understand this :)
+
+
 ## FEATURES
 
 * A Bulletin Board like FluxBB or DjangoBB in Flask
