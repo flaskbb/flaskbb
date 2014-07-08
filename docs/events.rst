@@ -9,7 +9,8 @@ events.
 .. admonition:: Additional events
 
     If you miss an event, feel free to open a new issue or create a pull
-    request.
+    request. The pull request should always contain a entry in this document
+    with a small example.
 
     A event can be created by placing a :func:`~flask.ext.plugins.emit_event`
     function at specific places in the code which then can modify the behavior
