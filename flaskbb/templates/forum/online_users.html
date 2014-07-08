@@ -10,9 +10,9 @@
 <legend>Online Users</legend>
 {% for user in online_users %}
     {% if config["REDIS_ENABLED"] %}
-    <a href="{{ url_for('user.profile', username=user) }}">{{ user }}<a>{% if not loop.last %}, {% endif %}
+    <a href="{{ url_for('user.profile', username=user.username) }}">{{ user }}<a>{% if not loop.last %}, {% endif %}
     {% else %}
-    <a href="{{ url_for('user.profile', username=user) }}">{{ user.username }}<a>{% if not loop.last %}, {% endif %}
+    <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}<a>{% if not loop.last %}, {% endif %}
     {% endif %}
 {% endfor %}
 
