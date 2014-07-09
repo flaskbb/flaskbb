@@ -45,7 +45,7 @@ body {
 ------------------------- */
 
 .featurette-divider {
-  margin: 80px 0; /* Space out the Bootstrap <hr> more */
+  margin: 60px 0; /* Space out the Bootstrap <hr> more */
 }
 
 /* Thin out the marketing headings */
@@ -68,7 +68,7 @@ body {
   }
 
   .featurette-heading {
-    font-size: 50px;
+    font-size: 40px;
   }
   #github {
     display: block;
@@ -87,6 +87,10 @@ body {
   }
 }
 
+.instruction
+{
+	margin: 10px 0 10px 0;
+}
 
 /*
  * Homepage

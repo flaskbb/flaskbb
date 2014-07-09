@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="FlaskBB is a lightweight discussion board written in Python using the micro framework Flask.">
+    <meta name="author" content="FlaskBB Team">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <title>FlaskBB - First Steps.</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/main.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <!-- Fork me on github -->
+    <a href="https://github.com/sh4nks/flaskbb" id="github"><img  src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">FlaskBB</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="index.html">Home</a></li>
+            <li><a href="http://forums.flaskbb.org">Forums</a></li>
+            <li><a href="http://flaskbb.readthedocs.org/en/latest/index.html">Documentation</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Development <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="https://github.com/sh4nks/flaskbb" target="_blank">Source Code</a></li>
+                <li><a href="https://github.com/sh4nks/flaskbb/graphs/contributors" target="_blank">Contributors</a></li>
+                <li><a href="https://github.com/sh4nks/flaskbb/issues" target="_blank">Bugs</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+	<div class="jumbotron masthead">
+		<div class="container">
+			<h1>First Steps</h1>
+			<p>Getting set up with FlaskBB is easy, just follow these few short steps and you will have a fully functional bulletin board.</p>
+		</div>
+	</div>
+	<div class="container">
+		
+		<h1>Installation</h1>
+		<p>To install FlaskBB, you will first need a server capable of running a webserver.</p> 
+		
+		<h2>Dependencies</h2>
+		<p>Before you can download and install FlaskBB you will need a few dependencies on your server first:</p>
+		<ul>
+			<li>Python 2.7+ </li>
+			<li>pip</li>
+			<li>git</li>
+		</ul>
+
+		<h2> Install Virtualenv</h2>
+		<p class='instruction'>To make it easier for you to test FlaskBB without interfering with your main python packages, you can use virtualenv.</p>
+		<p class='instruction'>Virtualenv allows you to create virtual python environments, that you are free install any python packages you wish.</p>
+		<code> pip install virtualenv</code>
+
+		<h2>Create Virtualenv for FlaskBB</h2>
+		<p class='instruction'>We will want to create a virtualenv for flaskbb</p>
+		<code>virtualenv flaskbb</code>
+		<p class='instruction'>We will then want to activate your new virtualenv so that any dependencies you install with not interfere with anything else on your machine.</p>
+		<code>source flaskbb/bin/activate</code>
+
+		<h2>Get FlaskBB and install dependencies</h2>
+		<p class='instruction'>Now we will want to download FlaskBB from github and install its dependencies.</p>
+		<code>cd flaskbb</code></br>
+		<code>git clone https://github.com/sh4nks/flaskbb.git</code>
+		<p class='instruction'>Then we will install the dependencies on your new virtualenv.</p>
+		<code>cd flaskbb</code>
+		<code>pip install -r requirements.txt</code>
+		
+		<h1>Configuration</h1>
+		<p class='instruction'>The next thing we will need to do is configure the FlaskBB</p>
+		<p class='instruction'>Doing so is easy, just activate the developement.py.example and create the test configuration</p>
+		<code>cp flaskbb/configs/development.py.example flaskbb/configs/development.py</code>
+		<code>python manage.py createall</code>
+
+		<h1>Run the server</h1>
+		<p class='instruction'>Now you can start the server and start playing!</p>
+		<code>python manage.py runserver</code>
+		<p class='instruction'>This will create and instance of FlaskBB, running on http://localhost:8080</p>
+	<footer>
+		<p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+		<p class="text-muted pull-right">&copy; 2014 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+	</footer>
+	</div>
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/holder.js"></script>
+  </body>
+</html>
