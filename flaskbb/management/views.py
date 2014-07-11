@@ -140,18 +140,6 @@ def edit_user(user_id):
 
         flash("User successfully edited", "success")
         return redirect(url_for("management.edit_user", user_id=user.id))
-    else:
-        form.username.data = user.username
-        form.email.data = user.email
-        form.birthday.data = user.birthday
-        form.gender.data = user.gender
-        form.website.data = user.website
-        form.location.data = user.location
-        form.signature.data = user.signature
-        form.avatar.data = user.avatar
-        form.notes.data = user.notes
-        form.primary_group.data = user.primary_group
-        form.secondary_groups.data = user.secondary_groups
 
     return render_template("management/user_form.html", form=form,
                            title="Edit User")
@@ -319,27 +307,13 @@ def edit_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
 
     form = EditGroupForm(group)
+
     if form.validate_on_submit():
         form.populate_obj(group)
         group.save()
 
         flash("Group successfully edited.", "success")
         return redirect(url_for("management.groups", group_id=group.id))
-    else:
-        form.name.data = group.name
-        form.description.data = group.description
-        form.admin.data = group.admin
-        form.super_mod.data = group.super_mod
-        form.mod.data = group.mod
-        form.guest.data = group.guest
-        form.banned.data = group.banned
-        form.editpost.data = group.editpost
-        form.deletepost.data = group.deletepost
-        form.deletetopic.data = group.deletetopic
-        form.posttopic.data = group.posttopic
-        form.postreply.data = group.postreply
-        form.mod_edituser.data = group.mod_edituser
-        form.mod_banuser.data = group.mod_banuser
 
     return render_template("management/group_form.html", form=form,
                            title="Edit Group")
@@ -388,14 +362,6 @@ def edit_forum(forum_id):
         flash("Forum successfully edited.", "success")
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
-        form.title.data = forum.title
-        form.description.data = forum.description
-        form.position.data = forum.position
-        form.category.data = forum.category
-        form.external.data = forum.external
-        form.locked.data = forum.locked
-        form.show_moderators.data = forum.show_moderators
-
         if forum.moderators:
             form.moderators.data = ",".join([user.username
                                             for user in forum.moderators])
@@ -458,15 +424,11 @@ def add_category():
 def edit_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
-    form = CategoryForm()
+    form = CategoryForm(obj=category)
 
     if form.validate_on_submit():
         form.populate_obj(category)
         category.save()
-    else:
-        form.title.data = category.title
-        form.description.data = category.description
-        form.position.data = category.position
 
     return render_template("management/category_form.html", form=form,
                            title="Edit Category")

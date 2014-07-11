@@ -95,20 +95,13 @@ def change_email():
 @user.route("/settings/user-details", methods=["POST", "GET"])
 @login_required
 def change_user_details():
-    form = ChangeUserDetailsForm()
+    form = ChangeUserDetailsForm(obj=current_user)
+
     if form.validate_on_submit():
         form.populate_obj(current_user)
         current_user.save()
 
         flash("Your details have been updated!", "success")
-    else:
-        form.birthday.data = current_user.birthday
-        form.gender.data = current_user.gender
-        form.location.data = current_user.location
-        form.website.data = current_user.website
-        form.avatar.data = current_user.avatar
-        form.signature.data = current_user.signature
-        form.notes.data = current_user.notes
 
     return render_template("user/change_user_details.html", form=form)
 
