@@ -54,7 +54,7 @@
                 </tr>
                 <tr>
                   <td align="right">Posts:</td>
-                  <td>{{ user.post_count }} ({{ posts_per_day }} per day)</td>
+                  <td>{{ user.post_count }} ({{ user.posts_per_day }} per day)</td>
                 </tr>
                 <tr>
                   <td align="right">Last seen:</td>
@@ -69,12 +69,6 @@
                       {%- endif -%}
                   </td>
                 </tr>
-                <!-- TODO: Implement Online Time
-                <tr>
-                  <td align="right">Online time:</td>
-                  <td>1024 hours</td>
-                </tr>
-                -->
                 <tr>
                   <td align="right">Location:</td>
                   <td>{%- if user.location -%} {{ user.location }} {%- else -%} No Info {%- endif -%}</td>

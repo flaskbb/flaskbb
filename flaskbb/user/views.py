@@ -30,14 +30,7 @@ user = Blueprint("user", __name__)
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
 
-    days_registered = (datetime.utcnow() - user.date_joined).days
-    if not days_registered:
-        days_registered = 1
-
-    posts_per_day = round((float(user.post_count) / float(days_registered)), 1)
-    return render_template("user/profile.html", user=user,
-                           days_registered=days_registered,
-                           posts_per_day=posts_per_day)
+    return render_template("user/profile.html", user=user)
 
 
 @user.route("/<username>/topics")

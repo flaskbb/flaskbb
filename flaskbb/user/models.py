@@ -133,7 +133,31 @@ class User(db.Model, UserMixin):
 
     @property
     def permissions(self):
+        """Returns the permissions for the user"""
         return self.get_permissions()
+
+    @property
+    def days_registered(self):
+        """Returns the amount of days the user is registered."""
+        days_registered = (datetime.utcnow() - self.date_joined).days
+        if not days_registered:
+            return 1
+        return days_registered
+
+    @property
+    def topic_count(self):
+        """Returns the thread count"""
+        return Topic.query.filter(Topic.user_id == self.id).count()
+
+    @property
+    def posts_per_day(self):
+        """Returns the posts per day count"""
+        return round((float(self.post_count) / float(self.days_registered)), 1)
+
+    @property
+    def topics_per_day(self):
+        """Returns the topics per day count"""
+        return round((float(self.topic_count) / float(self.days_registered)), 1)
 
     # Methods
     def __repr__(self):
