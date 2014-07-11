@@ -106,6 +106,7 @@ def users():
                                search_form=search_form)
 
     users = User.query. \
+        order_by(User.id.asc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("management/users.html", users=users,
@@ -296,6 +297,7 @@ def groups():
     page = request.args.get("page", 1, type=int)
 
     groups = Group.query.\
+        order_by(Group.id.asc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
     return render_template("management/groups.html", groups=groups)
