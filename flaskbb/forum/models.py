@@ -574,7 +574,6 @@ class Forum(db.Model):
     __tablename__ = "forums"
     __searchable__ = ['title', 'description']
 
-
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
                             nullable=False)

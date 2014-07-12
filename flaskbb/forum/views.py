@@ -21,7 +21,7 @@ from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import get_online_users, time_diff, render_template
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
-                                       can_edit_post)
+                                       can_edit_post, can_moderate)
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
