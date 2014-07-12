@@ -13,7 +13,7 @@ from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
-from werkzeug import generate_random_salt, generate_password_hash, check_password_hash
+from werkzeug import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
