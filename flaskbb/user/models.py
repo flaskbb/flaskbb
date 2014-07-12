@@ -13,7 +13,7 @@ from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
-from flask.ext.scrypt import generate_random_salt, generate_password_hash, check_password_hash
+from werkzeug import generate_random_salt, generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
@@ -81,7 +81,6 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
     _password = db.Column('password', db.String(88), nullable=False)
-    salt = db.Column(db.String(172), nullable=False)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow())
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
@@ -167,20 +166,13 @@ class User(db.Model, UserMixin):
         """
         return "<{} {}>".format(self.__class__.__name__, self.username)
 
-    def _get_salt(self):
-        return self.salt
-
-    def _set_salt(self):
-        self.salt = generate_random_salt(128) #128-bit salt
-
     def _get_password(self):
         """Returns the hashed password"""
         return self._password
 
     def _set_password(self, password):
         """Generates a password hash for the provided password"""
-        self._set_salt()
-        self._password = generate_password_hash(password, self._get_salt())
+        self._password = generate_password_hash(password)
 
     password = db.synonym('_password',
                           descriptor=property(_get_password,
@@ -191,7 +183,7 @@ class User(db.Model, UserMixin):
 
         if self.password is None:
             return False
-        return check_password_hash(password, self.password, self._get_salt())
+        return check_password_hash(self.password, password)
 
     @classmethod
     def authenticate(cls, login, password):
