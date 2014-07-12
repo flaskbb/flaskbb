@@ -11,13 +11,13 @@ Flask-Script==2.0.5
 Flask-Scrypt==0.1.3.6
 Flask-Themes2==0.1.3
 Flask-WTF==0.9.5
-Jinja2==2.7.2
-Mako==0.9.1
+Jinja2==2.7.3
+Mako==1.0.0
 MarkupSafe==0.23
 Pygments==1.6
-SQLAlchemy==0.9.4
-WTForms==2.0
-Werkzeug==0.9.4
+SQLAlchemy==0.9.6
+WTForms==2.0.1
+Werkzeug==0.9.6
 Whoosh==2.6.0
 alembic==0.6.5
 blinker==1.3
@@ -25,10 +25,10 @@ itsdangerous==0.24
 py==1.4.20
 pytest==2.5.2
 pytest-random==0.02
-redis==2.9.1
-simplejson==3.5.2
+redis==2.10.1
+scrypt==0.6.1
+simplejson==3.5.3
 wsgiref==0.1.2
 
 https://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg
 https://github.com/frol/postmarkup/tarball/master#egg
-
