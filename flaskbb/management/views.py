@@ -118,7 +118,7 @@ def users():
 def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
 
-    if not can_edit_user(current_user) or is_admin(user):
+    if not can_edit_user(current_user):
         flash("You are not allowed to edit this user.", "danger")
         return redirect(url_for("management.users"))
 
