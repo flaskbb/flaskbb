@@ -13,7 +13,7 @@ $(document).ready(function () {
             var content = $original.clone().find('.signature').remove().end().text().trim();
 
             // Add quote to the Quickreply Textarea
-            if ($contents.val().length > 0) {
+            if ($contents.length > 0) {
                 $contents.val($contents.val() + "\n[quote]" + content + "[/quote]");
             } else {
         $contents.val("[quote]" + content + "[/quote]");
