@@ -92,6 +92,7 @@ def view_topic(topic_id, slug=None):
 
     topic = Topic.query.filter_by(id=topic_id).first()
     posts = Post.query.filter_by(topic_id=topic.id).\
+        order_by(Post.id.asc()).\
         paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
     # Count the topic views
