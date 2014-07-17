@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-from wtforms import TextAreaField, TextField, SelectMultipleField
+from wtforms import TextAreaField, TextField, SelectMultipleField, BooleanField
 from wtforms.validators import Required, Optional, Length
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
@@ -37,12 +37,19 @@ class ReplyForm(Form):
 class NewTopicForm(ReplyForm):
     title = TextField("Topic Title", validators=[
         Required(message="A topic title is required")])
+
     content = TextAreaField("Content", validators=[
         Required(message="You cannot post a reply without content.")])
+
+    track_topic = BooleanField("Track this topic", default=False, validators=[
+        Optional()])
 
     def save(self, user, forum):
         topic = Topic(title=self.title.data)
         post = Post(content=self.content.data)
+
+        if self.track_topic.data:
+            user.track_topic(topic)
         return topic.save(user=user, forum=forum, post=post)
 
 
