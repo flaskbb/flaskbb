@@ -29,8 +29,14 @@ class ReplyForm(Form):
     content = TextAreaField("Content", validators=[
         Required(message="You cannot post a reply without content.")])
 
+    track_topic = BooleanField("Track this topic", default=False, validators=[
+        Optional()])
+
     def save(self, user, topic):
-        post = Post(**self.data)
+        post = Post(content=self.content.data)
+
+        if self.track_topic.data:
+            user.track_topic(topic)
         return post.save(user=user, topic=topic)
 
 
