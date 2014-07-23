@@ -612,6 +612,8 @@ class Forum(db.Model):
     @property
     def url(self):
         """Returns the slugified url for the forum"""
+        if self.external:
+            return self.external
         return url_for("forum.view_forum", forum_id=self.id, slug=self.slug)
 
     # Methods
