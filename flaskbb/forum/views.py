@@ -78,6 +78,10 @@ def view_forum(forum_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
     forum, forumsread = Forum.get_forum(forum_id=forum_id, user=current_user)
+
+    if forum.external:
+        return redirect(forum.external)
+
     topics = Forum.get_topics(forum_id=forum.id, user=current_user, page=page,
                               per_page=flaskbb_config["TOPICS_PER_PAGE"])
 
