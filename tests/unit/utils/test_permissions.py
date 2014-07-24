@@ -92,3 +92,8 @@ def test_super_moderator_permissions(forum, super_moderator_user, topic):
 
     assert can_edit_user(super_moderator_user)
     assert can_ban_user(super_moderator_user)
+
+
+def test_can_moderate_without_permission(moderator_user):
+    """Test can moderate for a moderator_user without a permission."""
+    assert can_moderate(moderator_user) == False
