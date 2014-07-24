@@ -203,6 +203,8 @@ class Post(db.Model):
             self.topic_id = topic.id
             self.date_created = datetime.utcnow()
 
+            topic.last_updated = datetime.utcnow()
+
             # This needs to be done before I update the last_post_id.
             db.session.add(self)
             db.session.commit()
@@ -502,6 +504,9 @@ class Topic(db.Model):
         self.user_id = user.id
         self.username = user.username
 
+        # Set the last_updated time. Needed for the readstracker
+        self.last_updated = datetime.utcnow()
+
         # Insert and commit the topic
         db.session.add(self)
         db.session.commit()
@@ -676,7 +681,8 @@ class Forum(db.Model):
                               ForumsRead.user_id == user.id)).\
             filter(Topic.forum_id == self.id,
                    db.or_(TopicsRead.last_read == None,
-                          TopicsRead.last_read < Topic.last_updated)).\
+                          TopicsRead.last_read < Topic.last_updated),
+                   db.or_(ForumsRead.cleared < Topic.last_updated)).\
             count()
 
         # No unread topics available - trying to mark the forum as read
@@ -685,8 +691,9 @@ class Forum(db.Model):
             if forumsread and forumsread.last_read > topicsread.last_read:
                 return False
 
-            # ForumRead Entry exists - Updating it because a new post
-            # has been submitted that the user hasn't read.
+            # ForumRead Entry exists - Updating it because a new topic/post
+            # has been submitted and has read everything (obviously, else the
+            # unread_count would be useless).
             elif forumsread:
                 forumsread.last_read = datetime.utcnow()
                 forumsread.save()

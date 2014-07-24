@@ -142,6 +142,10 @@ def forum_is_unread(forum, forumsread, user):
     read_cutoff = datetime.utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
+    # disable tracker if read_cutoff is set to 0
+    if read_cutoff == 0:
+        return False
+
     # If there are no topics in the forum, mark it as read
     if forum and forum.topic_count == 0:
         return False
@@ -156,7 +160,7 @@ def forum_is_unread(forum, forumsread, user):
 
 
 def topic_is_unread(topic, topicsread, user, forumsread=None):
-    """Checks if a topic is unread
+    """Checks if a topic is unread.
 
     :param topic: The topic that should be checked if it is unread
 
@@ -176,17 +180,27 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     read_cutoff = datetime.utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
+    # disable tracker if read_cutoff is set to 0
+    if read_cutoff == 0:
+        return False
+
+    # check read_cutoff
+    if topic.last_post.date_created < read_cutoff:
+        return False
+
     # topicsread is none if the user has marked the forum as read
     # or if he hasn't visited yet
-    if topic and not topicsread and topic.last_post.date_created > read_cutoff:
+    if topicsread is None:
 
         # user has cleared the forum sometime ago - check if there is a new post
         if forumsread and forumsread.cleared is not None:
             return forumsread.cleared < topic.last_post.date_created
 
-        # user hasn't read the topic yet, or it has been cleared
+        # user hasn't read the topic yet, or there is a new post since the user
+        # has marked the forum as read
         return True
 
+    # check if there is a new post since the user's last topic visit
     return topicsread.last_read < topic.last_post.date_created
 
 
