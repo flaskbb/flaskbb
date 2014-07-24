@@ -1,6 +1,11 @@
 import pytest
 
-from flaskbb.user.models import User
+from flaskbb.user.models import User, Guest
+
+@pytest.fixture
+def guest():
+    """Return a guest (not logged in) user."""
+    return Guest()
 
 
 @pytest.fixture
@@ -13,7 +18,7 @@ def user(default_groups):
 
 
 @pytest.fixture
-def moderator_user(forum, default_groups):
+def moderator_user(user, forum, default_groups):
     """Creates a test user with moderator permissions."""
 
     user = User(username="test_mod", email="test_mod@example.org",
