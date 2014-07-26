@@ -7,6 +7,6 @@ install:
   - "pip install coveralls"
 # command to run tests
 script:
-	py.test --cov=flaskbb --cov-report=term-missing tests
+	- py.test --cov=flaskbb --cov-report=term-missing tests
 after_success:
-	coveralls
+	- coveralls
