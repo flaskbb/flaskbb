@@ -25,6 +25,7 @@ itsdangerous==0.24
 py==1.4.20
 pytest==2.5.2
 pytest-random==0.02
+pytest-cov==1.7.0
 redis==2.10.1
 scrypt==0.6.1
 simplejson==3.5.3
