@@ -10,7 +10,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import datetime
-import math
 
 from flask import (Blueprint, redirect, url_for, current_app,
                    request, flash)

@@ -22,7 +22,7 @@ from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required, moderator_required
-from flaskbb.utils.permissions import can_ban_user, can_edit_user, is_admin
+from flaskbb.utils.permissions import can_ban_user, can_edit_user
 from flaskbb.extensions import db
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
