@@ -681,8 +681,7 @@ class Forum(db.Model):
                               ForumsRead.user_id == user.id)).\
             filter(Topic.forum_id == self.id,
                    db.or_(TopicsRead.last_read == None,
-                          TopicsRead.last_read < Topic.last_updated),
-                   db.or_(ForumsRead.cleared < Topic.last_updated)).\
+                          TopicsRead.last_read < Topic.last_updated)).\
             count()
 
         # No unread topics available - trying to mark the forum as read
