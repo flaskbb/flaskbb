@@ -132,8 +132,9 @@ def view_topic(topic_id, slug=None):
 def view_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
     count = post.topic.post_count
-    page = math.ceil(count / flaskbb_config["POSTS_PER_PAGE"])
-    if count > 10:
+    page = count / flaskbb_config["POSTS_PER_PAGE"]
+
+    if count > flaskbb_config["POSTS_PER_PAGE"]:
         page += 1
     else:
         page = 1
