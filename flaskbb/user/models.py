@@ -13,7 +13,7 @@ from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
-from werkzeug import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from flaskbb.extensions import db, cache
@@ -80,7 +80,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
-    _password = db.Column('password', db.String(88), nullable=False)
+    _password = db.Column('password', db.String(120), nullable=False)
     date_joined = db.Column(db.DateTime, default=datetime.utcnow())
     lastseen = db.Column(db.DateTime, default=datetime.utcnow())
     birthday = db.Column(db.DateTime)
@@ -174,6 +174,7 @@ class User(db.Model, UserMixin):
         """Generates a password hash for the provided password"""
         self._password = generate_password_hash(password)
 
+    # Hide password encryption by exposing password field only.
     password = db.synonym('_password',
                           descriptor=property(_get_password,
                                               _set_password))

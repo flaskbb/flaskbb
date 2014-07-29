@@ -149,7 +149,7 @@
                     <a href="{{ url_for('user.new_message') }}?to_user={{ post.user.username }}">PM</a>
                     {% endif %}
                     {% if post.user.website %}
-                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{post.user.website}}">Website</a>
+                    | <a href="{{post.user.website}}">Website</a>
                     {% endif %}
                 </span>
 

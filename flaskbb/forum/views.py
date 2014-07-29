@@ -193,7 +193,7 @@ def lock_topic(topic_id, slug=None):
     # TODO: Bulk lock
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to lock this topic", "danger")
+        flash("Yo do not have the permissions to lock this topic", "danger")
         return redirect(topic.url)
 
     topic.locked = True
