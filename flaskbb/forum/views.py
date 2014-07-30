@@ -159,10 +159,13 @@ def new_topic(forum_id, slug=None):
 
     form = NewTopicForm()
     if form.validate_on_submit():
-        topic = form.save(current_user, forum)
+        if request.form['button'] == 'preview':
+            return render_template("forum/new_topic.html", forum=forum, form=form, preview=form.content.data)
+        else:
+            topic = form.save(current_user, forum)
 
-        # redirect to the new topic
-        return redirect(url_for('forum.view_topic', topic_id=topic.id))
+            # redirect to the new topic
+            return redirect(url_for('forum.view_topic', topic_id=topic.id))
     return render_template("forum/new_topic.html", forum=forum, form=form)
 
 
@@ -282,8 +285,11 @@ def new_post(topic_id, slug=None):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        post = form.save(current_user, topic)
-        return view_post(post.id)
+        if request.form['button'] == 'preview':
+            return render_template("forum/new_post.html", topic=topic, form=form, preview=form.content.data)
+        else:
+            post = form.save(current_user, topic)
+            return view_post(post.id)
 
     return render_template("forum/new_post.html", topic=topic, form=form)
 
@@ -309,8 +315,11 @@ def reply_post(topic_id, post_id):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        form.save(current_user, topic)
-        return redirect(post.topic.url)
+        if request.form['button'] == 'preview':
+            return render_template("forum/new_post.html", topic=topic, form=form, preview=form.content.data)
+        else:
+            form.save(current_user, topic)
+            return redirect(post.topic.url)
     else:
         form.content.data = '[quote]{}[/quote]'.format(post.content)
 
@@ -338,11 +347,14 @@ def edit_post(post_id):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        form.populate_obj(post)
-        post.date_modified = datetime.datetime.utcnow()
-        post.modified_by = current_user.username
-        post.save()
-        return redirect(post.topic.url)
+        if request.form['button'] == 'preview':
+            return render_template("forum/new_post.html", topic=post.topic, form=form, preview=form.content.data)
+        else:
+            form.populate_obj(post)
+            post.date_modified = datetime.datetime.utcnow()
+            post.modified_by = current_user.username
+            post.save()
+            return redirect(post.topic.url)
     else:
         form.content.data = post.content
 

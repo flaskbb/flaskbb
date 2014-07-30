@@ -15,10 +15,24 @@
     {{ form.hidden_tag() }}
     <h3>New Topic</h3>
 
+    {% if preview %}
+    <div class="form-group">
+        <div class="col-sm-12">
+            <label>Preview</label>
+            <div class="form-control preview-body">
+                {% autoescape false %}
+                {{ preview|markup }}
+                {% endautoescape %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {{ render_field(form.title, div_class="col-sm-12") }}
     {{ render_field(form.content, div_class="col-sm-12", rows=12) }}
 
-    <button type="submit" class="btn btn-success">Reply!</button>
+    <button type="submit" class="btn btn-success" name="button" value="reply">Reply</button>
+    <button type="submit" class="btn btn-success" name="button" value="preview">Preview</button>
 </form>
 
 {% endblock %}

@@ -217,3 +217,8 @@ margin-bottom: 0px;
 .blog-content h5 {
     font-weight:500;
 }
+
+/* Reply/Topic previews */
+.preview-body {
+    height: auto;
+}
