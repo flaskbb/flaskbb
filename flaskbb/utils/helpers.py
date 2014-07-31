@@ -79,7 +79,7 @@ def get_categories_and_forums(query_result, user):
             <Forum 3> None
             <Forum 4> None
 
-    :param result: A tuple (KeyedTuple) with all categories and forums
+    :param query_result: A tuple (KeyedTuple) with all categories and forums
 
     :param user: The user object is needed because a signed out user does not
                  have the ForumsRead relation joined.
@@ -108,7 +108,7 @@ def get_forums(query_result, user):
           [(<Forum 3>, None),
           (<Forum 4>, None)])
 
-    :param result: A tuple (KeyedTuple) with all categories and forums
+    :param query_result: A tuple (KeyedTuple) with all categories and forums
 
     :param user: The user object is needed because a signed out user does not
                  have the ForumsRead relation joined.
