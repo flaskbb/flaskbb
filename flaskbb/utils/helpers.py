@@ -134,7 +134,6 @@ def forum_is_unread(forum, forumsread, user):
 
     :param user: The user who should be checked if he has read the forum
     """
-
     # If the user is not signed in, every forum is marked as read
     if not user.is_authenticated():
         return False
@@ -155,8 +154,10 @@ def forum_is_unread(forum, forumsread, user):
     if forum and not forumsread:
         return forum.last_post.date_created > read_cutoff
 
-    # the user has visited a topic in this forum, check if there is a new post
-    return forumsread.last_read < forum.last_post.date_created
+    try:
+        return forumsread.cleared > forum.last_post.date_created
+    except TypeError:
+        return forumsread.last_read < forum.last_post.date_created
 
 
 def topic_is_unread(topic, topicsread, user, forumsread=None):
@@ -191,7 +192,6 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     # topicsread is none if the user has marked the forum as read
     # or if he hasn't visited yet
     if topicsread is None:
-
         # user has cleared the forum sometime ago - check if there is a new post
         if forumsread and forumsread.cleared is not None:
             return forumsread.cleared < topic.last_post.date_created
