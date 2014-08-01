@@ -28,6 +28,5 @@ pytest-random==0.02
 pytest-cov==1.7.0
 redis==2.10.1
 simplejson==3.6.0
-wsgiref==0.1.2
 
 https://github.com/frol/postmarkup/tarball/master#egg=postmarkup

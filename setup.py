@@ -69,7 +69,6 @@ setup(
         'pytest-cov',
         'redis',
         'simplejson',
-        'wsgiref',
         'postmarkup'
     ],
     dependency_links=[
