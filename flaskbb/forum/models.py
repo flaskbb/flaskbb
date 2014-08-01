@@ -791,7 +791,6 @@ class Forum(db.Model):
         """
         if user.is_authenticated():
             topics = Topic.query.filter_by(forum_id=forum_id).\
-                filter(Post.topic_id == Topic.id).\
                 outerjoin(TopicsRead,
                           db.and_(TopicsRead.topic_id == Topic.id,
                                   TopicsRead.user_id == user.id)).\
@@ -800,7 +799,6 @@ class Forum(db.Model):
                 paginate(page, per_page, True)
         else:
             topics = Topic.query.filter_by(forum_id=forum_id).\
-                filter(Post.topic_id == Topic.id).\
                 order_by(Post.id.desc()).\
                 paginate(page, per_page, True)
 
