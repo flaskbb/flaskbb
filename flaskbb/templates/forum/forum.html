@@ -58,9 +58,9 @@
 
         {% for topic, topicread in topics.items %}
         <tr>
-            <td width="4%">
+            <td width="4%" style="vertical-align: middle; text-align: center;">
             {% if topic.locked %}
-                <span class="fa fa-locked" style="font-size: 2em"></span>
+                <span class="fa fa-lock" style="font-size: 2em"></span>
             {% else %}
                 {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
                     <span class="fa fa-comment" style="font-size: 2em"></span>
