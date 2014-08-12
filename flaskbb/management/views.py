@@ -124,7 +124,7 @@ def edit_user(user_id):
 
     secondary_group_query = Group.query.filter(
         db.not_(Group.id == user.primary_group_id),
-        db.not_(Group.banned == True),
+        db.not_(Group.banned),
         db.not_(Group.guest == True))
 
     form = EditUserForm(user)
@@ -203,10 +203,10 @@ def ban_user(user_id):
     # Do not allow moderators to ban admins
     if user.get_permissions()['admin'] and \
             (current_user.permissions['mod'] or
-                current_user.permissions['super_mod']):
+             current_user.permissions['super_mod']):
 
-            flash("A moderator cannot ban an admin user.", "danger")
-            return redirect(url_for("management.overview"))
+        flash("A moderator cannot ban an admin user.", "danger")
+        return redirect(url_for("management.overview"))
 
     if user.ban():
         flash("User was banned successfully.", "success")
@@ -250,7 +250,7 @@ def reports():
 def unread_reports():
     page = request.args.get("page", 1, type=int)
     reports = Report.query.\
-        filter(Report.zapped == None).\
+        filter(Report.zapped is None).\
         order_by(Report.id.desc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
@@ -276,7 +276,7 @@ def report_markread(report_id=None):
         return redirect(url_for("management.reports"))
 
     # mark all as read
-    reports = Report.query.filter(Report.zapped == None).all()
+    reports = Report.query.filter(Report.zapped is None).all()
     report_list = []
     for report in reports:
         report.zapped_by = current_user.id
@@ -365,8 +365,9 @@ def edit_forum(forum_id):
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
-            form.moderators.data = ",".join([user.username
-                                            for user in forum.moderators])
+            form.moderators.data = ",".join([
+                user.username for user in forum.moderators
+            ])
         else:
             form.moderators.data = None
 
