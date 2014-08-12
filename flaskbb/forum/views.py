@@ -118,10 +118,10 @@ def view_topic(topic_id, slug=None):
         and can_post_reply(user=current_user,
                            forum=topic.forum):
 
-            form = QuickreplyForm()
-            if form.validate_on_submit():
-                post = form.save(current_user, topic)
-                return view_post(post.id)
+        form = QuickreplyForm()
+        if form.validate_on_submit():
+            post = form.save(current_user, topic)
+            return view_post(post.id)
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
                            last_seen=time_diff(), form=form)
