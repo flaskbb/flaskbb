@@ -250,7 +250,7 @@ def reports():
 def unread_reports():
     page = request.args.get("page", 1, type=int)
     reports = Report.query.\
-        filter(Report.zapped is None).\
+        filter(Report.zapped == None).\
         order_by(Report.id.desc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
@@ -276,7 +276,7 @@ def report_markread(report_id=None):
         return redirect(url_for("management.reports"))
 
     # mark all as read
-    reports = Report.query.filter(Report.zapped is None).all()
+    reports = Report.query.filter(Report.zapped == None).all()
     report_list = []
     for report in reports:
         report.zapped_by = current_user.id
