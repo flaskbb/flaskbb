@@ -9,8 +9,9 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-from wtforms import TextAreaField, TextField, SelectMultipleField, BooleanField
-from wtforms.validators import Required, Optional, Length
+from wtforms import (TextAreaField, StringField, SelectMultipleField,
+                     BooleanField)
+from wtforms.validators import DataRequired, Optional, Length
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User
@@ -18,7 +19,7 @@ from flaskbb.user.models import User
 
 class QuickreplyForm(Form):
     content = TextAreaField("Quickreply", validators=[
-        Required(message="You cannot post a reply without content.")])
+        DataRequired(message="You cannot post a reply without content.")])
 
     def save(self, user, topic):
         post = Post(**self.data)
@@ -27,7 +28,7 @@ class QuickreplyForm(Form):
 
 class ReplyForm(Form):
     content = TextAreaField("Content", validators=[
-        Required(message="You cannot post a reply without content.")])
+        DataRequired(message="You cannot post a reply without content.")])
 
     track_topic = BooleanField("Track this topic", default=False, validators=[
         Optional()])
@@ -41,11 +42,11 @@ class ReplyForm(Form):
 
 
 class NewTopicForm(ReplyForm):
-    title = TextField("Topic Title", validators=[
-        Required(message="A topic title is required")])
+    title = StringField("Topic Title", validators=[
+        DataRequired(message="A topic title is required")])
 
     content = TextAreaField("Content", validators=[
-        Required(message="You cannot post a reply without content.")])
+        DataRequired(message="You cannot post a reply without content.")])
 
     track_topic = BooleanField("Track this topic", default=False, validators=[
         Optional()])
@@ -61,8 +62,8 @@ class NewTopicForm(ReplyForm):
 
 class ReportForm(Form):
     reason = TextAreaField("Reason", validators=[
-        Required(message="Please insert a reason why you want to report this \
-                          post")
+        DataRequired(message="Please insert a reason why you want to report \
+                              this post")
     ])
 
     def save(self, user, post):
@@ -71,7 +72,7 @@ class ReportForm(Form):
 
 
 class UserSearchForm(Form):
-    search_query = TextField("Search", validators=[
+    search_query = StringField("Search", validators=[
         Optional(), Length(min=3, max=50)
     ])
 
@@ -81,12 +82,12 @@ class UserSearchForm(Form):
 
 
 class SearchPageForm(Form):
-    search_query = TextField("Criteria", validators=[
-        Required(), Length(min=3, max=50)])
+    search_query = StringField("Criteria", validators=[
+        DataRequired(), Length(min=3, max=50)])
 
     search_types = SelectMultipleField("Content", validators=[
-        Required()], choices=[('post', 'Post'), ('topic', 'Topic'),
-                              ('forum', 'Forum'), ('user', 'Users')])
+        DataRequired()], choices=[('post', 'Post'), ('topic', 'Topic'),
+                                  ('forum', 'Forum'), ('user', 'Users')])
 
     def get_results(self):
         # Because the DB is not yet initialized when this form is loaded,

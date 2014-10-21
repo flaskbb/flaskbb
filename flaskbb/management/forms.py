@@ -9,9 +9,9 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask.ext.wtf import Form
-from wtforms import (TextField, TextAreaField, PasswordField, IntegerField,
+from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField)
-from wtforms.validators import (Required, Optional, Email, regexp, Length, URL,
+from wtforms.validators import (DataRequired, Optional, Email, regexp, Length, URL,
                                 ValidationError)
 
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
@@ -40,12 +40,12 @@ def select_primary_group():
 
 
 class UserForm(Form):
-    username = TextField("Username", validators=[
-        Required(),
+    username = StringField("Username", validators=[
+        DataRequired(message="A username is required."),
         is_username])
 
-    email = TextField("E-Mail", validators=[
-        Required(),
+    email = StringField("E-Mail", validators=[
+        DataRequired(message="A E-Mail address is required."),
         Email(message="This email is invalid")])
 
     password = PasswordField("Password", validators=[
@@ -60,13 +60,13 @@ class UserForm(Form):
         ("Male", "Male"),
         ("Female", "Female")])
 
-    location = TextField("Location", validators=[
+    location = StringField("Location", validators=[
         Optional()])
 
-    website = TextField("Website", validators=[
+    website = StringField("Website", validators=[
         Optional(), URL()])
 
-    avatar = TextField("Avatar", validators=[
+    avatar = StringField("Avatar", validators=[
         Optional(), URL()])
 
     signature = TextAreaField("Forum Signature", validators=[
@@ -131,8 +131,8 @@ class EditUserForm(UserForm):
 
 
 class GroupForm(Form):
-    name = TextField("Group Name", validators=[
-        Required(message="Group name required")])
+    name = StringField("Group Name", validators=[
+        DataRequired(message="Group name required")])
 
     description = TextAreaField("Description", validators=[
         Optional()])
@@ -247,15 +247,15 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(Form):
-    title = TextField("Forum Title", validators=[
-        Required(message="Forum title required")])
+    title = StringField("Forum Title", validators=[
+        DataRequired(message="Forum title required")])
 
     description = TextAreaField("Description", validators=[
         Optional()],
         description="You can format your description with BBCode.")
 
     position = IntegerField("Position", default=1, validators=[
-        Required(message="Forum position required")])
+        DataRequired(message="Forum position required")])
 
     category = QuerySelectField(
         "Category",
@@ -265,11 +265,11 @@ class ForumForm(Form):
         description="The category that contains this forum."
     )
 
-    external = TextField("External link", validators=[
+    external = StringField("External link", validators=[
         Optional(), URL()],
         description="A link to a website i.e. 'http://flaskbb.org'")
 
-    moderators = TextField(
+    moderators = StringField(
         "Moderators",
         description="Comma seperated usernames. Leave it blank if you do not \
                      want to set any moderators."
@@ -352,15 +352,15 @@ class AddForumForm(ForumForm):
 
 
 class CategoryForm(Form):
-    title = TextField("Category title", validators=[
-        Required(message="Category title required")])
+    title = StringField("Category title", validators=[
+        DataRequired(message="Category title required")])
 
     description = TextAreaField("Description", validators=[
         Optional()],
         description="You can format your description with BBCode.")
 
     position = IntegerField("Position", default=1, validators=[
-        Required(message="Category position required")])
+        DataRequired(message="Category position required")])
 
     def save(self):
         category = Category(**self.data)

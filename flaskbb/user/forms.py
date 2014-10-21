@@ -10,9 +10,9 @@
 """
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
-from wtforms import (TextField, PasswordField, DateField, TextAreaField,
+from wtforms import (StringField, PasswordField, DateField, TextAreaField,
                      SelectField, ValidationError)
-from wtforms.validators import (Length, Required, Email, EqualTo, regexp,
+from wtforms.validators import (Length, DataRequired, Email, EqualTo, regexp,
                                 Optional, URL)
 
 from flaskbb.user.models import User, PrivateMessage
@@ -34,16 +34,16 @@ class GeneralSettingsForm(Form):
 
 
 class ChangeEmailForm(Form):
-    old_email = TextField("Old E-Mail Address", validators=[
-        Required(message="Email adress required"),
+    old_email = StringField("Old E-Mail Address", validators=[
+        DataRequired(message="Email address required"),
         Email(message="This email is invalid")])
 
-    new_email = TextField("New E-Mail Address", validators=[
-        Required(message="Email adress required"),
+    new_email = StringField("New E-Mail Address", validators=[
+        DataRequired(message="Email address required"),
         Email(message="This email is invalid")])
 
-    confirm_new_email = TextField("Confirm E-Mail Address", validators=[
-        Required(message="Email adress required"),
+    confirm_new_email = StringField("Confirm E-Mail Address", validators=[
+        DataRequired(message="Email adress required"),
         Email(message="This email is invalid"),
         EqualTo("new_email", message="E-Mails do not match")])
 
@@ -62,13 +62,13 @@ class ChangeEmailForm(Form):
 
 class ChangePasswordForm(Form):
     old_password = PasswordField("Old Password", validators=[
-        Required(message="Password required")])
+        DataRequired(message="Password required")])
 
     new_password = PasswordField("New Password", validators=[
-        Required(message="Password required")])
+        DataRequired(message="Password required")])
 
     confirm_new_password = PasswordField("Confirm New Password", validators=[
-        Required(message="Password required"),
+        DataRequired(message="Password required"),
         EqualTo("new_password", message="Passwords do not match")])
 
 
@@ -82,13 +82,13 @@ class ChangeUserDetailsForm(Form):
         ("Male", "Male"),
         ("Female", "Female")])
 
-    location = TextField("Location", validators=[
+    location = StringField("Location", validators=[
         Optional()])
 
-    website = TextField("Website", validators=[
+    website = StringField("Website", validators=[
         Optional(), URL()])
 
-    avatar = TextField("Avatar", validators=[
+    avatar = StringField("Avatar", validators=[
         Optional(), URL()])
 
     signature = TextAreaField("Forum Signature", validators=[
@@ -99,12 +99,12 @@ class ChangeUserDetailsForm(Form):
 
 
 class NewMessageForm(Form):
-    to_user = TextField("To User", validators=[
-        Required(message="A username is required.")])
-    subject = TextField("Subject", validators=[
-        Required(message="A subject is required.")])
+    to_user = StringField("To User", validators=[
+        DataRequired(message="A username is required.")])
+    subject = StringField("Subject", validators=[
+        DataRequired(message="A subject is required.")])
     message = TextAreaField("Message", validators=[
-        Required(message="A message is required.")])
+        DataRequired(message="A message is required.")])
 
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()
