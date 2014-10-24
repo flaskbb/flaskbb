@@ -232,7 +232,7 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     # TODO: Bulk move
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("Yo do not have the permissions to move this topic", "danger")
+        flash("You do not have the permissions to move this topic", "danger")
         return redirect(forum.url)
 
     if not topic.move(forum):
