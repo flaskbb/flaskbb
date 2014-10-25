@@ -71,7 +71,7 @@ def settings(slug=None):
     form = SettingsForm()
 
     if form.validate_on_submit():
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 # check if the value has changed
                 if values['value'] == form[key].data:
@@ -83,7 +83,7 @@ def settings(slug=None):
 
         Setting.update(settings=new_settings, app=current_app)
     else:
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 form[key].data = values['value']
             except (KeyError, ValueError):

@@ -182,7 +182,7 @@ class Setting(db.Model):
         :param settings: A dictionary with setting items.
         """
         # update the database
-        for key, value in settings.iteritems():
+        for key, value in iteritems(settings):
             setting = cls.query.filter(Setting.key == key.lower()).first()
 
             setting.value = value
