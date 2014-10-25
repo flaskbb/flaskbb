@@ -18,6 +18,7 @@ from flask.ext.login import current_user
 from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
 
 from flaskbb import __version__ as flaskbb_version
+from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
@@ -70,7 +71,7 @@ def settings(slug=None):
     form = SettingsForm()
 
     if form.validate_on_submit():
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 # check if the value has changed
                 if values['value'] == form[key].data:
@@ -82,7 +83,7 @@ def settings(slug=None):
 
         Setting.update(settings=new_settings, app=current_app)
     else:
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 form[key].data = values['value']
             except (KeyError, ValueError):

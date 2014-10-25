@@ -32,7 +32,7 @@ mail = Mail()
 cache = Cache()
 
 # Redis
-redis = Redis()
+redis_store = Redis()
 
 # Debugtoolbar
 debugtoolbar = DebugToolbarExtension()

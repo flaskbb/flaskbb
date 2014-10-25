@@ -12,7 +12,6 @@ import re
 import time
 import itertools
 import operator
-from unicodedata import normalize
 from datetime import datetime, timedelta
 
 from flask import session
@@ -20,8 +19,10 @@ from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 
 from postmarkup import render_bbcode
+import unidecode
+from flaskbb._compat import range_method, text_type
 
-from flaskbb.extensions import redis
+from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
@@ -34,12 +35,13 @@ def slugify(text, delim=u'-'):
    :param text: The text which should be slugified
    :param delim: Default "-". The delimeter for whitespace
     """
+
+    text = unidecode.unidecode(text)
     result = []
     for word in _punct_re.split(text.lower()):
-        word = normalize('NFKD', word).encode('ascii', 'ignore')
         if word:
             result.append(word)
-    return unicode(delim.join(result))
+    return text_type(delim.join(result))
 
 
 def render_template(template, **context):
@@ -222,7 +224,7 @@ def mark_online(user_id, guest=False):
     else:
         all_users_key = 'online-users/%d' % (now // 60)
         user_key = 'user-activity/%s' % user_id
-    p = redis.pipeline()
+    p = redis_store.pipeline()
     p.sadd(all_users_key, user_id)
     p.set(user_key, now)
     p.expireat(all_users_key, expires)
@@ -238,9 +240,9 @@ def get_last_user_activity(user_id, guest=False):
     :param guest: If the user is a guest (not signed in)
     """
     if guest:
-        last_active = redis.get('guest-activity/%s' % user_id)
+        last_active = redis_store.get('guest-activity/%s' % user_id)
     else:
-        last_active = redis.get('user-activity/%s' % user_id)
+        last_active = redis_store.get('user-activity/%s' % user_id)
 
     if last_active is None:
         return None
@@ -253,11 +255,11 @@ def get_online_users(guest=False):
     :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
-    minutes = xrange(flaskbb_config['ONLINE_LAST_MINUTES'])
+    minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
-        return redis.sunion(['online-guests/%d' % (current - x)
+        return redis_store.sunion(['online-guests/%d' % (current - x)
                              for x in minutes])
-    return redis.sunion(['online-users/%d' % (current - x)
+    return redis_store.sunion(['online-users/%d' % (current - x)
                          for x in minutes])
 
 
@@ -338,11 +340,10 @@ def time_delta_format(dt, default=None):
     )
 
     for period, singular, plural in periods:
-
-        if not period:
+        if period < 1:
             continue
 
-        if period == 1:
+        if 1 <= period < 2:
             return u'%d %s ago' % (period, singular)
         else:
             return u'%d %s ago' % (period, plural)

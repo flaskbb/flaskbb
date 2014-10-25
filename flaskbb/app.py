@@ -26,7 +26,7 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
-from flaskbb.extensions import db, login_manager, mail, cache, redis, \
+from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
     debugtoolbar, migrate, themes, plugin_manager
 from flask.ext.whooshalchemy import whoosh_index
 # various helpers
@@ -100,7 +100,7 @@ def configure_extensions(app):
     themes.init_themes(app, app_identifier="flaskbb")
 
     # Flask-And-Redis
-    redis.init_app(app)
+    redis_store.init_app(app)
 
     # Flask-WhooshAlchemy
     with app.app_context():

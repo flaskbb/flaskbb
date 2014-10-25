@@ -80,11 +80,10 @@ class ProductionConfig(DefaultConfig):
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
 
-    # Redis
+    # Flask-Redis
     REDIS_ENABLED = False
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
-    REDIS_DB = 0
+    REDIS_URL = "redis://:password@localhost:6379"
+    REDIS_DATABASE = 0
 
     # URL Prefixes.
     FORUM_URL_PREFIX = ""

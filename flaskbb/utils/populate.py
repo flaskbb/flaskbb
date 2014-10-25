@@ -76,8 +76,13 @@ def create_admin_user(username, password, email):
     Creates the administrator user
     """
     admin_group = Group.query.filter_by(admin=True).first()
-    user = User(username=username, password=password, email=email,
-                date_joined=datetime.utcnow(), primary_group_id=admin_group.id)
+    user = User()
+
+    user.username = username
+    user.password = password
+    user.email = email
+    user.primary_group_id = admin_group.id
+
     user.save()
 
 
