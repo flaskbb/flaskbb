@@ -340,11 +340,10 @@ def time_delta_format(dt, default=None):
     )
 
     for period, singular, plural in periods:
-
-        if not period:
+        if period < 1:
             continue
 
-        if period == 1:
+        if 1 <= period < 2:
             return u'%d %s ago' % (period, singular)
         else:
             return u'%d %s ago' % (period, plural)
