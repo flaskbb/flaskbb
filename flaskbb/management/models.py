@@ -12,6 +12,7 @@ import sys
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form
+from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 
 
@@ -218,7 +219,7 @@ class Setting(db.Model):
         return settings
 
     @classmethod
-    @cache.memoize(timeout=sys.maxint)
+    @cache.memoize(timeout=max_integer)
     def as_dict(cls, from_group=None, upper=True):
         """Returns all settings as a dict. This method is cached. If you want
         to invalidate the cache, simply execute ``self.invalidate_cache()``.
@@ -235,6 +236,7 @@ class Setting(db.Model):
                 first_or_404()
             result = result.settings
         else:
+            print(Setting.query)
             result = cls.query.all()
 
         for setting in result:
