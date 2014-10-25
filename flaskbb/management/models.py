@@ -12,7 +12,7 @@ import sys
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form
-from flaskbb._compat import max_integer
+from flaskbb._compat import max_integer, text_type
 from flaskbb.extensions import db, cache
 
 
@@ -132,7 +132,7 @@ class Setting(db.Model):
                 if "coerce" in setting.extra:
                     coerce_to = setting.extra['coerce']
                 else:
-                    coerce_to = unicode
+                    coerce_to = text_type
 
                 setattr(
                     SettingsForm, setting.key,
@@ -150,7 +150,7 @@ class Setting(db.Model):
                 if "coerce" in setting.extra:
                     coerce_to = setting.extra['coerce']
                 else:
-                    coerce_to = unicode
+                    coerce_to = text_type
 
                 setattr(
                     SettingsForm, setting.key,
