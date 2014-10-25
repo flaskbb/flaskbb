@@ -69,7 +69,8 @@ setup(
         'pytest-cov',
         'redis',
         'simplejson',
-        'postmarkup'
+        'postmarkup',
+        'unidecode'
     ],
     dependency_links=[
         'https://github.com/frol/postmarkup/tarball/master#egg=postmarkup',

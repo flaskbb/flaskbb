@@ -12,7 +12,6 @@ import re
 import time
 import itertools
 import operator
-from unicodedata import normalize
 from datetime import datetime, timedelta
 
 from flask import session
@@ -20,7 +19,8 @@ from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 
 from postmarkup import render_bbcode
-from flaskbb._compat import range_method
+import unidecode
+from flaskbb._compat import range_method, text_type
 
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
@@ -35,12 +35,13 @@ def slugify(text, delim=u'-'):
    :param text: The text which should be slugified
    :param delim: Default "-". The delimeter for whitespace
     """
+
+    text = unidecode.unidecode(text)
     result = []
     for word in _punct_re.split(text.lower()):
-        word = normalize('NFKD', word).encode('ascii', 'ignore')
         if word:
             result.append(word)
-    return str(delim.join(str(result)))
+    return text_type(delim.join(result))
 
 
 def render_template(template, **context):

@@ -29,5 +29,6 @@ pytest-random==0.02
 redis==2.10.3
 simplejson==3.6.4
 flask-redis==0.0.6
+unidecode==0.04.16
 https://github.com/frol/postmarkup/tarball/master#egg=postmarkup
 https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-Whooshalchemy
