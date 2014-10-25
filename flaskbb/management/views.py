@@ -18,6 +18,7 @@ from flask.ext.login import current_user
 from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
 
 from flaskbb import __version__ as flaskbb_version
+from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
