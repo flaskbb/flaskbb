@@ -12,6 +12,7 @@ if not PY2:     # pragma: no cover
     string_types = (str,)
     integer_types = (int, )
     intern_method = sys.intern
+    range_method = range
     iterkeys = lambda d: iter(d.keys())
     itervalues = lambda d: iter(d.values())
     iteritems = lambda d: iter(d.items())
@@ -21,6 +22,7 @@ else:           # pragma: no cover
     string_types = (str, unicode)
     integer_types = (int, long)
     intern_method = intern
+    range_method = xrange
     iterkeys = lambda d: d.iterkeys()
     itervalues = lambda d: d.itervalues()
     iteritems = lambda d: d.iteritems()

@@ -20,8 +20,9 @@ from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 
 from postmarkup import render_bbcode
+from flaskbb._compat import range_method
 
-from flaskbb.extensions import redis
+from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
@@ -39,7 +40,7 @@ def slugify(text, delim=u'-'):
         word = normalize('NFKD', word).encode('ascii', 'ignore')
         if word:
             result.append(word)
-    return unicode(delim.join(result))
+    return str(delim.join(str(result)))
 
 
 def render_template(template, **context):
@@ -222,7 +223,7 @@ def mark_online(user_id, guest=False):
     else:
         all_users_key = 'online-users/%d' % (now // 60)
         user_key = 'user-activity/%s' % user_id
-    p = redis.pipeline()
+    p = redis_store.pipeline()
     p.sadd(all_users_key, user_id)
     p.set(user_key, now)
     p.expireat(all_users_key, expires)
@@ -238,9 +239,9 @@ def get_last_user_activity(user_id, guest=False):
     :param guest: If the user is a guest (not signed in)
     """
     if guest:
-        last_active = redis.get('guest-activity/%s' % user_id)
+        last_active = redis_store.get('guest-activity/%s' % user_id)
     else:
-        last_active = redis.get('user-activity/%s' % user_id)
+        last_active = redis_store.get('user-activity/%s' % user_id)
 
     if last_active is None:
         return None
@@ -253,11 +254,11 @@ def get_online_users(guest=False):
     :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
-    minutes = xrange(flaskbb_config['ONLINE_LAST_MINUTES'])
+    minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
-        return redis.sunion(['online-guests/%d' % (current - x)
+        return redis_store.sunion(['online-guests/%d' % (current - x)
                              for x in minutes])
-    return redis.sunion(['online-users/%d' % (current - x)
+    return redis_store.sunion(['online-users/%d' % (current - x)
                          for x in minutes])
 
 
