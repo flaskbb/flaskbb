@@ -40,7 +40,7 @@ setup(
     platforms='any',
     install_requires=[
         'Flask',
-        'Flask-And-Redis',
+        'Flask-Redis',
         'Flask-Cache',
         'Flask-DebugToolbar',
         'Flask-Login',
@@ -72,7 +72,8 @@ setup(
         'postmarkup'
     ],
     dependency_links=[
-        'https://github.com/frol/postmarkup/tarball/master#egg=postmarkup'
+        'https://github.com/frol/postmarkup/tarball/master#egg=postmarkup',
+        'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
