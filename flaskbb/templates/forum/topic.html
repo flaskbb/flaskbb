@@ -12,50 +12,7 @@
     <li class="active">{{ topic.title }}</li>
 </ol>
 
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(posts, topic.url) }}
-</div> <!-- end span pagination -->
-
-<div class="pull-right" style="padding-bottom: 10px">
-    <div class="btn btn-group">
-    {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-danger">
-            <span class="fa fa-trash-o"></span> Delete Topic
-        </a>
-    {% endif %}
-    {% if current_user|can_moderate(topic.forum) %}
-        {% if not topic.locked %}
-            <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-lock"></span> Lock Topic
-            </a>
-        {% else %}
-            <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-unlock"></span> Unlock Topic
-            </a>
-        {% endif %}
-    {% endif %}
-    </div>
-
-    {% if current_user.is_authenticated() %}
-    <div class="btn btn-group">
-        {% if current_user.is_tracking_topic(topic) %}
-        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default"><span class="fa fa-star">
-            </span> Untrack Topic
-        </a>
-        {% else %}
-        <a href="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default">
-            <span class="fa fa-star"></span> Track Topic
-        </a>
-        {% endif %}
-
-        {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
-        <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
-            <span class="fa fa-pencil"></span> Reply
-        </a>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
+{% include 'forum/topic_controls.html' %}
 
 <table class="table table-bordered">
     <tbody>
@@ -159,7 +116,7 @@
                         Report
                     </a> |
                     {% endif %}
-                    {% if current_user|edit_post(post.user_id, topic.forum) %}
+                    {% if current_user|edit_post(post) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
@@ -171,9 +128,9 @@
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}
-                    {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+                    {% if current_user|post_reply(topic) %}
                         <!-- Quick quote -->
-                        <a href="#" class="quote_btn" data-post-id="pid{{ post.id }}">Quote</a> |
+                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">Quote</a> |
                         <!-- Full quote/reply -->
                         <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">Reply</a>
                     {% endif %}
@@ -183,6 +140,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% include 'forum/topic_controls.html' %}
 
 {% if form %}
     {% from "macros.html" import render_field %}
@@ -198,5 +157,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
 {% endblock %}

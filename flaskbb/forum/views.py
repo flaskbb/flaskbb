@@ -17,7 +17,7 @@ from flask.ext.login import login_required, current_user
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import get_online_users, time_diff, render_template
+from flaskbb.utils.helpers import get_online_users, time_diff, render_template, format_quote
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
                                        can_edit_post, can_moderate)
@@ -113,15 +113,11 @@ def view_topic(topic_id, slug=None):
 
     form = None
 
-    if not topic.locked \
-        and not topic.forum.locked \
-        and can_post_reply(user=current_user,
-                           forum=topic.forum):
-
-            form = QuickreplyForm()
-            if form.validate_on_submit():
-                post = form.save(current_user, topic)
-                return view_post(post.id)
+    if can_post_reply(user=current_user, topic=topic):
+        form = QuickreplyForm()
+        if form.validate_on_submit():
+            post = form.save(current_user, topic)
+            return view_post(post.id)
 
     return render_template("forum/topic.html", topic=topic, posts=posts,
                            last_seen=time_diff(), form=form)
@@ -147,14 +143,8 @@ def view_post(post_id):
 def new_topic(forum_id, slug=None):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
-    if forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.",
-              "danger")
-        return redirect(forum.url)
-
     if not can_post_topic(user=current_user, forum=forum):
-        flash("You do not have the permissions to create a new topic.",
-              "danger")
+        flash("You do not have the permissions to create a new topic.", "danger")
         return redirect(forum.url)
 
     form = NewTopicForm()
@@ -270,17 +260,8 @@ def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
 def new_post(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if topic.forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.",
-              "danger")
-        return redirect(topic.forum.url)
-
-    if topic.locked:
-        flash("The topic is locked.", "danger")
-        return redirect(topic.forum.url)
-
-    if not can_post_reply(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to delete the topic", "danger")
+    if not can_post_reply(user=current_user, topic=topic):
+        flash("You do not have the permissions to post here", "danger")
         return redirect(topic.forum.url)
 
     form = ReplyForm()
@@ -300,16 +281,7 @@ def reply_post(topic_id, post_id):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     post = Post.query.filter_by(id=post_id).first_or_404()
 
-    if post.topic.forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.",
-              "danger")
-        return redirect(post.topic.forum.url)
-
-    if post.topic.locked:
-        flash("The topic is locked.", "danger")
-        return redirect(post.topic.forum.url)
-
-    if not can_post_reply(user=current_user, forum=topic.forum):
+    if not can_post_reply(user=current_user, topic=topic):
         flash("You do not have the permissions to post in this topic", "danger")
         return redirect(topic.forum.url)
 
@@ -321,7 +293,7 @@ def reply_post(topic_id, post_id):
             form.save(current_user, topic)
             return redirect(post.topic.url)
     else:
-        form.content.data = '[quote]{}[/quote]'.format(post.content)
+        form.content.data = format_quote(post)
 
     return render_template("forum/new_post.html", topic=post.topic, form=form)
 
@@ -331,17 +303,7 @@ def reply_post(topic_id, post_id):
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
-    if post.topic.forum.locked:
-        flash("This forum is locked; you cannot submit new topics or posts.",
-              "danger")
-        return redirect(post.topic.forum.url)
-
-    if post.topic.locked:
-        flash("The topic is locked.", "danger")
-        return redirect(post.topic.forum.url)
-
-    if not can_edit_post(user=current_user, forum=post.topic.forum,
-                         post_user_id=post.user_id):
+    if not can_edit_post(user=current_user, post=post):
         flash("You do not have the permissions to edit this post", "danger")
         return redirect(post.topic.url)
 
@@ -392,6 +354,13 @@ def report_post(post_id):
         flash("Thanks for reporting!", "success")
 
     return render_template("forum/report_post.html", form=form)
+
+
+@forum.route("/post/<int:post_id>/format_quote", methods=["POST", "GET"])
+@login_required
+def raw_post(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    return format_quote(post)
 
 
 @forum.route("/markread")
