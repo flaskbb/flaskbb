@@ -14,11 +14,12 @@ import itertools
 import operator
 from datetime import datetime, timedelta
 
-from flask import session
+from flask import session, url_for
 from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 
 from postmarkup import render_bbcode
+from markdown2 import markdown as render_markdown
 import unidecode
 from flaskbb._compat import range_method, text_type
 
@@ -279,7 +280,11 @@ def render_markup(text):
 
     :param text: The text that should be rendered as bbcode
     """
-    return render_bbcode(text)
+    if flaskbb_config['MARKUP_TYPE'] == 'bbcode':
+        return render_bbcode(text)
+    elif flaskbb_config['MARKUP_TYPE'] == 'markdown':
+        return render_markdown(text, extras=['tables'])
+    return text
 
 
 def is_online(user):
@@ -349,3 +354,14 @@ def time_delta_format(dt, default=None):
             return u'%d %s ago' % (period, plural)
 
     return default
+
+
+def format_quote(post):
+    if flaskbb_config['MARKUP_TYPE'] == 'markdown':
+        profile_url = url_for('user.profile', username=post.username)
+        content = '\n> '.join(post.content.strip().split('\n'))
+        return 'Quote from [{post.username}]({profile_url}):\n> {content}\n'.format(**locals())
+    else:
+        profile_url = url_for('user.profile', username=post.username, _external=True)
+        return 'Quote from [url={profile_url}]{post.username}[/url]:\n[quote]{post.content}[/quote]\n'.\
+            format(**locals())

@@ -17,7 +17,7 @@ from flask.ext.login import login_required, current_user
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import get_online_users, time_diff, render_template
+from flaskbb.utils.helpers import get_online_users, time_diff, render_template, format_quote
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
                                        can_edit_post, can_moderate)
@@ -321,7 +321,7 @@ def reply_post(topic_id, post_id):
             form.save(current_user, topic)
             return redirect(post.topic.url)
     else:
-        form.content.data = '[quote]{}[/quote]'.format(post.content)
+        form.content.data = format_quote(post)
 
     return render_template("forum/new_post.html", topic=post.topic, form=form)
 
@@ -392,6 +392,13 @@ def report_post(post_id):
         flash("Thanks for reporting!", "success")
 
     return render_template("forum/report_post.html", form=form)
+
+
+@forum.route("/post/<int:post_id>/format_quote", methods=["POST", "GET"])
+@login_required
+def raw_post(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    return format_quote(post)
 
 
 @forum.route("/markread")

@@ -130,7 +130,7 @@
                     {% endif %}
                     {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
                         <!-- Quick quote -->
-                        <a href="#" class="quote_btn" data-post-id="pid{{ post.id }}">Quote</a> |
+                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">Quote</a> |
                         <!-- Full quote/reply -->
                         <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">Reply</a>
                     {% endif %}
@@ -157,5 +157,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
 {% endblock %}
