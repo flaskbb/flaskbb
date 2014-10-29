@@ -116,7 +116,7 @@
                         Report
                     </a> |
                     {% endif %}
-                    {% if current_user|edit_post(post.user_id, topic.forum) %}
+                    {% if current_user|edit_post(post) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
@@ -128,7 +128,7 @@
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}
-                    {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+                    {% if current_user|post_reply(topic) %}
                         <!-- Quick quote -->
                         <a href="#" class="quote_btn" data-post-id="pid{{ post.id }}">Quote</a> |
                         <!-- Full quote/reply -->
