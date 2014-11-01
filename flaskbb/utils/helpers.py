@@ -259,9 +259,9 @@ def get_online_users(guest=False):
     minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
         return redis_store.sunion(['online-guests/%d' % (current - x)
-                             for x in minutes])
+                                   for x in minutes])
     return redis_store.sunion(['online-users/%d' % (current - x)
-                         for x in minutes])
+                               for x in minutes])
 
 
 def crop_title(title):
@@ -281,6 +281,7 @@ def render_markup(text):
     :param text: The text that should be rendered as bbcode
     """
     if flaskbb_config['MARKUP_TYPE'] == 'bbcode':
+        print render_bbcode(text)
         return render_bbcode(text)
     elif flaskbb_config['MARKUP_TYPE'] == 'markdown':
         return render_markdown(text, extras=['tables'])
@@ -357,11 +358,21 @@ def time_delta_format(dt, default=None):
 
 
 def format_quote(post):
+    """Returns a formatted quote depending on the markup language.
+
+    :param post: The quoted post."""
+
     if flaskbb_config['MARKUP_TYPE'] == 'markdown':
         profile_url = url_for('user.profile', username=post.username)
-        content = '\n> '.join(post.content.strip().split('\n'))
-        return 'Quote from [{post.username}]({profile_url}):\n> {content}\n'.format(**locals())
+        content = "\n> ".join(post.content.strip().split('\n'))
+        quote = "**[{post.username}]({profile_url}) wrote:**\n> {content}\n".\
+                format(post=post, profile_url=profile_url, content=content)
+
+        return quote
     else:
-        profile_url = url_for('user.profile', username=post.username, _external=True)
-        return 'Quote from [url={profile_url}]{post.username}[/url]:\n[quote]{post.content}[/quote]\n'.\
-            format(**locals())
+        profile_url = url_for('user.profile', username=post.username,
+                              _external=True)
+        quote = '[b][url={profile_url}]{post.username}[/url] wrote:[/b][quote]{post.content}[/quote]\n'.\
+                format(post=post, profile_url=profile_url)
+
+        return quote

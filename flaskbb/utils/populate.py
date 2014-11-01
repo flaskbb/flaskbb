@@ -8,14 +8,15 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
-
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
 
 def delete_settings_from_fixture(fixture):
+    """
+    Deletes the settings from a fixture from the database.
+    """
     for settingsgroup in fixture:
         group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
 
@@ -26,6 +27,9 @@ def delete_settings_from_fixture(fixture):
 
 
 def create_settings_from_fixture(fixture):
+    """
+    Inserts the settings from a fixture into the database.
+    """
     for settingsgroup in fixture:
         group = SettingsGroup(
             key=settingsgroup[0],
@@ -50,6 +54,9 @@ def create_settings_from_fixture(fixture):
 
 
 def create_default_settings():
+    """
+    Creates the default settings
+    """
     from flaskbb.fixtures.settings import fixture
     create_settings_from_fixture(fixture)
 
@@ -111,7 +118,10 @@ def create_welcome_forum():
 
 
 def create_test_data():
-
+    """
+    Creates 5 users, 2 categories and 2 forums in each category. It also opens
+    a new topic topic in each forum with a post.
+    """
     create_default_groups()
     create_default_settings()
 
