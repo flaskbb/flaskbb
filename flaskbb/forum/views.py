@@ -319,7 +319,6 @@ def reply_post(topic_id, post_id):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            print form.content.data
             return render_template("forum/new_post.html", topic=topic,
                                    form=form, preview=form.content.data)
         else:

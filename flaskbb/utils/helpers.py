@@ -281,7 +281,6 @@ def render_markup(text):
     :param text: The text that should be rendered as bbcode
     """
     if flaskbb_config['MARKUP_TYPE'] == 'bbcode':
-        print render_bbcode(text)
         return render_bbcode(text)
     elif flaskbb_config['MARKUP_TYPE'] == 'markdown':
         return render_markdown(text, extras=['tables'])
