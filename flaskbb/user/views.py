@@ -165,7 +165,7 @@ def new_message():
     to_user = request.args.get("to_user")
 
     if request.method == "POST":
-        if "save_message" in request.form:
+        if "save_message" in request.form and form.validate():
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
             form.save(from_user=current_user.id,
