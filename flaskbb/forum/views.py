@@ -17,7 +17,8 @@ from flask.ext.login import login_required, current_user
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import get_online_users, time_diff, render_template, format_quote
+from flaskbb.utils.helpers import (get_online_users, time_diff, render_template,
+                                   format_quote)
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
                                        can_edit_post, can_moderate)
@@ -150,7 +151,8 @@ def new_topic(forum_id, slug=None):
     form = NewTopicForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_topic.html", forum=forum, form=form, preview=form.content.data)
+            return render_template("forum/new_topic.html", forum=forum,
+                                   form=form, preview=form.content.data)
         else:
             topic = form.save(current_user, forum)
 
@@ -242,7 +244,7 @@ def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
 
     # TODO: Bulk merge
 
-    if not can_moderate(user=current_user, forum=topic.forum):
+    if not can_moderate(user=current_user, forum=old_topic.forum):
         flash("Yo do not have the permissions to merge this topic", "danger")
         return redirect(old_topic.url)
 
@@ -267,7 +269,8 @@ def new_post(topic_id, slug=None):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=topic, form=form, preview=form.content.data)
+            return render_template("forum/new_post.html", topic=topic,
+                                   form=form, preview=form.content.data)
         else:
             post = form.save(current_user, topic)
             return view_post(post.id)
@@ -288,7 +291,8 @@ def reply_post(topic_id, post_id):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=topic, form=form, preview=form.content.data)
+            return render_template("forum/new_post.html", topic=topic,
+                                   form=form, preview=form.content.data)
         else:
             form.save(current_user, topic)
             return redirect(post.topic.url)
@@ -310,7 +314,8 @@ def edit_post(post_id):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=post.topic, form=form, preview=form.content.data)
+            return render_template("forum/new_post.html", topic=post.topic,
+                                   form=form, preview=form.content.data)
         else:
             form.populate_obj(post)
             post.date_modified = datetime.datetime.utcnow()
@@ -356,7 +361,7 @@ def report_post(post_id):
     return render_template("forum/report_post.html", form=form)
 
 
-@forum.route("/post/<int:post_id>/format_quote", methods=["POST", "GET"])
+@forum.route("/post/<int:post_id>/raw", methods=["POST", "GET"])
 @login_required
 def raw_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
