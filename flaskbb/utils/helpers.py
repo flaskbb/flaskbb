@@ -158,7 +158,7 @@ def forum_is_unread(forum, forumsread, user):
         return forum.last_post.date_created > read_cutoff
 
     try:
-        return forumsread.cleared > forum.last_post.date_created
+        return forumsread.cleared < forum.last_post.date_created
     except TypeError:
         return forumsread.last_read < forum.last_post.date_created
 
