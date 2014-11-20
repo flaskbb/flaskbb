@@ -13,13 +13,13 @@ def test_moderator_permissions_in_forum(
 
     assert moderator_user in forum.moderators
 
-    assert can_post_reply(moderator_user, forum)
+    assert can_post_reply(moderator_user, topic)
     assert can_post_topic(moderator_user, forum)
-    assert can_edit_post(moderator_user, topic.user_id, forum)
+    assert can_edit_post(moderator_user, topic.first_post)
 
     assert can_moderate(moderator_user, forum)
-    assert can_delete_post(moderator_user, topic.user_id, forum)
-    assert can_delete_topic(moderator_user, topic.user_id, forum)
+    assert can_delete_post(moderator_user, topic.first_post)
+    assert can_delete_topic(moderator_user, topic)
 
 
 def test_moderator_permissions_without_forum(
@@ -32,17 +32,17 @@ def test_moderator_permissions_without_forum(
     assert not moderator_user in forum.moderators
     assert not can_moderate(moderator_user, forum)
 
-    assert can_post_reply(moderator_user, forum)
+    assert can_post_reply(moderator_user, topic)
     assert can_post_topic(moderator_user, forum)
 
-    assert not can_edit_post(moderator_user, topic.user_id, forum)
-    assert not can_delete_post(moderator_user, topic.user_id, forum)
-    assert not can_delete_topic(moderator_user, topic.user_id, forum)
+    assert not can_edit_post(moderator_user, topic.first_post)
+    assert not can_delete_post(moderator_user, topic.first_post)
+    assert not can_delete_topic(moderator_user, topic)
 
     # Test with own topic
-    assert can_delete_post(moderator_user, topic_moderator.user_id, forum)
-    assert can_delete_topic(moderator_user, topic_moderator.user_id, forum)
-    assert can_edit_post(moderator_user, topic_moderator.user_id, forum)
+    assert can_delete_post(moderator_user, topic_moderator.first_post)
+    assert can_delete_topic(moderator_user, topic_moderator)
+    assert can_edit_post(moderator_user, topic_moderator.first_post)
 
     # Test moderator permissions
     assert can_edit_user(moderator_user)
@@ -53,12 +53,12 @@ def test_normal_permissions(forum, user, topic):
     """Test the permissions for a normal user."""
     assert not can_moderate(user, forum)
 
-    assert can_post_reply(user, forum)
+    assert can_post_reply(user, topic)
     assert can_post_topic(user, forum)
 
-    assert can_edit_post(user, topic.user_id, forum)
-    assert not can_delete_post(user, topic.user_id, forum)
-    assert not can_delete_topic(user, topic.user_id, forum)
+    assert can_edit_post(user, topic.first_post)
+    assert not can_delete_post(user, topic.first_post)
+    assert not can_delete_topic(user, topic)
 
     assert not can_edit_user(user)
     assert not can_ban_user(user)
@@ -68,12 +68,12 @@ def test_admin_permissions(forum, admin_user, topic):
     """Test the permissions for a admin user."""
     assert can_moderate(admin_user, forum)
 
-    assert can_post_reply(admin_user, forum)
+    assert can_post_reply(admin_user, topic)
     assert can_post_topic(admin_user, forum)
 
-    assert can_edit_post(admin_user, topic.user_id, forum)
-    assert can_delete_post(admin_user, topic.user_id, forum)
-    assert can_delete_topic(admin_user, topic.user_id, forum)
+    assert can_edit_post(admin_user, topic.first_post)
+    assert can_delete_post(admin_user, topic.first_post)
+    assert can_delete_topic(admin_user, topic)
 
     assert can_edit_user(admin_user)
     assert can_ban_user(admin_user)
@@ -83,12 +83,12 @@ def test_super_moderator_permissions(forum, super_moderator_user, topic):
     """Test the permissions for a super moderator user."""
     assert can_moderate(super_moderator_user, forum)
 
-    assert can_post_reply(super_moderator_user, forum)
+    assert can_post_reply(super_moderator_user, topic)
     assert can_post_topic(super_moderator_user, forum)
 
-    assert can_edit_post(super_moderator_user, topic.user_id, forum)
-    assert can_delete_post(super_moderator_user, topic.user_id, forum)
-    assert can_delete_topic(super_moderator_user, topic.user_id, forum)
+    assert can_edit_post(super_moderator_user, topic.first_post)
+    assert can_delete_post(super_moderator_user, topic.first_post)
+    assert can_delete_topic(super_moderator_user, topic)
 
     assert can_edit_user(super_moderator_user)
     assert can_ban_user(super_moderator_user)

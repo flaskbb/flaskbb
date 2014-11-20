@@ -103,18 +103,18 @@ def can_edit_post(user, post):
                       post_user_id=post.user_id)
 
 
-def can_delete_post(user, post_user_id, forum):
+def can_delete_post(user, post):
     """Check if the post can be deleted by the user"""
 
-    return check_perm(user=user, perm='deletepost', forum=forum,
-                      post_user_id=post_user_id)
+    return check_perm(user=user, perm='deletepost', forum=post.topic.forum,
+                      post_user_id=post.user_id)
 
 
-def can_delete_topic(user, post_user_id, forum):
+def can_delete_topic(user, topic):
     """Check if the topic can be deleted by the user"""
 
-    return check_perm(user=user, perm='deletetopic', forum=forum,
-                      post_user_id=post_user_id)
+    return check_perm(user=user, perm='deletetopic', forum=topic.forum,
+                      post_user_id=topic.user_id)
 
 
 def can_post_reply(user, topic):

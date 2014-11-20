@@ -167,8 +167,7 @@ def new_topic(forum_id, slug=None):
 def delete_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_delete_topic(user=current_user, forum=topic.forum,
-                            post_user_id=topic.first_post.user_id):
+    if not can_delete_topic(user=current_user, topic=topic):
 
         flash("You do not have the permissions to delete the topic", "danger")
         return redirect(topic.forum.url)
@@ -335,8 +334,7 @@ def delete_post(post_id, slug=None):
 
     # TODO: Bulk delete
 
-    if not can_delete_post(user=current_user, forum=post.topic.forum,
-                           post_user_id=post.user_id):
+    if not can_delete_post(user=current_user, post=post):
         flash("You do not have the permissions to edit this post", "danger")
         return redirect(post.topic.url)
 
