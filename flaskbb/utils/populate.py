@@ -53,6 +53,47 @@ def create_settings_from_fixture(fixture):
             setting.save()
 
 
+def update_settings_from_fixture(fixture, overwrite_group=False,
+                                 overwrite_setting=False):
+    """
+    Updates the database settings from a fixture.
+    Returns the number of updated groups and settings.
+    """
+    groups_count = 0
+    settings_count = 0
+    for settingsgroup in fixture:
+
+        group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
+
+        if group is not None and overwrite_group or group is None:
+            groups_count += 1
+            group = SettingsGroup(
+                key=settingsgroup[0],
+                name=settingsgroup[1]['name'],
+                description=settingsgroup[1]['description']
+            )
+
+            group.save()
+
+        for settings in settingsgroup[1]['settings']:
+
+            setting = Setting.query.filter_by(key=settings[0]).first()
+
+            if setting is not None and overwrite_setting or setting is None:
+                settings_count += 1
+                setting = Setting(
+                    key=settings[0],
+                    value=settings[1]['value'],
+                    value_type=settings[1]['value_type'],
+                    name=settings[1]['name'],
+                    description=settings[1]['description'],
+                    extra=settings[1].get('extra', ""),
+                    settingsgroup=group.key
+                )
+                setting.save()
+    return groups_count, settings_count
+
+
 def create_default_settings():
     """
     Creates the default settings
