@@ -671,6 +671,11 @@ class Forum(db.Model):
         if not user.is_authenticated() or topicsread is None:
             return False
 
+        read_cutoff = None
+        if flaskbb_config['TRACKER_LENGTH'] > 0:
+            read_cutoff = datetime.utcnow() - timedelta(
+                days=flaskbb_config['TRACKER_LENGTH'])
+
         # fetch the unread posts in the forum
         unread_count = Topic.query.\
             outerjoin(TopicsRead,
@@ -680,6 +685,7 @@ class Forum(db.Model):
                       db.and_(ForumsRead.forum_id == Topic.forum_id,
                               ForumsRead.user_id == user.id)).\
             filter(Topic.forum_id == self.id,
+                   Topic.last_updated > read_cutoff,
                    db.or_(TopicsRead.last_read == None,
                           TopicsRead.last_read < Topic.last_updated)).\
             count()
