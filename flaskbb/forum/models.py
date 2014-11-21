@@ -507,6 +507,8 @@ class Topic(db.Model):
         # Set the last_updated time. Needed for the readstracker
         self.last_updated = datetime.utcnow()
 
+        self.date_created = datetime.utcnow()
+
         # Insert and commit the topic
         db.session.add(self)
         db.session.commit()
@@ -712,7 +714,7 @@ class Forum(db.Model):
             forumsread.save()
             return True
 
-        # Nothing updated, because there are still more than 0 unread topics
+        # Nothing updated, because there are still more than 0 unread topicsread
         return False
 
     def save(self, moderators=None):

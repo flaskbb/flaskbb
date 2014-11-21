@@ -157,10 +157,16 @@ def forum_is_unread(forum, forumsread, user):
         return forum.last_post.date_created > read_cutoff
 
     try:
-        # A user has never marked a forum as cleared
-        return forumsread.cleared < forum.last_post.date_created
+        # check if the forum has been cleared and if there is a new post
+        # since it have been cleared
+        if forum.last_post.date_created > forumsread.cleared:
+            if forum.last_post.date_created < forumsread.last_read:
+                return False
     except TypeError:
-        return forumsread.last_read < forum.last_post.date_created
+        pass
+
+    # else just check if the user has read the last post
+    return forum.last_post.date_created > forumsread.last_read
 
 
 def topic_is_unread(topic, topicsread, user, forumsread=None):
