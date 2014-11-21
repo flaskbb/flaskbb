@@ -4,12 +4,12 @@
 
 <div class="pull-right" style="padding-bottom: 10px">
     <div class="btn btn-group">
-        {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
+        {% if current_user|delete_topic(topic) %}
         <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-danger">
             <span class="fa fa-trash-o"></span> Delete Topic
         </a>
         {% endif %}
-        {% if current_user|can_moderate(topic.forum) %}
+        {% if current_user|can_moderate(topic) %}
         {% if not topic.locked %}
         <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
             <span class="fa fa-lock"></span> Lock Topic
