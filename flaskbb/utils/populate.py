@@ -139,7 +139,6 @@ def create_welcome_forum():
     This will create the `welcome forum` that nearly every
     forum software has after the installation process is finished
     """
-
     if User.query.count() < 1:
         raise "You need to create the admin user first!"
 

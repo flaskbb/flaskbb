@@ -36,7 +36,6 @@ def slugify(text, delim=u'-'):
    :param text: The text which should be slugified
    :param delim: Default "-". The delimeter for whitespace
     """
-
     text = unidecode.unidecode(text)
     result = []
     for word in _punct_re.split(text.lower()):
@@ -158,6 +157,7 @@ def forum_is_unread(forum, forumsread, user):
         return forum.last_post.date_created > read_cutoff
 
     try:
+        # A user has never marked a forum as cleared
         return forumsread.cleared < forum.last_post.date_created
     except TypeError:
         return forumsread.last_read < forum.last_post.date_created
@@ -327,7 +327,6 @@ def time_delta_format(dt, default=None):
     note: when Babel1.0 is released, use format_timedelta/timedeltaformat
           instead
     """
-
     if default is None:
         default = 'just now'
 
@@ -359,8 +358,8 @@ def time_delta_format(dt, default=None):
 def format_quote(post):
     """Returns a formatted quote depending on the markup language.
 
-    :param post: The quoted post."""
-
+    :param post: The quoted post.
+    """
     if flaskbb_config['MARKUP_TYPE'] == 'markdown':
         profile_url = url_for('user.profile', username=post.username)
         content = "\n> ".join(post.content.strip().split('\n'))
