@@ -7,7 +7,7 @@
 using the micro framework Flask.
 
 
-**_Note:_** Do not expect too much activity during the summer holidays - I hope you can understand this :)
+**_Note:_** I'm doing my exchange semester and most of the time I'm busy with traveling and such :). The project is not dead in any way - I'm just really busy.
 
 
 ## FEATURES
