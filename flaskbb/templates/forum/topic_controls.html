@@ -1,4 +1,3 @@
-
 <div class="pull-left" style="padding-bottom: 10px">
     {{ render_pagination(posts, topic.url) }}
 </div> <!-- end span pagination -->
@@ -35,7 +34,7 @@
         </a>
         {% endif %}
 
-        {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+        {% if current_user|post_reply(topic) %}
         <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
             <span class="fa fa-pencil"></span> Reply
         </a>
