@@ -85,7 +85,6 @@ class UserForm(Form):
         # TODO: Template rendering errors "NoneType is not callable"
         #       without this, figure out why.
         query_factory=select_primary_group,
-        allow_blank=True,
         get_label="name")
 
     def validate_username(self, field):
