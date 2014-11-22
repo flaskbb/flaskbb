@@ -80,11 +80,11 @@
 
   <!-- Left -->
   <div class="col-md-8">
-    <div class="panel panel-default">
-      <div class="panel-heading">
+    <div class="panel panel-default panel-widget">
+      <div class="panel-heading panel-widget-heading">
         <h3 class="panel-title">News</h3>
       </div>
-      <div class="panel-body" style="padding-top: 0px">
+      <div class="panel-body panel-widget-body" style="padding-top: 0px">
 
       {% for topic in news.items %}
         <h1><a href="{{ topic.url }}">{{ topic.title }}</a></h1>
@@ -106,11 +106,11 @@
 
   <!-- Right -->
   <div class="col-md-4">
-    <div class="panel panel-default">
-      <div class="panel-heading">
+    <div class="panel panel-default panel-widget">
+      <div class="panel-heading panel-widget-heading">
         <h3 class="panel-title">Recent Topics</h3>
       </div>
-      <div class="panel-body">
+      <div class="panel-body panel-widget-body">
       {% for topic in recent_topics %}
 
           <div class="portal-topic">
@@ -129,11 +129,11 @@
       </div>
     </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading">
+    <div class="panel panel-default panel-widget">
+      <div class="panel-heading panel-widget-heading">
         <h3 class="panel-title">Statistics</h3>
       </div>
-      <div class="panel-body">
+      <div class="panel-body panel-widget-body">
 
             <div class="portal-stats">
               <div class="portal-stats-left">
