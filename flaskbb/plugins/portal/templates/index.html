@@ -115,7 +115,7 @@
 
           <div class="portal-topic">
             <div class="portal-topic-name">
-              <a href="{{ topic.url }}">{{ topic.title }}</a>
+              <a href="{{ topic.url }}">{{ topic.title | truncate(length=45) }}</a>
             </div>
             <div class="portal-topic-updated-by">
               <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a>
