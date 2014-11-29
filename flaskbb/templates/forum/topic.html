@@ -120,11 +120,11 @@
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
-                        {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
+                        {% if current_user|delete_topic(topic) %}
                         <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">Delete</a> |
                         {% endif %}
                     {% else %}
-                        {% if current_user|delete_post(post.user_id, topic.forum) %}
+                        {% if current_user|delete_post(post) %}
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}
