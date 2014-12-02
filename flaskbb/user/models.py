@@ -419,6 +419,17 @@ class User(db.Model, UserMixin):
         ForumsRead.query.filter_by(user_id=self.id).delete()
         TopicsRead.query.filter_by(user_id=self.id).delete()
 
+        # This should actually be handeld by the dbms.. but dunno why it doesnt
+        # work here
+        from flaskbb.forum.models import Forum
+
+        last_post_forums = Forum.query.\
+            filter_by(last_post_user_id=self.id).all()
+
+        for forum in last_post_forums:
+            forum.last_post_user_id = None
+            forum.save()
+
         db.session.delete(self)
         db.session.commit()
 
@@ -430,6 +441,7 @@ class Guest(AnonymousUserMixin):
     def permissions(self):
         return self.get_permissions()
 
+    @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
         exclude = exclude or []
@@ -443,6 +455,12 @@ class Guest(AnonymousUserMixin):
                 continue
             perms[c.name] = getattr(group, c.name)
         return perms
+
+    @classmethod
+    def invalidate_cache(cls):
+        """Invalidates this objects cached metadata."""
+
+        cache.delete_memoized(cls.get_permissions, cls)
 
 
 class PrivateMessage(db.Model):

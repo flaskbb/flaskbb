@@ -25,7 +25,7 @@ from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required, moderator_required
 from flaskbb.utils.permissions import can_ban_user, can_edit_user
 from flaskbb.extensions import db
-from flaskbb.user.models import User, Group
+from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.management.forms import (AddUserForm, EditUserForm, AddGroupForm,
@@ -180,7 +180,6 @@ def banned_users():
         Group.id == User.primary_group_id
     ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-
     if search_form.validate():
         users = search_form.get_results().\
             paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
@@ -314,6 +313,9 @@ def edit_group(group_id):
     if form.validate_on_submit():
         form.populate_obj(group)
         group.save()
+
+        if group.guest:
+            Guest.invalidate_cache()
 
         flash("Group successfully edited.", "success")
         return redirect(url_for("management.groups", group_id=group.id))

@@ -11,6 +11,10 @@
 import os
 import logging
 import datetime
+import time
+
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 from flask import Flask, request
 from flask.ext.login import current_user
@@ -264,3 +268,18 @@ def configure_logging(app):
         mail_handler.setLevel(logging.ERROR)
         mail_handler.setFormatter(formatter)
         app.logger.addHandler(mail_handler)
+
+    if app.config["SQLALCHEMY_ECHO"]:
+        # Ref: http://stackoverflow.com/a/8428546
+        @event.listens_for(Engine, "before_cursor_execute")
+        def before_cursor_execute(conn, cursor, statement,
+                                  parameters, context, executemany):
+            context._query_start_time = time.time()
+
+        @event.listens_for(Engine, "after_cursor_execute")
+        def after_cursor_execute(conn, cursor, statement,
+                                 parameters, context, executemany):
+            total = time.time() - context._query_start_time
+
+            # Modification for StackOverflow: times in milliseconds
+            app.logger.debug("Total Time: %.02fms" % (total*1000))

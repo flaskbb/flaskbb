@@ -16,7 +16,7 @@
 
 <table class="table table-bordered">
     <tbody>
-        {% for post in posts.items %}
+        {% for post, user in posts.items %}
         <tr>
             <td >
                 <span class="pull-right">
@@ -47,28 +47,28 @@
             <table class="table table-borderless">
                 <tr>
                 {% if post.user_id %}
-                    {% if post.user.avatar %}
+                    {% if user.avatar %}
                     <td width="1">
-                        <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
+                        <img src="{{ user.avatar }}" alt="Avatar" height="100" width="100">
                     </td>
                     {% endif %}
                     <td>
-                        <a href="{{ post.user.url }}">
-                            <span style="font-weight:bold">{{ post.user.username }}</span> <!-- TODO: Implement userstyles -->
+                        <a href="{{ user.url }}">
+                            <span style="font-weight:bold">{{ user.username }}</span> <!-- TODO: Implement userstyles -->
                         </a>
-                            {%- if post.user|is_online %}
+                            {%- if user|is_online %}
                             <span class="label label-success">Online</span>
                             {%- else %}
                             <span class="label label-default">Offline</span>
                             {%- endif %}
                             <div class="profile primary-group">
-                            {{ post.user.primary_group.name }}
+                            {{ user.primary_group.name }}
                             </div>
                     </td>
 
                     <td class="pull-right">
-                        Posts: {{ post.user.post_count }}<br />
-                        Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
+                        Posts: {{ user.post_count }}<br />
+                        Registered since: {{ user.date_joined|format_date('%b %d %Y') }}<br />
                     </td>
                 {% else %}
                     <td>
@@ -88,10 +88,10 @@
                 {% autoescape false %}
                     {{ post.content|markup }}
                     <!-- Signature Begin -->
-                    {% if post.user_id and post.user.signature %}
+                    {% if post.user_id and user.signature %}
                     <div class="signature">
                         <hr>
-                        {{ post.user.signature|markup }}
+                        {{ user.signature|markup }}
                     </div>
                     {% endif %}
                     <!-- Signature End -->
@@ -105,8 +105,8 @@
                     {% if current_user.is_authenticated() and post.user_id and post.user_id != current_user.id %}
                     <a href="{{ url_for('user.new_message', to_user=post.user.username) }}">PM</a>
                     {% endif %}
-                    {% if post.user.website %}
-                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{post.user.website}}">Website</a>
+                    {% if user.website %}
+                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">Website</a>
                     {% endif %}
                 </span>
 
@@ -120,11 +120,11 @@
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
-                        {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
+                        {% if current_user|delete_topic(topic) %}
                         <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">Delete</a> |
                         {% endif %}
                     {% else %}
-                        {% if current_user|delete_post(post.user_id, topic.forum) %}
+                        {% if current_user|delete_post(post) %}
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}

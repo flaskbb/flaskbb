@@ -380,7 +380,7 @@ def test_topic_move(topic):
 
     assert topic.move(forum_other)
 
-    assert forum_old.topics == []
+    assert forum_old.topics.all() == []
     assert forum_old.last_post_id is None
 
     assert forum_old.topic_count == 0

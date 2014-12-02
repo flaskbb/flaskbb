@@ -26,7 +26,7 @@ from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
-from flaskbb.user.models import User
+from flaskbb.user.models import User, Group
 
 forum = Blueprint("forum", __name__)
 
@@ -94,13 +94,20 @@ def view_forum(forum_id, slug=None):
 def view_topic(topic_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
+    # Fetch some information about the topic
     topic = Topic.query.filter_by(id=topic_id).first()
-    posts = Post.query.filter_by(topic_id=topic.id).\
-        order_by(Post.id.asc()).\
-        paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
     # Count the topic views
     topic.views += 1
+    topic.save()
+
+    # fetch the posts in the topic
+    posts = Post.query.\
+        join(User, Post.user_id == User.id).\
+        filter(Post.topic_id == topic.id).\
+        add_entity(User).\
+        order_by(Post.id.asc()).\
+        paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
     # Update the topicsread status if the user hasn't read it
     forumsread = None
@@ -110,7 +117,6 @@ def view_topic(topic_id, slug=None):
                       forum_id=topic.forum.id).first()
 
     topic.update_read(current_user, topic.forum, forumsread)
-    topic.save()
 
     form = None
 

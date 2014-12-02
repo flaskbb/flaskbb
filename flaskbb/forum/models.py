@@ -156,7 +156,7 @@ class Post(db.Model):
                                        use_alter=True,
                                        name="fk_post_topic_id",
                                        ondelete="CASCADE"))
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
@@ -211,7 +211,13 @@ class Post(db.Model):
 
             # Now lets update the last post id
             topic.last_post_id = self.id
+
+            # Update the last post info for the forum
             topic.forum.last_post_id = self.id
+            topic.forum.last_post_title = topic.title
+            topic.forum.last_post_user_id = user.id
+            topic.forum.last_post_username = user.username
+            topic.forum.last_post_created = datetime.utcnow()
 
             # Update the post counts
             user.post_count += 1
@@ -301,7 +307,7 @@ class Topic(db.Model):
                                 foreign_keys=[last_post_id])
 
     # One-to-many
-    posts = db.relationship("Post", backref="topic", lazy="joined",
+    posts = db.relationship("Post", backref="topic", lazy="dynamic",
                             primaryjoin="Post.topic_id == Topic.id",
                             cascade="all, delete-orphan", post_update=True)
 
@@ -493,6 +499,7 @@ class Topic(db.Model):
 
         :param post: The post object which is connected to the topic
         """
+
         # Updates the topic
         if self.id:
             db.session.add(self)
@@ -545,6 +552,10 @@ class Topic(db.Model):
             # There is no second last post
             except IndexError:
                 self.forum.last_post_id = None
+                self.forum.last_post_title = None
+                self.forum.last_post_user_id = None
+                self.forum.last_post_username = None
+                self.forum.last_post_created = None
 
             # Commit the changes
             db.session.commit()
@@ -599,8 +610,14 @@ class Forum(db.Model):
     last_post = db.relationship("Post", backref="last_post_forum",
                                 uselist=False, foreign_keys=[last_post_id])
 
+    # Not nice, but needed to improve the performance
+    last_post_title = db.Column(db.String(255))
+    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    last_post_username = db.Column(db.String(255))
+    last_post_created = db.Column(db.DateTime, default=datetime.utcnow())
+
     # One-to-many
-    topics = db.relationship("Topic", backref="forum", lazy="joined",
+    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
                              cascade="all, delete-orphan")
 
     # Many-to-many
@@ -622,6 +639,11 @@ class Forum(db.Model):
         if self.external:
             return self.external
         return url_for("forum.view_forum", forum_id=self.id, slug=self.slug)
+
+    @property
+    def last_post_url(self):
+        """Returns the url for the last post in the forum"""
+        return url_for("forum.view_post", post_id=self.last_post_id)
 
     # Methods
     def __repr__(self):
