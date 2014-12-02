@@ -205,3 +205,29 @@ def create_test_data():
             post = Post()
             post.content = "Test Post"
             post.save(user=user2, topic=topic)
+
+
+def insert_mass_data():
+    """
+    Creates 100 topics in the first forum and each topic has 100 posts.
+    """
+    user1 = User.query.filter_by(id=1).first()
+    user2 = User.query.filter_by(id=2).first()
+    forum = Forum.query.filter_by(id=1).first()
+
+    # create 1000 topics
+    for i in range(1, 101):
+
+        # create a topic
+        topic = Topic()
+        post = Post()
+
+        topic.title = "Test Title %s" % i
+        post.content = "Test Content"
+        topic.save(post=post, user=user1, forum=forum)
+
+        # create 100 posts in each topic
+        for j in range(1, 100):
+            post = Post()
+            post.content = "Test Post"
+            post.save(user=user2, topic=topic)

@@ -23,7 +23,7 @@ from flaskbb import create_app
 from flaskbb.extensions import db
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
-                                    create_default_settings,
+                                    create_default_settings, insert_mass_data,
                                     update_settings_from_fixture)
 
 # Use the development configuration if available
@@ -165,6 +165,14 @@ def initflaskbb(username=None, password=None, email=None):
     create_welcome_forum()
 
     app.logger.info("Congratulations! FlaskBB has been successfully installed")
+
+
+@manager.command
+def insertmassdata():
+    """Warning: This can take a long time!.
+    Creates 100 topics and each topic contains 100 posts.
+    """
+    insert_mass_data()
 
 
 if __name__ == "__main__":
