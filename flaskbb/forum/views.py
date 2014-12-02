@@ -338,12 +338,16 @@ def delete_post(post_id, slug=None):
         flash("You do not have the permissions to edit this post", "danger")
         return redirect(post.topic.url)
 
+    first_post = post.first_post
+    topic_url = post.topic.url
+    forum_url = post.topic.forum.url
+
     post.delete()
 
     # If the post was the first post in the topic, redirect to the forums
-    if post.first_post:
-        return redirect(post.topic.forum.url)
-    return redirect(post.topic.url)
+    if first_post:
+        return redirect(forum_url)
+    return redirect(topic_url)
 
 
 @forum.route("/post/<int:post_id>/report", methods=["GET", "POST"])
