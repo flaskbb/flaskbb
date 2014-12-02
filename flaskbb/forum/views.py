@@ -459,7 +459,7 @@ def topictracker():
                   db.and_(TopicsRead.topic_id == Topic.id,
                           TopicsRead.user_id == current_user.id)).\
         add_entity(TopicsRead).\
-        order_by(Post.id.desc()).\
+        order_by(Topic.last_updated.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
 
     return render_template("forum/topictracker.html", topics=topics)
