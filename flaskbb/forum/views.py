@@ -26,7 +26,7 @@ from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
                                  ReportForm, UserSearchForm, SearchPageForm)
-from flaskbb.user.models import User, Group
+from flaskbb.user.models import User
 
 forum = Blueprint("forum", __name__)
 
@@ -77,16 +77,21 @@ def view_category(category_id, slug=None):
 def view_forum(forum_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
-    forum, forumsread = Forum.get_forum(forum_id=forum_id, user=current_user)
+    forum_instance, forumsread = Forum.get_forum(forum_id=forum_id,
+                                                 user=current_user)
 
-    if forum.external:
-        return redirect(forum.external)
+    if forum_instance.external:
+        return redirect(forum_instance.external)
 
-    topics = Forum.get_topics(forum_id=forum.id, user=current_user, page=page,
-                              per_page=flaskbb_config["TOPICS_PER_PAGE"])
+    topics = Forum.get_topics(
+        forum_id=forum_instance.id, user=current_user, page=page,
+        per_page=flaskbb_config["TOPICS_PER_PAGE"]
+    )
 
-    return render_template("forum/forum.html", forum=forum, topics=topics,
-                           forumsread=forumsread,)
+    return render_template(
+        "forum/forum.html", forum=forum_instance,
+        topics=topics, forumsread=forumsread,
+    )
 
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
@@ -148,23 +153,28 @@ def view_post(post_id):
 @forum.route("/<int:forum_id>-<slug>/topic/new", methods=["POST", "GET"])
 @login_required
 def new_topic(forum_id, slug=None):
-    forum = Forum.query.filter_by(id=forum_id).first_or_404()
+    forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
 
     if not can_post_topic(user=current_user, forum=forum):
-        flash("You do not have the permissions to create a new topic.", "danger")
+        flash("You do not have the permissions to create a new topic.",
+              "danger")
         return redirect(forum.url)
 
     form = NewTopicForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_topic.html", forum=forum,
-                                   form=form, preview=form.content.data)
+            return render_template(
+                "forum/new_topic.html", forum=forum_instance,
+                form=form, preview=form.content.data
+            )
         else:
-            topic = form.save(current_user, forum)
+            topic = form.save(current_user, forum_instance)
 
             # redirect to the new topic
             return redirect(url_for('forum.view_topic', topic_id=topic.id))
-    return render_template("forum/new_topic.html", forum=forum, form=form)
+    return render_template(
+        "forum/new_topic.html", forum=forum_instance, form=form
+    )
 
 
 @forum.route("/topic/<int:topic_id>/delete")
@@ -220,23 +230,28 @@ def unlock_topic(topic_id, slug=None):
 
 
 @forum.route("/topic/<int:topic_id>/move/<int:forum_id>")
-@forum.route("/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>")
+@forum.route(
+    "/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>"
+)
 @login_required
 def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
-    forum = Forum.query.filter_by(id=forum_id).first_or_404()
+    forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     # TODO: Bulk move
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to move this topic", "danger")
-        return redirect(forum.url)
+        flash("Yo do not have the permissions to move this topic", "danger")
+        return redirect(forum_instance.url)
 
-    if not topic.move(forum):
-        flash("Could not move the topic to forum %s" % forum.title, "danger")
+    if not topic.move(forum_instance):
+        flash(
+            "Could not move the topic to forum %s" % forum_instance.title,
+            "danger"
+        )
         return redirect(topic.url)
 
-    flash("Topic was moved to forum %s" % forum.title, "success")
+    flash("Topic was moved to forum %s" % forum_instance.title, "success")
     return redirect(topic.url)
 
 
@@ -244,21 +259,22 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
 @forum.route("/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>")
 @login_required
 def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
-    old_topic = Topic.query.filter_by(id=old_id).first_or_404()
-    new_topic = Topic.query.filter_by(id=new_id).first_or_404()
+    _old_topic = Topic.query.filter_by(id=old_id).first_or_404()
+    _new_topic = Topic.query.filter_by(id=new_id).first_or_404()
 
     # TODO: Bulk merge
 
-    if not can_moderate(user=current_user, forum=old_topic.forum):
+    # Looks to me that the user should have permissions on both forums, right?
+    if not can_moderate(user=current_user, forum=_old_topic.forum):
         flash("Yo do not have the permissions to merge this topic", "danger")
-        return redirect(old_topic.url)
+        return redirect(_old_topic.url)
 
-    if not old_topic.merge(new_topic):
+    if not _old_topic.merge(_new_topic):
         flash("Could not merge the topic.", "danger")
-        return redirect(old_topic.url)
+        return redirect(_old_topic.url)
 
     flash("Topic succesfully merged.", "success")
-    return redirect(new_topic.url)
+    return redirect(_new_topic.url)
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
@@ -274,8 +290,10 @@ def new_post(topic_id, slug=None):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=topic,
-                                   form=form, preview=form.content.data)
+            return render_template(
+                "forum/new_post.html", topic=topic,
+                form=form, preview=form.content.data
+            )
         else:
             post = form.save(current_user, topic)
             return view_post(post.id)
@@ -283,7 +301,9 @@ def new_post(topic_id, slug=None):
     return render_template("forum/new_post.html", topic=topic, form=form)
 
 
-@forum.route("/topic/<int:topic_id>/post/<int:post_id>/reply", methods=["POST", "GET"])
+@forum.route(
+    "/topic/<int:topic_id>/post/<int:post_id>/reply", methods=["POST", "GET"]
+)
 @login_required
 def reply_post(topic_id, post_id):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -296,8 +316,10 @@ def reply_post(topic_id, post_id):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=topic,
-                                   form=form, preview=form.content.data)
+            return render_template(
+                "forum/new_post.html", topic=topic,
+                form=form, preview=form.content.data
+            )
         else:
             form.save(current_user, topic)
             return redirect(post.topic.url)
@@ -319,8 +341,10 @@ def edit_post(post_id):
     form = ReplyForm()
     if form.validate_on_submit():
         if request.form['button'] == 'preview':
-            return render_template("forum/new_post.html", topic=post.topic,
-                                   form=form, preview=form.content.data)
+            return render_template(
+                "forum/new_post.html", topic=post.topic,
+                form=form, preview=form.content.data
+            )
         else:
             form.populate_obj(post)
             post.date_modified = datetime.datetime.utcnow()
@@ -383,16 +407,17 @@ def raw_post(post_id):
 def markread(forum_id=None, slug=None):
     # Mark a single forum as read
     if forum_id:
-        forum = Forum.query.filter_by(id=forum_id).first_or_404()
-        forumsread = ForumsRead.query.filter_by(user_id=current_user.id,
-                                                forum_id=forum.id).first()
+        forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
+        forumsread = ForumsRead.query.filter_by(
+            user_id=current_user.id, forum_id=forum_instance.id
+        ).first()
         TopicsRead.query.filter_by(user_id=current_user.id,
-                                   forum_id=forum.id).delete()
+                                   forum_id=forum_instance.id).delete()
 
         if not forumsread:
             forumsread = ForumsRead()
             forumsread.user_id = current_user.id
-            forumsread.forum_id = forum.id
+            forumsread.forum_id = forum_instance.id
 
         forumsread.last_read = datetime.datetime.utcnow()
         forumsread.cleared = datetime.datetime.utcnow()
@@ -400,7 +425,7 @@ def markread(forum_id=None, slug=None):
         db.session.add(forumsread)
         db.session.commit()
 
-        return redirect(forum.url)
+        return redirect(forum_instance.url)
 
     # Mark all forums as read
     ForumsRead.query.filter_by(user_id=current_user.id).delete()
@@ -408,10 +433,10 @@ def markread(forum_id=None, slug=None):
 
     forums = Forum.query.all()
     forumsread_list = []
-    for forum in forums:
+    for forum_instance in forums:
         forumsread = ForumsRead()
         forumsread.user_id = current_user.id
-        forumsread.forum_id = forum.id
+        forumsread.forum_id = forum_instance.id
         forumsread.last_read = datetime.datetime.utcnow()
         forumsread.cleared = datetime.datetime.utcnow()
         forumsread_list.append(forumsread)
