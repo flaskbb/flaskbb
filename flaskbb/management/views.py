@@ -125,7 +125,7 @@ def edit_user(user_id):
 
     secondary_group_query = Group.query.filter(
         db.not_(Group.id == user.primary_group_id),
-        db.not_(Group.banned == True),
+        db.not_(Group.banned),
         db.not_(Group.guest == True))
 
     form = EditUserForm(user)
@@ -203,10 +203,10 @@ def ban_user(user_id):
     # Do not allow moderators to ban admins
     if user.get_permissions()['admin'] and \
             (current_user.permissions['mod'] or
-                current_user.permissions['super_mod']):
+             current_user.permissions['super_mod']):
 
-            flash("A moderator cannot ban an admin user.", "danger")
-            return redirect(url_for("management.overview"))
+        flash("A moderator cannot ban an admin user.", "danger")
+        return redirect(url_for("management.overview"))
 
     if user.ban():
         flash("User was banned successfully.", "success")
@@ -368,8 +368,9 @@ def edit_forum(forum_id):
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
-            form.moderators.data = ",".join([user.username
-                                            for user in forum.moderators])
+            form.moderators.data = ",".join([
+                user.username for user in forum.moderators
+            ])
         else:
             form.moderators.data = None
 

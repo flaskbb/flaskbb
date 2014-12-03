@@ -11,8 +11,8 @@
 from flask.ext.wtf import Form
 from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField)
-from wtforms.validators import (DataRequired, Optional, Email, regexp, Length, URL,
-                                ValidationError)
+from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
+                                URL, ValidationError)
 
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
@@ -36,7 +36,7 @@ def selectable_categories():
 
 
 def select_primary_group():
-    return Group.query.filter(Group.guest == False).order_by(Group.id)
+    return Group.query.filter(not Group.guest).order_by(Group.id)
 
 
 class UserForm(Form):
@@ -90,9 +90,10 @@ class UserForm(Form):
     def validate_username(self, field):
         if hasattr(self, "user"):
             user = User.query.filter(
-                db.and_(User.username.like(field.data),
-                        db.not_(User.id == self.user.id)
-                        )
+                db.and_(
+                    User.username.like(field.data),
+                    db.not_(User.id == self.user.id)
+                )
             ).first()
         else:
             user = User.query.filter(User.username.like(field.data)).first()
@@ -103,9 +104,10 @@ class UserForm(Form):
     def validate_email(self, field):
         if hasattr(self, "user"):
             user = User.query.filter(
-                db.and_(User.email.like(field.data),
-                        db.not_(User.id == self.user.id)
-                        )
+                db.and_(
+                    User.email.like(field.data),
+                    db.not_(User.id == self.user.id)
+                )
             ).first()
         else:
             user = User.query.filter(User.email.like(field.data)).first()
@@ -193,9 +195,10 @@ class GroupForm(Form):
     def validate_name(self, field):
         if hasattr(self, "group"):
             group = Group.query.filter(
-                db.and_(Group.name.like(field.data),
-                        db.not_(Group.id == self.group.id)
-                        )
+                db.and_(
+                    Group.name.like(field.data),
+                    db.not_(Group.id == self.group.id)
+                )
             ).first()
         else:
             group = Group.query.filter(Group.name.like(field.data)).first()
@@ -206,9 +209,10 @@ class GroupForm(Form):
     def validate_banned(self, field):
         if hasattr(self, "group"):
             group = Group.query.filter(
-                db.and_(Group.banned == True,
-                        db.not_(Group.id == self.group.id)
-                        )
+                db.and_(
+                    Group.banned,
+                    db.not_(Group.id == self.group.id)
+                )
             ).count()
         else:
             group = Group.query.filter_by(banned=True).count()
@@ -219,9 +223,10 @@ class GroupForm(Form):
     def validate_guest(self, field):
         if hasattr(self, "group"):
             group = Group.query.filter(
-                db.and_(Group.guest == True,
-                        db.not_(Group.id == self.group.id)
-                        )
+                db.and_(
+                    Group.guest,
+                    db.not_(Group.id == self.group.id)
+                )
             ).count()
         else:
             group = Group.query.filter_by(guest=True).count()
@@ -246,15 +251,22 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(Form):
-    title = StringField("Forum Title", validators=[
-        DataRequired(message="Forum title required")])
+    title = StringField(
+        "Forum Title",
+        validators=[DataRequired(message="Forum title required")]
+    )
 
-    description = TextAreaField("Description", validators=[
-        Optional()],
-        description="You can format your description with BBCode.")
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()],
+        description="You can format your description with BBCode."
+    )
 
-    position = IntegerField("Position", default=1, validators=[
-        DataRequired(message="Forum position required")])
+    position = IntegerField(
+        "Position",
+        default=1,
+        validators=[DataRequired(message="Forum position required")]
+    )
 
     category = QuerySelectField(
         "Category",
@@ -264,9 +276,11 @@ class ForumForm(Form):
         description="The category that contains this forum."
     )
 
-    external = StringField("External link", validators=[
-        Optional(), URL()],
-        description="A link to a website i.e. 'http://flaskbb.org'")
+    external = StringField(
+        "External link",
+        validators=[Optional(), URL()],
+        description="A link to a website i.e. 'http://flaskbb.org'"
+    )
 
     moderators = StringField(
         "Moderators",
@@ -354,12 +368,17 @@ class CategoryForm(Form):
     title = StringField("Category title", validators=[
         DataRequired(message="Category title required")])
 
-    description = TextAreaField("Description", validators=[
-        Optional()],
-        description="You can format your description with BBCode.")
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()],
+        description="You can format your description with BBCode."
+    )
 
-    position = IntegerField("Position", default=1, validators=[
-        DataRequired(message="Category position required")])
+    position = IntegerField(
+        "Position",
+        default=1,
+        validators=[DataRequired(message="Category position required")]
+    )
 
     def save(self):
         category = Category(**self.data)

@@ -74,7 +74,9 @@ def configure_blueprints(app):
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
     app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
-    app.register_blueprint(management, url_prefix=app.config["ADMIN_URL_PREFIX"])
+    app.register_blueprint(
+        management, url_prefix=app.config["ADMIN_URL_PREFIX"]
+    )
 
 
 def configure_extensions(app):
@@ -125,7 +127,7 @@ def configure_extensions(app):
         Loads the user. Required by the `login` extension
         """
         unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
-            filter(PrivateMessage.unread == True,
+            filter(PrivateMessage.unread,
                    PrivateMessage.user_id == id).subquery()
         u = db.session.query(User, unread_count).filter(User.id == id).first()
 
