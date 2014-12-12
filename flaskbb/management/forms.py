@@ -36,7 +36,7 @@ def selectable_categories():
 
 
 def select_primary_group():
-    return Group.query.filter(not Group.guest).order_by(Group.id)
+    return Group.query.filter(Group.guest != True).order_by(Group.id)
 
 
 class UserForm(Form):
