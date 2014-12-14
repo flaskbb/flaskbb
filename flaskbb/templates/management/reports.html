@@ -33,7 +33,7 @@
         <tbody>
             {% for report in reports.items %}
             <tr>
-                <td>{{ report.id }}</td>
+                <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.id }}</a></td>
                 <td>{{ report.post.user.username }}</td>
                 <td>{{ report.post.topic.title }}</td>
                 <td>{{ report.reporter.username }}</td>
