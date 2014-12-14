@@ -12,54 +12,11 @@
     <li class="active">{{ topic.title }}</li>
 </ol>
 
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(posts, topic.url) }}
-</div> <!-- end span pagination -->
-
-<div class="pull-right" style="padding-bottom: 10px">
-    <div class="btn btn-group">
-    {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
-        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-danger">
-            <span class="fa fa-trash-o"></span> Delete Topic
-        </a>
-    {% endif %}
-    {% if current_user|can_moderate(topic.forum) %}
-        {% if not topic.locked %}
-            <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-lock"></span> Lock Topic
-            </a>
-        {% else %}
-            <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-unlock"></span> Unlock Topic
-            </a>
-        {% endif %}
-    {% endif %}
-    </div>
-
-    {% if current_user.is_authenticated() %}
-    <div class="btn btn-group">
-        {% if current_user.is_tracking_topic(topic) %}
-        <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default"><span class="fa fa-star">
-            </span> Untrack Topic
-        </a>
-        {% else %}
-        <a href="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default">
-            <span class="fa fa-star"></span> Track Topic
-        </a>
-        {% endif %}
-
-        {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
-        <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
-            <span class="fa fa-pencil"></span> Reply
-        </a>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
+{% include 'forum/topic_controls.html' %}
 
 <table class="table table-bordered">
     <tbody>
-        {% for post in posts.items %}
+        {% for post, user in posts.items %}
         <tr>
             <td >
                 <span class="pull-right">
@@ -90,28 +47,28 @@
             <table class="table table-borderless">
                 <tr>
                 {% if post.user_id %}
-                    {% if post.user.avatar %}
+                    {% if user.avatar %}
                     <td width="1">
-                        <img src="{{ post.user.avatar }}" alt="Avatar" height="100" width="100">
+                        <img src="{{ user.avatar }}" alt="Avatar" height="100" width="100">
                     </td>
                     {% endif %}
                     <td>
-                        <a href="{{ post.user.url }}">
-                            <span style="font-weight:bold">{{ post.user.username }}</span> <!-- TODO: Implement userstyles -->
+                        <a href="{{ user.url }}">
+                            <span style="font-weight:bold">{{ user.username }}</span> <!-- TODO: Implement userstyles -->
                         </a>
-                            {%- if post.user|is_online %}
+                            {%- if user|is_online %}
                             <span class="label label-success">Online</span>
                             {%- else %}
                             <span class="label label-default">Offline</span>
                             {%- endif %}
                             <div class="profile primary-group">
-                            {{ post.user.primary_group.name }}
+                            {{ user.primary_group.name }}
                             </div>
                     </td>
 
                     <td class="pull-right">
-                        Posts: {{ post.user.post_count }}<br />
-                        Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
+                        Posts: {{ user.post_count }}<br />
+                        Registered since: {{ user.date_joined|format_date('%b %d %Y') }}<br />
                     </td>
                 {% else %}
                     <td>
@@ -131,10 +88,10 @@
                 {% autoescape false %}
                     {{ post.content|markup }}
                     <!-- Signature Begin -->
-                    {% if post.user_id and post.user.signature %}
+                    {% if post.user_id and user.signature %}
                     <div class="signature">
                         <hr>
-                        {{ post.user.signature|markup }}
+                        {{ user.signature|markup }}
                     </div>
                     {% endif %}
                     <!-- Signature End -->
@@ -148,8 +105,8 @@
                     {% if current_user.is_authenticated() and post.user_id and post.user_id != current_user.id %}
                     <a href="{{ url_for('user.new_message', to_user=post.user.username) }}">PM</a>
                     {% endif %}
-                    {% if post.user.website %}
-                    | <a href="{{post.user.website}}">Website</a>
+                    {% if user.website %}
+                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">Website</a>
                     {% endif %}
                 </span>
 
@@ -159,21 +116,21 @@
                         Report
                     </a> |
                     {% endif %}
-                    {% if current_user|edit_post(post.user_id, topic.forum) %}
+                    {% if current_user|edit_post(post) %}
                     <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
-                        {% if current_user|delete_topic(topic.first_post.user_id, topic.forum) %}
+                        {% if current_user|delete_topic(topic) %}
                         <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">Delete</a> |
                         {% endif %}
                     {% else %}
-                        {% if current_user|delete_post(post.user_id, topic.forum) %}
+                        {% if current_user|delete_post(post) %}
                         <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
                         {% endif %}
                     {% endif %}
-                    {% if current_user|post_reply(topic.forum) and not (topic.locked or topic.forum.locked) %}
+                    {% if current_user|post_reply(topic) %}
                         <!-- Quick quote -->
-                        <a href="#" class="quote_btn" data-post-id="pid{{ post.id }}">Quote</a> |
+                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">Quote</a> |
                         <!-- Full quote/reply -->
                         <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">Reply</a>
                     {% endif %}
@@ -183,6 +140,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% include 'forum/topic_controls.html' %}
 
 {% if form %}
     {% from "macros.html" import render_field %}
@@ -198,5 +157,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
 {% endblock %}

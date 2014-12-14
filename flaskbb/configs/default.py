@@ -79,11 +79,10 @@ class DefaultConfig(object):
     # Where to logger should send the emails to
     ADMINS = ["admin@example.org"]
 
-    ## Flask-And-Redis
+    # Flask-Redis
     REDIS_ENABLED = False
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
-    REDIS_DB = 0
+    REDIS_URL = "redis://:password@localhost:6379"
+    REDIS_DATABASE = 0
 
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"

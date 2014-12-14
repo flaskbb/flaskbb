@@ -12,16 +12,18 @@ import re
 import time
 import itertools
 import operator
-from unicodedata import normalize
 from datetime import datetime, timedelta
 
-from flask import session
+from flask import session, url_for
 from flask.ext.themes2 import render_theme_template
 from flask.ext.login import current_user
 
 from postmarkup import render_bbcode
+from markdown2 import markdown as render_markdown
+import unidecode
+from flaskbb._compat import range_method, text_type
 
-from flaskbb.extensions import redis
+from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
@@ -34,12 +36,12 @@ def slugify(text, delim=u'-'):
    :param text: The text which should be slugified
    :param delim: Default "-". The delimeter for whitespace
     """
+    text = unidecode.unidecode(text)
     result = []
     for word in _punct_re.split(text.lower()):
-        word = normalize('NFKD', word).encode('ascii', 'ignore')
         if word:
             result.append(word)
-    return unicode(delim.join(result))
+    return text_type(delim.join(result))
 
 
 def render_template(template, **context):
@@ -152,12 +154,19 @@ def forum_is_unread(forum, forumsread, user):
     # If the user hasn't visited a topic in the forum - therefore,
     # forumsread is None and we need to check if it is still unread
     if forum and not forumsread:
-        return forum.last_post.date_created > read_cutoff
+        return forum.last_post_created > read_cutoff
 
     try:
-        return forumsread.cleared > forum.last_post.date_created
+        # check if the forum has been cleared and if there is a new post
+        # since it have been cleared
+        if forum.last_post_created > forumsread.cleared:
+            if forum.last_post_created < forumsread.last_read:
+                return False
     except TypeError:
-        return forumsread.last_read < forum.last_post.date_created
+        pass
+
+    # else just check if the user has read the last post
+    return forum.last_post_created > forumsread.last_read
 
 
 def topic_is_unread(topic, topicsread, user, forumsread=None):
@@ -222,7 +231,7 @@ def mark_online(user_id, guest=False):
     else:
         all_users_key = 'online-users/%d' % (now // 60)
         user_key = 'user-activity/%s' % user_id
-    p = redis.pipeline()
+    p = redis_store.pipeline()
     p.sadd(all_users_key, user_id)
     p.set(user_key, now)
     p.expireat(all_users_key, expires)
@@ -238,9 +247,9 @@ def get_last_user_activity(user_id, guest=False):
     :param guest: If the user is a guest (not signed in)
     """
     if guest:
-        last_active = redis.get('guest-activity/%s' % user_id)
+        last_active = redis_store.get('guest-activity/%s' % user_id)
     else:
-        last_active = redis.get('user-activity/%s' % user_id)
+        last_active = redis_store.get('user-activity/%s' % user_id)
 
     if last_active is None:
         return None
@@ -253,12 +262,12 @@ def get_online_users(guest=False):
     :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
-    minutes = xrange(flaskbb_config['ONLINE_LAST_MINUTES'])
+    minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
-        return redis.sunion(['online-guests/%d' % (current - x)
-                             for x in minutes])
-    return redis.sunion(['online-users/%d' % (current - x)
-                         for x in minutes])
+        return redis_store.sunion(['online-guests/%d' % (current - x)
+                                   for x in minutes])
+    return redis_store.sunion(['online-users/%d' % (current - x)
+                               for x in minutes])
 
 
 def crop_title(title):
@@ -277,7 +286,11 @@ def render_markup(text):
 
     :param text: The text that should be rendered as bbcode
     """
-    return render_bbcode(text)
+    if flaskbb_config['MARKUP_TYPE'] == 'bbcode':
+        return render_bbcode(text)
+    elif flaskbb_config['MARKUP_TYPE'] == 'markdown':
+        return render_markdown(text, extras=['tables'])
+    return text
 
 
 def is_online(user):
@@ -320,7 +333,6 @@ def time_delta_format(dt, default=None):
     note: when Babel1.0 is released, use format_timedelta/timedeltaformat
           instead
     """
-
     if default is None:
         default = 'just now'
 
@@ -338,13 +350,33 @@ def time_delta_format(dt, default=None):
     )
 
     for period, singular, plural in periods:
-
-        if not period:
+        if period < 1:
             continue
 
-        if period == 1:
+        if 1 <= period < 2:
             return u'%d %s ago' % (period, singular)
         else:
             return u'%d %s ago' % (period, plural)
 
     return default
+
+
+def format_quote(post):
+    """Returns a formatted quote depending on the markup language.
+
+    :param post: The quoted post.
+    """
+    if flaskbb_config['MARKUP_TYPE'] == 'markdown':
+        profile_url = url_for('user.profile', username=post.username)
+        content = "\n> ".join(post.content.strip().split('\n'))
+        quote = "**[{post.username}]({profile_url}) wrote:**\n> {content}\n".\
+                format(post=post, profile_url=profile_url, content=content)
+
+        return quote
+    else:
+        profile_url = url_for('user.profile', username=post.username,
+                              _external=True)
+        quote = '[b][url={profile_url}]{post.username}[/url] wrote:[/b][quote]{post.content}[/quote]\n'.\
+                format(post=post, profile_url=profile_url)
+
+        return quote

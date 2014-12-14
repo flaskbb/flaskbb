@@ -71,16 +71,16 @@
 
             <td valign="top" align="right" style="white-space: nowrap">
                 {% if forum.last_post_id %}
-                <a href="{{ forum.last_post.url }}" title="{{ forum.last_post.topic.title }}">
-                    <strong>{{ forum.last_post.topic.title|crop_title }}</strong>
+                <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
+                    <strong>{{ forum.last_post_title|crop_title }}</strong>
                 </a>
                 <br />
-                {{ forum.last_post.date_created|time_since }}<br />
+                {{ forum.last_post_created|time_since }}<br />
 
-                    {% if forum.last_post.user_id %}
-                    by <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
+                    {% if forum.last_post_user_id %}
+                    by <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
                     {% else %}
-                    {{ forum.last_post.username }}
+                    {{ forum.last_post_username }}
                     {% endif %}
 
                 {% else %}

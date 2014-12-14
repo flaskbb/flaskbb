@@ -8,7 +8,6 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import sys
 from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -16,6 +15,7 @@ from itsdangerous import SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask.ext.login import UserMixin, AnonymousUserMixin
+from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -316,7 +316,7 @@ class User(db.Model, UserMixin):
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
-    @cache.memoize(timeout=sys.maxint)
+    @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all the permissions the user has.
 
@@ -419,6 +419,17 @@ class User(db.Model, UserMixin):
         ForumsRead.query.filter_by(user_id=self.id).delete()
         TopicsRead.query.filter_by(user_id=self.id).delete()
 
+        # This should actually be handeld by the dbms.. but dunno why it doesnt
+        # work here
+        from flaskbb.forum.models import Forum
+
+        last_post_forums = Forum.query.\
+            filter_by(last_post_user_id=self.id).all()
+
+        for forum in last_post_forums:
+            forum.last_post_user_id = None
+            forum.save()
+
         db.session.delete(self)
         db.session.commit()
 
@@ -430,6 +441,7 @@ class Guest(AnonymousUserMixin):
     def permissions(self):
         return self.get_permissions()
 
+    @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
         exclude = exclude or []
@@ -443,6 +455,12 @@ class Guest(AnonymousUserMixin):
                 continue
             perms[c.name] = getattr(group, c.name)
         return perms
+
+    @classmethod
+    def invalidate_cache(cls):
+        """Invalidates this objects cached metadata."""
+
+        cache.delete_memoized(cls.get_permissions, cls)
 
 
 class PrivateMessage(db.Model):

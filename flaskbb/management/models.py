@@ -12,6 +12,7 @@ import sys
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form
+from flaskbb._compat import max_integer, text_type, iteritems
 from flaskbb.extensions import db, cache
 
 
@@ -74,32 +75,23 @@ class Setting(db.Model):
         for setting in group.settings:
             field_validators = []
 
+            if setting.value_type in ("integer", "float"):
+                validator_class = validators.NumberRange
+            elif setting.value_type == "string":
+                validator_class = validators.Length
+
             # generate the validators
             if "min" in setting.extra:
                 # Min number validator
-                if setting.value_type in ("integer", "float"):
-                    field_validators.append(
-                        validators.NumberRange(min=setting.extra["min"])
-                    )
-
-                # Min text length validator
-                elif setting.value_type in ("string"):
-                    field_validators.append(
-                        validators.Length(min=setting.extra["min"])
-                    )
+                field_validators.append(
+                    validator_class(min=setting.extra["min"])
+                )
 
             if "max" in setting.extra:
                 # Max number validator
-                if setting.value_type in ("integer", "float"):
-                    field_validators.append(
-                        validators.NumberRange(max=setting.extra["max"])
-                    )
-
-                # Max text length validator
-                elif setting.value_type in ("string"):
-                    field_validators.append(
-                        validators.Length(max=setting.extra["max"])
-                    )
+                field_validators.append(
+                    validator_class(max=setting.extra["max"])
+                )
 
             # Generate the fields based on value_type
             # IntegerField
@@ -118,7 +110,7 @@ class Setting(db.Model):
                 )
 
             # TextField
-            if setting.value_type == "string":
+            elif setting.value_type == "string":
                 setattr(
                     SettingsForm, setting.key,
                     TextField(setting.name, validators=field_validators,
@@ -126,12 +118,12 @@ class Setting(db.Model):
                 )
 
             # SelectMultipleField
-            if setting.value_type == "selectmultiple":
+            elif setting.value_type == "selectmultiple":
                 # if no coerce is found, it will fallback to unicode
                 if "coerce" in setting.extra:
                     coerce_to = setting.extra['coerce']
                 else:
-                    coerce_to = unicode
+                    coerce_to = text_type
 
                 setattr(
                     SettingsForm, setting.key,
@@ -144,12 +136,12 @@ class Setting(db.Model):
                 )
 
             # SelectField
-            if setting.value_type == "select":
+            elif setting.value_type == "select":
                 # if no coerce is found, it will fallback to unicode
                 if "coerce" in setting.extra:
                     coerce_to = setting.extra['coerce']
                 else:
-                    coerce_to = unicode
+                    coerce_to = text_type
 
                 setattr(
                     SettingsForm, setting.key,
@@ -161,7 +153,7 @@ class Setting(db.Model):
                 )
 
             # BooleanField
-            if setting.value_type == "boolean":
+            elif setting.value_type == "boolean":
                 setattr(
                     SettingsForm, setting.key,
                     BooleanField(setting.name, description=setting.description)
@@ -181,7 +173,7 @@ class Setting(db.Model):
         :param settings: A dictionary with setting items.
         """
         # update the database
-        for key, value in settings.iteritems():
+        for key, value in iteritems(settings):
             setting = cls.query.filter(Setting.key == key.lower()).first()
 
             setting.value = value
@@ -218,7 +210,7 @@ class Setting(db.Model):
         return settings
 
     @classmethod
-    @cache.memoize(timeout=sys.maxint)
+    @cache.memoize(timeout=max_integer)
     def as_dict(cls, from_group=None, upper=True):
         """Returns all settings as a dict. This method is cached. If you want
         to invalidate the cache, simply execute ``self.invalidate_cache()``.
@@ -235,6 +227,7 @@ class Setting(db.Model):
                 first_or_404()
             result = result.settings
         else:
+            print(Setting.query)
             result = cls.query.all()
 
         for setting in result:

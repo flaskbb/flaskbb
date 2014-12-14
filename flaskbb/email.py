@@ -30,12 +30,8 @@ def send_reset_token(user, token):
     )
 
 
-def send_email(subject, recipients, text_body, html_body, sender=""):
-    if not sender:
-        msg = Message(subject, recipients=recipients)
-    else:
-        msg = Message(subject, recipients=recipients, sender=sender)
-
+def send_email(subject, recipients, text_body, html_body, sender=None):
+    msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = text_body
     msg.html = html_body
     mail.send(msg)

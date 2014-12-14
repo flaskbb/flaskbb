@@ -11,6 +11,10 @@
 import os
 import logging
 import datetime
+import time
+
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 from flask import Flask, request
 from flask.ext.login import current_user
@@ -26,7 +30,7 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
-from flaskbb.extensions import db, login_manager, mail, cache, redis, \
+from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
     debugtoolbar, migrate, themes, plugin_manager
 from flask.ext.whooshalchemy import whoosh_index
 # various helpers
@@ -70,7 +74,9 @@ def configure_blueprints(app):
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
     app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
-    app.register_blueprint(management, url_prefix=app.config["ADMIN_URL_PREFIX"])
+    app.register_blueprint(
+        management, url_prefix=app.config["ADMIN_URL_PREFIX"]
+    )
 
 
 def configure_extensions(app):
@@ -100,7 +106,7 @@ def configure_extensions(app):
     themes.init_themes(app, app_identifier="flaskbb")
 
     # Flask-And-Redis
-    redis.init_app(app)
+    redis_store.init_app(app)
 
     # Flask-WhooshAlchemy
     with app.app_context():
@@ -121,7 +127,7 @@ def configure_extensions(app):
         Loads the user. Required by the `login` extension
         """
         unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
-            filter(PrivateMessage.unread == True,
+            filter(PrivateMessage.unread,
                    PrivateMessage.user_id == id).subquery()
         u = db.session.query(User, unread_count).filter(User.id == id).first()
 
@@ -264,3 +270,18 @@ def configure_logging(app):
         mail_handler.setLevel(logging.ERROR)
         mail_handler.setFormatter(formatter)
         app.logger.addHandler(mail_handler)
+
+    if app.config["SQLALCHEMY_ECHO"]:
+        # Ref: http://stackoverflow.com/a/8428546
+        @event.listens_for(Engine, "before_cursor_execute")
+        def before_cursor_execute(conn, cursor, statement,
+                                  parameters, context, executemany):
+            context._query_start_time = time.time()
+
+        @event.listens_for(Engine, "after_cursor_execute")
+        def after_cursor_execute(conn, cursor, statement,
+                                 parameters, context, executemany):
+            total = time.time() - context._query_start_time
+
+            # Modification for StackOverflow: times in milliseconds
+            app.logger.debug("Total Time: %.02fms" % (total*1000))

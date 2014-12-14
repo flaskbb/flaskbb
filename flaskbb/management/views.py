@@ -18,13 +18,14 @@ from flask.ext.login import current_user
 from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
 
 from flaskbb import __version__ as flaskbb_version
+from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
 from flaskbb.utils.decorators import admin_required, moderator_required
 from flaskbb.utils.permissions import can_ban_user, can_edit_user
 from flaskbb.extensions import db
-from flaskbb.user.models import User, Group
+from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.management.forms import (AddUserForm, EditUserForm, AddGroupForm,
@@ -70,7 +71,7 @@ def settings(slug=None):
     form = SettingsForm()
 
     if form.validate_on_submit():
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 # check if the value has changed
                 if values['value'] == form[key].data:
@@ -82,7 +83,7 @@ def settings(slug=None):
 
         Setting.update(settings=new_settings, app=current_app)
     else:
-        for key, values in old_settings.iteritems():
+        for key, values in iteritems(old_settings):
             try:
                 form[key].data = values['value']
             except (KeyError, ValueError):
@@ -124,7 +125,7 @@ def edit_user(user_id):
 
     secondary_group_query = Group.query.filter(
         db.not_(Group.id == user.primary_group_id),
-        db.not_(Group.banned == True),
+        db.not_(Group.banned),
         db.not_(Group.guest == True))
 
     form = EditUserForm(user)
@@ -179,7 +180,6 @@ def banned_users():
         Group.id == User.primary_group_id
     ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-
     if search_form.validate():
         users = search_form.get_results().\
             paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
@@ -203,10 +203,10 @@ def ban_user(user_id):
     # Do not allow moderators to ban admins
     if user.get_permissions()['admin'] and \
             (current_user.permissions['mod'] or
-                current_user.permissions['super_mod']):
+             current_user.permissions['super_mod']):
 
-            flash("A moderator cannot ban an admin user.", "danger")
-            return redirect(url_for("management.overview"))
+        flash("A moderator cannot ban an admin user.", "danger")
+        return redirect(url_for("management.overview"))
 
     if user.ban():
         flash("User was banned successfully.", "success")
@@ -314,6 +314,9 @@ def edit_group(group_id):
         form.populate_obj(group)
         group.save()
 
+        if group.guest:
+            Guest.invalidate_cache()
+
         flash("Group successfully edited.", "success")
         return redirect(url_for("management.groups", group_id=group.id))
 
@@ -365,8 +368,9 @@ def edit_forum(forum_id):
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
-            form.moderators.data = ",".join([user.username
-                                            for user in forum.moderators])
+            form.moderators.data = ",".join([
+                user.username for user in forum.moderators
+            ])
         else:
             form.moderators.data = None
 

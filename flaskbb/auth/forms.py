@@ -11,8 +11,9 @@
 from datetime import datetime
 
 from flask.ext.wtf import Form, RecaptchaField
-from wtforms import TextField, PasswordField, BooleanField, HiddenField
-from wtforms.validators import Required, Email, EqualTo, regexp, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, HiddenField
+from wtforms.validators import (DataRequired, Email, EqualTo, regexp,
+                                ValidationError)
 
 from flaskbb.user.models import User
 
@@ -22,29 +23,29 @@ is_username = regexp(USERNAME_RE,
 
 
 class LoginForm(Form):
-    login = TextField("Username or E-Mail", validators=[
-        Required(message="You must provide an email adress or username")])
+    login = StringField("Username or E-Mail", validators=[
+        DataRequired(message="You must provide an email adress or username")])
 
     password = PasswordField("Password", validators=[
-        Required(message="Password required")])
+        DataRequired(message="Password required")])
 
     remember_me = BooleanField("Remember Me", default=False)
 
 
 class RegisterForm(Form):
-    username = TextField("Username", validators=[
-        Required(message="Username required"),
+    username = StringField("Username", validators=[
+        DataRequired(message="Username required"),
         is_username])
 
-    email = TextField("E-Mail", validators=[
-        Required(message="Email adress required"),
+    email = StringField("E-Mail", validators=[
+        DataRequired(message="Email adress required"),
         Email(message="This email is invalid")])
 
     password = PasswordField("Password", validators=[
-        Required(message="Password required")])
+        DataRequired(message="Password required")])
 
     confirm_password = PasswordField("Confirm Password", validators=[
-        Required(message="Confirm Password required"),
+        DataRequired(message="Confirm Password required"),
         EqualTo("password", message="Passwords do not match")])
 
     accept_tos = BooleanField("Accept Terms of Service", default=True)
@@ -73,27 +74,28 @@ class RegisterRecaptchaForm(RegisterForm):
 
 
 class ReauthForm(Form):
-    password = PasswordField('Password', [Required()])
+    password = PasswordField('Password', valdidators=[
+        DataRequired()])
 
 
 class ForgotPasswordForm(Form):
-    email = TextField('Email', validators=[
-        Required(message="Email reguired"),
+    email = StringField('Email', validators=[
+        DataRequired(message="Email reguired"),
         Email()])
 
 
 class ResetPasswordForm(Form):
     token = HiddenField('Token')
 
-    email = TextField('Email', validators=[
-        Required(),
+    email = StringField('Email', validators=[
+        DataRequired(),
         Email()])
 
     password = PasswordField('Password', validators=[
-        Required()])
+        DataRequired()])
 
     confirm_password = PasswordField('Confirm password', validators=[
-        Required(),
+        DataRequired(),
         EqualTo('password', message='Passwords must match')])
 
     def validate_email(self, field):

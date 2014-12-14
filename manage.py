@@ -13,6 +13,7 @@
 import sys
 
 from flask import current_app
+from werkzeug.utils import import_string
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
                               prompt_bool)
@@ -22,7 +23,8 @@ from flaskbb import create_app
 from flaskbb.extensions import db
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
-                                    create_default_settings)
+                                    create_default_settings, insert_mass_data,
+                                    update_settings_from_fixture)
 
 # Use the development configuration if available
 try:
@@ -58,6 +60,35 @@ def dropdb():
     """Deletes the database"""
 
     db.drop_all()
+
+
+@manager.option('-s', '--settings', dest="settings")
+@manager.option('-f', '--force', dest="force")
+def update(settings=None, force=False):
+    """Updates the settings via a fixture. All fixtures have to be placed
+    in the `fixture`.
+    Usage: python manage.py update -s your_fixture
+    """
+    try:
+        fixture = import_string(
+            "flaskbb.fixtures.{}".format(settings)
+        )
+        fixture = fixture.fixture
+    except ImportError:
+        raise "{} fixture is not available".format(settings)
+
+    if force:
+        count = update_settings_from_fixture(fixture, overwrite_group=True,
+                                             overwrite_setting=True)
+        app.logger.info(
+            "{} groups and {} settings forcefully updated."
+            .format(count[0], count[1])
+        )
+    else:
+        count = update_settings_from_fixture(fixture)
+        app.logger.info(
+            "{} groups and {} settings updated.".format(count[0], count[1])
+        )
 
 
 @manager.command
@@ -134,6 +165,14 @@ def initflaskbb(username=None, password=None, email=None):
     create_welcome_forum()
 
     app.logger.info("Congratulations! FlaskBB has been successfully installed")
+
+
+@manager.command
+def insertmassdata():
+    """Warning: This can take a long time!.
+    Creates 100 topics and each topic contains 100 posts.
+    """
+    insert_mass_data()
 
 
 if __name__ == "__main__":
