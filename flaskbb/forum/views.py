@@ -229,6 +229,37 @@ def unlock_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/<int:topic_id>/highlight")
+@forum.route("/topic/<int:topic_id>-<slug>/highlight")
+@login_required
+def highlight_topic(topic_id, slug=None):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
+    if not can_moderate(user=current_user, forum=topic.forum):
+        flash("You do not have the permissions to highlight this topic", "danger")
+        return redirect(topic.url)
+
+    topic.important = True
+    topic.save()
+    return redirect(topic.url)
+
+
+@forum.route("/topic/<int:topic_id>/trivialize")
+@forum.route("/topic/<int:topic_id>-<slug>/trivialize")
+@login_required
+def trivialize_topic(topic_id, slug=None):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
+    # Unlock is basically the same as lock
+    if not can_moderate(user=current_user, forum=topic.forum):
+        flash("Yo do not have the permissions to trivialize this topic", "danger")
+        return redirect(topic.url)
+
+    topic.important = False
+    topic.save()
+    return redirect(topic.url)
+
+
 @forum.route("/topic/<int:topic_id>/move/<int:forum_id>")
 @forum.route(
     "/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>"

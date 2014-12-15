@@ -825,11 +825,11 @@ class Forum(db.Model):
                           db.and_(TopicsRead.topic_id == Topic.id,
                                   TopicsRead.user_id == user.id)).\
                 add_entity(TopicsRead).\
-                order_by(Topic.last_updated.desc()).\
+                order_by(Topic.important.desc(), Topic.last_updated.desc()).\
                 paginate(page, per_page, True)
         else:
             topics = Topic.query.filter_by(forum_id=forum_id).\
-                order_by(Topic.last_updated.desc()).\
+                order_by(Topic.important.desc(), Topic.last_updated.desc()).\
                 paginate(page, per_page, True)
 
             topics.items = [(topic, None) for topic in topics.items]
