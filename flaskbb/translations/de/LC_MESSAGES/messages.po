@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.1-dev\n"
 "Report-Msgid-Bugs-To: http://github.com/flaskbb/issues\n"
-"POT-Creation-Date: 2015-01-03 13:47+0100\n"
+"POT-Creation-Date: 2015-01-03 20:37+0100\n"
 "PO-Revision-Date: 2015-01-03 13:45+0100\n"
 "Last-Translator: Peter Justin <sh4nks7@gmail.com>\n"
 "Language-Team: FlaskBB Team\n"
@@ -46,38 +46,40 @@ msgid "You do not have the permissions to move this topic"
 msgstr ""
 
 #: flaskbb/forum/views.py:284
-msgid "Could not move the topic to forum %(forum_instance.title)s"
+#, python-format
+msgid "Could not move the topic to forum %(title)s"
 msgstr ""
 
-#: flaskbb/forum/views.py:290
-msgid "Topic was moved to forum %(forum_instance.title)s"
+#: flaskbb/forum/views.py:288
+#, python-format
+msgid "Topic was moved to forum %(title)s"
 msgstr ""
 
-#: flaskbb/forum/views.py:305
+#: flaskbb/forum/views.py:304
 msgid "You do not have the permissions to merge this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:310
+#: flaskbb/forum/views.py:309
 msgid "Could not merge the topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:313
+#: flaskbb/forum/views.py:312
 msgid "Topic succesfully merged."
 msgstr ""
 
-#: flaskbb/forum/views.py:324
+#: flaskbb/forum/views.py:323
 msgid "You do not have the permissions to post here"
 msgstr ""
 
-#: flaskbb/forum/views.py:350
+#: flaskbb/forum/views.py:349
 msgid "You do not have the permissions to post in this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:376 flaskbb/forum/views.py:406
+#: flaskbb/forum/views.py:375 flaskbb/forum/views.py:405
 msgid "You do not have the permissions to edit this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:429
+#: flaskbb/forum/views.py:428
 msgid "Thanks for reporting!"
 msgstr ""
 

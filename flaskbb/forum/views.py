@@ -281,13 +281,12 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
         return redirect(forum_instance.url)
 
     if not topic.move(forum_instance):
-        flash(_(
-            "Could not move the topic to forum %(forum_instance.title)s"),
-            "danger"
-        )
+        flash(_("Could not move the topic to forum %(title)s",
+                title=forum_instance.title), "danger")
         return redirect(topic.url)
 
-    flash(_("Topic was moved to forum %(forum_instance.title)s"), "success")
+    flash(_("Topic was moved to forum %(title)s",
+            title=forum_instance.title), "success")
     return redirect(topic.url)
 
 
