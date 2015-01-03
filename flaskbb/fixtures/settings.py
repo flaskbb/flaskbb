@@ -10,6 +10,8 @@
 """
 from flask.ext.themes2 import get_themes_list
 
+from flaskbb.extensions import babel
+
 
 def available_themes():
     return [(theme.identifier, theme.name) for theme in get_themes_list()]
@@ -17,6 +19,11 @@ def available_themes():
 
 def available_markups():
     return [('bbcode', 'BBCode'), ('markdown', 'Markdown')]
+
+
+def available_languages():
+    return [(locale.language, locale.display_name)
+            for locale in babel.list_translations()]
 
 
 fixture = (
@@ -94,16 +101,23 @@ fixture = (
             })
         ),
     }),
-    ('themes', {
-        'name': "Theme Settings",
-        "description": "Change the appearance for your forum.",
+    ('theme_language', {
+        'name': "Theme and Language Settings",
+        "description": "Change the appearance and language for your forum.",
         "settings": (
             ('default_theme', {
                 'value':        "bootstrap3",
                 'value_type':   "select",
                 'extra':        {'choices': available_themes},
-                'name':         "Default theme",
+                'name':         "Default Theme",
                 'description':  "Change the default theme for your forum."
+            }),
+            ('default_language', {
+                'value':        "en",
+                'value_type':   "select",
+                'extra':        {'choices': available_languages},
+                'name':         "Default Language",
+                'description':  "Change the default language for your forum."
             }),
         ),
     }),

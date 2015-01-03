@@ -15,7 +15,7 @@ from flask import Blueprint, flash, request, redirect, url_for
 from flask.ext.login import login_required, current_user
 from flask.ext.themes2 import get_themes_list
 
-from flaskbb.extensions import db
+from flaskbb.extensions import db, babel
 from flaskbb.utils.helpers import render_template
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
@@ -57,13 +57,18 @@ def settings():
     form.theme.choices = [(theme.identifier, theme.name)
                           for theme in get_themes_list()]
 
+    form.language.choices = [(locale.language, locale.display_name)
+                             for locale in babel.list_translations()]
+
     if form.validate_on_submit():
         current_user.theme = form.theme.data
+        current_user.language = form.language.data
         current_user.save()
 
         flash("Your settings have been updated!", "success")
     else:
         form.theme.data = current_user.theme
+        form.theme.data = current_user.language
 
     return render_template("user/general_settings.html", form=form)
 

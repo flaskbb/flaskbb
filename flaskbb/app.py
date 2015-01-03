@@ -31,7 +31,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager
+    debugtoolbar, migrate, themes, plugin_manager, babel
 from flask.ext.whooshalchemy import whoosh_index
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
@@ -138,6 +138,17 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
+
+    # Flask-Babel
+    babel.init_app(app)
+
+    @babel.localeselector
+    def get_locale():
+        # if a user is logged in, use the locale from the user settings
+        if current_user.is_authenticated() and current_user.language:
+            return current_user.language
+        # otherwise we will just fallback to the default language
+        return flaskbb_config["DEFAULT_LANGUAGE"]
 
 
 def configure_template_filters(app):

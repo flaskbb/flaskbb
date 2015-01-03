@@ -29,7 +29,7 @@ is_image = regexp(IMG_RE,
 class GeneralSettingsForm(Form):
     # The choices for those fields will be generated in the user view
     # because we cannot access the current_app outside of the context
-    #language = SelectField("Language")
+    language = SelectField("Language")
     theme = SelectField("Theme")
 
 

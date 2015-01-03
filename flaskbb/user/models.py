@@ -92,6 +92,7 @@ class User(db.Model, UserMixin):
     notes = db.Column(db.Text)
 
     theme = db.Column(db.String(15))
+    language = db.Column(db.String(15), default="en")
 
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")

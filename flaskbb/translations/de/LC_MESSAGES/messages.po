@@ -1,0 +1,83 @@
+# German translations for FlaskBB.
+# Copyright (C) 2015 FlaskBB
+# This file is distributed under the same license as the FlaskBB project.
+# Peter Justin <sh4nks7@gmail.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  0.1-dev\n"
+"Report-Msgid-Bugs-To: http://github.com/flaskbb/issues\n"
+"POT-Creation-Date: 2015-01-03 13:47+0100\n"
+"PO-Revision-Date: 2015-01-03 13:45+0100\n"
+"Last-Translator: Peter Justin <sh4nks7@gmail.com>\n"
+"Language-Team: FlaskBB Team\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+
+#: flaskbb/forum/views.py:160
+msgid "You do not have the permissions to create a new topic."
+msgstr ""
+
+#: flaskbb/forum/views.py:189
+msgid "You do not have the permissions to delete the topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:208
+msgid "You do not have the permissions to lock this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:226
+msgid "You do not have the permissions to unlock this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:242
+msgid "You do not have the permissions to highlight this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:259
+msgid "You do not have the permissions to trivialize this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:280
+msgid "You do not have the permissions to move this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:284
+msgid "Could not move the topic to forum %(forum_instance.title)s"
+msgstr ""
+
+#: flaskbb/forum/views.py:290
+msgid "Topic was moved to forum %(forum_instance.title)s"
+msgstr ""
+
+#: flaskbb/forum/views.py:305
+msgid "You do not have the permissions to merge this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:310
+msgid "Could not merge the topic."
+msgstr ""
+
+#: flaskbb/forum/views.py:313
+msgid "Topic succesfully merged."
+msgstr ""
+
+#: flaskbb/forum/views.py:324
+msgid "You do not have the permissions to post here"
+msgstr ""
+
+#: flaskbb/forum/views.py:350
+msgid "You do not have the permissions to post in this topic"
+msgstr ""
+
+#: flaskbb/forum/views.py:376 flaskbb/forum/views.py:406
+msgid "You do not have the permissions to edit this post"
+msgstr ""
+
+#: flaskbb/forum/views.py:429
+msgid "Thanks for reporting!"
+msgstr ""
+

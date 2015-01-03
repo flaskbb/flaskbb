@@ -11,6 +11,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+import os
 
 from flask import current_app
 from werkzeug.utils import import_string
@@ -173,6 +174,34 @@ def insertmassdata():
     Creates 100 topics and each topic contains 100 posts.
     """
     insert_mass_data()
+
+
+@manager.command
+def update_translations():
+    """
+    Updates the translations
+    """
+    os.system("pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .")
+    os.system("pybabel update -i messages.pot -d flaskbb/translations")
+    os.unlink("messages.pot")
+
+
+@manager.command
+def init_translations(translation):
+    """
+    Adds a new language to the translations
+    """
+    os.system("pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .")
+    os.system("pybabel init -i messages.pot -d flaskbb/translations -l " + translation)
+    os.unlink('messages.pot')
+
+
+@manager.command
+def compile_translations():
+    """
+    Compile the translations.
+    """
+    os.system("pybabel compile -d flaskbb/translations")
 
 
 if __name__ == "__main__":

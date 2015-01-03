@@ -14,6 +14,7 @@ import datetime
 from flask import (Blueprint, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
+from flask.ext.babel import gettext as _
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
@@ -156,7 +157,7 @@ def new_topic(forum_id, slug=None):
     forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
 
     if not can_post_topic(user=current_user, forum=forum):
-        flash("You do not have the permissions to create a new topic.",
+        flash(_("You do not have the permissions to create a new topic."),
               "danger")
         return redirect(forum.url)
 
@@ -185,7 +186,8 @@ def delete_topic(topic_id, slug=None):
 
     if not can_delete_topic(user=current_user, topic=topic):
 
-        flash("You do not have the permissions to delete the topic", "danger")
+        flash(_("You do not have the permissions to delete the topic"),
+              "danger")
         return redirect(topic.forum.url)
 
     involved_users = User.query.filter(Post.topic_id == topic.id,
@@ -203,7 +205,7 @@ def lock_topic(topic_id, slug=None):
     # TODO: Bulk lock
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to lock this topic", "danger")
+        flash(_("You do not have the permissions to lock this topic"), "danger")
         return redirect(topic.url)
 
     topic.locked = True
@@ -221,7 +223,8 @@ def unlock_topic(topic_id, slug=None):
 
     # Unlock is basically the same as lock
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("Yo do not have the permissions to unlock this topic", "danger")
+        flash(_("You do not have the permissions to unlock this topic"),
+              "danger")
         return redirect(topic.url)
 
     topic.locked = False
@@ -236,7 +239,8 @@ def highlight_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("You do not have the permissions to highlight this topic", "danger")
+        flash(_("You do not have the permissions to highlight this topic"),
+              "danger")
         return redirect(topic.url)
 
     topic.important = True
@@ -252,7 +256,8 @@ def trivialize_topic(topic_id, slug=None):
 
     # Unlock is basically the same as lock
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("Yo do not have the permissions to trivialize this topic", "danger")
+        flash(_("You do not have the permissions to trivialize this topic"),
+              "danger")
         return redirect(topic.url)
 
     topic.important = False
@@ -272,17 +277,17 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     # TODO: Bulk move
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash("Yo do not have the permissions to move this topic", "danger")
+        flash(_("You do not have the permissions to move this topic"), "danger")
         return redirect(forum_instance.url)
 
     if not topic.move(forum_instance):
-        flash(
-            "Could not move the topic to forum %s" % forum_instance.title,
+        flash(_(
+            "Could not move the topic to forum %(forum_instance.title)s"),
             "danger"
         )
         return redirect(topic.url)
 
-    flash("Topic was moved to forum %s" % forum_instance.title, "success")
+    flash(_("Topic was moved to forum %(forum_instance.title)s"), "success")
     return redirect(topic.url)
 
 
@@ -297,14 +302,15 @@ def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
 
     # Looks to me that the user should have permissions on both forums, right?
     if not can_moderate(user=current_user, forum=_old_topic.forum):
-        flash("Yo do not have the permissions to merge this topic", "danger")
+        flash(_("You do not have the permissions to merge this topic"),
+              "danger")
         return redirect(_old_topic.url)
 
     if not _old_topic.merge(_new_topic):
-        flash("Could not merge the topic.", "danger")
+        flash(_("Could not merge the topic."), "danger")
         return redirect(_old_topic.url)
 
-    flash("Topic succesfully merged.", "success")
+    flash(_("Topic succesfully merged."), "success")
     return redirect(_new_topic.url)
 
 
@@ -315,7 +321,7 @@ def new_post(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_post_reply(user=current_user, topic=topic):
-        flash("You do not have the permissions to post here", "danger")
+        flash(_("You do not have the permissions to post here"), "danger")
         return redirect(topic.forum.url)
 
     form = ReplyForm()
@@ -341,7 +347,8 @@ def reply_post(topic_id, post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_post_reply(user=current_user, topic=topic):
-        flash("You do not have the permissions to post in this topic", "danger")
+        flash(_("You do not have the permissions to post in this topic"),
+              "danger")
         return redirect(topic.forum.url)
 
     form = ReplyForm()
@@ -366,7 +373,7 @@ def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_edit_post(user=current_user, post=post):
-        flash("You do not have the permissions to edit this post", "danger")
+        flash(_("You do not have the permissions to edit this post"), "danger")
         return redirect(post.topic.url)
 
     form = ReplyForm()
@@ -396,7 +403,7 @@ def delete_post(post_id, slug=None):
     # TODO: Bulk delete
 
     if not can_delete_post(user=current_user, post=post):
-        flash("You do not have the permissions to edit this post", "danger")
+        flash(_("You do not have the permissions to edit this post"), "danger")
         return redirect(post.topic.url)
 
     first_post = post.first_post
@@ -419,7 +426,7 @@ def report_post(post_id):
     form = ReportForm()
     if form.validate_on_submit():
         form.save(current_user, post)
-        flash("Thanks for reporting!", "success")
+        flash(_("Thanks for reporting!"), "success")
 
     return render_template("forum/report_post.html", form=form)
 
