@@ -101,9 +101,9 @@ fixture = (
             })
         ),
     }),
-    ('theme_language', {
-        'name': "Theme and Language Settings",
-        "description": "Change the appearance and language for your forum.",
+    ('appearance', {
+        'name': "Appearance Settings",
+        "description": "Change the theme and language for your forum.",
         "settings": (
             ('default_theme', {
                 'value':        "bootstrap3",
