@@ -1,14 +1,14 @@
-{% set page_title = "Sent Messages" %}
+{% set page_title = _("Sent Messages") %}
 
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>To</th>
-            <th>Subject</th>
-            <th>Date</th>
-            <th>Options</th>
+            <th>{% trans %}To{% endtrans %}</th>
+            <th>{% trans %}Subject{% endtrans %}</th>
+            <th>{% trans %}Date{% endtrans %}</th>
+            <th>{% trans %}Options{% endtrans %}</th>
         </tr>
     </thead>
     <tbody>
@@ -17,16 +17,16 @@
         {% if message.to_user %}
             <td><a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a></td>
         {% else %}
-            <td>[deleted]</td>
+            <td>[{% trans %}deleted{% endtrans %}]</td>
         {% endif %}
             <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{{ message.subject }}</a></td>
             <td>{{ message.date_created|time_since }}</td>
-            <td><a href="{{ url_for('user.move_message', message_id=message.id) }}">Delete</a></td>
+            <td><a href="{{ url_for('user.move_message', message_id=message.id) }}">{% trans %}Delete{% endtrans %}</a></td>
         </tr>
         {% else %}
         <tr>
             <td colspan="4">
-                This message folder is empty.
+                {% trans %}This message folder is empty.{% endtrans %}
             </td>
         </tr>
         {% endfor %}

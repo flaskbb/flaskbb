@@ -1,4 +1,4 @@
-{% set page_title = "Users" %}
+{% set page_title = _("Users") %}
 {% set active_management_user_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
@@ -7,17 +7,17 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.users', "Manage Users") }}
-        {{ navlink('management.banned_users', 'Banned Users') }}
+        {{ navlink('management.users', _("Manage Users")) }}
+        {{ navlink('management.banned_users', _('Banned Users')) }}
 
         {% if current_user|is_admin %}
-            {{ navlink('management.add_user', "Add User") }}
+            {{ navlink('management.add_user', _("Add User")) }}
         {% endif %}
     </ul>
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-    <legend>Manage Users</legend>
+    <legend>{% trans %}Manage Users{% endtrans %}</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
         {{ render_pagination(users, url_for('management.users')) }}
@@ -28,7 +28,7 @@
                 {{ search_form.hidden_tag() }}
                 {{ group_field(search_form.search_query) }}
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
                 </span>
             </div>
         </form>
@@ -38,11 +38,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Username</th>
-                <th>Posts</th>
-                <th>Date registered</th>
-                <th>Group</th>
-                <th>Manage</th>
+                <th>{% trans %}Username{% endtrans %}</th>
+                <th>{% trans %}Posts{% endtrans %}</th>
+                <th>{% trans %}Date registered{% endtrans %}</th>
+                <th>{% trans %}Group{% endtrans %}</th>
+                <th>{% trans %}Manage{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -55,23 +55,26 @@
                     <td>{{ user.primary_group.name }}</td>
                     <td>
                         {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
-                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">Edit</a>
+                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">{% trans %}Edit{% endtrans %}</a>
                         {% endif %}
 
                         {% if current_user|can_ban_user and not user.permissions['banned'] %}
-                            | <a href="{{ url_for('management.ban_user', user_id = user.id) }}">Ban</a>
+                            | <a href="{{ url_for('management.ban_user', user_id = user.id) }}">{% trans %}Ban{% endtrans %}</a>
                         {% endif %}
 
+                        {% if current_user|can_ban_user and user.permissions['banned'] %}
+                            | <a href="{{ url_for('management.unban_user', user_id = user.id) }}">{% trans %}Unban{% endtrans %}</a>
+                        {% endif %}
 
                         {% if current_user|is_admin %}
-                            | <a href="{{ url_for('management.delete_user', user_id = user.id) }}">Delete</a>
+                            | <a href="{{ url_for('management.delete_user', user_id = user.id) }}">{% trans %}Delete{% endtrans %}</a>
                         {% endif %}
                     </td>
                 </tr>
             {% else %}
                 <tr>
                     <td colspan="6">
-                        No users found matching your search query
+                        {% trans %}No users found matching your search query{% endtrans %}
                     </td>
                 </tr>
             {% endfor %}

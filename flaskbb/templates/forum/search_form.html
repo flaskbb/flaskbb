@@ -1,16 +1,16 @@
-{% set page_title = "Search" %}
+{% set page_title = _("Search") %}
 
 {% extends theme("layout.html") %}
 {% from theme("macros.html") import horizontal_field %}
 {% block content %}
 
     <ul class="breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-        <li class="active">Search</li>
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Search{% endtrans %}</li>
     </ul>
 
     <form class="form-horizontal" role="form" method="post">
-        <h2>Search</h2>
+        <h2>{% trans %}Search{% endtrans %}</h2>
         <hr>
         {{ form.hidden_tag() }}
         {{ horizontal_field(form.search_types)}}
@@ -18,7 +18,7 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-success">Search</button>
+                <button type="submit" class="btn btn-success">{% trans %}Search{% endtrans %}</button>
             </div>
         </div>
     </form>

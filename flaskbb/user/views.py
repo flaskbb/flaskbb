@@ -14,6 +14,7 @@ from datetime import datetime
 from flask import Blueprint, flash, request, redirect, url_for
 from flask.ext.login import login_required, current_user
 from flask.ext.themes2 import get_themes_list
+from flask.ext.babel import gettext as _
 
 from flaskbb.extensions import db, babel
 from flaskbb.utils.helpers import render_template
@@ -65,7 +66,7 @@ def settings():
         current_user.language = form.language.data
         current_user.save()
 
-        flash("Your settings have been updated!", "success")
+        flash(_("Your settings have been updated!"), "success")
     else:
         form.theme.data = current_user.theme
         form.theme.data = current_user.language
@@ -81,7 +82,7 @@ def change_password():
         current_user.password = form.new_password.data
         current_user.save()
 
-        flash("Your password have been updated!", "success")
+        flash(_("Your password have been updated!"), "success")
     return render_template("user/change_password.html", form=form)
 
 
@@ -93,7 +94,7 @@ def change_email():
         current_user.email = form.new_email.data
         current_user.save()
 
-        flash("Your email have been updated!", "success")
+        flash(_("Your email have been updated!"), "success")
     return render_template("user/change_email.html", form=form)
 
 
@@ -106,7 +107,7 @@ def change_user_details():
         form.populate_obj(current_user)
         current_user.save()
 
-        flash("Your details have been updated!", "success")
+        flash(_("Your details have been updated!"), "success")
 
     return render_template("user/change_user_details.html", form=form)
 
@@ -179,7 +180,7 @@ def new_message():
                       unread=False,
                       as_draft=True)
 
-            flash("Message saved!", "success")
+            flash(_("Message saved!"), "success")
             return redirect(url_for("user.drafts"))
 
         if "send_message" in request.form and form.validate():
@@ -197,13 +198,13 @@ def new_message():
                       user_id=to_user.id,
                       unread=True)
 
-            flash("Message sent!", "success")
+            flash(_("Message sent!"), "success")
             return redirect(url_for("user.sent"))
     else:
         form.to_user.data = to_user
 
     return render_template("message/message_form.html", form=form,
-                           title="Compose Message")
+                           title=_("Compose Message"))
 
 
 @user.route("/messages/<int:message_id>/edit", methods=["POST", "GET"])
@@ -212,7 +213,7 @@ def edit_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
 
     if not message.draft:
-        flash("You cannot edit a sent message", "danger")
+        flash(_("You cannot edit a sent message"), "danger")
         return redirect(url_for("user.inbox"))
 
     form = EditMessageForm()
@@ -226,7 +227,7 @@ def edit_message(message_id):
             message.to_user = to_user.id
             message.save()
 
-            flash("Message saved!", "success")
+            flash(_("Message saved!"), "success")
             return redirect(url_for("user.drafts"))
 
         if "send_message" in request.form and form.validate():
@@ -243,7 +244,7 @@ def edit_message(message_id):
             message.date_created = datetime.utcnow()
             message.save()
 
-            flash("Message sent!", "success")
+            flash(_("Message sent!"), "success")
             return redirect(url_for("user.sent"))
     else:
         form.to_user.data = message.to_user.username
@@ -251,7 +252,7 @@ def edit_message(message_id):
         form.message.data = message.message
 
     return render_template("message/message_form.html", form=form,
-                           title="Edit Message")
+                           title=_("Edit Message"))
 
 
 @user.route("/messages/<int:message_id>/move")
@@ -260,7 +261,7 @@ def move_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.trash = True
     message.save()
-    flash("Message moved to Trash!", "success")
+    flash(_("Message moved to Trash!"), "success")
     return redirect(url_for("user.inbox"))
 
 
@@ -270,7 +271,7 @@ def restore_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.trash = False
     message.save()
-    flash("Message restored from Trash!", "success")
+    flash(_("Message restored from Trash!"), "success")
     return redirect(url_for("user.inbox"))
 
 
@@ -279,5 +280,5 @@ def restore_message(message_id):
 def delete_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.delete()
-    flash("Message deleted!", "success")
+    flash(_("Message deleted!"), "success")
     return redirect(url_for("user.inbox"))

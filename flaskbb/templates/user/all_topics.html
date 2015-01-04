@@ -3,9 +3,9 @@
 
 {% block content %}
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li ><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></li>
-    <li class="active">All Topics</li>
+    <li class="active">{% trans %}All Topics{% endtrans %}</li>
 </ul>
 
 <div class="pull-left">
@@ -17,19 +17,19 @@
     <thead>
         <tr>
             <th colspan="5">
-                All Topics created by {{ user.username }}
+                {% trans %}All Topics created by{% endtrans %} {{ user.username }}
             </th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td colspan="2">Thread</td>
+            <td colspan="2">{% trans %}Topic{% endtrans %}</td>
 
-            <td>Posts</td>
+            <td>{% trans %}Posts{% endtrans %}</td>
 
-            <td>Views</td>
+            <td>{% trans %}Views{% endtrans %}</td>
 
-            <td>Last Post</td>
+            <td>{% trans %}Last Post{% endtrans %}</td>
         </tr>
 
         {% for topic in topics.items %}
@@ -38,7 +38,14 @@
             <td>
                 <div>
                     <a href="{{ topic.url }}">{{ topic.title }}</a> <br />
-                    <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
+                    <small>
+                        {% trans %}by{% endtrans %}
+                        {% if topic.user_id %}
+                         <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                        {% else %}
+                        {{ topic.username }}
+                        {% endif %}
+                    </small>
                 </div>
             </td>
             <td>
@@ -49,7 +56,14 @@
             </td>
             <td>
                 <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
-                <small>by <a href="{{ topic.last_post.user.username }}">{{ topic.last_post.user.username }}</a></small>
+                <small>
+                    {% trans %}by{% endtrans %}
+                    {% if topic.last_post.user_id %}
+                    <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                    {% else %}
+                    {{ topic.last_post.username }}
+                    {% endif %}
+                </small>
             </td>
         </tr>
         {% else %}

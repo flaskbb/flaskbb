@@ -8,7 +8,6 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import sys
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask.ext.wtf import Form

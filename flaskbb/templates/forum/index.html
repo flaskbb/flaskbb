@@ -2,7 +2,7 @@
 {% block content %}
 
 <ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
 </ol>
 
 {% for category, forums in categories %}
@@ -14,23 +14,23 @@
     <thead>
         <tr>
             <td colspan="2">
-                <strong>Board Statistics</strong>
-                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">Who is online?</a>]
+                <strong>{% trans %}Board Statistics{% endtrans %}</strong>
+                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
             </td>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td>
-                Total number of registered users: <strong>{{ user_count }}</strong> <br />
-                Total number of topics: <strong>{{ topic_count }}</strong> <br />
-                Total number of posts: <strong>{{ post_count }}</strong> <br />
+                {% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong> <br />
+                {% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong> <br />
+                {% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong> <br />
             </td>
             <td>
-                Newest registered user: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}No users{% endif %}<br />
-                Registered users online: <strong>{{ online_users }}</strong> <br />
+                {% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}<br />
+                {% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong> <br />
                 {% if config["REDIS_ENABLED"] %}
-                Guests online: <strong>{{ online_guests }}</strong> <br />
+                {% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong> <br />
                 {% endif %}
             </td>
         </tr>

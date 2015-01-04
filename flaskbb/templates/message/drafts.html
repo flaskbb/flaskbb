@@ -1,31 +1,31 @@
-{% set page_title = "Drafts" %}
+{% set page_title = _("Drafts") %}
 
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>To</th>
-            <th>Subject</th>
-            <th>Date</th>
-            <th>Options</th>
+            <th>{% trans %}To{% endtrans %}</th>
+            <th>{% trans %}Subject{% endtrans %}</th>
+            <th>{% trans %}Date{% endtrans %}</th>
+            <th>{% trans %}Options{% endtrans %}</th>
         </tr>
     </thead>
     <tbody>
         {% for message in messages %}
         <tr>
             <td><a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a></td>
-            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}(No Subject){% endif %}</a></td>
+            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}({% trans %}No Subject{% endtrans %}){% endif %}</a></td>
             <td>{{ message.date_created|format_date('%d %B %Y') }}</td>
             <td>
-                <a href="{{ url_for('user.edit_message', message_id=message.id) }}">Edit</a> |
-                <a href="{{ url_for('user.move_message', message_id=message.id) }}">Delete</a>
+                <a href="{{ url_for('user.edit_message', message_id=message.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                <a href="{{ url_for('user.move_message', message_id=message.id) }}">{% trans %}Delete{% endtrans %}</a>
             </td>
         </tr>
         {% else %}
         <tr>
             <td colspan="4">
-                This message folder is empty.
+                {% trans %}This message folder is empty.{% endtrans %}
             </td>
         </tr>
         {% endfor %}

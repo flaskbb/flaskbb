@@ -6,26 +6,26 @@
     <div class="btn btn-group">
         {% if current_user|delete_topic(topic) %}
         <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-danger">
-            <span class="fa fa-trash-o"></span> Delete Topic
+            <span class="fa fa-trash-o"></span> {% trans %}Delete Topic{% endtrans %}
         </a>
         {% endif %}
         {% if current_user|can_moderate(topic.forum) %}
             {% if not topic.locked %}
             <a href="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-lock"></span> Lock Topic
+                <span class="fa fa-lock"></span> {% trans %}Lock Topic{% endtrans %}
             </a>
             {% else %}
             <a href="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-warning">
-                <span class="fa fa-unlock"></span> Unlock Topic
+                <span class="fa fa-unlock"></span> {% trans %}Unlock Topic{% endtrans %}
             </a>
             {% endif %}
             {% if not topic.important %}
             <a href="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-success">
-                    <span class="fa fa-star"></span> Highlight Topic
+                    <span class="fa fa-star"></span> {% trans %}Highlight Topic{% endtrans %}
             </a>
             {% else %}
             <a href="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-success">
-                <span class="fa fa-star-o"></span> Trivialize Topic
+                <span class="fa fa-star-o"></span> {% trans %}Trivialize Topic{% endtrans %}
             </a>
             {% endif %}
         {% endif %}
@@ -35,17 +35,17 @@
     <div class="btn btn-group">
         {% if current_user.is_tracking_topic(topic) %}
         <a href="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default"><span class="fa fa-tag">
-            </span> Untrack Topic
+            </span> {% trans %}Untrack Topic{% endtrans %}
         </a>
         {% else %}
         <a href="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-default">
-            <span class="fa fa-tag"></span> Track Topic
+            <span class="fa fa-tag"></span> {% trans %}Track Topic{% endtrans %}
         </a>
         {% endif %}
 
         {% if current_user|post_reply(topic) %}
         <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
-            <span class="fa fa-pencil"></span> Reply
+            <span class="fa fa-pencil"></span> {% trans %}Reply{% endtrans %}
         </a>
         {% endif %}
     </div>

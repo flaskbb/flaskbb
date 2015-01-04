@@ -3,20 +3,20 @@
 {%- from theme('macros.html') import navlink with context -%}
 
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ url_for('user.profile', username=current_user.username) }}">{{ current_user.username }}</a></li>
-    <li class="active">Private Message</li>
+    <li class="active">{% trans %}Private Message{% endtrans %}</li>
 </ul>
 
 <div class="row">
     <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <li class="nav-header">Options | <small><a href="{{ url_for('user.new_message') }}">New PM</a></small></li>
-                {{ navlink('user.inbox', 'Inbox') }}
-                {{ navlink('user.sent', 'Sent') }}
-                {{ navlink('user.drafts', 'Drafts') }}
-                {{ navlink('user.trash', 'Trash') }}
+                <li class="nav-header">{% trans %}Options{% endtrans %} | <small><a href="{{ url_for('user.new_message') }}">{% trans %}New PM{% endtrans %}</a></small></li>
+                {{ navlink('user.inbox', _('Inbox')) }}
+                {{ navlink('user.sent', _('Sent')) }}
+                {{ navlink('user.drafts', _('Drafts')) }}
+                {{ navlink('user.trash', _('Trash')) }}
             </ul>
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->

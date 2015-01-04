@@ -1,4 +1,4 @@
-{% set page_title = "Reports" %}
+{% set page_title = _("Reports") %}
 {% set active_management_report_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
@@ -7,13 +7,13 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.unread_reports', "Show unread reports") }}
-        {{ navlink('management.reports', "Show all reports") }}
+        {{ navlink('management.unread_reports', _("Show unread reports")) }}
+        {{ navlink('management.reports', _("Show all reports")) }}
     </ul>
 </div>
 
 <div class="col-md-9">
-    <legend>All Reports</legend>
+    <legend>{% trans %}All Reports{% endtrans %}</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
         {{ render_pagination(reports, url_for('management.reports')) }}
@@ -23,11 +23,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Poster</th>
-                <th>Topic</th>
-                <th>Reporter</th>
-                <th>Reason</th>
-                <th>Reported</th>
+                <th>{% trans %}Poster{% endtrans %}</th>
+                <th>{% trans %}Topic{% endtrans %}</th>
+                <th>{% trans %}Reporter{% endtrans %}</th>
+                <th>{% trans %}Reason{% endtrans %}</th>
+                <th>{% trans %}Reported{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="6">No reports.</td>
+                <td colspan="6">{% trans %}No reports.{% endtrans %}</td>
             </tr>
             {% endfor %}
         </tbody>

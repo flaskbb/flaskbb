@@ -16,6 +16,7 @@ from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
 
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
+from flask.ext.babel import lazy_gettext as _
 
 from flaskbb.utils.widgets import SelectDateWidget
 from flaskbb.extensions import db
@@ -24,7 +25,7 @@ from flaskbb.user.models import User, Group
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
-                     message=("You can only use letters, numbers or dashes"))
+                     message=_("You can only use letters, numbers or dashes"))
 
 
 def selectable_forums():
@@ -40,48 +41,48 @@ def select_primary_group():
 
 
 class UserForm(Form):
-    username = StringField("Username", validators=[
-        DataRequired(message="A username is required."),
+    username = StringField(_("Username"), validators=[
+        DataRequired(message=_("A username is required.")),
         is_username])
 
-    email = StringField("E-Mail", validators=[
-        DataRequired(message="A E-Mail address is required."),
-        Email(message="This email is invalid")])
+    email = StringField(_("E-Mail"), validators=[
+        DataRequired(message=_("A E-Mail address is required.")),
+        Email(message=_("This email is invalid"))])
 
     password = PasswordField("Password", validators=[
         Optional()])
 
-    birthday = DateField("Birthday", format="%d %m %Y",
+    birthday = DateField(_("Birthday"), format="%d %m %Y",
                          widget=SelectDateWidget(),
                          validators=[Optional()])
 
-    gender = SelectField("Gender", default="None", choices=[
+    gender = SelectField(_("Gender"), default="None", choices=[
         ("None", ""),
-        ("Male", "Male"),
-        ("Female", "Female")])
+        ("Male", _("Male")),
+        ("Female", _("Female"))])
 
-    location = StringField("Location", validators=[
+    location = StringField(_("Location"), validators=[
         Optional()])
 
-    website = StringField("Website", validators=[
+    website = StringField(_("Website"), validators=[
         Optional(), URL()])
 
-    avatar = StringField("Avatar", validators=[
+    avatar = StringField(_("Avatar"), validators=[
         Optional(), URL()])
 
-    signature = TextAreaField("Forum Signature", validators=[
+    signature = TextAreaField(_("Forum Signature"), validators=[
         Optional(), Length(min=0, max=250)])
 
-    notes = TextAreaField("Notes", validators=[
+    notes = TextAreaField(_("Notes"), validators=[
         Optional(), Length(min=0, max=5000)])
 
     primary_group = QuerySelectField(
-        "Primary Group",
+        _("Primary Group"),
         query_factory=select_primary_group,
         get_label="name")
 
     secondary_groups = QuerySelectMultipleField(
-        "Secondary Groups",
+        _("Secondary Groups"),
         # TODO: Template rendering errors "NoneType is not callable"
         #       without this, figure out why.
         query_factory=select_primary_group,
@@ -99,7 +100,7 @@ class UserForm(Form):
             user = User.query.filter(User.username.like(field.data)).first()
 
         if user:
-            raise ValidationError("This username is taken")
+            raise ValidationError(_("This username is taken"))
 
     def validate_email(self, field):
         if hasattr(self, "user"):
@@ -113,7 +114,7 @@ class UserForm(Form):
             user = User.query.filter(User.email.like(field.data)).first()
 
         if user:
-            raise ValidationError("This email is taken")
+            raise ValidationError(_("This email is taken"))
 
     def save(self):
         user = User(**self.data)
@@ -132,64 +133,65 @@ class EditUserForm(UserForm):
 
 
 class GroupForm(Form):
-    name = StringField("Group Name", validators=[
-        DataRequired(message="Group name required")])
+    name = StringField(_("Group Name"), validators=[
+        DataRequired(message=_("Group name required"))])
 
-    description = TextAreaField("Description", validators=[
+    description = TextAreaField(_("Description"), validators=[
         Optional()])
 
     admin = BooleanField(
-        "Is Admin Group?",
-        description="With this option the group has access to the admin panel."
+        _("Is Admin Group?"),
+        description=_("With this option the group has access to "
+                      "the admin panel.")
     )
     super_mod = BooleanField(
-        "Is Super Moderator Group?",
-        description="Check this if the users in this group are allowed to \
-                     moderate every forum"
+        _("Is Super Moderator Group?"),
+        description=_("Check this if the users in this group are allowed to "
+                      "moderate every forum")
     )
     mod = BooleanField(
-        "Is Moderator Group?",
-        description="Check this if the users in this group are allowed to \
-                     moderate specified forums"
+        _("Is Moderator Group?"),
+        description=_("Check this if the users in this group are allowed to "
+                      "moderate specified forums")
     )
     banned = BooleanField(
-        "Is Banned Group?",
-        description="Only one Banned group is allowed"
+        _("Is Banned Group?"),
+        description=_("Only one Banned group is allowed")
     )
     guest = BooleanField(
-        "Is Guest Group?",
-        description="Only one Guest group is allowed"
+        _("Is Guest Group?"),
+        description=_("Only one Guest group is allowed")
     )
     editpost = BooleanField(
-        "Can edit posts",
-        description="Check this if the users in this group can edit posts"
+        _("Can edit posts"),
+        description=_("Check this if the users in this group can edit posts")
     )
     deletepost = BooleanField(
-        "Can delete posts",
-        description="Check this is the users in this group can delete posts"
+        _("Can delete posts"),
+        description=_("Check this is the users in this group can delete posts")
     )
     deletetopic = BooleanField(
-        "Can delete topics",
-        description="Check this is the users in this group can delete topics"
+        _("Can delete topics"),
+        description=_("Check this is the users in this group can delete topics")
     )
     posttopic = BooleanField(
-        "Can create topics",
-        description="Check this is the users in this group can create topics"
+        _("Can create topics"),
+        description=_("Check this is the users in this group can create topics")
     )
     postreply = BooleanField(
-        "Can post replies",
-        description="Check this is the users in this group can post replies"
+        _("Can post replies"),
+        description=_("Check this is the users in this group can post replies")
     )
 
     mod_edituser = BooleanField(
-        "Moderators can edit user profiles",
-        description=("Allow moderators to edit a another users profile "
-                     "including password and email changes.")
+        _("Moderators can edit user profiles"),
+        description=_("Allow moderators to edit a another users profile "
+                      "including password and email changes.")
     )
 
     mod_banuser = BooleanField(
-        "Moderators can ban users",
-        description="Allow moderators to ban other users"
+        _("Moderators can ban users"),
+        description=_("Allow moderators to ban other users")
     )
 
     def validate_name(self, field):
@@ -204,7 +206,7 @@ class GroupForm(Form):
             group = Group.query.filter(Group.name.like(field.data)).first()
 
         if group:
-            raise ValidationError("This name is taken")
+            raise ValidationError(_("This name is taken"))
 
     def validate_banned(self, field):
         if hasattr(self, "group"):
@@ -218,7 +220,7 @@ class GroupForm(Form):
             group = Group.query.filter_by(banned=True).count()
 
         if field.data and group > 0:
-            raise ValidationError("There is already a Banned group")
+            raise ValidationError(_("There is already a Banned group"))
 
     def validate_guest(self, field):
         if hasattr(self, "group"):
@@ -232,7 +234,7 @@ class GroupForm(Form):
             group = Group.query.filter_by(guest=True).count()
 
         if field.data and group > 0:
-            raise ValidationError("There is already a Guest group")
+            raise ValidationError(_("There is already a Guest group"))
 
     def save(self):
         group = Group(**self.data)
@@ -252,61 +254,62 @@ class AddGroupForm(GroupForm):
 
 class ForumForm(Form):
     title = StringField(
-        "Forum Title",
-        validators=[DataRequired(message="Forum title required")]
+        _("Forum Title"),
+        validators=[DataRequired(message=_("Forum title required"))]
     )
 
     description = TextAreaField(
-        "Description",
+        _("Description"),
         validators=[Optional()],
-        description="You can format your description with BBCode."
+        description=_("You can format your description with BBCode.")
     )
 
     position = IntegerField(
-        "Position",
+        _("Position"),
         default=1,
-        validators=[DataRequired(message="Forum position required")]
+        validators=[DataRequired(message=_("Forum position required"))]
     )
 
     category = QuerySelectField(
-        "Category",
+        _("Category"),
         query_factory=selectable_categories,
         allow_blank=False,
         get_label="title",
-        description="The category that contains this forum."
+        description=_("The category that contains this forum.")
     )
 
     external = StringField(
-        "External link",
+        _("External link"),
         validators=[Optional(), URL()],
-        description="A link to a website i.e. 'http://flaskbb.org'"
+        description=_("A link to a website i.e. 'http://flaskbb.org'")
     )
 
     moderators = StringField(
-        "Moderators",
-        description="Comma seperated usernames. Leave it blank if you do not \
-                     want to set any moderators."
+        _("Moderators"),
+        description=_("Comma seperated usernames. Leave it blank if you do not "
+                      "want to set any moderators.")
     )
 
     show_moderators = BooleanField(
-        "Show Moderators",
-        description="Do you want show the moderators on the index page?"
+        _("Show Moderators"),
+        description=_("Do you want show the moderators on the index page?")
     )
 
     locked = BooleanField(
-        "Locked?",
-        description="Disable new posts and topics in this forum."
+        _("Locked?"),
+        description=_("Disable new posts and topics in this forum.")
     )
 
     def validate_external(self, field):
         if hasattr(self, "forum"):
             if self.forum.topics:
-                raise ValidationError("You cannot convert a forum that \
-                                       contain topics in a external link")
+                raise ValidationError(_("You cannot convert a forum that "
+                                        "contain topics in a external link"))
 
     def validate_show_moderators(self, field):
         if field.data and not self.moderators.data:
-            raise ValidationError("You also need to specify some moderators.")
+            raise ValidationError(_("You also need to specify some "
+                                    "moderators."))
 
     def validate_moderators(self, field):
         approved_moderators = list()
@@ -325,12 +328,15 @@ class ForumForm(Form):
                     if not (user.get_permissions()["mod"] or
                             user.get_permissions()["admin"] or
                             user.get_permissions()["super_mod"]):
-                        raise ValidationError("%s is not in a moderators \
-                            group" % user.username)
+                        raise ValidationError(
+                            _("%(user)s is not in a moderators group",
+                              user=user.username)
+                        )
                     else:
                         approved_moderators.append(user)
                 else:
-                    raise ValidationError("User %s not found" % moderator)
+                    raise ValidationError(_("User %(moderator)s not found",
+                                            moderator=moderator))
             field.data = approved_moderators
 
         else:
@@ -365,19 +371,19 @@ class AddForumForm(ForumForm):
 
 
 class CategoryForm(Form):
-    title = StringField("Category title", validators=[
-        DataRequired(message="Category title required")])
+    title = StringField(_("Category title"), validators=[
+        DataRequired(message=_("Category title required"))])
 
     description = TextAreaField(
-        "Description",
+        _("Description"),
         validators=[Optional()],
-        description="You can format your description with BBCode."
+        description=_("You can format your description with BBCode.")
     )
 
     position = IntegerField(
-        "Position",
+        _("Position"),
         default=1,
-        validators=[DataRequired(message="Category position required")]
+        validators=[DataRequired(message=_("Category position required"))]
     )
 
     def save(self):

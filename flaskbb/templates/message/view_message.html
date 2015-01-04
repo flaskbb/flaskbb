@@ -26,11 +26,11 @@
                     </td>
 
                     <td class="pull-right">
-                        Posts: {{ message.from_user.post_count }}<br />
-                        Registered since: {{ message.from_user.date_joined|format_date('%b %d %Y') }}<br />
+                        {% trans %}Posts{% endtrans %}: {{ message.from_user.post_count }}<br />
+                        {% trans %}Registered since{% endtrans %}: {{ message.from_user.date_joined|format_date('%b %d %Y') }}<br />
                     </td>
                 {% else %}
-                    [deleted]
+                    [{% trans %}deleted{% endtrans %}]
                 {% endif %}
                 </tr>
 
@@ -46,7 +46,7 @@
                         {{ message.message|markup }}
                         {% endautoescape %}
                     {% else %}
-                        (No Message)
+                        ({% trans %}No Message{% endtrans %})
                     {% endif %}
                 </div>
             </td>

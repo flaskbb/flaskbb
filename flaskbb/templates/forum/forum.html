@@ -6,7 +6,7 @@
 {% from theme('macros.html') import render_pagination, topic_pages %}
 
 <ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
     <li class="active">{{ forum.title }}</li>
 </ol>
@@ -19,16 +19,16 @@
 <div class="pull-right" style="padding-bottom: 10px">
     <div class="btn-group">
         <a href="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-default">
-            <span class="fa fa-check"></span> Mark as Read
+            <span class="fa fa-check"></span> {% trans %}Mark as Read{% endtrans %}
         </a>
 
         {% if forum.locked %}
         <span class="btn btn-primary">
-            <span class="fa fa-lock"></span> Locked
+            <span class="fa fa-lock"></span> {% trans %}Locked{% endtrans %}
         </span>
         {% else %}
         <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-primary">
-            <span class="fa fa-pencil"></span> New Topic
+            <span class="fa fa-pencil"></span> {% trans %}New Topic{% endtrans %}
         </a>
         {% endif %}
 
@@ -47,13 +47,13 @@
 
     <tbody>
         <tr>
-            <td colspan="2">Topic</td>
+            <td colspan="2">{% trans %}Topic{% endtrans %}</td>
 
-            <td>Posts</td>
+            <td>{% trans %}Posts{% endtrans %}</td>
 
-            <td>Views</td>
+            <td>{% trans %}Views{% endtrans %}</td>
 
-            <td>Last Post</td>
+            <td>{% trans %}Last Post{% endtrans %}</td>
         </tr>
 
         {% for topic, topicread in topics.items %}
@@ -82,11 +82,14 @@
                     <!-- Topic Pagination -->
                     {{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}
                     <br />
-                    {% if topic.user_id %}
-                    <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
-                    {% else %}
-                    <small>by {{ topic.username }}</small>
-                    {% endif %}
+                    <small>
+                        {% trans %}by{% endtrans %}
+                        {% if topic.user_id %}
+                         <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                        {% else %}
+                        {{ topic.username }}
+                        {% endif %}
+                    </small>
                 </div>
             </td>
             <td>
@@ -98,17 +101,20 @@
             <td>
                 <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
 
-                {% if topic.last_post.user_id %}
-                <small>by <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a></small>
-                {% else %}
-                <small>{{ topic.last_post.username }}</small>
-                {% endif %}
+                <small>
+                    {% trans %}by{% endtrans %}
+                    {% if topic.last_post.user_id %}
+                    <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                    {% else %}
+                    {{ topic.last_post.username }}
+                    {% endif %}
+                </small>
             </td>
         </tr>
         {% else %}
         <tr>
             <td colspan="5">
-                No Topics so far.
+                {% trans %}No Topics so far.{% endtrans %}
             </td>
         </tr>
         {% endfor %}

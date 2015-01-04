@@ -7,8 +7,8 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.groups', "Manage Groups") }}
-        {{ navlink('management.add_group', "Add Group") }}
+        {{ navlink('management.groups', _("Manage Groups")) }}
+        {{ navlink('management.add_group', _("Add Group")) }}
     </ul>
 </div>
 
@@ -38,7 +38,7 @@
 
             <div class="form-group">
                 <div class="col-lg-offset-0 col-lg-9">
-                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
                 </div>
             </div>
     </form>

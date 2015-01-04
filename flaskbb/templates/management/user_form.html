@@ -7,11 +7,11 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.users', "Manage Users") }}
-        {{ navlink('management.banned_users', 'Banned Users') }}
+        {{ navlink('management.users', _("Manage Users")) }}
+        {{ navlink('management.banned_users', _('Banned Users')) }}
 
         {% if current_user|is_admin %}
-            {{ navlink('management.add_user', "Add User") }}
+            {{ navlink('management.add_user', _("Add User")) }}
         {% endif %}
     </ul>
 </div><!--/.col-md-3 -->
@@ -36,7 +36,7 @@
 
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
-                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
                 </div>
             </div>
     </form>

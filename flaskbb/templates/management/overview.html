@@ -1,4 +1,4 @@
-{% set page_title = "Overview" %}
+{% set page_title = _("Overview") %}
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
@@ -7,26 +7,26 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th colspan="4">Global Statistics</th>
+                <th colspan="4">{% trans %}Global Statistics{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><b>FlaskBB Version</b></td>
+                <td><b>{% trans %}FlaskBB Version{% endtrans %}</b></td>
                 <td>{{ flaskbb_version }}</td>
-                <td><b>Posts</b></td>
+                <td><b>{% trans %}Posts{% endtrans %}</b></td>
                 <td>{{ post_count }}</td>
             </tr>
             <tr>
-                <td><b>Python Version</b></td>
+                <td><b>{% trans %}Python Version{% endtrans %}</b></td>
                 <td>{{ python_version }}</td>
-                <td><b>Topics</b></td>
+                <td><b>{% trans %}Topics{% endtrans %}</b></td>
                 <td>{{ topic_count }}</td>
             </tr>
             <tr>
-                <td><b>Flask Version</b></td>
+                <td><b>{% trans %}Flask Version{% endtrans %}</b></td>
                 <td>{{ flask_version }}</td>
-                <td><b>Users</b></td>
+                <td><b>{% trans %}Users{% endtrans %}</b></td>
                 <td>{{ user_count }}</td>
             </tr>
         </tbody>

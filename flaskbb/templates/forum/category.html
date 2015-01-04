@@ -5,7 +5,7 @@
 {% block content %}
 
 <ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li class="active">{{ category.title }}</li>
 </ol>
 

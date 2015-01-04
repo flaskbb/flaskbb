@@ -1,4 +1,4 @@
-{% set page_title = "Groups" %}
+{% set page_title = _("Groups") %}
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
@@ -6,13 +6,13 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.groups', "Manage Groups") }}
-        {{ navlink('management.add_group', "Add Group") }}
+        {{ navlink('management.groups', _("Manage Groups")) }}
+        {{ navlink('management.add_group', _("Add Group")) }}
     </ul>
 </div>
 
 <div class="col-md-9">
-    <legend>Manage Groups</legend>
+    <legend>{% trans %}Manage Groups{% endtrans %}</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
         {{ render_pagination(groups, url_for('management.groups')) }}
@@ -22,9 +22,9 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Group Name</th>
-                <th>Description</th>
-                <th>Manage</th>
+                <th>{% trans %}Group Name{% endtrans %}</th>
+                <th>{% trans %}Description{% endtrans %}</th>
+                <th>{% trans %}Manage{% endtrans %}</th>
             </tr>
         </thead>
         <tbody>
@@ -34,8 +34,8 @@
                 <td><a href="#">{{ group.name }}</a></td>
                 <td>{{ group.description }}</td>
                 <td>
-                    <a href="{{ url_for('management.edit_group', group_id = group.id) }}">Edit</a> |
-                    <a href="{{ url_for('management.delete_group', group_id = group.id) }}">Delete</a>
+                    <a href="{{ url_for('management.edit_group', group_id = group.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                    <a href="{{ url_for('management.delete_group', group_id = group.id) }}">{% trans %}Delete{% endtrans %}</a>
                 </td>
             </tr>
             {% endfor %}

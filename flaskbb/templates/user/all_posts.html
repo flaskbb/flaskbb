@@ -3,9 +3,9 @@
 
 {% block content %}
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li ><a href="{{ user.url }}">{{ user.username }}</a></li>
-    <li class="active">All Posts</li>
+    <li class="active">{% trans %}All Posts{% endtrans %}</li>
 </ul>
 
 <div class="pull-left" style="padding-bottom: 10px">

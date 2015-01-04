@@ -3,7 +3,7 @@
 
 {% block settings_content %}
 <form class="form-horizontal" role="form" method="POST">
-    <legend class="">Change User Details</legend>
+    <legend class="">{% trans %}Change User Details{% endtrans %}</legend>
     {{ form.hidden_tag() }}
     {{ horizontal_field(form.birthday) }}
     {{ horizontal_field(form.gender) }}
@@ -15,7 +15,7 @@
 
     <div class="form-group row">
         <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">Save</button>
+            <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
         </div>
     </div>
 </form>

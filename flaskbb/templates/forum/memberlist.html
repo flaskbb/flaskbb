@@ -1,12 +1,12 @@
-{% set page_title = "Memberlist" %}
+{% set page_title = _("Memberlist") %}
 
 {% extends theme("layout.html") %}
 {% block content %}
 {% from theme('macros.html') import render_pagination, group_field %}
 
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-    <li class="active">Memberlist</li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="active">{% trans %}Memberlist{% endtrans %}</li>
 </ul>
 
 <div class="pull-left" style="padding-bottom: 10px">
@@ -18,7 +18,7 @@
           {{ search_form.hidden_tag() }}
           {{ group_field(search_form.search_query) }}
           <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit">Search</button>
+            <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
           </span>
       </div>
   </form>
@@ -28,10 +28,10 @@
     <thead>
         <tr>
             <th>#</th>
-            <th>Username</th>
-            <th>Posts</th>
-            <th>Date registered</th>
-            <th>Group</th>
+            <th>{% trans %}Username{% endtrans %}</th>
+            <th>{% trans %}Posts{% endtrans %}</th>
+            <th>{% trans %}Date registered{% endtrans %}</th>
+            <th>{% trans %}Group{% endtrans %}</th>
         </tr>
     </thead>
     <tbody>

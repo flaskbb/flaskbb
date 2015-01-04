@@ -1,16 +1,16 @@
-{% set page_title = "Search" %}
+{% set page_title = _("Search") %}
 
 {% extends theme("layout.html") %}
 {% block content %}
     {% from theme('macros.html') import render_pagination, group_field, topic_pages %}
 
     <ul class="breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
-        <li class="active">Search</li>
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Search{% endtrans %}</li>
     </ul>
 
     {% if result['post'] %}
-        <h3>Posts</h3>
+        <h3>{% trans %}Posts{% endtrans %}</h3>
 
         <table class="table table-bordered">
             <tbody>
@@ -40,8 +40,8 @@
                                 </td>
 
                                 <td class="pull-right">
-                                    Posts: {{ post.user.post_count }}<br />
-                                    Registered since: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
+                                    {% trans %}Posts{% endtrans %}: {{ post.user.post_count }}<br />
+                                    {% trans %}Registered since{% endtrans %}: {{ post.user.date_joined|format_date('%b %d %Y') }}<br />
                                 </td>
                             {% else %}
                                 <td>
@@ -66,7 +66,7 @@
             </tr>
             {% else %}
             <tr>
-                <td>No posts found matching your search criteria</td>
+                <td>{% trans %}No posts found matching your search criteria{% endtrans %}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -74,16 +74,16 @@
     {% endif %}
 
     {% if result['user'] %}
-        <h3>Users</h3>
+        <h3>{% trans %}Users{% endtrans %}</h3>
 
         <table class="table table-bordered">
             <thead>
             <tr>
                 <th>#</th>
-                <th>Username</th>
-                <th>Posts</th>
-                <th>Date registered</th>
-                <th>Group</th>
+                <th>{% trans %}Username{% endtrans %}</th>
+                <th>{% trans %}Posts{% endtrans %}</th>
+                <th>{% trans %}Date registered{% endtrans %}</th>
+                <th>{% trans %}Group{% endtrans %}</th>
             </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">No users found matching your search criteria</td>
+                    <td colspan="5">{% trans %}No users found matching your search criteria{% endtrans %}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -105,18 +105,18 @@
     {% endif %}
 
     {% if result['topic'] %}
-        <h3>Topics</h3>
+        <h3>{% trans %}Topics{% endtrans %}</h3>
 
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th colspan="2">Topic</th>
+                <th colspan="2">{% trans %}Topic{% endtrans %}</th>
 
-                <th>Posts</th>
+                <th>{% trans %}Posts{% endtrans %}</th>
 
-                <th>Views</th>
+                <th>{% trans %}Views{% endtrans %}</th>
 
-                <th>Last Post</th>
+                <th>{% trans %}Last Post{% endtrans %}</th>
             </tr>
             </thead>
 
@@ -137,11 +137,15 @@
                             <!-- Topic Pagination -->
                             {{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}
                             <br />
+
+                            <small>
+                            {% trans %}by{% endtrans %}
                             {% if topic.user_id %}
-                                <small>by <a href="{{ topic.user.url }}">{{ topic.user.username }}</a></small>
+                                <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
                             {% else %}
-                                <small>by {{ topic.username }}</small>
+                                {{ topic.username }}
                             {% endif %}
+                            </small>
                         </div>
                     </td>
                     <td>
@@ -153,16 +157,19 @@
                     <td>
                         <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
 
+                        <small>
+                        {% trans %}by{% endtrans %}
                         {% if topic.last_post.user_id %}
-                            <small>by <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a></small>
+                            <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
                         {% else %}
-                            <small>{{ topic.last_post.username }}</small>
+                            {{ topic.last_post.username }}
                         {% endif %}
+                        </small>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">No topics found matching your search criteria</td>
+                    <td colspan="5">{% trans %}No topics found matching your search criteria{% trans %}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -170,15 +177,15 @@
     {% endif %}
 
     {% if result['forum'] %}
-        <h3>Forums</h3>
+        <h3>{% trans %}Forums{% endtrans %}</h3>
 
         <table class="table table-bordered">
             <thead class="categoryhead">
             <tr>
-                <th colspan="2"><strong>Forum</strong></th>
-                <th width="85" align="center" style="white-space: nowrap"><strong>Topics</strong></th>
-                <th width="85" align="center" style="white-space: nowrap"><strong>Posts</strong></th>
-                <th width="200" align="center" style="white-space: nowrap"><strong>Last Post</strong></th>
+                <th colspan="2"><strong>{% trans %}Forum{% endtrans %}</strong></th>
+                <th width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Topics{% endtrans %}</strong></th>
+                <th width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Posts{% endtrans %}</strong></th>
+                <th width="200" align="center" style="white-space: nowrap"><strong>{% trans %}Last Post{% endtrans %}</strong></th>
             </tr>
             </thead>
             <tbody class="forumbody">
@@ -223,7 +230,7 @@
                         {% endautoescape %}
                         {% if forum.show_moderators %}
                             <div class="forum-moderators">
-                                Moderators:
+                                {% trans %}Moderators{% endtrans %}:
                                 {% for moderator in forum.moderators %}
                                     <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
                                 {% endfor %}
@@ -243,14 +250,15 @@
                         <br />
                         {{ forum.last_post.date_created|time_since }}<br />
 
+                        {% trans %}by{% endtrans %}
                         {% if forum.last_post.user_id %}
-                            by <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
+                            <a href="{{ url_for('user.profile', username=forum.last_post.user.username) }}">{{ forum.last_post.user.username }}</a>
                         {% else %}
                             {{ forum.last_post.username }}
                         {% endif %}
 
                     {% else %}
-                        No posts
+                        {% trans %}No posts{% endtrans %}
                     {% endif %}
                     {% endif %}
                 </td>
@@ -258,7 +266,7 @@
             {% else %}
             <tr>
                 <td colspan="5">
-                    No forums found matching your search criteria
+                    {% trans %}No forums found matching your search criteria{% endtrans %}
                 </td>
             </tr>
             {% endfor %}

@@ -174,7 +174,7 @@
 
 {% macro render_pagination(page_obj, url) %}
 <ul class="pagination" style="margin: 0; float:right">
-    <li><span class="pages-label">Pages: </span></li>
+    <li><span class="pages-label">{% trans %}Pages{% endtrans %}: </span></li>
     {%- for page in page_obj.iter_pages() %}
         {% if page %}
             {% if page != page_obj.page %}

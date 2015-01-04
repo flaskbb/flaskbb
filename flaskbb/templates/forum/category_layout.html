@@ -8,10 +8,10 @@
     </thead>
     <tbody class="forumbody">
         <tr class="forum_stats">
-            <td colspan="2"><strong>Forum</strong></td>
-            <td width="85" align="center" style="white-space: nowrap"><strong>Topics</strong></td>
-            <td width="85" align="center" style="white-space: nowrap"><strong>Posts</strong></td>
-            <td width="200" align="center" style="white-space: nowrap"><strong>Last Post</strong></td>
+            <td colspan="2"><strong>{% trans %}Forum{% endtrans %}</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Topics{% endtrans %}</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Posts{% endtrans %}</strong></td>
+            <td width="200" align="center" style="white-space: nowrap"><strong>{% trans %}Last Post{% endtrans %}</strong></td>
         </tr>
 
         {% for forum, forumsread in forums %}
@@ -57,7 +57,7 @@
                     {% endautoescape %}
                     {% if forum.show_moderators %}
                     <div class="forum-moderators">
-                        Moderators:
+                        {% trans %}Moderators{% endtrans %}:
                         {% for moderator in forum.moderators %}
                         <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
                         {% endfor %}

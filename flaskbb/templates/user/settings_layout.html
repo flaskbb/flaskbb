@@ -3,20 +3,20 @@
 {%- from theme('macros.html') import navlink with context -%}
 
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
-    <li class="active">Settings</li>
+    <li class="active">{% trans %}Settings{% endtrans %}</li>
 </ul>
 
 <div class="row">
     <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <li class="nav-header">Account Settings</li>
-                {{ navlink('user.settings', 'General Settings') }}
-                {{ navlink('user.change_user_details', 'Change User Details') }}
-                {{ navlink('user.change_email', 'Change E-Mail Address') }}
-                {{ navlink('user.change_password', 'Change Password') }}
+                <li class="nav-header">{% trans %}Account Settings{% endtrans %}</li>
+                {{ navlink('user.settings', _('General Settings')) }}
+                {{ navlink('user.change_user_details', _('Change User Details')) }}
+                {{ navlink('user.change_email', _('Change E-Mail Address')) }}
+                {{ navlink('user.change_password', _('Change Password')) }}
             </ul>
         </div> <!--/.sidebar -->
     </div><!--/.col-sm-3 -->

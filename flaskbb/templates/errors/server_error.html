@@ -1,11 +1,11 @@
-{% set page_title = "Server Error - 500" %}
+{% set page_title = _("Server Error - 500") %}
 
 {% extends theme("layout.html") %}
 {% block content %}
 
 <div class="well">
-    <h1>Server Error</h1>
-    <p>Something went wrong!</p>
+    <h1>{% trans %}Server Error{% endtrans %}</h1>
+    <p>{% trans %}Something went wrong!{% endtrans %}</p>
 </div>
 
 {% endblock %}

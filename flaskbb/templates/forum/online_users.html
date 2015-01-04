@@ -1,4 +1,4 @@
-{% set page_title = "Online Users" %}
+{% set page_title = _("Online Users") %}
 
 {% extends theme("layout.html") %}
 
@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<legend>Online Users</legend>
+<legend>{% trans %}Online Users{% endtrans %}</legend>
 {% for user in online_users %}
     {% if config["REDIS_ENABLED"] %}
     <a href="{{ url_for('user.profile', username=user) }}">{{ user }}<a>{% if not loop.last %}, {% endif %}

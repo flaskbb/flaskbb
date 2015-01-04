@@ -16,6 +16,7 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
 from flask.ext.login import current_user
 from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
+from flask.ext.babel import gettext as _
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems
@@ -120,7 +121,7 @@ def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
 
     if not can_edit_user(current_user):
-        flash("You are not allowed to edit this user.", "danger")
+        flash(_("You are not allowed to edit this user."), "danger")
         return redirect(url_for("management.users"))
 
     secondary_group_query = Group.query.filter(
@@ -140,11 +141,11 @@ def edit_user(user_id):
 
         user.save(groups=form.secondary_groups.data)
 
-        flash("User successfully edited", "success")
+        flash(_("User successfully edited"), "success")
         return redirect(url_for("management.edit_user", user_id=user.id))
 
     return render_template("management/user_form.html", form=form,
-                           title="Edit User")
+                           title=_("Edit User"))
 
 
 @management.route("/users/<int:user_id>/delete")
@@ -152,7 +153,7 @@ def edit_user(user_id):
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     user.delete()
-    flash("User successfully deleted", "success")
+    flash(_("User successfully deleted"), "success")
     return redirect(url_for("management.users"))
 
 
@@ -162,11 +163,11 @@ def add_user():
     form = AddUserForm()
     if form.validate_on_submit():
         form.save()
-        flash("User successfully added.", "success")
+        flash(_("User successfully added."), "success")
         return redirect(url_for("management.users"))
 
     return render_template("management/user_form.html", form=form,
-                           title="Add User")
+                           title=_("Add User"))
 
 
 @management.route("/users/banned")
@@ -195,7 +196,7 @@ def banned_users():
 @moderator_required
 def ban_user(user_id):
     if not can_ban_user(current_user):
-        flash("You do not have the permissions to ban this user.")
+        flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
 
     user = User.query.filter_by(id=user_id).first_or_404()
@@ -205,13 +206,13 @@ def ban_user(user_id):
             (current_user.permissions['mod'] or
              current_user.permissions['super_mod']):
 
-        flash("A moderator cannot ban an admin user.", "danger")
+        flash(_("A moderator cannot ban an admin user."), "danger")
         return redirect(url_for("management.overview"))
 
     if user.ban():
-        flash("User was banned successfully.", "success")
+        flash(_("User was banned successfully."), "success")
     else:
-        flash("Could not ban user.", "danger")
+        flash(_("Could not ban user."), "danger")
 
     return redirect(url_for("management.banned_users"))
 
@@ -220,15 +221,16 @@ def ban_user(user_id):
 @moderator_required
 def unban_user(user_id):
     if not can_ban_user(current_user):
-        flash("You do not have the permissions to unban this user.")
+        flash(_("You do not have the permissions to unban this user."),
+              "danger")
         return redirect(url_for("management.overview"))
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
     if user.unban():
-        flash("User is now unbanned.", "success")
+        flash(_("User is now unbanned."), "success")
     else:
-        flash("Could not unban user.", "danger")
+        flash(_("Could not unban user."), "danger")
 
     return redirect(url_for("management.banned_users"))
 
@@ -266,13 +268,14 @@ def report_markread(report_id=None):
 
         report = Report.query.filter_by(id=report_id).first_or_404()
         if report.zapped:
-            flash("Report %s is already marked as read" % report.id, "success")
+            flash(_("Report %(id)s is already marked as read", id=report.id),
+                  "success")
             return redirect(url_for("management.reports"))
 
         report.zapped_by = current_user.id
         report.zapped = datetime.utcnow()
         report.save()
-        flash("Report %s marked as read" % report.id, "success")
+        flash(_("Report %(id)s marked as read", id=report.id), "success")
         return redirect(url_for("management.reports"))
 
     # mark all as read
@@ -286,7 +289,7 @@ def report_markread(report_id=None):
     db.session.add_all(report_list)
     db.session.commit()
 
-    flash("All reports were marked as read", "success")
+    flash(_("All reports were marked as read"), "success")
     return redirect(url_for("management.reports"))
 
 
@@ -317,11 +320,11 @@ def edit_group(group_id):
         if group.guest:
             Guest.invalidate_cache()
 
-        flash("Group successfully edited.", "success")
+        flash(_("Group successfully edited."), "success")
         return redirect(url_for("management.groups", group_id=group.id))
 
     return render_template("management/group_form.html", form=form,
-                           title="Edit Group")
+                           title=_("Edit Group"))
 
 
 @management.route("/groups/<int:group_id>/delete")
@@ -329,7 +332,7 @@ def edit_group(group_id):
 def delete_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
     group.delete()
-    flash("Group successfully deleted.", "success")
+    flash(_("Group successfully deleted."), "success")
     return redirect(url_for("management.groups"))
 
 
@@ -339,11 +342,11 @@ def add_group():
     form = AddGroupForm()
     if form.validate_on_submit():
         form.save()
-        flash("Group successfully added.", "success")
+        flash(_("Group successfully added."), "success")
         return redirect(url_for("management.groups"))
 
     return render_template("management/group_form.html", form=form,
-                           title="Add Group")
+                           title=_("Add Group"))
 
 
 # Forums and Categories
@@ -364,7 +367,7 @@ def edit_forum(forum_id):
         form.populate_obj(forum)
         forum.save(moderators=form.moderators.data)
 
-        flash("Forum successfully edited.", "success")
+        flash(_("Forum successfully edited."), "success")
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
@@ -375,7 +378,7 @@ def edit_forum(forum_id):
             form.moderators.data = None
 
     return render_template("management/forum_form.html", form=form,
-                           title="Edit Forum")
+                           title=_("Edit Forum"))
 
 
 @management.route("/forums/<int:forum_id>/delete")
@@ -388,7 +391,7 @@ def delete_forum(forum_id):
 
     forum.delete(involved_users)
 
-    flash("Forum successfully deleted.", "success")
+    flash(_("Forum successfully deleted."), "success")
     return redirect(url_for("management.forums"))
 
 
@@ -400,7 +403,7 @@ def add_forum(category_id=None):
 
     if form.validate_on_submit():
         form.save()
-        flash("Forum successfully added.", "success")
+        flash(_("Forum successfully added."), "success")
         return redirect(url_for("management.forums"))
     else:
         if category_id:
@@ -408,7 +411,7 @@ def add_forum(category_id=None):
             form.category.data = category
 
     return render_template("management/forum_form.html", form=form,
-                           title="Add Forum")
+                           title=_("Add Forum"))
 
 
 @management.route("/category/add", methods=["GET", "POST"])
@@ -418,11 +421,11 @@ def add_category():
 
     if form.validate_on_submit():
         form.save()
-        flash("Category successfully created.", "success")
+        flash(_("Category successfully created."), "success")
         return redirect(url_for("management.forums"))
 
     return render_template("management/category_form.html", form=form,
-                           title="Add Category")
+                           title=_("Add Category"))
 
 
 @management.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
@@ -437,7 +440,7 @@ def edit_category(category_id):
         category.save()
 
     return render_template("management/category_form.html", form=form,
-                           title="Edit Category")
+                           title=_("Edit Category"))
 
 
 @management.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
@@ -450,7 +453,7 @@ def delete_category(category_id):
                                        Post.user_id == User.id).all()
 
     category.delete(involved_users)
-    flash("Category with all associated forums deleted.", "success")
+    flash(_("Category with all associated forums deleted."), "success")
     return redirect(url_for("management.forums"))
 
 
@@ -476,13 +479,13 @@ def enable_plugin(plugin):
 
         os.remove(disabled_file)
 
-        flash("Plugin should be enabled. Please reload your app.", "success")
+        flash(_("Plugin is enabled. Please reload your app."), "success")
 
-        flash("If you are using a host which doesn't support writting on the "
-              "disk, this won't work - than you need to delete the "
-              "'DISABLED' file by yourself.", "info")
+        flash(_("If you are using a host which doesn't support writting on the "
+                "disk, this won't work - than you need to delete the "
+                "'DISABLED' file by yourself."), "info")
     else:
-        flash("Plugin is not enabled", "danger")
+        flash(_("Plugin is not enabled"), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -493,7 +496,7 @@ def disable_plugin(plugin):
     try:
         plugin = get_plugin(plugin)
     except KeyError:
-        flash("Plugin {} not found".format(plugin), "danger")
+        flash(_("Plugin %(plugin)s not found", plugin=plugin.name), "danger")
         return redirect(url_for("management.plugins"))
 
     plugin_dir = os.path.join(
@@ -505,11 +508,11 @@ def disable_plugin(plugin):
 
     open(disabled_file, "a").close()
 
-    flash("Plugin should be disabled. Please reload your app.", "success")
+    flash(_("Plugin is disabled. Please reload your app."), "success")
 
-    flash("If you are using a host which doesn't "
-          "support writting on the disk, this won't work - than you need to "
-          "create a 'DISABLED' file by yourself.", "info")
+    flash(_("If you are using a host which doesn't "
+            "support writting on the disk, this won't work - than you need to "
+            "create a 'DISABLED' file by yourself."), "info")
 
     return redirect(url_for("management.plugins"))
 
@@ -522,9 +525,9 @@ def uninstall_plugin(plugin):
         plugin.uninstall()
         Setting.invalidate_cache()
 
-        flash("Plugin {} has been uninstalled.".format(plugin.name), "success")
+        flash(_("Plugin has been uninstalled."), "success")
     else:
-        flash("Cannot uninstall Plugin {}".format(plugin.name), "danger")
+        flash(_("Cannot uninstall Plugin"), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -537,8 +540,8 @@ def install_plugin(plugin):
         plugin.install()
         Setting.invalidate_cache()
 
-        flash("Plugin {} has been installed.".format(plugin.name), "success")
+        flash(_("Plugin has been installed."), "success")
     else:
-        flash("Cannot install Plugin {}".format(plugin.name), "danger")
+        flash(_("Cannot install Plugin"), "danger")
 
     return redirect(url_for("management.plugins"))

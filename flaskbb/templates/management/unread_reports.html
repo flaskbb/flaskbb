@@ -1,4 +1,4 @@
-{% set page_title = "Unread Reports" %}
+{% set page_title = _("Unread Reports") %}
 {% set active_management_report_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
@@ -7,13 +7,13 @@
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.unread_reports', "Show unread reports") }}
-        {{ navlink('management.reports', "Show all reports") }}
+        {{ navlink('management.unread_reports', _("Show unread reports")) }}
+        {{ navlink('management.reports', _("Show all reports")) }}
     </ul>
 </div>
 
 <div class="col-md-9">
-    <legend>Unread Reports</legend>
+    <legend>{% trans %}Unread Reports{% endtrans %}</legend>
 
     <div class="pull-left" style="padding-bottom: 10px">
         {{ render_pagination(reports, url_for('management.unread_reports')) }}
@@ -23,12 +23,12 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Poster</th>
-                <th>Topic</th>
-                <th>Reporter</th>
-                <th>Reason</th>
-                <th>Reported</th>
-                <th><a href="{{ url_for('management.report_markread') }}">Mark all as Read</a></th>
+                <th>{% trans %}Poster{% endtrans %}</th>
+                <th>{% trans %}Topic{% endtrans %}</th>
+                <th>{% trans %}Reporter{% endtrans %}</th>
+                <th>{% trans %}Reason{% endtrans %}</th>
+                <th>{% trans %}Reported{% endtrans %}</th>
+                <th><a href="{{ url_for('management.report_markread') }}">{% trans %}Mark all as Read{% endtrans %}</a></th>
             </tr>
         </thead>
         <tbody>
@@ -41,12 +41,12 @@
                 <td>{{ report.reason }}</td>
                 <td>{{ report.reported|time_since }}</td>
                 <td>
-                    <a href="{{ url_for('management.report_markread', report_id=report.id) }}">Mark as Read</a>
+                    <a href="{{ url_for('management.report_markread', report_id=report.id) }}">{% trans %}Mark as Read{% endtrans %}</a>
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="7">No unread reports.</td>
+                <td colspan="7">{% trans %}No unread reports.{% endtrans %}</td>
             </tr>
             {% endfor %}
         </tbody>

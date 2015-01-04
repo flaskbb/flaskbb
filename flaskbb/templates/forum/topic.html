@@ -1,12 +1,12 @@
 {% extends theme("layout.html") %}
-{% set page_title = topic.title ~ " - Topic" %}
+{% set page_title = _("%(title)s - Topic", title=topic.title) %}
 {% set active_forum_nav=True %}
 
 {% block content %}
 {% from theme('macros.html') import render_pagination, form_field %}
 
 <ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
     <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
     <li class="active">{{ topic.title }}</li>
@@ -32,7 +32,7 @@
                         ">{{ post.date_created|format_date('%d %B %Y') }}</a>
                     {% if post.user_id and post.date_modified %}
                     <small>
-                        (Last modified: {{ post.date_modified|format_date }} by
+                        ({% trans %}Last modified{% endtrans %}: {{ post.date_modified|format_date }} {% trans %}by{% endtrans %}
                         <a href="{{ url_for('user.profile', username=post.modified_by) }}">
                             {{ post.modified_by }}
                         </a>.)
@@ -67,14 +67,14 @@
                     </td>
 
                     <td class="pull-right">
-                        Posts: {{ user.post_count }}<br />
-                        Registered since: {{ user.date_joined|format_date('%b %d %Y') }}<br />
+                        {% trans %}Posts{% endtrans %}: {{ user.post_count }}<br />
+                        {% trans %}Registered since{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}<br />
                     </td>
                 {% else %}
                     <td>
                         <strong>{{ post.username }}</strong>
                         <br />
-                        Guest
+                        {% trans %}Guest{% endtrans %}
                     </td>
                 {% endif %}
                 </tr>
@@ -103,36 +103,36 @@
             <td>
                 <span class="pull-left">
                     {% if current_user.is_authenticated() and post.user_id and post.user_id != current_user.id %}
-                    <a href="{{ url_for('user.new_message', to_user=post.user.username) }}">PM</a>
+                    <a href="{{ url_for('user.new_message', to_user=post.user.username) }}">{% trans %}PM{% endtrans %}</a>
                     {% endif %}
                     {% if user.website %}
-                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">Website</a>
+                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">{% trans %}Website{% endtrans %}</a>
                     {% endif %}
                 </span>
 
                 <span class="pull-right">
                     {% if current_user.is_authenticated() %}
                     <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">
-                        Report
+                        {% trans %}Report{% endtrans %}
                     </a> |
                     {% endif %}
                     {% if current_user|edit_post(post) %}
-                    <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">Edit</a> |
+                    <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">{% trans %}Edit{% endtrans %}</a> |
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
                         {% if current_user|delete_topic(topic) %}
-                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">Delete</a> |
+                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">{% trans %}Delete{% endtrans %}</a> |
                         {% endif %}
                     {% else %}
                         {% if current_user|delete_post(post) %}
-                        <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">Delete</a> |
+                        <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">{% trans %}Delete{% endtrans %}</a> |
                         {% endif %}
                     {% endif %}
                     {% if current_user|post_reply(topic) %}
                         <!-- Quick quote -->
-                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">Quote</a> |
+                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">{% trans %}Quote{% endtrans %}</a> |
                         <!-- Full quote/reply -->
-                        <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">Reply</a>
+                        <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">{% trans %}Reply{% endtrans %}</a>
                     {% endif %}
                 </span>
             </td>
@@ -150,7 +150,7 @@
 
         {{ render_field(form.content, div_class="col-sm-12 reply-content", rows=5) }}
 
-        <button type="submit" class="btn btn-success">Reply!</button>
+        <button type="submit" class="btn btn-success">{% trans %}Reply{% endtrans %}</button>
     </form>
 {% endif %}
 

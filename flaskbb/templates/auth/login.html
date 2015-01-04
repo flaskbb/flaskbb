@@ -1,11 +1,11 @@
-{% set page_title = "Login" %}
+{% set page_title = _("Login") %}
 
 {% extends theme("layout.html") %}
 {% from theme("macros.html") import horizontal_field %}
 {% block content %}
 
 <form class="form-horizontal" role="form" method="POST">
-    <h2>Login</h2>
+    <h2>{% trans %}Login{% endtrans %}</h2>
     <hr>
     {{ form.hidden_tag() }}
     {{ horizontal_field(form.login)}}
@@ -15,7 +15,7 @@
         <div class="col-sm-offset-3 col-sm-3">
             <div class="checkbox">
                 <label>
-                    {{ form.remember_me }} Remember Me
+                    {{ form.remember_me }} {{ form.remember_me.label }}
                 </label>
             </div>
         </div>
@@ -23,7 +23,7 @@
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">Login</button>
+            <button type="submit" class="btn btn-success">{% trans %}Login{% endtrans %}</button>
         </div>
     </div>
 </form>

@@ -1,4 +1,4 @@
-{% set page_title = "New Post" %}
+{% set page_title = _("New Post") %}
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
@@ -6,20 +6,20 @@
 {% from theme("macros.html") import render_field %}
 
 <ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">Forum</a></li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
     <li><a href="{{ topic.url }}">{{ topic.title }} </a></li>
-    <li class="active">New Post</li>
+    <li class="active">{% trans %}New Post{% endtrans %}</li>
 </ul>
 
 <form class="form" role="form" method="post">
     {{ form.hidden_tag() }}
-    <h3>New Post</h3>
+    <h3>{% trans %}New Post{% endtrans %}</h3>
 
     {% if preview %}
     <div class="form-group">
         <div class="col-sm-12">
-            <label>Preview</label>
+            <label>{% trans %}Preview{% endtrans %}</label>
             <div class="form-control preview-body">
                 {% autoescape false %}
                 {{ preview|markup }}
@@ -31,8 +31,8 @@
 
     {{ render_field(form.content, div_class="col-sm-12", rows=12) }}
 
-    <button type="submit" class="btn btn-success" name="button" value="reply">Reply</button>
-    <button type="submit" class="btn btn-success" name="button" value="preview">Preview</button>
+    <button type="submit" class="btn btn-success" name="button" value="reply">{% trans %}Reply{% endtrans %}</button>
+    <button type="submit" class="btn btn-success" name="button" value="preview">{% trans %}Preview{% endtrans %}</button>
 </form>
 
 {% endblock %}
