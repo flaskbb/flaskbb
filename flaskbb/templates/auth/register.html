@@ -17,21 +17,9 @@
         {{ horizontal_field(form.recaptcha) }}
     {% endif %}
 
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-3">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox"> {{ form.accept_tos }} {{ form.accept_tos.label }}
-                </label>
-            </div>
-        </div>
-    </div>
+    {{ horizontal_field(form.accept_tos)}}
+    {{ horizontal_field(form.submit)}}
 
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-10">
-            <button type="submit" class="btn btn-success">{% trans %}Register{% endtrans %}</button>
-        </div>
-    </div>
 </form>
 
 {% endblock %}

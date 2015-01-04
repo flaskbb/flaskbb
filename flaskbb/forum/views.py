@@ -325,7 +325,7 @@ def new_post(topic_id, slug=None):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        if request.form['button'] == 'preview':
+        if "preview" in request.form:
             return render_template(
                 "forum/new_post.html", topic=topic,
                 form=form, preview=form.content.data
@@ -352,7 +352,7 @@ def reply_post(topic_id, post_id):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        if request.form['button'] == 'preview':
+        if "preview" in request.form:
             return render_template(
                 "forum/new_post.html", topic=topic,
                 form=form, preview=form.content.data
@@ -377,7 +377,7 @@ def edit_post(post_id):
 
     form = ReplyForm()
     if form.validate_on_submit():
-        if request.form['button'] == 'preview':
+        if "preview" in request.form:
             return render_template(
                 "forum/new_post.html", topic=post.topic,
                 form=form, preview=form.content.data

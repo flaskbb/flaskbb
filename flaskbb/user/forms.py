@@ -11,9 +11,9 @@
 from flask.ext.login import current_user
 from flask.ext.wtf import Form
 from wtforms import (StringField, PasswordField, DateField, TextAreaField,
-                     SelectField, ValidationError)
-from wtforms.validators import (Length, DataRequired, Email, EqualTo, regexp,
-                                Optional, URL)
+                     SelectField, ValidationError, SubmitField)
+from wtforms.validators import (Length, DataRequired, InputRequired, Email,
+                                EqualTo, regexp, Optional, URL)
 from flask.ext.babel import lazy_gettext as _
 
 from flaskbb.user.models import User, PrivateMessage
@@ -33,20 +33,23 @@ class GeneralSettingsForm(Form):
     language = SelectField(_("Language"))
     theme = SelectField(_("Theme"))
 
+    submit = SubmitField(_("Save"))
+
 
 class ChangeEmailForm(Form):
     old_email = StringField(_("Old E-Mail Address"), validators=[
-        DataRequired(message=_("E-Mail address required")),
+        DataRequired(message=_("A E-Mail Address is required.")),
         Email(message=_("This E-Mail is invalid"))])
 
     new_email = StringField(_("New E-Mail Address"), validators=[
-        DataRequired(message=_("E-Mail address required")),
-        Email(message=_("This E-Mail is invalid"))])
+        InputRequired(),
+        EqualTo('confirm_new_email', message=_("E-Mails must match.")),
+        Email(message=_("Invalid E-Mail Address."))])
 
     confirm_new_email = StringField(_("Confirm E-Mail Address"), validators=[
-        DataRequired(message=_("E-Mail adress required")),
-        Email(message=_("This E-Mail is invalid")),
-        EqualTo("new_email", message=_("E-Mails do not match"))])
+        Email(message=_("Invalid E-Mail Address."))])
+
+    submit = SubmitField(_("Save"))
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -58,19 +61,20 @@ class ChangeEmailForm(Form):
                                  User.email.like(field.data),
                                  db.not_(User.id == self.user.id))).first()
         if user:
-            raise ValidationError(_("This email is taken"))
+            raise ValidationError(_("This E-Mail is taken."))
 
 
 class ChangePasswordForm(Form):
     old_password = PasswordField(_("Old Password"), validators=[
         DataRequired(message=_("Password required"))])
 
-    new_password = PasswordField(_("New Password"), validators=[
-        DataRequired(message=_("Password required"))])
+    new_password = PasswordField(_('Password'), validators=[
+        InputRequired(),
+        EqualTo('confirm_new_password', message=_('Passwords must match.'))])
 
-    confirm_new_password = PasswordField(_("Confirm New Password"), validators=[
-        DataRequired(message=_("Password required")),
-        EqualTo("new_password", message=_("Passwords do not match"))])
+    confirm_new_password = PasswordField(_('Confirm New Password'))
+
+    submit = SubmitField(_("Save"))
 
 
 class ChangeUserDetailsForm(Form):
@@ -98,14 +102,21 @@ class ChangeUserDetailsForm(Form):
     notes = TextAreaField(_("Notes"), validators=[
         Optional(), Length(min=0, max=5000)])
 
+    submit = SubmitField(_("Save"))
+
 
 class NewMessageForm(Form):
     to_user = StringField(_("To User"), validators=[
         DataRequired(message=_("A username is required."))])
+
     subject = StringField(_("Subject"), validators=[
         DataRequired(message=_("A subject is required."))])
+
     message = TextAreaField(_("Message"), validators=[
         DataRequired(message=_("A message is required."))])
+
+    send_message = SubmitField(_("Send Message"))
+    save_message = SubmitField(_("Save Message"))
 
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()

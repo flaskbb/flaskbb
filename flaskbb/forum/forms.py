@@ -10,7 +10,7 @@
 """
 from flask.ext.wtf import Form
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
-                     BooleanField)
+                     BooleanField, SubmitField)
 from wtforms.validators import DataRequired, Optional, Length
 from flask.ext.babel import lazy_gettext as _
 
@@ -22,6 +22,8 @@ class QuickreplyForm(Form):
     content = TextAreaField(_("Quickreply"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
+    submit = SubmitField(_("Reply"))
+
     def save(self, user, topic):
         post = Post(**self.data)
         return post.save(user=user, topic=topic)
@@ -31,8 +33,11 @@ class ReplyForm(Form):
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
-    track_topic = BooleanField(_("Track this topic"), default=False,
+    track_topic = BooleanField(_("Track this Topic"), default=False,
                                validators=[Optional()])
+
+    submit = SubmitField(_("Reply"))
+    preview = SubmitField(_("Preview"))
 
     def save(self, user, topic):
         post = Post(content=self.content.data)
@@ -44,13 +49,16 @@ class ReplyForm(Form):
 
 class NewTopicForm(ReplyForm):
     title = StringField(_("Topic Title"), validators=[
-        DataRequired(message=_("A topic title is required"))])
+        DataRequired(message=_("Please choose a Topic title."))])
 
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
-    track_topic = BooleanField(_("Track this topic"), default=False,
+    track_topic = BooleanField(_("Track this Topic"), default=False,
                                validators=[Optional()])
+
+    submit = SubmitField(_("Post Topic"))
+    preview = SubmitField(_("Preview"))
 
     def save(self, user, forum):
         topic = Topic(title=self.title.data)
@@ -63,9 +71,10 @@ class NewTopicForm(ReplyForm):
 
 class ReportForm(Form):
     reason = TextAreaField(_("Reason"), validators=[
-        DataRequired(message=_("Please insert a reason why you want to report "
-                               "this post."))
+        DataRequired(message=_("What's the reason for reporting this post?"))
     ])
+
+    submit = SubmitField(_("Report Post"))
 
     def save(self, user, post):
         report = Report(**self.data)
@@ -76,6 +85,8 @@ class UserSearchForm(Form):
     search_query = StringField(_("Search"), validators=[
         Optional(), Length(min=3, max=50)
     ])
+
+    submit = SubmitField(_("Search"))
 
     def get_results(self):
         query = self.search_query.data
@@ -89,6 +100,8 @@ class SearchPageForm(Form):
     search_types = SelectMultipleField(_("Content"), validators=[
         DataRequired()], choices=[('post', _('Post')), ('topic', _('Topic')),
                                   ('forum', _('Forum')), ('user', _('Users'))])
+
+    submit = SubmitField(_("Search"))
 
     def get_results(self):
         # Because the DB is not yet initialized when this form is loaded,

@@ -15,12 +15,7 @@
         {{ form.hidden_tag() }}
         {{ horizontal_field(form.search_types)}}
         {{ horizontal_field(form.search_query)}}
-
-        <div class="form-group">
-            <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-success">{% trans %}Search{% endtrans %}</button>
-            </div>
-        </div>
+        {{ horizontal_field(form.submit) }}
     </form>
 
 {% endblock %}

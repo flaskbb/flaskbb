@@ -11,9 +11,10 @@
 from datetime import datetime
 
 from flask.ext.wtf import Form, RecaptchaField
-from wtforms import StringField, PasswordField, BooleanField, HiddenField
-from wtforms.validators import (DataRequired, Email, EqualTo, regexp,
-                                ValidationError)
+from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
+                     SubmitField)
+from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
+                                regexp, ValidationError)
 from flask.ext.babel import lazy_gettext as _
 
 from flaskbb.user.models import User
@@ -25,42 +26,45 @@ is_username = regexp(USERNAME_RE,
 
 class LoginForm(Form):
     login = StringField(_("Username or E-Mail"), validators=[
-        DataRequired(message=_("You must provide an email adress or username"))]
+        DataRequired(message=_("A Username or E-Mail Address is required."))]
     )
 
     password = PasswordField(_("Password"), validators=[
-        DataRequired(message=_("Password required"))])
+        DataRequired(message=_("A Password is required."))])
 
     remember_me = BooleanField(_("Remember Me"), default=False)
+
+    submit = SubmitField(_("Login"))
 
 
 class RegisterForm(Form):
     username = StringField(_("Username"), validators=[
-        DataRequired(message=_("Username required")),
+        DataRequired(message=_("A Username is required.")),
         is_username])
 
     email = StringField(_("E-Mail"), validators=[
-        DataRequired(message=_("E-Mail required")),
-        Email(message=_("This E-Mail is invalid"))])
+        DataRequired(message=_("A E-Mail Address is required.")),
+        Email(message=_("Invalid E-Mail Address."))])
 
-    password = PasswordField(_("Password"), validators=[
-        DataRequired(message=_("Password required"))])
+    password = PasswordField(_('Password'), validators=[
+        InputRequired(),
+        EqualTo('confirm_password', message=_('Passwords must match.'))])
 
-    confirm_password = PasswordField(_("Confirm Password"), validators=[
-        DataRequired(message=_("Confirm Password required")),
-        EqualTo("password", message=_("Passwords do not match"))])
+    confirm_password = PasswordField(_('Confirm Password'))
 
     accept_tos = BooleanField(_("I accept the Terms of Service"), default=True)
+
+    submit = SubmitField(_("Register"))
 
     def validate_username(self, field):
         user = User.query.filter_by(username=field.data).first()
         if user:
-            raise ValidationError(_("This username is taken"))
+            raise ValidationError(_("This Username is taken."))
 
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()
         if email:
-            raise ValidationError(_("This email is taken"))
+            raise ValidationError(_("This E-Mail is taken."))
 
     def save(self):
         user = User(username=self.username.data,
@@ -77,28 +81,33 @@ class RegisterRecaptchaForm(RegisterForm):
 
 class ReauthForm(Form):
     password = PasswordField(_('Password'), valdidators=[
-        DataRequired()])
+        DataRequired(message=_("A Password is required."))])
+
+    submit = SubmitField(_("Refresh Login"))
 
 
 class ForgotPasswordForm(Form):
     email = StringField(_('E-Mail'), validators=[
-        DataRequired(message=("E-Mail reguired")),
+        DataRequired(message=_("A E-Mail Address is reguired.")),
         Email()])
+
+    submit = SubmitField(_("Request Password"))
 
 
 class ResetPasswordForm(Form):
     token = HiddenField('Token')
 
     email = StringField(_('E-Mail'), validators=[
-        DataRequired(),
+        DataRequired(message=_("A E-Mail Address is required.")),
         Email()])
 
     password = PasswordField(_('Password'), validators=[
-        DataRequired()])
+        InputRequired(),
+        EqualTo('confirm_password', message=_('Passwords must match.'))])
 
-    confirm_password = PasswordField(_('Confirm password'), validators=[
-        DataRequired(),
-        EqualTo('password', message=_('Passwords do not match'))])
+    confirm_password = PasswordField(_('Confirm Password'))
+
+    submit = SubmitField(_("Reset Password"))
 
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()

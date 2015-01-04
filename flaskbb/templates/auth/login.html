@@ -10,22 +10,8 @@
     {{ form.hidden_tag() }}
     {{ horizontal_field(form.login)}}
     {{ horizontal_field(form.password)}}
-
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-3">
-            <div class="checkbox">
-                <label>
-                    {{ form.remember_me }} {{ form.remember_me.label }}
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">{% trans %}Login{% endtrans %}</button>
-        </div>
-    </div>
+    {{ horizontal_field(form.remember_me) }}
+    {{ horizontal_field(form.submit) }}
 </form>
 
 {% endblock %}

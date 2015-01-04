@@ -21,12 +21,7 @@
             {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
 
             {{ horizontal_field(form.position) }}
-
-            <div class="form-group">
-                <div class="col-lg-offset-0 col-lg-9">
-                    <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
-                </div>
-            </div>
+            {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
     </form>
 </div>
 

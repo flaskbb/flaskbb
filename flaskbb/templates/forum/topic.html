@@ -144,13 +144,13 @@
 {% include 'forum/topic_controls.html' %}
 
 {% if form %}
-    {% from "macros.html" import render_field %}
+    {% from "macros.html" import render_field, render_submit_field %}
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
 
         {{ render_field(form.content, div_class="col-sm-12 reply-content", rows=5) }}
+        {{ render_submit_field(form.submit) }}
 
-        <button type="submit" class="btn btn-success">{% trans %}Reply{% endtrans %}</button>
     </form>
 {% endif %}
 

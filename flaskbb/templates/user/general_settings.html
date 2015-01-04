@@ -7,10 +7,6 @@
     {{ form.hidden_tag() }}
     {{ horizontal_field(form.theme) }}
     {{ horizontal_field(form.language) }}
-    <div class="form-group row">
-        <div class="col-sm-offset-3 col-sm-9">
-            <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
-        </div>
-    </div>
+    {{ horizontal_field(form.submit) }}
 </form>
 {% endblock %}

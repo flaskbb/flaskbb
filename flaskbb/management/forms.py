@@ -10,7 +10,7 @@
 """
 from flask.ext.wtf import Form
 from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
-                     BooleanField, SelectField, DateField)
+                     BooleanField, SelectField, DateField, SubmitField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
 
@@ -42,12 +42,12 @@ def select_primary_group():
 
 class UserForm(Form):
     username = StringField(_("Username"), validators=[
-        DataRequired(message=_("A username is required.")),
+        DataRequired(message=_("A Username is required.")),
         is_username])
 
     email = StringField(_("E-Mail"), validators=[
-        DataRequired(message=_("A E-Mail address is required.")),
-        Email(message=_("This email is invalid"))])
+        DataRequired(message=_("A E-Mail Address is required.")),
+        Email(message=_("Invalid E-Mail Address."))])
 
     password = PasswordField("Password", validators=[
         Optional()])
@@ -88,6 +88,8 @@ class UserForm(Form):
         query_factory=select_primary_group,
         get_label="name")
 
+    submit = SubmitField(_("Save"))
+
     def validate_username(self, field):
         if hasattr(self, "user"):
             user = User.query.filter(
@@ -100,7 +102,7 @@ class UserForm(Form):
             user = User.query.filter(User.username.like(field.data)).first()
 
         if user:
-            raise ValidationError(_("This username is taken"))
+            raise ValidationError(_("This Username is taken."))
 
     def validate_email(self, field):
         if hasattr(self, "user"):
@@ -114,7 +116,7 @@ class UserForm(Form):
             user = User.query.filter(User.email.like(field.data)).first()
 
         if user:
-            raise ValidationError(_("This email is taken"))
+            raise ValidationError(_("This E-Mail is taken."))
 
     def save(self):
         user = User(**self.data)
@@ -134,7 +136,7 @@ class EditUserForm(UserForm):
 
 class GroupForm(Form):
     name = StringField(_("Group Name"), validators=[
-        DataRequired(message=_("Group name required"))])
+        DataRequired(message=_("A Group name is required."))])
 
     description = TextAreaField(_("Description"), validators=[
         Optional()])
@@ -194,6 +196,8 @@ class GroupForm(Form):
         description=_("Allow moderators to ban other users")
     )
 
+    submit = SubmitField(_("Save"))
+
     def validate_name(self, field):
         if hasattr(self, "group"):
             group = Group.query.filter(
@@ -206,7 +210,7 @@ class GroupForm(Form):
             group = Group.query.filter(Group.name.like(field.data)).first()
 
         if group:
-            raise ValidationError(_("This name is taken"))
+            raise ValidationError(_("This Group name is taken."))
 
     def validate_banned(self, field):
         if hasattr(self, "group"):
@@ -220,7 +224,7 @@ class GroupForm(Form):
             group = Group.query.filter_by(banned=True).count()
 
         if field.data and group > 0:
-            raise ValidationError(_("There is already a Banned group"))
+            raise ValidationError(_("There is already a Banned group."))
 
     def validate_guest(self, field):
         if hasattr(self, "group"):
@@ -234,7 +238,7 @@ class GroupForm(Form):
             group = Group.query.filter_by(guest=True).count()
 
         if field.data and group > 0:
-            raise ValidationError(_("There is already a Guest group"))
+            raise ValidationError(_("There is already a Guest group."))
 
     def save(self):
         group = Group(**self.data)
@@ -255,7 +259,7 @@ class AddGroupForm(GroupForm):
 class ForumForm(Form):
     title = StringField(
         _("Forum Title"),
-        validators=[DataRequired(message=_("Forum title required"))]
+        validators=[DataRequired(message=_("A Forum Title is required."))]
     )
 
     description = TextAreaField(
@@ -267,7 +271,7 @@ class ForumForm(Form):
     position = IntegerField(
         _("Position"),
         default=1,
-        validators=[DataRequired(message=_("Forum position required"))]
+        validators=[DataRequired(message=_("The Forum Position is required."))]
     )
 
     category = QuerySelectField(
@@ -279,7 +283,7 @@ class ForumForm(Form):
     )
 
     external = StringField(
-        _("External link"),
+        _("External Link"),
         validators=[Optional(), URL()],
         description=_("A link to a website i.e. 'http://flaskbb.org'")
     )
@@ -299,6 +303,8 @@ class ForumForm(Form):
         _("Locked?"),
         description=_("Disable new posts and topics in this forum.")
     )
+
+    submit = SubmitField(_("Save"))
 
     def validate_external(self, field):
         if hasattr(self, "forum"):
@@ -371,8 +377,8 @@ class AddForumForm(ForumForm):
 
 
 class CategoryForm(Form):
-    title = StringField(_("Category title"), validators=[
-        DataRequired(message=_("Category title required"))])
+    title = StringField(_("Category Title"), validators=[
+        DataRequired(message=_("A Category Title is required."))])
 
     description = TextAreaField(
         _("Description"),
@@ -383,8 +389,11 @@ class CategoryForm(Form):
     position = IntegerField(
         _("Position"),
         default=1,
-        validators=[DataRequired(message=_("Category position required"))]
+        validators=[DataRequired(message=_("The Category Position is "
+                                           "required."))]
     )
+
+    submit = SubmitField(_("Save"))
 
     def save(self):
         category = Category(**self.data)

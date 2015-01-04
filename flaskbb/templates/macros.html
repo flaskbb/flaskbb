@@ -20,12 +20,12 @@
 
 
 {%- macro render_boolean_field(field, inline=False) -%}
-<label class="checkbox {%- if inline -%}inline{%- endif -%}">
+<div class="checkbox {%- if inline -%}inline{%- endif -%}">
     {{ field(**kwargs) }}
     {{ field_label(field) }}
     {{ field_description(field) }}
     {{ field_errors(field) }}
-</label>
+</div>
 {%- endmacro -%}
 
 {%- macro render_select_field(field, div_class='') -%}
@@ -46,6 +46,18 @@
         {{ field_errors(field) }}
     </div>
 </div>
+{%- endmacro -%}
+
+{%- macro render_submit_field(field, div_class='', input_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {{ field(class=input_class or 'btn btn-success') }}
+
+{% if div_class %}
+</div>
+{% endif %}
 {%- endmacro -%}
 
 {%- macro render_field(field, div_class='', rows='') -%}
@@ -125,29 +137,69 @@
 {%- endmacro -%}
 
 
-{%- macro horizontal_field(field, label_text='', label_class='') -%}
+{%- macro horizontal_boolean_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% else %}
+<div class="col-sm-offset-3 col-sm-3">
+{% endif %}
+    <div class="checkbox">
+        {{ field(**kwargs) }}
+        {{ field_label(field) }}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro horizontal_submit_field(field, div_class='', input_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% else %}
+<div class="col-sm-offset-3 col-sm-9">
+{% endif %}
+    {{ field(class=input_class or 'btn btn-success') }}
+</div>
+{%- endmacro -%}
+
+
+{%- macro horizontal_field(field, label_text='', label_class='', div_class='', input_class='') -%}
 <div class="form-group row {%- if field.errors %} has-error{%- endif %}">
 
-    {% if class %}
-        {{ field.label(class=class) }}
+    {% if field.type == "BooleanField" or field.type == "SubmitField" %}
+        {% if field.type == "BooleanField" %}
+            {{ horizontal_boolean_field(field, div_class) }}
+        {% else %}
+            {{ horizontal_submit_field(field, div_class) }}
+        {% endif %}
     {% else %}
-        {{ field.label(class="col-sm-3 control-label") }}
-    {% endif %}
-    <div class="col-sm-9">
 
-    {%- if kwargs['required'] or field.flags.required -%}
-        {% if label_text %}
-            {{ field(class='form-control', placeholder=label_text, required="required", **kwargs) }}
+        {% if label_class %}
+            {{ field.label(class=label_class) }}
         {% else %}
-            {{ field(class='form-control', placeholder=field.label.text, required="required", **kwargs) }}
+            {{ field.label(class="col-sm-3 control-label") }}
         {% endif %}
-    {%- else -%}
-        {% if label_text %}
-            {{ field(class='form-control', placeholder=label_text, **kwargs) }}
+
+        {% if div_class %}
+            <div class="{{ div_class }}">
         {% else %}
-            {{ field(class='form-control', placeholder=field.label.text, **kwargs) }}
+            <div class="col-sm-9">
         {% endif %}
-    {%- endif -%}
+
+        {%- if kwargs['required'] or field.flags.required -%}
+            {% if label_text %}
+                {{ field(class='form-control', placeholder=label_text, required="required", **kwargs) }}
+            {% else %}
+                {{ field(class='form-control', placeholder=field.label.text, required="required", **kwargs) }}
+            {% endif %}
+        {%- else -%}
+            {% if label_text %}
+                {{ field(class='form-control', placeholder=label_text, **kwargs) }}
+            {% else %}
+                {{ field(class='form-control', placeholder=field.label.text, **kwargs) }}
+            {% endif %}
+        {%- endif -%}
+
+    {% endif %}
 
     {{ field_description(field) }}
     {{ field_errors(field) }}

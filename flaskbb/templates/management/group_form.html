@@ -36,11 +36,7 @@
             {{ render_boolean_field(form.posttopic) }}
             {{ render_boolean_field(form.postreply) }}
 
-            <div class="form-group">
-                <div class="col-lg-offset-0 col-lg-9">
-                    <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
-                </div>
-            </div>
+            {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
     </form>
 </div>
 {% endblock %}

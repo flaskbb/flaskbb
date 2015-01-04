@@ -3,7 +3,7 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("macros.html") import render_field %}
+{% from theme("macros.html") import render_field, render_submit_field %}
 
 <ul class="breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
@@ -31,8 +31,9 @@
 
     {{ render_field(form.content, div_class="col-sm-12", rows=12) }}
 
-    <button type="submit" class="btn btn-success" name="button" value="reply">{% trans %}Reply{% endtrans %}</button>
-    <button type="submit" class="btn btn-success" name="button" value="preview">{% trans %}Preview{% endtrans %}</button>
+    {{ render_submit_field(form.submit) }}
+    {{ render_submit_field(form.preview) }}
+
 </form>
 
 {% endblock %}
