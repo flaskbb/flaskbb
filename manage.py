@@ -7,11 +7,17 @@
     You can also run the development server with it.
     Just type `python manage.py` to see the full list of commands.
 
+    TODO: When Flask 1.0 is released, get rid of Flask-Script and use click.
+          Then it's also possible to split the commands in "command groups"
+          which would make the commands better seperated from each other
+          and less confusing.
+
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
 import sys
 import os
+import subprocess
 
 from flask import current_app
 from werkzeug.utils import import_string
@@ -35,6 +41,9 @@ except ImportError:
 
 app = create_app(Config)
 manager = Manager(app)
+
+# Used to get the plugin translations
+PLUGINS_FOLDER = os.path.join(app.root_path, "plugins")
 
 # Run local server
 manager.add_command("runserver", Server("localhost", port=8080))
@@ -181,8 +190,12 @@ def update_translations():
     """
     Updates the translations
     """
-    os.system("pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .")
-    os.system("pybabel update -i messages.pot -d flaskbb/translations")
+    translations_folder = os.path.join(app.root_path, "translations")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", "messages.pot", "."])
+    subprocess.call(["pybabel", "update", "-i", "messages.pot",
+                     "-d", translations_folder])
     os.unlink("messages.pot")
 
 
@@ -191,17 +204,70 @@ def init_translations(translation):
     """
     Adds a new language to the translations
     """
-    os.system("pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .")
-    os.system("pybabel init -i messages.pot -d flaskbb/translations -l " + translation)
+    translations_folder = os.path.join(app.root_path, "translations")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", "messages.pot", "."])
+    subprocess.call(["pybabel", "init", "-i", "messages.pot",
+                     "-d", translations_folder, "-l", translation])
     os.unlink('messages.pot')
 
 
 @manager.command
 def compile_translations():
     """
-    Compile the translations.
+    Compiles the translations.
     """
-    os.system("pybabel compile -d flaskbb/translations")
+    translations_folder = os.path.join(app.root_path, "translations")
+
+    subprocess.call(["pybabel", "compile", "-d", translations_folder])
+
+
+# Plugin translation commands
+@manager.command
+def add_plugin_translations(plugin, translation):
+    """
+    Adds a new language to the plugin translations
+    Expects the name of the plugin and the translations name like "en"
+    """
+    plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", "messages.pot",
+                     plugin_folder])
+    subprocess.call(["pybabel", "init", "-i", "messages.pot",
+                     "-d", translations_folder, "-l", translation])
+    os.unlink('messages.pot')
+
+
+@manager.command
+def update_plugin_translations(plugin):
+    """
+    Updates the plugin translations
+    Expects the name of the plugin.
+    """
+    plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", "messages.pot",
+                     plugin_folder])
+    subprocess.call(["pybabel", "update", "-i", "messages.pot"
+                     "-d", translations_folder])
+    os.unlink("messages.pot")
+
+
+@manager.command
+def compile_plugin_translations(plugin):
+    """
+    Compile the plugin translations.
+    Expects the name of the plugin.
+    """
+    plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+
+    subprocess.call(["pybabel", "compile", "-d", translations_folder])
 
 
 if __name__ == "__main__":
