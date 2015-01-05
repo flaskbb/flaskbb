@@ -239,7 +239,7 @@ msgstr ""
 #: flaskbb/themes/bootstrap2/templates/layout.html:52
 #: flaskbb/themes/bootstrap3/templates/layout.html:51
 msgid "Search"
-msgstr ""
+msgstr "Suche"
 
 #: flaskbb/forum/forms.py:97
 msgid "Criteria"
@@ -1582,4 +1582,3 @@ msgstr ""
 #: flaskbb/user/views.py:283
 msgid "Message deleted!"
 msgstr ""
-
