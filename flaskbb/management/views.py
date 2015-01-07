@@ -135,7 +135,7 @@ def edit_user(user_id):
         form.populate_obj(user)
         user.primary_group_id = form.primary_group.data.id
 
-       # Don't override the password
+        # Don't override the password
         if form.password.data:
             user.password = form.password.data
 

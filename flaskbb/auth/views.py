@@ -118,8 +118,8 @@ def forgot_password():
             flash(_("E-Mail sent! Please check your inbox."), "info")
             return redirect(url_for("auth.forgot_password"))
         else:
-            flash(_("You have entered an username or email that is not linked \
-                with your account"), "danger")
+            flash(_("You have entered an username or email that is not linked "
+                    "with your account"), "danger")
     return render_template("auth/forgot_password.html", form=form)
 
 
