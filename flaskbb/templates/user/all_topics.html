@@ -17,7 +17,7 @@
     <thead>
         <tr>
             <th colspan="5">
-                {% trans %}All Topics created by{% endtrans %} {{ user.username }}
+                {% trans user=user.username %}All Topics created by {{user}}{% endtrans %}
             </th>
         </tr>
     </thead>
@@ -69,7 +69,7 @@
         {% else %}
         <tr>
             <td colspan="5">
-                No Topics so far.
+                {% trans %}No Topics so far.{% endtrans %}
             </td>
         </tr>
         {% endfor %}

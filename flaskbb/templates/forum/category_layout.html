@@ -77,14 +77,15 @@
                 <br />
                 {{ forum.last_post_created|time_since }}<br />
 
+                    {% trans %}by{% endtrans %}
                     {% if forum.last_post_user_id %}
-                    by <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
+                    <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
                     {% else %}
                     {{ forum.last_post_username }}
                     {% endif %}
 
                 {% else %}
-                No posts
+                {% trans %}No posts{% endtrans %}
                 {% endif %}
             {% endif %}
             </td>

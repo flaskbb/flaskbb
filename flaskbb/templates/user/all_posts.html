@@ -12,6 +12,13 @@
     {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
 </div> <!-- end span pagination -->
 <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>
+                {% trans user=user.username %}All Posts created by {{user}}{% endtrans %}
+            </th>
+        </tr>
+    </thead>
     <tbody>
     {% for post in posts.items %}
         <tr>
@@ -25,6 +32,12 @@
         <tr>
             <td>
                 {{ post.content }}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td>
+                {% trans %}No Posts so far.{% endtrans %}
             </td>
         </tr>
     {% endfor %}
