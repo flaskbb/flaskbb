@@ -14,7 +14,7 @@ from datetime import datetime
 from flask import Blueprint, flash, request, redirect, url_for
 from flask.ext.login import login_required, current_user
 from flask.ext.themes2 import get_themes_list
-from flask.ext.babel import gettext as _
+from flask.ext.babelex import gettext as _
 
 from flaskbb.extensions import db, babel
 from flaskbb.utils.helpers import render_template

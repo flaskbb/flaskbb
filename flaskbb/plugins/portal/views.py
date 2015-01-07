@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, current_app, flash, request
+from flask.ext.babelex import gettext as _
+
 from flaskbb.utils.helpers import render_template
 from flaskbb.forum.models import Topic, Post
 from flaskbb.user.models import User
@@ -21,8 +23,8 @@ def index():
         forum_ids = flaskbb_config["PLUGIN_PORTAL_FORUM_IDS"]
     except KeyError:
         forum_ids = [1]
-        flash("Please install the plugin first to configure the forums "
-              "which should be displayed", "warning")
+        flash(_("Please install the plugin first to configure the forums "
+              "which should be displayed"), "warning")
 
     news = Topic.query.filter(Topic.forum_id.in_(forum_ids)).\
         order_by(Topic.id.desc()).\

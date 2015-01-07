@@ -14,12 +14,12 @@ import datetime
 from flask import (Blueprint, redirect, url_for, current_app,
                    request, flash)
 from flask.ext.login import login_required, current_user
-from flask.ext.babel import gettext as _
+from flask.ext.babelex import gettext as _
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import (get_online_users, time_diff, render_template,
-                                   format_quote)
+from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
+                                   render_template)
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
                                        can_edit_post, can_moderate)

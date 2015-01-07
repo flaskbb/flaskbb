@@ -37,6 +37,7 @@ from flask.ext.whooshalchemy import whoosh_index
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
     render_template
+from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_edit_user, \
@@ -139,8 +140,8 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-    # Flask-Babel
-    babel.init_app(app)
+    # Flask-BabelEx
+    babel.init_app(app=app, default_domain=FlaskBBDomain(app))
 
     @babel.localeselector
     def get_locale():
@@ -269,14 +270,13 @@ def configure_logging(app):
 
     if app.config["SEND_LOGS"]:
         mail_handler = \
-            SMTPHandler(app.config['MAIL_SERVER'],
-                        app.config['MAIL_DEFAULT_SENDER'],
-                        app.config['ADMINS'],
-                        'application error, no admins specified',
-                        (
-                            app.config['MAIL_USERNAME'],
-                            app.config['MAIL_PASSWORD'],
-                        ))
+            SMTPHandler(
+                app.config['MAIL_SERVER'],
+                app.config['MAIL_DEFAULT_SENDER'],
+                app.config['ADMINS'],
+                'application error, no admins specified',
+                (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+            )
 
         mail_handler.setLevel(logging.ERROR)
         mail_handler.setFormatter(formatter)

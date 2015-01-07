@@ -14,7 +14,7 @@ from wtforms import (StringField, PasswordField, DateField, TextAreaField,
                      SelectField, ValidationError, SubmitField)
 from wtforms.validators import (Length, DataRequired, InputRequired, Email,
                                 EqualTo, regexp, Optional, URL)
-from flask.ext.babel import lazy_gettext as _
+from flask.ext.babelex import lazy_gettext as _
 
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.extensions import db

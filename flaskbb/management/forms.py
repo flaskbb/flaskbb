@@ -13,10 +13,9 @@ from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField, SubmitField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
-
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
-from flask.ext.babel import lazy_gettext as _
+from flask.ext.babelex import lazy_gettext as _
 
 from flaskbb.utils.widgets import SelectDateWidget
 from flaskbb.extensions import db
