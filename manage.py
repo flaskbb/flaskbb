@@ -255,7 +255,7 @@ def update_plugin_translations(plugin):
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
                      "-k", "lazy_gettext", "-o", "messages.pot",
                      plugin_folder])
-    subprocess.call(["pybabel", "update", "-i", "messages.pot"
+    subprocess.call(["pybabel", "update", "-i", "messages.pot",
                      "-d", translations_folder])
     os.unlink("messages.pot")
 
