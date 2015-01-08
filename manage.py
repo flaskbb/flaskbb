@@ -202,7 +202,7 @@ def update_translations():
 
 
 @manager.command
-def init_translations(translation):
+def add_translations(translation):
     """
     Adds a new language to the translations
     """
