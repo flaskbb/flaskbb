@@ -14,7 +14,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, url_for
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin
+
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config

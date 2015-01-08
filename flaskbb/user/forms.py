@@ -8,13 +8,13 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.login import current_user
-from flask.ext.wtf import Form
+from flask_login import current_user
+from flask_wtf import Form
 from wtforms import (StringField, PasswordField, DateField, TextAreaField,
                      SelectField, ValidationError, SubmitField)
 from wtforms.validators import (Length, DataRequired, InputRequired, Email,
                                 EqualTo, regexp, Optional, URL)
-from flask.ext.babelex import lazy_gettext as _
+from flask_babelex import lazy_gettext as _
 
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.extensions import db

@@ -17,7 +17,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
 from flask import Flask, request
-from flask.ext.login import current_user
+from flask_login import current_user
 
 # Import the user blueprint
 from flaskbb.user.views import user

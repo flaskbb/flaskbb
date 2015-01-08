@@ -10,9 +10,9 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import Blueprint, flash, redirect, url_for, request, current_app
-from flask.ext.login import (current_user, login_user, login_required,
-                             logout_user, confirm_login, login_fresh)
-from flask.ext.babelex import gettext as _
+from flask_login import (current_user, login_user, login_required,
+                         logout_user, confirm_login, login_fresh)
+from flask_babelex import gettext as _
 
 from flaskbb.utils.helpers import render_template
 from flaskbb.email import send_reset_token

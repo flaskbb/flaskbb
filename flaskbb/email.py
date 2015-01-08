@@ -9,8 +9,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import render_template
-from flask.ext.mail import Message
-from flask.ext.babelex import lazy_gettext as _
+from flask_mail import Message
+from flask_babelex import lazy_gettext as _
 
 from flaskbb.extensions import mail
 

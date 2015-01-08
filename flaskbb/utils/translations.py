@@ -1,9 +1,8 @@
 import os
 
 import babel
-
-from flask.ext.babelex import Domain, get_locale
-from flask.ext.plugins import get_plugins_list
+from flask_babelex import Domain, get_locale
+from flask_plugins import get_plugins_list
 
 
 class FlaskBBDomain(Domain):

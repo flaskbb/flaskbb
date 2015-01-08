@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask import current_app
-from flask.ext.login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user
 
 from flaskbb.forum.models import Category, Forum, Topic, Post, ForumsRead, \
     TopicsRead, Report

@@ -8,14 +8,14 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
                      BooleanField, SelectField, DateField, SubmitField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
-from flask.ext.babelex import lazy_gettext as _
+from flask_babelex import lazy_gettext as _
 
 from flaskbb.utils.widgets import SelectDateWidget
 from flaskbb.extensions import db

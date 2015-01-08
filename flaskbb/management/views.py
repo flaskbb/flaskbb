@@ -14,9 +14,9 @@ from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    __version__ as flask_version)
-from flask.ext.login import current_user
-from flask.ext.plugins import get_all_plugins, get_plugin, get_plugin_from_all
-from flask.ext.babelex import gettext as _
+from flask_login import current_user
+from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
+from flask_babelex import gettext as _
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems

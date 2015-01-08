@@ -24,9 +24,9 @@ import subprocess
 from flask import current_app
 from werkzeug.utils import import_string
 from sqlalchemy.exc import IntegrityError, OperationalError
-from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
-                              prompt_bool)
-from flask.ext.migrate import MigrateCommand
+from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
+                          prompt_bool)
+from flask_migrate import MigrateCommand
 
 from flaskbb import create_app
 from flaskbb.extensions import db

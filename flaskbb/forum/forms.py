@@ -8,11 +8,11 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
                      BooleanField, SubmitField)
 from wtforms.validators import DataRequired, Optional, Length
-from flask.ext.babelex import lazy_gettext as _
+from flask_babelex import lazy_gettext as _
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User
@@ -25,7 +25,7 @@ class QuickreplyForm(Form):
     submit = SubmitField(_("Reply"))
 
     def save(self, user, topic):
-        post = Post(**self.data)
+        post = Post(content=self.content.data)
         return post.save(user=user, topic=topic)
 
 

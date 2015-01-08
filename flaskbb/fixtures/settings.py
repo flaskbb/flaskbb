@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.themes2 import get_themes_list
+from flask_themes2 import get_themes_list
 
 from flaskbb.extensions import babel
 

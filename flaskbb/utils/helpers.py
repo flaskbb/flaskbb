@@ -15,14 +15,13 @@ import operator
 from datetime import datetime, timedelta
 
 from flask import session, url_for
-from flask.ext.themes2 import render_theme_template
-from flask.ext.login import current_user
-
+from flask_themes2 import render_theme_template
+from flask_login import current_user
 from postmarkup import render_bbcode
 from markdown2 import markdown as render_markdown
 import unidecode
-from flaskbb._compat import range_method, text_type
 
+from flaskbb._compat import range_method, text_type
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 

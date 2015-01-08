@@ -1,5 +1,5 @@
-from flask.ext.plugins import Plugin
 from flask import current_app
+from flask_plugins import Plugin
 
 from flaskbb.management.models import SettingsGroup
 

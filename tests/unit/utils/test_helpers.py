@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from flask.ext.login import login_user
+from flask_login import login_user
 from flaskbb.utils.helpers import slugify, forum_is_unread
 
 
