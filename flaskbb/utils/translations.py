@@ -20,8 +20,10 @@ class FlaskBBDomain(Domain):
         )
         # Plugin translations
         with self.app.app_context():
-            self.plugin_translations = [os.path.join(plugin.path, "translations")
-                                        for plugin in get_plugins_list()]
+            self.plugin_translations = [
+                os.path.join(plugin.path, "translations")
+                for plugin in get_plugins_list()
+            ]
 
     def get_translations_cache(self):
         return self.cache

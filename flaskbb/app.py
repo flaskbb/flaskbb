@@ -18,6 +18,7 @@ from sqlalchemy.engine import Engine
 
 from flask import Flask, request
 from flask_login import current_user
+from flask_whooshalchemy import whoosh_index
 
 # Import the user blueprint
 from flaskbb.user.views import user
@@ -32,7 +33,6 @@ from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
     debugtoolbar, migrate, themes, plugin_manager, babel
-from flask.ext.whooshalchemy import whoosh_index
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
