@@ -26,7 +26,7 @@ from werkzeug.utils import import_string
 from sqlalchemy.exc import IntegrityError, OperationalError
 from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
                           prompt_bool)
-from flask_migrate import MigrateCommand
+from flask_migrate import MigrateCommand, upgrade
 
 from flaskbb import create_app
 from flaskbb.extensions import db
@@ -64,7 +64,7 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 def initdb():
     """Creates the database."""
 
-    db.create_all()
+    upgrade()
 
 
 @manager.command
@@ -116,7 +116,7 @@ def createall(dropdb=False, createdb=False):
 
     if not createdb:
         app.logger.info("Creating database...")
-        db.create_all()
+        upgrade()
 
     app.logger.info("Creating test data...")
     create_test_data()
@@ -152,7 +152,7 @@ def initflaskbb(username=None, password=None, email=None):
         if prompt_bool("Do you want to recreate the database? (y/n)"):
             db.session.rollback()
             db.drop_all()
-            db.create_all()
+            upgrade()
             create_default_groups()
             create_default_settings()
         else:
@@ -161,7 +161,7 @@ def initflaskbb(username=None, password=None, email=None):
         app.logger.error("No database found.")
         if prompt_bool("Do you want to create the database now? (y/n)"):
             db.session.rollback()
-            db.create_all()
+            upgrade()
             create_default_groups()
             create_default_settings()
         else:
@@ -198,7 +198,7 @@ def update_translations():
                      "-k", "lazy_gettext", "-o", "messages.pot", "."])
     subprocess.call(["pybabel", "update", "-i", "messages.pot",
                      "-d", translations_folder])
-    os.unlink("messages.pot")
+    #os.unlink("messages.pot")
 
 
 @manager.command
