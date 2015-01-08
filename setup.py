@@ -52,9 +52,11 @@ setup(
         'Flask-Themes2',
         'Flask-WTF',
         'Flask-WhooshAlchemy',
+        'Flask-BabelEx',
         'Jinja2',
         'Mako',
         'MarkupSafe',
+        'markdown2',
         'Pygments',
         'SQLAlchemy',
         'WTForms',
@@ -67,14 +69,17 @@ setup(
         'pytest',
         'pytest-random',
         'pytest-cov',
+        'pytz',
         'redis',
         'simplejson',
+        'speaklater',
         'postmarkup',
         'unidecode'
     ],
     dependency_links=[
         'https://github.com/frol/postmarkup/tarball/master#egg=postmarkup',
-        'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy'
+        'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy',
+        'https://github.com/sh4nks/flask-babelex/tarball/master#egg=Flask-BabelEx'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
