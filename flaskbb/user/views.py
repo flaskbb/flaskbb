@@ -180,7 +180,7 @@ def new_message():
                       unread=False,
                       as_draft=True)
 
-            flash(_("Message saved!"), "success")
+            flash(_("Message saved."), "success")
             return redirect(url_for("user.drafts"))
 
         if "send_message" in request.form and form.validate():
@@ -198,7 +198,7 @@ def new_message():
                       user_id=to_user.id,
                       unread=True)
 
-            flash(_("Message sent!"), "success")
+            flash(_("Message sent."), "success")
             return redirect(url_for("user.sent"))
     else:
         form.to_user.data = to_user

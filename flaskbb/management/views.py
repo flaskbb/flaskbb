@@ -528,7 +528,7 @@ def uninstall_plugin(plugin):
 
         flash(_("Plugin has been uninstalled."), "success")
     else:
-        flash(_("Cannot uninstall Plugin"), "danger")
+        flash(_("Cannot uninstall Plugin."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -543,6 +543,6 @@ def install_plugin(plugin):
 
         flash(_("Plugin has been installed."), "success")
     else:
-        flash(_("Cannot install Plugin"), "danger")
+        flash(_("Cannot install Plugin."), "danger")
 
     return redirect(url_for("management.plugins"))

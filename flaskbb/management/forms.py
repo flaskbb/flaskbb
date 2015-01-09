@@ -24,7 +24,7 @@ from flaskbb.user.models import User, Group
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
-                     message=_("You can only use letters, numbers or dashes"))
+                     message=_("You can only use letters, numbers or dashes."))
 
 
 def selectable_forums():
@@ -101,7 +101,7 @@ class UserForm(Form):
             user = User.query.filter(User.username.like(field.data)).first()
 
         if user:
-            raise ValidationError(_("This Username is taken."))
+            raise ValidationError(_("This Username is already taken."))
 
     def validate_email(self, field):
         if hasattr(self, "user"):
@@ -115,7 +115,7 @@ class UserForm(Form):
             user = User.query.filter(User.email.like(field.data)).first()
 
         if user:
-            raise ValidationError(_("This E-Mail is taken."))
+            raise ValidationError(_("This E-Mail Address is already taken."))
 
     def save(self):
         user = User(**self.data)
@@ -148,40 +148,42 @@ class GroupForm(Form):
     super_mod = BooleanField(
         _("Is Super Moderator Group?"),
         description=_("Check this if the users in this group are allowed to "
-                      "moderate every forum")
+                      "moderate every forum.")
     )
     mod = BooleanField(
         _("Is Moderator Group?"),
         description=_("Check this if the users in this group are allowed to "
-                      "moderate specified forums")
+                      "moderate specified forums.")
     )
     banned = BooleanField(
         _("Is Banned Group?"),
-        description=_("Only one Banned group is allowed")
+        description=_("Only one Banned group is allowed.")
     )
     guest = BooleanField(
         _("Is Guest Group?"),
-        description=_("Only one Guest group is allowed")
+        description=_("Only one Guest group is allowed.")
     )
     editpost = BooleanField(
         _("Can edit posts"),
-        description=_("Check this if the users in this group can edit posts")
+        description=_("Check this if the users in this group can edit posts.")
     )
     deletepost = BooleanField(
         _("Can delete posts"),
-        description=_("Check this is the users in this group can delete posts")
+        description=_("Check this is the users in this group can delete posts.")
     )
     deletetopic = BooleanField(
         _("Can delete topics"),
-        description=_("Check this is the users in this group can delete topics")
+        description=_("Check this is the users in this group can delete "
+                      "topics.")
     )
     posttopic = BooleanField(
         _("Can create topics"),
-        description=_("Check this is the users in this group can create topics")
+        description=_("Check this is the users in this group can create "
+                      "topics.")
     )
     postreply = BooleanField(
         _("Can post replies"),
-        description=_("Check this is the users in this group can post replies")
+        description=_("Check this is the users in this group can post replies.")
     )
 
     mod_edituser = BooleanField(
@@ -192,7 +194,7 @@ class GroupForm(Form):
 
     mod_banuser = BooleanField(
         _("Moderators can ban users"),
-        description=_("Allow moderators to ban other users")
+        description=_("Allow moderators to ban other users.")
     )
 
     submit = SubmitField(_("Save"))
@@ -209,7 +211,7 @@ class GroupForm(Form):
             group = Group.query.filter(Group.name.like(field.data)).first()
 
         if group:
-            raise ValidationError(_("This Group name is taken."))
+            raise ValidationError(_("This Group name is already taken."))
 
     def validate_banned(self, field):
         if hasattr(self, "group"):
@@ -284,7 +286,7 @@ class ForumForm(Form):
     external = StringField(
         _("External Link"),
         validators=[Optional(), URL()],
-        description=_("A link to a website i.e. 'http://flaskbb.org'")
+        description=_("A link to a website i.e. 'http://flaskbb.org'.")
     )
 
     moderators = StringField(
@@ -309,7 +311,7 @@ class ForumForm(Form):
         if hasattr(self, "forum"):
             if self.forum.topics:
                 raise ValidationError(_("You cannot convert a forum that "
-                                        "contain topics in a external link"))
+                                        "contain topics in a external link."))
 
     def validate_show_moderators(self, field):
         if field.data and not self.moderators.data:
@@ -334,13 +336,13 @@ class ForumForm(Form):
                             user.get_permissions()["admin"] or
                             user.get_permissions()["super_mod"]):
                         raise ValidationError(
-                            _("%(user)s is not in a moderators group",
+                            _("%(user)s is not in a moderators group.",
                               user=user.username)
                         )
                     else:
                         approved_moderators.append(user)
                 else:
-                    raise ValidationError(_("User %(moderator)s not found",
+                    raise ValidationError(_("User %(moderator)s not found.",
                                             moderator=moderator))
             field.data = approved_moderators
 

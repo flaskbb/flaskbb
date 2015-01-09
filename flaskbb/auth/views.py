@@ -119,7 +119,7 @@ def forgot_password():
             return redirect(url_for("auth.forgot_password"))
         else:
             flash(_("You have entered a Username or E-Mail Address that is "
-                    "not linked with your account"), "danger")
+                    "not linked with your account."), "danger")
     return render_template("auth/forgot_password.html", form=form)
 
 

@@ -429,7 +429,7 @@ def report_post(post_id):
     form = ReportForm()
     if form.validate_on_submit():
         form.save(current_user, post)
-        flash(_("Thanks for reporting!"), "success")
+        flash(_("Thanks for reporting."), "success")
 
     return render_template("forum/report_post.html", form=form)
 

@@ -21,7 +21,7 @@ from flaskbb.user.models import User
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
-                     message=_("You can only use letters, numbers or dashes"))
+                     message=_("You can only use letters, numbers or dashes."))
 
 
 class LoginForm(Form):
@@ -59,12 +59,12 @@ class RegisterForm(Form):
     def validate_username(self, field):
         user = User.query.filter_by(username=field.data).first()
         if user:
-            raise ValidationError(_("This Username is taken."))
+            raise ValidationError(_("This Username is already taken."))
 
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()
         if email:
-            raise ValidationError(_("This E-Mail is taken."))
+            raise ValidationError(_("This E-Mail Address is already taken."))
 
     def save(self):
         user = User(username=self.username.data,
