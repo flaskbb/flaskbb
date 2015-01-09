@@ -19,6 +19,53 @@
 {%- endmacro -%}
 
 
+{%- macro render_quickreply(field, rows, cols, div_class='') -%}
+{%- if kwargs['required'] or field.flags.required -%}
+    {% if div_class %}
+        {{ field(class=div_class, required="required", cols=cols, rows=rows, placeholder=field.label.text) }}
+    {% else %}
+        {{ field(class="new-message", required="required", cols=cols, rows=row, placeholder=field.label.text) }}
+    {% endif %}
+{%- else -%}
+    {% if div_class %}
+        {{ field(class=div_class, cols=cols, rows=row, placeholder=field.label.text) }}
+    {% else %}
+        {{ field(class="new-message", cols=cols, rows=row, placeholder=field.label.text) }}
+    {% endif %}
+{%- endif -%}
+
+{{ field_description(field) }}
+{{ field_errors(field) }}
+{%- endmacro -%}
+
+
+{# Renders a non bootstrap input field #}
+{%- macro render_input_field(field, div_class='', placeholder='') -%}
+{%- if div_class -%}
+    <div class="{{ div_class }}">
+{%- endif -%}
+
+{%- if placeholder -%}
+    {% set field_placeholder = placeholder %}
+{%- else -%}
+    {% set field_placeholder = field.label.text %}
+{%- endif -%}
+
+{%- if kwargs['required'] or field.flags.required -%}
+    {{ field(required="required", placeholder=field_placeholder) }}
+{%- else -%}
+    {{ field(placeholder=field_placeholder) }}
+{% endif %}
+
+{%- if div_class -%}
+    </div>
+{%- endif -%}
+
+{{ field_description(field) }}
+{{ field_errors(field) }}
+{%- endmacro -%}
+
+
 {%- macro render_boolean_field(field, inline=False) -%}
 <div class="checkbox {%- if inline -%}inline{%- endif -%}">
     {{ field(**kwargs) }}
@@ -27,6 +74,7 @@
     {{ field_errors(field) }}
 </div>
 {%- endmacro -%}
+
 
 {%- macro render_select_field(field, div_class='') -%}
 <div class="form-group">
@@ -60,14 +108,18 @@
 {% endif %}
 {%- endmacro -%}
 
-{%- macro render_field(field, div_class='', rows='') -%}
+{%- macro render_field(field, with_label=True, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
     {% if div_class %}
     <div class="{{ div_class }}">
     {% else %}
     <div class="col-sm-5">
     {% endif %}
-        <label>{{ field.label.text }}</label>
+
+        {% if with_label %}
+            <label>{{ field.label.text }}</label>
+        {% endif %}
+
         {%- if kwargs['required'] or field.flags.required -%}
             {% if rows %}
                 {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text) }}
@@ -138,11 +190,11 @@
 
 
 {%- macro horizontal_boolean_field(field, div_class='') -%}
-{% if div_class %}
+{%- if div_class %}
 <div class="{{ div_class }}">
-{% else %}
+{%- else %}
 <div class="col-sm-offset-3 col-sm-3">
-{% endif %}
+{%- endif %}
     <div class="checkbox">
         {{ field(**kwargs) }}
         {{ field_label(field) }}
@@ -182,7 +234,7 @@
         {% if div_class %}
             <div class="{{ div_class }}">
         {% else %}
-            <div class="col-sm-9">
+            <div class="col-sm-4">
         {% endif %}
 
         {%- if kwargs['required'] or field.flags.required -%}
@@ -198,18 +250,18 @@
                 {{ field(class='form-control', placeholder=field.label.text, **kwargs) }}
             {% endif %}
         {%- endif -%}
-
+    </div> <!-- end div_class -->
     {% endif %}
 
     {{ field_description(field) }}
     {{ field_errors(field) }}
-    </div>
-</div>
+
+</div> <!-- end form-group -->
 {%- endmacro -%}
 
 
-{% macro topnav(endpoint, name, icon='', active=False) %}
-<li {% if endpoint == request.endpoint or active == True %}class="active"{% endif %}>
+{% macro topnav(endpoint, name, icon='', id='', active=False) %}
+<li {% if id %}id={{id}}{% endif %} {% if endpoint == request.endpoint or active == True %}class="active"{% endif %}>
     <a href={{ url_for(endpoint) }}>
         {% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ name }}
     </a>
@@ -224,9 +276,9 @@
 {% endmacro %}
 
 
-{% macro render_pagination(page_obj, url) %}
-<ul class="pagination" style="margin: 0; float:right">
-    <li><span class="pages-label">{% trans %}Pages{% endtrans %}: </span></li>
+{% macro render_pagination(page_obj, url, ul_class='') %}
+<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}'>
+    <li class="disabled"><a href="#"><span class="pages-label">{% trans %}Pages{% endtrans %}:</span></a></li>
     {%- for page in page_obj.iter_pages() %}
         {% if page %}
             {% if page != page_obj.page %}
@@ -240,6 +292,27 @@
     {%- endfor %}
     {% if page_obj.has_next %}
         <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+
+{% macro render_topic_pagination(page_obj, url) %}
+<ul class="pagination pagelink pull-left">
+    <li class="disabled"><a><span class="pages-label">Pages: </span></a></li>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="disabled"><a href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="disabled"><a href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}">Next</a></li>
     {% endif %}
 </ul>
 {% endmacro %}

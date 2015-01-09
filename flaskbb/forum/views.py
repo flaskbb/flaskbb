@@ -186,7 +186,7 @@ def delete_topic(topic_id, slug=None):
 
     if not can_delete_topic(user=current_user, topic=topic):
 
-        flash(_("You do not have the permissions to delete the topic"),
+        flash(_("You do not have the permissions to delete this topic."),
               "danger")
         return redirect(topic.forum.url)
 
@@ -205,7 +205,8 @@ def lock_topic(topic_id, slug=None):
     # TODO: Bulk lock
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to lock this topic"), "danger")
+        flash(_("You do not have the permissions to lock this topic."),
+              "danger")
         return redirect(topic.url)
 
     topic.locked = True
@@ -223,7 +224,7 @@ def unlock_topic(topic_id, slug=None):
 
     # Unlock is basically the same as lock
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to unlock this topic"),
+        flash(_("You do not have the permissions to unlock this topic."),
               "danger")
         return redirect(topic.url)
 
@@ -239,7 +240,7 @@ def highlight_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to highlight this topic"),
+        flash(_("You do not have the permissions to highlight this topic."),
               "danger")
         return redirect(topic.url)
 
@@ -256,7 +257,7 @@ def trivialize_topic(topic_id, slug=None):
 
     # Unlock is basically the same as lock
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to trivialize this topic"),
+        flash(_("You do not have the permissions to trivialize this topic."),
               "danger")
         return redirect(topic.url)
 
@@ -277,15 +278,16 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     # TODO: Bulk move
 
     if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to move this topic"), "danger")
+        flash(_("You do not have the permissions to move this topic."),
+              "danger")
         return redirect(forum_instance.url)
 
     if not topic.move(forum_instance):
-        flash(_("Could not move the topic to forum %(title)s",
+        flash(_("Could not move the topic to forum %(title)s.",
                 title=forum_instance.title), "danger")
         return redirect(topic.url)
 
-    flash(_("Topic was moved to forum %(title)s",
+    flash(_("Topic was moved to forum %(title)s.",
             title=forum_instance.title), "success")
     return redirect(topic.url)
 
@@ -301,15 +303,15 @@ def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
 
     # Looks to me that the user should have permissions on both forums, right?
     if not can_moderate(user=current_user, forum=_old_topic.forum):
-        flash(_("You do not have the permissions to merge this topic"),
+        flash(_("You do not have the permissions to merge this topic."),
               "danger")
         return redirect(_old_topic.url)
 
     if not _old_topic.merge(_new_topic):
-        flash(_("Could not merge the topic."), "danger")
+        flash(_("Could not merge the topics."), "danger")
         return redirect(_old_topic.url)
 
-    flash(_("Topic succesfully merged."), "success")
+    flash(_("Topics succesfully merged."), "success")
     return redirect(_new_topic.url)
 
 
@@ -320,7 +322,8 @@ def new_post(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_post_reply(user=current_user, topic=topic):
-        flash(_("You do not have the permissions to post here"), "danger")
+        flash(_("You do not have the permissions to post in this topic."),
+              "danger")
         return redirect(topic.forum.url)
 
     form = ReplyForm()
@@ -346,7 +349,7 @@ def reply_post(topic_id, post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_post_reply(user=current_user, topic=topic):
-        flash(_("You do not have the permissions to post in this topic"),
+        flash(_("You do not have the permissions to post in this topic."),
               "danger")
         return redirect(topic.forum.url)
 
@@ -372,7 +375,7 @@ def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_edit_post(user=current_user, post=post):
-        flash(_("You do not have the permissions to edit this post"), "danger")
+        flash(_("You do not have the permissions to edit this post."), "danger")
         return redirect(post.topic.url)
 
     form = ReplyForm()
@@ -402,7 +405,8 @@ def delete_post(post_id, slug=None):
     # TODO: Bulk delete
 
     if not can_delete_post(user=current_user, post=post):
-        flash(_("You do not have the permissions to edit this post"), "danger")
+        flash(_("You do not have the permissions to delete this post."),
+              "danger")
         return redirect(post.topic.url)
 
     first_post = post.first_post
@@ -462,6 +466,9 @@ def markread(forum_id=None, slug=None):
         db.session.add(forumsread)
         db.session.commit()
 
+        flash(_("Forum %(forum)s marked as read.", forum=forum_instance.title),
+              "success")
+
         return redirect(forum_instance.url)
 
     # Mark all forums as read
@@ -480,6 +487,8 @@ def markread(forum_id=None, slug=None):
 
     db.session.add_all(forumsread_list)
     db.session.commit()
+
+    flash(_("All forums marked as read."), "success")
 
     return redirect(url_for("forum.index"))
 

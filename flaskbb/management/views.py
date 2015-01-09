@@ -81,8 +81,8 @@ def settings(slug=None):
                     new_settings[key] = form[key].data
             except KeyError:
                 pass
-
         Setting.update(settings=new_settings, app=current_app)
+        flash(_("Settings saved."), "success")
     else:
         for key, values in iteritems(old_settings):
             try:
@@ -141,7 +141,7 @@ def edit_user(user_id):
 
         user.save(groups=form.secondary_groups.data)
 
-        flash(_("User successfully edited"), "success")
+        flash(_("User successfully updated."), "success")
         return redirect(url_for("management.edit_user", user_id=user.id))
 
     return render_template("management/user_form.html", form=form,
@@ -153,7 +153,7 @@ def edit_user(user_id):
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
     user.delete()
-    flash(_("User successfully deleted"), "success")
+    flash(_("User successfully deleted."), "success")
     return redirect(url_for("management.users"))
 
 
@@ -210,7 +210,7 @@ def ban_user(user_id):
         return redirect(url_for("management.overview"))
 
     if user.ban():
-        flash(_("User was banned successfully."), "success")
+        flash(_("User is now banned."), "success")
     else:
         flash(_("Could not ban user."), "danger")
 
@@ -268,14 +268,14 @@ def report_markread(report_id=None):
 
         report = Report.query.filter_by(id=report_id).first_or_404()
         if report.zapped:
-            flash(_("Report %(id)s is already marked as read", id=report.id),
+            flash(_("Report %(id)s is already marked as read.", id=report.id),
                   "success")
             return redirect(url_for("management.reports"))
 
         report.zapped_by = current_user.id
         report.zapped = datetime.utcnow()
         report.save()
-        flash(_("Report %(id)s marked as read", id=report.id), "success")
+        flash(_("Report %(id)s marked as read.", id=report.id), "success")
         return redirect(url_for("management.reports"))
 
     # mark all as read
@@ -289,7 +289,7 @@ def report_markread(report_id=None):
     db.session.add_all(report_list)
     db.session.commit()
 
-    flash(_("All reports were marked as read"), "success")
+    flash(_("All reports were marked as read."), "success")
     return redirect(url_for("management.reports"))
 
 
@@ -320,7 +320,7 @@ def edit_group(group_id):
         if group.guest:
             Guest.invalidate_cache()
 
-        flash(_("Group successfully edited."), "success")
+        flash(_("Group successfully updated."), "success")
         return redirect(url_for("management.groups", group_id=group.id))
 
     return render_template("management/group_form.html", form=form,
@@ -367,7 +367,7 @@ def edit_forum(forum_id):
         form.populate_obj(forum)
         forum.save(moderators=form.moderators.data)
 
-        flash(_("Forum successfully edited."), "success")
+        flash(_("Forum successfully updated."), "success")
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
@@ -421,7 +421,7 @@ def add_category():
 
     if form.validate_on_submit():
         form.save()
-        flash(_("Category successfully created."), "success")
+        flash(_("Category successfully added."), "success")
         return redirect(url_for("management.forums"))
 
     return render_template("management/category_form.html", form=form,
@@ -437,6 +437,7 @@ def edit_category(category_id):
 
     if form.validate_on_submit():
         form.populate_obj(category)
+        flash(_("Category successfully updated."), "success")
         category.save()
 
     return render_template("management/category_form.html", form=form,
@@ -485,7 +486,7 @@ def enable_plugin(plugin):
                 "disk, this won't work - than you need to delete the "
                 "'DISABLED' file by yourself."), "info")
     else:
-        flash(_("Plugin is not enabled"), "danger")
+        flash(_("Couldn't enable Plugin."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -496,7 +497,7 @@ def disable_plugin(plugin):
     try:
         plugin = get_plugin(plugin)
     except KeyError:
-        flash(_("Plugin %(plugin)s not found", plugin=plugin.name), "danger")
+        flash(_("Plugin %(plugin)s not found.", plugin=plugin.name), "danger")
         return redirect(url_for("management.plugins"))
 
     plugin_dir = os.path.join(

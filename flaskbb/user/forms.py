@@ -39,7 +39,7 @@ class GeneralSettingsForm(Form):
 class ChangeEmailForm(Form):
     old_email = StringField(_("Old E-Mail Address"), validators=[
         DataRequired(message=_("A E-Mail Address is required.")),
-        Email(message=_("This E-Mail is invalid"))])
+        Email(message=_("Invalid E-Mail Address."))])
 
     new_email = StringField(_("New E-Mail Address"), validators=[
         InputRequired(),
@@ -61,7 +61,7 @@ class ChangeEmailForm(Form):
                                  User.email.like(field.data),
                                  db.not_(User.id == self.user.id))).first()
         if user:
-            raise ValidationError(_("This E-Mail is taken."))
+            raise ValidationError(_("This E-Mail Address is already taken."))
 
 
 class ChangePasswordForm(Form):

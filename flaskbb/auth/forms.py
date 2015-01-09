@@ -25,7 +25,7 @@ is_username = regexp(USERNAME_RE,
 
 
 class LoginForm(Form):
-    login = StringField(_("Username or E-Mail"), validators=[
+    login = StringField(_("Username or E-Mail Address"), validators=[
         DataRequired(message=_("A Username or E-Mail Address is required."))]
     )
 
@@ -42,7 +42,7 @@ class RegisterForm(Form):
         DataRequired(message=_("A Username is required.")),
         is_username])
 
-    email = StringField(_("E-Mail"), validators=[
+    email = StringField(_("E-Mail Address"), validators=[
         DataRequired(message=_("A E-Mail Address is required.")),
         Email(message=_("Invalid E-Mail Address."))])
 
@@ -87,7 +87,7 @@ class ReauthForm(Form):
 
 
 class ForgotPasswordForm(Form):
-    email = StringField(_('E-Mail'), validators=[
+    email = StringField(_('E-Mail Address'), validators=[
         DataRequired(message=_("A E-Mail Address is reguired.")),
         Email()])
 
@@ -97,7 +97,7 @@ class ForgotPasswordForm(Form):
 class ResetPasswordForm(Form):
     token = HiddenField('Token')
 
-    email = StringField(_('E-Mail'), validators=[
+    email = StringField(_('E-Mail Address'), validators=[
         DataRequired(message=_("A E-Mail Address is required.")),
         Email()])
 
@@ -112,4 +112,4 @@ class ResetPasswordForm(Form):
     def validate_email(self, field):
         email = User.query.filter_by(email=field.data).first()
         if not email:
-            raise ValidationError(_("Wrong E-Mail."))
+            raise ValidationError(_("Wrong E-Mail Address."))

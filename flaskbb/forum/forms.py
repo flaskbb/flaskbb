@@ -19,7 +19,7 @@ from flaskbb.user.models import User
 
 
 class QuickreplyForm(Form):
-    content = TextAreaField(_("Quickreply"), validators=[
+    content = TextAreaField(_("Quick Reply"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
     submit = SubmitField(_("Reply"))
@@ -49,7 +49,7 @@ class ReplyForm(Form):
 
 class NewTopicForm(ReplyForm):
     title = StringField(_("Topic Title"), validators=[
-        DataRequired(message=_("Please choose a Topic title."))])
+        DataRequired(message=_("Please choose a Topic Title."))])
 
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])

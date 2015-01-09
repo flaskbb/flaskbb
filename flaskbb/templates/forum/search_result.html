@@ -47,7 +47,7 @@
                                 <td>
                                     <strong>{{ post.username }}</strong>
                                     <br />
-                                    Guest
+                                    {% trans %}Guest{% endtrans %}
                                 </td>
                             {% endif %}
                         </tr>
@@ -66,7 +66,7 @@
             </tr>
             {% else %}
             <tr>
-                <td>{% trans %}No posts found matching your search criteria{% endtrans %}</td>
+                <td>{% trans %}No posts found matching your search criteria.{% endtrans %}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -97,7 +97,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">{% trans %}No users found matching your search criteria{% endtrans %}</td>
+                    <td colspan="5">{% trans %}No users found matching your search criteria.{% endtrans %}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -169,7 +169,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5">{% trans %}No topics found matching your search criteria{% trans %}</td>
+                    <td colspan="5">{% trans %}No topics found matching your search criteria.{% trans %}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -258,7 +258,7 @@
                         {% endif %}
 
                     {% else %}
-                        {% trans %}No posts{% endtrans %}
+                        {% trans %}No posts.{% endtrans %}
                     {% endif %}
                     {% endif %}
                 </td>
@@ -266,7 +266,7 @@
             {% else %}
             <tr>
                 <td colspan="5">
-                    {% trans %}No forums found matching your search criteria{% endtrans %}
+                    {% trans %}No forums found matching your search criteria.{% endtrans %}
                 </td>
             </tr>
             {% endfor %}

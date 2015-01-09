@@ -66,7 +66,7 @@ def settings():
         current_user.language = form.language.data
         current_user.save()
 
-        flash(_("Your settings have been updated!"), "success")
+        flash(_("Settings updated."), "success")
     else:
         form.theme.data = current_user.theme
         form.theme.data = current_user.language
@@ -82,7 +82,7 @@ def change_password():
         current_user.password = form.new_password.data
         current_user.save()
 
-        flash(_("Your password have been updated!"), "success")
+        flash(_("Password updated."), "success")
     return render_template("user/change_password.html", form=form)
 
 
@@ -94,7 +94,7 @@ def change_email():
         current_user.email = form.new_email.data
         current_user.save()
 
-        flash(_("Your email have been updated!"), "success")
+        flash(_("E-Mail Address updated."), "success")
     return render_template("user/change_email.html", form=form)
 
 
@@ -107,7 +107,7 @@ def change_user_details():
         form.populate_obj(current_user)
         current_user.save()
 
-        flash(_("Your details have been updated!"), "success")
+        flash(_("Details updated."), "success")
 
     return render_template("user/change_user_details.html", form=form)
 
@@ -213,7 +213,7 @@ def edit_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
 
     if not message.draft:
-        flash(_("You cannot edit a sent message"), "danger")
+        flash(_("You cannot edit a sent message."), "danger")
         return redirect(url_for("user.inbox"))
 
     form = EditMessageForm()
@@ -227,7 +227,7 @@ def edit_message(message_id):
             message.to_user = to_user.id
             message.save()
 
-            flash(_("Message saved!"), "success")
+            flash(_("Message saved."), "success")
             return redirect(url_for("user.drafts"))
 
         if "send_message" in request.form and form.validate():
@@ -244,7 +244,7 @@ def edit_message(message_id):
             message.date_created = datetime.utcnow()
             message.save()
 
-            flash(_("Message sent!"), "success")
+            flash(_("Message sent."), "success")
             return redirect(url_for("user.sent"))
     else:
         form.to_user.data = message.to_user.username
@@ -261,7 +261,7 @@ def move_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.trash = True
     message.save()
-    flash(_("Message moved to Trash!"), "success")
+    flash(_("Message moved to Trash."), "success")
     return redirect(url_for("user.inbox"))
 
 
@@ -271,7 +271,7 @@ def restore_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.trash = False
     message.save()
-    flash(_("Message restored from Trash!"), "success")
+    flash(_("Message restored from Trash."), "success")
     return redirect(url_for("user.inbox"))
 
 
@@ -280,5 +280,5 @@ def restore_message(message_id):
 def delete_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
     message.delete()
-    flash(_("Message deleted!"), "success")
+    flash(_("Message deleted."), "success")
     return redirect(url_for("user.inbox"))
