@@ -107,13 +107,13 @@ class ChangeUserDetailsForm(Form):
 
 class NewMessageForm(Form):
     to_user = StringField(_("To User"), validators=[
-        DataRequired(message=_("A username is required."))])
+        DataRequired(message=_("A Username is required."))])
 
     subject = StringField(_("Subject"), validators=[
-        DataRequired(message=_("A subject is required."))])
+        DataRequired(message=_("A Subject is required."))])
 
     message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A message is required."))])
+        DataRequired(message=_("A Message is required."))])
 
     send_message = SubmitField(_("Send Message"))
     save_message = SubmitField(_("Save Message"))
@@ -121,7 +121,7 @@ class NewMessageForm(Form):
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()
         if not user:
-            raise ValidationError(_("The username you entered doesn't exist"))
+            raise ValidationError(_("The Username you entered doesn't exist"))
         if user.id == current_user.id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 

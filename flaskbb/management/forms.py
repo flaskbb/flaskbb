@@ -44,7 +44,7 @@ class UserForm(Form):
         DataRequired(message=_("A Username is required.")),
         is_username])
 
-    email = StringField(_("E-Mail"), validators=[
+    email = StringField(_("E-Mail Address"), validators=[
         DataRequired(message=_("A E-Mail Address is required.")),
         Email(message=_("Invalid E-Mail Address."))])
 
