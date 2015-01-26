@@ -92,6 +92,7 @@ class UserAPI(Resource):
         super(UserAPI, self).__init__()
 
     def get(self, id):
+        print auth.username()
         user = User.query.filter_by(id=id).first()
 
         if not user:
@@ -106,6 +107,9 @@ class UserAPI(Resource):
         if not user:
             abort(404)
 
+        if user.username != auth.username():
+            abort(403, message="You are not allowed to modify this user.")
+
         args = self.reqparse.parse_args()
         for k, v in args.items():
             if v is not None:
@@ -119,6 +123,9 @@ class UserAPI(Resource):
 
         if not user:
             abort(404)
+
+        if user.username != auth.username() and not user.permissions['admin']:
+            abort(403, message="You are not allowed to delete this user.")
 
         user.delete()
         return {'result': True}
