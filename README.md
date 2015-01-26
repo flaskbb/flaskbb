@@ -7,18 +7,18 @@
 using the micro framework Flask.
 
 
-**_Note:_** I'm doing my exchange semester and most of the time I'm busy with traveling and such :). The project is not dead in any way - I'm just really busy.
-
-
 ## FEATURES
 
 * A Bulletin Board like FluxBB or DjangoBB in Flask
 * Private Messages
 * Admin Interface
 * Group based permissions
-* BBCode support
+* BBCode Support
 * Topic Tracker
 * Unread Topics/Forums
+* i18n Support
+* Completely Themeable
+* Plugin System
 
 
 ## TODO
@@ -27,6 +27,9 @@ using the micro framework Flask.
 
 
 ## INSTALLATION
+
+For a complete installation guide please visit the installation documentation
+[here](https://flaskbb.readthedocs.org/en/latest/installation.html).
 
 * Create a virtualenv
 * Install the dependencies

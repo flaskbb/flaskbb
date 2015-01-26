@@ -166,20 +166,23 @@ To test if everything has worked, run the development server with
 Production
 ~~~~~~~~~~
 
-Now, you should be able to install `FlaskBB` and can run therefore
+Now, you can start the installation process with
 ::
 
     python manage.py initflaskbb
 
-There you are going to be asked about your username, your email adress
-and which password you want to use for your admin user
-(please choose a secure one).
+During the installation process you are asked about your username,
+your email address and the password for your administrator user.
 
 
 Upgrading
 ---------
 
-`A upgrade guide will be written when first stable version is released.`
+If the database models changed after a release, you have to run the ``upgrade``
+command
+::
+
+    python manage.py db upgrade
 
 
 Deploying
