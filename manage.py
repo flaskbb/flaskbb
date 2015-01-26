@@ -193,12 +193,12 @@ def update_translations():
     Updates the translations
     """
     translations_folder = os.path.join(app.root_path, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
 
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", "messages.pot", "."])
-    subprocess.call(["pybabel", "update", "-i", "messages.pot",
+                     "-k", "lazy_gettext", "-o", source_file, "."])
+    subprocess.call(["pybabel", "update", "-i", source_file,
                      "-d", translations_folder])
-    #os.unlink("messages.pot")
 
 
 @manager.command
@@ -207,12 +207,12 @@ def add_translations(translation):
     Adds a new language to the translations
     """
     translations_folder = os.path.join(app.root_path, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
 
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", "messages.pot", "."])
-    subprocess.call(["pybabel", "init", "-i", "messages.pot",
+                     "-k", "lazy_gettext", "-o", source_file, "."])
+    subprocess.call(["pybabel", "init", "-i", source_file,
                      "-d", translations_folder, "-l", translation])
-    os.unlink('messages.pot')
 
 
 @manager.command

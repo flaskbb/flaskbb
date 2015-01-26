@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[flaskbb.messagespot]
+file_filter = flaskbb/translations/<lang>/LC_MESSAGES/messages.po
+source_file = flaskbb/translations/messages.pot
+source_lang = en
+type = PO
