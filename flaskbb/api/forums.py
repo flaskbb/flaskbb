@@ -10,7 +10,7 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask_restful import Resource, fields, marshal, abort
+from flask_restful import Resource, fields, marshal, abort, reqparse
 
 from flaskbb.forum.models import Category, Forum, Topic, Post
 
@@ -52,10 +52,9 @@ topic_fields = {
     'important': fields.Boolean,
     'views': fields.Integer,
     'post_count': fields.Integer,
+    'content': fields.String(attribute='first_post.content'),
     'first_post_id': fields.Integer,
-    'first_post_title': fields.String(attribute='first_post.title'),
     'last_post_id': fields.Integer,
-    'last_post_title': fields.String(attribute='last_post.title')
 }
 
 post_fields = {
@@ -100,13 +99,16 @@ class CategoryAPI(Resource):
 class ForumListAPI(Resource):
 
     def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('category_id', type=int, location='args')
         super(ForumListAPI, self).__init__()
 
-    def get(self, category_id=None):
+    def get(self):
         # get the forums for a category or get all
-        if category_id is not None:
+        args = self.reqparse.parse_args()
+        if args['category_id'] is not None:
             forums_list = Forum.query.\
-                filter(Forum.category_id == Category.id).\
+                filter(Forum.category_id == args['category_id']).\
                 order_by(Forum.position).all()
         else:
             forums_list = Forum.query.order_by(Forum.position).all()
@@ -133,9 +135,18 @@ class ForumAPI(Resource):
 class TopicListAPI(Resource):
 
     def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int, location='args')
+        self.reqparse.add_argument('per_page', type=int, location='args')
+        self.reqparse.add_argument('forum_id', type=int, location='args')
         super(TopicListAPI, self).__init__()
 
-    def get(self, page=1, per_page=20, forum_id=None):
+    def get(self):
+        args = self.reqparse.parse_args()
+        page = args['page'] or 1
+        per_page = args['per_page'] or 20
+        forum_id = args['forum_id']
+
         if forum_id is not None:
             topics_list = Topic.query.filter_by(forum_id=forum_id).\
                 order_by(Topic.important.desc(), Topic.last_updated.desc()).\
@@ -167,9 +178,18 @@ class TopicAPI(Resource):
 class PostListAPI(Resource):
 
     def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('page', type=int, location='args')
+        self.reqparse.add_argument('per_page', type=int, location='args')
+        self.reqparse.add_argument('topic_id', type=int, location='args')
         super(PostListAPI, self).__init__()
 
-    def get(self, page=1, per_page=20, topic_id=None):
+    def get(self):
+        args = self.reqparse.parse_args()
+        page = args['page'] or 1
+        per_page = args['per_page'] or 20
+        topic_id = args['topic_id']
+
         if topic_id is not None:
             posts_list = Post.query.\
                 filter_by(topic_id=id).\
