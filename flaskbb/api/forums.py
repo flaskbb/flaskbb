@@ -4,134 +4,196 @@
     ~~~~~~~~~~~~~~~~~~
 
     The Forum API.
-    TODO: Permission checks.
+    TODO: - POST/PUT/DELETE stuff
+          - Permission checks.
 
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
+from flask_restful import Resource, fields, marshal, abort
 
-from flask_restful import Resource, reqparse, fields, marshal, abort
-
-from flaskbb.api import auth
 from flaskbb.forum.models import Category, Forum, Topic, Post
+
+
+category_fields = {
+    'id': fields.Integer,
+    'title': fields.String,
+    'description': fields.String,
+    'slug': fields.String,
+    'forums': fields.String(attribute="forums.title")
+}
+
+forum_fields = {
+    'id': fields.Integer,
+    'category_id': fields.Integer,
+    'title': fields.String,
+    'description': fields.String,
+    'position': fields.Integer,
+    'locked': fields.Boolean,
+    'show_moderators': fields.Boolean,
+    'external': fields.String,
+    'post_count': fields.Integer,
+    'topic_count': fields.Integer,
+    'last_post_id': fields.Integer,
+    'last_post_title': fields.String,
+    'last_post_created': fields.DateTime,
+    'last_post_username': fields.String
+}
+
+topic_fields = {
+    'id': fields.Integer,
+    'forum_id': fields.Integer,
+    'title': fields.String,
+    'user_id': fields.Integer,
+    'username': fields.String,
+    'date_created': fields.DateTime,
+    'last_updated': fields.DateTime,
+    'locked': fields.Boolean,
+    'important': fields.Boolean,
+    'views': fields.Integer,
+    'post_count': fields.Integer,
+    'first_post_id': fields.Integer,
+    'first_post_title': fields.String(attribute='first_post.title'),
+    'last_post_id': fields.Integer,
+    'last_post_title': fields.String(attribute='last_post.title')
+}
+
+post_fields = {
+    'id': fields.Integer,
+    'topic_id': fields.Integer,
+    'user_id': fields.Integer,
+    'username': fields.String,
+    'content': fields.String,
+    'date_created': fields.DateTime,
+    'date_modified': fields.DateTime,
+    'modified_by': fields.String
+}
 
 
 class CategoryListAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(CategoryListAPI, self).__init__()
 
     def get(self):
-        pass
+        categories_list = Category.query.order_by(Category.position).all()
 
-    @auth.login_required
-    def post(self):
-        pass
+        categories = {'categories': [marshal(category, category_fields)
+                                     for category in categories_list]}
+        return categories
 
 
 class CategoryAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(CategoryAPI, self).__init__()
 
     def get(self, id):
-        pass
+        category = Category.query.filter_by(id=id).first()
 
-    def put(self, id):
-        pass
+        if not category:
+            abort(404)
 
-    def delete(self, id):
-        pass
+        return {'category': marshal(category, category_fields)}
 
 
 class ForumListAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(ForumListAPI, self).__init__()
 
-    def get(self):
-        pass
+    def get(self, category_id=None):
+        # get the forums for a category or get all
+        if category_id is not None:
+            forums_list = Forum.query.\
+                filter(Forum.category_id == Category.id).\
+                order_by(Forum.position).all()
+        else:
+            forums_list = Forum.query.order_by(Forum.position).all()
 
-    @auth.login_required
-    def post(self):
-        pass
+        forums = {'forums': [marshal(forum, forum_fields)
+                             for forum in forums_list]}
+        return forums
 
 
 class ForumAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(ForumAPI, self).__init__()
 
     def get(self, id):
-        pass
+        forum = Forum.query.filter_by(id=id).first()
 
-    def put(self, id):
-        pass
+        if not forum:
+            abort(404)
 
-    def delete(self, id):
-        pass
+        return {'forum': marshal(forum, forum_fields)}
 
 
 class TopicListAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(TopicListAPI, self).__init__()
 
-    def get(self):
-        pass
+    def get(self, page=1, per_page=20, forum_id=None):
+        if forum_id is not None:
+            topics_list = Topic.query.filter_by(forum_id=forum_id).\
+                order_by(Topic.important.desc(), Topic.last_updated.desc()).\
+                paginate(page, per_page, True)
+        else:
+            topics_list = Topic.query.\
+                order_by(Topic.important.desc(), Topic.last_updated.desc()).\
+                paginate(page, per_page, True)
 
-    @auth.login_required
-    def post(self):
-        pass
+        topics = {'topics': [marshal(topic, topic_fields)
+                             for topic in topics_list.items]}
+        return topics
 
 
 class TopicAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(TopicAPI, self).__init__()
 
     def get(self, id):
-        pass
+        topic = Topic.query.filter_by(id=id).first()
 
-    def put(self, id):
-        pass
+        if not topic:
+            abort(404)
 
-    def delete(self, id):
-        pass
+        return {'topic': marshal(topic, topic_fields)}
 
 
 class PostListAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(PostListAPI, self).__init__()
 
-    def get(self):
-        pass
+    def get(self, page=1, per_page=20, topic_id=None):
+        if topic_id is not None:
+            posts_list = Post.query.\
+                filter_by(topic_id=id).\
+                order_by(Post.id.asc()).\
+                paginate(page, per_page)
+        else:
+            posts_list = Post.query.\
+                order_by(Post.id.asc()).\
+                paginate(page, per_page)
 
-    @auth.login_required
-    def post(self):
-        pass
+        posts = {'posts': [marshal(post, post_fields)
+                           for post in posts_list.items]}
+        return posts
 
 
 class PostAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
         super(PostAPI, self).__init__()
 
     def get(self, id):
-        pass
+        post = Post.query.filter_by(id=id).first()
 
-    def put(self, id):
-        pass
+        if not post:
+            abort(404)
 
-    def delete(self, id):
-        pass
+        return {'post': marshal(post, post_fields)}
