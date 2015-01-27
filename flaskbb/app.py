@@ -32,7 +32,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel
+    debugtoolbar, migrate, themes, plugin_manager, babel, restful
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -60,6 +60,7 @@ def create_app(config=None):
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
+    configure_api(app)
     configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
@@ -80,10 +81,75 @@ def configure_blueprints(app):
     )
 
 
+def configure_api(app):
+    from flaskbb.api.users import UserAPI, UserListAPI
+    from flaskbb.api.forums import (CategoryListAPI, CategoryAPI,
+                                    ForumListAPI, ForumAPI,
+                                    TopicListAPI, TopicAPI,
+                                    PostListAPI, PostAPI)
+    # User API
+    restful.add_resource(
+        UserListAPI,
+        "{}/users".format(app.config["API_URL_PREFIX"]),
+        endpoint='tasks'
+    )
+    restful.add_resource(
+        UserAPI,
+        '{}/users/<int:id>'.format(app.config["API_URL_PREFIX"]),
+        endpoint='task'
+    )
+
+    # Forum API
+    restful.add_resource(
+        CategoryListAPI,
+        "{}/categories".format(app.config["API_URL_PREFIX"]),
+        endpoint='categories'
+    )
+    restful.add_resource(
+        CategoryAPI,
+        '{}/categories/<int:id>'.format(app.config["API_URL_PREFIX"]),
+        endpoint='category'
+    )
+    restful.add_resource(
+        ForumListAPI,
+        "{}/forums".format(app.config["API_URL_PREFIX"]),
+        endpoint='forums'
+    )
+    restful.add_resource(
+        ForumAPI,
+        '{}/forums/<int:id>'.format(app.config["API_URL_PREFIX"]),
+        endpoint='forum'
+    )
+    restful.add_resource(
+        TopicListAPI,
+        "{}/topics".format(app.config["API_URL_PREFIX"]),
+        endpoint='topics'
+    )
+    restful.add_resource(
+        TopicAPI,
+        '{}/topics/<int:id>'.format(app.config["API_URL_PREFIX"]),
+        endpoint='topic'
+    )
+    restful.add_resource(
+        PostListAPI,
+        "{}/posts".format(app.config["API_URL_PREFIX"]),
+        endpoint='posts'
+    )
+    restful.add_resource(
+        PostAPI,
+        '{}/posts/<int:id>'.format(app.config["API_URL_PREFIX"]),
+        endpoint='post'
+    )
+
+    # Management API
+
+
 def configure_extensions(app):
     """
     Configures the extensions
     """
+    # Flask-Restful
+    restful.init_app(app)
 
     # Flask-Plugins
     plugin_manager.init_app(app)
