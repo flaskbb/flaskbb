@@ -76,6 +76,10 @@ class ChangePasswordForm(Form):
 
     submit = SubmitField(_("Save"))
 
+    def validate_old_password(self, field):
+        if not current_user.check_password(field.data):
+            raise ValidationError(_("Old Password is wrong."))
+
 
 class ChangeUserDetailsForm(Form):
     # TODO: Better birthday field
