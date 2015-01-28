@@ -162,13 +162,13 @@ def new_topic(forum_id, slug=None):
         return redirect(forum.url)
 
     form = NewTopicForm()
-    if form.validate_on_submit():
-        if request.form['button'] == 'preview':
+    if request.method == "POST":
+        if "preview" in request.form and form.validate():
             return render_template(
                 "forum/new_topic.html", forum=forum_instance,
                 form=form, preview=form.content.data
             )
-        else:
+        if "submit" in request.form and form.validate():
             topic = form.save(current_user, forum_instance)
 
             # redirect to the new topic
