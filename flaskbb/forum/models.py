@@ -548,6 +548,10 @@ class Topic(db.Model):
             try:
                 # Now the second last post will be the last post
                 self.forum.last_post_id = topic[1].last_post_id
+                self.forum.last_post_title = topic[1].title
+                self.forum.last_post_user_id = topic[1].user_id
+                self.forum.last_post_username = topic[1].username
+                self.forum.last_post_created = topic[1].last_updated
             # Catch an IndexError when you delete the last topic in the forum
             # There is no second last post
             except IndexError:
