@@ -92,7 +92,6 @@ class UserAPI(Resource):
         super(UserAPI, self).__init__()
 
     def get(self, id):
-        print auth.username()
         user = User.query.filter_by(id=id).first()
 
         if not user:
