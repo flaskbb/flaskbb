@@ -16,9 +16,10 @@ import time
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
-from flask import Flask, request
+from flask import Flask, Blueprint, request
 from flask_login import current_user
 from flask_whooshalchemy import whoosh_index
+from flask_restful import Api
 
 # Import the user blueprint
 from flaskbb.user.views import user
@@ -32,7 +33,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, restful
+    debugtoolbar, migrate, themes, plugin_manager, babel
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -60,7 +61,6 @@ def create_app(config=None):
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
-    configure_api(app)
     configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
@@ -68,6 +68,7 @@ def create_app(config=None):
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
+    configure_api(app)
 
     return app
 
@@ -87,70 +88,29 @@ def configure_api(app):
                                     ForumListAPI, ForumAPI,
                                     TopicListAPI, TopicAPI,
                                     PostListAPI, PostAPI)
+
+    api_blueprint = Blueprint("api", __name__)
+    restful = Api(api_blueprint, prefix=app.config["API_URL_PREFIX"])
+
     # User API
-    restful.add_resource(
-        UserListAPI,
-        "{}/users".format(app.config["API_URL_PREFIX"]),
-        endpoint='tasks'
-    )
-    restful.add_resource(
-        UserAPI,
-        '{}/users/<int:id>'.format(app.config["API_URL_PREFIX"]),
-        endpoint='task'
-    )
+    restful.add_resource(UserListAPI, "/users")
+    restful.add_resource(UserAPI, '/users/<int:id>')
 
     # Forum API
-    restful.add_resource(
-        CategoryListAPI,
-        "{}/categories".format(app.config["API_URL_PREFIX"]),
-        endpoint='categories'
-    )
-    restful.add_resource(
-        CategoryAPI,
-        '{}/categories/<int:id>'.format(app.config["API_URL_PREFIX"]),
-        endpoint='category'
-    )
-    restful.add_resource(
-        ForumListAPI,
-        "{}/forums".format(app.config["API_URL_PREFIX"]),
-        endpoint='forums'
-    )
-    restful.add_resource(
-        ForumAPI,
-        '{}/forums/<int:id>'.format(app.config["API_URL_PREFIX"]),
-        endpoint='forum'
-    )
-    restful.add_resource(
-        TopicListAPI,
-        "{}/topics".format(app.config["API_URL_PREFIX"]),
-        endpoint='topics'
-    )
-    restful.add_resource(
-        TopicAPI,
-        '{}/topics/<int:id>'.format(app.config["API_URL_PREFIX"]),
-        endpoint='topic'
-    )
-    restful.add_resource(
-        PostListAPI,
-        "{}/posts".format(app.config["API_URL_PREFIX"]),
-        endpoint='posts'
-    )
-    restful.add_resource(
-        PostAPI,
-        '{}/posts/<int:id>'.format(app.config["API_URL_PREFIX"]),
-        endpoint='post'
-    )
-
-    # Management API
+    restful.add_resource(CategoryListAPI, "/categories")
+    restful.add_resource(CategoryAPI, '/categories/<int:id>')
+    restful.add_resource(ForumListAPI, "/forums")
+    restful.add_resource(ForumAPI, '/forums/<int:id>')
+    restful.add_resource(TopicListAPI, "/topics")
+    restful.add_resource(TopicAPI, '/topics/<int:id>')
+    restful.add_resource(PostListAPI, "/posts")
+    restful.add_resource(PostAPI, '/posts/<int:id>')
 
 
 def configure_extensions(app):
     """
     Configures the extensions
     """
-    # Flask-Restful
-    restful.init_app(app)
-
     # Flask-Plugins
     plugin_manager.init_app(app)
 

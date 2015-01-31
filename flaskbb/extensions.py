@@ -18,7 +18,6 @@ from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
 from flask_babelex import Babel
-from flask_restful import Api
 from flask_httpauth import HTTPBasicAuth
 
 
@@ -52,6 +51,5 @@ plugin_manager = PluginManager()
 # Babel
 babel = Babel()
 
-# Flask-Restful with Auth
-restful = Api()
+# Flask-HTTPAuth
 auth = HTTPBasicAuth()

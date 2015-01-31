@@ -15,6 +15,7 @@ from flask_httpauth import HTTPBasicAuth
 
 from flaskbb.user.models import User
 
+
 auth = HTTPBasicAuth()
 
 
