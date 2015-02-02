@@ -12,3 +12,8 @@ ignore-paths:
     - migrations
     - flaskbb/configs
     - wsgi.py
+pep8:
+  full: true
+  disable:
+    - E711
+    - E712
