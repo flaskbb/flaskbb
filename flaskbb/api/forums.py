@@ -87,8 +87,8 @@ class CategoryAPI(Resource):
     def __init__(self):
         super(CategoryAPI, self).__init__()
 
-    def get(self, id):
-        category = Category.query.filter_by(id=id).first()
+    def get(self, category_id):
+        category = Category.query.filter_by(id=category_id).first()
 
         if not category:
             abort(404)
@@ -123,8 +123,8 @@ class ForumAPI(Resource):
     def __init__(self):
         super(ForumAPI, self).__init__()
 
-    def get(self, id):
-        forum = Forum.query.filter_by(id=id).first()
+    def get(self, forum_id):
+        forum = Forum.query.filter_by(id=forum_id).first()
 
         if not forum:
             abort(404)
@@ -166,8 +166,8 @@ class TopicAPI(Resource):
     def __init__(self):
         super(TopicAPI, self).__init__()
 
-    def get(self, id):
-        topic = Topic.query.filter_by(id=id).first()
+    def get(self, topic_id):
+        topic = Topic.query.filter_by(id=topic_id).first()
 
         if not topic:
             abort(404)
@@ -210,8 +210,8 @@ class PostAPI(Resource):
     def __init__(self):
         super(PostAPI, self).__init__()
 
-    def get(self, id):
-        post = Post.query.filter_by(id=id).first()
+    def get(self, post_id):
+        post = Post.query.filter_by(id=post_id).first()
 
         if not post:
             abort(404)

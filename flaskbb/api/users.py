@@ -16,14 +16,6 @@ from flask_restful import Resource, reqparse, fields, marshal, abort
 from flaskbb.api import auth
 from flaskbb.user.models import User
 
-# CREATE NEW USER
-# curl -u test:test1 -i -H "Content-Type: application/json" -X POST -d '{"username":"test6", "password": "test", "email": "test6@example.org"}' http://localhost:8080/api/users
-
-# UPDATE USER
-# curl -u test1:test -i -H "Content-Type: application/json" -X PUT -d '{"email": "test7@example.org"}' http://localhost:8080/api/users/5
-
-# GET USER
-# curl -i http://localhost:8080/api/users
 
 user_fields = {
     'id': fields.Integer,
@@ -91,8 +83,8 @@ class UserAPI(Resource):
 
         super(UserAPI, self).__init__()
 
-    def get(self, id):
-        user = User.query.filter_by(id=id).first()
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
 
         if not user:
             abort(404)
@@ -100,8 +92,8 @@ class UserAPI(Resource):
         return {'user': marshal(user, user_fields)}
 
     @auth.login_required
-    def put(self, id):
-        user = User.query.filter_by(id=id).first()
+    def put(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
 
         if not user:
             abort(404)
@@ -117,8 +109,8 @@ class UserAPI(Resource):
         return {'user': marshal(user, user_fields)}
 
     @auth.login_required
-    def delete(self, id):
-        user = User.query.filter_by(id=id).first()
+    def delete(self, user_id):
+        user = User.query.filter_by(id=user_id).first()
 
         if not user:
             abort(404)
