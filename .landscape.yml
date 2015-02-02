@@ -1,0 +1,14 @@
+doc-warnings: false
+test-warnings: false
+strictness: veryhigh
+max-line-length: 79
+uses:
+    - flask
+autodetect: yes
+requirements:
+    - requirements.txt
+ignore-paths:
+    - docs
+    - migrations
+    - flaskbb/configs
+    - wsgi.py
