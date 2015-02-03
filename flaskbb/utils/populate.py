@@ -207,16 +207,23 @@ def create_test_data():
             post.save(user=user2, topic=topic)
 
 
-def insert_mass_data():
+def insert_mass_data(topics=100, posts=100):
     """
     Creates 100 topics in the first forum and each topic has 100 posts.
+    Returns ``True`` if the topics and posts were successfully created.
+
+    :param topics: The amount of topics in the forum.
+    :param posts: The number of posts in each topic.
     """
     user1 = User.query.filter_by(id=1).first()
     user2 = User.query.filter_by(id=2).first()
     forum = Forum.query.filter_by(id=1).first()
 
+    if not user1 or user2 or forum:
+        raise "Please make sure that there are at least 2 users and 1 forum."
+
     # create 1000 topics
-    for i in range(1, 101):
+    for i in range(1, topics+1):
 
         # create a topic
         topic = Topic()
@@ -227,7 +234,7 @@ def insert_mass_data():
         topic.save(post=post, user=user1, forum=forum)
 
         # create 100 posts in each topic
-        for j in range(1, 100):
+        for j in range(1, posts):
             post = Post()
             post.content = "Test Post"
             post.save(user=user2, topic=topic)
