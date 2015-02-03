@@ -48,9 +48,8 @@ from flaskbb.utils.settings import flaskbb_config
 
 
 def create_app(config=None):
-    """
-    Creates the app.
-    """
+    """Creates the app."""
+
     # Initialize the app
     app = Flask("flaskbb")
 
@@ -108,9 +107,8 @@ def configure_api(app):
 
 
 def configure_extensions(app):
-    """
-    Configures the extensions
-    """
+    """Configures the extensions."""
+
     # Flask-Plugins
     plugin_manager.init_app(app)
 
@@ -150,9 +148,8 @@ def configure_extensions(app):
 
     @login_manager.user_loader
     def load_user(user_id):
-        """
-        Loads the user. Required by the `login` extension
-        """
+        """Loads the user. Required by the `login` extension."""
+
         unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
             filter(PrivateMessage.unread,
                    PrivateMessage.user_id == user_id).subquery()
@@ -180,9 +177,8 @@ def configure_extensions(app):
 
 
 def configure_template_filters(app):
-    """
-    Configures the template filters
-    """
+    """Configures the template filters."""
+
     app.jinja_env.filters['markup'] = render_markup
     app.jinja_env.filters['format_date'] = format_date
     app.jinja_env.filters['time_since'] = time_since
@@ -207,27 +203,25 @@ def configure_template_filters(app):
 
 
 def configure_context_processors(app):
-    """
-    Configures the context processors
-    """
+    """Configures the context processors."""
+
     @app.context_processor
     def inject_flaskbb_config():
+        """Injects the ``flaskbb_config`` config variable into the
+        templates.
         """
-        Injects the ``flaskbb_config`` config variable into the templates.
-        """
+
         return dict(flaskbb_config=flaskbb_config)
 
 
 def configure_before_handlers(app):
-    """
-    Configures the before request handlers
-    """
+    """Configures the before request handlers."""
 
     @app.before_request
     def update_lastseen():
-        """
-        Updates `lastseen` before every reguest if the user is authenticated
-        """
+        """Updates `lastseen` before every reguest if the user is
+        authenticated."""
+
         if current_user.is_authenticated():
             current_user.lastseen = datetime.datetime.utcnow()
             db.session.add(current_user)
@@ -243,9 +237,7 @@ def configure_before_handlers(app):
 
 
 def configure_errorhandlers(app):
-    """
-    Configures the error handlers
-    """
+    """Configures the error handlers."""
 
     @app.errorhandler(403)
     def forbidden_page(error):
@@ -261,9 +253,7 @@ def configure_errorhandlers(app):
 
 
 def configure_logging(app):
-    """
-    Configures logging.
-    """
+    """Configures logging."""
 
     logs_folder = os.path.join(app.root_path, os.pardir, "logs")
     from logging.handlers import SMTPHandler

@@ -13,8 +13,7 @@ from wtforms.widgets.core import Select, HTMLString, html_params
 
 
 class SelectDateWidget(object):
-    """
-    Renders a DateTime field with 3 selects.
+    """Renders a DateTime field with 3 selects.
     For more information see: http://stackoverflow.com/a/14664504
     """
     FORMAT_CHOICES = {

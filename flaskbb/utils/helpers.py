@@ -72,7 +72,7 @@ def get_categories_and_forums(query_result, user):
            .....:     for forum, forumsread in forums:
            .....:         print "\t", forum, forumsread
 
-   This will print something this:
+   This will print something like this:
         <Category 1>
             <Forum 1> None
             <Forum 2> <flaskbb.forum.models.ForumsRead object at 0x38fdb50>
@@ -375,6 +375,7 @@ def format_quote(post):
     else:
         profile_url = url_for('user.profile', username=post.username,
                               _external=True)
+        # just ignore this long line :P
         quote = '[b][url={profile_url}]{post.username}[/url] wrote:[/b][quote]{post.content}[/quote]\n'.\
                 format(post=post, profile_url=profile_url)
 

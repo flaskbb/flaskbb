@@ -36,8 +36,8 @@ For a complete installation guide please visit the installation documentation
     * `pip install -r requirements.txt`
 * Configuration (_adjust them accordingly to your needs_)
     * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
-* Database creation
-    * `python manage.py createall`
+* Create the database & populate it
+    * `python manage.py populate`
 * Run the development server
     * `python manage.py runserver`
 * Visit [localhost:8080](http://localhost:8080)

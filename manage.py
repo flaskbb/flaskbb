@@ -69,43 +69,14 @@ def initdb():
 
 @manager.command
 def dropdb():
-    """Deletes the database"""
+    """Deletes the database."""
 
     db.drop_all()
 
 
-@manager.option('-s', '--settings', dest="settings")
-@manager.option('-f', '--force', dest="force")
-def update(settings=None, force=False):
-    """Updates the settings via a fixture. All fixtures have to be placed
-    in the `fixture`.
-    Usage: python manage.py update -s your_fixture
-    """
-    try:
-        fixture = import_string(
-            "flaskbb.fixtures.{}".format(settings)
-        )
-        fixture = fixture.fixture
-    except ImportError:
-        raise "{} fixture is not available".format(settings)
-
-    if force:
-        count = update_settings_from_fixture(fixture, overwrite_group=True,
-                                             overwrite_setting=True)
-        app.logger.info(
-            "{} groups and {} settings forcefully updated."
-            .format(count[0], count[1])
-        )
-    else:
-        count = update_settings_from_fixture(fixture)
-        app.logger.info(
-            "{} groups and {} settings updated.".format(count[0], count[1])
-        )
-
-
 @manager.command
-def createall(dropdb=False, createdb=False):
-    """Creates the database with some testing content.
+def populate(dropdb=False, createdb=False):
+    """Creates the database with some default data.
     If you do not want to drop or create the db add
     '-c' (to not create the db) and '-d' (to not drop the db)
     """
@@ -126,7 +97,7 @@ def createall(dropdb=False, createdb=False):
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
 def create_admin(username=None, password=None, email=None):
-    """Creates the admin user"""
+    """Creates the admin user."""
 
     if not (username and password and email):
         username = prompt("Username")
@@ -139,8 +110,8 @@ def create_admin(username=None, password=None, email=None):
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-def initflaskbb(username=None, password=None, email=None):
-    """Initializes FlaskBB with all necessary data"""
+def init(username=None, password=None, email=None):
+    """Initializes FlaskBB with all necessary data."""
 
     app.logger.info("Creating default data...")
     try:
@@ -149,7 +120,8 @@ def initflaskbb(username=None, password=None, email=None):
     except IntegrityError:
         app.logger.error("Couldn't create the default data because it already "
                          "exist!")
-        if prompt_bool("Do you want to recreate the database? (y/n)"):
+        if prompt_bool("Found an existing database."
+                       "Do you want to recreate the database? (y/n)"):
             db.session.rollback()
             db.drop_all()
             upgrade()
@@ -187,11 +159,40 @@ def insertmassdata():
     insert_mass_data()
 
 
+@manager.option('-s', '--settings', dest="settings")
+@manager.option('-f', '--force', dest="force", default=False)
+def update(settings=None, force=False):
+    """Updates the settings via a fixture. All fixtures have to be placed
+    in the `fixture`.
+    Usage: python manage.py update -s your_fixture
+    """
+
+    try:
+        fixture = import_string(
+            "flaskbb.fixtures.{}".format(settings)
+        )
+        fixture = fixture.fixture
+    except ImportError:
+        raise "{} fixture is not available".format(settings)
+
+    if force:
+        count = update_settings_from_fixture(fixture, overwrite_group=True,
+                                             overwrite_setting=True)
+        app.logger.info(
+            "{} groups and {} settings forcefully updated."
+            .format(count[0], count[1])
+        )
+    else:
+        count = update_settings_from_fixture(fixture)
+        app.logger.info(
+            "{} groups and {} settings updated.".format(count[0], count[1])
+        )
+
+
 @manager.command
 def update_translations():
-    """
-    Updates the translations
-    """
+    """Updates the translations."""
+
     translations_folder = os.path.join(app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
@@ -203,9 +204,8 @@ def update_translations():
 
 @manager.command
 def add_translations(translation):
-    """
-    Adds a new language to the translations
-    """
+    """Adds a new language to the translations."""
+
     translations_folder = os.path.join(app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
@@ -217,9 +217,8 @@ def add_translations(translation):
 
 @manager.command
 def compile_translations():
-    """
-    Compiles the translations.
-    """
+    """Compiles the translations."""
+
     translations_folder = os.path.join(app.root_path, "translations")
 
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
@@ -228,10 +227,10 @@ def compile_translations():
 # Plugin translation commands
 @manager.command
 def add_plugin_translations(plugin, translation):
+    """Adds a new language to the plugin translations. Expects the name
+    of the plugin and the translations name like "en".
     """
-    Adds a new language to the plugin translations
-    Expects the name of the plugin and the translations name like "en"
-    """
+
     plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
 
@@ -245,10 +244,8 @@ def add_plugin_translations(plugin, translation):
 
 @manager.command
 def update_plugin_translations(plugin):
-    """
-    Updates the plugin translations
-    Expects the name of the plugin.
-    """
+    """Updates the plugin translations. Expects the name of the plugin."""
+
     plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
 
@@ -262,10 +259,8 @@ def update_plugin_translations(plugin):
 
 @manager.command
 def compile_plugin_translations(plugin):
-    """
-    Compile the plugin translations.
-    Expects the name of the plugin.
-    """
+    """Compile the plugin translations. Expects the name of the plugin."""
+
     plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
 

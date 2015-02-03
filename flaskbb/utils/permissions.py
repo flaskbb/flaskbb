@@ -95,7 +95,7 @@ def can_moderate(user, forum=None, perm=None):
 
 
 def can_edit_post(user, post):
-    """Check if the post can be edited by the user"""
+    """Check if the post can be edited by the user."""
     topic = post.topic
 
     if can_moderate(user, topic.forum):
@@ -109,19 +109,19 @@ def can_edit_post(user, post):
 
 
 def can_delete_post(user, post):
-    """Check if the post can be deleted by the user"""
+    """Check if the post can be deleted by the user."""
     return check_perm(user=user, perm='deletepost', forum=post.topic.forum,
                       post_user_id=post.user_id)
 
 
 def can_delete_topic(user, topic):
-    """Check if the topic can be deleted by the user"""
+    """Check if the topic can be deleted by the user."""
     return check_perm(user=user, perm='deletetopic', forum=topic.forum,
                       post_user_id=topic.user_id)
 
 
 def can_post_reply(user, topic):
-    """Check if the user is allowed to post in the forum"""
+    """Check if the user is allowed to post in the forum."""
     if can_moderate(user, topic.forum):
         return True
 
@@ -132,7 +132,7 @@ def can_post_reply(user, topic):
 
 
 def can_post_topic(user, forum):
-    """Checks if the user is allowed to create a new topic in the forum"""
+    """Checks if the user is allowed to create a new topic in the forum."""
     return check_perm(user=user, perm='posttopic', forum=forum)
 
 
