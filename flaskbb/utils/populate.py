@@ -248,7 +248,7 @@ def insert_mass_data(topics=100, posts=100):
         raise "Please make sure that there are at least 2 users and 1 forum."
 
     # create 1000 topics
-    for i in range(1, topics+1):
+    for i in range(1, topics + 1):
 
         # create a topic
         topic = Topic()
