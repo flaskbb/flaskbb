@@ -96,4 +96,25 @@ def test_super_moderator_permissions(forum, super_moderator_user, topic):
 
 def test_can_moderate_without_permission(moderator_user):
     """Test can moderate for a moderator_user without a permission."""
-    assert can_moderate(moderator_user) == False
+    assert can_moderate(moderator_user) is False
+
+
+def test_permissions_locked_topic(topic_locked, user):
+    """Test user permission if a topic is locked."""
+    assert topic_locked.locked
+
+    post = topic_locked.first_post
+    assert not can_edit_post(user, post)
+    assert not can_post_reply(user, topic_locked)
+
+
+def test_permissions_locked_forum(topic_in_locked_forum, user):
+    """Test user permission if forum is locked."""
+    topic = topic_in_locked_forum
+    post = topic.first_post
+
+    assert not topic.locked
+    assert topic.forum.locked
+
+    assert not can_edit_post(user, post)
+    assert not can_post_reply(user, topic)

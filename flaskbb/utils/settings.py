@@ -28,7 +28,7 @@ class FlaskBBConfig(collections.MutableMapping):
     def __setitem__(self, key, value):
         Setting.update({key.lower(): value})
 
-    def __delitem__(self, key):
+    def __delitem__(self, key):  # pragma: no cover
         pass
 
     def __iter__(self):

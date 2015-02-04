@@ -22,6 +22,15 @@ def forum(category, default_settings):
 
 
 @pytest.fixture
+def forum_locked(category, default_settings):
+    """A single locked forum in a category."""
+    forum = Forum(title="Test Forum", category_id=category.id)
+    forum.locked = True
+    forum.save()
+    return forum
+
+
+@pytest.fixture
 def topic(forum, user):
     """A topic by a normal user without any extra permissions."""
     topic = Topic(title="Test Topic Normal")
@@ -36,10 +45,29 @@ def topic_moderator(forum, moderator_user):
     post = Post(content="Test Content Moderator")
     return topic.save(forum=forum, user=moderator_user, post=post)
 
+
+@pytest.fixture
+def topic_locked(forum, user):
+    """A locked topic by a user with normal permissions."""
+    topic = Topic(title="Test Topic Locked")
+    topic.locked = True
+    post = Post(content="Test Content Locked")
+    return topic.save(forum=forum, user=user, post=post)
+
+
+@pytest.fixture
+def topic_in_locked_forum(forum_locked, user):
+    """A locked topic by a user with normal permissions."""
+    topic = Topic(title="Test Topic Forum Locked")
+    post = Post(content="Test Content Forum Locked")
+    return topic.save(forum=forum_locked, user=user, post=post)
+
+
 @pytest.fixture
 def forumsread_last_read():
     """The datetime of the formsread last_read."""
     return datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+
 
 @pytest.fixture
 def forumsread(user, forum, forumsread_last_read):

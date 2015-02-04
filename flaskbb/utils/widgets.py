@@ -49,7 +49,7 @@ class SelectBirthdayWidget(object):
                 id_suffix = date_format.replace('%', '-')
                 id_current = field_id + id_suffix
 
-                if css_class is not None:
+                if css_class is not None:  # pragma: no cover
                     select_class = "{} {}".format(
                         css_class, self.FORMAT_CLASSES[date_format]
                     )
