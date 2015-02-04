@@ -16,10 +16,9 @@ import time
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
-from flask import Flask, Blueprint, request
+from flask import Flask, request
 from flask_login import current_user
 from flask_whooshalchemy import whoosh_index
-from flask_restful import Api
 
 # Import the user blueprint
 from flaskbb.user.views import user
@@ -67,7 +66,6 @@ def create_app(config=None):
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
-    configure_api(app)
 
     return app
 
@@ -79,31 +77,6 @@ def configure_blueprints(app):
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
-
-
-def configure_api(app):
-    from flaskbb.api.users import UserAPI, UserListAPI
-    from flaskbb.api.forums import (CategoryListAPI, CategoryAPI,
-                                    ForumListAPI, ForumAPI,
-                                    TopicListAPI, TopicAPI,
-                                    PostListAPI, PostAPI)
-
-    api_blueprint = Blueprint("api", __name__)
-    restful = Api(api_blueprint, prefix=app.config["API_URL_PREFIX"])
-
-    # User API
-    restful.add_resource(UserListAPI, "/users")
-    restful.add_resource(UserAPI, '/users/<int:id>')
-
-    # Forum API
-    restful.add_resource(CategoryListAPI, "/categories")
-    restful.add_resource(CategoryAPI, '/categories/<int:id>')
-    restful.add_resource(ForumListAPI, "/forums")
-    restful.add_resource(ForumAPI, '/forums/<int:id>')
-    restful.add_resource(TopicListAPI, "/topics")
-    restful.add_resource(TopicAPI, '/topics/<int:id>')
-    restful.add_resource(PostListAPI, "/posts")
-    restful.add_resource(PostAPI, '/posts/<int:id>')
 
 
 def configure_extensions(app):

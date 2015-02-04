@@ -18,7 +18,6 @@ from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
 from flask_babelex import Babel
-from flask_httpauth import HTTPBasicAuth
 
 
 # Database
@@ -50,6 +49,3 @@ plugin_manager = PluginManager()
 
 # Babel
 babel = Babel()
-
-# Flask-HTTPAuth
-auth = HTTPBasicAuth()
