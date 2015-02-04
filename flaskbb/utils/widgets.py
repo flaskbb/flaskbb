@@ -40,16 +40,22 @@ class SelectBirthdayWidget(object):
         field_id = kwargs.pop('id', field.id)
         html = []
         allowed_format = ['%d', '%m', '%Y']
-        surrounded_div = kwargs.get('surrounded_div', None)
+        surrounded_div = kwargs.pop('surrounded_div', None)
+        css_class = kwargs.get('class', None)
 
         for date_format in field.format.split():
-            if (date_format in allowed_format):
+            if date_format in allowed_format:
                 choices = self.FORMAT_CHOICES[date_format]
                 id_suffix = date_format.replace('%', '-')
                 id_current = field_id + id_suffix
 
-                select_class = "{} {}".format(self.FORMAT_CLASSES[date_format],
-                                              kwargs['class'])
+                if css_class is not None:
+                    select_class = "{} {}".format(
+                        css_class, self.FORMAT_CLASSES[date_format]
+                    )
+                else:
+                    select_class = self.FORMAT_CLASSES[date_format]
+
                 kwargs['class'] = select_class
 
                 try:
@@ -58,7 +64,7 @@ class SelectBirthdayWidget(object):
                     pass
 
                 if surrounded_div is not None:
-                    html.append("<div class='%s'>" % surrounded_div)
+                    html.append('<div class="%s">' % surrounded_div)
 
                 html.append('<select %s>' % html_params(name=field.name,
                                                         id=id_current,
@@ -82,11 +88,6 @@ class SelectBirthdayWidget(object):
 
                 if surrounded_div is not None:
                     html.append("</div>")
-            else:
-                html.append(date_format)
-                html.append(
-                    """<input type="hidden" value="{}" {}></input>""".format(
-                        html_params(name=field.name, id=id_current, **kwargs)))
 
             html.append(' ')
 
