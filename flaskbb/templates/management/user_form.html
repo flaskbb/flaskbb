@@ -3,7 +3,7 @@
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
-{% from theme("macros.html") import horizontal_field, navlink with context %}
+{% from theme("macros.html") import horizontal_field, horizontal_select_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
@@ -23,7 +23,7 @@
             {{ horizontal_field(form.username) }}
             {{ horizontal_field(form.email) }}
             {{ horizontal_field(form.password) }}
-            {{ horizontal_field(form.birthday) }}
+            {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
             {{ horizontal_field(form.website) }}

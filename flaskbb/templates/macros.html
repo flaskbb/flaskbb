@@ -76,7 +76,7 @@
 {%- endmacro -%}
 
 
-{%- macro render_select_field(field, div_class='') -%}
+{%- macro render_select_field(field, div_class='', select_class="form-control") -%}
 <div class="form-group">
     {% if div_class %}
     <div class="{{ div_class }}">
@@ -85,9 +85,9 @@
     {% endif %}
         <label>{{ field.label.text }}</label>
         {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
-            {{ field(multiple=True, class="form-control") }}
+            {{ field(multiple=True, class=select_class) }}
         {% else %}
-            {{ field(class="form-control") }}
+            {{ field(class=select_class) }}
         {%- endif -%}
 
         {{ field_description(field) }}
@@ -186,6 +186,33 @@
         {{ field_description(field) }}
         {{ field_errors(field) }}
     </div>
+{%- endmacro -%}
+
+{%- macro horizontal_select_field(field, div_class='', label_class='', select_class="form-control", surrounded_div="col-sm-4") -%}
+<div class="form-group row {%- if field.errors %} has-error{%- endif %}">
+    {% if label_class %}
+        {{ field.label(class=label_class) }}
+    {% else %}
+        {{ field.label(class="col-sm-3 control-label") }}
+    {% endif %}
+
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% else %}
+        <div class="col-sm-5">
+    {% endif %}
+
+        <div class="row">
+        {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
+            {{ field(multiple=True, class=select_class, surrounded_div=surrounded_div) }}
+        {% else %}
+            {{ field(class=select_class, surrounded_div=surrounded_div) }}
+        {%- endif -%}
+        </div>
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+</div>
 {%- endmacro -%}
 
 

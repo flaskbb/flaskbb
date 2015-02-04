@@ -10,14 +10,15 @@
 """
 from flask_wtf import Form
 from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
-                     BooleanField, SelectField, DateField, SubmitField)
+                     BooleanField, SelectField, SubmitField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
 from flask_babelex import lazy_gettext as _
 
-from flaskbb.utils.widgets import SelectDateWidget
+from flaskbb.utils.fields import BirthdayField
+from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
@@ -51,9 +52,9 @@ class UserForm(Form):
     password = PasswordField("Password", validators=[
         Optional()])
 
-    birthday = DateField(_("Birthday"), format="%d %m %Y",
-                         widget=SelectDateWidget(),
-                         validators=[Optional()])
+    birthday = BirthdayField(_("Birthday"), format="%d %m %Y",
+                             widget=SelectBirthdayWidget(),
+                             validators=[Optional()])
 
     gender = SelectField(_("Gender"), default="None", choices=[
         ("None", ""),

@@ -10,15 +10,16 @@
 """
 from flask_login import current_user
 from flask_wtf import Form
-from wtforms import (StringField, PasswordField, DateField, TextAreaField,
-                     SelectField, ValidationError, SubmitField)
+from wtforms import (StringField, PasswordField, TextAreaField, SelectField,
+                     ValidationError, SubmitField)
 from wtforms.validators import (Length, DataRequired, InputRequired, Email,
                                 EqualTo, regexp, Optional, URL)
 from flask_babelex import lazy_gettext as _
 
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.extensions import db
-from flaskbb.utils.widgets import SelectDateWidget
+from flaskbb.utils.widgets import SelectBirthdayWidget
+from flaskbb.utils.fields import BirthdayField
 
 
 IMG_RE = r'^[^/\\]\.(?:jpg|gif|png)'
@@ -82,9 +83,9 @@ class ChangePasswordForm(Form):
 
 
 class ChangeUserDetailsForm(Form):
-    # TODO: Better birthday field
-    birthday = DateField(_("Your Birthday"), format="%d %m %Y",
-                         widget=SelectDateWidget(), validators=[Optional()])
+    birthday = BirthdayField(_("Birthday"), format="%d %m %Y",
+                             validators=[Optional()],
+                             widget=SelectBirthdayWidget())
 
     gender = SelectField(_("Gender"), default="None", choices=[
         ("None", ""),
@@ -107,6 +108,10 @@ class ChangeUserDetailsForm(Form):
         Optional(), Length(min=0, max=5000)])
 
     submit = SubmitField(_("Save"))
+
+    def validate_birthday(self, field):
+        if field.data is None:
+            return True
 
 
 class NewMessageForm(Form):
