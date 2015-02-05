@@ -44,5 +44,5 @@ __pycache__
 *.iml
 flaskbb/configs/production.py
 flaskbb/configs/development.py
-
+.tox
 *.rdb
