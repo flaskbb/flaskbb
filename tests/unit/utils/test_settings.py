@@ -1,4 +1,3 @@
-from flaskbb._compat import iterkeys
 from flaskbb.utils.settings import FlaskBBConfig
 
 
@@ -12,4 +11,5 @@ def test_flaskbb_config(default_settings):
     flaskbb_config['PROJECT_TITLE'] = 'FlaskBBTest'
     assert flaskbb_config['PROJECT_TITLE'] == 'FlaskBBTest'
     # test __iter__
-    assert iterkeys(flaskbb_config).next() == "USERS_PER_PAGE"
+    test_dict = {}
+    assert type(flaskbb_config.__iter__()) == type(test_dict.__iter__())
