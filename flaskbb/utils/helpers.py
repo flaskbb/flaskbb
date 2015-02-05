@@ -15,6 +15,7 @@ import operator
 from datetime import datetime, timedelta
 
 from flask import session, url_for
+from babel.dates import format_timedelta
 from flask_themes2 import render_theme_template
 from flask_login import current_user
 from postmarkup import render_bbcode
@@ -43,7 +44,7 @@ def slugify(text, delim=u'-'):
     return text_type(delim.join(result))
 
 
-def render_template(template, **context):
+def render_template(template, **context):  # pragma: no cover
     """A helper function that uses the `render_theme_template` function
     without needing to edit all the views
     """
@@ -142,8 +143,8 @@ def forum_is_unread(forum, forumsread, user):
     read_cutoff = datetime.utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
-    # disable tracker if read_cutoff is set to 0
-    if read_cutoff == 0:
+    # disable tracker if TRACKER_LENGTH is set to 0
+    if flaskbb_config["TRACKER_LENGTH"] == 0:
         return False
 
     # If there are no topics in the forum, mark it as read
@@ -212,7 +213,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     return topicsread.last_read < topic.last_post.date_created
 
 
-def mark_online(user_id, guest=False):
+def mark_online(user_id, guest=False):  # pragma: no cover
     """Marks a user as online
 
     :param user_id: The id from the user who should be marked as online
@@ -238,24 +239,7 @@ def mark_online(user_id, guest=False):
     p.execute()
 
 
-def get_last_user_activity(user_id, guest=False):
-    """Returns the last active time from a given user_id
-
-    :param user_id: The user id for whom you want to know the latest activity
-
-    :param guest: If the user is a guest (not signed in)
-    """
-    if guest:
-        last_active = redis_store.get('guest-activity/%s' % user_id)
-    else:
-        last_active = redis_store.get('user-activity/%s' % user_id)
-
-    if last_active is None:
-        return None
-    return datetime.utcfromtimestamp(int(last_active))
-
-
-def get_online_users(guest=False):
+def get_online_users(guest=False):  # pragma: no cover
     """Returns all online users within a specified time range
 
     :param guest: If True, it will return the online guests
@@ -269,15 +253,20 @@ def get_online_users(guest=False):
                                for x in minutes])
 
 
-def crop_title(title):
+def crop_title(title, suffix="..."):
     """Crops the title to a specified length
 
     :param title: The title that should be cropped
+
+    :param suffix: The suffix which should be appended at the
+                   end of the title.
     """
     length = flaskbb_config['TITLE_LENGTH']
-    if len(title) > length:
-        return title[:length] + "..."
-    return title
+
+    if len(title) <= length:
+        return title
+
+    return title[:length].rsplit(' ', 1)[0] + suffix
 
 
 def render_markup(text):
@@ -321,43 +310,19 @@ def format_date(value, format='%Y-%m-%d'):
     return value.strftime(format)
 
 
-def time_since(value):
-    """Just a interface for `time_delta_format`"""
-    return time_delta_format(value)
+def time_since(time):
+    """Returns a string representing time since e.g.
+    3 days ago, 5 hours ago.
 
-
-def time_delta_format(dt, default=None):
-    """Returns a string representing time since e.g. 3 days ago, 5 hours ago.
-    ref: https://bitbucket.org/danjac/newsmeme/src/a281babb9ca3/newsmeme/
-    note: when Babel1.0 is released, use format_timedelta/timedeltaformat
-          instead
+    :param time: A datetime object
     """
-    if default is None:
-        default = 'just now'
+    delta = time - datetime.utcnow()
 
-    now = datetime.utcnow()
-    diff = now - dt
+    locale = "en"
+    if current_user.is_authenticated() and current_user.language is not None:
+        locale = current_user.language
 
-    periods = (
-        (diff.days / 365, 'year', 'years'),
-        (diff.days / 30, 'month', 'months'),
-        (diff.days / 7, 'week', 'weeks'),
-        (diff.days, 'day', 'days'),
-        (diff.seconds / 3600, 'hour', 'hours'),
-        (diff.seconds / 60, 'minute', 'minutes'),
-        (diff.seconds, 'second', 'seconds'),
-    )
-
-    for period, singular, plural in periods:
-        if period < 1:
-            continue
-
-        if 1 <= period < 2:
-            return u'%d %s ago' % (period, singular)
-        else:
-            return u'%d %s ago' % (period, plural)
-
-    return default
+    return format_timedelta(delta, add_direction=True, locale=locale)
 
 
 def format_quote(post):
