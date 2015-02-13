@@ -2,7 +2,8 @@
 import datetime
 import pytest
 
-from flaskbb.forum.models import Forum, Category, Topic, Post, ForumsRead
+from flaskbb.forum.models import Forum, Category, Topic, Post, ForumsRead, \
+    TopicsRead
 
 
 @pytest.fixture
@@ -64,17 +65,29 @@ def topic_in_locked_forum(forum_locked, user):
 
 
 @pytest.fixture
-def forumsread_last_read():
+def last_read():
     """The datetime of the formsread last_read."""
     return datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 
 
 @pytest.fixture
-def forumsread(user, forum, forumsread_last_read):
+def forumsread(user, forum, last_read):
     """Create a forumsread object for the user and a forum."""
     forumsread = ForumsRead()
     forumsread.user_id = user.id
     forumsread.forum_id = forum.id
-    forumsread.last_read = forumsread_last_read
+    forumsread.last_read = last_read
     forumsread.save()
     return forumsread
+
+
+@pytest.fixture
+def topicsread(user, topic, last_read):
+    """Create a topicsread object for the user and a topic."""
+    topicsread = TopicsRead()
+    topicsread.user_id = user.id
+    topicsread.topic_id = topic.id
+    topicsread.forum_id = topic.forum_id
+    topicsread.last_read = last_read
+    topicsread.save()
+    return topicsread

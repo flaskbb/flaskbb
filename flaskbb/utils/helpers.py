@@ -191,7 +191,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
         days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if read_cutoff is set to 0
-    if read_cutoff == 0:
+    if flaskbb_config["TRACKER_LENGTH"] == 0:
         return False
 
     # check read_cutoff
@@ -310,7 +310,7 @@ def format_date(value, format='%Y-%m-%d'):
     return value.strftime(format)
 
 
-def time_since(time):
+def time_since(time):  # pragma: no cover
     """Returns a string representing time since e.g.
     3 days ago, 5 hours ago.
 
