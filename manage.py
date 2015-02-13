@@ -29,7 +29,7 @@ from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
 from flask_migrate import MigrateCommand, upgrade
 
 from flaskbb import create_app
-from flaskbb.extensions import db
+from flaskbb.extensions import db, plugin_manager
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
                                     create_default_settings, insert_mass_data,
@@ -148,6 +148,9 @@ def init(username=None, password=None, email=None):
     app.logger.info("Creating welcome forum...")
     create_welcome_forum()
 
+    app.logger.info("Compiling translations...")
+    compile_translations()
+
     app.logger.info("Congratulations! FlaskBB has been successfully installed")
 
 
@@ -191,8 +194,9 @@ def update(settings=None, force=False):
 
 @manager.command
 def update_translations():
-    """Updates the translations."""
+    """Updates all translations."""
 
+    # update flaskbb translations
     translations_folder = os.path.join(app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
@@ -200,6 +204,10 @@ def update_translations():
                      "-k", "lazy_gettext", "-o", source_file, "."])
     subprocess.call(["pybabel", "update", "-i", source_file,
                      "-d", translations_folder])
+
+    # updates all plugin translations too
+    for plugin in plugin_manager.all_plugins:
+        update_plugin_translations(plugin)
 
 
 @manager.command
@@ -217,11 +225,15 @@ def add_translations(translation):
 
 @manager.command
 def compile_translations():
-    """Compiles the translations."""
+    """Compiles all translations."""
 
+    # compile flaskbb translations
     translations_folder = os.path.join(app.root_path, "translations")
-
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
+
+    # compile all plugin translations
+    for plugin in plugin_manager.all_plugins:
+        compile_plugin_translations(plugin)
 
 
 # Plugin translation commands
@@ -233,13 +245,13 @@ def add_plugin_translations(plugin, translation):
 
     plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
 
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", "messages.pot",
+                     "-k", "lazy_gettext", "-o", source_file,
                      plugin_folder])
-    subprocess.call(["pybabel", "init", "-i", "messages.pot",
+    subprocess.call(["pybabel", "init", "-i", source_file,
                      "-d", translations_folder, "-l", translation])
-    os.unlink('messages.pot')
 
 
 @manager.command
@@ -248,13 +260,13 @@ def update_plugin_translations(plugin):
 
     plugin_folder = os.path.join(PLUGINS_FOLDER, plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
 
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", "messages.pot",
+                     "-k", "lazy_gettext", "-o", source_file,
                      plugin_folder])
-    subprocess.call(["pybabel", "update", "-i", "messages.pot",
+    subprocess.call(["pybabel", "update", "-i", source_file,
                      "-d", translations_folder])
-    os.unlink("messages.pot")
 
 
 @manager.command
