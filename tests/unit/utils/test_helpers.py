@@ -103,7 +103,7 @@ def test_is_online(default_settings, user):
 
 
 def test_format_date():
-    date = datetime.date(2015, 02, 15)
+    date = datetime.date(2015, 2, 15)
     time = datetime.datetime.combine(date, datetime.datetime.min.time())
     assert format_date(time) == "2015-02-15"
 
