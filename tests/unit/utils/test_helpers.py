@@ -116,5 +116,4 @@ def test_format_quote(topic):
     assert format_quote(topic.first_post) == expected_bbcode
 
     flaskbb_config["MARKUP_TYPE"] = "markdown"
-    print format_quote(topic.first_post)
     assert format_quote(topic.first_post) == expected_markdown
