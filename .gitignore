@@ -47,3 +47,4 @@ flaskbb/configs/development.py
 .tox
 *.rdb
 .cache
+*.mo
