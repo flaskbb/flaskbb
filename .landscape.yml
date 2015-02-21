@@ -1,7 +1,7 @@
 doc-warnings: false
 test-warnings: false
 strictness: veryhigh
-max-line-length: 79
+max-line-length: 80
 autodetect: yes
 requirements:
     - requirements.txt
@@ -10,8 +10,17 @@ ignore-paths:
     - migrations
     - flaskbb/configs
     - wsgi.py
+    - flaskbb/_compat.py
 pep8:
   full: true
   disable:
     - E711
     - E712
+
+pylint:
+  disable:
+    - too-few-public-methods
+    - too-many-public-methods
+    - too-many-locals
+    - invalid-name
+    - unused-argument
