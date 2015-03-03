@@ -1,6 +1,8 @@
 import os
 
 import babel
+from flask import _request_ctx_stack
+
 from flask_babelex import Domain, get_locale
 from flask_plugins import get_plugins_list
 
@@ -25,15 +27,16 @@ class FlaskBBDomain(Domain):
                 for plugin in get_plugins_list()
             ]
 
-    def get_translations_cache(self):
-        return self.cache
-
     def get_translations(self):
         """Returns the correct gettext translations that should be used for
         this request.  This will never fail and return a dummy translation
         object if used outside of the request or if a translation cannot be
         found.
         """
+        ctx = _request_ctx_stack.top
+        if ctx is None:
+            return babel.support.NullTranslations()
+
         locale = get_locale()
 
         cache = self.get_translations_cache()
