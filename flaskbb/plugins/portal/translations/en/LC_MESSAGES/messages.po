@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-01-05 21:38+0100\n"
+"POT-Creation-Date: 2015-02-13 14:26+0100\n"
 "PO-Revision-Date: 2015-01-05 21:38+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -22,5 +21,5 @@ msgstr ""
 msgid ""
 "Please install the plugin first to configure the forums which should be "
 "displayed"
-msgstr ""
+msgstr "Please install the plugin first in order to configure which forums are displayed."
 

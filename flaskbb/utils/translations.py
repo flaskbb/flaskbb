@@ -1,7 +1,6 @@
 import os
 
 import babel
-from flask import _request_ctx_stack
 
 from flask_babelex import Domain, get_locale
 from flask_plugins import get_plugins_list
@@ -20,6 +19,7 @@ class FlaskBBDomain(Domain):
         self.flaskbb_translations = os.path.join(
             self.app.root_path, "translations"
         )
+
         # Plugin translations
         with self.app.app_context():
             self.plugin_translations = [
@@ -33,12 +33,7 @@ class FlaskBBDomain(Domain):
         object if used outside of the request or if a translation cannot be
         found.
         """
-        ctx = _request_ctx_stack.top
-        if ctx is None:
-            return babel.support.NullTranslations()
-
         locale = get_locale()
-
         cache = self.get_translations_cache()
 
         translations = cache.get(str(locale))
@@ -49,6 +44,11 @@ class FlaskBBDomain(Domain):
                 locales=locale,
                 domain="messages"
             )
+
+            # If no compiled translations are found, return the
+            # NullTranslations object.
+            if not isinstance(translations, babel.support.Translations):
+                return translations
 
             # now load and add the plugin translations
             for plugin in self.plugin_translations:
