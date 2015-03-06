@@ -34,6 +34,7 @@ Unidecode==0.4.17
 Werkzeug==0.9.6
 Whoosh==2.6.0
 WTForms==2.0.1
+requests==2.5.3
 https://github.com/sh4nks/flask-babelex/tarball/master#egg=Flask-BabelEx
 https://github.com/frol/postmarkup/tarball/master#egg=postmarkup
 https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-Whooshalchemy
