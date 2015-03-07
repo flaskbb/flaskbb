@@ -20,12 +20,7 @@ from flaskbb.user.models import User, PrivateMessage
 from flaskbb.extensions import db
 from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.utils.fields import BirthdayField
-
-
-IMG_RE = r'^[^/\\]\.(?:jpg|gif|png)'
-
-is_image = regexp(IMG_RE,
-                  message=_("Only jpg, jpeg, png and gifs are allowed!"))
+from flaskbb.utils.helpers import check_image
 
 
 class GeneralSettingsForm(Form):
@@ -112,6 +107,13 @@ class ChangeUserDetailsForm(Form):
     def validate_birthday(self, field):
         if field.data is None:
             return True
+
+    def validate_avatar(self, field):
+        if field.data is not None:
+            error, status = check_image(field.data)
+            if error is not None:
+                raise ValidationError(error)
+            return status
 
 
 class NewMessageForm(Form):

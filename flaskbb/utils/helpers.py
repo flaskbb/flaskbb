@@ -367,7 +367,6 @@ def get_image_info(url):
     width = -1
     content_type = ''
 
-    #image_size     size = file.headers.get("content-length")
     if size:
         size = int(size)
 
@@ -382,8 +381,8 @@ def get_image_info(url):
     # See PNG 2. Edition spec (http://www.w3.org/TR/PNG/)
     # Bytes 0-7 are below, 4-byte chunk length, then 'IHDR'
     # and finally the 4-byte width, height
-    elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n')
-          and (data[12:16] == b'IHDR')):
+    elif ((size >= 24) and data.startswith(b'\211PNG\r\n\032\n') and
+            (data[12:16] == b'IHDR')):
         content_type = 'image/png'
         w, h = struct.unpack(b">LL", data[16:24])
         width = int(w)
@@ -428,3 +427,43 @@ def get_image_info(url):
 
     return {"content-type": content_type, "size": image_size,
             "width": width, "height": height}
+
+
+def check_image(url):
+    """A little wrapper for the :func:`get_image_info` function.
+    If the image doesn't match the ``flaskbb_config`` settings it will
+    return a tuple with a the first value is the custom error message and
+    the second value ``False`` for not passing the check.
+    If the check is successful, it will return ``None`` for the error message
+    and ``True`` for the passed check.
+
+    :param url: The image url to be checked.
+    """
+    img_info = get_image_info(url)
+    error = None
+
+    if not img_info["content-type"] in flaskbb_config["AVATAR_TYPES"]:
+        error = "Image type is not allowed. Allowed types are: {}".format(
+            ", ".join(flaskbb_config["AVATAR_TYPES"])
+        )
+        return error, False
+
+    if img_info["width"] > flaskbb_config["AVATAR_WIDTH"]:
+        error = "Image is too wide! {}px width is allowed.".format(
+            flaskbb_config["AVATAR_WIDTH"]
+        )
+        return error, False
+
+    if img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]:
+        error = "Image is too high! {}px height is allowed.".format(
+            flaskbb_config["AVATAR_HEIGHT"]
+        )
+        return error, False
+
+    if img_info["size"] > flaskbb_config["AVATAR_SIZE"]:
+        error = "Image is too big! {}kb are allowed.".format(
+            flaskbb_config["AVATAR_SIZE"]
+        )
+        return error, False
+
+    return error, True

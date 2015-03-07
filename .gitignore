@@ -48,3 +48,4 @@ flaskbb/configs/development.py
 *.rdb
 .cache
 *.mo
+.coverage

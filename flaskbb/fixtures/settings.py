@@ -21,6 +21,10 @@ def available_markups():
     return [('bbcode', 'BBCode'), ('markdown', 'Markdown')]
 
 
+def available_avatar_types():
+    return [("image/png", "PNG"), ("image/jpeg", "JPG"), ("image/gif", "GIF")]
+
+
 def available_languages():
     return [(locale.language, locale.display_name)
             for locale in babel.list_translations()]
@@ -98,6 +102,34 @@ fixture = (
                 'extra':        {'choices': available_markups},
                 'name':         "Post markup",
                 'description':  "Select post markup type."
+            }),
+            ('avatar_height', {
+                'value':        150,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Avatar Height",
+                'description':  "The allowed height of an avatar in pixels."
+            }),
+            ('avatar_width', {
+                'value':        150,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Avatar Width",
+                'description':  "The allowed width of an avatar in pixels."
+            }),
+            ('avatar_size', {
+                'value':        200,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Avatar Size",
+                'description':  "The allowed size of the avatar in kilobytes."
+            }),
+            ('avatar_types', {
+                'value':        ["image/png", "image/jpeg", "image/gif"],
+                'value_type':   "selectmultiple",
+                'extra':        {"choices": available_avatar_types},
+                'name':         "Avatar Types",
+                'description':  "The allowed types of an avatar. Such as JPEG, GIF or PNG."
             })
         ),
     }),

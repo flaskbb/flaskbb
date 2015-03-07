@@ -1,7 +1,8 @@
 #-*- coding: utf-8 -*-
 import datetime
 from flaskbb.utils.helpers import slugify, forum_is_unread, topic_is_unread, \
-    crop_title, render_markup, is_online, format_date, format_quote
+    crop_title, render_markup, is_online, format_date, format_quote, \
+    get_image_info, check_image
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import Forum
 
@@ -117,3 +118,63 @@ def test_format_quote(topic):
 
     flaskbb_config["MARKUP_TYPE"] = "markdown"
     assert format_quote(topic.first_post) == expected_markdown
+
+
+def test_get_image_info():
+    # some random jpg/gif/png images from my imgur account
+    jpg = "http://i.imgur.com/NgVIeRG.jpg"
+    gif = "http://i.imgur.com/l3Vmp4m.gif"
+    png = "http://i.imgur.com/JXzKxNs.png"
+
+    jpg_img = get_image_info(jpg)
+    assert jpg_img["content-type"] == "image/jpeg"
+    assert jpg_img["height"] == 1024
+    assert jpg_img["width"] == 1280
+    assert jpg_img["size"] == 209.06
+
+    gif_img = get_image_info(gif)
+    assert gif_img["content-type"] == "image/gif"
+    assert gif_img["height"] == 168
+    assert gif_img["width"] == 400
+    assert gif_img["size"] == 576.138
+
+    png_img = get_image_info(png)
+    assert png_img["content-type"] == "image/png"
+    assert png_img["height"] == 1080
+    assert png_img["width"] == 1920
+    assert png_img["size"] == 269.409
+
+
+def test_check_image(default_settings):
+    # test200x100.png
+    img_width = "http://i.imgur.com/4dAWAZI.png"
+    # test100x200.png
+    img_height = "http://i.imgur.com/I7GwF3D.png"
+    # test100x100.png
+    img_ok = "http://i.imgur.com/CYV6NzT.png"
+    # random too big image
+    img_size = "http://i.imgur.com/l3Vmp4m.gif"
+    # random image wrong type
+    img_type = "https://d11xdyzr0div58.cloudfront.net/static/logos/archlinux-logo-black-scalable.f931920e6cdb.svg"
+
+    data = check_image(img_width)
+    assert "wide" in data[0]
+    assert not data[1]
+
+    data = check_image(img_height)
+    assert "high" in data[0]
+    assert not data[1]
+
+    data = check_image(img_type)
+    assert "type" in data[0]
+    assert not data[1]
+
+    data = check_image(img_ok)
+    assert data[0] is None
+    assert data[1]
+
+    flaskbb_config["AVATAR_WIDTH"] = 1000
+    flaskbb_config["AVATAR_HEIGHT"] = 1000
+    data = check_image(img_size)
+    assert "big" in data[0]
+    assert not data[1]
