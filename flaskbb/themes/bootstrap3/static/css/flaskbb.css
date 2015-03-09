@@ -226,3 +226,12 @@ margin-bottom: 0px;
 .preview-body {
     height: auto;
 }
+
+.inline-form {
+  display: inline;
+  padding: 0px;
+}
+
+.inline-form .btn-link {
+  padding: 0px;
+}

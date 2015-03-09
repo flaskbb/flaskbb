@@ -178,8 +178,8 @@ def new_topic(forum_id, slug=None):
     )
 
 
-@forum.route("/topic/<int:topic_id>/delete")
-@forum.route("/topic/<int:topic_id>-<slug>/delete")
+@forum.route("/topic/<int:topic_id>/delete", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/delete", methods=["POST"])
 @login_required
 def delete_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -397,9 +397,9 @@ def edit_post(post_id):
     return render_template("forum/new_post.html", topic=post.topic, form=form)
 
 
-@forum.route("/post/<int:post_id>/delete")
+@forum.route("/post/<int:post_id>/delete", methods=["POST"])
 @login_required
-def delete_post(post_id, slug=None):
+def delete_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     # TODO: Bulk delete

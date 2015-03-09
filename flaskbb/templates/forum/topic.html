@@ -121,11 +121,17 @@
                     {% endif %}
                     {% if topic.first_post_id == post.id %}
                         {% if current_user|delete_topic(topic) %}
-                        <a href="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">{% trans %}Delete{% endtrans %}</a> |
+                        <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button> |
+                        </form>
                         {% endif %}
                     {% else %}
                         {% if current_user|delete_post(post) %}
-                        <a href="{{ url_for('forum.delete_post', post_id=post.id) }}">{% trans %}Delete{% endtrans %}</a> |
+                        <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button> |
+                        </form>
                         {% endif %}
                     {% endif %}
                     {% if current_user|post_reply(topic) %}

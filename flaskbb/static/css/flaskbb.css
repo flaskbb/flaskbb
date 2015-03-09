@@ -188,3 +188,12 @@ margin-bottom: 0px;
   border-top-right-radius: 0;
 }
 /* End sidebar */
+
+.inline-form {
+  display: inline;
+  padding: 0px;
+}
+
+.inline-form .btn-link {
+  padding: 0px;
+}

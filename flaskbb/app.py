@@ -32,7 +32,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel
+    debugtoolbar, migrate, themes, plugin_manager, babel, csrf
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -81,6 +81,9 @@ def configure_blueprints(app):
 
 def configure_extensions(app):
     """Configures the extensions."""
+
+    # Flask-WTF CSRF
+    csrf.init_app(app)
 
     # Flask-Plugins
     plugin_manager.init_app(app)
