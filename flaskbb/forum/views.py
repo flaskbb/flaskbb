@@ -196,8 +196,8 @@ def delete_topic(topic_id, slug=None):
     return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 
-@forum.route("/topic/<int:topic_id>/lock")
-@forum.route("/topic/<int:topic_id>-<slug>/lock")
+@forum.route("/topic/<int:topic_id>/lock", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/lock", methods=["POST"])
 @login_required
 def lock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -214,8 +214,8 @@ def lock_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:topic_id>/unlock")
-@forum.route("/topic/<int:topic_id>-<slug>/unlock")
+@forum.route("/topic/<int:topic_id>/unlock", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/unlock", methods=["POST"])
 @login_required
 def unlock_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -233,8 +233,8 @@ def unlock_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:topic_id>/highlight")
-@forum.route("/topic/<int:topic_id>-<slug>/highlight")
+@forum.route("/topic/<int:topic_id>/highlight", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/highlight", methods=["POST"])
 @login_required
 def highlight_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -249,8 +249,8 @@ def highlight_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:topic_id>/trivialize")
-@forum.route("/topic/<int:topic_id>-<slug>/trivialize")
+@forum.route("/topic/<int:topic_id>/trivialize", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/trivialize", methods=["POST"])
 @login_required
 def trivialize_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -536,8 +536,8 @@ def topictracker():
     return render_template("forum/topictracker.html", topics=topics)
 
 
-@forum.route("/topictracker/<int:topic_id>/add")
-@forum.route("/topictracker/<int:topic_id>-<slug>/add")
+@forum.route("/topictracker/<int:topic_id>/add", methods=["POST"])
+@forum.route("/topictracker/<int:topic_id>-<slug>/add", methods=["POST"])
 @login_required
 def track_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -546,8 +546,8 @@ def track_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topictracker/<int:topic_id>/delete")
-@forum.route("/topictracker/<int:topic_id>-<slug>/delete")
+@forum.route("/topictracker/<int:topic_id>/delete", methods=["POST"])
+@forum.route("/topictracker/<int:topic_id>-<slug>/delete", methods=["POST"])
 @login_required
 def untrack_topic(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
