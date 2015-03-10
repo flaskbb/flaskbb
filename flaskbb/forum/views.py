@@ -266,9 +266,10 @@ def trivialize_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:topic_id>/move/<int:forum_id>")
+@forum.route("/topic/<int:topic_id>/move/<int:forum_id>", methods=["POST"])
 @forum.route(
-    "/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>"
+    "/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>",
+    methods=["POST"]
 )
 @login_required
 def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
@@ -292,8 +293,11 @@ def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:old_id>/merge/<int:new_id>")
-@forum.route("/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>")
+@forum.route("/topic/<int:old_id>/merge/<int:new_id>", methods=["POST"])
+@forum.route(
+    "/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>",
+    methods=["POST"]
+)
 @login_required
 def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
     _old_topic = Topic.query.filter_by(id=old_id).first_or_404()
@@ -441,9 +445,9 @@ def raw_post(post_id):
     return format_quote(post)
 
 
-@forum.route("/markread")
-@forum.route("/<int:forum_id>/markread")
-@forum.route("/<int:forum_id>-<slug>/markread")
+@forum.route("/markread", methods=["POST"])
+@forum.route("/<int:forum_id>/markread", methods=["POST"])
+@forum.route("/<int:forum_id>-<slug>/markread", methods=["POST"])
 @login_required
 def markread(forum_id=None, slug=None):
     # Mark a single forum as read
@@ -493,7 +497,7 @@ def markread(forum_id=None, slug=None):
     return redirect(url_for("forum.index"))
 
 
-@forum.route("/who_is_online")
+@forum.route("/who-is-online")
 def who_is_online():
     if current_app.config['REDIS_ENABLED']:
         online_users = get_online_users()

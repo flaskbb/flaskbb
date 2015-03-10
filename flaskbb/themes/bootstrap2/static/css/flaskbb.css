@@ -26,6 +26,10 @@ body {
   padding-right: 15px;
 }
 
+.pagination {
+  margin: 0;
+}
+
 .pagination-text {
   cursor: default;
   background-color: #fff;
