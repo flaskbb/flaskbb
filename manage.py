@@ -48,7 +48,7 @@ manager = Manager(app)
 PLUGINS_FOLDER = os.path.join(app.root_path, "plugins")
 
 # Run local server
-manager.add_command("runserver", Server("localhost", port=8080))
+manager.add_command("runserver", Server("0.0.0.0", port=8080))
 
 # Migration commands
 manager.add_command('db', MigrateCommand)
