@@ -26,7 +26,6 @@
     </head>
 
     <body>
-        <div id="wrap">
         {% block navigation %}
         {%- from theme("macros.html") import topnav with context -%}
         <!-- Navigation -->
@@ -112,7 +111,6 @@
                 {% block content %}
                 {% endblock %}
             </div> <!-- /container -->
-        </div> <!-- End wrap -->
 
             {% block footer %}
             <div id="footer">

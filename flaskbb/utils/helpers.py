@@ -21,13 +21,12 @@ from flask import session, url_for
 from babel.dates import format_timedelta
 from flask_themes2 import render_theme_template
 from flask_login import current_user
-from postmarkup import render_bbcode
-from markdown2 import markdown as render_markdown
 import unidecode
 
 from flaskbb._compat import range_method, text_type
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.markup import markdown
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -273,15 +272,11 @@ def crop_title(title, suffix="..."):
 
 
 def render_markup(text):
-    """Renders the given text as bbcode
+    """Renders the given text as markdown
 
-    :param text: The text that should be rendered as bbcode
+    :param text: The text that should be rendered as markdown
     """
-    if flaskbb_config['MARKUP_TYPE'] == 'bbcode':
-        return render_bbcode(text)
-    elif flaskbb_config['MARKUP_TYPE'] == 'markdown':
-        return render_markdown(text, extras=['tables'])
-    return text
+    return markdown.render(text)
 
 
 def is_online(user):
@@ -333,21 +328,12 @@ def format_quote(post):
 
     :param post: The quoted post.
     """
-    if flaskbb_config['MARKUP_TYPE'] == 'markdown':
-        profile_url = url_for('user.profile', username=post.username)
-        content = "\n> ".join(post.content.strip().split('\n'))
-        quote = "**[{post.username}]({profile_url}) wrote:**\n> {content}\n".\
-                format(post=post, profile_url=profile_url, content=content)
+    profile_url = url_for('user.profile', username=post.username)
+    content = "\n> ".join(post.content.strip().split('\n'))
+    quote = "**[{post.username}]({profile_url}) wrote:**\n> {content}\n".\
+            format(post=post, profile_url=profile_url, content=content)
 
-        return quote
-    else:
-        profile_url = url_for('user.profile', username=post.username,
-                              _external=True)
-        # just ignore this long line :P
-        quote = '[b][url={profile_url}]{post.username}[/url] wrote:[/b][quote]{post.content}[/quote]\n'.\
-                format(post=post, profile_url=profile_url)
-
-        return quote
+    return quote
 
 
 def get_image_info(url):

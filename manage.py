@@ -20,6 +20,7 @@
 import sys
 import os
 import subprocess
+import requests
 
 from flask import current_app
 from werkzeug.utils import import_string
@@ -278,6 +279,26 @@ def compile_plugin_translations(plugin):
 
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
 
+
+@manager.command
+def download_emoji():
+    """Downloads emojis from emoji-cheat-sheet.com."""
+    HOSTNAME = "https://api.github.com"
+    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"
+    FULL_URL = "{}{}".format(HOSTNAME, REPO)
+    DOWNLOAD_PATH = os.path.join(app.static_folder, "emoji")
+
+    response = requests.get(FULL_URL)
+
+    for image in response.json():
+        if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
+            print "%s does not exist." % os.path.abspath(DOWNLOAD_PATH)
+            sys.exit(1)
+
+        full_path = os.path.join(DOWNLOAD_PATH, image["name"])
+        f = open(full_path, 'wb')
+        f.write(requests.get(image["download_url"]).content)
+        f.close()
 
 if __name__ == "__main__":
     manager.run()

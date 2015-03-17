@@ -17,10 +17,6 @@ def available_themes():
     return [(theme.identifier, theme.name) for theme in get_themes_list()]
 
 
-def available_markups():
-    return [('bbcode', 'BBCode'), ('markdown', 'Markdown')]
-
-
 def available_avatar_types():
     return [("image/png", "PNG"), ("image/jpeg", "JPG"), ("image/gif", "GIF")]
 
@@ -95,13 +91,6 @@ fixture = (
                 'extra':        {'min': 0},
                 'name':         "Tracker length",
                 'description':  "The days for how long the forum should deal with unread topics. 0 to disable it."
-            }),
-            ('markup_type', {
-                'value':        "bbcode",
-                'value_type':   "select",
-                'extra':        {'choices': available_markups},
-                'name':         "Post markup",
-                'description':  "Select post markup type."
             }),
             ('avatar_height', {
                 'value':        150,

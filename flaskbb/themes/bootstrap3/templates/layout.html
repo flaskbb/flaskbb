@@ -19,14 +19,13 @@
 
         {% block css %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/code.css') }}">
-        <link rel="stylesheet" href="{{ url_for('css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('css/font-awesome.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('css/flaskbb.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+        <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
         {% endblock %}
     </head>
 
     <body>
-        <div id="wrap">
         {% block navigation %}
         {%- from theme("macros.html") import topnav with context -%}
         <!-- Navigation -->
@@ -112,13 +111,12 @@
                 {% block content %}
                 {% endblock %}
             </div> <!-- /container -->
-        </div> <!-- End wrap -->
 
             {% block footer %}
-            <div id="footer">
+            <div class="footer">
                 <div class="container">
-                    <p class="text-muted credit pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
-                    <p class="text-muted credit pull-right">&copy; 2013 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                    <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                    <p class="text-muted pull-right">&copy; 2013 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
                 </div>
             </div>
             {% endblock %}
