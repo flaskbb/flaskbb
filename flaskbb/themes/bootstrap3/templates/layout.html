@@ -19,9 +19,9 @@
 
         {% block css %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/code.css') }}">
-        <link rel="stylesheet" href="{{ theme_static('css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ theme_static('css/font-awesome.min.css') }}">
-        <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
+        <link rel="stylesheet" href="{{ url_for('css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('css/font-awesome.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('css/flaskbb.css') }}">
         {% endblock %}
     </head>
 
