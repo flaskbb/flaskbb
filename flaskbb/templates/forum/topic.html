@@ -2,6 +2,11 @@
 {% set page_title = _("%(title)s - Topic", title=topic.title) %}
 {% set active_forum_nav=True %}
 
+{% block css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
+{% endblock %}
+
 {% block content %}
 {% from theme('macros.html') import render_pagination, form_field %}
 
@@ -154,9 +159,11 @@
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
 
-        {{ render_field(form.content, div_class="col-sm-12 reply-content", rows=5) }}
-        {{ render_submit_field(form.submit) }}
+        {{ render_field(form.content, div_class="col-sm-12", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
 
+        <div class="col-sm-12" style="padding-top: 5px">
+        {{ render_submit_field(form.submit) }}
+        </div>
     </form>
 {% endif %}
 
@@ -164,4 +171,6 @@
 
 {% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}

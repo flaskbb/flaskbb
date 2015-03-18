@@ -22,15 +22,15 @@
 {%- macro render_quickreply(field, rows, cols, div_class='') -%}
 {%- if kwargs['required'] or field.flags.required -%}
     {% if div_class %}
-        {{ field(class=div_class, required="required", cols=cols, rows=rows, placeholder=field.label.text) }}
+        {{ field(class=div_class, required="required", cols=cols, rows=rows, placeholder=field.label.text, **kwargs) }}
     {% else %}
-        {{ field(class="new-message", required="required", cols=cols, rows=row, placeholder=field.label.text) }}
+        {{ field(class="new-message", required="required", cols=cols, rows=row, placeholder=field.label.text, **kwargs) }}
     {% endif %}
 {%- else -%}
     {% if div_class %}
-        {{ field(class=div_class, cols=cols, rows=row, placeholder=field.label.text) }}
+        {{ field(class=div_class, cols=cols, rows=row, placeholder=field.label.text, **kwargs) }}
     {% else %}
-        {{ field(class="new-message", cols=cols, rows=row, placeholder=field.label.text) }}
+        {{ field(class="new-message", cols=cols, rows=row, placeholder=field.label.text, **kwargs) }}
     {% endif %}
 {%- endif -%}
 
@@ -122,15 +122,15 @@
 
         {%- if kwargs['required'] or field.flags.required -%}
             {% if rows %}
-                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text) }}
+                {{ field(class="form-control", required="required", rows=rows, placeholder=field.label.text, **kwargs) }}
             {% else %}
-                {{ field(class="form-control", required="required", placeholder=field.label.text) }}
+                {{ field(class="form-control", required="required", placeholder=field.label.text, **kwargs) }}
             {% endif %}
         {%- else -%}
             {% if rows %}
-                {{ field(class="form-control", rows=rows, placeholder=field.label.text) }}
+                {{ field(class="form-control", rows=rows, placeholder=field.label.text, **kwargs) }}
             {% else %}
-                {{ field(class="form-control", placeholder=field.label.text) }}
+                {{ field(class="form-control", placeholder=field.label.text, **kwargs) }}
             {% endif %}
         {%- endif -%}
 
