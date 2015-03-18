@@ -1,24 +1,22 @@
 .PHONY: clean
 
 help:
-	    @echo "  clean       remove unwanted stuff"
-	    @echo "  release     package and upload a release"
-	    @echo "  develop     make a development package"
-	    @echo "  sdist       package"
+	    @echo "  clean      remove unwanted stuff"
+	    @echo "  install    install testend"
+	    @echo "  tests       run the testsuite"
+	    @echo "  run        run the development server"
 
 clean:
 	    find . -name '*.pyc' -exec rm -f {} +
 	    find . -name '*.pyo' -exec rm -f {} +
 	    find . -name '*~' -exec rm -f {} +
+	    find . -name '__pycache__' -exec rm -rf {} +
 
-release: register
-	    python setup.py sdist upload
+tests:
+	    py.test --cov=flaskbb --cov-report=term-missing tests
 
-register:
-	    python setup.py register
+run:
+	    python manage.py runserver
 
-sdist:
-	    python setup.py sdist
-
-develop:
-	    python setup.py develop
+install:
+	    python manage.py install

@@ -17,6 +17,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from __future__ import print_function
 import sys
 import os
 import subprocess
@@ -83,11 +84,11 @@ def populate(dropdb=False, createdb=False):
     """
 
     if not dropdb:
-        app.logger.info("Dropping database...")
+        print("Dropping database...")
         db.drop_all()
 
     if not createdb:
-        app.logger.info("Creating database...")
+        print("Creating database...")
         upgrade()
 
     app.logger.info("Creating test data...")
@@ -111,16 +112,15 @@ def create_admin(username=None, password=None, email=None):
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-def init(username=None, password=None, email=None):
-    """Initializes FlaskBB with all necessary data."""
+def install(username=None, password=None, email=None):
+    """Installs FlaskBB with all necessary data."""
 
-    app.logger.info("Creating default data...")
+    print("Creating default data...")
     try:
         create_default_groups()
         create_default_settings()
     except IntegrityError:
-        app.logger.error("Couldn't create the default data because it already "
-                         "exist!")
+        print("Couldn't create the default data because it already exist!")
         if prompt_bool("Found an existing database."
                        "Do you want to recreate the database? (y/n)"):
             db.session.rollback()
@@ -131,7 +131,7 @@ def init(username=None, password=None, email=None):
         else:
             sys.exit(0)
     except OperationalError:
-        app.logger.error("No database found.")
+        print("No database found.")
         if prompt_bool("Do you want to create the database now? (y/n)"):
             db.session.rollback()
             upgrade()
@@ -140,19 +140,23 @@ def init(username=None, password=None, email=None):
         else:
             sys.exit(0)
 
-    app.logger.info("Creating admin user...")
+    print("Creating admin user...")
     if username and password and email:
         create_admin_user(username=username, password=password, email=email)
     else:
         create_admin()
 
-    app.logger.info("Creating welcome forum...")
+    print("Creating welcome forum...")
     create_welcome_forum()
 
-    app.logger.info("Compiling translations...")
+    print("Compiling translations...")
     compile_translations()
 
-    app.logger.info("Congratulations! FlaskBB has been successfully installed")
+    if prompt_bool("Do you want to use Emojis? (y/n)"):
+        print("Downloading emojis. This can take a few minutes.")
+        download_emoji()
+
+    print("Congratulations! FlaskBB has been successfully installed")
 
 
 @manager.command
@@ -182,15 +186,11 @@ def update(settings=None, force=False):
     if force:
         count = update_settings_from_fixture(fixture, overwrite_group=True,
                                              overwrite_setting=True)
-        app.logger.info(
-            "{} groups and {} settings forcefully updated."
-            .format(count[0], count[1])
-        )
+        print("{} groups and {} settings forcefully updated.".format(
+            count[0], count[1]))
     else:
         count = update_settings_from_fixture(fixture)
-        app.logger.info(
-            "{} groups and {} settings updated.".format(count[0], count[1])
-        )
+        print("{} groups and {} settings updated.".format(count[0], count[1]))
 
 
 @manager.command
@@ -292,13 +292,16 @@ def download_emoji():
 
     for image in response.json():
         if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
-            print "%s does not exist." % os.path.abspath(DOWNLOAD_PATH)
+            print("{} does not exist.".format(os.path.abspath(DOWNLOAD_PATH)))
             sys.exit(1)
 
         full_path = os.path.join(DOWNLOAD_PATH, image["name"])
-        f = open(full_path, 'wb')
-        f.write(requests.get(image["download_url"]).content)
-        f.close()
+        if not os.path.exists(full_path):
+            f = open(full_path, 'wb')
+            f.write(requests.get(image["download_url"]).content)
+            f.close()
+
+    print("Finshed downloading emojis.")
 
 if __name__ == "__main__":
     manager.run()

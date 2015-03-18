@@ -49,3 +49,4 @@ flaskbb/configs/development.py
 .cache
 *.mo
 .coverage
+flaskbb/static/emoji/*
