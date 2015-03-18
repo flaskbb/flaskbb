@@ -2,6 +2,12 @@
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
+
+{% block css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
+{% endblock %}
+
 {% block content %}
 {% from theme("macros.html") import render_field, render_submit_field %}
 
@@ -29,10 +35,14 @@
     {% endif %}
 
     {{ render_field(form.title, div_class="col-sm-12") }}
-    {{ render_field(form.content, div_class="col-sm-12", rows=12) }}
+    {{ render_field(form.content, div_class="col-sm-12", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
 
     {{ render_submit_field(form.submit) }}
-    {{ render_submit_field(form.preview) }}
 </form>
 
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
