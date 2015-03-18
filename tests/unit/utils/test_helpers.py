@@ -86,17 +86,7 @@ def test_crop_title(default_settings):
 
 def test_render_markup(default_settings):
     markdown = "**Bold**"
-    bbcode = "[b]Bold[/b]"
-    no_markup = "Bold"
-
-    flaskbb_config["MARKUP_TYPE"] = "markdown"
     assert render_markup(markdown) == "<p><strong>Bold</strong></p>\n"
-
-    flaskbb_config["MARKUP_TYPE"] = "bbcode"
-    assert render_markup(bbcode) == "<strong>Bold</strong>"
-
-    flaskbb_config["MARKUP_TYPE"] = "text"
-    assert render_markup(no_markup) == "Bold"
 
 
 def test_is_online(default_settings, user):
@@ -110,13 +100,7 @@ def test_format_date():
 
 
 def test_format_quote(topic):
-    expected_bbcode = "[b][url=http://localhost:5000/user/test_normal]test_normal[/url] wrote:[/b][quote]Test Content Normal[/quote]\n"
     expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"
-
-    flaskbb_config["MARKUP_TYPE"] = "bbcode"
-    assert format_quote(topic.first_post) == expected_bbcode
-
-    flaskbb_config["MARKUP_TYPE"] = "markdown"
     assert format_quote(topic.first_post) == expected_markdown
 
 
