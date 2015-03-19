@@ -255,7 +255,7 @@ def edit_message(message_id):
                            title=_("Edit Message"))
 
 
-@user.route("/messages/<int:message_id>/move")
+@user.route("/messages/<int:message_id>/move", methods=["POST"])
 @login_required
 def move_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
@@ -265,7 +265,7 @@ def move_message(message_id):
     return redirect(url_for("user.inbox"))
 
 
-@user.route("/messages/<int:message_id>/restore")
+@user.route("/messages/<int:message_id>/restore", methods=["POST"])
 @login_required
 def restore_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()
@@ -275,7 +275,7 @@ def restore_message(message_id):
     return redirect(url_for("user.inbox"))
 
 
-@user.route("/messages/<int:message_id>/delete")
+@user.route("/messages/<int:message_id>/delete", methods=["POST"])
 @login_required
 def delete_message(message_id):
     message = PrivateMessage.query.filter_by(id=message_id).first_or_404()

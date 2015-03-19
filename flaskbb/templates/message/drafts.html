@@ -18,8 +18,11 @@
             <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{% if message.subject %}{{ message.subject }}{% else %}({% trans %}No Subject{% endtrans %}){% endif %}</a></td>
             <td>{{ message.date_created|format_date('%d %B %Y') }}</td>
             <td>
-                <a href="{{ url_for('user.edit_message', message_id=message.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                <a href="{{ url_for('user.move_message', message_id=message.id) }}">{% trans %}Delete{% endtrans %}</a>
+                <a href="{{ url_for('user.edit_message', message_id=message.id) }}">{% trans %}Continue{% endtrans %}</a> |
+                <form class="inline-form" method="post" action="{{ url_for('user.move_message', message_id=message.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                </form>
             </td>
         </tr>
         {% else %}

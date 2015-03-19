@@ -21,7 +21,12 @@
         {% endif %}
             <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{{ message.subject }}</a></td>
             <td>{{ message.date_created|time_since }}</td>
-            <td><a href="{{ url_for('user.move_message', message_id=message.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+            <td>
+                <form class="inline-form" method="post" action="{{ url_for('user.move_message', message_id=message.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                </form>
+            </td>
         </tr>
         {% else %}
         <tr>
