@@ -35,7 +35,10 @@
                 <td>{{ group.description }}</td>
                 <td>
                     <a href="{{ url_for('management.edit_group', group_id = group.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    <a href="{{ url_for('management.delete_group', group_id = group.id) }}">{% trans %}Delete{% endtrans %}</a>
+                    <form class="inline-form" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

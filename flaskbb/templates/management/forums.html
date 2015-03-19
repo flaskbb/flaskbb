@@ -26,7 +26,10 @@
                 <td valign="top" align="center" style="white-space: nowrap">
                     <a href="{{ url_for('management.add_forum', category_id=category.id) }}">{% trans %}Add Forum{% endtrans %}</a> |
                     <a href="{{ url_for('management.edit_category', category_id = category.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    <a href="{{ url_for('management.delete_category', category_id = category.id) }}">{% trans %}Delete{% endtrans %}</a>
+                    <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                    </form>
                 </td>
             </tr>
         </thead>
@@ -54,7 +57,10 @@
 
                 <td valign="top" align="center" style="white-space: nowrap">
                     <a href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    <a href="{{ url_for('management.delete_forum', forum_id = forum.id) }}">{% trans %}Delete{% endtrans %}</a>
+                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

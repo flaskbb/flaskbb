@@ -148,7 +148,7 @@ def edit_user(user_id):
                            title=_("Edit User"))
 
 
-@management.route("/users/<int:user_id>/delete")
+@management.route("/users/<int:user_id>/delete", methods=["POST"])
 @admin_required
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
@@ -170,7 +170,7 @@ def add_user():
                            title=_("Add User"))
 
 
-@management.route("/users/banned")
+@management.route("/users/banned", methods=["GET", "POST"])
 @moderator_required
 def banned_users():
     page = request.args.get("page", 1, type=int)
@@ -192,7 +192,7 @@ def banned_users():
                            search_form=search_form)
 
 
-@management.route("/users/<int:user_id>/ban", methods=["GET", "POST"])
+@management.route("/users/<int:user_id>/ban", methods=["POST"])
 @moderator_required
 def ban_user(user_id):
     if not can_ban_user(current_user):
@@ -217,7 +217,7 @@ def ban_user(user_id):
     return redirect(url_for("management.banned_users"))
 
 
-@management.route("/users/<int:user_id>/unban", methods=["GET", "POST"])
+@management.route("/users/<int:user_id>/unban", methods=["POST"])
 @moderator_required
 def unban_user(user_id):
     if not can_ban_user(current_user):
@@ -259,8 +259,8 @@ def unread_reports():
     return render_template("management/unread_reports.html", reports=reports)
 
 
-@management.route("/reports/<int:report_id>/markread")
-@management.route("/reports/markread")
+@management.route("/reports/<int:report_id>/markread", methods=["POST"])
+@management.route("/reports/markread", methods=["POST"])
 @moderator_required
 def report_markread(report_id=None):
     # mark single report as read
@@ -327,7 +327,7 @@ def edit_group(group_id):
                            title=_("Edit Group"))
 
 
-@management.route("/groups/<int:group_id>/delete")
+@management.route("/groups/<int:group_id>/delete", methods=["POST"])
 @admin_required
 def delete_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
@@ -381,7 +381,7 @@ def edit_forum(forum_id):
                            title=_("Edit Forum"))
 
 
-@management.route("/forums/<int:forum_id>/delete")
+@management.route("/forums/<int:forum_id>/delete", methods=["POST"])
 @admin_required
 def delete_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -444,7 +444,7 @@ def edit_category(category_id):
                            title=_("Edit Category"))
 
 
-@management.route("/category/<int:category_id>/delete", methods=["GET", "POST"])
+@management.route("/category/<int:category_id>/delete", methods=["POST"])
 @admin_required
 def delete_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
@@ -466,7 +466,7 @@ def plugins():
     return render_template("management/plugins.html", plugins=plugins)
 
 
-@management.route("/plugins/enable/<plugin>")
+@management.route("/plugins/<path:plugin>/enable", methods=["POST"])
 @admin_required
 def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
@@ -491,7 +491,7 @@ def enable_plugin(plugin):
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/disable/<plugin>")
+@management.route("/plugins/<path:plugin>/disable", methods=["POST"])
 @admin_required
 def disable_plugin(plugin):
     try:
@@ -518,7 +518,7 @@ def disable_plugin(plugin):
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/uninstall/<plugin>")
+@management.route("/plugins/<path:plugin>/uninstall", methods=["POST"])
 @admin_required
 def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
@@ -533,7 +533,7 @@ def uninstall_plugin(plugin):
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/install/<plugin>")
+@management.route("/plugins/<path:plugin>/install", methods=["POST"])
 @admin_required
 def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)

@@ -55,7 +55,10 @@
                     <td>{{ user.primary_group.name }}</td>
                     <td>
                         {% if current_user|can_ban_user and user.permissions['banned'] %}
-                            <a href="{{ url_for('management.unban_user', user_id = user.id) }}">{% trans %}Unban{% endtrans %}</a>
+                        <form class="inline-form" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-link">{% trans %}Unban{% endtrans %}</button>
+                        </form>
                         {% endif %}
                     </td>
                 </tr>

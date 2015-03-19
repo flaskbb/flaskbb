@@ -31,18 +31,30 @@
             </td>
             <td>
                 {% if not plugin.enabled %}
-                <a href="{{ url_for('management.enable_plugin', plugin=plugin.identifier) }}">{% trans %}Enable{% endtrans %}</a>
+                <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', plugin=plugin.identifier) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Enable{% endtrans %}</button>
+                </form>
                 {% else %}
-                <a href="{{ url_for('management.disable_plugin', plugin=plugin.identifier) }}">{% trans %}Disable{% endtrans %}</a>
+                <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', plugin=plugin.identifier) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Disable{% endtrans %}</button>
+                </form>
                 {% endif %}
 
                 {% set uninstallable = plugin.uninstallable %}
                 {% if plugin.installable and not uninstallable %}
                 <br />
-                <a href="{{ url_for('management.install_plugin', plugin=plugin.identifier) }}">{% trans %}Install{% endtrans %}</a>
+                <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', plugin=plugin.identifier) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Install{% endtrans %}</button>
+                </form>
                 {% endif %}
                 {% if uninstallable %}
-                <a href="{{ url_for('management.uninstall_plugin', plugin=plugin.identifier) }}">{% trans %}Uninstall{% endtrans %}</a>
+                <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', plugin=plugin.identifier) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-link">{% trans %}Uninstall{% endtrans %}</button>
+                </form>
                 {% endif %}
             </td>
         </tr>

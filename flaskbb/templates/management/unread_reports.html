@@ -28,7 +28,12 @@
                 <th>{% trans %}Reporter{% endtrans %}</th>
                 <th>{% trans %}Reason{% endtrans %}</th>
                 <th>{% trans %}Reported{% endtrans %}</th>
-                <th><a href="{{ url_for('management.report_markread') }}">{% trans %}Mark all as Read{% endtrans %}</a></th>
+                <th>
+                    <form class="inline-form" method="post" action="{{ url_for('management.report_markread') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">{% trans %}Mark all as Read{% endtrans %}</button>
+                    </form>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -41,7 +46,10 @@
                 <td>{{ report.reason }}</td>
                 <td>{{ report.reported|time_since }}</td>
                 <td>
-                    <a href="{{ url_for('management.report_markread', report_id=report.id) }}">{% trans %}Mark as Read{% endtrans %}</a>
+                    <form class="inline-form" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">{% trans %}Mark as Read{% endtrans %}</button>
+                    </form>
                 </td>
             </tr>
             {% else %}

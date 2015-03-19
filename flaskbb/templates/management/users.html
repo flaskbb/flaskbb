@@ -55,19 +55,28 @@
                     <td>{{ user.primary_group.name }}</td>
                     <td>
                         {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
-                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">{% trans %}Edit{% endtrans %}</a>
+                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">{% trans %}Edit{% endtrans %}</a> |
                         {% endif %}
 
                         {% if current_user|can_ban_user and not user.permissions['banned'] %}
-                            | <a href="{{ url_for('management.ban_user', user_id = user.id) }}">{% trans %}Ban{% endtrans %}</a>
+                            <form class="inline-form" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Ban{% endtrans %}</button> |
+                            </form>
                         {% endif %}
 
                         {% if current_user|can_ban_user and user.permissions['banned'] %}
-                            | <a href="{{ url_for('management.unban_user', user_id = user.id) }}">{% trans %}Unban{% endtrans %}</a>
+                            <form class="inline-form" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Unban{% endtrans %}</button> |
+                            </form>
                         {% endif %}
 
                         {% if current_user|is_admin %}
-                            | <a href="{{ url_for('management.delete_user', user_id = user.id) }}">{% trans %}Delete{% endtrans %}</a>
+                        <form class="inline-form" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                        </form>
                         {% endif %}
                     </td>
                 </tr>
