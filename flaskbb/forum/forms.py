@@ -77,7 +77,7 @@ class ReportForm(Form):
     submit = SubmitField(_("Report Post"))
 
     def save(self, user, post):
-        report = Report(**self.data)
+        report = Report(reason=self.reason.data)
         return report.save(post=post, user=user)
 
 
