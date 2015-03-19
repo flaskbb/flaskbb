@@ -13,7 +13,7 @@ from flask_wtf import Form
 from wtforms import (StringField, PasswordField, TextAreaField, SelectField,
                      ValidationError, SubmitField)
 from wtforms.validators import (Length, DataRequired, InputRequired, Email,
-                                EqualTo, regexp, Optional, URL)
+                                EqualTo, Optional, URL)
 from flask_babelex import lazy_gettext as _
 
 from flaskbb.user.models import User, PrivateMessage
