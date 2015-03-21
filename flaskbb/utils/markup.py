@@ -25,7 +25,9 @@ def collect_emojis():
         return emojis
 
     for emoji in os.listdir(full_path):
-        emojis[emoji.split(".")[0]] = emoji
+        name, ending = emoji.split(".")
+        if ending in ["png", "gif", "jpg", "jpeg"]:
+            emojis[name] = emoji
 
     return emojis
 
@@ -61,7 +63,7 @@ class FlaskBBRenderer(mistune.Renderer):
         def userify(match):
             value = match.group(1)
             user = "<a href='{url}'>@{user}</a>".format(
-                url=url_for("user.profile", username=value),
+                url=url_for("user.profile", username=value, _external=False),
                 user=value
             )
             return user
