@@ -131,7 +131,7 @@ class EditUserForm(UserForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs['obj'] = self.user
-        super(UserForm, self).__init__(*args, **kwargs)
+        UserForm.__init__(self, *args, **kwargs)
 
 
 class GroupForm(Form):
@@ -251,7 +251,7 @@ class EditGroupForm(GroupForm):
     def __init__(self, group, *args, **kwargs):
         self.group = group
         kwargs['obj'] = self.group
-        super(GroupForm, self).__init__(*args, **kwargs)
+        GroupForm.__init__(self, *args, **kwargs)
 
 
 class AddGroupForm(GroupForm):
@@ -371,7 +371,7 @@ class EditForumForm(ForumForm):
     def __init__(self, forum, *args, **kwargs):
         self.forum = forum
         kwargs['obj'] = self.forum
-        super(ForumForm, self).__init__(*args, **kwargs)
+        ForumForm.__init__(self, *args, **kwargs)
 
 
 class AddForumForm(ForumForm):

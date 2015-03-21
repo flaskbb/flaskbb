@@ -8,8 +8,9 @@ requirements:
 ignore-paths:
     - docs
     - migrations
-    - flaskbb/configs
     - wsgi.py
+    - setup.py
+    - flaskbb/configs
     - flaskbb/_compat.py
 pep8:
   full: true

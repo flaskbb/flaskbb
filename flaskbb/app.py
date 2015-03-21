@@ -133,8 +133,8 @@ def configure_extensions(app):
             first()
 
         if u:
-            user, user.pm_unread = u
-            return user
+            user_instance, user_instance.pm_unread = u
+            return user_instance
         else:
             return None
 
@@ -288,4 +288,4 @@ def configure_logging(app):
             total = time.time() - context._query_start_time
 
             # Modification for StackOverflow: times in milliseconds
-            app.logger.debug("Total Time: %.02fms" % (total*1000))
+            app.logger.debug("Total Time: %.02fms" % (total * 1000))

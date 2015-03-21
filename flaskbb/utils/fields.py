@@ -18,7 +18,7 @@ class BirthdayField(DateField):
     """
     def __init__(self, label=None, validators=None, format='%Y-%m-%d',
                  **kwargs):
-        super(DateField, self).__init__(label, validators, format, **kwargs)
+        DateField.__init__(self, label, validators, format, **kwargs)
 
     def process_formdata(self, valuelist):
         if valuelist:
