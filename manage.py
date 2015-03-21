@@ -290,6 +290,8 @@ def download_emoji():
 
     response = requests.get(FULL_URL)
 
+    cached_count = 0
+    count = 0
     for image in response.json():
         if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
             print("{} does not exist.".format(os.path.abspath(DOWNLOAD_PATH)))
@@ -297,11 +299,16 @@ def download_emoji():
 
         full_path = os.path.join(DOWNLOAD_PATH, image["name"])
         if not os.path.exists(full_path):
+            count += 1
             f = open(full_path, 'wb')
             f.write(requests.get(image["download_url"]).content)
             f.close()
+            if count == cached_count+50:
+                cached_count = count
+                print("{} out of {} Emojis downloaded...".format(
+                      cached_count, len(response.json())))
 
-    print("Finshed downloading emojis.")
+    print("Finished downloading {} Emojis.".format(count))
 
 if __name__ == "__main__":
     manager.run()
