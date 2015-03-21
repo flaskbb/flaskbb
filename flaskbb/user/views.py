@@ -69,7 +69,7 @@ def settings():
         flash(_("Settings updated."), "success")
     else:
         form.theme.data = current_user.theme
-        form.theme.data = current_user.language
+        form.language.data = current_user.language
 
     return render_template("user/general_settings.html", form=form)
 
