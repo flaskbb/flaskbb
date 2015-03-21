@@ -37,7 +37,7 @@
         </button>
     </form>
 {% endif %}
-{% if current_user|can_moderate(topic) %}
+{% if current_user|can_moderate(topic.forum) %}
     {% if not topic.locked %}
         <form class="inline-form" method="post" action="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
