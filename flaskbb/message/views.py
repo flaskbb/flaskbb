@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from flask import Blueprint, redirect, request, url_for, flash, abort
@@ -60,11 +61,29 @@ def view_conversation(conversation_id):
             return redirect(url_for("message.view_conversation",
                                     conversation_id=conversation.id))
 
+        to_user_id = None
+        # If the current_user is the user who recieved the message
+        # then we have to change the id's a bit.
+        if current_user.id == conversation.to_user_id:
+            to_user_id = conversation.from_user_id
+        else:
+            to_user_id = conversation.to_user_id
+
+        form.save(conversation=conversation, user_id=current_user.id)
+
+        # save the message in the recievers conversation
+        old_conv = conversation
+        conversation = Conversation.query.\
+            filter(
+                Conversation.user_id == to_user_id,
+                Conversation.shared_id == conversation.shared_id
+            ).first()
+
         form.save(conversation=conversation, user_id=current_user.id,
-                  reciever=True)
+                  unread=True)
 
         return redirect(url_for("message.view_conversation",
-                                conversation_id=conversation.id))
+                                conversation_id=old_conv.id))
 
     return render_template("message/conversation.html",
                            conversation=conversation, form=form)
@@ -101,17 +120,23 @@ def new_conversation():
         if "send_message" in request.form and form.validate():
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
+            # this is the shared id between conversations because the messages
+            # are saved on both ends
+            shared_id = uuid.uuid4()
+
             # Save the message in the current users inbox
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=current_user.id,
-                      unread=False)
+                      unread=False,
+                      shared_id=shared_id)
 
             # Save the message in the recievers inbox
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=to_user.id,
-                      unread=True)
+                      unread=True,
+                      shared_id=shared_id)
 
             flash(_("Message sent."), "success")
             return redirect(url_for("message.sent"))
@@ -156,7 +181,7 @@ def edit_conversation(conversation_id):
         if "save_message" in request.form:
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
-            conversation.draft = False
+            conversation.draft = True
             conversation.to_user = to_user.id
             conversation.save()
 

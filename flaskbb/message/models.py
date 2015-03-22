@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy_utils import UUIDType
+
 from flaskbb.extensions import db
 
 
@@ -10,7 +12,7 @@ class Conversation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-
+    shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255))
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
     trash = db.Column(db.Boolean, nullable=False, default=False)
@@ -84,7 +86,6 @@ class Message(db.Model):
 
     # the user who wrote the message
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-
     message = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow())
 

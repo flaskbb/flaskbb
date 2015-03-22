@@ -77,7 +77,8 @@ setup(
         'redis',
         'requests',
         'simplejson',
-        'speaklater'
+        'speaklater',
+        'sqlalchemy-utils'
     ],
     dependency_links=[
         'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy',

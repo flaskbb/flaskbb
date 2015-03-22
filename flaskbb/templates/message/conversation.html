@@ -13,7 +13,7 @@
             {% for message in conversation.messages %}
             <!-- First Comment -->
             <article class="row" id="mid{{message.id}}">
-                {% if message.conversation.from_user_id == message.user_id %}
+                {% if current_user.id == message.user_id %}
                 <div class="col-md-2 col-sm-2 hidden-xs">
                         <figure class="thumbnail">
                         <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
@@ -22,7 +22,7 @@
                 </div>
                 {% endif %}
                 <div class="col-md-10 col-sm-10">
-                    <div class="panel panel-default arrow {% if message.conversation.from_user_id == message.user_id %}left{% else %}right{% endif %}">
+                    <div class="panel panel-default arrow {% if current_user.id == message.user_id %}left{% else %}right{% endif %}">
                         <div class="panel-body">
                             <header class="text-left">
                                 <time class="conversation-date" datetime="{{ message.date_created }}"><i class="fa fa-clock-o"></i> {{ message.date_created|format_date("%d %B %Y - %H:%M") }}</time>
@@ -34,11 +34,11 @@
                         </div>
                     </div>
                 </div>
-                {% if message.conversation.from_user_id != message.user_id %}
+                {% if current_user.id != message.user_id %}
                 <div class="col-md-2 col-sm-2 hidden-xs">
                         <figure class="thumbnail">
                         <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
-                        <figcaption class="text-center">{{ message.user.username }}</figcaption>
+                        <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
                     </figure>
                 </div>
                 {% endif %}

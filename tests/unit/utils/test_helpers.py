@@ -101,7 +101,8 @@ def test_format_date():
 
 def test_format_quote(topic):
     expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"
-    assert format_quote(topic.first_post) == expected_markdown
+    actual = format_quote(topic.first_post.username, topic.first_post.content)
+    assert actual == expected_markdown
 
 
 def test_get_image_info():

@@ -38,8 +38,10 @@ class ConversationForm(Form):
         if user.id == current_user.id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 
-    def save(self, from_user, to_user, user_id, unread, as_draft=False):
-        conversation = Conversation(subject=self.subject.data, draft=as_draft)
+    def save(self, from_user, to_user, user_id, unread, as_draft=False,
+             shared_id=None):
+        conversation = Conversation(subject=self.subject.data, draft=as_draft,
+                                    shared_id=shared_id)
         message = Message(message=self.message.data, user_id=from_user)
         return conversation.save(message=message, from_user=from_user,
                                  to_user=to_user, user_id=user_id)
@@ -50,7 +52,7 @@ class MessageForm(Form):
         DataRequired(message=_("A Message is required."))])
     submit = SubmitField(_("Send Message"))
 
-    def save(self, conversation, user_id, reciever=True):
+    def save(self, conversation, user_id, unread=False):
         """Saves the form data to the model.
         :param conversation: The Conversation object.
         :param user_id: The id from the user who sent the message.
@@ -58,10 +60,8 @@ class MessageForm(Form):
                          inbox.
         """
         message = Message(message=self.message.data, user_id=user_id)
-        conversation.save(message)
 
-        if reciever:
+        if unread:
             conversation.unread = True
-            conversation.save(message)
-
+            conversation.save()
         return message.save(conversation)
