@@ -22,7 +22,10 @@ from flask_whooshalchemy import whoosh_index
 
 # Import the user blueprint
 from flaskbb.user.views import user
-from flaskbb.user.models import User, Guest, PrivateMessage
+from flaskbb.user.models import User, Guest
+# Import the (private) message blueprint
+from flaskbb.message.views import message
+from flaskbb.message.models import Conversation
 # Import the auth blueprint
 from flaskbb.auth.views import auth
 # Import the admin blueprint
@@ -77,6 +80,9 @@ def configure_blueprints(app):
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
+    app.register_blueprint(
+        message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
+    )
 
 
 def configure_extensions(app):
@@ -126,14 +132,14 @@ def configure_extensions(app):
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
 
-        unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
-            filter(PrivateMessage.unread,
-                   PrivateMessage.user_id == user_id).subquery()
-        u = db.session.query(User, unread_count).filter(User.id == user_id).\
-            first()
-
+        #unread_count = db.session.query(db.func.count(PrivateMessage.id)).\
+        #    filter(PrivateMessage.unread,
+        #           PrivateMessage.user_id == user_id).subquery()
+        #u = db.session.query(User, unread_count).filter(User.id == user_id).\
+        #    first()
+        u = User.query.get(user_id)
         if u:
-            user_instance, user_instance.pm_unread = u
+            user_instance, user_instance.pm_unread = u, 0
             return user_instance
         else:
             return None

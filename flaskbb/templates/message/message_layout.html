@@ -9,18 +9,18 @@
 </ul>
 
 <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-2">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <li class="nav-header">{% trans %}Options{% endtrans %} | <small><a href="{{ url_for('user.new_message') }}">{% trans %}New PM{% endtrans %}</a></small></li>
-                {{ navlink('user.inbox', _('Inbox')) }}
-                {{ navlink('user.sent', _('Sent')) }}
-                {{ navlink('user.drafts', _('Drafts')) }}
-                {{ navlink('user.trash', _('Trash')) }}
+                <a href="#" class="btn btn-success btn-compose">Compose</a>
+                {{ navlink('message.inbox', _('Inbox')) }}
+                {{ navlink('message.sent', _('Sent')) }}
+                {{ navlink('message.drafts', _('Drafts')) }}
+                {{ navlink('message.trash', _('Trash')) }}
             </ul>
         </div><!--/.sidebar -->
     </div><!--/.col-sm-3 -->
-    <div class="col-sm-9">
+    <div class="col-sm-10">
         {% block message_content %}{% endblock %}
     </div><!--/.col-sm-9 -->
 </div><!--/.row -->

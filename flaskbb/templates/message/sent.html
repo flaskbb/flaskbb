@@ -1,40 +1,62 @@
 {% set page_title = _("Sent Messages") %}
 
+{% from theme('macros.html') import render_pagination %}
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>{% trans %}To{% endtrans %}</th>
-            <th>{% trans %}Subject{% endtrans %}</th>
-            <th>{% trans %}Date{% endtrans %}</th>
-            <th>{% trans %}Options{% endtrans %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for message in messages %}
-        <tr>
-        {% if message.to_user %}
-            <td><a href="{{ url_for('user.profile', username=message.to_user.username) }}">{{ message.to_user.username }}</a></td>
-        {% else %}
-            <td>[{% trans %}deleted{% endtrans %}]</td>
-        {% endif %}
-            <td><a href="{{ url_for('user.view_message', message_id=message.id) }}">{{ message.subject }}</a></td>
-            <td>{{ message.date_created|time_since }}</td>
-            <td>
-                <form class="inline-form" method="post" action="{{ url_for('user.move_message', message_id=message.id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="4">
-                {% trans %}This message folder is empty.{% endtrans %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="panel panel-default conversation">
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-comment"></span>
+        <h3 class="panel-title">{% trans %}Sent Conversations{% endtrans %}</h3>
+        <span class="label label-info">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            {% for conversation in conversations.items %}
+
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-2 col-md-1">
+                        {% if conversation.to_user.avatar %}
+                        <img src="{{ url_for('conversation.to_user.avatar') }}" class="img-circle img-responsive" alt="" />
+                        {% else %}
+                        <span class="fa fa-user" style="font-size: 80px; color: #E5E5E5"></span>
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-10 col-md-11">
+                        <div>
+                            <a href="{{ url_for('message.view_conversation', conversation_id=conversation.id) }}">
+                                <strong>{{ conversation.subject }}</strong>
+                            </a>
+                            <div class="mic-info">
+                                To: <a href="#">{{ conversation.to_user.username }}</a> on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
+                            </div>
+                        </div>
+                        <div class="comment-text">
+                            {# the first message of conversation is always the starting message #}
+                            {{ conversation.messages[0].message }}
+                        </div>
+                        <div class="action">
+                            <button type="button" class="btn btn-danger btn-xs" title="Delete">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {% trans %}No conversations found.{% endtrans %}
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{{ render_pagination(conversations, url_for("message.inbox")) }}
+
 {% endblock %}

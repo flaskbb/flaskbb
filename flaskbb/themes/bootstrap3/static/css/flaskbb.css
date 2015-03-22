@@ -87,6 +87,11 @@ margin-bottom: 0px;
   border-radius: 5px;
 }
 
+.sidenav .btn-compose {
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
 /* All levels of nav */
 .sidebar .nav > li > a {
   display: block;
@@ -239,4 +244,128 @@ margin-bottom: 0px;
   vertical-align: middle;
   width: 20px;
   height: 20px;
+}
+
+.conversation .panel-body {
+    padding:0px;
+}
+
+.conversation .list-group {
+    margin-bottom: 0;
+}
+
+.conversation .panel-title {
+    display:inline;
+}
+
+.conversation .label-info {
+    float: right;
+}
+
+.conversation li.list-group-item {
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.conversation li.list-group-item:hover {
+    background-color: rgba(86,61,124,.1);
+}
+
+.conversation .mic-info {
+    color: #666666;
+    font-size: 11px;
+}
+
+.conversation .action {
+    margin-top:5px;
+}
+
+.conversation .comment-text {
+    font-size: 12px;
+}
+
+.conversation .btn-block {
+    border-top-left-radius:0px;
+    border-top-right-radius:0px;
+}
+
+/*Comment List styles*/
+.conversation-list .row {
+  margin-bottom: 0px;
+}
+.conversation-list .panel .panel-heading {
+  padding: 4px 15px;
+  position: absolute;
+  border:none;
+  /*Panel-heading border radius*/
+  border-top-right-radius:0px;
+  top: 1px;
+}
+.conversation-list .panel .panel-heading.right {
+  border-right-width: 0px;
+  /*Panel-heading border radius*/
+  border-top-left-radius:0px;
+  right: 16px;
+}
+.conversation-list .panel .panel-heading .panel-body {
+  padding-top: 6px;
+}
+.conversation-list figcaption {
+  /*For wrapping text in thumbnail*/
+  word-wrap: break-word;
+}
+/* Portrait tablets and medium desktops */
+@media (min-width: 768px) {
+  .conversation-list .arrow:after, .conversation-list .arrow:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent;
+  }
+  .conversation-list .panel.arrow.left:after, .conversation-list .panel.arrow.left:before {
+    border-left: 0;
+  }
+  /*****Left Arrow*****/
+  /*Outline effect style*/
+  .conversation-list .panel.arrow.left:before {
+    left: 0px;
+    top: 30px;
+    /*Use boarder color of panel*/
+    border-right-color: inherit;
+    border-width: 16px;
+  }
+  /*Background color effect*/
+  .conversation-list .panel.arrow.left:after {
+    left: 1px;
+    top: 31px;
+    /*Change for different outline color*/
+    border-right-color: #FFFFFF;
+    border-width: 15px;
+  }
+  /*****Right Arrow*****/
+  /*Outline effect style*/
+  .conversation-list .panel.arrow.right:before {
+    right: -16px;
+    top: 30px;
+    /*Use boarder color of panel*/
+    border-left-color: inherit;
+    border-width: 16px;
+  }
+  /*Background color effect*/
+  .conversation-list .panel.arrow.right:after {
+    right: -14px;
+    top: 31px;
+    /*Change for different outline color*/
+    border-left-color: #FFFFFF;
+    border-width: 15px;
+  }
+}
+.conversation-list .conversation-message {
+  margin-top: 6px;
+}
+.conversation-list .conversation-date {
+    color: #999999;
 }

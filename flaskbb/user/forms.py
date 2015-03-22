@@ -16,7 +16,7 @@ from wtforms.validators import (Length, DataRequired, InputRequired, Email,
                                 EqualTo, Optional, URL)
 from flask_babelex import lazy_gettext as _
 
-from flaskbb.user.models import User, PrivateMessage
+from flaskbb.user.models import User
 from flaskbb.extensions import db
 from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.utils.fields import BirthdayField
@@ -114,38 +114,3 @@ class ChangeUserDetailsForm(Form):
             if error is not None:
                 raise ValidationError(error)
             return status
-
-
-class NewMessageForm(Form):
-    to_user = StringField(_("To User"), validators=[
-        DataRequired(message=_("A Username is required."))])
-
-    subject = StringField(_("Subject"), validators=[
-        DataRequired(message=_("A Subject is required."))])
-
-    message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A Message is required."))])
-
-    send_message = SubmitField(_("Send Message"))
-    save_message = SubmitField(_("Save Message"))
-
-    def validate_to_user(self, field):
-        user = User.query.filter_by(username=field.data).first()
-        if not user:
-            raise ValidationError(_("The Username you entered doesn't exist"))
-        if user.id == current_user.id:
-            raise ValidationError(_("You cannot send a PM to yourself."))
-
-    def save(self, from_user, to_user, user_id, unread, as_draft=False):
-        message = PrivateMessage(
-            subject=self.subject.data,
-            message=self.message.data,
-            unread=unread)
-
-        if as_draft:
-            return message.save(from_user, to_user, user_id, draft=True)
-        return message.save(from_user, to_user, user_id)
-
-
-class EditMessageForm(NewMessageForm):
-    pass

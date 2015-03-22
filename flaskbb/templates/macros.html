@@ -345,6 +345,26 @@
 {% endmacro %}
 
 
+{% macro message_pagination(page_obj, url) %}
+<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination pagination-sm{%- endif -%}'>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="active"><a href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="active"><a href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+
 {%- macro topic_pages(topic_obj, per_page=10) -%}
 {% set topic_pages = (topic_obj.post_count / per_page)|round|int %}
 {%- if topic_pages >  1 -%}

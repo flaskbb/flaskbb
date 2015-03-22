@@ -21,6 +21,7 @@ from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
                                   ForumsRead)
+from flaskbb.message.models import Conversation
 
 
 groups_users = db.Table(
@@ -417,7 +418,7 @@ class User(db.Model, UserMixin):
         """Deletes the User."""
 
         # This isn't done automatically...
-        PrivateMessage.query.filter_by(user_id=self.id).delete()
+        Conversation.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()
         TopicsRead.query.filter_by(user_id=self.id).delete()
 
@@ -463,62 +464,3 @@ class Guest(AnonymousUserMixin):
         """Invalidates this objects cached metadata."""
 
         cache.delete_memoized(cls.get_permissions, cls)
-
-
-class PrivateMessage(db.Model):
-    __tablename__ = "privatemessages"
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    subject = db.Column(db.String(255))
-    message = db.Column(db.Text)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    trash = db.Column(db.Boolean, nullable=False, default=False)
-    draft = db.Column(db.Boolean, nullable=False, default=False)
-    unread = db.Column(db.Boolean, nullable=False, default=True)
-
-    user = db.relationship("User", backref="pms", lazy="joined",
-                           foreign_keys=[user_id])
-    from_user = db.relationship("User", lazy="joined",
-                                foreign_keys=[from_user_id])
-    to_user = db.relationship("User", lazy="joined", foreign_keys=[to_user_id])
-
-    def save(self, from_user=None, to_user=None, user_id=None, draft=False):
-        """Saves a private message.
-
-        :param from_user: The user who has sent the message
-
-        :param to_user: The user who should recieve the message
-
-        :param user_id: The senders user id - This is the id to which user the
-                        Inbox belongs.
-
-        :param draft: If the message is a draft. Defaults to ``False``.
-        """
-
-        if self.id:
-            db.session.add(self)
-            db.session.commit()
-            return self
-
-        # Defaults to ``False``.
-        self.draft = draft
-
-        # Add the message to the user's pm box
-        self.user_id = user_id
-        self.from_user_id = from_user
-        self.to_user_id = to_user
-        self.date_created = datetime.utcnow()
-
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        """Deletes a private message"""
-
-        db.session.delete(self)
-        db.session.commit()
-        return self

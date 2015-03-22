@@ -108,7 +108,7 @@
             <td>
                 <span class="pull-left">
                     {% if current_user.is_authenticated() and post.user_id and post.user_id != current_user.id %}
-                    <a href="{{ url_for('user.new_message', to_user=post.user.username) }}">{% trans %}PM{% endtrans %}</a>
+                    <a href="{{ url_for('message.new_conversation', to_user=post.user.username) }}">{% trans %}PM{% endtrans %}</a>
                     {% endif %}
                     {% if user.website %}
                     {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">{% trans %}Website{% endtrans %}</a>
@@ -159,7 +159,7 @@
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
 
-        {{ render_field(form.content, div_class="col-sm-12", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
+        {{ render_field(form.content, div_class="col-sm-12 reply-content", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
 
         <div class="col-sm-12" style="padding-top: 5px">
         {{ render_submit_field(form.submit) }}

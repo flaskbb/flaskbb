@@ -323,15 +323,16 @@ def time_since(time):  # pragma: no cover
     return format_timedelta(delta, add_direction=True, locale=locale)
 
 
-def format_quote(post):
+def format_quote(username, content):
     """Returns a formatted quote depending on the markup language.
 
-    :param post: The quoted post.
+    :param username: The username of a user.
+    :param content: The content of the quote
     """
-    profile_url = url_for('user.profile', username=post.username)
-    content = "\n> ".join(post.content.strip().split('\n'))
-    quote = "**[{post.username}]({profile_url}) wrote:**\n> {content}\n".\
-            format(post=post, profile_url=profile_url, content=content)
+    profile_url = url_for('user.profile', username=username)
+    content = "\n> ".join(content.strip().split('\n'))
+    quote = "**[{username}]({profile_url}) wrote:**\n> {content}\n".\
+            format(username=username, profile_url=profile_url, content=content)
 
     return quote
 

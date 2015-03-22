@@ -84,7 +84,9 @@ class DefaultConfig(object):
     REDIS_URL = "redis://:password@localhost:6379"
     REDIS_DATABASE = 0
 
+    # URL Prefixes
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
+    MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"

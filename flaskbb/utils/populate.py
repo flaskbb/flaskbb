@@ -236,6 +236,11 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
     user1 = User.query.filter_by(id=1).first()
     user2 = User.query.filter_by(id=2).first()
 
+    # lets send them a few private messages
+    for i in range(1, 3):
+        # TODO
+        pass
+
     # create 2 categories
     for i in range(1, categories + 1):
         category_title = "Test Category %s" % i

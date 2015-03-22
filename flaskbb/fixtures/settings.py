@@ -71,6 +71,13 @@ fixture = (
         'name': "Misc Settings",
         'description': "Miscellaneous settings.",
         'settings': (
+            ('message_quota', {
+                'value':        50,
+                'value_type':   "integer",
+                'extra':        {"min": 0},
+                'name':         "Private Message Quota",
+                'description':  "The amount of messages a user can have."
+            }),
             ('online_last_minutes', {
                 'value':        15,
                 'value_type':   "integer",

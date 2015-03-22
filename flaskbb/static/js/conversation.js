@@ -3,13 +3,12 @@
  */
 $(document).ready(function () {
     // Quote
-    $('.quote_btn').click(function (event) {
+    $('.reply-btn').click(function (event) {
         event.preventDefault();
-        var post_id = $(this).attr('data-post-id');
+        var message_id = $(this).attr('data-message-id');
 
-        $.get('/post/' + post_id + '/raw', function(text) {
-            var $contents = $('.reply-content .md-editor textarea');
-            console.log($contents)
+        $.get('/message/message/' + message_id + '/raw', function(text) {
+            var $contents = $('.message-content .md-editor textarea');
             $contents.val(($contents.val() + '\n' + text).trim() + '\n');
             $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
             $contents[0].scrollTop = $contents[0].scrollHeight;

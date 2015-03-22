@@ -442,7 +442,7 @@ def report_post(post_id):
 @login_required
 def raw_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
-    return format_quote(post)
+    return format_quote(username=post.username, content=post.content)
 
 
 @forum.route("/markread", methods=["POST"])
