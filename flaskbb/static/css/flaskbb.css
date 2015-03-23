@@ -4,10 +4,12 @@ html {
   position: relative;
   min-height: 100%;
 }
+
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -16,6 +18,7 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
+
 .container .text-muted {
   margin: 20px 0;
 }
@@ -58,7 +61,7 @@ margin-bottom: 0px;
 }
 
 .nav li + .nav-header {
-  margin-top: 9px;
+    margin-top: 9px;
 }
 
 /*
@@ -73,131 +76,285 @@ margin-bottom: 0px;
 
 /* By default it's not affixed in mobile views, so undo that */
 .sidebar.affix {
-  position: static;
+    position: static;
 }
 
 /* First level of nav */
 .sidenav {
-  margin-bottom: 30px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  text-shadow: 0 1px 0 #fff;
-  background-color: #f7f5fa;
-  border-radius: 5px;
+    margin-bottom: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-shadow: 0 1px 0 #fff;
+    background-color: #f7f5fa;
+    border-radius: 5px;
+}
+
+.sidenav .btn-compose {
+    margin-left: 20px;
+    margin-bottom: 5px;
 }
 
 /* All levels of nav */
 .sidebar .nav > li > a {
-  display: block;
-  color: #716b7a;
-  padding: 5px 20px;
+    display: block;
+    color: #716b7a;
+    padding: 5px 20px;
 }
+
 .sidebar .nav > li > a:hover,
 .sidebar .nav > li > a:focus {
-  text-decoration: none;
-  background-color: #e5e3e9;
-  border-right: 1px solid #dbd8e0;
+    text-decoration: none;
+    background-color: #e5e3e9;
+    border-right: 1px solid #dbd8e0;
 }
+
 .sidebar .nav > .active > a,
 .sidebar .nav > .active:hover > a,
 .sidebar .nav > .active:focus > a {
-  font-weight: bold;
-  color: #0088cc;
-  background-color: transparent;
-  border-right: 1px solid #0088cc;
+    font-weight: bold;
+    color: #0088cc;
+    background-color: transparent;
+    border-right: 1px solid #0088cc;
 }
 
 /* Nav: second level (shown on .active) */
 .sidebar .nav .nav {
-  display: none; /* Hide by default, but at >768px, show it */
-  margin-bottom: 8px;
+    display: none; /* Hide by default, but at >768px, show it */
+    margin-bottom: 8px;
 }
+
 .sidebar .nav .nav > li > a {
-  padding-top: 3px;
-  padding-bottom: 3px;
-  padding-left: 30px;
-  font-size: 90%;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 30px;
+    font-size: 90%;
 }
 
 /* Show and affix the side nav when space allows it */
 @media screen and (min-width: 992px) {
-  .sidebar .nav > .active > ul {
-    display: block;
-  }
-  /* Widen the fixed sidebar */
-  .sidebar.affix,
-  .sidebar.affix-bottom {
-    width: 213px;
-  }
-  .sidebar.affix {
-    position: fixed; /* Undo the static from mobile first approach */
-    top: 80px;
-  }
-  .sidebar.affix-bottom {
-    position: absolute; /* Undo the static from mobile first approach */
-  }
-  .sidebar.affix-bottom .sidenav,
-  .sidebar.affix .sidenav {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
+    .sidebar .nav > .active > ul {
+        display: block;
+    }
+    /* Widen the fixed sidebar */
+    .sidebar.affix,
+    .sidebar.affix-bottom {
+        width: 213px;
+    }
+    .sidebar.affix {
+        position: fixed; /* Undo the static from mobile first approach */
+        top: 80px;
+    }
+    .sidebar.affix-bottom {
+        position: absolute; /* Undo the static from mobile first approach */
+    }
+    .sidebar.affix-bottom .sidenav,
+    .sidebar.affix .sidenav {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
 }
 
 @media screen and (min-width: 1200px) {
-  /* Widen the fixed sidebar again */
-  .sidebar.affix-bottom,
-  .sidebar.affix {
-    width: 263px;
-  }
-}
-
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
-}
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  font-size: 16px;
-  height: auto;
-  padding: 10px;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="text"] {
-  margin-bottom: -1px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+    /* Widen the fixed sidebar again */
+    .sidebar.affix-bottom,
+    .sidebar.affix {
+        width: 263px;
+    }
 }
 /* End sidebar */
 
+.form-grouped {
+    border-radius: 5px 0px 0px 5px !important;
+}
+
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="text"] {
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Reply/Topic previews */
+.preview-body {
+    height: auto;
+}
+
 .inline-form {
-  display: inline;
-  padding: 0px;
+    display: inline;
+    padding: 0px;
 }
 
 .inline-form .btn-link {
-  padding: 0px;
+    padding: 0px;
 }
 
 .emoji {
-  vertical-align: middle;
-  width: 20px;
-  height: 20px;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+}
+
+.conversation .panel-body {
+    padding:0px;
+}
+
+.conversation .list-group {
+    margin-bottom: 0;
+}
+
+.conversation .panel-title {
+    display:inline;
+}
+
+.conversation .label-info {
+    float: right;
+}
+
+.conversation li.list-group-item {
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.conversation li.list-group-item:hover {
+    background-color: rgba(86,61,124,.1);
+}
+
+.conversation .mic-info {
+    color: #666666;
+    font-size: 11px;
+}
+
+.conversation .action {
+    margin-top:5px;
+}
+
+.conversation .comment-text {
+    font-size: 12px;
+}
+
+.conversation .btn-block {
+    border-top-left-radius:0px;
+    border-top-right-radius:0px;
+}
+
+/* Conversation List styles */
+.conversation-list .row {
+    margin-bottom: 0px;
+}
+
+.conversation-list .panel .panel-heading {
+    padding: 4px 15px;
+    position: absolute;
+    border:none;
+    /*Panel-heading border radius*/
+    border-top-right-radius:0px;
+    top: 1px;
+}
+
+.conversation-list .panel .panel-heading.right {
+    border-right-width: 0px;
+    /*Panel-heading border radius*/
+    border-top-left-radius:0px;
+    right: 16px;
+}
+
+.conversation-list .panel .panel-heading .panel-body {
+    padding-top: 6px;
+}
+
+.conversation-list figcaption {
+    /*For wrapping text in thumbnail*/
+    word-wrap: break-word;
+}
+
+/* Portrait tablets and medium desktops */
+@media (min-width: 768px) {
+    .conversation-list .arrow:after, .conversation-list .arrow:before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-color: transparent;
+    }
+    .conversation-list .panel.arrow.left:after, .conversation-list .panel.arrow.left:before {
+        border-left: 0;
+    }
+    /*****Left Arrow*****/
+    /*Outline effect style*/
+    .conversation-list .panel.arrow.left:before {
+        left: 0px;
+        top: 30px;
+        /*Use boarder color of panel*/
+        border-right-color: inherit;
+        border-width: 16px;
+    }
+    /*Background color effect*/
+    .conversation-list .panel.arrow.left:after {
+        left: 1px;
+        top: 31px;
+        /*Change for different outline color*/
+        border-right-color: #FFFFFF;
+        border-width: 15px;
+    }
+    /*****Right Arrow*****/
+    /*Outline effect style*/
+    .conversation-list .panel.arrow.right:before {
+        right: -16px;
+        top: 30px;
+        /*Use boarder color of panel*/
+        border-left-color: inherit;
+        border-width: 16px;
+    }
+    /*Background color effect*/
+    .conversation-list .panel.arrow.right:after {
+        right: -14px;
+        top: 31px;
+        /*Change for different outline color*/
+        border-left-color: #FFFFFF;
+        border-width: 15px;
+    }
+}
+
+.conversation-list .conversation-message {
+    margin-top: 6px;
+}
+
+.conversation-list .conversation-date {
+    color: #999999;
 }
