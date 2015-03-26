@@ -12,7 +12,7 @@
     <div class="col-sm-2">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <a href="#" class="btn btn-success btn-compose">Compose</a>
+                <a href="{{ url_for('message.new_conversation') }}" class="btn btn-success btn-compose">Compose</a>
                 {{ navlink('message.inbox', _('Inbox')) }}
                 {{ navlink('message.sent', _('Sent')) }}
                 {{ navlink('message.drafts', _('Drafts')) }}

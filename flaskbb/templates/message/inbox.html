@@ -17,7 +17,7 @@
                 <div class="row">
                     <div class="col-xs-2 col-md-1">
                         {% if conversation.from_user.avatar %}
-                        <img src="{{ url_for('conversation.from_user.avatar') }}" class="img-circle img-responsive" alt="" />
+                        <img src="{{ conversation.from_user.avatar }}" class="img-circle" alt="avatar" width="65px" height="65px" />
                         {% else %}
                         <span class="fa fa-user" style="font-size: 80px; color: #E5E5E5"></span>
                         {% endif %}
@@ -25,7 +25,11 @@
                     <div class="col-xs-10 col-md-11">
                         <div>
                             <a href="{{ url_for('message.view_conversation', conversation_id=conversation.id) }}">
-                                <strong>{{ conversation.subject }}</strong>
+                                {% if conversation.unread %}
+                                    <strong>{{ conversation.subject }}</strong>
+                                {% else %}
+                                    {{ conversation.subject }}
+                                {% endif %}
                             </a>
                             <div class="mic-info">
                                 By: <a href="#">{{ conversation.from_user.username }}</a> on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
@@ -33,7 +37,7 @@
                         </div>
                         <div class="comment-text">
                             {# the first message of conversation is always the starting message #}
-                            {{ conversation.messages[0].message }}
+                            {{ conversation.first_message.message|truncate(200)|markup|safe }}
                         </div>
                         <div class="action">
                             <button type="button" class="btn btn-danger btn-xs" title="Delete">

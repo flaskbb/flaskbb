@@ -48,6 +48,10 @@ def view_conversation(conversation_id):
         # just abort with 404
         abort(404)
 
+    if conversation.unread:
+        conversation.unread = False
+        conversation.save()
+
     form = MessageForm()
     if form.validate_on_submit():
 
@@ -108,11 +112,14 @@ def new_conversation():
         if "save_message" in request.form and form.validate():
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
+            shared_id = uuid.uuid4()
+
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=current_user.id,
                       unread=False,
-                      as_draft=True)
+                      as_draft=True,
+                      shared_id=shared_id)
 
             flash(_("Message saved."), "success")
             return redirect(url_for("message.drafts"))
@@ -182,7 +189,8 @@ def edit_conversation(conversation_id):
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
             conversation.draft = True
-            conversation.to_user = to_user.id
+            conversation.to_user_id = to_user.id
+            conversation.first_message.message = form.message.data
             conversation.save()
 
             flash(_("Message saved."), "success")
@@ -194,7 +202,8 @@ def edit_conversation(conversation_id):
             form.save(from_user=current_user.id,
                       to_user=to_user.id,
                       user_id=to_user.id,
-                      unread=True)
+                      unread=True,
+                      shared_id=conversation.shared_id)
 
             # Move the message from ``Drafts`` to ``Sent``.
             conversation.draft = False
@@ -207,7 +216,7 @@ def edit_conversation(conversation_id):
     else:
         form.to_user.data = conversation.to_user.username
         form.subject.data = conversation.subject
-        form.message.data = conversation.first_message
+        form.message.data = conversation.first_message.message
 
     return render_template("message/message_form.html", form=form,
                            title=_("Edit Message"))

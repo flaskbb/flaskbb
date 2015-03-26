@@ -10,13 +10,22 @@
     <div class="panel-heading">Subject: <strong>{{ conversation.subject }}</strong></div>
     <div class="panel-body">
         <section class="conversation-list">
-            {% for message in conversation.messages %}
+            {% if conversation.draft %}
+                {% set messages = [conversation.first_message] %}
+            {% else %}
+                {% set messages = conversation.messages %}
+            {% endif %}
+            {% for message in messages %}
             <!-- First Comment -->
             <article class="row" id="mid{{message.id}}">
                 {% if current_user.id == message.user_id %}
                 <div class="col-md-2 col-sm-2 hidden-xs">
                         <figure class="thumbnail">
-                        <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                        {% if message.user.avatar %}
+                            <img class="img-responsive" src="{{ message.user.avatar }}" />
+                        {% else %}
+                            <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                        {% endif %}
                         <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
                     </figure>
                 </div>
@@ -30,14 +39,22 @@
                             <div class="conversation-message">
                                 {{ message.message|markup|safe }}
                             </div>
-                            <p class="text-right"><a href="#" class="btn btn-default btn-sm reply-btn" data-message-id="{{ message.id }}"><i class="fa fa-reply"></i> reply</a></p>
+                            {% if conversation.draft %}
+                                <p class="text-right"><a href="{{ url_for('message.edit_conversation', conversation_id=conversation.id) }}" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i> edit</a></p>
+                            {% else %}
+                                <p class="text-right"><a href="#" class="btn btn-default btn-sm reply-btn" data-message-id="{{ message.id }}"><i class="fa fa-reply"></i> reply</a></p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 {% if current_user.id != message.user_id %}
                 <div class="col-md-2 col-sm-2 hidden-xs">
                         <figure class="thumbnail">
-                        <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                            {% if message.user.avatar %}
+                                <img class="img-responsive" src="{{ message.user.avatar }}" />
+                            {% else %}
+                                <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                            {% endif %}
                         <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
                     </figure>
                 </div>
@@ -47,7 +64,7 @@
         </section>
     </div>
 </div>
-{% if form %}
+{% if not conversation.draft %}
     {% from "macros.html" import render_field, render_submit_field %}
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}

@@ -35,11 +35,13 @@ class Conversation(db.Model):
 
     @property
     def first_message(self):
-        return self.messages[0].message
+        """Returns the first message object."""
+        return self.messages[0]
 
     @property
     def last_message(self):
-        return self.messages[-1].message
+        """Returns the last message object."""
+        return self.messages[-1]
 
     def save(self, message=None, user_id=None, from_user=None, to_user=None):
         """Saves a conversation.
