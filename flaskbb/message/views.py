@@ -83,6 +83,18 @@ def view_conversation(conversation_id):
                 Conversation.shared_id == conversation.shared_id
             ).first()
 
+        # user deleted the conversation, start a new conversation with just
+        # the recieving message
+        if conversation is None:
+            conversation = Conversation(
+                subject=old_conv.subject,
+                from_user_id=current_user.id,
+                to_user=to_user_id,
+                user_id=to_user_id,
+                shared_id=old_conv.shared_id
+            )
+            conversation.save()
+
         form.save(conversation=conversation, user_id=current_user.id,
                   unread=True)
 
@@ -220,6 +232,54 @@ def edit_conversation(conversation_id):
 
     return render_template("message/message_form.html", form=form,
                            title=_("Edit Message"))
+
+
+@message.route("/<int:conversation_id>/move", methods=["POST"])
+@login_required
+def move_conversation(conversation_id):
+    conversation = Conversation.query.filter_by(
+        id=conversation_id).first_or_404()
+
+    if conversation.user_id != current_user.id:
+        # if a user tries to view a conversation which does not belong to him
+        # just abort with 404
+        abort(404)
+
+    conversation.trash = True
+    conversation.save()
+
+    return redirect(url_for("message.inbox"))
+
+
+@message.route("/<int:conversation_id>/restore", methods=["POST"])
+@login_required
+def restore_conversation(conversation_id):
+    conversation = Conversation.query.filter_by(
+        id=conversation_id).first_or_404()
+
+    if conversation.user_id != current_user.id:
+        # if a user tries to view a conversation which does not belong to him
+        # just abort with 404
+        abort(404)
+
+    conversation.trash = False
+    conversation.save()
+    return redirect(url_for("message.inbox"))
+
+
+@message.route("/<int:conversation_id>/delete", methods=["POST"])
+@login_required
+def delete_conversation(conversation_id):
+    conversation = Conversation.query.filter_by(
+        id=conversation_id).first_or_404()
+
+    if conversation.user_id != current_user.id:
+        # if a user tries to view a conversation which does not belong to him
+        # just abort with 404
+        abort(404)
+
+    conversation.delete()
+    return redirect(url_for("message.inbox"))
 
 
 @message.route("/sent")

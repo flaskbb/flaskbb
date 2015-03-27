@@ -40,9 +40,12 @@
                             {{ conversation.first_message.message|truncate(200)|markup|safe }}
                         </div>
                         <div class="action">
-                            <button type="button" class="btn btn-danger btn-xs" title="Delete">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                            <form class="inline-form" method="POST" action="{{ url_for('message.move_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-info btn-xs" title="Move to Trash">
+                                    <span class="fa fa-archive"></span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

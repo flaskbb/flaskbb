@@ -37,9 +37,18 @@
                             {{ conversation.first_message.message }}
                         </div>
                         <div class="action">
-                            <button type="button" class="btn btn-danger btn-xs" title="Delete">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                            <form class="inline-form" method="POST" action="{{ url_for('message.delete_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                            </form>
+                            <form class="inline-form" method="POST" action="{{ url_for('message.restore_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-success btn-xs" title="Restore">
+                                    <span class="fa fa-undo"></span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

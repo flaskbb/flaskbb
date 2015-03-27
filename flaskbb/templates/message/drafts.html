@@ -36,11 +36,20 @@
                             {{ conversation.first_message.message }}
                         </div>
                         <div class="action">
-                            <button type="button" class="btn btn-danger btn-xs" title="Delete">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                            <form class="inline-form" method="POST" action="{{ url_for('message.delete_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                            </form>
+                            <form class="inline-form" method="POST" action="{{ url_for('message.move_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-info btn-xs" title="Move to Trash">
+                                    <span class="fa fa-archive"></span>
+                                </button>
+                            </form>
                             <a class="btn btn-success btn-xs" alt="Edit" href="{{ url_for('message.edit_conversation', conversation_id = conversation.id) }}">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="fa fa-pencil"></span>
                             </a>
                         </div>
                     </div>

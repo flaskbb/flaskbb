@@ -71,6 +71,10 @@ class Conversation(db.Model):
             message.save(self)
             return self
 
+        db.session.add(self)
+        db.session.commit()
+        return self
+
     def delete(self):
         """Deletes a private message"""
 
