@@ -1,0 +1,84 @@
+<div class="panel panel-default conversation">
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-comment"></span>
+        <h3 class="panel-title">{% trans %}Conversations{% endtrans %}</h3>
+        <span class="label label-info">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            {% for conversation in conversations.items %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-2 col-md-1">
+                        {% if conversation.from_user.avatar %}
+                        <img src="{{ conversation.from_user.avatar }}" class="img-circle" alt="avatar" width="65px" height="65px" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/avatar80x80.png') }}" class="img-circle" alt="avatar" width="65px" height="65px" />
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-10 col-md-11">
+                        <div>
+                            <a href="{{ url_for('message.view_conversation', conversation_id=conversation.id) }}">
+                                {% if conversation.unread %}
+                                    <strong>{{ conversation.subject }}</strong>
+                                {% else %}
+                                    {{ conversation.subject }}
+                                {% endif %}
+                            </a>
+                            <div class="mic-info">
+                                By: <a href="#">{{ conversation.from_user.username }}</a> on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
+                            </div>
+                        </div>
+                        <div class="comment-text">
+                            {# the first message of conversation is always the starting message #}
+                            {{ conversation.first_message.message|crop_title(150)|markup|safe }}
+                        </div>
+                        <div class="action">
+                            {% if include_move %}
+                            <form class="inline-form" method="POST" action="{{ url_for('message.move_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-info btn-xs" title="Move to Trash">
+                                    <span class="fa fa-archive"></span>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if include_delete %}
+                            <form class="inline-form" method="POST" action="{{ url_for('message.delete_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if include_restore %}
+                            <form class="inline-form" method="POST" action="{{ url_for('message.restore_conversation', conversation_id=conversation.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-success btn-xs" title="Restore">
+                                    <span class="fa fa-undo"></span>
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {% if include_edit %}
+                            <a class="btn btn-success btn-xs" alt="Edit" title="Edit" href="{{ url_for('message.edit_conversation', conversation_id = conversation.id) }}">
+                                <span class="fa fa-pencil"></span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {% trans %}No conversations found.{% endtrans %}
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

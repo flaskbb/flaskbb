@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.message.forms
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~
 
     It provides the forms that are needed for the message views.
 
@@ -40,11 +40,17 @@ class ConversationForm(Form):
 
     def save(self, from_user, to_user, user_id, unread, as_draft=False,
              shared_id=None):
-        conversation = Conversation(subject=self.subject.data, draft=as_draft,
-                                    shared_id=shared_id)
-        message = Message(message=self.message.data, user_id=from_user)
-        return conversation.save(message=message, from_user=from_user,
-                                 to_user=to_user, user_id=user_id)
+
+        conversation = Conversation(
+            subject=self.subject.data,
+            draft=as_draft,
+            shared_id=shared_id,
+            from_user_id=from_user,
+            to_user_id=to_user,
+            user_id=user_id
+        )
+        message = Message(message=self.message.data)
+        return conversation.save(message=message)
 
 
 class MessageForm(Form):

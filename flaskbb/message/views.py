@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.message.views
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    The views for the conversations and messages are located in this module.
+
+    :copyright: (c) 2014 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 import uuid
 from datetime import datetime
 
@@ -41,12 +51,9 @@ def inbox():
 @message.route("/<int:conversation_id>/view", methods=["GET", "POST"])
 def view_conversation(conversation_id):
     conversation = Conversation.query.filter_by(
-        id=conversation_id).first_or_404()
-
-    if conversation.user_id != current_user.id:
-        # if a user tries to view a conversation which does not belong to him
-        # just abort with 404
-        abort(404)
+        id=conversation_id,
+        user_id=current_user.id
+    ).first_or_404()
 
     if conversation.unread:
         conversation.unread = False
@@ -171,6 +178,8 @@ def new_conversation():
 def raw_message(message_id):
     message = Message.query.filter_by(id=message_id).first_or_404()
 
+    # abort if the message was not the current_user's one or the one of the
+    # recieved ones
     if not (message.conversation.from_user_id == current_user.id or
             message.conversation.to_user_id == current_user.id):
         abort(404)
@@ -183,12 +192,9 @@ def raw_message(message_id):
 @login_required
 def edit_conversation(conversation_id):
     conversation = Conversation.query.filter_by(
-        id=conversation_id).first_or_404()
-
-    if conversation.user_id != current_user.id:
-        # if a user tries to view a conversation which does not belong to him
-        # just abort with 404
-        abort(404)
+        id=conversation_id,
+        user_id=current_user.id
+    ).first_or_404()
 
     if not conversation.draft:
         flash(_("You cannot edit a sent message."), "danger")
@@ -238,12 +244,9 @@ def edit_conversation(conversation_id):
 @login_required
 def move_conversation(conversation_id):
     conversation = Conversation.query.filter_by(
-        id=conversation_id).first_or_404()
-
-    if conversation.user_id != current_user.id:
-        # if a user tries to view a conversation which does not belong to him
-        # just abort with 404
-        abort(404)
+        id=conversation_id,
+        user_id=current_user.id
+    ).first_or_404()
 
     conversation.trash = True
     conversation.save()
@@ -255,12 +258,9 @@ def move_conversation(conversation_id):
 @login_required
 def restore_conversation(conversation_id):
     conversation = Conversation.query.filter_by(
-        id=conversation_id).first_or_404()
-
-    if conversation.user_id != current_user.id:
-        # if a user tries to view a conversation which does not belong to him
-        # just abort with 404
-        abort(404)
+        id=conversation_id,
+        user_id=current_user.id
+    ).first_or_404()
 
     conversation.trash = False
     conversation.save()
@@ -271,12 +271,9 @@ def restore_conversation(conversation_id):
 @login_required
 def delete_conversation(conversation_id):
     conversation = Conversation.query.filter_by(
-        id=conversation_id).first_or_404()
-
-    if conversation.user_id != current_user.id:
-        # if a user tries to view a conversation which does not belong to him
-        # just abort with 404
-        abort(404)
+        id=conversation_id,
+        user_id=current_user.id
+    ).first_or_404()
 
     conversation.delete()
     return redirect(url_for("message.inbox"))

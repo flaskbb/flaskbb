@@ -24,7 +24,8 @@
                         {% if message.user.avatar %}
                             <img class="img-responsive" src="{{ message.user.avatar }}" />
                         {% else %}
-                            <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                            <!-- "no" avatar proudly made with Google Drawing.. because lol -->
+                            <img src="{{ url_for('static', filename='img/avatar100x100.png') }}" class="img-responsive" alt="avatar" />
                         {% endif %}
                         <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
                     </figure>
@@ -53,7 +54,7 @@
                             {% if message.user.avatar %}
                                 <img class="img-responsive" src="{{ message.user.avatar }}" />
                             {% else %}
-                                <img class="img-responsive" src="http://www.keita-gaming.com/assets/profile/default-avatar-c5d8ec086224cb6fc4e395f4ba3018c2.jpg" />
+                                <img src="{{ url_for('static', filename='img/avatar100x100.png') }}" class="img-responsive" alt="avatar" />
                             {% endif %}
                         <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
                     </figure>

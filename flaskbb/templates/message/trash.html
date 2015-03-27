@@ -4,67 +4,9 @@
 {% extends theme("message/message_layout.html") %}
 {% block message_content %}
 
-<div class="panel panel-default conversation">
-    <div class="panel-heading">
-        <span class="glyphicon glyphicon-comment"></span>
-        <h3 class="panel-title">{% trans %}Deleted Conversations{% endtrans %}</h3>
-        <span class="label label-info">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
-    </div>
-    <div class="panel-body">
-        <ul class="list-group">
-            {% for conversation in conversations.items %}
-
-            <li class="list-group-item">
-                <div class="row">
-                    <div class="col-xs-2 col-md-1">
-                        {% if conversation.from_user.avatar %}
-                        <img src="{{ conversation.from_user.avatar }}" class="img-circle" alt="avatar" width="65px" height="65px" />
-                        {% else %}
-                        <span class="fa fa-user" style="font-size: 80px; color: #E5E5E5"></span>
-                        {% endif %}
-                    </div>
-                    <div class="col-xs-10 col-md-11">
-                        <div>
-                            <a href="{{ url_for('message.view_conversation', conversation_id=conversation.id) }}">
-                                <strong>{{ conversation.subject }}</strong>
-                            </a>
-                            <div class="mic-info">
-                                By: <a href="#">{{ conversation.from_user.username }}</a> on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
-                            </div>
-                        </div>
-                        <div class="comment-text">
-                            {# the first message of conversation is always the starting message #}
-                            {{ conversation.first_message.message }}
-                        </div>
-                        <div class="action">
-                            <form class="inline-form" method="POST" action="{{ url_for('message.delete_conversation', conversation_id=conversation.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button type="submit" class="btn btn-danger btn-xs" title="Delete">
-                                    <span class="fa fa-trash"></span>
-                                </button>
-                            </form>
-                            <form class="inline-form" method="POST" action="{{ url_for('message.restore_conversation', conversation_id=conversation.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button type="submit" class="btn btn-success btn-xs" title="Restore">
-                                    <span class="fa fa-undo"></span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            {% else %}
-            <li class="list-group-item">
-                <div class="row">
-                    <div class="col-xs-12">
-                        {% trans %}No conversations found.{% endtrans %}
-                    </div>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+{% set include_restore = True %}
+{% set include_delete = True %}
+{% include "message/conversation_list.html" %}
 
 {{ render_pagination(conversations, url_for("message.inbox")) }}
 

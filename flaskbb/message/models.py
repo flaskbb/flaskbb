@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.message.models
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    The models for the conversations and messages are located here.
+
+    :copyright: (c) 2014 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 from datetime import datetime
 
 from sqlalchemy_utils import UUIDType
@@ -20,7 +30,7 @@ class Conversation(db.Model):
     unread = db.Column(db.Boolean, nullable=False, default=True)
 
     messages = db.relationship(
-        "Message", lazy="dynamic", backref="conversation",
+        "Message", lazy="joined", backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
         cascade="all, delete-orphan"
     )
@@ -43,27 +53,15 @@ class Conversation(db.Model):
         """Returns the last message object."""
         return self.messages[-1]
 
-    def save(self, message=None, user_id=None, from_user=None, to_user=None):
-        """Saves a conversation.
+    def save(self, message=None):
+        """Saves a conversation and returns the saved conversation object.
 
-        :param message: The Message object.
-        :param user_id: The senders user id - This is the id to which user the
-                        conversation belongs.
-        :param from_user: The user who has created the conversation
-        :param to_user: The user who should recieve the conversation
+        :param message: If given, it will also save the message for the
+                        conversation. It expects a Message object.
         """
-        if self.id:
-            db.session.add(self)
-            db.session.commit()
-            return self
-
         if message is not None:
             # create the conversation
-            self.user_id = user_id
-            self.from_user_id = from_user
-            self.to_user_id = to_user
             self.date_created = datetime.utcnow()
-
             db.session.add(self)
             db.session.commit()
 
@@ -97,14 +95,16 @@ class Message(db.Model):
 
     user = db.relationship("User", lazy="joined")
 
-    def save(self, conversation):
+    def save(self, conversation=None):
         """Saves a private message.
 
         :param conversation_id: The id of the conversation to which the message
                                 belongs to.
         """
-        self.conversation_id = conversation.id
-        self.date_created = datetime.utcnow()
+        if conversation is not None:
+            self.conversation_id = conversation.id
+            self.user_id = conversation.from_user_id
+            self.date_created = datetime.utcnow()
 
         db.session.add(self)
         db.session.commit()
