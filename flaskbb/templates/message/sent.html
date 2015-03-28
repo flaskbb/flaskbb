@@ -7,6 +7,6 @@
 {% set include_move = True %}
 {% include "message/conversation_list.html" %}
 
-{{ render_pagination(conversations, url_for("message.inbox")) }}
+{{ render_pagination(conversations, url_for("message.sent")) }}
 
 {% endblock %}
