@@ -51,7 +51,7 @@ def upgrade():
     op.create_table('settings',
     sa.Column('key', sa.String(length=255), nullable=False),
     sa.Column('value', sa.PickleType(), nullable=False),
-    sa.Column('settingsgroup', sa.String(), nullable=False),
+    sa.Column('settingsgroup', sa.String(length=255), nullable=False),
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('value_type', sa.String(length=20), nullable=False),
