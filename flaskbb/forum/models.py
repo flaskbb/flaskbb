@@ -924,14 +924,14 @@ class Category(db.Model):
                                   ForumsRead.user_id == user.id)).\
                 add_entity(Forum).\
                 add_entity(ForumsRead).\
-                order_by(Category.id, Category.position, Forum.position).\
+                order_by(Category.position, Category.id,  Forum.position).\
                 all()
         else:
             # Get all the forums
             forums = cls.query.\
                 join(Forum, cls.id == Forum.category_id).\
                 add_entity(Forum).\
-                order_by(Category.id, Category.position, Forum.position).\
+                order_by(Category.position, Category.id, Forum.position).\
                 all()
 
         return get_categories_and_forums(forums, user)
