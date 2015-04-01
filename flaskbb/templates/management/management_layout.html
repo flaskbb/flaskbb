@@ -1,4 +1,10 @@
 {% extends theme("layout.html") %}
+
+{% block head_extra %}
+{# include the csrf token here because we access it in the javascript #}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
 {% block content %}
 {%- from theme('macros.html') import navlink with context -%}
 
@@ -19,4 +25,11 @@
 
 {% block management_content %}{% endblock %}
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var MANAGEMENT_URL = "/admin";
+</script>
+<script src="{{ url_for('static', filename='js/management.js') }}"></script>
 {% endblock %}

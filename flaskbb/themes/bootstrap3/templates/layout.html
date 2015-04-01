@@ -11,17 +11,26 @@
             {%- endif -%}
         {% endblock %}
         </title>
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="FlaskBB is a forum software written in Flask">
         <meta name="author" content="FlaskBB Team">
 
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-        {% block css %}
+        {% block stylesheets %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/code.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/flaskbb.css') }}">
+        {% endblock %}
+
+        {# for extra stylesheets. e.q. a template has to add something #}
+        {% block css %}
+        {% endblock %}
+
+        {# for various extra things #}
+        {% block head_extra %}
         {% endblock %}
     </head>
 

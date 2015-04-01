@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
-                   __version__ as flask_version)
+                   jsonify, __version__ as flask_version)
 from flask_login import current_user
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelex import gettext as _
@@ -192,12 +192,17 @@ def banned_users():
                            search_form=search_form)
 
 
+@management.route("/users/ban", methods=["POST"])
 @management.route("/users/<int:user_id>/ban", methods=["POST"])
 @moderator_required
-def ban_user(user_id):
+def ban_user(user_id=None):
     if not can_ban_user(current_user):
         flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
+
+    if request.is_xhr:
+        print "I AM A XHR REQUEST"
+        return jsonify(message="success", status=200)
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
