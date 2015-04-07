@@ -398,5 +398,8 @@ class CategoryForm(Form):
     submit = SubmitField(_("Save"))
 
     def save(self):
-        category = Category(**self.data)
+        data = self.data
+        # remove the button
+        data.pop('submit', None)
+        category = Category(**data)
         return category.save()
