@@ -9,16 +9,25 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_wtf import Form
-from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
-                     BooleanField, SelectField, SubmitField)
+from wtforms import (
+    StringField,
+    TextAreaField,
+    PasswordField,
+    IntegerField,
+    BooleanField,
+    SelectField,
+    SubmitField,
+    HiddenField,
+)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
                                            QuerySelectMultipleField)
+from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from flask_babelex import lazy_gettext as _
 
 from flaskbb.utils.fields import BirthdayField
-from flaskbb.utils.widgets import SelectBirthdayWidget
+from flaskbb.utils.widgets import SelectBirthdayWidget, MultiSelect
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
@@ -35,6 +44,8 @@ def selectable_forums():
 def selectable_categories():
     return Category.query.order_by(Category.position)
 
+def selectable_groups():
+    return Group.query.order_by(Group.name.asc()).all()
 
 def select_primary_group():
     return Group.query.filter(Group.guest != True).order_by(Group.id)
@@ -306,6 +317,14 @@ class ForumForm(Form):
         description=_("Disable new posts and topics in this forum.")
     )
 
+    groups = QuerySelectMultipleField(
+        _("Group Access to Forum"),
+        query_factory=selectable_groups,
+        get_label="name",
+        widget=MultiSelect(),
+        description=_("Select user groups that can access this forum.")
+    )
+
     submit = SubmitField(_("Save"))
 
     def validate_external(self, field):
@@ -350,24 +369,34 @@ class ForumForm(Form):
         else:
             field.data = approved_moderators
 
-    def save(self):
-        forum = Forum(title=self.title.data,
-                      description=self.description.data,
-                      position=self.position.data,
-                      external=self.external.data,
-                      show_moderators=self.show_moderators.data,
-                      locked=self.locked.data)
+    def validate_groups(self, field):
 
-        if self.moderators.data:
-            # is already validated
-            forum.moderators = self.moderators.data
+        if field.data:
+            pass
+        elif field.raw_data:
+            ids = field.raw_data.pop().split(",")
+            groups  = Group.query.filter(Group.id.in_(ids)).all()
+            field.data = groups
+        else:
+            field.data = []
 
-        forum.category_id = self.category.data.id
+    def save(self, obj=None):
+
+        data = self.data
+        # remove the button
+        data.pop('submit', None)
+        forum = Forum(**data)
+        #flush SQLA info from created instabce so that it can be merged
+        make_transient(forum)
+        make_transient_to_detached(forum)
 
         return forum.save()
 
 
 class EditForumForm(ForumForm):
+
+    id = HiddenField()
+
     def __init__(self, forum, *args, **kwargs):
         self.forum = forum
         kwargs['obj'] = self.forum

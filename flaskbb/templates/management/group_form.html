@@ -13,30 +13,30 @@
 </div>
 
 <div class="col-md-9">
-    <form class="form-horizontal" role="form" method="post">
-        {{ form.hidden_tag() }}
-        <legend class="">{{ title }}</legend>
-            {{ horizontal_field(form.name) }}
-            {{ horizontal_field(form.description) }}
+        <form class="form-horizontal" role="form" method="post">
+            {{ form.hidden_tag() }}
+            <legend class="">{{ title }}</legend>
+                {{ horizontal_field(form.name) }}
+                {{ horizontal_field(form.description) }}
 
-            {{ render_boolean_field(form.admin) }}
-            {{ render_boolean_field(form.super_mod) }}
+                {{ render_boolean_field(form.admin) }}
+                {{ render_boolean_field(form.super_mod) }}
 
 
-            {{ render_boolean_field(form.mod) }}
-            {{ render_boolean_field(form.banned) }}
-            {{ render_boolean_field(form.guest) }}
+                {{ render_boolean_field(form.mod) }}
+                {{ render_boolean_field(form.banned) }}
+                {{ render_boolean_field(form.guest) }}
 
-            {{ render_boolean_field(form.mod_edituser) }}
-            {{ render_boolean_field(form.mod_banuser) }}
+                {{ render_boolean_field(form.mod_edituser) }}
+                {{ render_boolean_field(form.mod_banuser) }}
 
-            {{ render_boolean_field(form.editpost) }}
-            {{ render_boolean_field(form.deletepost) }}
-            {{ render_boolean_field(form.deletetopic) }}
-            {{ render_boolean_field(form.posttopic) }}
-            {{ render_boolean_field(form.postreply) }}
+                {{ render_boolean_field(form.editpost) }}
+                {{ render_boolean_field(form.deletepost) }}
+                {{ render_boolean_field(form.deletetopic) }}
+                {{ render_boolean_field(form.posttopic) }}
+                {{ render_boolean_field(form.postreply) }}
 
-            {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
-    </form>
+                {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
+        </form>
 </div>
 {% endblock %}

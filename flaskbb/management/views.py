@@ -364,9 +364,7 @@ def edit_forum(forum_id):
 
     form = EditForumForm(forum)
     if form.validate_on_submit():
-        form.populate_obj(forum)
-        forum.save(moderators=form.moderators.data)
-
+        form.save()
         flash(_("Forum successfully updated."), "success")
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:

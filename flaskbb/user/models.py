@@ -74,6 +74,16 @@ class Group(db.Model):
         db.session.commit()
         return self
 
+    @classmethod
+    def selectable_groups_choices(cls):
+        return Group.query.order_by(Group.name.asc()).with_entities(
+            Group.id, Group.name
+        ).all()
+
+    @classmethod
+    def get_guest_group(cls):
+        return Group.query.filter(cls.guest==True).first()
+
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
@@ -161,6 +171,11 @@ class User(db.Model, UserMixin):
     def topics_per_day(self):
         """Returns the topics per day count"""
         return round((float(self.topic_count) / float(self.days_registered)), 1)
+
+    @property
+    def groups(self):
+        """Returns user groups"""
+        return [self.primary_group] + list(self.secondary_groups)
 
     # Methods
     def __repr__(self):
