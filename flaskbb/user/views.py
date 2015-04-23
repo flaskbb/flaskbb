@@ -21,8 +21,9 @@ from flaskbb.utils.helpers import render_template
 from flaskbb.user.models import User, PrivateMessage
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
                                 ChangeUserDetailsForm, GeneralSettingsForm,
-                                NewMessageForm, EditMessageForm)
-
+                                NewMessageForm, EditMessageForm,
+                                RegisterAppForm)
+from flaskbb.oauth.models import Client
 
 user = Blueprint("user", __name__)
 
@@ -282,3 +283,21 @@ def delete_message(message_id):
     message.delete()
     flash(_("Message deleted."), "success")
     return redirect(url_for("user.inbox"))
+
+
+@user.route("/settings/apps", methods=["POST", "GET"])
+@login_required
+def register_app():
+    form = RegisterAppForm()
+    clients = Client.query.filter_by(user_id=current_user.id).all()
+    client = Client()
+    if form.validate_on_submit():
+        form.populate_obj(client)
+        client.user_id = current_user.id
+        client._redirect_uris = form.redirect_uri.data
+        client.save()
+        flash(_("App added."), "success")
+        return redirect(url_for("user.register_app"))
+
+    return render_template("user/register_app.html", form=form,
+                           clients=clients)

@@ -1,0 +1,27 @@
+{% extends theme("user/settings_layout.html") %}
+{% from theme("macros.html") import horizontal_field %}
+
+{% block settings_content %}
+<form class="form-horizontal" role="form" method="POST">
+    <legend class="">{% trans %}Register App{% endtrans %}</legend>
+    {{ form.hidden_tag() }}
+    {{ horizontal_field(form.name) }}
+    {{ horizontal_field(form.description, rows=12, div_class="col-sm-9") }}
+    {{ horizontal_field(form.redirect_uri) }}
+    {{ horizontal_field(form.submit) }}
+</form>
+
+<hr />
+
+<h3>Clients</h3>
+    {% for client in clients %}
+        Name: {{ client.name }} <br />
+        Description: {{ client.description }} <br />
+        Client ID: {{ client.client_id }} <br />
+        Client Secret: <strong>{{ client.client_secret }}</strong> <br />
+        Redirect URI: {{ client.redirect_uris|join(" ") }} <br />
+        <hr />
+    {% else %}
+        No Clients found.
+    {% endfor %}
+{% endblock %}

@@ -18,7 +18,7 @@ from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
 from flask_babelex import Babel
-from flask_httpauth import HTTPBasicAuth
+from flask_oauthlib.provider import OAuth2Provider
 
 
 # Database
@@ -51,5 +51,5 @@ plugin_manager = PluginManager()
 # Babel
 babel = Babel()
 
-# Flask-HTTPAuth
-auth = HTTPBasicAuth()
+# Flask-OAuthLib
+oauth_provider = OAuth2Provider()

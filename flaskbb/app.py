@@ -19,13 +19,15 @@ from sqlalchemy.engine import Engine
 from flask import Flask, Blueprint, request
 from flask_login import current_user
 from flask_whooshalchemy import whoosh_index
-from flask_restful import Api
+from flask_restful import Api as RESTApi
 
 # Import the user blueprint
 from flaskbb.user.views import user
 from flaskbb.user.models import User, Guest, PrivateMessage
 # Import the auth blueprint
 from flaskbb.auth.views import auth
+# Import the OAuth blueprint
+from flaskbb.oauth.views import oauth
 # Import the admin blueprint
 from flaskbb.management.views import management
 # Import the forum blueprint
@@ -33,7 +35,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel
+    debugtoolbar, migrate, themes, plugin_manager, babel, oauth_provider
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -76,6 +78,7 @@ def configure_blueprints(app):
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
     app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
+    app.register_blueprint(oauth, url_prefix=app.config["OAUTH_URL_PREFIX"])
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
@@ -88,8 +91,10 @@ def configure_api(app):
                                     TopicListAPI, TopicAPI,
                                     PostListAPI, PostAPI)
 
-    api_blueprint = Blueprint("api", __name__)
-    restful = Api(api_blueprint, prefix=app.config["API_URL_PREFIX"])
+    # Blueprint for the API
+    api = Blueprint("api", __name__)
+    # create the extension object
+    restful = RESTApi()
 
     # User API
     restful.add_resource(UserListAPI, "/users")
@@ -104,6 +109,15 @@ def configure_api(app):
     restful.add_resource(TopicAPI, '/topics/<int:id>')
     restful.add_resource(PostListAPI, "/posts")
     restful.add_resource(PostAPI, '/posts/<int:id>')
+
+    # initialize the extension with the blueprint
+    restful.init_app(api)
+    # register the blueprint
+    app.register_blueprint(
+        api,
+        url_prefix="{}/{}".format(app.config["API_URL_PREFIX"],
+                                  app.config["API_VERSION"])
+    )
 
 
 def configure_extensions(app):
@@ -132,6 +146,9 @@ def configure_extensions(app):
 
     # Flask-And-Redis
     redis_store.init_app(app)
+
+    # Flask-OAuth (Provider)
+    oauth_provider.init_app(app)
 
     # Flask-WhooshAlchemy
     with app.app_context():

@@ -147,3 +147,19 @@ class NewMessageForm(Form):
 
 class EditMessageForm(NewMessageForm):
     pass
+
+
+class RegisterAppForm(Form):
+    name = StringField(_("App Name"), validators=[
+        DataRequired(message=_("App Name is requried."))
+    ])
+
+    description = TextAreaField(_("Description"), validators=[
+        Optional()
+    ])
+
+    redirect_uri = StringField(_("Redirect URI"), validators=[
+        DataRequired(message=_("Redirect URI is required."))
+    ])
+
+    submit = SubmitField(_("Save"))

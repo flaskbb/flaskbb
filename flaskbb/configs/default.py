@@ -87,5 +87,18 @@ class DefaultConfig(object):
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
     AUTH_URL_PREFIX = "/auth"
+    OAUTH_URL_PREFIX = "/oauth"
     ADMIN_URL_PREFIX = "/admin"
+
+    # RESTful API
+    # Set this to False if you do not want to use the API
+    API_ENABLED = True
     API_URL_PREFIX = "/api"
+    # Do not change this unless you know what you are doing
+    API_VERSION = "v1"
+
+    # OAuth Settings
+    OAUTH2_CACHE_TYPE = CACHE_TYPE
+    OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 3600
+    #OAUTH2_PROVIDER_ERROR_ENDPOINT =
+    #OAUTH2_PROVIDER_ERROR_URI =

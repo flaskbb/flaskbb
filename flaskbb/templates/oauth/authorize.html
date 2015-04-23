@@ -1,0 +1,37 @@
+{% extends theme("layout.html") %}
+{% block content %}
+{%- from theme('macros.html') import navlink with context -%}
+
+<ul class="breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
+    <li class="active">{% trans %}Authorize{% endtrans %}</li>
+</ul>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3>Allow access?</h3>
+        <p>
+            The App <strong>{{ client.name }}</strong> would like to access some of your data.
+        </p>
+        <p>
+            Following scopes would be exposed to the client:
+            <strong>{{ client.default_scopes|join(", ") }}</strong>
+        </p>
+        <p>Client ID: {{ client.client_id }}</p>
+        <p>User: {{ user.username }}</p>
+        <form action="/oauth/authorize" method="post">
+          <input type="hidden" name="client_id" value="{{ client.client_id }}">
+          <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
+          <input type="hidden" name="response_type" value="{{ response_type }}">
+          <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+          {% if state %}
+          <input type="hidden" name="state" value="{{ state }}">
+          {% endif %}
+          <input type="submit" class="btn btn-success" name="confirm" value="yes">
+          <input type="submit" class="btn btn-danger" name="confirm" value="no">
+        </form>
+
+    </div><!--/.col-sm-9 -->
+</div><!--/row-->
+{% endblock %}
