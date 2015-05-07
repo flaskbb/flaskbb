@@ -54,6 +54,27 @@ def render_template(template, **context):
     return render_theme_template(theme, template, **context)
 
 
+def populate_model(model, attributes, commit=False):
+    """Populates a model with the given attributes.
+    Returns the populated model.
+
+    :param model: The model which should be populated.
+    :param attributes: A dictionary with the name of the attributes and their
+                       corresponding values.
+    :param commit: If set to ``True``, the changes are committed to the model.
+                   In case the model does not have the method ``save``
+                   implemented, it will just return the unsaved model.
+    """
+    for k, v in attributes.items():
+        if v is not None:
+            setattr(model, k, v)
+
+    if commit and hasattr(model, "save"):
+        model.save()
+
+    return model
+
+
 def get_categories_and_forums(query_result, user):
     """Returns a list with categories. Every category has a list for all
     their associated forums.

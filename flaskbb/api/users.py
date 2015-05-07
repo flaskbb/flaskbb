@@ -11,12 +11,31 @@
 """
 from datetime import datetime
 
-from flask_restful import Resource, reqparse, fields, marshal, abort
+from flask_restful import Resource, reqparse, fields, marshal
 
-from flaskbb.api import auth
+from flaskbb.extensions import oauth_provider
+from flaskbb.utils.helpers import populate_model
 from flaskbb.user.models import User
 
+# request parsers
+addparser = reqparse.RequestParser()
+addparser.add_argument('username', type=str, required=True, location="json")
+addparser.add_argument('email', type=str, required=True, location='json')
+addparser.add_argument('password', type=str, required=True, location='json')
 
+updateparser = reqparse.RequestParser()
+updateparser.add_argument('email', type=str, location='json')
+updateparser.add_argument('birthday', type=str, location='json')
+updateparser.add_argument('gender', type=str, location='json')
+updateparser.add_argument('website', type=str, location='json')
+updateparser.add_argument('location', type=str, location='json')
+updateparser.add_argument('signature', type=str, location='json')
+updateparser.add_argument('notes', type=str, location='json')
+updateparser.add_argument('theme', type=str, location='json')
+updateparser.add_argument('language', type=str, location='json')
+
+
+# fields
 user_fields = {
     'id': fields.Integer,
     'username': fields.String,
@@ -39,14 +58,6 @@ user_fields = {
 class UserListAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type=str, required=True,
-                                   location="json")
-        self.reqparse.add_argument('email', type=str, required=True,
-                                   location='json')
-        self.reqparse.add_argument('password', type=str, required=True,
-                                   location='json')
-        self.user_fields = user_fields
         super(UserListAPI, self).__init__()
 
     def get(self):
@@ -54,9 +65,9 @@ class UserListAPI(Resource):
                            for user in User.query.all()]}
         return users
 
-    @auth.login_required
+    @oauth_provider.require_oauth("admin")
     def post(self):
-        args = self.reqparse.parse_args()
+        args = addparser.parse_args()
         user = User(username=args['username'],
                     password=args['password'],
                     email=args['email'],
@@ -70,53 +81,25 @@ class UserListAPI(Resource):
 class UserAPI(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('email', type=str, location='json')
-        self.reqparse.add_argument('birthday', type=str, location='json')
-        self.reqparse.add_argument('gender', type=str, location='json')
-        self.reqparse.add_argument('website', type=str, location='json')
-        self.reqparse.add_argument('location', type=str, location='json')
-        self.reqparse.add_argument('signature', type=str, location='json')
-        self.reqparse.add_argument('notes', type=str, location='json')
-        self.reqparse.add_argument('theme', type=str, location='json')
-        self.reqparse.add_argument('language', type=str, location='json')
-
         super(UserAPI, self).__init__()
 
     def get(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
-
-        if not user:
-            abort(404)
+        user = User.query.filter_by(id=user_id).first_or_404()
 
         return {'user': marshal(user, user_fields)}
 
-    @auth.login_required
+    @oauth_provider.require_oauth("user")
     def put(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
+        """Updates a user."""
+        user = User.query.filter_by(id=user_id).first_or_404()
 
-        if not user:
-            abort(404)
-
-        if user.username != auth.username():
-            abort(403, message="You are not allowed to modify this user.")
-
-        args = self.reqparse.parse_args()
-        for k, v in args.items():
-            if v is not None:
-                setattr(user, k, v)
-        user.save()
+        args = updateparser.parse_args()
+        user = populate_model(user, args, commit=True)
         return {'user': marshal(user, user_fields)}
 
-    @auth.login_required
+    @oauth_provider.require_oauth("admin")
     def delete(self, user_id):
-        user = User.query.filter_by(id=user_id).first()
-
-        if not user:
-            abort(404)
-
-        if user.username != auth.username() and not user.permissions['admin']:
-            abort(403, message="You are not allowed to delete this user.")
+        user = User.query.filter_by(id=user_id).first_or_404()
 
         user.delete()
         return {'result': True}

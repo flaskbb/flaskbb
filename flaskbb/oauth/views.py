@@ -10,8 +10,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime, timedelta
-from flask import Blueprint, request, redirect, url_for
-from flask_login import current_user
+from flask import Blueprint, request
+from flask_login import current_user, login_required
 
 from flaskbb.utils.helpers import render_template
 from flaskbb.extensions import db, oauth_provider
@@ -89,11 +89,9 @@ def access_token():
 
 
 @oauth.route('/authorize', methods=['GET', 'POST'])
+@login_required
 @oauth_provider.authorize_handler
 def authorize(*args, **kwargs):
-    if not current_user.is_authenticated():
-        flash("Yo")
-        return redirect(url_for('auth.login'))
     if request.method == 'GET':
         client_id = kwargs.get('client_id')
         client = Client.query.filter_by(client_id=client_id).first()
