@@ -156,7 +156,7 @@ def view_post(post_id):
 def new_topic(forum_id, slug=None):
     forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
 
-    if not can_post_topic(user=current_user, forum=forum):
+    if not can_post_topic(user=current_user, forum=forum_instance):
         flash(_("You do not have the permissions to create a new topic."),
               "danger")
         return redirect(forum.url)
