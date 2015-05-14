@@ -27,8 +27,9 @@ def delete_settings_from_fixture(fixture):
 
         for settings in settingsgroup[1]["settings"]:
             setting = Setting.query.filter_by(key=settings[0]).first()
-            deleted_settings[group].append(setting)
-            setting.delete()
+            if setting:
+                deleted_settings[group].append(setting)
+                setting.delete()
 
         group.delete()
 
@@ -62,8 +63,9 @@ def create_settings_from_fixture(fixture):
 
                 settingsgroup=group.key
             )
-            setting.save()
-            created_settings[group].append(setting)
+            if setting:
+                setting.save()
+                created_settings[group].append(setting)
 
     return created_settings
 
