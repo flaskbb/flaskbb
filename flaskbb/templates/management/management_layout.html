@@ -1,4 +1,8 @@
 {% extends theme("layout.html") %}
+{% block css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/megalist-multiselect.css') }}" >
+{% endblock %}
 {% block content %}
 {%- from theme('macros.html') import navlink with context -%}
 
@@ -19,4 +23,9 @@
 
 {% block management_content %}{% endblock %}
 
+{% endblock %}
+{% block javascript %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/modernizr.custom.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/megalist-multiselect.js') }}"></script>
 {% endblock %}

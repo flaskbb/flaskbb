@@ -358,3 +358,7 @@ margin-bottom: 0px;
 .conversation-list .conversation-date {
     color: #999999;
 }
+
+.spacer-megalist{
+    padding-top: 20px;
+}

@@ -1,0 +1,114 @@
+.megalist-mutliselect {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+.megalist-mutliselect .megalist {
+  float: left;
+  width: 285px;
+}
+.megalist-mutliselect .megalist input[type=text] {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100% !important;
+  padding: 5px 4px;
+  margin-bottom: 5px;
+}
+.megalist-mutliselect .megalist .megalist-inner {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  position: relative;
+  height: 205px;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid silver;
+}
+.megalist-mutliselect .megalist .megalist-inner ul {
+  position: absolute;
+  padding: 0;
+  display: block;
+  margin-top: 0px;
+  width: 100%;
+  top: 0px;
+}
+.megalist-mutliselect .megalist .megalist-inner ul li {
+  margin: 0;
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 6px 0px 6px 10px !important;
+  display: block;
+  position: absolute;
+  width: 100%;
+  border-top: 1px solid #EDEDED;
+  line-height: 1em !important;
+  cursor: pointer;
+  color: #555;
+}
+.megalist-mutliselect .megalist .megalist-inner ul li:hover {
+  background-color: #08c;
+}
+.megalist-mutliselect .megalist .scrollbar {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  position: absolute;
+  right: 1px;
+  width: 11px;
+  height: 25px;
+  background-color: #bebebe;
+  z-index: 2;
+}
+.megalist-mutliselect .megalist .scrollbar:hover {
+  background-color: #afafaf;
+}
+.megalist-mutliselect .megalist .scrollbar-background {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 14px;
+  height: 100%;
+  z-index: 1;
+  background-color: #ececec;
+}
+.megalist-mutliselect .move-buttons {
+  margin: 90px 0px;
+  float: left;
+}
+.megalist-mutliselect .move-buttons .move-button {
+  height: 30px;
+  padding: 0px 50px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.megalist-mutliselect .move-buttons .move-button svg {
+  fill: #0374bb;
+}
+.megalist-mutliselect .move-buttons .move-button:hover svg {
+  fill: #024570;
+}
+.megalist-mutliselect .move-buttons .move-button:hover.arrow-left.no-svg .svg {
+  background-position: 0% 100%;
+}
+.megalist-mutliselect .move-buttons .move-button:hover.arrow-right.no-svg .svg {
+  background-position: 100% 100%;
+}
+.megalist-mutliselect .move-buttons .move-button.no-svg .svg {
+  background-repeat: no-repeat;
+  background-position: center;
+  background: url('../icons/megalist-icons.png');
+  width: 32px;
+  height: 32px;
+}
+.megalist-mutliselect .move-buttons .move-button.arrow-left.no-svg .svg {
+  background-position: 0% 0%;
+}
+.megalist-mutliselect .move-buttons .move-button.arrow-right.no-svg .svg {
+  background-position: 100% 0%;
+}

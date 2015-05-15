@@ -123,13 +123,10 @@ def test_category_get_all(forum, user):
 def test_forum_save(category, moderator_user):
     """Test the save forum method"""
     forum = Forum(title="Test Forum", category_id=category.id)
+    forum.moderators = [moderator_user]
     forum.save()
 
     assert forum.title == "Test Forum"
-
-    # Test with adding a moderator
-    forum.save([moderator_user])
-
     assert forum.moderators == [moderator_user]
 
 

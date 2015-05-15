@@ -101,7 +101,7 @@ def view_topic(topic_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
     # Fetch some information about the topic
-    topic = Topic.query.filter_by(id=topic_id).first()
+    topic = Topic.get_topic(topic_id=topic_id, user=current_user )
 
     # Count the topic views
     topic.views += 1

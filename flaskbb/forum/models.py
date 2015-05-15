@@ -11,8 +11,10 @@
 from datetime import datetime, timedelta
 
 from flask import url_for, abort
+from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
+from flaskbb.utils.decorators import can_access_forum, can_access_topic
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
 from flaskbb.utils.settings import flaskbb_config
 
@@ -35,6 +37,22 @@ topictracker = db.Table(
                             use_alter=True, name="fk_tracker_topic_id"),
               nullable=False))
 
+# m2m table for group-forum permission mapping
+forumgroups = db.Table(
+    'forumgroups',
+    db.Column(
+        'group_id',
+        db.Integer(),
+        db.ForeignKey('groups.id'),
+        nullable=False
+    ),
+    db.Column(
+        'forum_id',
+        db.Integer(),
+        db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+        nullable=False
+    )
+)
 
 class TopicsRead(db.Model):
     __tablename__ = "topicsread"
@@ -339,6 +357,12 @@ class Topic(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    @classmethod
+    @can_access_topic
+    def get_topic(cls, topic_id, user):
+        topic = Topic.query.filter_by(id=topic_id).first()
+        return topic
+
     def tracker_needs_update(self, forumsread, topicsread):
         """Returns True if the topicsread tracker needs an update.
         Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
@@ -621,15 +645,28 @@ class Forum(db.Model):
     last_post_created = db.Column(db.DateTime, default=datetime.utcnow())
 
     # One-to-many
-    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
-                             cascade="all, delete-orphan")
+    topics = db.relationship(
+        "Topic",
+        backref="forum",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
 
     # Many-to-many
-    moderators = \
-        db.relationship("User", secondary=moderators,
-                        primaryjoin=(moderators.c.forum_id == id),
-                        backref=db.backref("forummoderator", lazy="dynamic"),
-                        lazy="joined")
+    moderators = db.relationship(
+        "User",
+        secondary=moderators,
+        primaryjoin=(moderators.c.forum_id == id),
+        backref=db.backref("forummoderator", lazy="dynamic"),
+        lazy="joined"
+    )
+    groups = db.relationship(
+        "Group",
+        secondary=forumgroups,
+        primaryjoin=(forumgroups.c.forum_id == id),
+        backref="forumgroups",
+        lazy="joined",
+    )
 
     # Properties
     @property
@@ -743,18 +780,12 @@ class Forum(db.Model):
         # Nothing updated, because there are still more than 0 unread topicsread
         return False
 
-    def save(self, moderators=None):
+    def save(self):
         """Saves a forum"""
-        if moderators is not None:
-            for moderator in self.moderators:
-                self.moderators.remove(moderator)
-            db.session.commit()
-
-            for moderator in moderators:
-                if moderator:
-                    self.moderators.append(moderator)
-
-        db.session.add(self)
+        if self.id:
+            db.session.merge(self)
+        else:
+            db.session.add(self)
         db.session.commit()
         return self
 
@@ -786,6 +817,7 @@ class Forum(db.Model):
 
     # Classmethods
     @classmethod
+    @can_access_forum
     def get_forum(cls, forum_id, user):
         """Returns the forum and forumsread object as a tuple for the user.
 
@@ -916,23 +948,48 @@ class Category(db.Model):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        # import Group model locally to avoid cicular imports
+        from flaskbb.user.models import Group
         if user.is_authenticated():
-            forums = cls.query.\
-                join(Forum, cls.id == Forum.category_id).\
-                outerjoin(ForumsRead,
-                          db.and_(ForumsRead.forum_id == Forum.id,
-                                  ForumsRead.user_id == user.id)).\
-                add_entity(Forum).\
-                add_entity(ForumsRead).\
-                order_by(Category.position, Category.id,  Forum.position).\
-                all()
+            # get list of user group ids
+            user_groups = [gr.id for gr in user.groups]
+            # filter forums by user groups
+            user_forums = Forum.query.filter(Forum.groups.any(
+                Group.id.in_(user_groups))
+            ).subquery()
+            forum_alias = aliased(Forum, user_forums)
+            # get all
+            forums = cls.query.join(
+                forum_alias,
+                cls.id == forum_alias.category_id
+            ).outerjoin(
+                ForumsRead,
+                db.and_(
+                    ForumsRead.forum_id == forum_alias.id,
+                    ForumsRead.user_id == user.id
+                )
+            ).add_entity(
+                forum_alias
+            ).add_entity(
+                ForumsRead
+            ).order_by(
+                Category.position, Category.id,  forum_alias.position
+            ).all()
         else:
-            # Get all the forums
-            forums = cls.query.\
-                join(Forum, cls.id == Forum.category_id).\
-                add_entity(Forum).\
-                order_by(Category.position, Category.id, Forum.position).\
-                all()
+            guest_group = Group.get_guest_group()
+            # filter forums by guest groups
+            guest_forums = Forum.query.filter(
+                Forum.groups.any(Group.id==guest_group.id)
+            ).subquery()
+            forum_alias = aliased(Forum, guest_forums)
+            forums = cls.query.join(
+                forum_alias,
+                cls.id == forum_alias.category_id
+            ).add_entity(
+                forum_alias
+            ).order_by(
+                Category.position, Category.id, forum_alias.position
+            ).all()
 
         return get_categories_and_forums(forums, user)
 
@@ -951,24 +1008,48 @@ class Category(db.Model):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        from flaskbb.user.models import Group
         if user.is_authenticated():
-            forums = cls.query.\
-                filter(cls.id == category_id).\
-                join(Forum, cls.id == Forum.category_id).\
-                outerjoin(ForumsRead,
-                          db.and_(ForumsRead.forum_id == Forum.id,
-                                  ForumsRead.user_id == user.id)).\
-                add_entity(Forum).\
-                add_entity(ForumsRead).\
-                order_by(Forum.position).\
-                all()
+            # get list of user group ids
+            user_groups = [gr.id for gr in user.groups]
+            # filter forums by user groups
+            user_forums = Forum.query.filter(Forum.groups.any(
+                Group.id.in_(user_groups))
+            ).subquery()
+            forum_alias = aliased(Forum, user_forums)
+            forums = cls.query.filter(
+                cls.id == category_id
+            ).join(
+                forum_alias,
+                cls.id == forum_alias.category_id
+            ).outerjoin(
+                ForumsRead,
+                db.and_(
+                    ForumsRead.forum_id == forum_alias.id,
+                    ForumsRead.user_id == user.id)
+            ).add_entity(
+                forum_alias
+            ).add_entity(
+                ForumsRead
+            ).order_by(
+                forum_alias.position
+            ).all()
         else:
-            forums = cls.query.\
-                filter(cls.id == category_id).\
-                join(Forum, cls.id == Forum.category_id).\
-                add_entity(Forum).\
-                order_by(Forum.position).\
-                all()
+            guest_group = Group.get_guest_group()
+            # filter forums by guest groups
+            guest_forums = Forum.query.filter(
+                Forum.groups.any(Group.id==guest_group.id)
+            ).subquery()
+            forum_alias = aliased(Forum, guest_forums)
+            forums = cls.query.filter(
+                cls.id == category_id
+            ).join(
+                forum_alias, cls.id == forum_alias.category_id
+            ).add_entity(
+                forum_alias
+            ).order_by(
+                forum_alias.position
+            ).all()
 
         if not forums:
             abort(404)
