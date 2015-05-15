@@ -302,6 +302,11 @@
 </li>
 {% endmacro %}
 
+{% macro tablink_href(endpoint, name, active=False) %}
+<li {% if endpoint == request.endpoint or active %}class="active"{% endif %} >
+    <a href={{ endpoint }} role="tab" data-toggle="tab">{{ name }}</a>
+</li>
+{% endmacro %}
 
 {% macro render_pagination(page_obj, url, ul_class='') %}
 <ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}'>
