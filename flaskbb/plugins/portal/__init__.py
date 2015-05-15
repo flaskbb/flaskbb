@@ -27,6 +27,13 @@ fixture = (
                 'description':  "The forum ids from which forums the posts should be displayed on the portal.",
                 'extra': {"choices": available_forums, "coerce": int}
             }),
+            ('plugin_portal_recent_topics', {
+                'value':        10,
+                'value_type':   "integer",
+                'name':         "Number of Recent Topics",
+                'description':  "The number of topics in Recent Topics portlet.",
+                'extra': {"min": 1},
+            }),
         ),
     }),
 )

@@ -30,7 +30,8 @@ def index():
         order_by(Topic.id.desc()).\
         paginate(page, flaskbb_config["TOPICS_PER_PAGE"], True)
 
-    recent_topics = Topic.query.order_by(Topic.last_updated.desc()).limit(5)
+    recent_topics = Topic.query.order_by(Topic.last_updated.desc()).limit(
+                            flaskbb_config.get("PLUGIN_PORTAL_RECENT_TOPICS", 10))
 
     user_count = User.query.count()
     topic_count = Topic.query.count()
