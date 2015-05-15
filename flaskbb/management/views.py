@@ -404,6 +404,9 @@ def add_forum(category_id=None):
         flash(_("Forum successfully added."), "success")
         return redirect(url_for("management.forums"))
     else:
+        # by default all groups have access to a forum
+        form.groups.data = Group.query.order_by(Group.name.asc()).all()
+
         if category_id:
             category = Category.query.filter_by(id=category_id).first()
             form.category.data = category
