@@ -368,7 +368,7 @@ def reply_post(topic_id, post_id):
             form.save(current_user, topic)
             return redirect(post.topic.url)
     else:
-        form.content.data = format_quote(post)
+        form.content.data = format_quote(post.username, post.content)
 
     return render_template("forum/new_post.html", topic=post.topic, form=form)
 
