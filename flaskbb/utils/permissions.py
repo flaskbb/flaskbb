@@ -3,11 +3,40 @@
     flaskbb.utils.permissions
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    A place for all permission checks
+    A place for all permission checks. Most of them are used in the templates
+    and therefore they need the user argument to be passed.
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flask_principal import Permission, RoleNeed
+
+
+def has_permission(*roles):
+    """Checks if a user has all of the specified roles.
+
+    :param args: The required roles.
+    """
+    perms = [Permission(RoleNeed(role)) for role in roles]
+    allowed = True
+    for perm in perms:
+        if not perm.can():
+            allowed = False
+    return allowed
+
+
+def has_any_permission(*roles):
+    """Checks if a user has one of the specified roles.
+
+    :param args: The possible roles.
+    """
+    perm = Permission(*[RoleNeed(role) for role in roles])
+    return perm.can()
+
+
+def check_user_permission(user, permission):
+    """Checks if the specified user has the permission."""
+    pass
 
 
 def check_perm(user, perm, forum, post_user_id=None):
@@ -29,9 +58,9 @@ def check_perm(user, perm, forum, post_user_id=None):
         return True
 
     if post_user_id and user.is_authenticated():
-        return user.permissions[perm] and user.id == post_user_id
+        return has_permission(perm) and user.id == post_user_id
 
-    return not user.permissions['banned'] and user.permissions[perm]
+    return not has_permission("banned") and has_permission(perm)
 
 
 def is_moderator(user):
@@ -39,7 +68,7 @@ def is_moderator(user):
 
     :param user: The user who should be checked.
     """
-    return user.permissions['mod'] or user.permissions['super_mod']
+    return has_any_permission("mod", "super_mod")
 
 
 def is_admin(user):
@@ -47,7 +76,7 @@ def is_admin(user):
 
     :param user:  The user who should be checked.
     """
-    return user.permissions['admin']
+    return has_permission("admin")
 
 
 def is_admin_or_moderator(user):
@@ -55,6 +84,7 @@ def is_admin_or_moderator(user):
 
     :param user: The user who should be checked.
     """
+    print user
     return is_admin(user) or is_moderator(user)
 
 
@@ -81,17 +111,14 @@ def can_moderate(user, forum=None, perm=None):
     if is_admin_or_moderator(user) and forum is None:
 
         if perm is not None and perm.startswith("mod_"):
-            return user.permissions[perm]
-
-        # If no permission is definied, return False
-        return False
+            return has_permission(perm)
 
     # check if the user is a moderation and is moderating the forum
-    if user.permissions['mod'] and user in forum.moderators:
+    if has_permission("mod") and user in forum.moderators:
         return True
 
     # if the user is a super_mod or admin, he can moderate all forums
-    return user.permissions['super_mod'] or user.permissions['admin']
+    return has_any_permission("super_mod", "admin")
 
 
 def can_edit_post(user, post):

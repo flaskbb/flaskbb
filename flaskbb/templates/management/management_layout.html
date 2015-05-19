@@ -8,11 +8,13 @@
 
 <div class="col-md-12" style="padding-bottom: 10px">
     <ul class="nav nav-tabs nav-justified">
-    {{ navlink('management.overview', _('Overview')) }}
-    {{ navlink('management.users', _('Users'), active=active_management_user_nav) }}
-    {{ navlink('management.unread_reports', _('Reports'), active=active_management_report_nav) }}
+    {% if current_user|is_admin_or_moderator %}
+        {{ navlink('management.overview', _('Overview')) }}
+        {{ navlink('management.users', _('Users'), active=active_management_user_nav) }}
+        {{ navlink('management.unread_reports', _('Reports'), active=active_management_report_nav) }}
+    {% endif %}
 
-    {% if current_user|is_admin %}
+    {% if is_admin %}
         {{ navlink('management.settings', _('Settings')) }}
         {{ navlink('management.groups', _('Groups'), active=active_management_group_nav) }}
         {{ navlink('management.forums', _('Forums'), active=active_management_forum_nav) }}
