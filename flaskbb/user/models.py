@@ -16,7 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 
-from flaskbb._compat import max_integer
+from flaskbb._compat import max_integer, string_types
 from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -24,36 +24,32 @@ from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
 from flaskbb.message.models import Conversation
 
 
+roles_groups = db.Table(
+    'roles_groups',
+    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
+)
+
+
 groups_users = db.Table(
     'groups_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
+    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id'))
+)
 
 
 class Group(db.Model):
+    """Users belong to groups and roles belong to groups. A user can be in more
+    than one group."""
+
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
     description = db.Column(db.Text)
 
-    # Group types
-    admin = db.Column(db.Boolean, default=False, nullable=False)
-    super_mod = db.Column(db.Boolean, default=False, nullable=False)
-    mod = db.Column(db.Boolean, default=False, nullable=False)
-    guest = db.Column(db.Boolean, default=False, nullable=False)
-    banned = db.Column(db.Boolean, default=False, nullable=False)
-
-    # Moderator permissions (only available when the user a moderator)
-    mod_edituser = db.Column(db.Boolean, default=False, nullable=False)
-    mod_banuser = db.Column(db.Boolean, default=False, nullable=False)
-
-    # User permissions
-    editpost = db.Column(db.Boolean, default=True, nullable=False)
-    deletepost = db.Column(db.Boolean, default=False, nullable=False)
-    deletetopic = db.Column(db.Boolean, default=False, nullable=False)
-    posttopic = db.Column(db.Boolean, default=True, nullable=False)
-    postreply = db.Column(db.Boolean, default=True, nullable=False)
+    roles = db.relationship('Role', secondary=roles_groups,
+                            backref=db.backref('groups', lazy='dynamic'))
 
     # Methods
     def __repr__(self):
@@ -82,7 +78,35 @@ class Group(db.Model):
 
     @classmethod
     def get_guest_group(cls):
-        return Group.query.filter(cls.guest==True).first()
+        return Group.query.filter(Role.name == "guest").first()
+
+
+class Role(db.Model):
+    __tablename__ = "roles"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+    def __eq__(self, other):
+        return (self.name == other or
+                self.name == getattr(other, 'name', None))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.name)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
 
 
 class User(db.Model, UserMixin):
@@ -145,9 +169,9 @@ class User(db.Model, UserMixin):
         return url_for("user.profile", username=self.username)
 
     @property
-    def permissions(self):
-        """Returns the permissions for the user"""
-        return self.get_permissions()
+    def roles(self):
+        """Returns the roles for the user"""
+        return self.get_roles()
 
     @property
     def days_registered(self):
@@ -175,7 +199,7 @@ class User(db.Model, UserMixin):
     @property
     def groups(self):
         """Returns user groups"""
-        return [self.primary_group] + list(self.secondary_groups)
+        return self.get_groups()
 
     # Methods
     def __repr__(self):
@@ -335,40 +359,39 @@ class User(db.Model, UserMixin):
             groups_users.c.group_id == group.id).count() > 0
 
     @cache.memoize(timeout=max_integer)
-    def get_permissions(self, exclude=None):
-        """Returns a dictionary with all the permissions the user has.
+    def get_groups(self):
+        """Returns a list of all groups the user is in."""
+        return [self.primary_group] + list(self.secondary_groups)
+
+    @cache.memoize(timeout=max_integer)
+    def get_roles(self):
+        """Returns a set with all roles the user has.
 
         :param exclude: a list with excluded permissions. default is None.
         """
 
-        exclude = exclude or []
-        exclude.extend(['id', 'name', 'description'])
-
-        perms = {}
+        roles = set()
         groups = self.secondary_groups.all()
         groups.append(self.primary_group)
         for group in groups:
-            for c in group.__table__.columns:
-                # try if the permission already exists in the dictionary
-                # and if the permission is true, set it to True
-                try:
-                    if not perms[c.name] and getattr(group, c.name):
-                        perms[c.name] = True
+            # collect the roles
+            roles.update(set(group.roles))
 
-                # if the permission doesn't exist in the dictionary
-                # add it to the dictionary
-                except KeyError:
-                    # if the permission is in the exclude list,
-                    # skip to the next permission
-                    if c.name in exclude:
-                        continue
-                    perms[c.name] = getattr(group, c.name)
-        return perms
+        return roles
+
+    def has_role(self, role):
+        """Returns `True` if the user identifies with the specified role.
+
+        :param role: A role name or `Role` instance"""
+        if isinstance(role, string_types):
+            return role in (role.name for role in self.roles)
+        else:
+            return role in self.roles
 
     def invalidate_cache(self):
         """Invalidates this objects cached metadata."""
-
         cache.delete_memoized(self.get_permissions, self)
+        cache.delete_memoized(self.get_roles, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
@@ -456,23 +479,20 @@ class User(db.Model, UserMixin):
 
 class Guest(AnonymousUserMixin):
     @property
-    def permissions(self):
-        return self.get_permissions()
+    def roles(self):
+        return self.get_roles()
 
     @cache.memoize(timeout=max_integer)
-    def get_permissions(self, exclude=None):
-        """Returns a dictionary with all permissions the user has"""
-        exclude = exclude or []
-        exclude.extend(['id', 'name', 'description'])
+    def get_roles(self):
+        """Returns a set with all roles the user has"""
 
-        perms = {}
         # Get the Guest group
         group = Group.query.filter_by(guest=True).first()
-        for c in group.__table__.columns:
-            if c.name in exclude:
-                continue
-            perms[c.name] = getattr(group, c.name)
-        return perms
+        return set(group.roles)
+
+    def has_role(self, *args):
+        """Returns `False`"""
+        return False
 
     @classmethod
     def invalidate_cache(cls):

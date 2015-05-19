@@ -12,6 +12,9 @@ from functools import wraps
 
 from flask import abort
 from flask_login import current_user
+from flask_principal import Permission, RoleNeed
+
+from flaskbb.utils.permissions import has_permission, has_any_permission
 
 
 def admin_required(f):
@@ -19,7 +22,7 @@ def admin_required(f):
     def decorated(*args, **kwargs):
         if current_user.is_anonymous():
             abort(403)
-        if not current_user.permissions['admin']:
+        if not has_permission("admin"):
             abort(403)
         return f(*args, **kwargs)
     return decorated
@@ -31,13 +34,44 @@ def moderator_required(f):
         if current_user.is_anonymous():
             abort(403)
 
-        if not any([current_user.permissions['admin'],
-                    current_user.permissions['super_mod'],
-                    current_user.permissions['mod']]):
+        if not has_any_permission("admin", "super_mod", "mod"):
             abort(403)
 
         return f(*args, **kwargs)
     return decorated
+
+
+def roles_required(*roles):
+    """Decorator which specifies that a user must have all the specified roles.
+
+    :param args: The required roles.
+    """
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            perms = [Permission(RoleNeed(role)) for role in roles]
+            for perm in perms:
+                if not perm.can():
+                    abort(403)
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
+
+
+def roles_accepted(*roles):
+    """Decorator which specifies that a user must have at least one of the
+    specified roles.
+
+    :param args: The possible roles.
+    """
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            perm = Permission(*[RoleNeed(role) for role in roles])
+            if perm.can():
+                return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
 
 
 def can_access_forum(func):

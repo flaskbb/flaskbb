@@ -19,6 +19,7 @@ from sqlalchemy.engine import Engine
 from flask import Flask, request
 from flask_login import current_user
 from flask_whooshalchemy import whoosh_index
+from flask_principal import identity_loaded, UserNeed, RoleNeed
 
 # Import the user blueprint
 from flaskbb.user.views import user
@@ -35,7 +36,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, csrf
+    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, principal
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -44,7 +45,7 @@ from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
     can_delete_topic, can_delete_post, can_edit_post, can_edit_user, \
-    can_ban_user, can_moderate, is_admin, is_moderator, is_admin_or_moderator
+    can_ban_user, can_moderate, is_admin, is_moderator, is_admin_or_moderator, has_permission
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
@@ -145,6 +146,24 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
+
+    # Flask-Principal
+    principal.init_app(app)
+
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        # Set the identity user object
+        identity.user = current_user
+
+        # Add the UserNeed to the identity
+        if hasattr(current_user, 'id'):
+            identity.provides.add(UserNeed(current_user.id))
+
+        # Assuming the User model has a list of roles, update the
+        # identity with the roles that the user provides
+        if hasattr(current_user, 'roles'):
+            for role in current_user.roles:
+                identity.provides.add(RoleNeed(role.name))
 
     # Flask-BabelEx
     babel.init_app(app=app, default_domain=FlaskBBDomain(app))

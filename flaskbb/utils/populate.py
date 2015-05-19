@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flaskbb.management.models import Setting, SettingsGroup
-from flaskbb.user.models import User, Group
+from flaskbb.user.models import User, Group, Role
 from flaskbb.forum.models import Post, Topic, Forum, Category
 
 
@@ -144,15 +144,21 @@ def create_default_settings():
 
 def create_default_groups():
     """This will create the 5 default groups."""
-    from flaskbb.fixtures.groups import fixture
+    from flaskbb.fixtures.groups import roles, groups
     result = []
-    for key, value in fixture.items():
-        group = Group(name=key)
 
-        for k, v in value.items():
-            setattr(group, k, v)
+    for name, desc in roles.items():
+        role = Role(name=name, description=desc)
+        role.save()
 
-        group.save()
+    for group in groups.items():
+        grp = Group(name=group[0])
+
+        roles = Role.query.filter(Role.name.in_(group[1]["roles"])).all()
+        grp.roles = roles
+        grp.description = group[1]["description"]
+
+        grp.save()
         result.append(group)
     return result
 

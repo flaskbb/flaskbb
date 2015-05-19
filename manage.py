@@ -83,11 +83,11 @@ def populate(dropdb=False, createdb=False):
     '-c' (to not create the db) and '-d' (to not drop the db)
     """
 
-    if not dropdb:
+    if dropdb:
         print("Dropping database...")
         db.drop_all()
 
-    if not createdb:
+    if createdb:
         print("Creating database...")
         upgrade()
 

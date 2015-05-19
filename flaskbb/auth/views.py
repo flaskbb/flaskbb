@@ -13,6 +13,7 @@ from flask import Blueprint, flash, redirect, url_for, request, current_app
 from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
 from flask_babelex import gettext as _
+from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from flaskbb.utils.helpers import render_template
 from flaskbb.email import send_reset_token
@@ -39,6 +40,11 @@ def login():
 
         if user and authenticated:
             login_user(user, remember=form.remember_me.data)
+
+            # Tell Flask-Principal that the identity has changed
+            identity_changed.send(current_app._get_current_object(),
+                                  identity=Identity(user.id))
+
             return redirect(request.args.get("next") or
                             url_for("forum.index"))
 
@@ -69,6 +75,11 @@ def reauth():
 @login_required
 def logout():
     logout_user()
+
+    # Tell Flask-Principal the user is anonymous
+    identity_changed.send(current_app._get_current_object(),
+                          identity=AnonymousIdentity())
+
     flash(("Logged out"), "success")
     return redirect(url_for("forum.index"))
 
