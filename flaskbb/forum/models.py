@@ -780,12 +780,19 @@ class Forum(db.Model):
         # Nothing updated, because there are still more than 0 unread topicsread
         return False
 
-    def save(self):
-        """Saves a forum"""
+    def save(self, groups=None):
+        """Saves a forum
+
+        :param groups: A list with group objects."""
         if self.id:
             db.session.merge(self)
         else:
+            if groups is None:
+                # importing here because of circular dependencies
+                from flaskbb.user.models import Group
+                self.groups = Group.query.order_by(Group.name.asc()).all()
             db.session.add(self)
+
         db.session.commit()
         return self
 

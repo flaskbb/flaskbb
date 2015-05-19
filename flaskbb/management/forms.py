@@ -375,7 +375,7 @@ class ForumForm(Form):
             pass
         elif field.raw_data:
             ids = field.raw_data.pop().split(",")
-            groups  = Group.query.filter(Group.id.in_(ids)).all()
+            groups = Group.query.filter(Group.id.in_(ids)).all()
             field.data = groups
         else:
             field.data = []
@@ -386,7 +386,7 @@ class ForumForm(Form):
         # remove the button
         data.pop('submit', None)
         forum = Forum(**data)
-        #flush SQLA info from created instabce so that it can be merged
+        # flush SQLA info from created instabce so that it can be merged
         make_transient(forum)
         make_transient_to_detached(forum)
 
