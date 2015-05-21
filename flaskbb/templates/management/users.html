@@ -37,17 +37,31 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
                 <th>#</th>
                 <th>{% trans %}Username{% endtrans %}</th>
                 <th>{% trans %}Posts{% endtrans %}</th>
                 <th>{% trans %}Date registered{% endtrans %}</th>
                 <th>{% trans %}Group{% endtrans %}</th>
-                <th><button class="btn btn-danger" id="ban_users">{% trans %}Ban{% endtrans %}</button></th>
+                <th>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Actions
+                            <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban')">Ban selected Users</a></li>
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban')">Unban selected Users</a></li>
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban')">Delete selected Users</a></li>
+                        </ul>
+                    </div>
+                </th>
             </tr>
         </thead>
         <tbody>
             {% for user in users.items %}
                 <tr>
+                    <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></td>
                     <td>{{ user.id }}</td>
                     <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
                     <td>{{ user.post_count }}</td>
@@ -90,4 +104,10 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    var bulk_actions = new BulkActions()
+    </script>
 {% endblock %}

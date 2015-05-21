@@ -15,6 +15,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="FlaskBB is a forum software written in Flask">
         <meta name="author" content="FlaskBB Team">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
@@ -38,102 +39,106 @@
         {% block navigation %}
         {%- from theme("macros.html") import topnav with context -%}
         <!-- Navigation -->
-            <nav class="navbar navbar-default navbar-static-top">
-                <div class="container">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="/">FlaskBB</a>
-                    </div>
-                    <div class="collapse navbar-collapse navbar-ex1-collapse">
-                        <ul class="nav navbar-nav">
-                            {{ emit_event("before-first-navigation-element") }}
-
-                            {# active_forum_nav is set in {forum, category, topic}.html and new_{topic, post}.html #}
-                            {{ topnav(endpoint='forum.index', name=_('Forum'), icon='fa fa-comment', active=active_forum_nav) }}
-                            {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='fa fa-user') }}
-                            {{ topnav(endpoint='forum.search', name=_('Search'), icon='fa fa-search') }}
-
-                            {{ emit_event("after-last-navigation-element") }}
-                        </ul>
-
-                    {% if current_user and current_user.is_authenticated() %}
-                        <div class="btn-group navbar-btn navbar-right" style="padding-left: 15px; margin-right: -10px">
-                            <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
-                                <span class="fa fa-user"></span> {{ current_user.username }}
-                            </a>
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url_for('forum.topictracker') }}"><span class="fa fa-book"></span> {% trans %}Topic Tracker{% endtrans %}</a></li>
-                                <li class="divider"></li>
-
-                                <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs"></span> {% trans %}Settings{% endtrans %}</a></li>
-                                {% if current_user|is_admin_or_moderator %}
-                                <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog"></span> {% trans %}Management{% endtrans %}</a></li>
-                                <li class="divider"></li>
-                                {% endif %}
-
-                                <li><a href="{{ url_for('auth.logout') }}"><span class="fa fa-power-off"></span> {% trans %}Logout{% endtrans %}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="btn-group navbar-btn navbar-right">
-                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="fa fa-envelope"></span> <span class="badge">{{ current_user.pm_unread }}</span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Private Messages{% endtrans %}</a></li>
-                                <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
-                            </ul>
-                        </div>
-                    {% else %}
-                        <div class="btn-group navbar-btn navbar-right">
-                            <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
-                                <span class="fa fa-user"></span> {% trans %}Login{% endtrans %}
-                            </a>
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url_for('auth.register') }}">{% trans %}Register{% endtrans %}</a></li>
-                                <li><a href="{{ url_for('auth.forgot_password') }}">{% trans %}Reset Password{% endtrans %}</a></li>
-                            </ul>
-                        </div>
-                    {% endif %}
-                    </div><!-- nav-collapse -->
-                </div><!-- container -->
-            </nav> <!-- navbar navbar-inverse -->
-            {% endblock %}
-
-
+        <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
-                {% block messages %}
-                    {% include theme('flashed_messages.html') %}
-                {% endblock %}
-
-                {% block content %}
-                {% endblock %}
-            </div> <!-- /container -->
-
-            {% block footer %}
-            <div id="footer">
-                <div class="container">
-                    <p class="text-muted credit pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
-                    <p class="text-muted credit pull-right">&copy; 2013 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">FlaskBB</a>
                 </div>
-            </div>
+                <div class="collapse navbar-collapse navbar-ex1-collapse">
+                    <ul class="nav navbar-nav">
+                        {{ emit_event("before-first-navigation-element") }}
+
+                        {# active_forum_nav is set in {forum, category, topic}.html and new_{topic, post}.html #}
+                        {{ topnav(endpoint='forum.index', name=_('Forum'), icon='fa fa-comment', active=active_forum_nav) }}
+                        {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='fa fa-user') }}
+                        {{ topnav(endpoint='forum.search', name=_('Search'), icon='fa fa-search') }}
+
+                        {{ emit_event("after-last-navigation-element") }}
+                    </ul>
+
+                {% if current_user and current_user.is_authenticated() %}
+                    <div class="btn-group navbar-btn navbar-right" style="padding-left: 15px; margin-right: -10px">
+                        <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
+                            <span class="fa fa-user"></span> {{ current_user.username }}
+                        </a>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ url_for('forum.topictracker') }}"><span class="fa fa-book"></span> {% trans %}Topic Tracker{% endtrans %}</a></li>
+                            <li class="divider"></li>
+
+                            <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs"></span> {% trans %}Settings{% endtrans %}</a></li>
+                            {% if current_user|is_admin_or_moderator %}
+                            <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog"></span> {% trans %}Management{% endtrans %}</a></li>
+                            <li class="divider"></li>
+                            {% endif %}
+
+                            <li><a href="{{ url_for('auth.logout') }}"><span class="fa fa-power-off"></span> {% trans %}Logout{% endtrans %}</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="btn-group navbar-btn navbar-right">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                            <span class="fa fa-envelope"></span> <span class="badge">{{ current_user.pm_unread }}</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Private Messages{% endtrans %}</a></li>
+                            <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="btn-group navbar-btn navbar-right">
+                        <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
+                            <span class="fa fa-user"></span> {% trans %}Login{% endtrans %}
+                        </a>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ url_for('auth.register') }}">{% trans %}Register{% endtrans %}</a></li>
+                            <li><a href="{{ url_for('auth.forgot_password') }}">{% trans %}Reset Password{% endtrans %}</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+                </div><!-- nav-collapse -->
+            </div><!-- container -->
+        </nav> <!-- navbar navbar-inverse -->
+        {% endblock %}
+
+
+        <div class="container">
+            {% block messages %}
+                {% include theme('flashed_messages.html') %}
             {% endblock %}
+
+            {% block content %}
+            {% endblock %}
+        </div> <!-- /container -->
+
+        {% block footer %}
+        <div id="footer">
+            <div class="container">
+                <p class="text-muted credit pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                <p class="text-muted credit pull-right">&copy; 2013 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+            </div>
+        </div>
+        {% endblock %}
 
         {# standard javascript libs #}
         {% block javascript %}
+        <script>
+            var BASE_URL = "{{ request.path.split('/')[0] }}";
+        </script>
         <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/flaskbb.js') }}"></script>
         {% endblock %}
 
         {# space for extra scripts - to use in other templates #}

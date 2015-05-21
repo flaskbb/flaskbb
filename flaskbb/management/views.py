@@ -201,8 +201,24 @@ def ban_user(user_id=None):
         return redirect(url_for("management.overview"))
 
     if request.is_xhr:
-        print "I AM A XHR REQUEST"
-        return jsonify(message="success", status=200)
+        ids = request.get_json()["ids"]
+
+        #banned_group = Group.query.filter_by(banned=True).first()
+        #users = User.query.\
+        #   filter(User.id.in_(ids)).\
+        #    update(
+        #        {"primary_group_id": banned_group.id},
+        #        synchronize_session=False
+        #    )
+
+        for user in User.query.filter(User.id.in_(ids)).all():
+            user.ban()
+
+        return jsonify(
+            message="{} Users banned.".format(users),
+            category="success",
+            status=200
+        )
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
