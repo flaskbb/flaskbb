@@ -82,7 +82,7 @@ class Group(db.Model):
 
     @classmethod
     def get_guest_group(cls):
-        return Group.query.filter(cls.guest==True).first()
+        return Group.query.filter(cls.guest == True).first()
 
 
 class User(db.Model, UserMixin):
@@ -150,6 +150,11 @@ class User(db.Model, UserMixin):
         return self.get_permissions()
 
     @property
+    def groups(self):
+        """Returns user groups"""
+        return self.get_groups()
+
+    @property
     def days_registered(self):
         """Returns the amount of days the user is registered."""
         days_registered = (datetime.utcnow() - self.date_joined).days
@@ -171,11 +176,6 @@ class User(db.Model, UserMixin):
     def topics_per_day(self):
         """Returns the topics per day count"""
         return round((float(self.topic_count) / float(self.days_registered)), 1)
-
-    @property
-    def groups(self):
-        """Returns user groups"""
-        return [self.primary_group] + list(self.secondary_groups)
 
     # Methods
     def __repr__(self):
@@ -280,7 +280,6 @@ class User(db.Model, UserMixin):
 
         :param topic: The topic which should be added to the topic tracker.
         """
-
         if not self.is_tracking_topic(topic):
             self.tracked_topics.append(topic)
             return self
@@ -291,7 +290,6 @@ class User(db.Model, UserMixin):
         :param topic: The topic which should be removed from the
                       topic tracker.
         """
-
         if self.is_tracking_topic(topic):
             self.tracked_topics.remove(topic)
             return self
@@ -310,7 +308,6 @@ class User(db.Model, UserMixin):
 
         :param group: The group which should be added to the user.
         """
-
         if not self.in_group(group):
             self.secondary_groups.append(group)
             return self
@@ -335,12 +332,16 @@ class User(db.Model, UserMixin):
             groups_users.c.group_id == group.id).count() > 0
 
     @cache.memoize(timeout=max_integer)
+    def get_groups(self):
+        """Returns all the groups the user is in."""
+        return [self.primary_group] + list(self.secondary_groups)
+
+    @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all the permissions the user has.
 
         :param exclude: a list with excluded permissions. default is None.
         """
-
         exclude = exclude or []
         exclude.extend(['id', 'name', 'description'])
 
@@ -367,12 +368,11 @@ class User(db.Model, UserMixin):
 
     def invalidate_cache(self):
         """Invalidates this objects cached metadata."""
-
         cache.delete_memoized(self.get_permissions, self)
+        cache.delete_memoized(self.get_groups, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
-
         if not self.get_permissions()['banned']:
             banned_group = Group.query.filter(
                 Group.banned == True
@@ -386,7 +386,6 @@ class User(db.Model, UserMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
-
         if self.get_permissions()['banned']:
             member_group = Group.query.filter(
                 Group.admin == False,
@@ -409,7 +408,6 @@ class User(db.Model, UserMixin):
         :param groups: A list with groups that should be added to the
                        secondary groups from user.
         """
-
         if groups:
             # TODO: Only remove/add groups that are selected
             secondary_groups = self.secondary_groups.all()
@@ -431,7 +429,6 @@ class User(db.Model, UserMixin):
 
     def delete(self):
         """Deletes the User."""
-
         # This isn't done automatically...
         Conversation.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()

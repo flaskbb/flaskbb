@@ -83,11 +83,11 @@ def populate(dropdb=False, createdb=False):
     '-c' (to not create the db) and '-d' (to not drop the db)
     """
 
-    if not dropdb:
+    if dropdb:
         print("Dropping database...")
         db.drop_all()
 
-    if not createdb:
+    if createdb:
         print("Creating database...")
         upgrade()
 
@@ -303,7 +303,7 @@ def download_emoji():
             f = open(full_path, 'wb')
             f.write(requests.get(image["download_url"]).content)
             f.close()
-            if count == cached_count+50:
+            if count == cached_count + 50:
                 cached_count = count
                 print("{} out of {} Emojis downloaded...".format(
                       cached_count, len(response.json())))

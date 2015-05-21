@@ -479,14 +479,16 @@ def enable_plugin(plugin):
         try:
             if os.path.exists(disabled_file):
                 os.remove(disabled_file)
-                flash(_("Plugin is enabled. Please reload your app."), "success")
+                flash(_("Plugin is enabled. Please reload your app."),
+                      "success")
             else:
-                flash(_("Plugin is already enabled. Please reload  your app."), "warning")
+                flash(_("Plugin is already enabled. Please reload  your app."),
+                      "warning")
 
         except OSError:
-            flash(_("If you are using a host which doesn't support writting on the "
-                "disk, this won't work - than you need to delete the "
-                "'DISABLED' file by yourself."), "danger")
+            flash(_("If you are using a host which doesn't support writting "
+                    "on the disk, this won't work - than you need to delete "
+                    "the 'DISABLED' file by yourself."), "danger")
 
     else:
         flash(_("Couldn't enable Plugin."), "danger")
@@ -516,8 +518,8 @@ def disable_plugin(plugin):
 
     except OSError:
         flash(_("If you are using a host which doesn't "
-            "support writting on the disk, this won't work - than you need to "
-            "create a 'DISABLED' file by yourself."), "info")
+                "support writting on the disk, this won't work - than you "
+                "need to create a 'DISABLED' file by yourself."), "info")
 
     return redirect(url_for("management.plugins"))
 

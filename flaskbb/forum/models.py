@@ -980,13 +980,13 @@ class Category(db.Model):
             ).add_entity(
                 ForumsRead
             ).order_by(
-                Category.position, Category.id,  forum_alias.position
+                Category.position, Category.id, forum_alias.position
             ).all()
         else:
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = Forum.query.filter(
-                Forum.groups.any(Group.id==guest_group.id)
+                Forum.groups.any(Group.id == guest_group.id)
             ).subquery()
             forum_alias = aliased(Forum, guest_forums)
             forums = cls.query.join(
@@ -1045,7 +1045,7 @@ class Category(db.Model):
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = Forum.query.filter(
-                Forum.groups.any(Group.id==guest_group.id)
+                Forum.groups.any(Group.id == guest_group.id)
             ).subquery()
             forum_alias = aliased(Forum, guest_forums)
             forums = cls.query.filter(
