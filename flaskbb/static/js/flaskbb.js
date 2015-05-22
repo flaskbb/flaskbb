@@ -8,6 +8,10 @@
  // get the csrf token from the header
 var csrftoken = $('meta[name=csrf-token]').attr('content');
 
+var change_link = function(data, link, text) {
+    $.each(data, function(k, v) {
+    });
+};
 
 var flash_message = function(message) {
     var container = $('#flashed-messages');
@@ -39,7 +43,7 @@ var BulkActions = function() {
             data.ids.push($(v).val());
         });
 
-        send_data(url, data);
+        send_data(url, data)
 
         return false;
     };
@@ -66,6 +70,14 @@ var send_data = function(endpoint_url, data) {
     })
     .done(function(response) {
         flash_message(response);
+        console.log(response.data);
+        $.each(response.data, function(k, v) {
+            // get the form
+            console.log(v.reverse_url);
+            var form = $('#' + v.type + '-' + v.id);
+            form.attr('action', v.reverse_url);
+            form.find('button').html(v.reverse_name);
+        });
     })
     .fail(function(error) {
         flash_message(error);

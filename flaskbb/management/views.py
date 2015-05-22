@@ -211,12 +211,24 @@ def ban_user(user_id=None):
         #        synchronize_session=False
         #    )
 
+        data = []
         for user in User.query.filter(User.id.in_(ids)).all():
-            user.ban()
+            if user.ban():
+                data.append({
+                    "id": user.id,
+                    "type": "ban",
+                    "reverse": "unban",
+                    "reverse_name": _("Unban"),
+                    "reverse_url": url_for("management.unban_user",
+                                           user_id=user.id)
+                })
+
+        print data
 
         return jsonify(
-            message="{} Users banned.".format(users),
+            message="{} Users banned.".format(len(data)),
             category="success",
+            data=data,
             status=200
         )
 
@@ -238,13 +250,46 @@ def ban_user(user_id=None):
     return redirect(url_for("management.banned_users"))
 
 
+@management.route("/users/unban", methods=["POST"])
 @management.route("/users/<int:user_id>/unban", methods=["POST"])
 @moderator_required
-def unban_user(user_id):
+def unban_user(user_id=None):
     if not can_ban_user(current_user):
         flash(_("You do not have the permissions to unban this user."),
               "danger")
         return redirect(url_for("management.overview"))
+
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+
+        #banned_group = Group.query.filter_by(banned=True).first()
+        #users = User.query.\
+        #   filter(User.id.in_(ids)).\
+        #    update(
+        #        {"primary_group_id": banned_group.id},
+        #        synchronize_session=False
+        #    )
+
+        data = []
+        for user in User.query.filter(User.id.in_(ids)).all():
+            if user.unban():
+                data.append({
+                    "id": user.id,
+                    "type": "unban",
+                    "reverse": "ban",
+                    "reverse_name": _("Ban"),
+                    "reverse_url": url_for("management.ban_user",
+                                           user_id=user.id)
+                })
+
+        print data
+
+        return jsonify(
+            message="{} Users unbanned.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
