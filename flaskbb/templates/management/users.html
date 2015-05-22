@@ -50,9 +50,9 @@
                             <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban')">Ban selected Users</a></li>
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban')">Unban selected Users</a></li>
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban')">Delete selected Users</a></li>
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">Ban selected Users</a></li>
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">Unban selected Users</a></li>
+                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">Delete selected Users</a></li>
                         </ul>
                     </div>
                 </th>
@@ -60,7 +60,7 @@
         </thead>
         <tbody>
             {% for user in users.items %}
-                <tr>
+                <tr class="action-row">
                     <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></td>
                     <td>{{ user.id }}</td>
                     <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
@@ -87,7 +87,7 @@
                         {% endif %}
 
                         {% if current_user|is_admin %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
+                        <form class="inline-form" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
                         </form>

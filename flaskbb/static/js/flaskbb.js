@@ -30,7 +30,7 @@ var flash_message = function(message) {
 };
 
 var BulkActions = function() {
-    this.execute = function(url) {
+    this.execute = function(url, confirm_message) {
         var selected = $('input.action-checkbox:checked').size();
         var data = {"ids": []};
 
@@ -42,6 +42,13 @@ var BulkActions = function() {
         $('input.action-checkbox:checked').each(function(k, v) {
             data.ids.push($(v).val());
         });
+
+        // http://stackoverflow.com/questions/784929/what-is-the-not-not-operator-in-javascript
+        if(!!confirm_message) {
+            if(!confirm(confirm_message)) {
+                return false;
+            }
+        }
 
         send_data(url, data)
 
@@ -70,13 +77,18 @@ var send_data = function(endpoint_url, data) {
     })
     .done(function(response) {
         flash_message(response);
-        console.log(response.data);
         $.each(response.data, function(k, v) {
             // get the form
-            console.log(v.reverse_url);
             var form = $('#' + v.type + '-' + v.id);
-            form.attr('action', v.reverse_url);
-            form.find('button').html(v.reverse_name);
+
+            // check if there is something to reverse it, otherwise remove the DOM.
+            if(v.reverse) {
+                form.attr('action', v.reverse_url);
+                form.find('button').html(v.reverse_name);
+            } else {
+                form.parents('.action-row').remove();
+            }
+
         });
     })
     .fail(function(error) {

@@ -148,9 +148,32 @@ def edit_user(user_id):
                            title=_("Edit User"))
 
 
+@management.route("/users/delete", methods=["POST"])
 @management.route("/users/<int:user_id>/delete", methods=["POST"])
 @admin_required
-def delete_user(user_id):
+def delete_user(user_id=None):
+    # ajax request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+
+        data = []
+        for user in User.query.filter(User.id.in_(ids)).all():
+            if user.delete():
+                data.append({
+                    "id": user.id,
+                    "type": "delete",
+                    "reverse": False,
+                    "reverse_name": None,
+                    "reverse_url": None
+                })
+
+        return jsonify(
+            message="{} Users deleted.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
+
     user = User.query.filter_by(id=user_id).first_or_404()
     user.delete()
     flash(_("User successfully deleted."), "success")
@@ -200,19 +223,13 @@ def ban_user(user_id=None):
         flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
 
+    # ajax request
     if request.is_xhr:
         ids = request.get_json()["ids"]
 
-        #banned_group = Group.query.filter_by(banned=True).first()
-        #users = User.query.\
-        #   filter(User.id.in_(ids)).\
-        #    update(
-        #        {"primary_group_id": banned_group.id},
-        #        synchronize_session=False
-        #    )
-
         data = []
-        for user in User.query.filter(User.id.in_(ids)).all():
+        users = User.query.filter(User.id.in_(ids)).all()
+        for user in users:
             if user.ban():
                 data.append({
                     "id": user.id,
@@ -222,8 +239,6 @@ def ban_user(user_id=None):
                     "reverse_url": url_for("management.unban_user",
                                            user_id=user.id)
                 })
-
-        print data
 
         return jsonify(
             message="{} Users banned.".format(len(data)),
@@ -259,16 +274,9 @@ def unban_user(user_id=None):
               "danger")
         return redirect(url_for("management.overview"))
 
+    # ajax request
     if request.is_xhr:
         ids = request.get_json()["ids"]
-
-        #banned_group = Group.query.filter_by(banned=True).first()
-        #users = User.query.\
-        #   filter(User.id.in_(ids)).\
-        #    update(
-        #        {"primary_group_id": banned_group.id},
-        #        synchronize_session=False
-        #    )
 
         data = []
         for user in User.query.filter(User.id.in_(ids)).all():
@@ -281,8 +289,6 @@ def unban_user(user_id=None):
                     "reverse_url": url_for("management.ban_user",
                                            user_id=user.id)
                 })
-
-        print data
 
         return jsonify(
             message="{} Users unbanned.".format(len(data)),
@@ -331,7 +337,6 @@ def unread_reports():
 def report_markread(report_id=None):
     # mark single report as read
     if report_id:
-
         report = Report.query.filter_by(id=report_id).first_or_404()
         if report.zapped:
             flash(_("Report %(id)s is already marked as read.", id=report.id),
