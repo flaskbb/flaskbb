@@ -19,10 +19,10 @@
 <div class="col-md-9">
     <legend>{% trans %}Manage Users{% endtrans %}</legend>
 
-    <div class="pull-left" style="padding-bottom: 10px">
+    <div class="col-md-6">
         {{ render_pagination(users, url_for('management.users')) }}
     </div><!-- /.col-pull-left -->
-    <div class="pull-right" style="padding-bottom: 10px">
+    <div class="col-md-6">
         <form role="form" method="post">
             <div class="input-group">
                 {{ search_form.hidden_tag() }}
@@ -44,16 +44,17 @@
                 <th>{% trans %}Date registered{% endtrans %}</th>
                 <th>{% trans %}Group{% endtrans %}</th>
                 <th>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            Actions
-                            <span class="caret"></span>
+                    <div class="btn-group">
+                      <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle" data-original-title="" title="">
+                        Action
+                        <span class="caret">
+                        </span>
                       </button>
-                      <ul class="dropdown-menu" role="menu">
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">Ban selected Users</a></li>
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">Unban selected Users</a></li>
-                            <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">Delete selected Users</a></li>
-                        </ul>
+                      <ul class="dropdown-menu pull-right">
+                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">Ban selected Users</a></li>
+                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">Unban selected Users</a></li>
+                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">Delete selected Users</a></li>
+                      </ul>
                     </div>
                 </th>
             </tr>

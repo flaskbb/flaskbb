@@ -158,6 +158,10 @@ def delete_user(user_id=None):
 
         data = []
         for user in User.query.filter(User.id.in_(ids)).all():
+            # do not delete current user
+            if current_user.id == user.id:
+                continue
+
             if user.delete():
                 data.append({
                     "id": user.id,
@@ -230,7 +234,15 @@ def ban_user(user_id=None):
         data = []
         users = User.query.filter(User.id.in_(ids)).all()
         for user in users:
-            if user.ban():
+            # don't let a user ban himself and do not allow a moderator to ban
+            # a admin user
+            if current_user.id == user.id and \
+                    user.get_permissions()['admin'] and \
+                    (current_user.permissions['mod'] or
+                     current_user.permissions['super_mod']):
+                continue
+
+            elif user.ban():
                 data.append({
                     "id": user.id,
                     "type": "ban",
