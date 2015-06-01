@@ -179,6 +179,10 @@ def delete_user(user_id=None):
         )
 
     user = User.query.filter_by(id=user_id).first_or_404()
+    if current_user.id == user.id:
+        flash(_("You cannot delete yourself.", "danger"))
+        return redirect(url_for("management.users"))
+
     user.delete()
     flash(_("User successfully deleted."), "success")
     return redirect(url_for("management.users"))
@@ -236,7 +240,7 @@ def ban_user(user_id=None):
         for user in users:
             # don't let a user ban himself and do not allow a moderator to ban
             # a admin user
-            if current_user.id == user.id and \
+            if current_user.id == user.id or \
                     user.get_permissions()['admin'] and \
                     (current_user.permissions['mod'] or
                      current_user.permissions['super_mod']):
@@ -269,7 +273,7 @@ def ban_user(user_id=None):
         flash(_("A moderator cannot ban an admin user."), "danger")
         return redirect(url_for("management.overview"))
 
-    if user.ban():
+    if not current_user.id == user.id and user.ban():
         flash(_("User is now banned."), "success")
     else:
         flash(_("Could not ban user."), "danger")

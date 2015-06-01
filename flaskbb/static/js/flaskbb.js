@@ -8,6 +8,21 @@
  // get the csrf token from the header
 var csrftoken = $('meta[name=csrf-token]').attr('content');
 
+var show_management_search = function() {
+    var body = $('.management-body');
+    var form = body.find('.search-form');
+    console.log(body);
+    console.log(form);
+
+    // toggle
+    form.slideToggle(function() {
+        if(form.css('display') != 'none') {
+            //body.css('padding', '15px');
+            form.find('input').focus();
+        }
+    });
+};
+
 var change_link = function(data, link, text) {
     $.each(data, function(k, v) {
     });
@@ -83,8 +98,14 @@ var send_data = function(endpoint_url, data) {
 
             // check if there is something to reverse it, otherwise remove the DOM.
             if(v.reverse) {
+                console.log(v);
                 form.attr('action', v.reverse_url);
-                form.find('button').html(v.reverse_name);
+                if(v.type == 'ban') {
+                    reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>'
+                } else if (v.type == 'unban') {
+                    reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>'
+                }
+                form.find('button').html(reverse_html);
             } else {
                 form.parents('.action-row').remove();
             }

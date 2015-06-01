@@ -17,98 +17,168 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-    <legend>{% trans %}Manage Users{% endtrans %}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
 
-    <div class="col-md-6">
-        {{ render_pagination(users, url_for('management.users')) }}
-    </div><!-- /.col-pull-left -->
-    <div class="col-md-6">
-        <form role="form" method="post">
-            <div class="input-group">
-                {{ search_form.hidden_tag() }}
-                {{ group_field(search_form.search_query) }}
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
-                </span>
-            </div>
-        </form>
-    </div>
+                    <span class="fa fa-list"></span> Users
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
-                <th>#</th>
-                <th>{% trans %}Username{% endtrans %}</th>
-                <th>{% trans %}Posts{% endtrans %}</th>
-                <th>{% trans %}Date registered{% endtrans %}</th>
-                <th>{% trans %}Group{% endtrans %}</th>
-                <th>
-                    <div class="btn-group">
-                      <button data-toggle="dropdown" class="btn btn-xs dropdown-toggle" data-original-title="" title="">
-                        Action
-                        <span class="caret">
-                        </span>
-                      </button>
-                      <ul class="dropdown-menu pull-right">
-                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">Ban selected Users</a></li>
-                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">Unban selected Users</a></li>
-                          <li><a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">Delete selected Users</a></li>
-                      </ul>
+                    <div class="pull-right action-buttons">
+                        <div class="btn-group pull-right">
+                            <button type="button" class="btn btn-default btn-xs" onclick="return show_management_search()">
+                                <span class="fa fa-search" style="margin-right: 0px;"></span> Search
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">
+                                        <span class="fa fa-flag text-warning"></span> Ban selected Users
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
+                                        <span class="fa fa-flag text-success"></span> Unban selected Users
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">
+                                        <span class="fa fa-trash text-danger"></span> Delete selected Users
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users.items %}
-                <tr class="action-row">
-                    <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></td>
-                    <td>{{ user.id }}</td>
-                    <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
-                    <td>{{ user.post_count }}</td>
-                    <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-                    <td>{{ user.primary_group.name }}</td>
-                    <td>
-                        {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
-                            <a href="{{ url_for('management.edit_user', user_id = user.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                        {% endif %}
 
-                        {% if current_user|can_ban_user and not user.permissions['banned'] %}
-                            <form class="inline-form" id="ban-{{user.id}}" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button class="btn btn-link">{% trans %}Ban{% endtrans %}</button> |
-                            </form>
-                        {% endif %}
+                </div>
+                <div class="panel-body management-body">
 
-                        {% if current_user|can_ban_user and user.permissions['banned'] %}
-                            <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button class="btn btn-link">{% trans %}Unban{% endtrans %}</button> |
-                            </form>
-                        {% endif %}
 
-                        {% if current_user|is_admin %}
-                        <form class="inline-form" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                        </form>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="6">
-                        {% trans %}No users found matching your search criteria.{% endtrans %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    <form class="search-form" role="form" method="post">
+                        {{ search_form.hidden_tag() }}
+                        <div class="input-group">
+                            {{ group_field(search_form.search_query, css_class="form-control") }}
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
+                                <th>#</th>
+                                <th>{% trans %}Username{% endtrans %}</th>
+                                <th>{% trans %}Posts{% endtrans %}</th>
+                                <th>{% trans %}Date registered{% endtrans %}</th>
+                                <th>{% trans %}Group{% endtrans %}</th>
+                                <th>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            <span class="fa fa-cog" style="margin-right: 0px;"></span> Actions
+                                        </button>
+                                        <ul class="dropdown-menu slidedown">
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">
+                                                    <span class="fa fa-flag text-warning"></span> Ban selected Users
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
+                                                    <span class="fa fa-flag text-success"></span> Unban selected Users
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">
+                                                    <span class="fa fa-trash text-danger"></span> Delete selected Users
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users.items %}
+                            <tr class="action-row">
+                                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></td>
+                                <td>{{ user.id }}</td>
+                                <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+                                <td>{{ user.post_count }}</td>
+                                <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                                <td>{{ user.primary_group.name }}</td>
+                                <td>
+                                    {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
+                                        <a href="{{ url_for('management.edit_user', user_id = user.id) }}">
+                                            <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                                        <form class="inline-form" id="ban-{{user.id}}" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                            <button class="btn btn-link">
+                                                <span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="{% trans %}Ban{% endtrans %}"></span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if current_user|can_ban_user and user.permissions['banned'] %}
+                                        <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                            <button class="btn btn-link">
+                                                <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if current_user|is_admin %}
+                                    <form class="inline-form" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                        <button class="btn btn-link">
+                                            <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6">
+                                    {% trans %}No users found matching your search criteria.{% endtrans %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ render_pagination(users, url_for('management.users')) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
     <script>
-    var bulk_actions = new BulkActions()
+    var bulk_actions = new BulkActions();
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
     </script>
 {% endblock %}
