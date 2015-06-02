@@ -17,59 +17,111 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-    <legend>{% trans %}Banned Users{% endtrans %}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
 
-    <div class="pull-left" style="padding-bottom: 10px">
-        {{ render_pagination(users, url_for('management.users')) }}
-    </div>
-    <div class="pull-right" style="padding-bottom: 10px">
-        <form role="form" method="post">
-            <div class="input-group">
-                {{ search_form.hidden_tag() }}
-                {{ group_field(search_form.search_query) }}
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
-                </span>
+                    <span class="fa fa-users"></span> {% trans %}Banned Users{% endtrans %}
+
+                    <div class="pull-right action-buttons">
+                        <div class="btn-group pull-right">
+                            <button type="button" class="btn btn-default btn-xs" onclick="return show_management_search()">
+                                <span class="fa fa-search" style="margin-right: 0px;"></span> {% trans %}Search{% endtrans %}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="panel-body management-body">
+
+
+                    <form class="search-form" role="form" method="post">
+                        {{ search_form.hidden_tag() }}
+                        <div class="input-group">
+                            {{ group_field(search_form.search_query, css_class="form-control") }}
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
+                                <th>#</th>
+                                <th>{% trans %}Username{% endtrans %}</th>
+                                <th>{% trans %}Posts{% endtrans %}</th>
+                                <th>{% trans %}Date registered{% endtrans %}</th>
+                                <th>{% trans %}Group{% endtrans %}</th>
+                                <th>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            <span class="fa fa-cog" style="margin-right: 0px;"></span> {% trans %}Actions{% endtrans %}
+                                        </button>
+                                        <ul class="dropdown-menu slidedown">
+                                            <li>
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
+                                                    <span class="fa fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users.items %}
+                            <tr class="action-row">
+                                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></td>
+                                <td>{{ user.id }}</td>
+                                <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
+                                <td>{{ user.post_count }}</td>
+                                <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
+                                <td>{{ user.primary_group.name }}</td>
+                                <td>
+                                    {% if current_user|can_ban_user and user.permissions['banned'] %}
+                                        <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                            <button class="btn btn-link">
+                                                <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6">
+                                    {% trans %}No users found matching your search criteria.{% endtrans %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ render_pagination(users, url_for('management.users')) }}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>{% trans %}Username{% endtrans %}</th>
-                <th>{% trans %}Posts{% endtrans %}</th>
-                <th>{% trans %}Date registered{% endtrans %}</th>
-                <th>{% trans %}Group{% endtrans %}</th>
-                <th>{% trans %}Manage{% endtrans %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users.items %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td><a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a></td>
-                    <td>{{ user.post_count }}</td>
-                    <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-                    <td>{{ user.primary_group.name }}</td>
-                    <td>
-                        {% if current_user|can_ban_user and user.permissions['banned'] %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">{% trans %}Unban{% endtrans %}</button>
-                        </form>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="6">
-                        {% trans %}No users found matching your search criteria.{% endtrans %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    var bulk_actions = new BulkActions();
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 {% endblock %}
