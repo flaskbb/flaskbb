@@ -360,7 +360,7 @@ class Topic(db.Model):
     @classmethod
     @can_access_topic
     def get_topic(cls, topic_id, user):
-        topic = Topic.query.filter_by(id=topic_id).first()
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
         return topic
 
     def tracker_needs_update(self, forumsread, topicsread):
