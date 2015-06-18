@@ -44,8 +44,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for group in groups.items %}
-                            <tr>
+                        {% for group in groups.items %}
+                            <tr class="action-row">
                                 <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ group.id }}" title="Select Group"/></td>
                                 <td>{{ group.id }}</td>
                                 <td><a href="#">{{ group.name }}</a></td>
@@ -54,7 +54,7 @@
                                     <a href="{{ url_for('management.edit_group', group_id = group.id) }}">
                                         <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
                                     </a>
-                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
+                                    <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-link">
                                             <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
@@ -62,7 +62,7 @@
                                     </form>
                                 </td>
                             </tr>
-                            {% endfor %}
+                        {% endfor %}
                         </tbody>
                     </table>
 

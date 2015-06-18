@@ -119,7 +119,9 @@ class UserForm(Form):
             raise ValidationError(_("This E-Mail Address is already taken."))
 
     def save(self):
-        user = User(**self.data)
+        data = self.data
+        data.pop('submit', None)
+        user = User(**data)
         return user.save()
 
 
@@ -243,7 +245,9 @@ class GroupForm(Form):
             raise ValidationError(_("There is already a Guest group."))
 
     def save(self):
-        group = Group(**self.data)
+        data = self.data
+        data.pop('submit', None)
+        group = Group(**data)
         return group.save()
 
 
@@ -398,5 +402,7 @@ class CategoryForm(Form):
     submit = SubmitField(_("Save"))
 
     def save(self):
-        category = Category(**self.data)
+        data = self.data
+        data.pop('submit', None)
+        category = Category(**data)
         return category.save()

@@ -24,6 +24,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
                             <th>#</th>
                             <th>{% trans %}Poster{% endtrans %}</th>
                             <th>{% trans %}Topic{% endtrans %}</th>
@@ -48,7 +49,8 @@
                     </thead>
                     <tbody>
                         {% for report in reports.items %}
-                        <tr>
+                        <tr class="action-row">
+                            <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ report.id }}" title="Select Report"/></td>
                             <td>{{ report.id }}</td>
                             <td>{{ report.post.user.username }}</td>
                             <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.post.topic.title }}</a></td>
@@ -56,7 +58,7 @@
                             <td>{{ report.reason }}</td>
                             <td>{{ report.reported|time_since }}</td>
                             <td>
-                                <form class="inline-form" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
+                                <form class="inline-form" id="read-{{report.id}}" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                     <button class="btn btn-link">
                                         <span class="fa fa-flag-o text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Mark as Read{% endtrans %}"></span>

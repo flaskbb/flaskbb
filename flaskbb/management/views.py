@@ -351,6 +351,30 @@ def unread_reports():
 @management.route("/reports/markread", methods=["POST"])
 @moderator_required
 def report_markread(report_id=None):
+    # AJAX request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        data = []
+
+        for report in Report.query.filter(Report.id.in_(ids)).all():
+            report.zapped_by = current_user.id
+            report.zapped = datetime.utcnow()
+            report.save()
+            data.append({
+                "id": report.id,
+                "type": "read",
+                "reverse": False,
+                "reverse_name": None,
+                "reverse_url": None
+            })
+
+        return jsonify(
+            message="{} Reports marked as read.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
+
     # mark single report as read
     if report_id:
         report = Report.query.filter_by(id=report_id).first_or_404()
@@ -415,11 +439,48 @@ def edit_group(group_id):
 
 
 @management.route("/groups/<int:group_id>/delete", methods=["POST"])
+@management.route("/groups/delete", methods=["POST"])
 @admin_required
-def delete_group(group_id):
-    group = Group.query.filter_by(id=group_id).first_or_404()
-    group.delete()
-    flash(_("Group successfully deleted."), "success")
+def delete_group(group_id=None):
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        if not (set(ids) & set(["1", "2", "3", "4", "5"])):
+            data = []
+            for group in Group.query.filter(Group.id.in_(ids)).all():
+                group.delete()
+                data.append({
+                    "id": group.id,
+                    "type": "delete",
+                    "reverse": False,
+                    "reverse_name": None,
+                    "reverse_url": None
+                })
+
+            return jsonify(
+                message="{} Groups deleted.".format(len(data)),
+                category="success",
+                data=data,
+                status=200
+            )
+        return jsonify(
+            message=_("You cannot delete one of the standard groups."),
+            category="danger",
+            data=None,
+            status=404
+        )
+
+    if group_id is not None:
+        if group_id <= 5:  # there are 5 standard groups
+            flash(_("You cannot delete the standard groups. "
+                    "Try renaming them instead.", "danger"))
+            return redirect(url_for("management.groups"))
+
+        group = Group.query.filter_by(id=group_id).first_or_404()
+        group.delete()
+        flash(_("Group successfully deleted."), "success")
+        return redirect(url_for("management.groups"))
+
+    flash(_("No group choosen.."), "danger")
     return redirect(url_for("management.groups"))
 
 

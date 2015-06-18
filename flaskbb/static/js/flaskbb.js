@@ -11,8 +11,6 @@ var csrftoken = $('meta[name=csrf-token]').attr('content');
 var show_management_search = function() {
     var body = $('.management-body');
     var form = body.find('.search-form');
-    console.log(body);
-    console.log(form);
 
     // toggle
     form.slideToggle(function() {
@@ -98,7 +96,6 @@ var send_data = function(endpoint_url, data) {
 
             // check if there is something to reverse it, otherwise remove the DOM.
             if(v.reverse) {
-                console.log(v);
                 form.attr('action', v.reverse_url);
                 if(v.type == 'ban') {
                     reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>'
