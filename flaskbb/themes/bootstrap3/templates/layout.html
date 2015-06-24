@@ -135,9 +135,6 @@
 
         {# standard javascript libs #}
         {% block javascript %}
-        <script>
-            var BASE_URL = "/{{ request.path.split('/')[1] }}";
-        </script>
         <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/flaskbb.js') }}"></script>

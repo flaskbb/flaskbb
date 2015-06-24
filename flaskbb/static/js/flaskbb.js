@@ -21,9 +21,9 @@ var show_management_search = function() {
     });
 };
 
-var change_link = function(data, link, text) {
-    $.each(data, function(k, v) {
-    });
+var show_moderation_tools = function() {
+
+
 };
 
 var flash_message = function(message) {
@@ -67,17 +67,11 @@ var BulkActions = function() {
 
         return false;
     };
-
-    $(function() {
-        $('.action-checkall').change(function() {
-            $('input.action-checkbox').prop('checked', this.checked);
-        });
-    });
 };
 
 var send_data = function(endpoint_url, data) {
     $.ajax({
-        url: BASE_URL + endpoint_url,
+        url: endpoint_url,
         method: "POST",
         data: JSON.stringify(data),
         dataType: "json",
@@ -116,6 +110,20 @@ var send_data = function(endpoint_url, data) {
 
 $(document).ready(function () {
     // TODO: Refactor
+
+    $('#toggle-moderation-tools').click(function (event) {
+        event.preventDefault();
+
+        $('.forum-moderation').toggle();
+        $('.forum-selectall').toggle();
+        $('.forum-select').toggle();
+    });
+
+    // listen on the action-checkall checkbox to un/check all
+    $('.action-checkall').change(function() {
+        $('input.action-checkbox').prop('checked', this.checked);
+    });
+
     // Reply conversation
     $('.reply-btn').click(function (event) {
         event.preventDefault();

@@ -10,6 +10,10 @@ body {
   margin-bottom: 60px;
 }
 
+.forum-moderation, .forum-selectall, .forum-select {
+    display: none;
+}
+
 .footer {
   position: absolute;
   bottom: 0;

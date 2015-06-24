@@ -34,7 +34,7 @@
                                         </button>
                                         <ul class="dropdown-menu slidedown">
                                             <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/groups/delete', '{% trans %}Are you sure you want to delete these Groups?{% endtrans %}')">
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.delete_group') }}', '{% trans %}Are you sure you want to delete these Groups?{% endtrans %}')">
                                                     <span class="fa fa-trash text-danger"></span> {% trans %}Delete selected Groups{% endtrans %}
                                                 </a>
                                             </li>

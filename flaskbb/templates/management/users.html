@@ -63,19 +63,19 @@
                                         </button>
                                         <ul class="dropdown-menu slidedown">
                                             <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/ban', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.ban_user') }}', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">
                                                     <span class="fa fa-flag text-warning"></span> {% trans %}Ban selected Users{% endtrans %}
                                                 </a>
                                             </li>
 
                                             <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
                                                     <span class="fa fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
                                                 </a>
                                             </li>
 
                                             <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/delete', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.delete_user') }}', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">
                                                     <span class="fa fa-trash text-danger"></span> {% trans %}Delete selected Users{% endtrans %}
                                                 </a>
                                             </li>

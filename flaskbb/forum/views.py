@@ -12,7 +12,7 @@
 import datetime
 
 from flask import (Blueprint, redirect, url_for, current_app,
-                   request, flash)
+                   request, flash, jsonify)
 from flask_login import login_required, current_user
 from flask_babelex import gettext as _
 
@@ -170,22 +170,22 @@ def new_topic(forum_id, slug=None):
             )
         if "submit" in request.form and form.validate():
             topic = form.save(current_user, forum_instance)
-
             # redirect to the new topic
             return redirect(url_for('forum.view_topic', topic_id=topic.id))
+
     return render_template(
         "forum/new_topic.html", forum=forum_instance, form=form
     )
 
 
+@forum.route("/topic/delete", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/delete", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/delete", methods=["POST"])
 @login_required
-def delete_topic(topic_id, slug=None):
+def delete_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_delete_topic(user=current_user, topic=topic):
-
         flash(_("You do not have the permissions to delete this topic."),
               "danger")
         return redirect(topic.forum.url)
@@ -196,14 +196,42 @@ def delete_topic(topic_id, slug=None):
     return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 
+@forum.route("/topic/lock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/lock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/lock", methods=["POST"])
 @login_required
-def lock_topic(topic_id, slug=None):
+def lock_topic(topic_id=None, slug=None):
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        data = []
+
+        for topic in Topic.query.filter(Topic.id.in_(ids)).all():
+            # skip already locked topics
+            if topic.locked:
+                continue
+
+            # check if the user has the right permissions
+            if not can_moderate(user=current_user, forum=topic.forum):
+                return jsonify(status=550,
+                               message=_("You do not have the permissions to "
+                                         "lock this topic."),
+                               category="danger")
+
+            topic.locked = True
+            topic.save()
+
+            data.append({
+                "id": topic.id,
+                "type": "lock",
+                "reverse": "unlock",
+                "reverse_name": _("Unlock"),
+                "reverse_url": url_for("forum.unlock_topic")
+            })
+
+        return jsonify(message="{} topics locked.".format(len(data)),
+                       category="success", data=data, status=200)
+
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    # TODO: Bulk lock
-
     if not can_moderate(user=current_user, forum=topic.forum):
         flash(_("You do not have the permissions to lock this topic."),
               "danger")
@@ -214,15 +242,42 @@ def lock_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/unlock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/unlock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/unlock", methods=["POST"])
 @login_required
-def unlock_topic(topic_id, slug=None):
+def unlock_topic(topic_id=None, slug=None):
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        data = []
+
+        for topic in Topic.query.filter(Topic.id.in_(ids)).all():
+            # skip already locked topics
+            if not topic.locked:
+                continue
+
+            # check if the user has the right permissions
+            if not can_moderate(user=current_user, forum=topic.forum):
+                return jsonify(status=550,
+                               message=_("You do not have the permissions to "
+                                         "unlock this topic."),
+                               category="danger")
+
+            topic.locked = False
+            topic.save()
+
+            data.append({
+                "id": topic.id,
+                "type": "unlock",
+                "reverse": "lock",
+                "reverse_name": _("Lock"),
+                "reverse_url": url_for("forum.lock_topic")
+            })
+
+        return jsonify(message="{} topics unlocked.".format(len(data)),
+                       category="success", data=data, status=200)
+
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    # TODO: Bulk unlock
-
-    # Unlock is basically the same as lock
     if not can_moderate(user=current_user, forum=topic.forum):
         flash(_("You do not have the permissions to unlock this topic."),
               "danger")
@@ -233,10 +288,11 @@ def unlock_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/highlight", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/highlight", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/highlight", methods=["POST"])
 @login_required
-def highlight_topic(topic_id, slug=None):
+def highlight_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     if not can_moderate(user=current_user, forum=topic.forum):
@@ -249,10 +305,11 @@ def highlight_topic(topic_id, slug=None):
     return redirect(topic.url)
 
 
+@forum.route("/topic/trivialize", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/trivialize", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/trivialize", methods=["POST"])
 @login_required
-def trivialize_topic(topic_id, slug=None):
+def trivialize_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     # Unlock is basically the same as lock

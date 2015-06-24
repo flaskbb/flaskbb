@@ -38,7 +38,7 @@
                                     </button>
                                     <ul class="dropdown-menu slidedown">
                                         <li>
-                                            <a href="javascript:void(0)" onclick="return bulk_actions.execute('/reports/markread', '{% trans %}Are you sure you want to mark these Reports as read?{% endtrans %}')">
+                                            <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.report_markread') }}', '{% trans %}Are you sure you want to mark these Reports as read?{% endtrans %}')">
                                                 <span class="fa fa-flag-o text-primary"></span> {% trans %}Mark as Read{% endtrans %}
                                             </a>
                                         </li>

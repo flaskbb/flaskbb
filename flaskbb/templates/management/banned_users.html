@@ -63,7 +63,7 @@
                                         </button>
                                         <ul class="dropdown-menu slidedown">
                                             <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('/users/unban', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
+                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
                                                     <span class="fa fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
                                                 </a>
                                             </li>
