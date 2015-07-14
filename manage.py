@@ -79,8 +79,7 @@ def dropdb():
 @manager.command
 def populate(dropdb=False, createdb=False):
     """Creates the database with some default data.
-    If you do not want to drop or create the db add
-    '-c' (to not create the db) and '-d' (to not drop the db)
+    To drop or create the databse use the '-d' or '-c' options.
     """
 
     if dropdb:
