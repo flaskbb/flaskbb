@@ -3,7 +3,7 @@
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
-{% from theme("macros.html") import horizontal_field, render_boolean_field, navlink, tablink_href  with context %}
+{% from theme("macros.html") import horizontal_field, render_boolean_field, navlink  with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
@@ -15,43 +15,34 @@
 
 
 <div class="col-md-9" role="tabpanel">
-            <form class="form-horizontal" role="form" method="post">
-    <ul class="nav nav-tabs nav-justified">
-        {{ tablink_href('#basic', _('General Settings'), true) }}
-        {{ tablink_href('#perms', _('Group Access'))}}
-    </ul>
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="basic">
-                {{ form.hidden_tag() }}
-                <legend class="">{{ title }}</legend>
-                    {{ form.id }}
-                    {{ horizontal_field(form.title) }}
-                    {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
+    <form class="form-horizontal" role="form" method="post">
+        {{ form.hidden_tag() }}
+        <legend class="">{{ title }}</legend>
+        {{ form.id }}
+        {{ horizontal_field(form.title) }}
+        {{ horizontal_field(form.description, rows=5, div_class="col-lg-9") }}
 
-                    {{ horizontal_field(form.category) }}
-                    {{ horizontal_field(form.position) }}
+        {{ horizontal_field(form.category) }}
+        {{ horizontal_field(form.position) }}
 
-                    {{ horizontal_field(form.external) }}
+        {{ horizontal_field(form.external) }}
 
-                    {{ horizontal_field(form.moderators) }}
-                    {{ render_boolean_field(form.show_moderators) }}
+        {{ horizontal_field(form.moderators) }}
+        {{ render_boolean_field(form.show_moderators) }}
 
-                    {{ render_boolean_field(form.locked) }}
+        {{ render_boolean_field(form.locked) }}
 
-                    {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
 
-        </div>
-
-        <div role="tabpanel" class="tab-pane" id="perms">
-            <legend class="">{{ _("Group access to the forum") }}</legend>
+        <div id="perms">
+            <h4>{{ _("Group Access to the forum") }}</h4>
             {{ form.groups }}
-            {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
         </div>
 
-    </div>
-        </form>
+        {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
+    </form>
 </div>
 {% endblock %}
+
 {% block scripts %}
 {{ super() }}
 <script type="application/javascript" >
@@ -60,15 +51,9 @@
             PLACEHOLDER_TEXT: "Search Groups",
             BUILD_FULL_POST: false
         };
-{#        $('#my_megalist').attr('data-provider-src', '{{ group_list|safe }}');#}
-{#        $('#my_megalist').attr('data-provider-dst', "[]");#}
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            if ($(e.target).attr('href') == '#perms' && $('#groups').attr('inited') === undefined) { // newly activated tab
-                $('#groups').megalist(options);
-                $('#groups').attr('inited', true)
-            }
-        })
 
+        $('#groups').megalist(options);
+        $('#groups').attr('inited', true);
     });
 </script>
 {% endblock %}

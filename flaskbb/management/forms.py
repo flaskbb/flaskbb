@@ -45,7 +45,7 @@ def selectable_categories():
     return Category.query.order_by(Category.position)
 
 def selectable_groups():
-    return Group.query.order_by(Group.name.asc()).all()
+    return Group.query.order_by(Group.id.asc()).all()
 
 def select_primary_group():
     return Group.query.filter(Group.guest != True).order_by(Group.id)
@@ -380,16 +380,12 @@ class ForumForm(Form):
         else:
             field.data = []
 
-    def save(self, obj=None):
-
+    def save(self):
         data = self.data
         # remove the button
         data.pop('submit', None)
         forum = Forum(**data)
-        # flush SQLA info from created instabce so that it can be merged
-        make_transient(forum)
-        make_transient_to_detached(forum)
-
+        # flush SQLA info from created instance so that it can be merged
         return forum.save()
 
 
@@ -401,6 +397,17 @@ class EditForumForm(ForumForm):
         self.forum = forum
         kwargs['obj'] = self.forum
         ForumForm.__init__(self, *args, **kwargs)
+
+    def save(self):
+        data = self.data
+        # remove the button
+        data.pop('submit', None)
+        forum = Forum(**data)
+        # flush SQLA info from created instance so that it can be merged
+        make_transient(forum)
+        make_transient_to_detached(forum)
+
+        return forum.save()
 
 
 class AddForumForm(ForumForm):
