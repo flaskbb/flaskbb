@@ -1,57 +1,59 @@
-# Translations template for PROJECT.
+# Chinese (Simplified, China) translations for PROJECT.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <realityone@me.com>, 2015.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Project-Id-Version: 0.1-dev\n"
+"Report-Msgid-Bugs-To: https://github.com/realityone/flaskbb\n"
 "POT-Creation-Date: 2015-07-14 22:49+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2015-07-15 10:53+0800\n"
+"Language-Team: FlaskBB in zh_Hans_CN\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+"Last-Translator: ZHOU JIAHUI <realityone@me.com>\n"
+"Language: zh\n"
+"X-Generator: Poedit 1.8.1\n"
 
 #: flaskbb/email.py:20
 msgid "Password Reset"
-msgstr ""
+msgstr "密码重置"
 
 #: flaskbb/auth/forms.py:24 flaskbb/management/forms.py:37
 msgid "You can only use letters, numbers or dashes."
-msgstr ""
+msgstr "您只能使用字母、数字与短划线"
 
 #: flaskbb/auth/forms.py:28
 msgid "Username or E-Mail Address"
-msgstr ""
+msgstr "用户名或邮箱地址"
 
 #: flaskbb/auth/forms.py:29
 msgid "A Username or E-Mail Address is required."
-msgstr ""
+msgstr "请输入用户名或邮箱地址。"
 
 #: flaskbb/auth/forms.py:32 flaskbb/auth/forms.py:49 flaskbb/auth/forms.py:83
 #: flaskbb/auth/forms.py:104 flaskbb/user/forms.py:67
 msgid "Password"
-msgstr ""
+msgstr "密码"
 
 #: flaskbb/auth/forms.py:33 flaskbb/auth/forms.py:84
 msgid "A Password is required."
-msgstr ""
+msgstr "请输入密码。"
 
 #: flaskbb/auth/forms.py:35
 msgid "Remember Me"
-msgstr ""
+msgstr "记住我"
 
 #: flaskbb/auth/forms.py:37 flaskbb/templates/layout.html:89
 #: flaskbb/templates/auth/login.html:1 flaskbb/templates/auth/login.html:8
 #: flaskbb/themes/bootstrap2/templates/layout.html:90
 #: flaskbb/themes/bootstrap3/templates/layout.html:89
 msgid "Login"
-msgstr ""
+msgstr "登录"
 
 #: flaskbb/auth/forms.py:41 flaskbb/management/forms.py:55
 #: flaskbb/templates/forum/memberlist.html:31
@@ -59,73 +61,72 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:41
 #: flaskbb/templates/management/users.html:41
 msgid "Username"
-msgstr ""
+msgstr "用户名"
 
 #: flaskbb/auth/forms.py:42 flaskbb/management/forms.py:56
 #: flaskbb/message/forms.py:23
 msgid "A Username is required."
-msgstr ""
+msgstr "请输入用户名。"
 
 #: flaskbb/auth/forms.py:45 flaskbb/auth/forms.py:90 flaskbb/auth/forms.py:100
 #: flaskbb/management/forms.py:59
 msgid "E-Mail Address"
-msgstr ""
+msgstr "邮箱地址"
 
 #: flaskbb/auth/forms.py:46 flaskbb/auth/forms.py:101
 #: flaskbb/management/forms.py:60 flaskbb/user/forms.py:37
 msgid "A E-Mail Address is required."
-msgstr ""
+msgstr "请输入邮箱地址"
 
 #: flaskbb/auth/forms.py:47 flaskbb/management/forms.py:61
 #: flaskbb/user/forms.py:38 flaskbb/user/forms.py:43 flaskbb/user/forms.py:46
 msgid "Invalid E-Mail Address."
-msgstr ""
+msgstr "不正确的邮箱地址"
 
 #: flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:106 flaskbb/user/forms.py:69
 msgid "Passwords must match."
-msgstr ""
+msgstr "两次输入的密码不一致。"
 
 #: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:108
 msgid "Confirm Password"
-msgstr ""
+msgstr "校验密码"
 
 #: flaskbb/auth/forms.py:55
 msgid "I accept the Terms of Service"
-msgstr ""
+msgstr "我同意并遵守服务条例"
 
 #: flaskbb/auth/forms.py:57 flaskbb/templates/layout.html:95
-#: flaskbb/templates/auth/register.html:1
-#: flaskbb/templates/auth/register.html:8
+#: flaskbb/templates/auth/register.html:1 flaskbb/templates/auth/register.html:8
 #: flaskbb/themes/bootstrap2/templates/layout.html:96
 #: flaskbb/themes/bootstrap3/templates/layout.html:95
 msgid "Register"
-msgstr ""
+msgstr "注册"
 
 #: flaskbb/auth/forms.py:62 flaskbb/management/forms.py:116
 msgid "This Username is already taken."
-msgstr ""
+msgstr "该用户名已被使用。"
 
 #: flaskbb/auth/forms.py:67 flaskbb/management/forms.py:130
 #: flaskbb/user/forms.py:60
 msgid "This E-Mail Address is already taken."
-msgstr ""
+msgstr "该邮箱已被使用。"
 
 #: flaskbb/auth/forms.py:79
 msgid "Captcha"
-msgstr ""
+msgstr "验证码"
 
 #: flaskbb/auth/forms.py:86 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:9
 msgid "Refresh Login"
-msgstr ""
+msgstr "重新登录"
 
 #: flaskbb/auth/forms.py:91
 msgid "A E-Mail Address is reguired."
-msgstr ""
+msgstr "请输入邮箱地址。"
 
 #: flaskbb/auth/forms.py:94 flaskbb/templates/auth/forgot_password.html:1
 msgid "Request Password"
-msgstr ""
+msgstr "请求重置密码"
 
 #: flaskbb/auth/forms.py:110 flaskbb/templates/layout.html:96
 #: flaskbb/templates/auth/forgot_password.html:8
@@ -134,105 +135,102 @@ msgstr ""
 #: flaskbb/themes/bootstrap2/templates/layout.html:97
 #: flaskbb/themes/bootstrap3/templates/layout.html:96
 msgid "Reset Password"
-msgstr ""
+msgstr "重置密码"
 
 #: flaskbb/auth/forms.py:115
 msgid "Wrong E-Mail Address."
-msgstr ""
+msgstr "错误的邮箱地址"
 
 #: flaskbb/auth/views.py:45
 msgid "Wrong Username or Password."
-msgstr ""
+msgstr "错误的用户名或密码。"
 
 #: flaskbb/auth/views.py:60
 msgid "Reauthenticated."
-msgstr ""
+msgstr "重新认证身份。"
 
 #: flaskbb/auth/views.py:96
 msgid "Thanks for registering."
-msgstr ""
+msgstr "感谢您的注册。"
 
 #: flaskbb/auth/views.py:118
 msgid "E-Mail sent! Please check your inbox."
-msgstr ""
+msgstr "邮件已发送至您的邮箱"
 
 #: flaskbb/auth/views.py:121
 msgid ""
-"You have entered a Username or E-Mail Address that is not linked with "
-"your account."
-msgstr ""
+"You have entered a Username or E-Mail Address that is not linked with your "
+"account."
+msgstr "您输入的邮箱没有关联至您的账户。"
 
 #: flaskbb/auth/views.py:141
 msgid "Your Password Token is invalid."
-msgstr ""
+msgstr "您的令牌已不合法。"
 
 #: flaskbb/auth/views.py:145
 msgid "Your Password Token is expired."
-msgstr ""
+msgstr "你的令牌已过期。"
 
 #: flaskbb/auth/views.py:151
 msgid "Your Password has been updated."
-msgstr ""
+msgstr "您的密码已被更新。"
 
 #: flaskbb/forum/forms.py:22
 msgid "Quick Reply"
-msgstr ""
+msgstr "快速回复"
 
-#: flaskbb/forum/forms.py:23 flaskbb/forum/forms.py:34
-#: flaskbb/forum/forms.py:55
+#: flaskbb/forum/forms.py:23 flaskbb/forum/forms.py:34 flaskbb/forum/forms.py:55
 msgid "You cannot post a reply without content."
-msgstr ""
+msgstr "您不能发表一个空的回复。"
 
 #: flaskbb/forum/forms.py:25 flaskbb/forum/forms.py:39
 #: flaskbb/templates/forum/topic.html:146
 #: flaskbb/templates/forum/topic_controls.html:25
 msgid "Reply"
-msgstr ""
+msgstr "回复"
 
-#: flaskbb/forum/forms.py:33 flaskbb/forum/forms.py:54
-#: flaskbb/forum/forms.py:100
+#: flaskbb/forum/forms.py:33 flaskbb/forum/forms.py:54 flaskbb/forum/forms.py:100
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #: flaskbb/forum/forms.py:36 flaskbb/forum/forms.py:57
 msgid "Track this Topic"
-msgstr ""
+msgstr "关注该主题"
 
 #: flaskbb/forum/forms.py:40 flaskbb/forum/forms.py:61
 #: flaskbb/templates/forum/new_post.html:28
 #: flaskbb/templates/forum/new_topic.html:27
 msgid "Preview"
-msgstr ""
+msgstr "预览"
 
 #: flaskbb/forum/forms.py:51
 msgid "Topic Title"
-msgstr ""
+msgstr "标题"
 
 #: flaskbb/forum/forms.py:52
 msgid "Please choose a Topic Title."
-msgstr ""
+msgstr "请输入一个标题"
 
 #: flaskbb/forum/forms.py:60
 msgid "Post Topic"
-msgstr ""
+msgstr "发表主题"
 
 #: flaskbb/forum/forms.py:73 flaskbb/templates/management/reports.html:29
 #: flaskbb/templates/management/unread_reports.html:29
 msgid "Reason"
-msgstr ""
+msgstr "原因"
 
 #: flaskbb/forum/forms.py:74
 msgid "What's the reason for reporting this post?"
-msgstr ""
+msgstr "您为何报告这个主题？"
 
 #: flaskbb/forum/forms.py:77 flaskbb/templates/forum/report_post.html:1
 #: flaskbb/templates/forum/report_post.html:13
 msgid "Report Post"
-msgstr ""
+msgstr "报告主题"
 
-#: flaskbb/forum/forms.py:85 flaskbb/forum/forms.py:89
-#: flaskbb/forum/forms.py:104 flaskbb/templates/layout.html:50
-#: flaskbb/templates/forum/memberlist.html:21
+#: flaskbb/forum/forms.py:85 flaskbb/forum/forms.py:89 flaskbb/forum/forms.py:104
+#: flaskbb/templates/layout.html:50 flaskbb/templates/forum/memberlist.html:21
 #: flaskbb/templates/forum/search_form.html:1
 #: flaskbb/templates/forum/search_form.html:9
 #: flaskbb/templates/forum/search_form.html:13
@@ -243,15 +241,15 @@ msgstr ""
 #: flaskbb/themes/bootstrap2/templates/layout.html:51
 #: flaskbb/themes/bootstrap3/templates/layout.html:50
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: flaskbb/forum/forms.py:97
 msgid "Criteria"
-msgstr ""
+msgstr "条件"
 
 #: flaskbb/forum/forms.py:101
 msgid "Post"
-msgstr ""
+msgstr "回复"
 
 #: flaskbb/forum/forms.py:101 flaskbb/templates/forum/forum.html:50
 #: flaskbb/templates/forum/search_result.html:113
@@ -260,7 +258,7 @@ msgstr ""
 #: flaskbb/templates/management/unread_reports.html:27
 #: flaskbb/templates/user/all_topics.html:26
 msgid "Topic"
-msgstr ""
+msgstr "主题"
 
 #: flaskbb/forum/forms.py:102 flaskbb/templates/layout.html:48
 #: flaskbb/templates/forum/category.html:8
@@ -277,487 +275,485 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:38
 #: flaskbb/templates/message/message_layout.html:6
 #: flaskbb/templates/user/all_posts.html:6
-#: flaskbb/templates/user/all_topics.html:6
-#: flaskbb/templates/user/profile.html:4
+#: flaskbb/templates/user/all_topics.html:6 flaskbb/templates/user/profile.html:4
 #: flaskbb/templates/user/settings_layout.html:6
 #: flaskbb/themes/bootstrap2/templates/layout.html:49
 #: flaskbb/themes/bootstrap3/templates/layout.html:48
 msgid "Forum"
-msgstr ""
+msgstr "论坛"
 
 #: flaskbb/forum/forms.py:102 flaskbb/templates/forum/search_result.html:77
 #: flaskbb/templates/management/management_layout.html:12
 #: flaskbb/templates/management/overview.html:29
 #: flaskbb/templates/management/users.html:1
 msgid "Users"
-msgstr ""
+msgstr "用户"
 
 #: flaskbb/forum/views.py:160
 msgid "You do not have the permissions to create a new topic."
-msgstr ""
+msgstr "您没有权限创建一个新主题。"
 
 #: flaskbb/forum/views.py:189
 msgid "You do not have the permissions to delete this topic."
-msgstr ""
+msgstr "你没有权限删除该主题。"
 
 #: flaskbb/forum/views.py:208
 msgid "You do not have the permissions to lock this topic."
-msgstr ""
+msgstr "您没有权限锁上该主题。"
 
 #: flaskbb/forum/views.py:227
 msgid "You do not have the permissions to unlock this topic."
-msgstr ""
+msgstr "您没有权限解锁该主题。"
 
 #: flaskbb/forum/views.py:243
 msgid "You do not have the permissions to highlight this topic."
-msgstr ""
+msgstr "您没有权限高亮该主题。"
 
 #: flaskbb/forum/views.py:260
 msgid "You do not have the permissions to trivialize this topic."
-msgstr ""
+msgstr "您没有权限去高亮该主题。"
 
 #: flaskbb/forum/views.py:282
 msgid "You do not have the permissions to move this topic."
-msgstr ""
+msgstr "您没有权限移动该主题。"
 
 #: flaskbb/forum/views.py:287
 #, python-format
 msgid "Could not move the topic to forum %(title)s."
-msgstr ""
+msgstr "无法将本主题移动至 %(title)s。"
 
 #: flaskbb/forum/views.py:291
 #, python-format
 msgid "Topic was moved to forum %(title)s."
-msgstr ""
+msgstr "本主题已被移动至 %(title)s。"
 
 #: flaskbb/forum/views.py:310
 msgid "You do not have the permissions to merge this topic."
-msgstr ""
+msgstr "您没有权限合并该主题。"
 
 #: flaskbb/forum/views.py:315
 msgid "Could not merge the topics."
-msgstr ""
+msgstr "无法合并主题。"
 
 #: flaskbb/forum/views.py:318
 msgid "Topics succesfully merged."
-msgstr ""
+msgstr "主题已被成功合并。"
 
 #: flaskbb/forum/views.py:329 flaskbb/forum/views.py:356
 msgid "You do not have the permissions to post in this topic."
-msgstr ""
+msgstr "您没有权限回复该主题。"
 
 #: flaskbb/forum/views.py:382
 msgid "You do not have the permissions to edit this post."
-msgstr ""
+msgstr "您没有权限编辑本条回复。"
 
 #: flaskbb/forum/views.py:412
 msgid "You do not have the permissions to delete this post."
-msgstr ""
+msgstr "您没有权限删除本条回复。"
 
 #: flaskbb/forum/views.py:436
 msgid "Thanks for reporting."
-msgstr ""
+msgstr "感谢您的报告。"
 
 #: flaskbb/forum/views.py:473
 #, python-format
 msgid "Forum %(forum)s marked as read."
-msgstr ""
+msgstr "论坛 %(forum)s 已被标记为已读。"
 
 #: flaskbb/forum/views.py:495
 msgid "All forums marked as read."
-msgstr ""
+msgstr "所有论坛已被标记为已读。"
 
 #: flaskbb/management/forms.py:66 flaskbb/templates/user/profile.html:77
 #: flaskbb/user/forms.py:81
 msgid "Birthday"
-msgstr ""
+msgstr "生日"
 
 #: flaskbb/management/forms.py:70 flaskbb/user/forms.py:85
 msgid "Gender"
-msgstr ""
+msgstr "性别"
 
 #: flaskbb/management/forms.py:72 flaskbb/user/forms.py:87
 msgid "Male"
-msgstr ""
+msgstr "男"
 
 #: flaskbb/management/forms.py:73 flaskbb/user/forms.py:88
 msgid "Female"
-msgstr ""
+msgstr "女"
 
 #: flaskbb/management/forms.py:75 flaskbb/templates/user/profile.html:73
 #: flaskbb/user/forms.py:90
 msgid "Location"
-msgstr ""
+msgstr "位置"
 
 #: flaskbb/management/forms.py:78 flaskbb/templates/forum/topic.html:114
 #: flaskbb/user/forms.py:93
 msgid "Website"
-msgstr ""
+msgstr "网站"
 
 #: flaskbb/management/forms.py:81 flaskbb/user/forms.py:96
 msgid "Avatar"
-msgstr ""
+msgstr "头像"
 
 #: flaskbb/management/forms.py:84 flaskbb/user/forms.py:99
 msgid "Forum Signature"
-msgstr ""
+msgstr "签名"
 
 #: flaskbb/management/forms.py:87 flaskbb/user/forms.py:102
 msgid "Notes"
-msgstr ""
+msgstr "个人说明"
 
 #: flaskbb/management/forms.py:91
 msgid "Primary Group"
-msgstr ""
+msgstr "主用户组"
 
 #: flaskbb/management/forms.py:96
 msgid "Secondary Groups"
-msgstr ""
+msgstr "次要用户组"
 
 #: flaskbb/management/forms.py:102 flaskbb/management/forms.py:212
 #: flaskbb/management/forms.py:328 flaskbb/management/forms.py:434
 #: flaskbb/templates/management/settings.html:39 flaskbb/user/forms.py:32
 #: flaskbb/user/forms.py:48 flaskbb/user/forms.py:73 flaskbb/user/forms.py:105
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: flaskbb/management/forms.py:149 flaskbb/templates/management/groups.html:25
 msgid "Group Name"
-msgstr ""
+msgstr "用户组名"
 
 #: flaskbb/management/forms.py:150
 msgid "A Group name is required."
-msgstr ""
+msgstr "请输入用户组名。"
 
 #: flaskbb/management/forms.py:152 flaskbb/management/forms.py:279
 #: flaskbb/management/forms.py:422 flaskbb/templates/management/groups.html:26
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: flaskbb/management/forms.py:156
 msgid "Is Admin Group?"
-msgstr ""
+msgstr "管理员组？"
 
 #: flaskbb/management/forms.py:157
 msgid "With this option the group has access to the admin panel."
-msgstr ""
+msgstr "勾上本选项后本群用户能够访问管理员面板。"
 
 #: flaskbb/management/forms.py:161
 msgid "Is Super Moderator Group?"
-msgstr ""
+msgstr "超级版主组？"
 
 #: flaskbb/management/forms.py:162
 msgid "Check this if the users in this group are allowed to moderate every forum."
-msgstr ""
+msgstr "勾上本选项后本群用户能够管理所有论坛。"
 
 #: flaskbb/management/forms.py:166
 msgid "Is Moderator Group?"
-msgstr ""
+msgstr "版主组？"
 
 #: flaskbb/management/forms.py:167
 msgid ""
-"Check this if the users in this group are allowed to moderate specified "
-"forums."
-msgstr ""
+"Check this if the users in this group are allowed to moderate specified forums."
+msgstr "勾上本选项后本群用户能够管理特定的论坛。"
 
 #: flaskbb/management/forms.py:171
 msgid "Is Banned Group?"
-msgstr ""
+msgstr "禁止用户组？"
 
 #: flaskbb/management/forms.py:172
 msgid "Only one Banned group is allowed."
-msgstr ""
+msgstr "只允许存在一个禁止用户组。"
 
 #: flaskbb/management/forms.py:175
 msgid "Is Guest Group?"
-msgstr ""
+msgstr "来宾组？"
 
 #: flaskbb/management/forms.py:176
 msgid "Only one Guest group is allowed."
-msgstr ""
+msgstr "只允许存在一个来宾用户组。"
 
 #: flaskbb/management/forms.py:179
 msgid "Can edit posts"
-msgstr ""
+msgstr "能编辑回复"
 
 #: flaskbb/management/forms.py:180
 msgid "Check this if the users in this group can edit posts."
-msgstr ""
+msgstr "勾上本选项后本群用户可以编辑回复。"
 
 #: flaskbb/management/forms.py:183
 msgid "Can delete posts"
-msgstr ""
+msgstr "能删除回复"
 
 #: flaskbb/management/forms.py:184
 msgid "Check this is the users in this group can delete posts."
-msgstr ""
+msgstr "勾上本选项后本群用户可以删除回复。"
 
 #: flaskbb/management/forms.py:187
 msgid "Can delete topics"
-msgstr ""
+msgstr "能删除主题"
 
 #: flaskbb/management/forms.py:188
 msgid "Check this is the users in this group can delete topics."
-msgstr ""
+msgstr "勾上本选项后本群用户可以删除主题。"
 
 #: flaskbb/management/forms.py:192
 msgid "Can create topics"
-msgstr ""
+msgstr "能创建主题"
 
 #: flaskbb/management/forms.py:193
 msgid "Check this is the users in this group can create topics."
-msgstr ""
+msgstr "勾上本选项后本群用户可以创建回复。"
 
 #: flaskbb/management/forms.py:197
 msgid "Can post replies"
-msgstr ""
+msgstr "能创建回复"
 
 #: flaskbb/management/forms.py:198
 msgid "Check this is the users in this group can post replies."
-msgstr ""
+msgstr "勾上本选项后本群用户可以创建回复。"
 
 #: flaskbb/management/forms.py:202
 msgid "Moderators can edit user profiles"
-msgstr ""
+msgstr "版主能够修改用户资料"
 
 #: flaskbb/management/forms.py:203
 msgid ""
-"Allow moderators to edit a another users profile including password and "
-"email changes."
-msgstr ""
+"Allow moderators to edit a another users profile including password and email "
+"changes."
+msgstr "允许版主能够编辑其他用户的资料（包括密码和邮箱地址）"
 
 #: flaskbb/management/forms.py:208
 msgid "Moderators can ban users"
-msgstr ""
+msgstr "版主能够禁止用户"
 
 #: flaskbb/management/forms.py:209
 msgid "Allow moderators to ban other users."
-msgstr ""
+msgstr "允许版主能够禁止其他用户。"
 
 #: flaskbb/management/forms.py:226
 msgid "This Group name is already taken."
-msgstr ""
+msgstr "该用户组名已被使用"
 
 #: flaskbb/management/forms.py:240
 msgid "There is already a Banned group."
-msgstr ""
+msgstr "已存在禁止用户组了。"
 
 #: flaskbb/management/forms.py:254
 msgid "There is already a Guest group."
-msgstr ""
+msgstr "已存在来宾用户组。"
 
 #: flaskbb/management/forms.py:274
 msgid "Forum Title"
-msgstr ""
+msgstr "论坛标题"
 
 #: flaskbb/management/forms.py:275
 msgid "A Forum Title is required."
-msgstr ""
+msgstr "请输入论坛标题。"
 
 #: flaskbb/management/forms.py:281 flaskbb/management/forms.py:424
 msgid "You can format your description with BBCode."
-msgstr ""
+msgstr "您可以使用 BBCode 来格式化您的描述。"
 
 #: flaskbb/management/forms.py:285 flaskbb/management/forms.py:428
 msgid "Position"
-msgstr ""
+msgstr "先后位置"
 
 #: flaskbb/management/forms.py:287
 msgid "The Forum Position is required."
-msgstr ""
+msgstr "请输入一个先后位置。"
 
 #: flaskbb/management/forms.py:291
 msgid "Category"
-msgstr ""
+msgstr "分类"
 
 #: flaskbb/management/forms.py:295
 msgid "The category that contains this forum."
-msgstr ""
+msgstr "该论坛将位与此分类之下。"
 
 #: flaskbb/management/forms.py:299
 msgid "External Link"
-msgstr ""
+msgstr "外部链接"
 
 #: flaskbb/management/forms.py:301
 msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr ""
+msgstr "链接到外部的网站（例：’http://flaskbb.org'）。"
 
 #: flaskbb/management/forms.py:305
 #: flaskbb/templates/forum/category_layout.html:60
 #: flaskbb/templates/forum/search_result.html:233
 msgid "Moderators"
-msgstr ""
+msgstr "版主"
 
 #: flaskbb/management/forms.py:306
 msgid ""
 "Comma seperated usernames. Leave it blank if you do not want to set any "
 "moderators."
-msgstr ""
+msgstr "使用逗号来分割用户。如果您不想设置版主的话留空即可。"
 
 #: flaskbb/management/forms.py:311
 msgid "Show Moderators"
-msgstr ""
+msgstr "展示版主"
 
 #: flaskbb/management/forms.py:312
 msgid "Do you want show the moderators on the index page?"
-msgstr ""
+msgstr "您是否想在主页上显示版主？"
 
 #: flaskbb/management/forms.py:316
 msgid "Locked?"
-msgstr ""
+msgstr "加锁？"
 
 #: flaskbb/management/forms.py:317
 msgid "Disable new posts and topics in this forum."
-msgstr ""
+msgstr "在该论坛禁止发表新主题与回复。"
 
 #: flaskbb/management/forms.py:321
 msgid "Group Access to Forum"
-msgstr ""
+msgstr "能够访问本论坛的用户组。"
 
 #: flaskbb/management/forms.py:325
 msgid "Select user groups that can access this forum."
-msgstr ""
+msgstr "请选择可以访问本论坛的用户组。"
 
 #: flaskbb/management/forms.py:333
 msgid "You cannot convert a forum that contain topics in a external link."
-msgstr ""
+msgstr "您不能改变一个主题包含外部链接的论坛。"
 
 #: flaskbb/management/forms.py:338
 msgid "You also need to specify some moderators."
-msgstr ""
+msgstr "您需要指定版主。"
 
 #: flaskbb/management/forms.py:359
 #, python-format
 msgid "%(user)s is not in a moderators group."
-msgstr ""
+msgstr "用户 %(user)s 不在版主组里。"
 
 #: flaskbb/management/forms.py:365
 #, python-format
 msgid "User %(moderator)s not found."
-msgstr ""
+msgstr "没有找到用户 %(moderator)s。"
 
 #: flaskbb/management/forms.py:418
 msgid "Category Title"
-msgstr ""
+msgstr "分类标题"
 
 #: flaskbb/management/forms.py:419
 msgid "A Category Title is required."
-msgstr ""
+msgstr "请输入分类标题。"
 
 #: flaskbb/management/forms.py:430
 msgid "The Category Position is required."
-msgstr ""
+msgstr "请输入分类的先后位置。"
 
 #: flaskbb/management/views.py:85
 msgid "Settings saved."
-msgstr ""
+msgstr "设置已被保存。"
 
 #: flaskbb/management/views.py:124
 msgid "You are not allowed to edit this user."
-msgstr ""
+msgstr "您没有权限编辑该用户。"
 
 #: flaskbb/management/views.py:144
 msgid "User successfully updated."
-msgstr ""
+msgstr "用户信息已被成功更新。"
 
 #: flaskbb/management/views.py:148
 msgid "Edit User"
-msgstr ""
+msgstr "编辑用户。"
 
 #: flaskbb/management/views.py:156
 msgid "User successfully deleted."
-msgstr ""
+msgstr "删除用户成功。"
 
 #: flaskbb/management/views.py:166
 msgid "User successfully added."
-msgstr ""
+msgstr "添加用户成功。"
 
 #: flaskbb/management/views.py:170
 #: flaskbb/templates/management/banned_users.html:14
 #: flaskbb/templates/management/user_form.html:14
 #: flaskbb/templates/management/users.html:14
 msgid "Add User"
-msgstr ""
+msgstr "添加用户"
 
 #: flaskbb/management/views.py:199
 msgid "You do not have the permissions to ban this user."
-msgstr ""
+msgstr "您没有权限禁止该用户。"
 
 #: flaskbb/management/views.py:209
 msgid "A moderator cannot ban an admin user."
-msgstr ""
+msgstr "一个版主无法禁止一个管理员。"
 
 #: flaskbb/management/views.py:213
 msgid "User is now banned."
-msgstr ""
+msgstr "该用户已被禁止。"
 
 #: flaskbb/management/views.py:215
 msgid "Could not ban user."
-msgstr ""
+msgstr "无法禁止该用户。"
 
 #: flaskbb/management/views.py:224
 msgid "You do not have the permissions to unban this user."
-msgstr ""
+msgstr "您没有权限恢复该用户。"
 
 #: flaskbb/management/views.py:231
 msgid "User is now unbanned."
-msgstr ""
+msgstr "该用户已被恢复。"
 
 #: flaskbb/management/views.py:233
 msgid "Could not unban user."
-msgstr ""
+msgstr "无法恢复该用户。"
 
 #: flaskbb/management/views.py:271
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "报告 %(id)s 已被标记为已读。"
 
 #: flaskbb/management/views.py:278
 #, python-format
 msgid "Report %(id)s marked as read."
-msgstr ""
+msgstr "报告 %(id)s 被标记为已读。"
 
 #: flaskbb/management/views.py:292
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "所有报告被标记为已读。"
 
 #: flaskbb/management/views.py:323
 msgid "Group successfully updated."
-msgstr ""
+msgstr "成功更新用户组信息。"
 
 #: flaskbb/management/views.py:327
 msgid "Edit Group"
-msgstr ""
+msgstr "编辑用户组"
 
 #: flaskbb/management/views.py:335
 msgid "Group successfully deleted."
-msgstr ""
+msgstr "删除用户组成功。"
 
 #: flaskbb/management/views.py:345
 msgid "Group successfully added."
-msgstr ""
+msgstr "添加用户组成功。"
 
 #: flaskbb/management/views.py:349
 #: flaskbb/templates/management/group_form.html:11
 #: flaskbb/templates/management/groups.html:10
 msgid "Add Group"
-msgstr ""
+msgstr "添加用户组"
 
 #: flaskbb/management/views.py:368
 msgid "Forum successfully updated."
-msgstr ""
+msgstr "成功更新论坛信息。"
 
 #: flaskbb/management/views.py:379
 msgid "Edit Forum"
-msgstr ""
+msgstr "编辑论坛"
 
 #: flaskbb/management/views.py:392
 msgid "Forum successfully deleted."
-msgstr ""
+msgstr "删除论坛成功。"
 
 #: flaskbb/management/views.py:404
 msgid "Forum successfully added."
-msgstr ""
+msgstr "添加论坛成功。"
 
 #: flaskbb/management/views.py:413
 #: flaskbb/templates/management/category_form.html:11
@@ -765,159 +761,162 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:10
 #: flaskbb/templates/management/forums.html:27
 msgid "Add Forum"
-msgstr ""
+msgstr "添加论坛"
 
 #: flaskbb/management/views.py:423
 msgid "Category successfully added."
-msgstr ""
+msgstr "添加分类成功。"
 
 #: flaskbb/management/views.py:427
 #: flaskbb/templates/management/category_form.html:12
 #: flaskbb/templates/management/forum_form.html:12
 #: flaskbb/templates/management/forums.html:11
 msgid "Add Category"
-msgstr ""
+msgstr "添加分类"
 
 #: flaskbb/management/views.py:439
 msgid "Category successfully updated."
-msgstr ""
+msgstr "成功更新分类信息。"
 
 #: flaskbb/management/views.py:443
 msgid "Edit Category"
-msgstr ""
+msgstr "编辑分类"
 
 #: flaskbb/management/views.py:456
 msgid "Category with all associated forums deleted."
-msgstr ""
+msgstr "该分类与所有相关联的论坛已被删除。"
 
 #: flaskbb/management/views.py:483
 msgid "Plugin is enabled. Please reload your app."
-msgstr ""
+msgstr "插件启用成功。请重新载入您的应用。"
 
 #: flaskbb/management/views.py:486
 msgid "Plugin is already enabled. Please reload  your app."
-msgstr ""
+msgstr "插件已被启用。请重新载入您的应用。"
 
 #: flaskbb/management/views.py:490
 msgid ""
-"If you are using a host which doesn't support writting on the disk, this "
-"won't work - than you need to delete the 'DISABLED' file by yourself."
+"If you are using a host which doesn't support writting on the disk, this won't "
+"work - than you need to delete the 'DISABLED' file by yourself."
 msgstr ""
+"如果您部署的环境无法写入磁盘，那么刚才的设置不会起作用——您需要自己删除 "
+"「DISABLED」文件。"
 
 #: flaskbb/management/views.py:495
 msgid "Couldn't enable Plugin."
-msgstr ""
+msgstr "无法启用插件。"
 
 #: flaskbb/management/views.py:506
 #, python-format
 msgid "Plugin %(plugin)s not found."
-msgstr ""
+msgstr "没有找到此插件：%(plugin)s。"
 
 #: flaskbb/management/views.py:518
 msgid "Plugin is disabled. Please reload your app."
-msgstr ""
+msgstr "插件已被禁用。请重新载入您的引用。"
 
 #: flaskbb/management/views.py:521
 msgid ""
-"If you are using a host which doesn't support writting on the disk, this "
-"won't work - than you need to create a 'DISABLED' file by yourself."
+"If you are using a host which doesn't support writting on the disk, this won't "
+"work - than you need to create a 'DISABLED' file by yourself."
 msgstr ""
+"如果您部署的环境无法写入磁盘，那么刚才的设置不会起作用——您需要自己创建"
+"「DISABLED」文件。"
 
 #: flaskbb/management/views.py:536
 msgid "Plugin has been uninstalled."
-msgstr ""
+msgstr "插件已被卸载。"
 
 #: flaskbb/management/views.py:538
 msgid "Cannot uninstall Plugin."
-msgstr ""
+msgstr "无法卸载插件。"
 
 #: flaskbb/management/views.py:551
 msgid "Plugin has been installed."
-msgstr ""
+msgstr "插件已被安装。"
 
 #: flaskbb/management/views.py:553
 msgid "Cannot install Plugin."
-msgstr ""
+msgstr "无法安装插件。"
 
 #: flaskbb/message/forms.py:22
 msgid "To User"
-msgstr ""
+msgstr "给用户"
 
 #: flaskbb/message/forms.py:25
 msgid "Subject"
-msgstr ""
+msgstr "主题"
 
 #: flaskbb/message/forms.py:26
 msgid "A Subject is required."
-msgstr ""
+msgstr "请输入主题"
 
 #: flaskbb/message/forms.py:28 flaskbb/message/forms.py:57
 msgid "Message"
-msgstr ""
+msgstr "消息"
 
 #: flaskbb/message/forms.py:29 flaskbb/message/forms.py:58
 msgid "A Message is required."
-msgstr ""
+msgstr "请输入消息。"
 
 #: flaskbb/message/forms.py:31
 msgid "Start Conversation"
-msgstr ""
+msgstr "新建会话"
 
 #: flaskbb/message/forms.py:32
 msgid "Save Conversation"
-msgstr ""
+msgstr "保存会话"
 
 #: flaskbb/message/forms.py:37
 msgid "The Username you entered doesn't exist"
-msgstr ""
+msgstr "您输入的用户不存在。"
 
 #: flaskbb/message/forms.py:39
 msgid "You cannot send a PM to yourself."
-msgstr ""
+msgstr "您无法给自己发送私人消息。"
 
 #: flaskbb/message/forms.py:59
 msgid "Send Message"
-msgstr ""
+msgstr "发送消息"
 
 #: flaskbb/message/views.py:70 flaskbb/message/views.py:126
 msgid ""
-"You cannot send any messages anymore because you havereached your message"
-" limit."
-msgstr ""
+"You cannot send any messages anymore because you havereached your message limit."
+msgstr "由于您超出了限额，因此您将无法继续发送任何消息。"
 
 #: flaskbb/message/views.py:143 flaskbb/message/views.py:214
 msgid "Message saved."
-msgstr ""
+msgstr "消息已被保存。"
 
 #: flaskbb/message/views.py:167 flaskbb/message/views.py:232
 msgid "Message sent."
-msgstr ""
+msgstr "消息已被发送。"
 
 #: flaskbb/message/views.py:173
 msgid "Compose Message"
-msgstr ""
+msgstr "撰写消息"
 
 #: flaskbb/message/views.py:200
 msgid "You cannot edit a sent message."
-msgstr ""
+msgstr "您无法编辑一条已被发送的消息。"
 
 #: flaskbb/message/views.py:240
 msgid "Edit Message"
-msgstr ""
+msgstr "编辑消息"
 
 #: flaskbb/templates/layout.html:49 flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:9
 #: flaskbb/themes/bootstrap2/templates/layout.html:50
 #: flaskbb/themes/bootstrap3/templates/layout.html:49
 msgid "Memberlist"
-msgstr ""
+msgstr "用户列表"
 
 #: flaskbb/templates/layout.html:64 flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:22
 #: flaskbb/themes/bootstrap2/templates/layout.html:65
 #: flaskbb/themes/bootstrap3/templates/layout.html:64
 msgid "Topic Tracker"
-msgstr ""
+msgstr "关注的主题"
 
 #: flaskbb/templates/layout.html:67
 #: flaskbb/templates/management/management_layout.html:16
@@ -925,87 +924,87 @@ msgstr ""
 #: flaskbb/themes/bootstrap2/templates/layout.html:68
 #: flaskbb/themes/bootstrap3/templates/layout.html:67
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: flaskbb/templates/layout.html:69 flaskbb/templates/management/forums.html:39
 #: flaskbb/themes/bootstrap2/templates/layout.html:70
 #: flaskbb/themes/bootstrap3/templates/layout.html:69
 msgid "Management"
-msgstr ""
+msgstr "管理"
 
 #: flaskbb/templates/layout.html:73
 #: flaskbb/themes/bootstrap2/templates/layout.html:74
 #: flaskbb/themes/bootstrap3/templates/layout.html:73
 msgid "Logout"
-msgstr ""
+msgstr "注销"
 
 #: flaskbb/templates/layout.html:82
 msgid "Private Messages"
-msgstr ""
+msgstr "私人消息"
 
 #: flaskbb/templates/layout.html:83
 #: flaskbb/themes/bootstrap2/templates/layout.html:84
 #: flaskbb/themes/bootstrap3/templates/layout.html:83
 msgid "New Message"
-msgstr ""
+msgstr "新消息"
 
 #: flaskbb/templates/macros.html:313
 msgid "Pages"
-msgstr ""
+msgstr "页面"
 
 #: flaskbb/templates/auth/login.html:18
 msgid "Not a member yet?"
-msgstr ""
+msgstr "还未注册？"
 
 #: flaskbb/templates/auth/login.html:19
 msgid "Forgot Password?"
-msgstr ""
+msgstr "忘记密码？"
 
 #: flaskbb/templates/email/reset_password.html:1
 #, python-format
 msgid "Dear %(user)s,"
-msgstr ""
+msgstr "亲爱的 %(user)s，"
 
 #: flaskbb/templates/email/reset_password.html:2
 msgid "To reset your password click on the following link:"
-msgstr ""
+msgstr "点击该链接来重置您的密码："
 
 #: flaskbb/templates/email/reset_password.html:4
 msgid "Sincerely,"
-msgstr ""
+msgstr "真诚的"
 
 #: flaskbb/templates/email/reset_password.html:5
 msgid "The Administration"
-msgstr ""
+msgstr "管理人员"
 
 #: flaskbb/templates/errors/forbidden_page.html:1
 msgid "No Access - 403"
-msgstr ""
+msgstr "无法访问 - 403"
 
 #: flaskbb/templates/errors/forbidden_page.html:7
 msgid "Forbidden Page"
-msgstr ""
+msgstr "被禁止的页面"
 
 #: flaskbb/templates/errors/forbidden_page.html:8
 msgid "You do not have the permission to view this page."
-msgstr ""
+msgstr "您没有权限访问该页面。"
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "Back to the Forums"
-msgstr ""
+msgstr "返回论坛。"
 
 #: flaskbb/templates/errors/page_not_found.html:1
 msgid "Oh noes! 404"
-msgstr ""
+msgstr "没有该页面 - 404"
 
 #: flaskbb/templates/errors/page_not_found.html:7
 msgid "Oops, Page not found!"
-msgstr ""
+msgstr "没有找到用户 %(moderator)s。"
 
 #: flaskbb/templates/errors/page_not_found.html:8
 msgid "The page you were looking for does not exist."
-msgstr ""
+msgstr "您查找的页面不存在。"
 
 #: flaskbb/templates/errors/server_error.html:1
 msgid "Server Error - 500"
@@ -1017,14 +1016,14 @@ msgstr ""
 
 #: flaskbb/templates/errors/server_error.html:8
 msgid "Something went wrong!"
-msgstr ""
+msgstr "服务器报告了一个错误。"
 
 #: flaskbb/templates/forum/category_layout.html:12
 #: flaskbb/templates/forum/search_result.html:108
 #: flaskbb/templates/forum/search_result.html:186
 #: flaskbb/templates/management/overview.html:23
 msgid "Topics"
-msgstr ""
+msgstr "主题"
 
 #: flaskbb/templates/forum/category_layout.html:13
 #: flaskbb/templates/forum/forum.html:52
@@ -1042,7 +1041,7 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:28
 #: flaskbb/templates/user/profile.html:56
 msgid "Posts"
-msgstr ""
+msgstr "回复量"
 
 #: flaskbb/templates/forum/category_layout.html:14
 #: flaskbb/templates/forum/forum.html:56
@@ -1051,7 +1050,7 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:34
 #: flaskbb/templates/user/all_topics.html:32
 msgid "Last Post"
-msgstr ""
+msgstr "最后的回复"
 
 #: flaskbb/templates/forum/category_layout.html:80
 #: flaskbb/templates/forum/forum.html:86 flaskbb/templates/forum/forum.html:105
@@ -1065,83 +1064,82 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:42
 #: flaskbb/templates/user/all_topics.html:60
 msgid "by"
-msgstr ""
+msgstr "来自"
 
 #: flaskbb/templates/forum/category_layout.html:88
 #: flaskbb/templates/forum/search_result.html:261
 #: flaskbb/templates/user/all_posts.html:40
 msgid "No posts."
-msgstr ""
+msgstr "暂无回复。"
 
 #: flaskbb/templates/forum/forum.html:23
 #: flaskbb/templates/management/unread_reports.html:51
 msgid "Mark as Read"
-msgstr ""
+msgstr "标记为已读。"
 
 #: flaskbb/templates/forum/forum.html:29
 msgid "Locked"
-msgstr ""
+msgstr "锁定"
 
-#: flaskbb/templates/forum/forum.html:33
-#: flaskbb/templates/forum/new_topic.html:1
+#: flaskbb/templates/forum/forum.html:33 flaskbb/templates/forum/new_topic.html:1
 #: flaskbb/templates/forum/new_topic.html:17
 #: flaskbb/templates/forum/new_topic.html:22
 msgid "New Topic"
-msgstr ""
+msgstr "新建主题"
 
 #: flaskbb/templates/forum/forum.html:54
 #: flaskbb/templates/forum/search_result.html:117
 #: flaskbb/templates/forum/topictracker.html:32
 #: flaskbb/templates/user/all_topics.html:30
 msgid "Views"
-msgstr ""
+msgstr "浏览"
 
 #: flaskbb/templates/forum/forum.html:117
 msgid "No Topics."
-msgstr ""
+msgstr "没有主题"
 
 #: flaskbb/templates/forum/index.html:17
 msgid "Board Statistics"
-msgstr ""
+msgstr "论坛统计"
 
 #: flaskbb/templates/forum/index.html:18
 msgid "Who is online?"
-msgstr ""
+msgstr "谁在线上？"
 
 #: flaskbb/templates/forum/index.html:25
 msgid "Total number of registered users"
-msgstr ""
+msgstr "所有注册用户数量"
 
 #: flaskbb/templates/forum/index.html:26
 msgid "Total number of topics"
-msgstr ""
+msgstr "所有主题数量"
 
 #: flaskbb/templates/forum/index.html:27
 msgid "Total number of posts"
-msgstr ""
+msgstr "所有回复数量"
 
 #: flaskbb/templates/forum/index.html:30
 msgid "Newest registered user"
-msgstr ""
+msgstr "最新注册用户"
 
 #: flaskbb/templates/forum/index.html:30
 msgid "No users"
-msgstr ""
+msgstr "暂无用户"
 
 #: flaskbb/templates/forum/index.html:31
 msgid "Registered users online"
-msgstr ""
+msgstr "在线注册用户"
 
 #: flaskbb/templates/forum/index.html:33
 msgid "Guests online"
-msgstr ""
+msgstr "在线来宾用户"
 
 #: flaskbb/templates/forum/memberlist.html:33
 #: flaskbb/templates/forum/search_result.html:85
 #: flaskbb/templates/management/banned_users.html:43
 #: flaskbb/templates/management/users.html:43
 msgid "Date registered"
-msgstr ""
+msgstr "注册日期"
 
 #: flaskbb/templates/forum/memberlist.html:34
 #: flaskbb/templates/forum/search_result.html:86
@@ -1149,74 +1147,74 @@ msgstr ""
 #: flaskbb/templates/management/users.html:44
 #: flaskbb/templates/user/profile.html:48
 msgid "Group"
-msgstr ""
+msgstr "用户组"
 
 #: flaskbb/templates/forum/new_post.html:1
 #: flaskbb/templates/forum/new_post.html:18
 #: flaskbb/templates/forum/new_post.html:23
 msgid "New Post"
-msgstr ""
+msgstr "新建回复"
 
 #: flaskbb/templates/forum/online_users.html:1
 #: flaskbb/templates/forum/online_users.html:10
 msgid "Online Users"
-msgstr ""
+msgstr "在线用户"
 
 #: flaskbb/templates/forum/report_post.html:17
 #: flaskbb/templates/forum/topic.html:121
 msgid "Report"
-msgstr ""
+msgstr "报告"
 
 #: flaskbb/templates/forum/report_post.html:18
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: flaskbb/templates/forum/search_result.html:44
 #: flaskbb/templates/forum/topic.html:76
 msgid "Registered since"
-msgstr ""
+msgstr "注册于"
 
 #: flaskbb/templates/forum/search_result.html:50
 #: flaskbb/templates/forum/topic.html:82
 msgid "Guest"
-msgstr ""
+msgstr "来宾用户"
 
 #: flaskbb/templates/forum/search_result.html:69
 msgid "No posts found matching your search criteria."
-msgstr ""
+msgstr "没有找到符合条件的回复。"
 
 #: flaskbb/templates/forum/search_result.html:100
 #: flaskbb/templates/management/banned_users.html:68
 #: flaskbb/templates/management/users.html:86
 msgid "No users found matching your search criteria."
-msgstr ""
+msgstr "没有找到符合条件的用户。"
 
 #: flaskbb/templates/forum/search_result.html:172
 msgid "No topics found matching your search criteria."
-msgstr ""
+msgstr "没有找到符合条件的主题。"
 
 #: flaskbb/templates/forum/search_result.html:180
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/management_layout.html:18
 msgid "Forums"
-msgstr ""
+msgstr "论坛"
 
 #: flaskbb/templates/forum/search_result.html:269
 msgid "No forums found matching your search criteria."
-msgstr ""
+msgstr "没有找到符合条件的论坛。"
 
 #: flaskbb/templates/forum/topic.html:2
 #, python-format
 msgid "%(title)s - Topic"
-msgstr ""
+msgstr "%(title)s - 主题"
 
 #: flaskbb/templates/forum/topic.html:40
 msgid "Last modified"
-msgstr ""
+msgstr "最后修改"
 
 #: flaskbb/templates/forum/topic.html:111
 msgid "PM"
-msgstr ""
+msgstr "私人消息"
 
 #: flaskbb/templates/forum/topic.html:125
 #: flaskbb/templates/management/forums.html:28
@@ -1224,57 +1222,56 @@ msgstr ""
 #: flaskbb/templates/management/groups.html:37
 #: flaskbb/templates/management/users.html:58
 msgid "Edit"
-msgstr ""
+msgstr "编辑"
 
-#: flaskbb/templates/forum/topic.html:131
-#: flaskbb/templates/forum/topic.html:138
+#: flaskbb/templates/forum/topic.html:131 flaskbb/templates/forum/topic.html:138
 #: flaskbb/templates/management/forums.html:31
 #: flaskbb/templates/management/forums.html:62
 #: flaskbb/templates/management/groups.html:40
 #: flaskbb/templates/management/users.html:78
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: flaskbb/templates/forum/topic.html:144
 msgid "Quote"
-msgstr ""
+msgstr "引用"
 
 #: flaskbb/templates/forum/topic_controls.html:11
 msgid "Untrack Topic"
-msgstr ""
+msgstr "不再关注"
 
 #: flaskbb/templates/forum/topic_controls.html:18
 msgid "Track Topic"
-msgstr ""
+msgstr "关注主题"
 
 #: flaskbb/templates/forum/topic_controls.html:36
 msgid "Delete Topic"
-msgstr ""
+msgstr "删除主题"
 
 #: flaskbb/templates/forum/topic_controls.html:45
 msgid "Lock Topic"
-msgstr ""
+msgstr "锁上主题"
 
 #: flaskbb/templates/forum/topic_controls.html:52
 msgid "Unlock Topic"
-msgstr ""
+msgstr "解锁主题"
 
 #: flaskbb/templates/forum/topic_controls.html:61
 msgid "Highlight Topic"
-msgstr ""
+msgstr "高亮主题"
 
 #: flaskbb/templates/forum/topic_controls.html:68
 msgid "Trivialize Topic"
-msgstr ""
+msgstr "普通化主题"
 
 #: flaskbb/templates/forum/topictracker.html:10
 msgid "Tracked Topics"
-msgstr ""
+msgstr "关注的主题"
 
 #: flaskbb/templates/forum/topictracker.html:82
 #: flaskbb/templates/user/all_topics.html:72
 msgid "No topics."
-msgstr ""
+msgstr "暂无主题。"
 
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:11
@@ -1282,67 +1279,67 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:11
 #: flaskbb/templates/management/users.html:11
 msgid "Banned Users"
-msgstr ""
+msgstr "被禁止的用户"
 
 #: flaskbb/templates/management/banned_users.html:10
 #: flaskbb/templates/management/user_form.html:10
 #: flaskbb/templates/management/users.html:10
 #: flaskbb/templates/management/users.html:20
 msgid "Manage Users"
-msgstr ""
+msgstr "管理员"
 
 #: flaskbb/templates/management/banned_users.html:45
 #: flaskbb/templates/management/groups.html:27
 #: flaskbb/templates/management/plugins.html:14
 #: flaskbb/templates/management/users.html:45
 msgid "Manage"
-msgstr ""
+msgstr "管理"
 
 #: flaskbb/templates/management/banned_users.html:60
 #: flaskbb/templates/management/users.html:71
 msgid "Unban"
-msgstr ""
+msgstr "恢复"
 
 #: flaskbb/templates/management/category_form.html:10
 #: flaskbb/templates/management/forum_form.html:10
 #: flaskbb/templates/management/forums.html:9
 #: flaskbb/templates/management/forums.html:17
 msgid "Manage Forums"
-msgstr ""
+msgstr "管理论坛"
 
 #: flaskbb/templates/management/forum_form.html:37
 msgid "Group Access to the forum"
-msgstr ""
+msgstr "能够访问本论坛的用户组。"
 
 #: flaskbb/templates/management/group_form.html:10
 #: flaskbb/templates/management/groups.html:9
 #: flaskbb/templates/management/groups.html:15
 msgid "Manage Groups"
-msgstr ""
+msgstr "管理用户组"
 
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/management_layout.html:17
 msgid "Groups"
-msgstr ""
+msgstr "用户组"
 
 #: flaskbb/templates/management/management_layout.html:11
 #: flaskbb/templates/management/overview.html:1
 msgid "Overview"
-msgstr ""
+msgstr "概况"
 
 #: flaskbb/templates/management/management_layout.html:13
 #: flaskbb/templates/management/reports.html:1
 msgid "Reports"
-msgstr ""
+msgstr "报告"
 
 #: flaskbb/templates/management/management_layout.html:19
 #: flaskbb/templates/management/plugins.html:1
 msgid "Plugins"
-msgstr ""
+msgstr "插件"
 
 #: flaskbb/templates/management/overview.html:10
 msgid "Global Statistics"
-msgstr ""
+msgstr "全局统计"
 
 #: flaskbb/templates/management/overview.html:15
 msgid "FlaskBB Version"
@@ -1358,257 +1355,254 @@ msgstr ""
 
 #: flaskbb/templates/management/plugins.html:7
 msgid "Manage Plugins"
-msgstr ""
+msgstr "管理插件"
 
 #: flaskbb/templates/management/plugins.html:12
 msgid "Plugin"
-msgstr ""
+msgstr "插件"
 
 #: flaskbb/templates/management/plugins.html:13
 msgid "Information"
-msgstr ""
+msgstr "信息"
 
 #: flaskbb/templates/management/plugins.html:28
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: flaskbb/templates/management/plugins.html:36
 msgid "Enable"
-msgstr ""
+msgstr "启用"
 
 #: flaskbb/templates/management/plugins.html:41
 msgid "Disable"
-msgstr ""
+msgstr "禁用"
 
 #: flaskbb/templates/management/plugins.html:50
 msgid "Install"
-msgstr ""
+msgstr "安装"
 
 #: flaskbb/templates/management/plugins.html:56
 msgid "Uninstall"
-msgstr ""
+msgstr "卸载"
 
 #: flaskbb/templates/management/reports.html:10
 #: flaskbb/templates/management/unread_reports.html:10
 msgid "Show unread reports"
-msgstr ""
+msgstr "显示未读报告"
 
 #: flaskbb/templates/management/reports.html:11
 #: flaskbb/templates/management/unread_reports.html:11
 msgid "Show all reports"
-msgstr ""
+msgstr "显示所有报告"
 
 #: flaskbb/templates/management/reports.html:16
 msgid "All Reports"
-msgstr ""
+msgstr "所有报告"
 
 #: flaskbb/templates/management/reports.html:26
 #: flaskbb/templates/management/unread_reports.html:26
 msgid "Poster"
-msgstr ""
+msgstr "回复者"
 
 #: flaskbb/templates/management/reports.html:28
 #: flaskbb/templates/management/unread_reports.html:28
 msgid "Reporter"
-msgstr ""
+msgstr "报告者"
 
 #: flaskbb/templates/management/reports.html:30
 #: flaskbb/templates/management/unread_reports.html:30
 msgid "Reported"
-msgstr ""
+msgstr "已被报告"
 
 #: flaskbb/templates/management/reports.html:45
 msgid "No reports."
-msgstr ""
+msgstr "还没有报告。"
 
 #: flaskbb/templates/management/unread_reports.html:1
 #: flaskbb/templates/management/unread_reports.html:16
 msgid "Unread Reports"
-msgstr ""
+msgstr "未读报告"
 
 #: flaskbb/templates/management/unread_reports.html:34
 msgid "Mark all as Read"
-msgstr ""
+msgstr "将所有标记为已读。"
 
 #: flaskbb/templates/management/unread_reports.html:57
 msgid "No unread reports."
-msgstr ""
+msgstr "没有未读的报告。"
 
 #: flaskbb/templates/management/users.html:64
 msgid "Ban"
-msgstr ""
+msgstr "禁止"
 
 #: flaskbb/templates/message/conversation_list.html:4
 msgid "Conversations"
-msgstr ""
+msgstr "所有会话"
 
 #: flaskbb/templates/message/conversation_list.html:77
 msgid "No conversations found."
-msgstr ""
+msgstr "未找到任何会话。"
 
 #: flaskbb/templates/message/drafts.html:1
 #: flaskbb/templates/message/message_layout.html:18
 msgid "Drafts"
-msgstr ""
+msgstr "草稿箱"
 
 #: flaskbb/templates/message/inbox.html:1
 #: flaskbb/templates/message/message_layout.html:16
 #: flaskbb/themes/bootstrap2/templates/layout.html:83
 #: flaskbb/themes/bootstrap3/templates/layout.html:82
 msgid "Inbox"
-msgstr ""
+msgstr "收件箱"
 
 #: flaskbb/templates/message/message_layout.html:8
 msgid "Private Message"
-msgstr ""
+msgstr "私人消息"
 
 #: flaskbb/templates/message/message_layout.html:17
 msgid "Sent"
-msgstr ""
+msgstr "发件箱"
 
 #: flaskbb/templates/message/message_layout.html:19
 #: flaskbb/templates/message/trash.html:1
 msgid "Trash"
-msgstr ""
+msgstr "废纸篓"
 
 #: flaskbb/templates/message/sent.html:1
 msgid "Sent Messages"
-msgstr ""
+msgstr "发送消息"
 
-#: flaskbb/templates/user/all_posts.html:8
-#: flaskbb/templates/user/profile.html:29
+#: flaskbb/templates/user/all_posts.html:8 flaskbb/templates/user/profile.html:29
 msgid "All Posts"
-msgstr ""
+msgstr "所有回复"
 
 #: flaskbb/templates/user/all_posts.html:18
 #, python-format
 msgid "All Posts created by %(user)s"
-msgstr ""
+msgstr "所有回复由 %(user)s 创建"
 
 #: flaskbb/templates/user/all_topics.html:8
 #: flaskbb/templates/user/profile.html:28
 msgid "All Topics"
-msgstr ""
+msgstr "所有主题"
 
 #: flaskbb/templates/user/all_topics.html:20
 #, python-format
 msgid "All Topics created by %(user)s"
-msgstr ""
+msgstr "所有主题由 %(user)s 创建"
 
 #: flaskbb/templates/user/change_email.html:6
 #: flaskbb/templates/user/settings_layout.html:18
 msgid "Change E-Mail Address"
-msgstr ""
+msgstr "修改邮箱"
 
 #: flaskbb/templates/user/change_password.html:6
 #: flaskbb/templates/user/settings_layout.html:19
 msgid "Change Password"
-msgstr ""
+msgstr "修改密码"
 
 #: flaskbb/templates/user/change_user_details.html:6
 #: flaskbb/templates/user/settings_layout.html:17
 msgid "Change User Details"
-msgstr ""
+msgstr "修改用户信息"
 
 #: flaskbb/templates/user/general_settings.html:6
 #: flaskbb/templates/user/settings_layout.html:16
 msgid "General Settings"
-msgstr ""
+msgstr "通用设置"
 
 #: flaskbb/templates/user/profile.html:11
 msgid "Info"
-msgstr ""
+msgstr "信息"
 
 #: flaskbb/templates/user/profile.html:12
 msgid "User Stats"
-msgstr ""
+msgstr "用户状态"
 
 #: flaskbb/templates/user/profile.html:40
 msgid "User has not added any notes about him."
-msgstr ""
+msgstr "该用户没有添加关于他的备注。"
 
 #: flaskbb/templates/user/profile.html:52
 msgid "Joined"
-msgstr ""
+msgstr "加入于"
 
 #: flaskbb/templates/user/profile.html:60
 msgid "Last seen"
-msgstr ""
+msgstr "最后上线于"
 
 #: flaskbb/templates/user/profile.html:61
 msgid "Never seen"
-msgstr ""
+msgstr "从未上线"
 
 #: flaskbb/templates/user/profile.html:64
 msgid "Last post"
-msgstr ""
+msgstr "最后发表回复"
 
 #: flaskbb/templates/user/profile.html:68
 msgid "Never"
-msgstr ""
+msgstr "从未"
 
-#: flaskbb/templates/user/profile.html:74
-#: flaskbb/templates/user/profile.html:78
+#: flaskbb/templates/user/profile.html:74 flaskbb/templates/user/profile.html:78
 msgid "No Info"
-msgstr ""
+msgstr "没有信息"
 
 #: flaskbb/templates/user/settings_layout.html:15
 msgid "Account Settings"
-msgstr ""
+msgstr "账户设置"
 
 #: flaskbb/user/forms.py:29
 msgid "Language"
-msgstr ""
+msgstr "语言"
 
 #: flaskbb/user/forms.py:30
 msgid "Theme"
-msgstr ""
+msgstr "主题"
 
 #: flaskbb/user/forms.py:36
 msgid "Old E-Mail Address"
-msgstr ""
+msgstr "原邮箱地址"
 
 #: flaskbb/user/forms.py:40
 msgid "New E-Mail Address"
-msgstr ""
+msgstr "新邮箱地址"
 
 #: flaskbb/user/forms.py:42
 msgid "E-Mails must match."
-msgstr ""
+msgstr "两次输入的邮箱不一致。"
 
 #: flaskbb/user/forms.py:45
 msgid "Confirm E-Mail Address"
-msgstr ""
+msgstr "校对邮箱地址"
 
 #: flaskbb/user/forms.py:64
 msgid "Old Password"
-msgstr ""
+msgstr "原密码"
 
 #: flaskbb/user/forms.py:65
 msgid "Password required"
-msgstr ""
+msgstr "请输入密码"
 
 #: flaskbb/user/forms.py:71
 msgid "Confirm New Password"
-msgstr ""
+msgstr "校对密码"
 
 #: flaskbb/user/forms.py:77
 msgid "Old Password is wrong."
-msgstr ""
+msgstr "原密码错误。"
 
 #: flaskbb/user/views.py:66
 msgid "Settings updated."
-msgstr ""
+msgstr "设置更新成功。"
 
 #: flaskbb/user/views.py:82
 msgid "Password updated."
-msgstr ""
+msgstr "密码修改成功。"
 
 #: flaskbb/user/views.py:94
 msgid "E-Mail Address updated."
-msgstr ""
+msgstr "邮箱更新成功。"
 
 #: flaskbb/user/views.py:107
 msgid "Details updated."
-msgstr ""
-
+msgstr "更新用户信息成功。"
