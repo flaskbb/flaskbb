@@ -4,32 +4,39 @@
 {% block management_content %}
 
 <div class="col-md-12">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th colspan="4">{% trans %}Global Statistics{% endtrans %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><b>{% trans %}FlaskBB Version{% endtrans %}</b></td>
-                <td>{{ flaskbb_version }}</td>
-                <td><b>{% trans %}Posts{% endtrans %}</b></td>
-                <td>{{ post_count }}</td>
-            </tr>
-            <tr>
-                <td><b>{% trans %}Python Version{% endtrans %}</b></td>
-                <td>{{ python_version }}</td>
-                <td><b>{% trans %}Topics{% endtrans %}</b></td>
-                <td>{{ topic_count }}</td>
-            </tr>
-            <tr>
-                <td><b>{% trans %}Flask Version{% endtrans %}</b></td>
-                <td>{{ flask_version }}</td>
-                <td><b>{% trans %}Users{% endtrans %}</b></td>
-                <td>{{ user_count }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <span class="fa fa-tasks"></span> {% trans %}Overview{% endtrans %}
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th colspan="4">{% trans %}Global Statistics{% endtrans %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>{% trans %}FlaskBB Version{% endtrans %}</b></td>
+                        <td>{{ flaskbb_version }}</td>
+                        <td><b>{% trans %}Posts{% endtrans %}</b></td>
+                        <td>{{ post_count }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{% trans %}Python Version{% endtrans %}</b></td>
+                        <td>{{ python_version }}</td>
+                        <td><b>{% trans %}Topics{% endtrans %}</b></td>
+                        <td>{{ topic_count }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{% trans %}Flask Version{% endtrans %}</b></td>
+                        <td>{{ flask_version }}</td>
+                        <td><b>{% trans %}Users{% endtrans %}</b></td>
+                        <td>{{ user_count }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

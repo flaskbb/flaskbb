@@ -14,59 +14,68 @@
 
 
 <div class="col-md-9">
-    <legend>{% trans %}Manage Forums{% endtrans %}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-comments"></span> {% trans %}Manage Forums{% endtrans %}
+                </div>
+                <div class="panel-body">
+                    {% for category in categories %}
+                    <table class="table table-bordered">
+                        <thead class="categoryhead">
+                            <tr>
+                                <td colspan="2">
+                                    <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
+                                </td>
+                                <td valign="top" align="center" style="white-space: nowrap">
+                                    <a href="{{ url_for('management.add_forum', category_id=category.id) }}">{% trans %}Add Forum{% endtrans %}</a> |
+                                    <a href="{{ url_for('management.edit_category', category_id = category.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody class="forumbody">
+                            <tr class="forum_stats">
+                                <td colspan="2"><strong>{% trans %}Forum{% endtrans %}</strong></td>
+                                <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Management{% endtrans %}</strong></td>
+                            </tr>
 
-    {% for category in categories %}
-    <table class="table table-bordered">
-        <thead class="categoryhead">
-            <tr>
-                <td colspan="2">
-                    <div><strong><a href="{{ url_for('forum.view_category', category_id=category.id) }}">{{ category.title }}</a></strong></div>
-                </td>
-                <td valign="top" align="center" style="white-space: nowrap">
-                    <a href="{{ url_for('management.add_forum', category_id=category.id) }}">{% trans %}Add Forum{% endtrans %}</a> |
-                    <a href="{{ url_for('management.edit_category', category_id = category.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                    </form>
-                </td>
-            </tr>
-        </thead>
-        <tbody class="forumbody">
-            <tr class="forum_stats">
-                <td colspan="2"><strong>{% trans %}Forum{% endtrans %}</strong></td>
-                <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Management{% endtrans %}</strong></td>
-            </tr>
+                            {% for forum in category.forums %}
+                            <tr>
+                                <td align="center" valign="center" width="4%">
 
-            {% for forum in category.forums %}
-            <tr>
-                <td align="center" valign="center" width="4%">
+                                </td>
 
-                </td>
+                                <td valign="top">
+                                    <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
 
-                <td valign="top">
-                    <strong><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}">{{ forum.title }}</a></strong>
+                                    <div class="forum-description">
+                                        {% autoescape false %}
+                                        {{ forum.description|markup }}
+                                        {% endautoescape %}
+                                    </div>
+                                </td>
 
-                    <div class="forum-description">
-                        {% autoescape false %}
-                        {{ forum.description|markup }}
-                        {% endautoescape %}
-                    </div>
-                </td>
+                                <td valign="top" align="center" style="white-space: nowrap">
+                                    <a href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
 
-                <td valign="top" align="center" style="white-space: nowrap">
-                    <a href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-
-        </tbody>
-    </table>
-    {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

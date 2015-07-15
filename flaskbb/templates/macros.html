@@ -67,9 +67,11 @@
 
 
 {%- macro render_boolean_field(field, inline=False) -%}
-<div class="checkbox {%- if inline -%}inline{%- endif -%}">
+<div class="checkbox{% if inline %}inline{% endif %}{% if field.errors %}has-error{% endif %}">
+    <label>
     {{ field(**kwargs) }}
-    {{ field_label(field) }}
+    {{ field.label.text }}
+    </label>
     {{ field_description(field) }}
     {{ field_errors(field) }}
 </div>
@@ -96,6 +98,7 @@
 </div>
 {%- endmacro -%}
 
+
 {%- macro render_submit_field(field, div_class='', input_class='') -%}
 {% if div_class %}
 <div class="{{ div_class }}">
@@ -107,6 +110,7 @@
 </div>
 {% endif %}
 {%- endmacro -%}
+
 
 {%- macro render_field(field, with_label=True, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
@@ -187,6 +191,7 @@
         {{ field_errors(field) }}
     </div>
 {%- endmacro -%}
+
 
 {%- macro horizontal_select_field(field, div_class='', label_class='', select_class="form-control", surrounded_div="col-sm-4") -%}
 <div class="form-group row {%- if field.errors %} has-error{%- endif %}">

@@ -4,61 +4,68 @@
 {% block management_content %}
 {% from theme('macros.html') import render_pagination %}
 
-<legend>{% trans %}Manage Plugins{% endtrans %}</legend>
+<div class="col-md-12">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <span class="fa fa-puzzle-piece"></span> {% trans %}Manage Plugins{% endtrans %}
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{% trans %}Plugin{% endtrans %}</th>
+                        <th>{% trans %}Information{% endtrans %}</th>
+                        <th>{% trans %}Manage{% endtrans %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for plugin in plugins %}
+                    <tr>
+                      <td>
+                        {% if plugin.website %}
+                          <a href="{{ plugin.website }}">{{ plugin.name }}</a>
+                        {% else %}
+                          {{ plugin.name }}
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% trans %}Version{% endtrans %}: <i>{{ plugin.version }}</i> <br />
+                            {{ plugin.description }} <br />
+                            {% trans %}by{% endtrans %}  <i>{{ plugin.author }}</i>
+                        </td>
+                        <td>
+                            {% if not plugin.enabled %}
+                            <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', plugin=plugin.identifier) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Enable{% endtrans %}</button>
+                            </form>
+                            {% else %}
+                            <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', plugin=plugin.identifier) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Disable{% endtrans %}</button>
+                            </form>
+                            {% endif %}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>{% trans %}Plugin{% endtrans %}</th>
-            <th>{% trans %}Information{% endtrans %}</th>
-            <th>{% trans %}Manage{% endtrans %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for plugin in plugins %}
-        <tr>
-          <td>
-            {% if plugin.website %}
-              <a href="{{ plugin.website }}">{{ plugin.name }}</a>
-            {% else %}
-              {{ plugin.name }}
-            {% endif %}
-            </td>
-            <td>
-                {% trans %}Version{% endtrans %}: <i>{{ plugin.version }}</i> <br />
-                {{ plugin.description }} <br />
-                {% trans %}by{% endtrans %}  <i>{{ plugin.author }}</i>
-            </td>
-            <td>
-                {% if not plugin.enabled %}
-                <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', plugin=plugin.identifier) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">{% trans %}Enable{% endtrans %}</button>
-                </form>
-                {% else %}
-                <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', plugin=plugin.identifier) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">{% trans %}Disable{% endtrans %}</button>
-                </form>
-                {% endif %}
-
-                {% set uninstallable = plugin.uninstallable %}
-                {% if plugin.installable and not uninstallable %}
-                <br />
-                <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', plugin=plugin.identifier) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">{% trans %}Install{% endtrans %}</button>
-                </form>
-                {% endif %}
-                {% if uninstallable %}
-                <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', plugin=plugin.identifier) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">{% trans %}Uninstall{% endtrans %}</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                            {% set uninstallable = plugin.uninstallable %}
+                            {% if plugin.installable and not uninstallable %}
+                            <br />
+                            <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', plugin=plugin.identifier) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Install{% endtrans %}</button>
+                            </form>
+                            {% endif %}
+                            {% if uninstallable %}
+                            <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', plugin=plugin.identifier) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button class="btn btn-link">{% trans %}Uninstall{% endtrans %}</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

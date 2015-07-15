@@ -3,7 +3,7 @@
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
-{% from theme("macros.html") import horizontal_field, render_boolean_field, navlink with context %}
+{% from theme("macros.html") import render_field, render_boolean_field, render_submit_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
@@ -13,30 +13,40 @@
 </div>
 
 <div class="col-md-9">
-    <form class="form-horizontal" role="form" method="post">
-        {{ form.hidden_tag() }}
-        <legend class="">{{ title }}</legend>
-            {{ horizontal_field(form.name) }}
-            {{ horizontal_field(form.description) }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-user-plus"></span> {{ title }}
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" method="post">
+                        {{ form.hidden_tag() }}
+                        {{ render_field(form.name) }}
+                        {{ render_field(form.description, rows="4", div_class="col-md-12") }}
 
-            {{ render_boolean_field(form.admin) }}
-            {{ render_boolean_field(form.super_mod) }}
+                        {{ render_boolean_field(form.admin) }}
+                        {{ render_boolean_field(form.super_mod) }}
 
+                        {{ render_boolean_field(form.mod) }}
+                        {{ render_boolean_field(form.banned) }}
+                        {{ render_boolean_field(form.guest) }}
 
-            {{ render_boolean_field(form.mod) }}
-            {{ render_boolean_field(form.banned) }}
-            {{ render_boolean_field(form.guest) }}
+                        {{ render_boolean_field(form.mod_edituser) }}
+                        {{ render_boolean_field(form.mod_banuser) }}
 
-            {{ render_boolean_field(form.mod_edituser) }}
-            {{ render_boolean_field(form.mod_banuser) }}
-
-            {{ render_boolean_field(form.editpost) }}
-            {{ render_boolean_field(form.deletepost) }}
-            {{ render_boolean_field(form.deletetopic) }}
-            {{ render_boolean_field(form.posttopic) }}
-            {{ render_boolean_field(form.postreply) }}
-
-            {{ horizontal_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
-    </form>
+                        {{ render_boolean_field(form.editpost) }}
+                        {{ render_boolean_field(form.deletepost) }}
+                        {{ render_boolean_field(form.deletetopic) }}
+                        {{ render_boolean_field(form.posttopic) }}
+                        {{ render_boolean_field(form.postreply) }}
+                        <div class="row">
+                            {{ render_submit_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
