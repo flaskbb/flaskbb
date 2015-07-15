@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1-dev\n"
-"Report-Msgid-Bugs-To: https://github.com/realityone/flaskbb\n"
+"Report-Msgid-Bugs-To: https://github.com/flaskbb\n"
 "POT-Creation-Date: 2015-07-14 22:49+0800\n"
 "PO-Revision-Date: 2015-07-15 10:53+0800\n"
 "Language-Team: FlaskBB in zh_Hans_CN\n"
