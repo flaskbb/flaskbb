@@ -13,39 +13,53 @@
 </div>
 
 <div class="col-md-9">
-    <legend>{% trans %}All Reports{% endtrans %}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-flag"></span> {% trans %}All Reports{% endtrans %}
+                </div>
+                <div class="panel-body management-body"></div>
 
-    <div class="pull-left" style="padding-bottom: 10px">
-        {{ render_pagination(reports, url_for('management.reports')) }}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{% trans %}Poster{% endtrans %}</th>
+                            <th>{% trans %}Topic{% endtrans %}</th>
+                            <th>{% trans %}Reporter{% endtrans %}</th>
+                            <th>{% trans %}Reason{% endtrans %}</th>
+                            <th>{% trans %}Reported{% endtrans %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports.items %}
+                        <tr>
+                            <td>{{ report.id }}</td>
+                            <td>{{ report.post.user.username }}</td>
+                            <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.post.topic.title }}</a></td>
+                            <td>{{ report.reporter.username }}</td>
+                            <td>{{ report.reason }}</td>
+                            <td>{{ report.reported|time_since }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6">{% trans %}No reports.{% endtrans %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ render_pagination(reports, url_for('management.reports')) }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>{% trans %}Poster{% endtrans %}</th>
-                <th>{% trans %}Topic{% endtrans %}</th>
-                <th>{% trans %}Reporter{% endtrans %}</th>
-                <th>{% trans %}Reason{% endtrans %}</th>
-                <th>{% trans %}Reported{% endtrans %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for report in reports.items %}
-            <tr>
-                <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.id }}</a></td>
-                <td>{{ report.post.user.username }}</td>
-                <td>{{ report.post.topic.title }}</td>
-                <td>{{ report.reporter.username }}</td>
-                <td>{{ report.reason }}</td>
-                <td>{{ report.reported|time_since }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6">{% trans %}No reports.{% endtrans %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 {% endblock %}

@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
-                   __version__ as flask_version)
+                   jsonify, __version__ as flask_version)
 from flask_login import current_user
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelex import gettext as _
@@ -148,10 +148,41 @@ def edit_user(user_id):
                            title=_("Edit User"))
 
 
+@management.route("/users/delete", methods=["POST"])
 @management.route("/users/<int:user_id>/delete", methods=["POST"])
 @admin_required
-def delete_user(user_id):
+def delete_user(user_id=None):
+    # ajax request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+
+        data = []
+        for user in User.query.filter(User.id.in_(ids)).all():
+            # do not delete current user
+            if current_user.id == user.id:
+                continue
+
+            if user.delete():
+                data.append({
+                    "id": user.id,
+                    "type": "delete",
+                    "reverse": False,
+                    "reverse_name": None,
+                    "reverse_url": None
+                })
+
+        return jsonify(
+            message="{} Users deleted.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
+
     user = User.query.filter_by(id=user_id).first_or_404()
+    if current_user.id == user.id:
+        flash(_("You cannot delete yourself.", "danger"))
+        return redirect(url_for("management.users"))
+
     user.delete()
     flash(_("User successfully deleted."), "success")
     return redirect(url_for("management.users"))
@@ -192,12 +223,45 @@ def banned_users():
                            search_form=search_form)
 
 
+@management.route("/users/ban", methods=["POST"])
 @management.route("/users/<int:user_id>/ban", methods=["POST"])
 @moderator_required
-def ban_user(user_id):
+def ban_user(user_id=None):
     if not can_ban_user(current_user):
         flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
+
+    # ajax request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+
+        data = []
+        users = User.query.filter(User.id.in_(ids)).all()
+        for user in users:
+            # don't let a user ban himself and do not allow a moderator to ban
+            # a admin user
+            if current_user.id == user.id or \
+                    user.get_permissions()['admin'] and \
+                    (current_user.permissions['mod'] or
+                     current_user.permissions['super_mod']):
+                continue
+
+            elif user.ban():
+                data.append({
+                    "id": user.id,
+                    "type": "ban",
+                    "reverse": "unban",
+                    "reverse_name": _("Unban"),
+                    "reverse_url": url_for("management.unban_user",
+                                           user_id=user.id)
+                })
+
+        return jsonify(
+            message="{} Users banned.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
@@ -209,7 +273,7 @@ def ban_user(user_id):
         flash(_("A moderator cannot ban an admin user."), "danger")
         return redirect(url_for("management.overview"))
 
-    if user.ban():
+    if not current_user.id == user.id and user.ban():
         flash(_("User is now banned."), "success")
     else:
         flash(_("Could not ban user."), "danger")
@@ -217,13 +281,37 @@ def ban_user(user_id):
     return redirect(url_for("management.banned_users"))
 
 
+@management.route("/users/unban", methods=["POST"])
 @management.route("/users/<int:user_id>/unban", methods=["POST"])
 @moderator_required
-def unban_user(user_id):
+def unban_user(user_id=None):
     if not can_ban_user(current_user):
         flash(_("You do not have the permissions to unban this user."),
               "danger")
         return redirect(url_for("management.overview"))
+
+    # ajax request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+
+        data = []
+        for user in User.query.filter(User.id.in_(ids)).all():
+            if user.unban():
+                data.append({
+                    "id": user.id,
+                    "type": "unban",
+                    "reverse": "ban",
+                    "reverse_name": _("Ban"),
+                    "reverse_url": url_for("management.ban_user",
+                                           user_id=user.id)
+                })
+
+        return jsonify(
+            message="{} Users unbanned.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
@@ -263,9 +351,32 @@ def unread_reports():
 @management.route("/reports/markread", methods=["POST"])
 @moderator_required
 def report_markread(report_id=None):
+    # AJAX request
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        data = []
+
+        for report in Report.query.filter(Report.id.in_(ids)).all():
+            report.zapped_by = current_user.id
+            report.zapped = datetime.utcnow()
+            report.save()
+            data.append({
+                "id": report.id,
+                "type": "read",
+                "reverse": False,
+                "reverse_name": None,
+                "reverse_url": None
+            })
+
+        return jsonify(
+            message="{} Reports marked as read.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
+
     # mark single report as read
     if report_id:
-
         report = Report.query.filter_by(id=report_id).first_or_404()
         if report.zapped:
             flash(_("Report %(id)s is already marked as read.", id=report.id),
@@ -328,11 +439,48 @@ def edit_group(group_id):
 
 
 @management.route("/groups/<int:group_id>/delete", methods=["POST"])
+@management.route("/groups/delete", methods=["POST"])
 @admin_required
-def delete_group(group_id):
-    group = Group.query.filter_by(id=group_id).first_or_404()
-    group.delete()
-    flash(_("Group successfully deleted."), "success")
+def delete_group(group_id=None):
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        if not (set(ids) & set(["1", "2", "3", "4", "5"])):
+            data = []
+            for group in Group.query.filter(Group.id.in_(ids)).all():
+                group.delete()
+                data.append({
+                    "id": group.id,
+                    "type": "delete",
+                    "reverse": False,
+                    "reverse_name": None,
+                    "reverse_url": None
+                })
+
+            return jsonify(
+                message="{} Groups deleted.".format(len(data)),
+                category="success",
+                data=data,
+                status=200
+            )
+        return jsonify(
+            message=_("You cannot delete one of the standard groups."),
+            category="danger",
+            data=None,
+            status=404
+        )
+
+    if group_id is not None:
+        if group_id <= 5:  # there are 5 standard groups
+            flash(_("You cannot delete the standard groups. "
+                    "Try renaming them instead.", "danger"))
+            return redirect(url_for("management.groups"))
+
+        group = Group.query.filter_by(id=group_id).first_or_404()
+        group.delete()
+        flash(_("Group successfully deleted."), "success")
+        return redirect(url_for("management.groups"))
+
+    flash(_("No group choosen.."), "danger")
     return redirect(url_for("management.groups"))
 
 

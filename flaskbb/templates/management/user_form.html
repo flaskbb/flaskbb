@@ -17,22 +17,32 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-    <form class="form-horizontal" role="form" method="post">
-        {{ form.hidden_tag() }}
-        <legend class="">{{ title }}</legend>
-            {{ horizontal_field(form.username) }}
-            {{ horizontal_field(form.email) }}
-            {{ horizontal_field(form.password) }}
-            {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
-            {{ horizontal_field(form.gender) }}
-            {{ horizontal_field(form.location) }}
-            {{ horizontal_field(form.website) }}
-            {{ horizontal_field(form.avatar) }}
-            {{ horizontal_field(form.primary_group) }}
-            {{ horizontal_field(form.secondary_groups) }}
-            {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
-            {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
-            {{ horizontal_field(form.submit) }}
-    </form>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-user-plus"></span> {{ title }}
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" method="post">
+                        {{ form.hidden_tag() }}
+                        {{ horizontal_field(form.username) }}
+                        {{ horizontal_field(form.email) }}
+                        {{ horizontal_field(form.password) }}
+                        {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
+                        {{ horizontal_field(form.gender) }}
+                        {{ horizontal_field(form.location) }}
+                        {{ horizontal_field(form.website) }}
+                        {{ horizontal_field(form.avatar) }}
+                        {{ horizontal_field(form.primary_group) }}
+                        {{ horizontal_field(form.secondary_groups) }}
+                        {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
+                        {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
+                        {{ horizontal_field(form.submit) }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

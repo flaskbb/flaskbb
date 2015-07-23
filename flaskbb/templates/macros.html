@@ -67,9 +67,11 @@
 
 
 {%- macro render_boolean_field(field, inline=False) -%}
-<div class="checkbox {%- if inline -%}inline{%- endif -%}">
+<div class="checkbox{% if inline %}inline{% endif %}{% if field.errors %}has-error{% endif %}">
+    <label>
     {{ field(**kwargs) }}
-    {{ field_label(field) }}
+    {{ field.label.text }}
+    </label>
     {{ field_description(field) }}
     {{ field_errors(field) }}
 </div>
@@ -96,6 +98,7 @@
 </div>
 {%- endmacro -%}
 
+
 {%- macro render_submit_field(field, div_class='', input_class='') -%}
 {% if div_class %}
 <div class="{{ div_class }}">
@@ -107,6 +110,7 @@
 </div>
 {% endif %}
 {%- endmacro -%}
+
 
 {%- macro render_field(field, with_label=True, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
@@ -166,27 +170,28 @@
 {%- endmacro -%}
 
 
-{%- macro group_field(field, label_text='', label_class='') -%}
+{%- macro group_field(field, label_text='', label_class='', css_class='form-control form-grouped') -%}
     <div class="form-group {%- if field.errors %} has-error{%- endif %}" style="margin-bottom: 0px;">
         {{field.label(class="sr-only")}}
 
         {%- if kwargs['required'] or field.flags.required -%}
             {% if label_text %}
-                {{field(class='form-control form-grouped', placeholder=label_text, required="required", **kwargs)}}
+                {{field(class=css_class, placeholder=label_text, required="required", **kwargs)}}
             {% else %}
-                {{field(class='form-control form-grouped', placeholder=field.label.text, required="required", **kwargs)}}
+                {{field(class=css_class, placeholder=field.label.text, required="required", **kwargs)}}
             {% endif %}
         {%- else -%}
             {% if label_text %}
-                {{field(class='form-control form-grouped', placeholder=label_text, **kwargs)}}
+                {{field(class=css_class, placeholder=label_text, **kwargs)}}
             {% else %}
-                {{field(class='form-control form-grouped', placeholder=field.label.text, **kwargs)}}
+                {{field(class=css_class, placeholder=field.label.text, **kwargs)}}
             {% endif %}
         {%- endif -%}
         {{ field_description(field) }}
         {{ field_errors(field) }}
     </div>
 {%- endmacro -%}
+
 
 {%- macro horizontal_select_field(field, div_class='', label_class='', select_class="form-control", surrounded_div="col-sm-4") -%}
 <div class="form-group row {%- if field.errors %} has-error{%- endif %}">

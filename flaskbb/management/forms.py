@@ -9,16 +9,9 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_wtf import Form
-from wtforms import (
-    StringField,
-    TextAreaField,
-    PasswordField,
-    IntegerField,
-    BooleanField,
-    SelectField,
-    SubmitField,
-    HiddenField,
-)
+from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
+                     BooleanField, SelectField, SubmitField,
+		     HiddenField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
                                 URL, ValidationError)
 from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
@@ -44,8 +37,10 @@ def selectable_forums():
 def selectable_categories():
     return Category.query.order_by(Category.position)
 
+
 def selectable_groups():
     return Group.query.order_by(Group.id.asc()).all()
+
 
 def select_primary_group():
     return Group.query.filter(Group.guest != True).order_by(Group.id)
@@ -130,7 +125,9 @@ class UserForm(Form):
             raise ValidationError(_("This E-Mail Address is already taken."))
 
     def save(self):
-        user = User(**self.data)
+        data = self.data
+        data.pop('submit', None)
+        user = User(**data)
         return user.save()
 
 
@@ -254,7 +251,9 @@ class GroupForm(Form):
             raise ValidationError(_("There is already a Guest group."))
 
     def save(self):
-        group = Group(**self.data)
+        data = self.data
+        data.pop('submit', None)
+        group = Group(**data)
         return group.save()
 
 
@@ -385,7 +384,6 @@ class ForumForm(Form):
         # remove the button
         data.pop('submit', None)
         forum = Forum(**data)
-        # flush SQLA info from created instance so that it can be merged
         return forum.save()
 
 
@@ -435,7 +433,6 @@ class CategoryForm(Form):
 
     def save(self):
         data = self.data
-        # remove the button
         data.pop('submit', None)
         category = Category(**data)
         return category.save()

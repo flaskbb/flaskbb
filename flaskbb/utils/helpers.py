@@ -17,16 +17,18 @@ from io import BytesIO
 from datetime import datetime, timedelta
 
 import requests
-from flask import session, url_for
+import unidecode
+from flask import session, url_for, flash
 from babel.dates import format_timedelta
+from flask_babelex import lazy_gettext as _
 from flask_themes2 import render_theme_template
 from flask_login import current_user
-import unidecode
 
 from flaskbb._compat import range_method, text_type
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
+
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -55,6 +57,50 @@ def render_template(template, **context):  # pragma: no cover
     else:
         theme = session.get('theme', flaskbb_config['DEFAULT_THEME'])
     return render_theme_template(theme, template, **context)
+
+
+def do_topic_action(topics, user, action, reverse):
+    """Executes a specific action for topics. Returns a list with the modified
+    topic objects.
+
+    :param topics: A iterable with ``Topic`` objects.
+    :param user: The user object which wants to perform the action.
+    :param action: One of the following actions: locked, important and delete.
+    :param reverse: If the action should be done in a reversed way.
+                    For example, to unlock a topic, ``reverse`` should be
+                    set to ``True``.
+    """
+    from flaskbb.utils.permissions import can_moderate, can_delete_topic
+    from flaskbb.user.models import User
+    from flaskbb.forum.models import Post
+
+    modified_topics = 0
+    if action != "delete":
+        for topic in topics:
+            if not can_moderate(user, topic.forum):
+                flash(_("You do not have the permissions to execute this "
+                        "action."), "danger")
+                return False
+
+            if getattr(topic, action) and not reverse:
+                continue
+
+            setattr(topic, action, not reverse)
+            modified_topics += 1
+            topic.save()
+    elif action == "delete":
+        for topic in topics:
+            if not can_delete_topic(user, topic):
+                flash(_("You do not have the permissions to delete this "
+                        "topic."), "danger")
+                return False
+
+            involved_users = User.query.filter(Post.topic_id == topic.id,
+                                               User.id == Post.user_id).all()
+            modified_topics += 1
+            topic.delete(involved_users)
+
+    return modified_topics
 
 
 def get_categories_and_forums(query_result, user):

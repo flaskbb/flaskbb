@@ -10,6 +10,10 @@ body {
   margin-bottom: 60px;
 }
 
+.forum-moderation, .forum-selectall, .forum-select {
+
+}
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -31,6 +35,35 @@ body {
   cursor: default;
   background-color: #fff;
   border-color: #ddd;
+}
+
+.text-success {
+    color: #5cb85c;
+}
+
+.text-info {
+    color: #5bc0de;
+}
+
+.text-danger {
+    color: #d9534f;
+}
+
+.text-primary {
+    color: #337ab7;
+}
+
+.text-warning {
+    color: #f0ad4e;
+}
+
+.search-form {
+    display: none;
+    padding: 15px;
+}
+
+.management-body {
+    padding: 0px;
 }
 
 /*

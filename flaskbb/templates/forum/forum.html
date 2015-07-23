@@ -58,7 +58,7 @@
 
         {% for topic, topicread in topics.items %}
         <tr>
-            <td width="4%" style="vertical-align: middle; text-align: center;">
+            <td class="topic-status" width="4%" style="vertical-align: middle; text-align: center;">
             {% if topic.locked %}
                 <span class="fa fa-lock" style="font-size: 2em"></span>
             {% elif topic.important %}
@@ -122,4 +122,9 @@
     </tbody>
 </table>
 
+<div class="pull-left">
+    <a class="btn btn-default" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
+        <span class="fa fa-tasks"></span> {% trans %}Moderation Mode{% endtrans %}
+    </a>
+</div>
 {% endblock %}

@@ -17,27 +17,34 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9">
-<legend>{{ active_group.name }}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-cogs"></span> {{ active_group.name }}
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" method="post">
+                        {{ form.hidden_tag() }}
+                        {% for field in form %}
+                            {% if field.type not in ["TextField", "IntegerField"] %}
+                                {% if field.type == "BooleanField" %}
+                                    {{ render_boolean_field(field) }}
+                                {% endif %}
 
-<form class="form-horizontal" role="form" method="post">
+                                {% if field.type in ["SelectField", "SelectMultipleField"] %}
+                                    {{ render_select_field(field) }}
+                                {% endif %}
+                            {% else %}
+                                {{ render_field(field) }}
+                            {% endif %}
+                        {%  endfor %}
 
-    {{ form.hidden_tag() }}
-    {% for field in form %}
-        {% if field.type not in ["TextField", "IntegerField"] %}
-            {% if field.type == "BooleanField" %}
-                {{ render_boolean_field(field) }}
-            {% endif %}
-
-            {% if field.type in ["SelectField", "SelectMultipleField"] %}
-                {{ render_select_field(field) }}
-            {% endif %}
-        {% else %}
-            {{ render_field(field) }}
-        {% endif %}
-    {%  endfor %}
-
-    <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
-
-</form>
+                        <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

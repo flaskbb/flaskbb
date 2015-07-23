@@ -13,51 +13,87 @@
 </div>
 
 <div class="col-md-9">
-    <legend>{% trans %}Unread Reports{% endtrans %}</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="fa fa-flag"></span> {% trans %}Unread Reports{% endtrans %}
+                </div>
+                <div class="panel-body management-body"></div>
 
-    <div class="pull-left" style="padding-bottom: 10px">
-        {{ render_pagination(reports, url_for('management.unread_reports')) }}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
+                            <th>#</th>
+                            <th>{% trans %}Poster{% endtrans %}</th>
+                            <th>{% trans %}Topic{% endtrans %}</th>
+                            <th>{% trans %}Reporter{% endtrans %}</th>
+                            <th>{% trans %}Reason{% endtrans %}</th>
+                            <th>{% trans %}Reported{% endtrans %}</th>
+                            <th>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        <span class="fa fa-cog" style="margin-right: 0px;"></span> {% trans %}Actions{% endtrans %}
+                                    </button>
+                                    <ul class="dropdown-menu slidedown">
+                                        <li>
+                                            <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.report_markread') }}', '{% trans %}Are you sure you want to mark these Reports as read?{% endtrans %}')">
+                                                <span class="fa fa-flag-o text-primary"></span> {% trans %}Mark as Read{% endtrans %}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports.items %}
+                        <tr class="action-row">
+                            <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ report.id }}" title="Select Report"/></td>
+                            <td>{{ report.id }}</td>
+                            <td>{{ report.post.user.username }}</td>
+                            <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.post.topic.title }}</a></td>
+                            <td>{{ report.reporter.username }}</td>
+                            <td>{{ report.reason }}</td>
+                            <td>{{ report.reported|time_since }}</td>
+                            <td>
+                                <form class="inline-form" id="read-{{report.id}}" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button class="btn btn-link">
+                                        <span class="fa fa-flag-o text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Mark as Read{% endtrans %}"></span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7">{% trans %}No unread reports.{% endtrans %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ render_pagination(reports, url_for('management.unread_reports')) }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>{% trans %}Poster{% endtrans %}</th>
-                <th>{% trans %}Topic{% endtrans %}</th>
-                <th>{% trans %}Reporter{% endtrans %}</th>
-                <th>{% trans %}Reason{% endtrans %}</th>
-                <th>{% trans %}Reported{% endtrans %}</th>
-                <th>
-                    <form class="inline-form" method="post" action="{{ url_for('management.report_markread') }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button class="btn btn-link">{% trans %}Mark all as Read{% endtrans %}</button>
-                    </form>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for report in reports.items %}
-            <tr>
-                <td><a href="{{ url_for('forum.view_post', post_id=report.post.id) }}" target="_blank">{{ report.id }}</a></td>
-                <td>{{ report.post.user.username }}</td>
-                <td>{{ report.post.topic.title }}</td>
-                <td>{{ report.reporter.username }}</td>
-                <td>{{ report.reason }}</td>
-                <td>{{ report.reported|time_since }}</td>
-                <td>
-                    <form class="inline-form" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button class="btn btn-link">{% trans %}Mark as Read{% endtrans %}</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7">{% trans %}No unread reports.{% endtrans %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    var bulk_actions = new BulkActions();
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 {% endblock %}

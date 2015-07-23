@@ -3,7 +3,6 @@
 {% set active_forum_nav=True %}
 
 {% block css %}
-    {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
 {% endblock %}
 
@@ -170,7 +169,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/topic.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}

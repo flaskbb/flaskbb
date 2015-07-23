@@ -17,12 +17,20 @@
 
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-        {% block css %}
+        {% block stylesheets %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/code.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ theme_static('css/bootstrap-theme.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/flaskbb.css') }}">
+        {% endblock %}
+
+        {# for extra stylesheets. e.q. a template has to add something #}
+        {% block css %}
+        {% endblock %}
+
+        {# for various extra things #}
+        {% block head_extra %}
         {% endblock %}
     </head>
 

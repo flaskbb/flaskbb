@@ -19,6 +19,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
@@ -30,7 +31,7 @@ groups_users = db.Table(
     db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
 
-class Group(db.Model):
+class Group(db.Model, CRUDMixin):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -62,18 +63,6 @@ class Group(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def save(self):
-        """Saves a group"""
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        """Deletes a group"""
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
     @classmethod
     def selectable_groups_choices(cls):
         return Group.query.order_by(Group.name.asc()).with_entities(
@@ -85,7 +74,7 @@ class Group(db.Model):
         return Group.query.filter(cls.guest == True).first()
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"
     __searchable__ = ['username', 'email']
 
@@ -280,6 +269,7 @@ class User(db.Model, UserMixin):
 
         :param topic: The topic which should be added to the topic tracker.
         """
+
         if not self.is_tracking_topic(topic):
             self.tracked_topics.append(topic)
             return self
@@ -290,6 +280,7 @@ class User(db.Model, UserMixin):
         :param topic: The topic which should be removed from the
                       topic tracker.
         """
+
         if self.is_tracking_topic(topic):
             self.tracked_topics.remove(topic)
             return self
@@ -308,6 +299,7 @@ class User(db.Model, UserMixin):
 
         :param group: The group which should be added to the user.
         """
+
         if not self.in_group(group):
             self.secondary_groups.append(group)
             return self
@@ -342,6 +334,7 @@ class User(db.Model, UserMixin):
 
         :param exclude: a list with excluded permissions. default is None.
         """
+
         exclude = exclude or []
         exclude.extend(['id', 'name', 'description'])
 
@@ -368,11 +361,13 @@ class User(db.Model, UserMixin):
 
     def invalidate_cache(self):
         """Invalidates this objects cached metadata."""
+
         cache.delete_memoized(self.get_permissions, self)
         cache.delete_memoized(self.get_groups, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
+
         if not self.get_permissions()['banned']:
             banned_group = Group.query.filter(
                 Group.banned == True
@@ -386,6 +381,7 @@ class User(db.Model, UserMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
+
         if self.get_permissions()['banned']:
             member_group = Group.query.filter(
                 Group.admin == False,
@@ -408,6 +404,7 @@ class User(db.Model, UserMixin):
         :param groups: A list with groups that should be added to the
                        secondary groups from user.
         """
+
         if groups:
             # TODO: Only remove/add groups that are selected
             secondary_groups = self.secondary_groups.all()
@@ -429,6 +426,7 @@ class User(db.Model, UserMixin):
 
     def delete(self):
         """Deletes the User."""
+
         # This isn't done automatically...
         Conversation.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()

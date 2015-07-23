@@ -14,9 +14,10 @@ from flask_wtf import Form
 
 from flaskbb._compat import max_integer, text_type, iteritems
 from flaskbb.extensions import db, cache
+from flaskbb.utils.database import CRUDMixin
 
 
-class SettingsGroup(db.Model):
+class SettingsGroup(db.Model, CRUDMixin):
     __tablename__ = "settingsgroup"
 
     key = db.Column(db.String(255), primary_key=True)
@@ -25,18 +26,8 @@ class SettingsGroup(db.Model):
     settings = db.relationship("Setting", lazy="dynamic", backref="group",
                                cascade="all, delete-orphan")
 
-    def save(self):
-        """Saves a settingsgroup."""
-        db.session.add(self)
-        db.session.commit()
 
-    def delete(self):
-        """Deletes a settingsgroup."""
-        db.session.delete(self)
-        db.session.commit()
-
-
-class Setting(db.Model):
+class Setting(db.Model, CRUDMixin):
     __tablename__ = "settings"
 
     key = db.Column(db.String(255), primary_key=True)
@@ -244,13 +235,3 @@ class Setting(db.Model):
     def invalidate_cache(cls):
         """Invalidates this objects cached metadata."""
         cache.delete_memoized(cls.as_dict, cls)
-
-    def save(self):
-        """Saves a setting"""
-        db.session.add(self)
-        db.session.commit()
-
-    def delete(self):
-        """Deletes a setting"""
-        db.session.delete(self)
-        db.session.commit()
