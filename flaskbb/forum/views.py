@@ -19,7 +19,7 @@ from flask_babelex import gettext as _
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
-                                   render_template)
+                                   render_template, do_topic_action)
 from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
                                        can_delete_topic, can_delete_post,
                                        can_edit_post, can_moderate)
@@ -125,7 +125,6 @@ def view_topic(topic_id, slug=None):
     topic.update_read(current_user, topic.forum, forumsread)
 
     form = None
-
     if can_post_reply(user=current_user, topic=topic):
         form = QuickreplyForm()
         if form.validate_on_submit():
@@ -178,7 +177,6 @@ def new_topic(forum_id, slug=None):
     )
 
 
-@forum.route("/topic/delete", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/delete", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/delete", methods=["POST"])
 @login_required
@@ -196,42 +194,12 @@ def delete_topic(topic_id=None, slug=None):
     return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 
-@forum.route("/topic/lock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/lock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/lock", methods=["POST"])
 @login_required
 def lock_topic(topic_id=None, slug=None):
-    if request.is_xhr:
-        ids = request.get_json()["ids"]
-        data = []
-
-        for topic in Topic.query.filter(Topic.id.in_(ids)).all():
-            # skip already locked topics
-            if topic.locked:
-                continue
-
-            # check if the user has the right permissions
-            if not can_moderate(user=current_user, forum=topic.forum):
-                return jsonify(status=550,
-                               message=_("You do not have the permissions to "
-                                         "lock this topic."),
-                               category="danger")
-
-            topic.locked = True
-            topic.save()
-
-            data.append({
-                "id": topic.id,
-                "type": "lock",
-                "reverse": "unlock",
-                "reverse_name": _("Unlock"),
-                "reverse_url": url_for("forum.unlock_topic")
-            })
-
-        return jsonify(message="{} topics locked.".format(len(data)),
-                       category="success", data=data, status=200)
-
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
     if not can_moderate(user=current_user, forum=topic.forum):
         flash(_("You do not have the permissions to lock this topic."),
               "danger")
@@ -242,42 +210,12 @@ def lock_topic(topic_id=None, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/unlock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/unlock", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/unlock", methods=["POST"])
 @login_required
 def unlock_topic(topic_id=None, slug=None):
-    if request.is_xhr:
-        ids = request.get_json()["ids"]
-        data = []
-
-        for topic in Topic.query.filter(Topic.id.in_(ids)).all():
-            # skip already locked topics
-            if not topic.locked:
-                continue
-
-            # check if the user has the right permissions
-            if not can_moderate(user=current_user, forum=topic.forum):
-                return jsonify(status=550,
-                               message=_("You do not have the permissions to "
-                                         "unlock this topic."),
-                               category="danger")
-
-            topic.locked = False
-            topic.save()
-
-            data.append({
-                "id": topic.id,
-                "type": "unlock",
-                "reverse": "lock",
-                "reverse_name": _("Lock"),
-                "reverse_url": url_for("forum.lock_topic")
-            })
-
-        return jsonify(message="{} topics unlocked.".format(len(data)),
-                       category="success", data=data, status=200)
-
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
     if not can_moderate(user=current_user, forum=topic.forum):
         flash(_("You do not have the permissions to unlock this topic."),
               "danger")
@@ -288,7 +226,6 @@ def unlock_topic(topic_id=None, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/highlight", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/highlight", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/highlight", methods=["POST"])
 @login_required
@@ -305,7 +242,6 @@ def highlight_topic(topic_id=None, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/trivialize", methods=["POST"])
 @forum.route("/topic/<int:topic_id>/trivialize", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/trivialize", methods=["POST"])
 @login_required
@@ -323,57 +259,98 @@ def trivialize_topic(topic_id=None, slug=None):
     return redirect(topic.url)
 
 
-@forum.route("/topic/<int:topic_id>/move/<int:forum_id>", methods=["POST"])
-@forum.route(
-    "/topic/<int:topic_id>-<topic_slug>/move/<int:forum_id>-<forum_slug>",
-    methods=["POST"]
-)
+@forum.route("/forum/<int:forum_id>/edit", methods=["POST", "GET"])
+@forum.route("/forum/<int:forum_id>-<slug>/edit", methods=["POST", "GET"])
 @login_required
-def move_topic(topic_id, forum_id, topic_slug=None, forum_slug=None):
-    forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+def manage_forum(forum_id, slug=None):
+    page = request.args.get('page', 1, type=int)
 
-    # TODO: Bulk move
+    forum_instance, forumsread = Forum.get_forum(forum_id=forum_id,
+                                                 user=current_user)
 
-    if not can_moderate(user=current_user, forum=topic.forum):
-        flash(_("You do not have the permissions to move this topic."),
+    # remove the current forum from the select field (move).
+    available_forums = Forum.query.order_by(Forum.position).all()
+    available_forums.remove(forum_instance)
+
+    if not can_moderate(current_user, forum=forum_instance):
+        flash(_("You do not have the permissions to moderate this forum."),
               "danger")
         return redirect(forum_instance.url)
 
-    if not topic.move(forum_instance):
-        flash(_("Could not move the topic to forum %(title)s.",
-                title=forum_instance.title), "danger")
-        return redirect(topic.url)
+    if forum_instance.external:
+        return redirect(forum_instance.external)
 
-    flash(_("Topic was moved to forum %(title)s.",
-            title=forum_instance.title), "success")
-    return redirect(topic.url)
+    topics = Forum.get_topics(
+        forum_id=forum_instance.id, user=current_user, page=page,
+        per_page=flaskbb_config["TOPICS_PER_PAGE"]
+    )
 
+    mod_forum_url = url_for("forum.manage_forum", forum_id=forum_instance.id,
+                            slug=forum_instance.slug)
 
-@forum.route("/topic/<int:old_id>/merge/<int:new_id>", methods=["POST"])
-@forum.route(
-    "/topic/<int:old_id>-<old_slug>/merge/<int:new_id>-<new_slug>",
-    methods=["POST"]
-)
-@login_required
-def merge_topic(old_id, new_id, old_slug=None, new_slug=None):
-    _old_topic = Topic.query.filter_by(id=old_id).first_or_404()
-    _new_topic = Topic.query.filter_by(id=new_id).first_or_404()
+    # the code is kind of the same here but it somehow still looks cleaner than
+    # doin some magic
+    if request.method == "POST":
+        ids = request.form.getlist("rowid")
+        tmp_topics = Topic.query.filter(Topic.id.in_(ids)).all()
 
-    # TODO: Bulk merge
+        # locking/unlocking
+        if "lock" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=current_user,
+                                      action="locked", reverse=False)
 
-    # Looks to me that the user should have permissions on both forums, right?
-    if not can_moderate(user=current_user, forum=_old_topic.forum):
-        flash(_("You do not have the permissions to merge this topic."),
-              "danger")
-        return redirect(_old_topic.url)
+            flash(_("%(count)s Topics locked.", count=changed), "success")
+            return redirect(mod_forum_url)
 
-    if not _old_topic.merge(_new_topic):
-        flash(_("Could not merge the topics."), "danger")
-        return redirect(_old_topic.url)
+        elif "unlock" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=current_user,
+                                      action="locked", reverse=True)
+            flash(_("%(count)s Topics unlocked.", count=changed), "success")
+            return redirect(mod_forum_url)
 
-    flash(_("Topics succesfully merged."), "success")
-    return redirect(_new_topic.url)
+        # highlighting/trivializing
+        elif "highlight" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=current_user,
+                                      action="important", reverse=False)
+            flash(_("%(count)s Topics highlighted.", count=changed), "success")
+            return redirect(mod_forum_url)
+
+        elif "trivialize" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=current_user,
+                                      action="important", reverse=True)
+            flash(_("%(count)s Topics trivialized.", count=changed), "success")
+            return redirect(mod_forum_url)
+
+        # deleting
+        elif "delete" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=current_user,
+                                      action="delete", reverse=False)
+            flash(_("%(count)s Topics deleted.", count=changed), "success")
+            return redirect(mod_forum_url)
+
+        # moving
+        elif "move" in request.form:
+            new_forum_id = request.form.get("forum")
+
+            if not new_forum_id:
+                flash(_("Please choose a new forum for the topics."), "info")
+                return redirect(mod_forum_url)
+
+            new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
+            # check the permission in the current forum and in the new forum
+            if not can_moderate(current_user, forum_instance) or \
+                    not can_moderate(current_user, new_forum):
+                flash(_("You do not have the permissions to move this topic."),
+                      "danger")
+                return redirect(mod_forum_url)
+
+            new_forum.move_topics_to(tmp_topics)
+            return redirect(mod_forum_url)
+
+    return render_template(
+        "forum/edit_forum.html", forum=forum_instance, topics=topics,
+        available_forums=available_forums, forumsread=forumsread,
+    )
 
 
 @forum.route("/topic/<int:topic_id>/post/new", methods=["POST", "GET"])
@@ -436,7 +413,8 @@ def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
     if not can_edit_post(user=current_user, post=post):
-        flash(_("You do not have the permissions to edit this post."), "danger")
+        flash(_("You do not have the permissions to edit this post."),
+              "danger")
         return redirect(post.topic.url)
 
     form = ReplyForm()
@@ -502,7 +480,6 @@ def raw_post(post_id):
     return format_quote(username=post.username, content=post.content)
 
 
-@forum.route("/markread", methods=["POST"])
 @forum.route("/<int:forum_id>/markread", methods=["POST"])
 @forum.route("/<int:forum_id>-<slug>/markread", methods=["POST"])
 @login_required

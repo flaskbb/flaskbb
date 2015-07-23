@@ -432,60 +432,31 @@ class Topic(db.Model):
 
         return updated
 
-    def move(self, forum):
+    def move(self, new_forum):
         """Moves a topic to the given forum.
         Returns True if it could successfully move the topic to forum.
 
-        :param forum: The new forum for the topic
+        :param new_forum: The new forum for the topic
         """
 
         # if the target forum is the current forum, abort
-        if self.forum_id == forum.id:
+        if self.forum_id == new_forum.id:
             return False
 
         old_forum = self.forum
         self.forum.post_count -= self.post_count
         self.forum.topic_count -= 1
-        self.forum_id = forum.id
+        self.forum_id = new_forum.id
 
-        forum.post_count += self.post_count
-        forum.topic_count += 1
+        new_forum.post_count += self.post_count
+        new_forum.topic_count += 1
 
         db.session.commit()
 
-        forum.update_last_post()
+        new_forum.update_last_post()
         old_forum.update_last_post()
 
         TopicsRead.query.filter_by(topic_id=self.id).delete()
-
-        return True
-
-    def merge(self, topic):
-        """Merges a topic with another topic
-
-        :param topic: The new topic for the posts in this topic
-        """
-
-        # You can only merge a topic with a differrent topic in the same forum
-        if self.id == topic.id or not self.forum_id == topic.forum_id:
-            return False
-
-        # Update the topic id
-        Post.query.filter_by(topic_id=self.id).\
-            update({Post.topic_id: topic.id})
-
-        # Update the last post
-        if topic.last_post.date_created < self.last_post.date_created:
-            topic.last_post_id = self.last_post_id
-
-        # Increase the post and views count
-        topic.post_count += self.post_count
-        topic.views += self.views
-
-        topic.save()
-
-        # Finally delete the old topic
-        Topic.query.filter_by(id=self.id).delete()
 
         return True
 
@@ -783,6 +754,17 @@ class Forum(db.Model):
             db.session.commit()
 
         return self
+
+    def move_topics_to(self, topics):
+        """Moves a bunch a topics to the forum. Returns ``True`` if all
+        topics were moved successfully to the forum.
+
+        :param topics: A iterable with topic objects.
+        """
+        status = False
+        for topic in topics:
+            status = topic.move(self)
+        return status
 
     # Classmethods
     @classmethod
