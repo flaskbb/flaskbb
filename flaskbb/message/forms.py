@@ -47,9 +47,10 @@ class ConversationForm(Form):
             shared_id=shared_id,
             from_user_id=from_user,
             to_user_id=to_user,
-            user_id=user_id
+            user_id=user_id,
+            unread=unread
         )
-        message = Message(message=self.message.data)
+        message = Message(message=self.message.data, user_id=from_user)
         return conversation.save(message=message)
 
 

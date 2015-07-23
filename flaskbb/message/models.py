@@ -98,12 +98,11 @@ class Message(db.Model):
     def save(self, conversation=None):
         """Saves a private message.
 
-        :param conversation_id: The id of the conversation to which the message
-                                belongs to.
+        :param conversation: The  conversation to which the message
+                             belongs to.
         """
         if conversation is not None:
             self.conversation_id = conversation.id
-            self.user_id = conversation.from_user_id
             self.date_created = datetime.utcnow()
 
         db.session.add(self)
