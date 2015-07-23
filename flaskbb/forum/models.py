@@ -710,12 +710,12 @@ class Forum(db.Model, CRUDMixin):
         # topicsread
         return False
 
-    def save(self, moderators=None, groups=None):
+    def save(self, groups=None):
         """Saves a forum
 
         :param moderators: If given, it will update the moderators in this
                            forum with the given iterable of user objects.
-	:param groups: A list with group objects."""
+        :param groups: A list with group objects.
         """
         if self.id:
             db.session.merge(self)
@@ -725,15 +725,6 @@ class Forum(db.Model, CRUDMixin):
                 from flaskbb.user.models import Group
                 self.groups = Group.query.order_by(Group.name.asc()).all()
             db.session.add(self)
-
-	    if moderators is not None:
-	        for moderator in self.moderators:
-	            self.moderators.remove(moderator)
-	        db.session.commit()
-
-	        for moderator in moderators:
-	            if moderator:
-	                self.moderators.append(moderator)
 
         db.session.commit()
         return self
