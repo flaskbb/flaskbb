@@ -320,7 +320,6 @@ class ForumForm(Form):
         _("Group Access to Forum"),
         query_factory=selectable_groups,
         get_label="name",
-        widget=MultiSelect(),
         description=_("Select user groups that can access this forum.")
     )
 
@@ -367,17 +366,6 @@ class ForumForm(Form):
 
         else:
             field.data = approved_moderators
-
-    def validate_groups(self, field):
-
-        if field.data:
-            pass
-        elif field.raw_data:
-            ids = field.raw_data.pop().split(",")
-            groups = Group.query.filter(Group.id.in_(ids)).all()
-            field.data = groups
-        else:
-            field.data = []
 
     def save(self):
         data = self.data

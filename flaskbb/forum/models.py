@@ -888,22 +888,41 @@ class Category(db.Model, CRUDMixin):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        # import Group model locally to avoid cicular imports
+        from flaskbb.user.models import Group
         if user.is_authenticated():
+            # get list of user group ids
+            user_groups = [gr.id for gr in user.groups]
+            # filter forums by user groups
+            user_forums = Forum.query.\
+                filter(Forum.groups.any(Group.id.in_(user_groups))).\
+                subquery()
+
+            forum_alias = aliased(Forum, user_forums)
+            # get all
             forums = cls.query.\
-                join(Forum, cls.id == Forum.category_id).\
+                join(forum_alias, cls.id == forum_alias.category_id).\
                 outerjoin(ForumsRead,
-                          db.and_(ForumsRead.forum_id == Forum.id,
+                          db.and_(ForumsRead.forum_id == forum_alias.id,
                                   ForumsRead.user_id == user.id)).\
-                add_entity(Forum).\
+                add_entity(forum_alias).\
                 add_entity(ForumsRead).\
-                order_by(Category.id, Category.position, Forum.position).\
+                order_by(Category.position, Category.id,
+                         forum_alias.position).\
                 all()
         else:
-            # Get all the forums
+            guest_group = Group.get_guest_group()
+            # filter forums by guest groups
+            guest_forums = Forum.query.\
+                filter(Forum.groups.any(Group.id == guest_group.id)).\
+                subquery()
+
+            forum_alias = aliased(Forum, guest_forums)
             forums = cls.query.\
-                join(Forum, cls.id == Forum.category_id).\
-                add_entity(Forum).\
-                order_by(Category.id, Category.position, Forum.position).\
+                join(forum_alias, cls.id == forum_alias.category_id).\
+                add_entity(forum_alias).\
+                order_by(Category.position, Category.id,
+                         forum_alias.position).\
                 all()
 
         return get_categories_and_forums(forums, user)
@@ -922,23 +941,39 @@ class Category(db.Model, CRUDMixin):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        from flaskbb.user.models import Group
         if user.is_authenticated():
+            # get list of user group ids
+            user_groups = [gr.id for gr in user.groups]
+            # filter forums by user groups
+            user_forums = Forum.query.\
+                filter(Forum.groups.any(Group.id.in_(user_groups))).\
+                subquery()
+
+            forum_alias = aliased(Forum, user_forums)
             forums = cls.query.\
                 filter(cls.id == category_id).\
-                join(Forum, cls.id == Forum.category_id).\
+                join(forum_alias, cls.id == forum_alias.category_id).\
                 outerjoin(ForumsRead,
-                          db.and_(ForumsRead.forum_id == Forum.id,
+                          db.and_(ForumsRead.forum_id == forum_alias.id,
                                   ForumsRead.user_id == user.id)).\
-                add_entity(Forum).\
+                add_entity(forum_alias).\
                 add_entity(ForumsRead).\
-                order_by(Forum.position).\
+                order_by(forum_alias.position).\
                 all()
         else:
+            guest_group = Group.get_guest_group()
+            # filter forums by guest groups
+            guest_forums = Forum.query.\
+                filter(Forum.groups.any(Group.id == guest_group.id)).\
+                subquery()
+
+            forum_alias = aliased(Forum, guest_forums)
             forums = cls.query.\
                 filter(cls.id == category_id).\
-                join(Forum, cls.id == Forum.category_id).\
-                add_entity(Forum).\
-                order_by(Forum.position).\
+                join(forum_alias, cls.id == forum_alias.category_id).\
+                add_entity(forum_alias).\
+                order_by(forum_alias.position).\
                 all()
 
         if not forums:

@@ -3,7 +3,7 @@
 
 {% extends theme("management/management_layout.html") %}
 {% block management_content %}
-{% from theme("macros.html") import render_field, render_submit_field, render_boolean_field, navlink with context %}
+{% from theme("macros.html") import render_field, render_submit_field, render_boolean_field, render_select_field, navlink with context %}
 
 <div class="col-md-3">
     <ul class="nav nav-pills nav-stacked">
@@ -31,11 +31,7 @@
                         {{ render_field(form.moderators) }}
                         {{ render_boolean_field(form.show_moderators) }}
                         {{ render_boolean_field(form.locked) }}
-
-			<div id="perms">
-			    <h4>{{ _("Group Access to the forum") }}</h4>
-			    {{ form.groups }}
-			</div>
+                        {{ render_select_field(form.groups) }}
 
                         <div class="row">
                             {{ render_submit_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
@@ -46,19 +42,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<script type="application/javascript" >
-    $(document).ready(function() {
-        var options = {
-            PLACEHOLDER_TEXT: "Search Groups",
-            BUILD_FULL_POST: false
-        };
-
-        $('#groups').megalist(options);
-        $('#groups').attr('inited', true);
-    });
-</script>
 {% endblock %}
