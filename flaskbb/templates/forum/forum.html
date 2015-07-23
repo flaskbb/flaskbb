@@ -39,7 +39,7 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th colspan="{% if current_user|can_moderate(forum) %}6{% else %}5{% endif %}">
+            <th colspan="5">
                 {{ forum.title }}
             </th>
         </tr>
@@ -54,10 +54,6 @@
             <td>{% trans %}Views{% endtrans %}</td>
 
             <td>{% trans %}Last Post{% endtrans %}</td>
-
-            {% if current_user|can_moderate(forum) %}
-            <td class="forum-selectall"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></td>
-            {% endif %}
         </tr>
 
         {% for topic, topicread in topics.items %}
@@ -114,9 +110,6 @@
                     {% endif %}
                 </small>
             </td>
-            {% if current_user|can_moderate(forum) %}
-            <td class="forum-select"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="Select Topic"/></td>
-            {% endif %}
         </tr>
         {% else %}
         <tr>
@@ -129,45 +122,9 @@
     </tbody>
 </table>
 
-{% if current_user|can_moderate(forum) %}
-<button id="toggle-moderation-tools" class="btn btn-default">Toggle Moderation Tools</button>
-
-<div class="forum-moderation pull-right">
-    <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn-warning" href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('forum.lock_topic') }}', '{% trans %}Are you sure you want to lock these Topics?{% endtrans %}')">
-            <span class="fa fa-lock"></span> {% trans %}Lock{% endtrans %}
-        </a>
-        <a class="btn btn-warning" href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('forum.unlock_topic') }}', '{% trans %}Are you sure you want to lock these Topics?{% endtrans %}')">
-            <span class="fa fa-unlock"></span> {% trans %}Unlock{% endtrans %}
-        </a>
-    </div>
-    <div class="btn-group" role="group" aria-label="...">
-        <a class="btn btn-success" href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('forum.highlight_topic') }}', '{% trans %}Are you sure you want to highlight these Topics?{% endtrans %}')">
-            <span class="fa fa-star"></span> {% trans %}Highlight{% endtrans %}
-        </a>
-        <a class="btn btn-success" href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('forum.trivialize_topic') }}', '{% trans %}Are you sure you want to trivialize these Topics?{% endtrans %}')">
-            <span class="fa fa-star-o"></span> {% trans %}Trivialize{% endtrans %}
-        </a>
-    </div>
-
-    <a class="btn btn-danger" href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('forum.delete_topic') }}', '{% trans %}Are you sure you want to trivialize these Topics?{% endtrans %}')">
-        <span class="fa fa-trash-o"></span> {% trans %}Delete{% endtrans %}
+<div class="pull-left">
+    <a class="btn btn-default" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
+        <span class="fa fa-tasks"></span> {% trans %}Moderation Mode{% endtrans %}
     </a>
-
-    <button class="btn btn-info">
-        <span class="fa fa-plane"></span> {% trans %}Move{% endtrans %}
-    </button>
 </div>
-{% endif %}
-
-{% endblock %}
-
-{% block scripts %}
-    <script>
-    var bulk_actions = new BulkActions();
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-    </script>
 {% endblock %}

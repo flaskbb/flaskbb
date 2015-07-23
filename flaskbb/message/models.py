@@ -13,9 +13,9 @@ from datetime import datetime
 from sqlalchemy_utils import UUIDType
 
 from flaskbb.extensions import db
+from flaskbb.utils.database import CRUDMixin
 
-
-class Conversation(db.Model):
+class Conversation(db.Model, CRUDMixin):
     __tablename__ = "conversations"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -73,15 +73,8 @@ class Conversation(db.Model):
         db.session.commit()
         return self
 
-    def delete(self):
-        """Deletes a private message"""
 
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-class Message(db.Model):
+class Message(db.Model, CRUDMixin):
     __tablename__ = "messages"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -107,12 +100,5 @@ class Message(db.Model):
             self.date_created = datetime.utcnow()
 
         db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        """Deletes a private message"""
-
-        db.session.delete(self)
         db.session.commit()
         return self
