@@ -339,38 +339,6 @@ def test_topic_delete(topic):
     assert forum.last_post_id is None
 
 
-def test_topic_merge(topic):
-    """Tests the topic merge method."""
-    topic_other = Topic(title="Test Topic Merge")
-    post = Post(content="Test Content Merge")
-    topic_other.save(post=post, user=topic.user, forum=topic.forum)
-
-    # Save the last_post_id in another variable because topic_other will be
-    # overwritten later
-    last_post_other = topic_other.last_post_id
-
-    assert topic_other.merge(topic)
-
-    # I just want to be sure that the topic is deleted
-    topic_other = Topic.query.filter_by(id=topic_other.id).first()
-    assert topic_other is None
-
-    assert topic.post_count == 2
-    assert topic.last_post_id == last_post_other
-
-
-def test_topic_merge_other_forum(topic):
-    """You cannot merge a topic with a topic from another forum."""
-    forum_other = Forum(title="Test Forum 2", category_id=1)
-    forum_other.save()
-
-    topic_other = Topic(title="Test Topic 2")
-    post_other = Post(content="Test Content 2")
-    topic_other.save(user=topic.user, forum=forum_other, post=post_other)
-
-    assert not topic.merge(topic_other)
-
-
 def test_topic_move(topic):
     """Tests the topic move method."""
     forum_other = Forum(title="Test Forum 2", category_id=1)
