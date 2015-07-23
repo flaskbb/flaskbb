@@ -13,7 +13,9 @@ from datetime import datetime, timedelta
 from flask import url_for, abort
 
 from flaskbb.extensions import db
-from flaskbb.utils.helpers import slugify, get_categories_and_forums, get_forums
+from flaskbb.utils.helpers import slugify, get_categories_and_forums, \
+    get_forums
+from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -36,7 +38,7 @@ topictracker = db.Table(
               nullable=False))
 
 
-class TopicsRead(db.Model):
+class TopicsRead(db.Model, CRUDMixin):
     __tablename__ = "topicsread"
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
@@ -51,23 +53,8 @@ class TopicsRead(db.Model):
                          primary_key=True)
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def __repr__(self):
-        return "<{}>".format(self.__class__.__name__)
 
-    def save(self):
-        """Saves a TopicsRead entry."""
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        """Deletes a TopicsRead entry."""
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-class ForumsRead(db.Model):
+class ForumsRead(db.Model, CRUDMixin):
     __tablename__ = "forumsread"
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
@@ -79,23 +66,8 @@ class ForumsRead(db.Model):
     last_read = db.Column(db.DateTime, default=datetime.utcnow())
     cleared = db.Column(db.DateTime)
 
-    def __repr__(self):
-        return "<{}>".format(self.__class__.__name__)
 
-    def save(self):
-        """Saves a ForumsRead entry."""
-        db.session.add(self)
-        db.session.commit()
-        return self
-
-    def delete(self):
-        """Deletes a ForumsRead entry."""
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-class Report(db.Model):
+class Report(db.Model, CRUDMixin):
     __tablename__ = "reports"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -119,9 +91,7 @@ class Report(db.Model):
         """Saves a report.
 
         :param post: The post that should be reported
-
         :param user: The user who has reported the post
-
         :param reason: The reason why the user has reported the post
         """
 
@@ -139,14 +109,8 @@ class Report(db.Model):
         db.session.commit()
         return self
 
-    def delete(self):
-        """Deletes a report."""
-        db.session.delete(self)
-        db.session.commit()
-        return self
 
-
-class Post(db.Model):
+class Post(db.Model, CRUDMixin):
     __tablename__ = "posts"
     __searchable__ = ['content', 'username']
 
@@ -187,7 +151,6 @@ class Post(db.Model):
         operation was successful.
 
         :param user: The user who has created the post
-
         :param topic: The topic in which the post was created
         """
         # update/edit the post
@@ -205,7 +168,7 @@ class Post(db.Model):
 
             topic.last_updated = datetime.utcnow()
 
-            # This needs to be done before I update the last_post_id.
+            # This needs to be done before the last_post_id gets updated.
             db.session.add(self)
             db.session.commit()
 
@@ -230,7 +193,7 @@ class Post(db.Model):
             return self
 
     def delete(self):
-        """Deletes a post and returns self"""
+        """Deletes a post and returns self."""
         # This will delete the whole topic
         if self.topic.first_post_id == self.id:
             self.topic.delete()
@@ -274,7 +237,7 @@ class Post(db.Model):
         return self
 
 
-class Topic(db.Model):
+class Topic(db.Model, CRUDMixin):
     __tablename__ = "topics"
     __searchable__ = ['title', 'username']
 
@@ -344,12 +307,9 @@ class Topic(db.Model):
         Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
         topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
 
-        TODO: Couldn't think of a better name for this method - ideas?
-
         :param forumsread: The ForumsRead object is needed because we also
                            need to check if the forum has been cleared
                            sometime ago.
-
         :param topicsread: The topicsread object is used to check if there is
                            a new post in the topic.
         """
@@ -383,9 +343,7 @@ class Topic(db.Model):
         Returns True if the tracker has been updated.
 
         :param user: The user for whom the readstracker should be updated.
-
         :param forum: The forum in which the topic is.
-
         :param forumsread: The forumsread object. It is used to check if there
                            is a new post since the forum has been marked as
                            read.
@@ -465,9 +423,7 @@ class Topic(db.Model):
         given, it will only update the topic.
 
         :param user: The user who has created the topic
-
         :param forum: The forum where the topic is stored
-
         :param post: The post object which is connected to the topic
         """
 
@@ -514,7 +470,7 @@ class Topic(db.Model):
             filter_by(forum_id=self.forum_id).\
             order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
 
-        # do want to delete the topic with the last post?
+        # do we want to delete the topic with the last post in the forum?
         if topic and topic[0].id == self.id:
             try:
                 # Now the second last post will be the last post
@@ -563,7 +519,7 @@ class Topic(db.Model):
         return self
 
 
-class Forum(db.Model):
+class Forum(db.Model, CRUDMixin):
     __tablename__ = "forums"
     __searchable__ = ['title', 'description']
 
@@ -711,11 +667,16 @@ class Forum(db.Model):
             forumsread.save()
             return True
 
-        # Nothing updated, because there are still more than 0 unread topicsread
+        # Nothing updated, because there are still more than 0 unread
+        # topicsread
         return False
 
     def save(self, moderators=None):
-        """Saves a forum"""
+        """Saves a forum
+
+        :param moderators: If given, it will update the moderators in this
+                           forum with the given iterable of user objects.
+       """
         if moderators is not None:
             for moderator in self.moderators:
                 self.moderators.remove(moderator)
@@ -772,7 +733,6 @@ class Forum(db.Model):
         """Returns the forum and forumsread object as a tuple for the user.
 
         :param forum_id: The forum id
-
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
@@ -798,11 +758,8 @@ class Forum(db.Model):
         forumsread relation to check if it is read or unread.
 
         :param forum_id: The forum id
-
         :param user: The user object
-
         :param page: The page whom should be loaded
-
         :param per_page: How many topics per page should be shown
         """
         if user.is_authenticated():
@@ -823,7 +780,7 @@ class Forum(db.Model):
         return topics
 
 
-class Category(db.Model):
+class Category(db.Model, CRUDMixin):
     __tablename__ = "categories"
     __searchable__ = ['title', 'description']
 
@@ -856,13 +813,6 @@ class Category(db.Model):
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
-
-    def save(self):
-        """Saves a category"""
-
-        db.session.add(self)
-        db.session.commit()
-        return self
 
     def delete(self, users=None):
         """Deletes a category. If a list with involved user objects is passed,
@@ -929,7 +879,6 @@ class Category(db.Model):
             (<Category 1>, [(<Forum 1>, None), (<Forum 2>, None)])
 
         :param category_id: The category id
-
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """

@@ -19,6 +19,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
@@ -30,7 +31,7 @@ groups_users = db.Table(
     db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
 
 
-class Group(db.Model):
+class Group(db.Model, CRUDMixin):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -62,20 +63,8 @@ class Group(db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def save(self):
-        """Saves a group"""
-        db.session.add(self)
-        db.session.commit()
-        return self
 
-    def delete(self):
-        """Deletes a group"""
-        db.session.delete(self)
-        db.session.commit()
-        return self
-
-
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"
     __searchable__ = ['username', 'email']
 
