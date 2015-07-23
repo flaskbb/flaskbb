@@ -79,15 +79,14 @@ def dropdb():
 @manager.command
 def populate(dropdb=False, createdb=False):
     """Creates the database with some default data.
-    If you do not want to drop or create the db add
-    '-c' (to not create the db) and '-d' (to not drop the db)
+    To drop or create the databse use the '-d' or '-c' options.
     """
 
-    if not dropdb:
+    if dropdb:
         print("Dropping database...")
         db.drop_all()
 
-    if not createdb:
+    if createdb:
         print("Creating database...")
         upgrade()
 
@@ -303,7 +302,7 @@ def download_emoji():
             f = open(full_path, 'wb')
             f.write(requests.get(image["download_url"]).content)
             f.close()
-            if count == cached_count+50:
+            if count == cached_count + 50:
                 cached_count = count
                 print("{} out of {} Emojis downloaded...".format(
                       cached_count, len(response.json())))

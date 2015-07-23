@@ -11,8 +11,10 @@
 from datetime import datetime, timedelta
 
 from flask import url_for, abort
+from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
+from flaskbb.utils.decorators import can_access_forum, can_access_topic
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, \
     get_forums
 from flaskbb.utils.database import CRUDMixin
@@ -36,6 +38,24 @@ topictracker = db.Table(
               db.ForeignKey('topics.id',
                             use_alter=True, name="fk_tracker_topic_id"),
               nullable=False))
+
+
+# m2m table for group-forum permission mapping
+forumgroups = db.Table(
+    'forumgroups',
+    db.Column(
+        'group_id',
+        db.Integer(),
+        db.ForeignKey('groups.id'),
+        nullable=False
+    ),
+    db.Column(
+        'forum_id',
+        db.Integer(),
+        db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+        nullable=False
+    )
+)
 
 
 class TopicsRead(db.Model, CRUDMixin):
@@ -302,6 +322,12 @@ class Topic(db.Model, CRUDMixin):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    @classmethod
+    @can_access_topic
+    def get_topic(cls, topic_id, user):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        return topic
+
     def tracker_needs_update(self, forumsread, topicsread):
         """Returns True if the topicsread tracker needs an update.
         Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
@@ -548,15 +574,28 @@ class Forum(db.Model, CRUDMixin):
     last_post_created = db.Column(db.DateTime, default=datetime.utcnow())
 
     # One-to-many
-    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
-                             cascade="all, delete-orphan")
+    topics = db.relationship(
+        "Topic",
+        backref="forum",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
 
     # Many-to-many
-    moderators = \
-        db.relationship("User", secondary=moderators,
-                        primaryjoin=(moderators.c.forum_id == id),
-                        backref=db.backref("forummoderator", lazy="dynamic"),
-                        lazy="joined")
+    moderators = db.relationship(
+        "User",
+        secondary=moderators,
+        primaryjoin=(moderators.c.forum_id == id),
+        backref=db.backref("forummoderator", lazy="dynamic"),
+        lazy="joined"
+    )
+    groups = db.relationship(
+        "Group",
+        secondary=forumgroups,
+        primaryjoin=(forumgroups.c.forum_id == id),
+        backref="forumgroups",
+        lazy="joined",
+    )
 
     # Properties
     @property
@@ -671,22 +710,31 @@ class Forum(db.Model, CRUDMixin):
         # topicsread
         return False
 
-    def save(self, moderators=None):
+    def save(self, moderators=None, groups=None):
         """Saves a forum
 
         :param moderators: If given, it will update the moderators in this
                            forum with the given iterable of user objects.
-       """
-        if moderators is not None:
-            for moderator in self.moderators:
-                self.moderators.remove(moderator)
-            db.session.commit()
+	:param groups: A list with group objects."""
+        """
+        if self.id:
+            db.session.merge(self)
+        else:
+            if groups is None:
+                # importing here because of circular dependencies
+                from flaskbb.user.models import Group
+                self.groups = Group.query.order_by(Group.name.asc()).all()
+            db.session.add(self)
 
-            for moderator in moderators:
-                if moderator:
-                    self.moderators.append(moderator)
+	    if moderators is not None:
+	        for moderator in self.moderators:
+	            self.moderators.remove(moderator)
+	        db.session.commit()
 
-        db.session.add(self)
+	        for moderator in moderators:
+	            if moderator:
+	                self.moderators.append(moderator)
+
         db.session.commit()
         return self
 
@@ -729,6 +777,7 @@ class Forum(db.Model, CRUDMixin):
 
     # Classmethods
     @classmethod
+    @can_access_forum
     def get_forum(cls, forum_id, user):
         """Returns the forum and forumsread object as a tuple for the user.
 

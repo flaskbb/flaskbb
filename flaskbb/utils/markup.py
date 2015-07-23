@@ -12,6 +12,10 @@ from pygments.formatters import HtmlFormatter
 _re_emoji = re.compile(r':([a-z0-9\+\-_]+):', re.I)
 _re_user = re.compile(r'@(\w+)', re.I)
 
+# base directory of flaskbb - used to collect the emojis
+_basedir = os.path.join(os.path.abspath(os.path.dirname(
+                        os.path.dirname(__file__))))
+
 
 def collect_emojis():
     """Returns a dictionary containing all emojis with their
@@ -19,7 +23,7 @@ def collect_emojis():
     dictionary.
     """
     emojis = dict()
-    full_path = os.path.join(os.path.abspath("flaskbb"), "static", "emoji")
+    full_path = os.path.join(_basedir, "static", "emoji")
     # return an empty dictionary if the path doesn't exist
     if not os.path.exists(full_path):
         return emojis

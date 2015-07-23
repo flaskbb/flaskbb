@@ -80,7 +80,7 @@ def register():
     """
 
     if current_user is not None and current_user.is_authenticated():
-        return redirect(url_for("user.profile"))
+        return redirect(url_for("user.profile", username=current_user.username))
 
     if current_app.config["RECAPTCHA_ENABLED"]:
         from flaskbb.auth.forms import RegisterRecaptchaForm

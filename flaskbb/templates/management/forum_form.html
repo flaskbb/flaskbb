@@ -32,6 +32,11 @@
                         {{ render_boolean_field(form.show_moderators) }}
                         {{ render_boolean_field(form.locked) }}
 
+			<div id="perms">
+			    <h4>{{ _("Group Access to the forum") }}</h4>
+			    {{ form.groups }}
+			</div>
+
                         <div class="row">
                             {{ render_submit_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
                         </div>
@@ -41,4 +46,19 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="application/javascript" >
+    $(document).ready(function() {
+        var options = {
+            PLACEHOLDER_TEXT: "Search Groups",
+            BUILD_FULL_POST: false
+        };
+
+        $('#groups').megalist(options);
+        $('#groups').attr('inited', true);
+    });
+</script>
 {% endblock %}
