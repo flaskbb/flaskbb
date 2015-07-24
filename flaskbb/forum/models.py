@@ -181,12 +181,13 @@ class Post(db.Model, CRUDMixin):
 
         # Adding a new post
         if user and topic:
+            created = datetime.utcnow()
             self.user_id = user.id
             self.username = user.username
             self.topic_id = topic.id
-            self.date_created = datetime.utcnow()
+            self.date_created = created
 
-            topic.last_updated = datetime.utcnow()
+            topic.last_updated = created
 
             # This needs to be done before the last_post_id gets updated.
             db.session.add(self)
@@ -200,7 +201,7 @@ class Post(db.Model, CRUDMixin):
             topic.forum.last_post_title = topic.title
             topic.forum.last_post_user_id = user.id
             topic.forum.last_post_username = user.username
-            topic.forum.last_post_created = datetime.utcnow()
+            topic.forum.last_post_created = created
 
             # Update the post counts
             user.post_count += 1
@@ -643,10 +644,18 @@ class Forum(db.Model, CRUDMixin):
             # a new last post was found in the forum
             if not last_post.id == self.last_post_id:
                 self.last_post_id = last_post.id
+                self.last_post_title = last_post.topic.title
+                self.last_post_user_id = last_post.user_id
+                self.last_post_username = last_post.username
+                self.last_post_created = last_post.date_created
 
         # No post found..
         else:
             self.last_post_id = None
+            self.last_post_title = None
+            self.last_post_user_id = None
+            self.last_post_username = None
+            self.last_post_created = None
 
         db.session.commit()
 

@@ -69,7 +69,7 @@ def can_access_topic(func):
         from flaskbb.forum.models import Forum, Topic
         from flaskbb.user.models import Group
 
-        topic = Topic.query.get(topic_id == topic_id)
+        topic = Topic.query.filter_by(id=topic_id).first()
         # get list of user group ids
         if current_user.is_authenticated():
             user_groups = [gr.id for gr in current_user.groups]

@@ -412,7 +412,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                        secondary groups from user.
         """
 
-        if groups:
+        if groups is not None:
             # TODO: Only remove/add groups that are selected
             secondary_groups = self.secondary_groups.all()
             for group in secondary_groups:

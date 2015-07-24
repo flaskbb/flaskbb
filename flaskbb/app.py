@@ -286,12 +286,10 @@ def configure_logging(app):
         @event.listens_for(Engine, "before_cursor_execute")
         def before_cursor_execute(conn, cursor, statement,
                                   parameters, context, executemany):
-            context._query_start_time = time.time()
+            conn.info.setdefault('query_start_time', []).append(time.time())
 
         @event.listens_for(Engine, "after_cursor_execute")
         def after_cursor_execute(conn, cursor, statement,
                                  parameters, context, executemany):
-            total = time.time() - context._query_start_time
-
-            # Modification for StackOverflow: times in milliseconds
-            app.logger.debug("Total Time: %.02fms" % (total * 1000))
+            total = time.time() - conn.info['query_start_time'].pop(-1)
+            app.logger.debug("Total Time: %f", total)
