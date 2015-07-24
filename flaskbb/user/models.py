@@ -250,6 +250,13 @@ class User(db.Model, UserMixin, CRUDMixin):
             data = False
         return expired, invalid, data
 
+    def recalculate(self):
+        """Recalculates the post count from the user."""
+        post_count = Post.query.filter_by(user_id=self.id).count()
+        self.post_count = post_count
+        self.save()
+        return self
+
     def all_topics(self, page):
         """Returns a paginated result with all topics the user has created."""
 

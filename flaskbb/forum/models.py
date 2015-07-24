@@ -416,6 +416,13 @@ class Topic(db.Model, CRUDMixin):
 
         return updated
 
+    def recalculate(self):
+        """Recalculates the post count in the topic."""
+        post_count = Post.query.filter_by(topic_id=self.id).count()
+        self.post_count = post_count
+        self.save()
+        return self
+
     def move(self, new_forum):
         """Moves a topic to the given forum.
         Returns True if it could successfully move the topic to forum.
@@ -709,6 +716,27 @@ class Forum(db.Model, CRUDMixin):
         # Nothing updated, because there are still more than 0 unread
         # topicsread
         return False
+
+    def recalculate(self, last_post=False):
+        """Recalculates the post_count and topic_count in the forum.
+        Returns the forum with the recounted stats.
+
+        :param last_post: If set to ``True`` it will also try to update
+                          the last post columns in the forum.
+        """
+        topic_count = Topic.query.filter_by(forum_id=self.id).count()
+        post_count = Post.query.\
+            filter(Post.topic_id == Topic.id,
+                   Topic.forum_id == self.id).\
+            count()
+        self.topic_count = topic_count
+        self.post_count = post_count
+
+        if last_post:
+            self.update_last_post()
+
+        self.save()
+        return self
 
     def save(self, groups=None):
         """Saves a forum
