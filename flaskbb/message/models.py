@@ -15,6 +15,7 @@ from sqlalchemy_utils import UUIDType
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
 
+
 class Conversation(db.Model, CRUDMixin):
     __tablename__ = "conversations"
 
@@ -32,6 +33,7 @@ class Conversation(db.Model, CRUDMixin):
     messages = db.relationship(
         "Message", lazy="joined", backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
+        order_by="asc(Message.id)",
         cascade="all, delete-orphan"
     )
 

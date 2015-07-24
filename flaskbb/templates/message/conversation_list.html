@@ -1,4 +1,4 @@
-<div class="panel panel-default conversation">
+<div class="panel panel-primary conversation">
     <div class="panel-heading">
         <span class="glyphicon glyphicon-comment"></span>
         <h3 class="panel-title">{% trans %}Conversations{% endtrans %}</h3>
@@ -26,7 +26,10 @@
                                 {% endif %}
                             </a>
                             <div class="mic-info">
-                                By: <a href="#">{{ conversation.from_user.username }}</a> on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
+                                From <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
+                                to <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
+                                on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
+
                             </div>
                         </div>
                         <div class="comment-text">
