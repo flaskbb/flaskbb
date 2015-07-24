@@ -58,7 +58,7 @@ var BulkActions = function() {
             }
         }
 
-        send_data(url, data)
+        send_data(url, data);
 
         return false;
     };
@@ -87,9 +87,9 @@ var send_data = function(endpoint_url, data) {
             if(v.reverse) {
                 form.attr('action', v.reverse_url);
                 if(v.type == 'ban') {
-                    reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>'
+                    reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>';
                 } else if (v.type == 'unban') {
-                    reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>'
+                    reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>';
                 }
                 form.find('button').html(reverse_html);
             } else {
@@ -123,7 +123,7 @@ $(document).ready(function () {
         });
     });
     // Reply to post
-    $('.quote_btn').click(function (event) {
+    $('.quote-btn').click(function (event) {
         event.preventDefault();
         var post_id = $(this).attr('data-post-id');
 
