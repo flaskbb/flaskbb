@@ -1,0 +1,96 @@
+<table class="table table-bordered">
+    <thead class="categoryhead">
+        <tr>
+            <td colspan="5">
+                <div><strong><a href="{{ category.url }}">{{ category.title }}</a></strong></div>
+            </td>
+        </tr>
+    </thead>
+    <tbody class="forumbody">
+        <tr class="forum_stats">
+            <td colspan="2"><strong>{% trans %}Forum{% endtrans %}</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Topics{% endtrans %}</strong></td>
+            <td width="85" align="center" style="white-space: nowrap"><strong>{% trans %}Posts{% endtrans %}</strong></td>
+            <td width="200" align="center" style="white-space: nowrap"><strong>{% trans %}Last Post{% endtrans %}</strong></td>
+        </tr>
+
+        {% for forum, forumsread in forums %}
+        <tr>
+            <td align="center" valign="center" width="4%">
+
+            {% if forum.external %}
+                <span class="fa fa-external-link" style="font-size: 2em"></span>
+            </td>
+
+            <td valign="top">
+                <strong><a href="{{ forum.external }}">{{ forum.title }}</a></strong>
+
+                <div class="forum-description">
+                    {% autoescape false %}
+                    {{ forum.description|markup }}
+                    {% endautoescape %}
+                </div>
+            </td>
+
+            <td valign="top" align="center" style="white-space: nowrap">-</td>
+            <td valign="top" align="center" style="white-space: nowrap">-</td>
+            <td valign="top" align="right" style="white-space: nowrap">-</td>
+            <!-- End external -->
+            {% else %}
+
+            {% if forum.locked %}
+                <span class="fa fa-lock" style="font-size: 2em"></span>
+            {% elif forum|forum_is_unread(forumsread, current_user) %}
+                <span class="fa fa-comments" style="font-size: 2em"></span>
+            {% else %}
+                <span class="fa fa-comments-o" style="font-size: 2em"></span>
+            {% endif %}
+
+            </td>
+
+            <td valign="top">
+                <strong><a href="{{ forum.url }}">{{ forum.title }}</a></strong>
+
+                <div class="forum-description">
+                    {% autoescape false %}
+                    {{ forum.description|markup }}
+                    {% endautoescape %}
+                    {% if forum.show_moderators %}
+                    <div class="forum-moderators">
+                        {% trans %}Moderators{% endtrans %}:
+                        {% for moderator in forum.moderators %}
+                        <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </td>
+
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum.topic_count }}</td>
+            <td valign="top" align="center" style="white-space: nowrap">{{ forum.post_count }}</td>
+
+            <td valign="top" align="right" style="white-space: nowrap">
+                {% if forum.last_post_id %}
+                <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
+                    <strong>{{ forum.last_post_title|crop_title }}</strong>
+                </a>
+                <br />
+                {{ forum.last_post_created|time_since }}<br />
+
+                    {% trans %}by{% endtrans %}
+                    {% if forum.last_post_user_id %}
+                    <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
+                    {% else %}
+                    {{ forum.last_post_username }}
+                    {% endif %}
+
+                {% else %}
+                {% trans %}No posts.{% endtrans %}
+                {% endif %}
+            {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
