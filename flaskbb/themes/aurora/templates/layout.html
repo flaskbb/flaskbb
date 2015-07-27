@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="FlaskBB is a forum software written in Flask">
+        <meta name="author" content="FlaskBB Team">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+        <title>
+        {% block title %}
+            {%- if not page_title -%}
+                {{ flaskbb_config["PROJECT_TITLE"] }} - {{ flaskbb_config["PROJECT_SUBTITLE"] }}
+            {%- else -%}
+                {{ page_title }} - {{ flaskbb_config["PROJECT_TITLE"] }}
+            {%- endif -%}
+        {% endblock %}
+        </title>
+
+        {% block stylesheets %}
+        <!-- libraries and dependencies -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" >
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
+        <!-- aurora theme -->
+        <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
+        {% endblock %}
+
+        {# for extra stylesheets. e.q. a template has to add something #}
+        {% block css %}
+        {% endblock %}
+
+        {# for various extra things #}
+        {% block head_extra %}
+        {% endblock %}
+    </head>
+
+    <body>
+
+        <!-- main forum layout -->
+        <div class="flaskbb-layout">
+            <div class="container">
+                <!-- forum header - place for the project title and subtitle -->
+                <div class="flaskbb-header">
+                    <div class="flaskbb-meta">
+                        <div class="flaskbb-title">FlaskBB</div>
+                        <div class="flaskbb-subtitle">A lightweight forum software in Flask.</div>
+                    </div>
+                </div>
+            </div>
+            <!-- forum menu - contains all the navigation items -->
+            {% block navigation %}
+                {% include theme('navigation.html') %}
+            {% endblock %}
+
+            {% block messages %}
+            <div class="flashed-messages">
+                {% include theme('flashed_messages.html') %}
+            </div>
+            {% endblock %}
+
+            <div class="container">
+            {% block content %}
+            {% endblock %}
+            </div>
+
+            <div class="container">
+            {% block footer %}
+            <div class="flaskbb-footer">
+                <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                <p class="text-muted pull-right">&copy; 2013 - 2015 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+            </div>
+            {% endblock %}
+            </div>
+
+        </div> <!-- end flaskbb-layout -->
+
+        {% block javascript %}
+        <!-- libraries and dependencies -->
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <!-- flaskbb's javascript -->
+        <script src="{{ url_for('static', filename='js/flaskbb.js') }}"></script>
+        {% endblock %}
+
+        {# for extra scripts in other templates. #}
+        {% block scripts %}
+        {% endblock %}
+    </body>
+</html>

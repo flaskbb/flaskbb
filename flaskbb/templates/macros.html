@@ -300,6 +300,11 @@
 </li>
 {% endmacro %}
 
+{% macro is_active(endpoint, active=False) %}
+    {%- if endpoint == request.endpoint or active == True -%}
+        active
+    {%- endif -%}
+{% endmacro %}
 
 {% macro navlink(endpoint, name, active=False) %}
 <li {% if endpoint == request.endpoint or active %}class="active"{% endif %}>
