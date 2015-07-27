@@ -5,17 +5,24 @@
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
 </ol>
 
+<div class="index-view">
 {% for category, forums in categories %}
     {% include theme("forum/category_layout.html") %}
 {% endfor %}
+</div>
 
+<div class="panel panel-default">
+<div class="panel-heading">
+    {% trans %}Board Statistics{% endtrans %}
+    [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+</div>
+<div class="panel-body">
 <!-- Forum Stats -->
 <table class="table table-bordered">
     <thead>
         <tr>
             <td colspan="2">
-                <strong>{% trans %}Board Statistics{% endtrans %}</strong>
-                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+
             </td>
         </tr>
     </thead>
@@ -37,5 +44,6 @@
 
     </tbody>
 </table>
-
+</div>
+</div>
 {% endblock %}

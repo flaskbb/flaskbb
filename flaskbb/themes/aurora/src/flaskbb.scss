@@ -1,3 +1,9 @@
+@mixin not-last-child($selector) {
+  & #{$selector}:not(:last-child) {
+    @content;
+  }
+}
+
 body {
     background-color: #E8F1F2;
 }
@@ -56,4 +62,52 @@ body {
 .flaskbb-breadcrumb {
     border: 1px solid #cad7e1;
     border-radius: 0;
+}
+
+.index-view .row {
+    margin: 0;
+}
+
+.category-panel {
+    border: 1px solid #cad7e1;
+    border-radius: 0;
+}
+
+// forum-body,..?
+.category-body {
+    padding: 0;
+    .category-meta {
+        padding-top: 0.5em;
+        height: 2.5em;
+        background-color: #e8ecf1;
+        border-bottom: 1px solid #cad7e1;
+
+        .forum-name, .forum-stats, .forum-last-post {
+            font-weight: bold;
+        }
+    }
+    .category-content {
+        margin-top: 1em;
+        padding-bottom: 1em;
+        &:not(:last-child) {
+            border-bottom: 1px solid #cad7e1;
+        }
+    }
+
+}
+
+// topic?
+.forum-info {
+    position: relative;
+    float: left;
+    .forum-status {
+        font-size: 2em;
+        padding-right: 0.5em;
+    }
+    .forum-name {
+
+    }
+    .forum-description {
+
+    }
 }
