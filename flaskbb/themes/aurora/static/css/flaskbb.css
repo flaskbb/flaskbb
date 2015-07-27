@@ -42,4 +42,33 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
+.index-view .row {
+  margin: 0; }
+
+.category-panel {
+  border: 1px solid #cad7e1;
+  border-radius: 0; }
+
+.category-body {
+  padding: 0; }
+  .category-body .category-meta {
+    padding-top: 0.5em;
+    height: 2.5em;
+    background-color: #e8ecf1;
+    border-bottom: 1px solid #cad7e1; }
+    .category-body .category-meta .forum-name, .category-body .category-meta .forum-stats, .category-body .category-meta .forum-last-post {
+      font-weight: bold; }
+  .category-body .category-content {
+    margin-top: 1em;
+    padding-bottom: 1em; }
+    .category-body .category-content:not(:last-child) {
+      border-bottom: 1px solid #cad7e1; }
+
+.forum-info {
+  position: relative;
+  float: left; }
+  .forum-info .forum-status {
+    font-size: 2em;
+    padding-right: 0.5em; }
+
 /*# sourceMappingURL=flaskbb.css.map */
