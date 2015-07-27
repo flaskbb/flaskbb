@@ -1,0 +1,9 @@
+{
+    "application": "flaskbb",
+    "identifier": "aurora",
+    "name": "Aurora",
+    "author": "sh4nks",
+    "license": "BSD 3-Clause",
+    "description": "The default theme for FlaskBB.",
+    "version": "1.0.0"
+}
