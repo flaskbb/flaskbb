@@ -5,10 +5,10 @@
 
     <div class="panel-body category-body">
         <div class="category-meta">
-            <div class="col-md-5 col-sm-5 col-xs-8 forum-name">Forum</div>
-            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">Topics</div>
-            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">Posts</div>
-            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">Last Post</div>
+            <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Forum{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Posts{% endtrans %}</div>
+            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
         </div>
         {% for forum, forumsread in forums %}
         <div class="row category-row">
@@ -22,7 +22,7 @@
 
                 <!-- Forum Name -->
                 <div class="forum-name">
-                    <span class="forum-link">Link to:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
+                    <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
                 </div>
 
                 <!-- Forum Description -->
