@@ -1,6 +1,6 @@
 <div class="panel panel-default category-panel">
     <div class="panel-heading category-head">
-        <strong><a href="{{ category.url }}">{{ category.title }}</a></strong>
+        <a href="{{ category.url }}">{{ category.title }}</a>
     </div>
 
     <div class="panel-body category-body">
@@ -11,7 +11,8 @@
             <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">Last Post</div>
         </div>
         {% for forum, forumsread in forums %}
-        <div class="row category-content">
+        <div class="row category-row">
+
             {% if forum.external %}
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
@@ -45,6 +46,7 @@
                 ---
             </div>
             {% else %}
+
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
                 <div class="forum-status pull-left">

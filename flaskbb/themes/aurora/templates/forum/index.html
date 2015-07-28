@@ -11,39 +11,26 @@
 {% endfor %}
 </div>
 
-<div class="panel panel-default">
-<div class="panel-heading">
-    {% trans %}Board Statistics{% endtrans %}
-    [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
-</div>
-<div class="panel-body">
-<!-- Forum Stats -->
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <td colspan="2">
-
-            </td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                {% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong> <br />
-                {% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong> <br />
-                {% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong> <br />
-            </td>
-            <td>
-                {% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}<br />
-                {% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong> <br />
+<div class="panel panel-default widget-panel">
+    <div class="panel-heading widget-head">
+        {% trans %}Board Statistics{% endtrans %}
+        [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+    </div>
+    <div class="panel-body">
+        <div class="row widget-row">
+            <div class="col-md-6">
+                <p class="stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
+                <p class="stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>
+                <p class="stats">{% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong></p>
+            </div>
+            <div class="col-md-6 pull-right">
+                <p class="stats">{% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}</p>
+                <p class="stats">{% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong></p>
                 {% if config["REDIS_ENABLED"] %}
-                {% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong> <br />
+                <p class="stats">{% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong></p>
                 {% endif %}
-            </td>
-        </tr>
-
-    </tbody>
-</table>
-</div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

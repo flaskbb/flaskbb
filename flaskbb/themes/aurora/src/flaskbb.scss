@@ -63,7 +63,6 @@ body {
         padding-left: 1em;
     }
 
-
     .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
         color: #555;
         background-color: #e7e7e7;
@@ -76,34 +75,45 @@ body {
     border-radius: 0;
 }
 
+
 .index-view .row {
     margin: 0;
 }
 
-.category-panel {
+// default values for the panels
+.category-panel, .forum-panel, .topic-panel, .widget-panel {
     border: 1px solid #cad7e1;
     border-radius: 0;
+    .category-head, .forum-head, .topic-head, .widget-head {
+        font-weight: bold;
+    }
 }
 
-// forum-body,..?
-.category-body {
+.category-body, .forum-body, .topic-body, .widget-body {
     padding: 0;
-    .category-meta {
+    .category-meta, .forum-meta, .topic-meta, .widget-meta {
         padding-top: 0.5em;
         height: 2.5em;
         background-color: #e8ecf1;
         border-bottom: 1px solid #cad7e1;
-
-        .forum-name, .forum-stats, .forum-last-post {
-            font-weight: bold;
-        }
     }
-    .category-content {
+    .category-row, .forum-row, .topic-row, .widget-row {
         margin-top: 1em;
         padding-bottom: 1em;
         &:not(:last-child) {
             border-bottom: 1px solid #cad7e1;
         }
+    }
+}
+
+// category specific values
+.category-body {
+    .category-meta, {
+        .forum-name, .forum-stats, .forum-last-post {
+            font-weight: bold;
+        }
+    }
+    .category-row {
         .forum-info {
             position: relative;
             float: left;
@@ -125,4 +135,9 @@ body {
         }
 
     }
+}
+
+p.stats {
+    margin: 0;
+    padding: 0;
 }
