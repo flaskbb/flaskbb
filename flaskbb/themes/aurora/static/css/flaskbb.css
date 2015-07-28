@@ -53,7 +53,8 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.index-view .row {
+.index-view .row,
+.forum-view .row {
   margin: 0; }
 
 .category-panel, .forum-panel, .topic-panel, .widget-panel {
@@ -75,6 +76,19 @@ body {
     .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .widget-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .widget-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .widget-row:not(:last-child), .widget-body .category-row:not(:last-child), .widget-body .forum-row:not(:last-child), .widget-body .topic-row:not(:last-child), .widget-body .widget-row:not(:last-child) {
       border-bottom: 1px solid #cad7e1; }
 
+.forum-body .forum-meta .topic-name, .forum-body .forum-meta .topic-stats, .forum-body .forum-meta .topic-last-post {
+  font-weight: bold; }
+.forum-body .forum-row .topic-info {
+  position: relative; }
+  .forum-body .forum-row .topic-info .topic-status {
+    font-size: 1em;
+    padding-right: 0.75em;
+    float: left; }
+  .forum-body .forum-row .topic-info .topic-name {
+    font-weight: bold; }
+  .forum-body .forum-row .topic-info .topic-pages {
+    font-size: small; }
+
 .category-body .category-meta .forum-name, .category-body .category-meta .forum-stats, .category-body .category-meta .forum-last-post {
   font-weight: bold; }
 .category-body .category-row .forum-info {
@@ -90,8 +104,22 @@ body {
 .category-body .category-row .forum-last-post .last-post-title {
   font-weight: bold; }
 
-p.stats {
+p.flaskbb-stats {
   margin: 0;
   padding: 0; }
+
+.controls-row {
+  padding: 0;
+  margin: 0; }
+  .controls-row .pagination {
+    padding: 0;
+    margin: 0; }
+
+.inline-form {
+  display: inline;
+  padding: 0px; }
+
+.inline-form .btn-link {
+  padding: 0px; }
 
 /*# sourceMappingURL=flaskbb.css.map */

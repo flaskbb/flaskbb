@@ -76,7 +76,8 @@ body {
 }
 
 
-.index-view .row {
+.index-view .row,
+.forum-view .row {
     margin: 0;
 }
 
@@ -102,6 +103,32 @@ body {
         padding-bottom: 1em;
         &:not(:last-child) {
             border-bottom: 1px solid #cad7e1;
+        }
+    }
+}
+
+
+// forum specific values
+.forum-body {
+    .forum-meta {
+        .topic-name, .topic-stats, .topic-last-post {
+            font-weight: bold;
+        }
+    }
+    .forum-row {
+        .topic-info {
+            position: relative;
+            .topic-status {
+                font-size: 1em;
+                padding-right: 0.75em;
+                float: left;
+            }
+            .topic-name {
+                font-weight: bold;
+            }
+            .topic-pages {
+                font-size: small;
+            }
         }
     }
 }
@@ -137,7 +164,27 @@ body {
     }
 }
 
-p.stats {
+
+p.flaskbb-stats {
     margin: 0;
     padding: 0;
+}
+
+.controls-row {
+    padding: 0;
+    margin: 0;
+
+    .pagination {
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.inline-form {
+    display: inline;
+    padding: 0px;
+}
+
+.inline-form .btn-link {
+    padding: 0px;
 }
