@@ -1,11 +1,22 @@
-@mixin not-last-child($selector) {
-  & #{$selector}:not(:last-child) {
-    @content;
-  }
+html {
+    // push footer to bottom
+    position: relative;
+    min-height: 100%;
 }
 
 body {
     background-color: #E8F1F2;
+    // Margin bottom by footer height
+    margin-bottom: 60px;
+}
+
+.flaskbb-footer {
+    position: absolute;
+    bottom: 0;
+    // Set the fixed height of the footer here
+    height: 60px;
+    // use the same width as container
+    width: inherit;
 }
 
 .flaskbb-layout {
@@ -46,6 +57,7 @@ body {
 .forum-navigation {
     border: 1px solid #cad7e1;
     border-radius: 0 0 0.25em 0.25em;
+
     .navbar-nav .user-btn {
         padding-right: 2em;
         padding-left: 1em;
@@ -92,22 +104,25 @@ body {
         &:not(:last-child) {
             border-bottom: 1px solid #cad7e1;
         }
-    }
-
-}
-
-// topic?
-.forum-info {
-    position: relative;
-    float: left;
-    .forum-status {
-        font-size: 2em;
-        padding-right: 0.5em;
-    }
-    .forum-name {
-
-    }
-    .forum-description {
+        .forum-info {
+            position: relative;
+            float: left;
+            .forum-status {
+                font-size: 2em;
+                padding-right: 0.5em;
+            }
+            .forum-name {
+                font-weight: bold;
+            }
+            .forum-moderators {
+                font-style: italic;
+            }
+        }
+        .forum-last-post {
+            .last-post-title {
+                font-weight: bold;
+            }
+        }
 
     }
 }
