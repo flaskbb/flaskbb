@@ -5,15 +5,15 @@
 
     <div class="panel-body category-body">
         <div class="category-meta">
-            <div class="col-md-5 forum-name">Forum</div>
-            <div class="col-md-2 forum-stats">Topics</div>
-            <div class="col-md-2 forum-stats">Posts</div>
-            <div class="col-md-3 forum-last-post">Last Post</div>
+            <div class="col-md-5 col-sm-5 col-xs-8 forum-name">Forum</div>
+            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">Topics</div>
+            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">Posts</div>
+            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">Last Post</div>
         </div>
         {% for forum, forumsread in forums %}
         <div class="row category-content">
             {% if forum.external %}
-            <div class="col-md-5 forum-info">
+            <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
                 <div class="forum-status pull-left">
                     <span class="fa fa-external-link forum-external"></span>
@@ -31,21 +31,21 @@
             </div> <!-- end forum-info -->
 
             <!-- Post Cunt -->
-            <div class="col-md-2 forum-posts">
+            <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
                 -
             </div>
 
             <!-- Topic Count -->
-            <div class="col-md-2 forum-topics">
+            <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
                 -
             </div>
 
             <!-- Last Post -->
-            <div class="col-md-3 forum-last-post">
+            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
                 ---
             </div>
             {% else %}
-            <div class="col-md-5 forum-info">
+            <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
                 <div class="forum-status pull-left">
                     {% if forum.locked %}
@@ -78,21 +78,21 @@
             </div> <!-- end forum-info -->
 
             <!-- Post Cunt -->
-            <div class="col-md-2 forum-posts">
+            <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
             {{ forum.topic_count }}
             </div>
 
             <!-- Topic Count -->
-            <div class="col-md-2 forum-topics">
+            <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
             {{ forum.topic_count }}
             </div>
 
             <!-- Last Post -->
-            <div class="col-md-3 forum-last-post">
+            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
                 {% if forum.last_post_id %}
                 <div class="last-post-title">
                     <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
-                        <strong>{{ forum.last_post_title|crop_title }}</strong>
+                        {{ forum.last_post_title|crop_title }}
                     </a>
                 </div>
 
@@ -120,26 +120,3 @@
         {% endfor %}
     </div>
 </div>
-
-{#
-<!--
-            {% if forum.external %}
-                <span class="fa fa-external-link" style="font-size: 2em"></span>
-            </td>
-
-            <td valign="top">
-                <strong><a href="{{ forum.external }}">{{ forum.title }}</a></strong>
-
-                <div class="forum-description">
-                    {% autoescape false %}
-                    {{ forum.description|markup }}
-                    {% endautoescape %}
-                </div>
-            </td>
-
-            <td valign="top" align="center" style="white-space: nowrap">-</td>
-            <td valign="top" align="center" style="white-space: nowrap">-</td>
-            <td valign="top" align="right" style="white-space: nowrap">-</td>
-            {% endif %}
--->
-#}
