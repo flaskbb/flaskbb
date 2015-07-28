@@ -42,39 +42,42 @@
         <!-- main forum layout -->
         <div class="flaskbb-layout">
             <div class="container">
+
                 <!-- forum header - place for the project title and subtitle -->
+                {% block header %}
                 <div class="flaskbb-header">
                     <div class="flaskbb-meta">
                         <div class="flaskbb-title">FlaskBB</div>
                         <div class="flaskbb-subtitle">A lightweight forum software in Flask.</div>
                     </div>
                 </div>
-            </div>
-            <!-- forum menu - contains all the navigation items -->
-            {% block navigation %}
-                {% include theme('navigation.html') %}
-            {% endblock %}
+                {% endblock %}
 
-            {% block messages %}
-            <div class="flashed-messages">
-                {% include theme('flashed_messages.html') %}
-            </div>
-            {% endblock %}
+                <!-- forum menu - contains all the navigation items -->
+                {% block navigation %}
+                    {% include theme('navigation.html') %}
+                {% endblock %}
 
-            <div class="container">
-            {% block content %}
-            {% endblock %}
-            </div>
+                <!-- Place for all the (flashed) messages -->
+                {% block messages %}
+                <div class="flashed-messages">
+                    {% include theme('flashed_messages.html') %}
+                </div>
+                {% endblock %}
 
-            <div class="container">
-            {% block footer %}
-            <div class="flaskbb-footer">
-                <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
-                <p class="text-muted pull-right">&copy; 2013 - 2015 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
-            </div>
-            {% endblock %}
-            </div>
+                <!-- the actual content block -->
+                {% block content %}
+                {% endblock %}
 
+                <!-- the forum footer -->
+                {% block footer %}
+                <div class="flaskbb-footer row">
+                    <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                    <p class="text-muted pull-right">&copy; 2013 - 2015 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                </div>
+                {% endblock %}
+
+            </div> <!-- end container -->
         </div> <!-- end flaskbb-layout -->
 
         {% block javascript %}
