@@ -132,14 +132,8 @@ def configure_extensions(app):
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
 
-        unread_count = db.session.query(db.func.count(Conversation.id)).\
-            filter(Conversation.unread,
-                   Conversation.user_id == user_id).subquery()
-        u = db.session.query(User, unread_count).filter(User.id == user_id).\
-            first()
-
-        if u:
-            user_instance, user_instance.pm_unread = u
+        user_instance = User.query.filter_by(id=user_id).first()
+        if user_instance:
             return user_instance
         else:
             return None
