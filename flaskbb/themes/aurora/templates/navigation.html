@@ -43,8 +43,8 @@
                     </li>
                     {% else %}
                     <li><a href="#">No unread messages.</a></li>
-                    <li class="divider"></li>
                     {% endfor %}
+                    <li class="divider"></li>
                     <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Inbox{% endtrans %}</a></li>
                     <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
                 </ul>
