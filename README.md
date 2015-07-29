@@ -39,6 +39,7 @@ For a complete installation guide please visit the installation documentation
 * Configuration (_adjust them accordingly to your needs_)
     * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
 * Create the database & populate it
+    * `python manage.py initdb`
     * `python manage.py populate`
 * Run the development server
     * `python manage.py runserver`
