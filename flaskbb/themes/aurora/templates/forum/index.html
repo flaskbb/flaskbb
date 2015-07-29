@@ -2,10 +2,6 @@
 {% block content %}
 
 <div class="index-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    </ol>
-
     {% for category, forums in categories %}
         {% include theme("forum/category_layout.html") %}
     {% endfor %}
