@@ -57,6 +57,7 @@ def view_conversation(conversation_id):
 
     if conversation.unread:
         conversation.unread = False
+        current_user.invalidate_cache(permissions=False)
         conversation.save()
 
     form = MessageForm()
@@ -163,6 +164,7 @@ def new_conversation():
                       user_id=to_user.id,
                       unread=True,
                       shared_id=shared_id)
+            to_user.invalidate_cache(permissions=False)
 
             flash(_("Message sent."), "success")
             return redirect(url_for("message.sent"))

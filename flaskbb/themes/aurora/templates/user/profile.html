@@ -1,0 +1,134 @@
+{% extends theme("layout.html") %}
+{% block content %}
+
+    <ul class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{{ user.username }}</li>
+    </ul>
+
+
+    <div class="row">
+        <!-- left column -->
+        <div class="col-md-2 col-sm-3 col-xs-12">
+            <div class="panel panel-default panel-widget">
+                <div class="panel-heading panel-widget-heading">
+                    <a href="{{ user.url }}">{{ user.username }}</a>
+                </div>
+
+                <div class="panel-body panel-widget-body">
+                    <div class="profile-picture">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar }}" alt="Avatar" class="profile-avatar">
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-online">
+                        {% if user|is_online %}
+                        <span class="label label-success">Online</span>
+                        {% else %}
+                        <span class="label label-default">Offline</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-pm">
+                        {% if current_user.is_authenticated() %}
+                        <a href="{{ url_for('message.new_conversation') }}?to_user={{ user.username }}">{% trans %}Send a Message{% endtrans %}</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="profile-topics">
+                        <a href="{{ url_for('user.view_all_topics', username=user.username) }}">{% trans %}All Topics{% endtrans %}</a>
+                    </div>
+
+                    <div class="profile-posts">
+                        <a href="{{ url_for('user.view_all_posts', username=user.username) }}">{% trans %}All Posts{% endtrans %}</a>
+                    </div>
+
+                </div>
+            </div> <!-- end profile widget -->
+        </div> <!-- end col -->
+
+
+        <!-- middle column -->
+        <div class="col-md-7 col-sm-5 col-xs-12">
+            <div class="panel panel-default panel-widget">
+                <div class="panel-heading panel-widget-heading">{% trans %}Info{% endtrans %}</div>
+                <div class="panel-body panel-widget-body">
+
+                    {% if user.notes %}
+                        {{ user.notes|markup|safe }}
+                    {% else %}
+                        {% trans %}User has not added any notes about him.{% endtrans %}
+                    {% endif %}
+
+                </div>
+            </div> <!-- end profile widget -->
+
+            {% if user.signature %}
+            <div class="panel panel-default panel-widget">
+                <div class="panel-heading panel-widget-heading">{% trans %}Signature{% endtrans %}</div>
+                <div class="panel-body panel-widget-body">
+
+                    {{ user.signature|markup|safe }}
+
+                </div>
+            </div> <!-- end profile widget -->
+            {% endif %}
+        </div> <!-- end col -->
+
+
+        <!-- right column -->
+        <div class="col-md-3 col-sm-4 col-xs-12">
+            <div class="panel panel-default panel-widget">
+                <div class="panel-heading panel-widget-heading">{% trans %}User Stats{% endtrans %}</div>
+                <div class="panel-body panel-widget-body">
+
+                <div class="profile-stats-field">
+                        <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Group{% endtrans %}:</p></div>
+                        <div class="col-md-7 col-sm-6 col-xs-6"><p>{{ user.primary_group.name }}</p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                        <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Joined{% endtrans %}:</p></div>
+                        <div class="col-md-7 col-sm-6 col-xs-6"><p>{{ user.date_joined|format_date('%b %d %Y') }}</p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                        <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Posts{% endtrans %}:</p></div>
+                        <div class="col-md-7 col-sm-6 col-xs-6"><p>{{ user.post_count }} ({{ user.posts_per_day }} per day)</p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                        <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Last seen{% endtrans %}:</p></div>
+                        <div class="col-md-7 col-sm-6 col-xs-6"><p>{%- if user.lastseen -%} {{ user.lastseen|time_since }} {%- else -%} {% trans %}Never seen{% endtrans %} {%- endif -%}</p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                        <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Last post{% endtrans %}:</p></div>
+                        <div class="col-md-7 col-sm-6 col-xs-6"><p>
+                            {%- if user.last_post -%}
+                            <a href="{{ user.last_post.url }}">{{ user.last_post.date_created|time_since }}</a>
+                            {%- else -%}
+                                {% trans %}Never{% endtrans %}
+                            {%- endif -%}
+                      </p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                      <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Location{% endtrans %}:</p></div>
+                      <div class="col-md-7 col-sm-6 col-xs-6"><p>{%- if user.location -%} {{ user.location }} {%- else -%} {% trans %}No Info{% endtrans %} {%- endif -%}</p></div>
+                    </div>
+
+                    <div class="profile-stats-field">
+                      <div class="col-md-5 col-sm-6 col-xs-6"><p class="stats-right">{% trans %}Birthday{% endtrans %}:</p></div>
+                      <div class="col-md-7 col-sm-6 col-xs-6"><p>{% if user.birthday %} {{ user.birthday|format_date('%b %d %Y') }} {% else %} {% trans %}No Info{% endtrans %} {% endif %} {% if user.gender %} ({{ user.gender }}) {% endif %}</p></div>
+                    </div>
+
+                </div>
+            </div> <!-- end panel-widget -->
+
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+</div>
+{% endblock %}

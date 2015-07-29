@@ -107,7 +107,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-2 col-sm-2 col-xs-2">
                 <div class="pull-left">
                     <a class="btn btn-default" href="{{ forum.url }}">
                         <span class="fa fa-arrow-left"></span> {% trans %}Back{% endtrans %}
@@ -115,7 +115,7 @@
                 </div>
             </div>
 
-            <div class="col-md-10 col-sm-10">
+            <div class="col-md-10 col-sm-10 col-xs-10">
                 <div class="pull-right">
                     <div class="form-group">
 
@@ -145,20 +145,18 @@
                 </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="pull-right">
-                    <div class="form-group">
+                    <div class="form-group ">
 
-                        <div class="col-md-8">
+                        <div class="form-inline">
                             <select class="form-control" id="forum" name="forum">
                                 <option selected value="">{% trans %}Move to...{% endtrans %}</option>
                                 {% for forum in available_forums %}
                                     <option value={{forum.id}}>{{ forum.title }}</option>
                                 {% endfor %}
                             </select>
-                        </div>
 
-                        <div class="col-md-4">
                             <button name="move" class="btn btn-info">
                                 <span class="fa fa-plane"></span> {% trans %}Move{% endtrans %}
                             </button>
