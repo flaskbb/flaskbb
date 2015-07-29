@@ -171,7 +171,7 @@ p.flaskbb-stats {
 }
 
 .controls-row {
-    padding: 0;
+    padding: 1em 0;
     margin: 0;
 
     .pagination {
@@ -197,4 +197,36 @@ p.flaskbb-stats {
     .author-name {
         font-weight: bold;
     }
+}
+
+.post-quickreply {
+    padding: 0;
+    min-height: 0;
+}
+
+.post-quickreply > .md-editor {
+
+}
+
+.post-quickreply > .md-editor.active {
+    border-color: none;
+    box-shadow: none;
+}
+
+.post-quickreply > .md-editor .md-footer, .md-editor>.md-header {
+    background: #F6F9FC;
+}
+
+.post-quickreply > .md-editor>textarea {
+    border-top: 1px solid #cad7e1;
+    border-bottom: none;
+    background: #fff;
+    padding-left: 3px;
+}
+
+.post-quickreply > .md-editor>.md-preview {
+    border-top: 1px solid #cad7e1;
+    border-right: 1px solid #cad7e1;
+    border-bottom: none;
+    background: #eee;
 }

@@ -383,7 +383,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             filter(Conversation.unread, Conversation.user_id == self.id).all()
         return unread_messages
 
-    def invalidate_cache(self, permissions_only=True):
+    def invalidate_cache(self, permissions=True, messages=True):
         """Invalidates this objects cached metadata.
 
         :param permissions_only: If set to ``True`` it will only invalidate
@@ -391,11 +391,12 @@ class User(db.Model, UserMixin, CRUDMixin):
                                  also invalidate the user's unread message
                                  cache.
         """
-        if not permissions_only:
+        if messages:
             cache.delete_memoized(self.get_unread_messages, self)
 
-        cache.delete_memoized(self.get_permissions, self)
-        cache.delete_memoized(self.get_groups, self)
+        if permissions:
+            cache.delete_memoized(self.get_permissions, self)
+            cache.delete_memoized(self.get_groups, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
