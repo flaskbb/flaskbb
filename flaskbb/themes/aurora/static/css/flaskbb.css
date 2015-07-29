@@ -53,8 +53,7 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.index-view .row,
-.forum-view .row {
+.index-view .forum-row, .index-view .category-row, .forum-view .forum-row, .forum-view .category-row {
   margin: 0; }
 
 .category-panel, .forum-panel, .topic-panel, .widget-panel {
@@ -81,9 +80,9 @@ body {
 .forum-body .forum-row .topic-info {
   position: relative; }
   .forum-body .forum-row .topic-info .topic-status {
+    float: left;
     font-size: 1em;
-    padding-right: 0.75em;
-    float: left; }
+    padding-right: 0.75em; }
   .forum-body .forum-row .topic-info .topic-name {
     font-weight: bold; }
   .forum-body .forum-row .topic-info .topic-pages {
@@ -92,9 +91,9 @@ body {
 .category-body .category-meta .forum-name, .category-body .category-meta .forum-stats, .category-body .category-meta .forum-last-post {
   font-weight: bold; }
 .category-body .category-row .forum-info {
-  position: relative;
-  float: left; }
+  position: relative; }
   .category-body .category-row .forum-info .forum-status {
+    float: left;
     font-size: 2em;
     padding-right: 0.5em; }
   .category-body .category-row .forum-info .forum-name {
@@ -121,5 +120,12 @@ p.flaskbb-stats {
 
 .inline-form .btn-link {
   padding: 0px; }
+
+.dropdown-messages {
+  min-width: 15em; }
+  .dropdown-messages .message-subject {
+    font-style: italic; }
+  .dropdown-messages .author-name {
+    font-weight: bold; }
 
 /*# sourceMappingURL=flaskbb.css.map */

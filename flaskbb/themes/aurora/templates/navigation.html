@@ -1,7 +1,7 @@
-<div class="navbar navbar-default forum-navigation">
+<div class="navbar navbar-default forum-navigation" role="navigation">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -29,16 +29,26 @@
             <!-- Inbox -->
             <li class="dropdown {{ is_active('message.inbox') }}">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                    <span class="fa fa-envelope"></span> Inbox <span class="label label-info">{{ current_user.pm_unread }}</span>
+                    <span class="fa fa-envelope"></span> Inbox <span class="label label-info">{{ current_user.unread_count }}</span>
                 </a>
-                <ul class="dropdown-menu">
-                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Private Messages{% endtrans %}</a></li>
+                <ul class="dropdown-menu dropdown-messages">
+                    {% for message in current_user.unread_messages %}
+                    <li>
+                        <a href="{{ url_for('message.view_conversation', conversation_id=message.id) }}">
+                            <div>
+                                <span class="author-name">{{ message.from_user.username }}</span> <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
+                                <div class="message-subject">{{ message.subject }}</div>
+                            </div>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li><a href="#">No unread messages.</a></li>
+                    <li class="divider"></li>
+                    {% endfor %}
+                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Inbox{% endtrans %}</a></li>
                     <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
                 </ul>
             </li>
-
-            <!-- Topic Tracker -->
-            {{ topnav(endpoint='forum.topictracker', name=_('Topic Tracker'), icon='fa fa-book') }}
 
             <!-- User Menu -->
             <li>

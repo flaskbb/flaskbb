@@ -76,9 +76,10 @@ body {
 }
 
 
-.index-view .row,
-.forum-view .row {
-    margin: 0;
+.index-view, .forum-view {
+    .forum-row, .category-row {
+        margin: 0;
+    }
 }
 
 // default values for the panels
@@ -119,9 +120,9 @@ body {
         .topic-info {
             position: relative;
             .topic-status {
+                float: left;
                 font-size: 1em;
                 padding-right: 0.75em;
-                float: left;
             }
             .topic-name {
                 font-weight: bold;
@@ -143,8 +144,8 @@ body {
     .category-row {
         .forum-info {
             position: relative;
-            float: left;
             .forum-status {
+                float: left;
                 font-size: 2em;
                 padding-right: 0.5em;
             }
@@ -160,7 +161,6 @@ body {
                 font-weight: bold;
             }
         }
-
     }
 }
 
@@ -187,4 +187,14 @@ p.flaskbb-stats {
 
 .inline-form .btn-link {
     padding: 0px;
+}
+
+.dropdown-messages {
+    min-width: 15em;
+    .message-subject {
+        font-style: italic;
+    }
+    .author-name {
+        font-weight: bold;
+    }
 }
