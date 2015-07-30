@@ -68,9 +68,9 @@
                         {% endif %}
                     {% else %}
                         {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                            <span class="fa fa-comment topic-unread" style="font-size: 2em"></span>
+                            <span class="fa fa-comment topic-unread"></span>
                         {% else %}
-                            <span class="fa fa-comment-o topic-read" style="font-size: 2em"></span>
+                            <span class="fa fa-comment-o topic-read"></span>
                         {% endif %}
                     {% endif %}
                     </div>
@@ -114,7 +114,10 @@
 
             </div>  <!-- end forum-row -->
             {% else %}
-                {% trans %}No Topics.{% endtrans %}
+            <div class="row forum-row clearfix">
+                <div class="col-md-12 col-sm-12 co-xs-12">
+                    {% trans %}No Topics.{% endtrans %}
+                </div>
             </div> <!-- end forum-row -->
             {% endfor %}
         </div>

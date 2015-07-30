@@ -113,7 +113,7 @@ body {
   position: relative; }
   .forum-body .forum-row .topic-info .topic-status {
     float: left;
-    font-size: 1em;
+    font-size: 2em;
     padding-right: 0.75em; }
   .forum-body .forum-row .topic-info .topic-name {
     font-weight: bold; }
