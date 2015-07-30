@@ -36,7 +36,7 @@
                 </div>
 
                 {% for topic, topicread in topics.items %}
-                <div class="row forum-row">
+                <div class="row forum-row clearfix">
 
                     <div class="col-md-4 col-sm-4 col-xs-6 topic-info">
 
@@ -51,9 +51,9 @@
                             {% endif %}
                         {% else %}
                             {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-comment topic-unread" style="font-size: 2em"></span>
+                                <span class="fa fa-comment topic-unread"></span>
                             {% else %}
-                                <span class="fa fa-comment-o topic-read" style="font-size: 2em"></span>
+                                <span class="fa fa-comment-o topic-read"></span>
                             {% endif %}
                         {% endif %}
                         </div>
@@ -100,8 +100,10 @@
                     </div>
                 </div>
                 {% else %}
-                <div class="row forum-row">
-                    {% trans %}No Topics.{% endtrans %}
+                <div class="row forum-row clearfix">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        {% trans %}No Topics.{% endtrans %}
+                    </div>
                 </div> <!-- end forum-row -->
                 {% endfor %}
             </div>

@@ -113,8 +113,10 @@ body {
   position: relative; }
   .forum-body .forum-row .topic-info .topic-status {
     float: left;
-    font-size: 2em;
-    padding-right: 0.75em; }
+    font-size: 1.5em;
+    padding-right: 0.5em; }
+    .forum-body .forum-row .topic-info .topic-status .topic-locked {
+      font-size: 1.5em; }
   .forum-body .forum-row .topic-info .topic-name {
     font-weight: bold; }
   .forum-body .forum-row .topic-info .topic-pages {
