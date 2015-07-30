@@ -186,4 +186,9 @@ p.flaskbb-stats {
   border-bottom: none;
   background: #eee; }
 
+.emoji {
+  vertical-align: middle;
+  width: 20px;
+  height: 20px; }
+
 /*# sourceMappingURL=flaskbb.css.map */
