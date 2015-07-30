@@ -10,7 +10,8 @@ body {
   position: absolute;
   bottom: 0;
   height: 60px;
-  width: inherit; }
+  width: inherit;
+  padding-top: 1em; }
 
 .flaskbb-layout {
   padding-top: 20px;
@@ -53,12 +54,13 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.index-view .forum-row, .index-view .category-row, .forum-view .forum-row, .forum-view .category-row {
+.index-view .forum-row, .index-view .category-row, .index-view .post-row, .forum-view .forum-row, .forum-view .category-row, .forum-view .post-row, .topic-view .forum-row, .topic-view .category-row, .topic-view .post-row {
   margin: 0; }
 
 .category-panel, .forum-panel, .topic-panel, .widget-panel {
   border: 1px solid #cad7e1;
-  border-radius: 0; }
+  border-radius: 0;
+  margin-bottom: 0; }
   .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .widget-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .widget-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .widget-head, .widget-panel .category-head, .widget-panel .forum-head, .widget-panel .topic-head, .widget-panel .widget-head {
     font-weight: bold; }
 
@@ -69,11 +71,41 @@ body {
     height: 2.5em;
     background-color: #e8ecf1;
     border-bottom: 1px solid #cad7e1; }
-  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .widget-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .widget-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .widget-row, .widget-body .category-row, .widget-body .forum-row, .widget-body .topic-row, .widget-body .widget-row {
-    margin-top: 1em;
-    padding-bottom: 1em; }
-    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .widget-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .widget-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .widget-row:not(:last-child), .widget-body .category-row:not(:last-child), .widget-body .forum-row:not(:last-child), .widget-body .topic-row:not(:last-child), .widget-body .widget-row:not(:last-child) {
+  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .widget-row, .category-body .post-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .widget-row, .forum-body .post-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .widget-row, .topic-body .post-row, .widget-body .category-row, .widget-body .forum-row, .widget-body .topic-row, .widget-body .widget-row, .widget-body .post-row {
+    margin-top: 0.5em;
+    padding-bottom: 0.5em; }
+    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .widget-row:not(:last-child), .category-body .post-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .widget-row:not(:last-child), .forum-body .post-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .widget-row:not(:last-child), .topic-body .post-row:not(:last-child), .widget-body .category-row:not(:last-child), .widget-body .forum-row:not(:last-child), .widget-body .topic-row:not(:last-child), .widget-body .widget-row:not(:last-child), .widget-body .post-row:not(:last-child) {
       border-bottom: 1px solid #cad7e1; }
+
+.topic-body .post-row {
+  margin-top: 0;
+  padding-bottom: 0; }
+  .topic-body .post-row .post-author {
+    padding-left: 0.5em;
+    padding-bottom: 0.5em;
+    background-color: #e8ecf1; }
+  .topic-body .post-row .post-meta {
+    padding-top: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border-bottom: 1px solid #e8ecf1; }
+  .topic-body .post-row .post-box {
+    padding-left: 0;
+    padding-right: 0; }
+    .topic-body .post-row .post-box .post-content {
+      padding-top: 0.5em;
+      padding-left: 0.5em;
+      padding-right: 0.5em; }
+  .topic-body .post-row .post-footer {
+    width: 100%;
+    height: 100%;
+    border-top: 1px solid #e8ecf1; }
+    .topic-body .post-row .post-footer .post-signature {
+      padding-left: 0.5em; }
+    .topic-body .post-row .post-footer .post-controls {
+      padding-left: 0; }
+      .topic-body .post-row .post-footer .post-controls .inline-form {
+        padding: 6px 12px; }
 
 .forum-body .forum-meta .topic-name, .forum-body .forum-meta .topic-stats, .forum-body .forum-meta .topic-last-post {
   font-weight: bold; }
@@ -108,11 +140,15 @@ p.flaskbb-stats {
   padding: 0; }
 
 .controls-row {
-  padding: 1em 0;
+  padding: 0.5em 0;
   margin: 0; }
   .controls-row .pagination {
     padding: 0;
     margin: 0; }
+
+.controls-col {
+  margin: 0;
+  padding: 0; }
 
 .inline-form {
   display: inline;
@@ -128,24 +164,21 @@ p.flaskbb-stats {
   .dropdown-messages .author-name {
     font-weight: bold; }
 
-.post-quickreply {
+.editor {
   padding: 0;
   min-height: 0; }
 
-.post-quickreply > .md-editor.active {
+.editor > .md-editor.active {
   border-color: none;
   box-shadow: none; }
-
-.post-quickreply > .md-editor .md-footer, .md-editor > .md-header {
+.editor > .md-editor > .md-footer, .editor > .md-editor > .md-header {
   background: #F6F9FC; }
-
-.post-quickreply > .md-editor > textarea {
+.editor > .md-editor > textarea {
   border-top: 1px solid #cad7e1;
   border-bottom: none;
   background: #fff;
   padding-left: 3px; }
-
-.post-quickreply > .md-editor > .md-preview {
+.editor > .md-editor > .md-preview {
   border-top: 1px solid #cad7e1;
   border-right: 1px solid #cad7e1;
   border-bottom: none;

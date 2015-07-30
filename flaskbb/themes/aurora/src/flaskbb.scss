@@ -17,6 +17,7 @@ body {
     height: 60px;
     // use the same width as container
     width: inherit;
+    padding-top: 1em;
 }
 
 .flaskbb-layout {
@@ -76,8 +77,8 @@ body {
 }
 
 
-.index-view, .forum-view {
-    .forum-row, .category-row {
+.index-view, .forum-view, .topic-view {
+    .forum-row, .category-row, .post-row {
         margin: 0;
     }
 }
@@ -86,6 +87,7 @@ body {
 .category-panel, .forum-panel, .topic-panel, .widget-panel {
     border: 1px solid #cad7e1;
     border-radius: 0;
+    margin-bottom: 0;
     .category-head, .forum-head, .topic-head, .widget-head {
         font-weight: bold;
     }
@@ -99,15 +101,62 @@ body {
         background-color: #e8ecf1;
         border-bottom: 1px solid #cad7e1;
     }
-    .category-row, .forum-row, .topic-row, .widget-row {
-        margin-top: 1em;
-        padding-bottom: 1em;
+    .category-row, .forum-row, .topic-row, .widget-row, .post-row {
+        margin-top: 0.5em;
+        padding-bottom: 0.5em;
         &:not(:last-child) {
             border-bottom: 1px solid #cad7e1;
         }
     }
 }
 
+// Topic
+.topic-body {
+    .post-row {
+        margin-top: 0;
+        padding-bottom: 0;
+        .post-author {
+            padding-left: 0.5em;
+            padding-bottom: 0.5em;
+            background-color: #e8ecf1;
+        }
+
+        .post-meta {
+            padding-top: 0.5em;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+            border-bottom: 1px solid #e8ecf1;
+        }
+
+        .post-box {
+            padding-left: 0;
+            padding-right: 0;
+            .post-content {
+                padding-top: 0.5em;
+                padding-left: 0.5em;
+                padding-right: 0.5em;
+            }
+        }
+
+        .post-footer {
+            width: 100%;
+            height: 100%;
+            border-top: 1px solid #e8ecf1;
+
+            .post-signature {
+                padding-left: 0.5em;
+            }
+
+            .post-controls {
+                padding-left: 0;
+
+                .inline-form {
+                    padding: 6px 12px;
+                }
+            }
+        }
+    }
+}
 
 // forum specific values
 .forum-body {
@@ -171,13 +220,18 @@ p.flaskbb-stats {
 }
 
 .controls-row {
-    padding: 1em 0;
+    padding: 0.5em 0;
     margin: 0;
 
     .pagination {
         padding: 0;
         margin: 0;
     }
+}
+
+.controls-col {
+    margin: 0;
+    padding: 0;
 }
 
 .inline-form {
@@ -199,34 +253,33 @@ p.flaskbb-stats {
     }
 }
 
-.post-quickreply {
+
+.editor {
     padding: 0;
     min-height: 0;
 }
 
-.post-quickreply > .md-editor {
+.editor > .md-editor {
+    &.active {
+        border-color: none;
+        box-shadow: none;
+    }
 
-}
+    & > .md-footer, & >.md-header {
+        background: #F6F9FC;
+    }
 
-.post-quickreply > .md-editor.active {
-    border-color: none;
-    box-shadow: none;
-}
+    & >textarea {
+        border-top: 1px solid #cad7e1;
+        border-bottom: none;
+        background: #fff;
+        padding-left: 3px;
+    }
 
-.post-quickreply > .md-editor .md-footer, .md-editor>.md-header {
-    background: #F6F9FC;
-}
-
-.post-quickreply > .md-editor>textarea {
-    border-top: 1px solid #cad7e1;
-    border-bottom: none;
-    background: #fff;
-    padding-left: 3px;
-}
-
-.post-quickreply > .md-editor>.md-preview {
-    border-top: 1px solid #cad7e1;
-    border-right: 1px solid #cad7e1;
-    border-bottom: none;
-    background: #eee;
+    & >.md-preview {
+        border-top: 1px solid #cad7e1;
+        border-right: 1px solid #cad7e1;
+        border-bottom: none;
+        background: #eee;
+    }
 }
