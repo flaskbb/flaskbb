@@ -43,6 +43,18 @@ body {
 .forum-navigation {
   border: 1px solid #cad7e1;
   border-radius: 0 0 0.25em 0.25em; }
+  .forum-navigation .navbar-btn > a.btn-primary {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4; }
+  .forum-navigation .navbar-btn > a.btn-primary:focus {
+    color: #fff;
+    background-color: #286090;
+    border-color: #122b40; }
+  .forum-navigation .navbar-btn > a.btn-primary:hover {
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74; }
   .forum-navigation .navbar-nav .user-btn {
     padding-right: 2em;
     padding-left: 1em; }
