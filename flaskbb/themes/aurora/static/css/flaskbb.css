@@ -78,34 +78,66 @@ body {
       border-bottom: 1px solid #cad7e1; }
 
 .topic-body .post-row {
+  background: #e8ecf1;
   margin-top: 0;
   padding-bottom: 0; }
-  .topic-body .post-row .post-author {
-    padding-left: 0.5em;
-    padding-bottom: 0.5em;
-    background-color: #e8ecf1; }
-  .topic-body .post-row .post-meta {
+.topic-body .post-box {
+  background: #fff;
+  border-left: 1px solid #e8ecf1;
+  padding-bottom: 3em;
+  padding-left: 0;
+  padding-right: 0;
+  min-height: 10em;
+  position: relative; }
+  .topic-body .post-box .post-meta {
     padding-top: 0.5em;
     padding-left: 0.5em;
     padding-right: 0.5em;
+    margin: 0;
     border-bottom: 1px solid #e8ecf1; }
-  .topic-body .post-row .post-box {
-    padding-left: 0;
-    padding-right: 0; }
-    .topic-body .post-row .post-box .post-content {
-      padding-top: 0.5em;
-      padding-left: 0.5em;
-      padding-right: 0.5em; }
-  .topic-body .post-row .post-footer {
+  .topic-body .post-box .post-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.5em; }
+  .topic-body .post-box .post-signature {
+    margin-top: 2em; }
+    .topic-body .post-box .post-signature hr {
+      margin: 0;
+      width: 25%; }
+  .topic-body .post-box .post-footer {
+    border-top: 1px solid #e8ecf1;
     width: 100%;
-    height: 100%;
-    border-top: 1px solid #e8ecf1; }
-    .topic-body .post-row .post-footer .post-signature {
-      padding-left: 0.5em; }
-    .topic-body .post-row .post-footer .post-controls {
+    left: 0;
+    bottom: 0;
+    position: absolute; }
+    .topic-body .post-box .post-footer .post-menu {
       padding-left: 0; }
-      .topic-body .post-row .post-footer .post-controls .inline-form {
+      .topic-body .post-box .post-footer .post-menu .inline-form {
         padding: 6px 12px; }
+
+.author .author-name h4 {
+  float: left;
+  margin-bottom: 0; }
+.author .author-title h5 {
+  margin-top: 0;
+  clear: both; }
+.author .author-avatar {
+  margin: 0.5em 0; }
+  .author .author-avatar img {
+    border-radius: 0.25em;
+    height: auto;
+    width: 8em; }
+.author .author-online, .author .author-offline {
+  margin-top: 0.75em;
+  margin-left: 0.25em;
+  float: left;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%; }
+.author .author-online {
+  background: #5cb85c; }
+.author .author-offline {
+  background: #777; }
 
 .forum-body .forum-meta .topic-name, .forum-body .forum-meta .topic-stats, .forum-body .forum-meta .topic-last-post {
   font-weight: bold; }
@@ -166,9 +198,21 @@ p.flaskbb-stats {
   .dropdown-messages .author-name {
     font-weight: bold; }
 
+/* Markdown Editor */
+.editor-box .editor-submit .btn {
+  margin: 0.75em 0.25em 0 0; }
+
 .editor {
   padding: 0;
   min-height: 0; }
+  .editor .editor-options {
+    margin-top: 0.5em; }
+  .editor .new-message {
+    background: #fff;
+    border: 0;
+    height: 12em;
+    outline: none;
+    width: 100%; }
 
 .editor > .md-editor.active {
   border-color: none;

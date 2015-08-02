@@ -28,7 +28,7 @@
             {% for post, user in posts.items %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
-                <div class="post-author col-md-2 col-sm-2 col-xs-12">
+                <div class="author col-md-2 col-sm-2 col-xs-12">
                     <!-- Registered User -->
                     {% if post.user_id %}
                     <div class="author-name"><h4><a href="{{ user.url }}">{{ user.username }}</a></h4></div>
@@ -58,6 +58,7 @@
                 </div>
 
                 <div class="post-box col-md-10 col-sm-10 col-xs-12">
+
                     <div class="post-meta clearfix">
                         <div class="pull-left">
                             <!-- Creation date / Date modified -->
@@ -74,84 +75,83 @@
 
                         <!-- Post number -->
                         <div class="pull-right">
-                            #{{ generate_post_id(posts, loop.index, flaskbb_config["POSTS_PER_PAGE"]) }}
+                            <strong>#{{ generate_post_id(posts, loop.index, flaskbb_config["POSTS_PER_PAGE"]) }}</strong>
                         </div>
                     </div>
 
                     <div class="post-content post_body clearfix" id="pid{{ post.id }}">
                         {{ post.content|markup|safe }}
-                    </div>
-
-                    <div class="post-footer clearfix">
-
                         <!-- Signature Begin -->
-                        {% if post.user_id and user.signature %}
-                        <div class="post-signature col-md-12 col-md-12 col-xs-12">
+                        {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
+                        <div class="post-signature hidden-xs">
+                        <hr />
                             {{ user.signature|markup|safe }}
                         </div>
                         {% endif %}
                         <!-- Signature End -->
-
-                        <!-- Report/Edit/Delete/Quote Post-->
-                        <div class="post-controls col-md-12 col-sm-12 col-xs-12">
-
-                        {% if current_user|post_reply(topic) %}
-                        <!-- Quick quote -->
-                            <a href="#" class="btn btn-link fa fa-reply quote_btn" data-placement="top" data-post-id="{{ post.id }}" title="" data-original-title="Quote this post"></a>
-                        <!-- Full quote/reply -->
-                            <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-link fa fa-reply-all" data-placement="top" title="" data-original-title="Full Reply"></a>
-                        {% endif %}
-
-                        {% if current_user|edit_post(post) %}
-                        <!-- Edit Post -->
-                        <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-link fa fa-pencil" data-placement="top" title="" data-original-title="Edit this post"></a>
-                        {% endif %}
-                        {% if topic.first_post_id == post.id %}
-                            {% if current_user|delete_topic(topic) %}
-                            <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button class="btn btn-link fa fa-trash" data-placement="top" title="" data-original-title="Delete this topic"></button>
-                            </form>
-                            {% endif %}
-                        {% else %}
-                            {% if current_user|delete_post(post) %}
-                        <!-- Delete Post -->
-                            <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button  class="btn btn-link fa fa-trash post-delete" data-placement="top" title="" data-original-title="Delete this post"></button>
-                            </form>
-                            {% endif %}
-
-                        {% endif %}
-
-                        {% if current_user.is_authenticated() %}
-                        <!-- Report post -->
-                            <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-link fa fa-flag" data-placement="top" title="Report this post" data-original-title="Report this post"></a>
-                        {% endif %}
-
-                        </div>
-
                     </div>
+
+                        <div class="post-footer clearfix">
+
+                            <!-- Report/Edit/Delete/Quote Post-->
+                            <div class="post-menu pull-right">
+
+                            {% if current_user|post_reply(topic) %}
+                            <!-- Quick quote -->
+                                <a href="#" class="btn btn-link fa fa-reply quote_btn" data-placement="top" data-post-id="{{ post.id }}" title="" data-original-title="Quote this post"></a>
+                            <!-- Full quote/reply -->
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-link fa fa-reply-all" data-placement="top" title="" data-original-title="Full Reply"></a>
+                            {% endif %}
+
+                            {% if current_user|edit_post(post) %}
+                            <!-- Edit Post -->
+                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-link fa fa-pencil" data-placement="top" title="" data-original-title="Edit this post"></a>
+                            {% endif %}
+                            {% if topic.first_post_id == post.id %}
+                                {% if current_user|delete_topic(topic) %}
+                                <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button class="btn btn-link fa fa-trash" data-placement="top" title="" data-original-title="Delete this topic"></button>
+                                </form>
+                                {% endif %}
+                            {% else %}
+                                {% if current_user|delete_post(post) %}
+                            <!-- Delete Post -->
+                                <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button  class="btn btn-link fa fa-trash post-delete" data-placement="top" title="" data-original-title="Delete this post"></button>
+                                </form>
+                                {% endif %}
+
+                            {% endif %}
+
+                            {% if current_user.is_authenticated() %}
+                            <!-- Report post -->
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-link fa fa-flag" data-placement="top" title="Report this post" data-original-title="Report this post"></a>
+                            {% endif %}
+
+                            </div> <!-- end post-menu -->
+                        </div> <!-- end footer -->
+
                 </div>
             </div>
             {% endfor %}
 
-        </div>
-    </div>
+        </div> <!-- end topic-body -->
+    </div> <!-- end topic-panel -->
 
     {% include theme('forum/topic_controls.html') %}
     {% from theme("macros.html") import render_field, render_quickreply, render_submit_field %}
     {% if form %}
-
-        <form class="form" action="#" method="post">
-            {{ form.hidden_tag() }}
-
-            <div id="quickpost">
+    <form class="form" action="#" method="post">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="editor-box col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10 col-xs-12">
                 <div class="editor col-md-12 col-sm-12 col-xs-12">
                         {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
                 </div>
-                <div class="new-post-submit">
-                    <div class="post-options pull-left">
+                <div class="editor-submit">
+                    <div class="editor-options pull-left">
                         <span class="label label-info">Markdown</span>
                         <a class="label label-success" href="#">help</a> <!-- TODO: add markdown cheat sheet -->
                         <a class="label label-success" href="#">emojis</a> <!-- TODO: add emoji cheat sheet -->
@@ -159,7 +159,8 @@
                     {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                 </div>
             </div>
-        </form>
+        </div>
+    </form>
     {% endif %}
 
 </div>
