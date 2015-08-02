@@ -68,16 +68,18 @@
                 <!-- the actual content block -->
                 {% block content %}
                 {% endblock %}
-
-                <!-- the forum footer -->
-                {% block footer %}
-                <div class="flaskbb-footer row">
-                    <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
-                    <p class="text-muted pull-right">&copy; 2013 - 2015 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
-                </div>
-                {% endblock %}
-
             </div> <!-- end container -->
+
+            <!-- the forum footer -->
+            {% block footer %}
+            <footer class="flaskbb-footer">
+                <div class="container">
+                    <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                    <p class="text-muted pull-right">&copy; 2013 - 2015 <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                </div>
+            </footer>
+            {% endblock %}
+
         </div> <!-- end flaskbb-layout -->
 
         {% block javascript %}
