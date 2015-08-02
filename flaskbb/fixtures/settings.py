@@ -126,6 +126,13 @@ fixture = (
                 'extra':        {"choices": available_avatar_types},
                 'name':         "Avatar Types",
                 'description':  "The allowed types of an avatar. Such as JPEG, GIF or PNG."
+            }),
+            ('signature_enabled', {
+                'value':        True,
+                'value_type':   "boolean",
+                'extra':        {},
+                'name':         "Enable Signatures",
+                'description':  "Enable signatures in posts."
             })
         ),
     }),
