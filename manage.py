@@ -182,14 +182,18 @@ def update(settings=None, force=False):
     except ImportError:
         raise "{} fixture is not available".format(settings)
 
+    overwrite_group = overwrite_setting = False
     if force:
-        count = update_settings_from_fixture(fixture, overwrite_group=True,
-                                             overwrite_setting=True)
-        print("{} groups and {} settings forcefully updated.".format(
-            count[0], count[1]))
-    else:
-        count = update_settings_from_fixture(fixture)
-        print("{} groups and {} settings updated.".format(count[0], count[1]))
+        overwrite_group = overwrite_setting = True
+
+    count = update_settings_from_fixture(
+        fixture=fixture,
+        overwrite_group=overwrite_group,
+        overwrite_setting=overwrite_setting
+    )
+    print("{} groups and {} settings updated.".format(
+        len(count.keys()), len(count.values()))
+    )
 
 
 @manager.command
