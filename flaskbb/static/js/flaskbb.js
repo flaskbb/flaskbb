@@ -128,7 +128,7 @@ $(document).ready(function () {
         var post_id = $(this).attr('data-post-id');
 
         $.get('/post/' + post_id + '/raw', function(text) {
-            var $contents = $('.reply-content .md-editor textarea');
+            var $contents = $('#quickreply-editor');
             console.log($contents);
             $contents.val(($contents.val() + '\n' + text).trim() + '\n');
             $contents.selectionStart = $contents.selectionEnd = $contents.val().length;

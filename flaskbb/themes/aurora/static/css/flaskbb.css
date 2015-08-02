@@ -10,7 +10,7 @@ body {
   position: absolute;
   bottom: 0;
   height: 60px;
-  width: inherit;
+  width: 100%;
   padding-top: 1em; }
 
 .flaskbb-layout {
@@ -99,7 +99,7 @@ body {
   padding-bottom: 3em;
   padding-left: 0;
   padding-right: 0;
-  min-height: 10em;
+  min-height: 18em;
   position: relative; }
   .topic-body .post-box .post-meta {
     padding-top: 0.5em;
@@ -132,6 +132,7 @@ body {
   margin-bottom: 0; }
 .author .author-title h5 {
   margin-top: 0;
+  font-weight: 600;
   clear: both; }
 .author .author-avatar {
   margin: 0.5em 0; }
@@ -198,10 +199,38 @@ p.flaskbb-stats {
 
 .inline-form {
   display: inline;
-  padding: 0px; }
+  padding: 0; }
 
-.inline-form .btn-link {
-  padding: 0px; }
+.inline-form .btn-icon {
+  padding: 0; }
+
+.btn-icon {
+  font-family: 'FontAwesome';
+  font-size: 1.15em;
+  line-height: 1.50em;
+  font-weight: normal;
+  background: none;
+  border-radius: 0; }
+
+.icon-delete:before {
+  content: "\f014";
+  color: #d9534f; }
+
+.icon-report:before {
+  content: "\f024";
+  color: #f0ad4e; }
+
+.icon-edit:before {
+  content: "\f040";
+  color: #5cb85c; }
+
+.icon-reply:before {
+  content: "\f10e";
+  color: #337ab7; }
+
+.icon-replyall:before {
+  content: "\f122";
+  color: #5bc0de; }
 
 .dropdown-messages {
   min-width: 15em; }
