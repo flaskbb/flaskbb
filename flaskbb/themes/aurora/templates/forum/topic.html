@@ -32,12 +32,15 @@
                     <!-- Registered User -->
                     {% if post.user_id %}
                     <div class="author-name"><h4><a href="{{ user.url }}">{{ user.username }}</a></h4></div>
-                    <div class="author-{%- if user|is_online -%}online{%- else -%}offline{%- endif -%}"></div>
-
+                    {% if user|is_online %}
+                        <div class="author-online" data-toggle="tooltip" data-placement="top" title="online"></div>
+                    {% else %}
+                        <div class="author-offline" data-toggle="tooltip" data-placement="top" title="offline"></div>
+                    {% endif %}
                     <div class="author-title"><h5>{{ user.primary_group.name }}</h5></div>
 
                     {% if user.avatar %}
-                        <div class="author-avatar"><img src="{{ user.avatar }}" width="100" height="100" alt=""></div>
+                        <div class="author-avatar"><img src="{{ user.avatar }}" alt="avatar"></div>
                     {% endif %}
 
                     <div class="author-field author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}</div>
@@ -98,20 +101,20 @@
 
                             {% if current_user|post_reply(topic) %}
                             <!-- Quick quote -->
-                                <a href="#" class="btn btn-link fa fa-reply quote_btn" data-placement="top" data-post-id="{{ post.id }}" title="" data-original-title="Quote this post"></a>
+                                <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Quote this post"></a>
                             <!-- Full quote/reply -->
-                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-link fa fa-reply-all" data-placement="top" title="" data-original-title="Full Reply"></a>
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="Full Reply"></a>
                             {% endif %}
 
                             {% if current_user|edit_post(post) %}
                             <!-- Edit Post -->
-                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-link fa fa-pencil" data-placement="top" title="" data-original-title="Edit this post"></a>
+                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="Edit this post"></a>
                             {% endif %}
                             {% if topic.first_post_id == post.id %}
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-link fa fa-trash" data-placement="top" title="" data-original-title="Delete this topic"></button>
+                                    <button class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this topic"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
@@ -119,7 +122,7 @@
                             <!-- Delete Post -->
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-link fa fa-trash post-delete" data-placement="top" title="" data-original-title="Delete this post"></button>
+                                    <button  class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this post"></button>
                                 </form>
                                 {% endif %}
 
@@ -127,7 +130,7 @@
 
                             {% if current_user.is_authenticated() %}
                             <!-- Report post -->
-                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-link fa fa-flag" data-placement="top" title="Report this post" data-original-title="Report this post"></a>
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="Report this post"></a>
                             {% endif %}
 
                             </div> <!-- end post-menu -->
@@ -167,6 +170,11 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
