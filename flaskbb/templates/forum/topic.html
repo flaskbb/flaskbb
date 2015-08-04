@@ -138,6 +138,12 @@
                         </form>
                         {% endif %}
                     {% endif %}
+					{% if current_user|can_moderate(topic.forum) %}
+						<form class="inline-form" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-link">{% trans %}Ban user{% endtrans %}</button> |
+                        </form>
+					{% endif %}
                     {% if current_user|post_reply(topic) %}
                         <!-- Quick quote -->
                         <a href="#" class="quote_btn" data-post-id="{{ post.id }}">{% trans %}Quote{% endtrans %}</a> |
