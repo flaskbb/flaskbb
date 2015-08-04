@@ -16,7 +16,7 @@
             {% if forum.external %}
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
-                <div class="forum-status pull-left">
+                <div class="forum-status">
                     <span class="fa fa-external-link forum-external"></span>
                 </div>
 
@@ -49,7 +49,7 @@
 
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                 <!-- Icon -->
-                <div class="forum-status pull-left">
+                <div class="forum-status">
                     {% if forum.locked %}
                         <span class="fa fa-lock forum-locked"></span>
                     {% elif forum|forum_is_unread(forumsread, current_user) %}

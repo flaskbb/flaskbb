@@ -3,7 +3,7 @@ html {
   min-height: 100%; }
 
 body {
-  background-color: #E8F1F2;
+  background-color: #e8f1f2;
   margin-bottom: 60px; }
 
 .flaskbb-footer {
@@ -25,7 +25,7 @@ body {
   background-image: -webkit-linear-gradient(top, #285e8e 0%, #3276b1 100%);
   background-image: linear-gradient(to bottom, #285e8e 0%, #3276b1 100%);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#285e8e', endColorstr='#3276b1', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$header-background-secondary', endColorstr='$header-background-primary', GradientType=0);
   border: 1px solid #cad7e1;
   border-bottom: 0;
   border-radius: 0.25em 0.25em 0 0;
@@ -38,11 +38,12 @@ body {
     font-size: 3em;
     font-weight: bold; }
   .flaskbb-header .flaskbb-meta .flaskbb-subtitle {
-    color: #e8ecf1; }
+    color: #E8F1F2; }
 
 .forum-navigation {
   border: 1px solid #cad7e1;
-  border-radius: 0 0 0.25em 0.25em; }
+  border-radius: 0 0 0.25em 0.25em;
+  background-color: #f8f8f8; }
   .forum-navigation .navbar-btn > a.btn-primary {
     color: #fff;
     background-color: #337ab7;
@@ -74,14 +75,16 @@ body {
   border-radius: 0;
   margin-bottom: 0; }
   .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .widget-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .widget-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .widget-head, .widget-panel .category-head, .widget-panel .forum-head, .widget-panel .topic-head, .widget-panel .widget-head {
+    background-color: #f5f5f5;
     font-weight: bold; }
 
 .category-body, .forum-body, .topic-body, .widget-body {
-  padding: 0; }
+  padding: 0;
+  background-color: #fff; }
   .category-body .category-meta, .category-body .forum-meta, .category-body .topic-meta, .category-body .widget-meta, .forum-body .category-meta, .forum-body .forum-meta, .forum-body .topic-meta, .forum-body .widget-meta, .topic-body .category-meta, .topic-body .forum-meta, .topic-body .topic-meta, .topic-body .widget-meta, .widget-body .category-meta, .widget-body .forum-meta, .widget-body .topic-meta, .widget-body .widget-meta {
     padding-top: 0.5em;
     height: 2.5em;
-    background-color: #e8ecf1;
+    background-color: #e8f1f2;
     border-bottom: 1px solid #cad7e1; }
   .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .widget-row, .category-body .post-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .widget-row, .forum-body .post-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .widget-row, .topic-body .post-row, .widget-body .category-row, .widget-body .forum-row, .widget-body .topic-row, .widget-body .widget-row, .widget-body .post-row {
     margin-top: 0.5em;
@@ -93,20 +96,23 @@ body {
   background: #e8ecf1;
   margin-top: 0;
   padding-bottom: 0; }
+  .topic-body .post-row:not(:last-child) {
+    border-bottom: 1px solid #cad7e1; }
 .topic-body .post-box {
   background: #fff;
-  border-left: 1px solid #e8ecf1;
+  border-left: 1px solid #cad7e1;
   padding-bottom: 3em;
   padding-left: 0;
   padding-right: 0;
-  min-height: 18em;
+  min-height: 19em;
   position: relative; }
   .topic-body .post-box .post-meta {
     padding-top: 0.5em;
     padding-left: 0.5em;
     padding-right: 0.5em;
     margin: 0;
-    border-bottom: 1px solid #e8ecf1; }
+    background-color: #fff;
+    border-bottom: 1px solid #e8f1f2; }
   .topic-body .post-box .post-content {
     padding-left: 0.5em;
     padding-right: 0.5em;
@@ -114,10 +120,15 @@ body {
   .topic-body .post-box .post-signature {
     margin-top: 2em; }
     .topic-body .post-box .post-signature hr {
+      height: 1px;
+      color: #e8f1f2;
+      background-color: #e8f1f2;
+      border: none;
       margin: 0;
       width: 25%; }
   .topic-body .post-box .post-footer {
-    border-top: 1px solid #e8ecf1;
+    border-top: 1px solid #cad7e1;
+    background-color: #fff;
     width: 100%;
     left: 0;
     bottom: 0;
@@ -150,37 +161,71 @@ body {
 .author .author-online {
   background: #5cb85c; }
 .author .author-offline {
-  background: #777; }
+  background: #555; }
 
-.forum-body .forum-meta .topic-name, .forum-body .forum-meta .topic-stats, .forum-body .forum-meta .topic-last-post {
-  font-weight: bold; }
-.forum-body .forum-row .topic-info {
-  position: relative; }
-  .forum-body .forum-row .topic-info .topic-status {
-    float: left;
-    font-size: 1.5em;
-    padding-right: 0.5em; }
-    .forum-body .forum-row .topic-info .topic-status .topic-locked {
-      font-size: 1.5em; }
-  .forum-body .forum-row .topic-info .topic-name {
-    font-weight: bold; }
-  .forum-body .forum-row .topic-info .topic-pages {
-    font-size: small; }
+.forum-panel {
+  border: 1px solid #cad7e1; }
+  .forum-panel .forum-head {
+    background-color: #f5f5f5; }
+  .forum-panel .forum-body {
+    background-color: #fff; }
+    .forum-panel .forum-body .forum-meta {
+      background-color: #e8f1f2;
+      border-bottom: 1px solid #cad7e1; }
+      .forum-panel .forum-body .forum-meta .topic-name, .forum-panel .forum-body .forum-meta .topic-stats, .forum-panel .forum-body .forum-meta .topic-last-post {
+        font-weight: bold; }
+    .forum-panel .forum-body .forum-row:not(:last-child) {
+      border-bottom: 1px solid #cad7e1; }
+    .forum-panel .forum-body .forum-row .topic-info {
+      position: relative; }
+      .forum-panel .forum-body .forum-row .topic-info .topic-status {
+        float: left;
+        font-size: 1.5em;
+        padding-right: 0.5em; }
+        .forum-panel .forum-body .forum-row .topic-info .topic-status .topic-locked {
+          font-size: 1.5em; }
+      .forum-panel .forum-body .forum-row .topic-info .topic-name {
+        font-weight: bold; }
+      .forum-panel .forum-body .forum-row .topic-info .topic-pages {
+        font-size: small; }
 
-.category-body .category-meta .forum-name, .category-body .category-meta .forum-stats, .category-body .category-meta .forum-last-post {
-  font-weight: bold; }
-.category-body .category-row .forum-info {
-  position: relative; }
-  .category-body .category-row .forum-info .forum-status {
-    float: left;
-    font-size: 2em;
-    padding-right: 0.5em; }
-  .category-body .category-row .forum-info .forum-name {
-    font-weight: bold; }
-  .category-body .category-row .forum-info .forum-moderators {
-    font-style: italic; }
-.category-body .category-row .forum-last-post .last-post-title {
-  font-weight: bold; }
+.category-panel {
+  border: 1px solid #cad7e1; }
+  .category-panel .category-head {
+    background-color: #f5f5f5; }
+  .category-panel .category-body {
+    background-color: #fff; }
+    .category-panel .category-body .category-meta {
+      background-color: #e8f1f2;
+      border-bottom: 1px solid #cad7e1; }
+      .category-panel .category-body .category-meta .forum-name, .category-panel .category-body .category-meta .forum-stats, .category-panel .category-body .category-meta .forum-last-post {
+        font-weight: bold; }
+    .category-panel .category-body .category-row:not(:last-child) {
+      border-bottom: 1px solid #cad7e1; }
+    .category-panel .category-body .category-row .forum-info {
+      position: relative; }
+      .category-panel .category-body .category-row .forum-info .forum-status {
+        float: left;
+        font-size: 2em;
+        padding-right: 0.5em; }
+      .category-panel .category-body .category-row .forum-info .forum-name {
+        font-weight: bold; }
+      .category-panel .category-body .category-row .forum-info .forum-moderators {
+        font-style: italic; }
+    .category-panel .category-body .category-row .forum-last-post .last-post-title {
+      font-weight: bold; }
+
+.widget-panel {
+  border: 1px solid #cad7e1; }
+  .widget-panel .widgety-head {
+    background-color: #f5f5f5; }
+  .widget-panel .widget-body {
+    background-color: #fff; }
+    .widget-panel .widget-body .widget-meta {
+      background-color: #e8f1f2;
+      border-bottom: 1px solid #cad7e1; }
+    .widget-panel .widget-body .widget-row:not(:last-child) {
+      border-bottom: 1px solid #cad7e1; }
 
 p.flaskbb-stats {
   margin: 0;

@@ -1,3 +1,69 @@
+// bootstrap colros
+$blue: #337ab7;
+$light-blue: #5bc0de;
+$green: #5cb85c;
+$orange: #f0ad4e;
+$red: #d9534f;
+$gray: #555;
+
+// main background and font colors
+$background-color: #e8f1f2;
+$font-color: #5a5a5a;
+$border-color: #cad7e1;
+
+// header colors
+$header-title-font-color: #fff;
+$header-subtitle-font-color: #E8F1F2;
+$header-background-primary: #3276b1;
+$header-background-secondary: #285e8e;
+
+// navigation
+$navigation-font-color: #555;
+$navigation-hover-color: #e7e7e7;
+$navigation-background-color: #f8f8f8;
+
+// panel colors
+$panel-background: #fff;            // panel body background
+$panel-head-background: #f5f5f5;    // panel head background
+$panel-meta-background: #e8f1f2;    // panel meta background
+$panel-meta-border: $border-color;  // panel meta (bottom) border
+$panel-border: $border-color;       // panel border (all over)
+
+$widget-panel: $panel-background;
+$widget-head-background: $panel-head-background;
+$widget-meta-background: $panel-meta-background;
+$widget-meta-border: $panel-border;
+$widget-border: $panel-border;
+
+$category-panel: $panel-background;
+$category-head-background: $panel-head-background;
+$category-meta-background: $panel-meta-background;
+$category-meta-border: $panel-border;
+$category-border: $panel-border;
+
+$forum-panel: $panel-background;
+$forum-head-background: $panel-head-background;
+$forum-meta-background: $panel-meta-background;
+$forum-meta-border: $panel-border;
+$forum-border: $panel-border;
+
+$topic-head-background: $panel-head-background;
+$topic-border: $panel-border;
+
+// post colors
+$post-box-background: $panel-background;
+$post-box-border: $border-color;
+$post-meta-border: $panel-meta-background;
+$post-meta-background: $panel-background;
+$post-signature-border: $panel-meta-background;
+$post-footer-border: $border-color;
+$post-footer-background: $panel-background;
+
+$author-box-background: #e8ecf1;
+$author-online: $green;
+$author-offline: $gray;
+
+
 html {
     // push footer to bottom
     position: relative;
@@ -5,7 +71,7 @@ html {
 }
 
 body {
-    background-color: #E8F1F2;
+    background-color: $background-color;
     // Margin bottom by footer height
     margin-bottom: 60px;
 }
@@ -22,19 +88,19 @@ body {
 
 .flaskbb-layout {
     padding-top: 20px;
-    color: #5a5a5a;
+    color: $font-color;
 }
 
 .flaskbb-header {
     color: #fff;
     text-align: left;
     text-shadow: 0 1px 0 rgba(0,0,0,.1);
-    background-color: #3276b1;
-    background-image: -webkit-linear-gradient(top, #285e8e 0%, #3276b1 100%);
-    background-image: linear-gradient(to bottom, #285e8e 0%, #3276b1 100%);
+    background-color: $header-background-primary;
+    background-image: -webkit-linear-gradient(top, $header-background-secondary 0%, $header-background-primary 100%);
+    background-image: linear-gradient(to bottom, $header-background-secondary 0%, $header-background-primary 100%);
     background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#285e8e', endColorstr='#3276b1', GradientType=0);
-    border: 1px solid #cad7e1;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$header-background-secondary', endColorstr='$header-background-primary', GradientType=0);
+    border: 1px solid $border-color;
     border-bottom: 0;
     border-radius: 0.25em 0.25em 0 0;
 
@@ -45,20 +111,20 @@ body {
 
     .flaskbb-meta {
         .flaskbb-title {
-            color: #fff;
+            color: $header-title-font-color;
             font-size: 3em;
             font-weight: bold;
         }
         .flaskbb-subtitle {
-            color: #e8ecf1;
+            color: $header-subtitle-font-color;
         }
     }
 }
 
 .forum-navigation {
-    border: 1px solid #cad7e1;
+    border: 1px solid $border-color;
     border-radius: 0 0 0.25em 0.25em;
-
+    background-color: $navigation-background-color;
     .navbar-btn {
         // fix for button in <a>
         &>a.btn-primary {
@@ -85,14 +151,13 @@ body {
     }
 
     .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
-        color: #555;
-        background-color: #e7e7e7;
+        color: $navigation-font-color;
+        background-color: $navigation-hover-color;
     }
-
 }
 
 .flaskbb-breadcrumb {
-    border: 1px solid #cad7e1;
+    border: 1px solid $border-color;
     border-radius: 0;
 }
 
@@ -105,46 +170,52 @@ body {
 
 // default values for the panels
 .category-panel, .forum-panel, .topic-panel, .widget-panel {
-    border: 1px solid #cad7e1;
+    border: 1px solid $panel-border;
     border-radius: 0;
     margin-bottom: 0;
     .category-head, .forum-head, .topic-head, .widget-head {
+        background-color: $panel-head-background;
         font-weight: bold;
     }
 }
 
 .category-body, .forum-body, .topic-body, .widget-body {
     padding: 0;
+    background-color: $panel-background;
     .category-meta, .forum-meta, .topic-meta, .widget-meta {
         padding-top: 0.5em;
         height: 2.5em;
-        background-color: #e8ecf1;
-        border-bottom: 1px solid #cad7e1;
+        background-color: $panel-meta-background;
+        border-bottom: 1px solid $panel-meta-border;
     }
     .category-row, .forum-row, .topic-row, .widget-row, .post-row {
         margin-top: 0.5em;
         padding-bottom: 0.5em;
         &:not(:last-child) {
-            border-bottom: 1px solid #cad7e1;
+            border-bottom: 1px solid $panel-border;
         }
     }
 }
 
+
 // Topic
 .topic-body {
     .post-row {
-        background: #e8ecf1;
+        background: $author-box-background;
         margin-top: 0;
         padding-bottom: 0;
+        &:not(:last-child) {
+            border-bottom: 1px solid $topic-border;
+        }
     }
 
     .post-box {
-        background: #fff;
-        border-left: 1px solid #e8ecf1;
+        background: $post-box-background;
+        border-left: 1px solid $post-box-border;
         padding-bottom: 3em;
         padding-left: 0;
         padding-right: 0;
-        min-height: 18em;
+        min-height: 19em;
         position: relative;
 
         // post meta information
@@ -153,7 +224,8 @@ body {
             padding-left: 0.5em;
             padding-right: 0.5em;
             margin: 0;
-            border-bottom: 1px solid #e8ecf1;
+            background-color: $post-meta-background;
+            border-bottom: 1px solid $post-meta-border;
         }
 
         // post content
@@ -166,13 +238,18 @@ body {
         .post-signature {
             margin-top: 2em;
             hr {
+                height: 1px;
+                color: $post-signature-border;
+                background-color: $post-signature-border;
+                border: none;
                 margin: 0;
                 width: 25%;
             }
         }
         // post footer
         .post-footer {
-            border-top: 1px solid #e8ecf1;
+            border-top: 1px solid $post-footer-border;
+            background-color: $post-footer-background;
             width: 100%;
             left: 0;
             // push to bottom
@@ -191,6 +268,7 @@ body {
     }
 }
 
+// author
 .author {
     .author-name h4 {
         float: left;
@@ -223,70 +301,126 @@ body {
     }
 
     .author-online {
-        background: #5cb85c;
+        background: $author-online;
     }
 
     .author-offline {
-        background: #777;
+        background: $author-offline;
     }
 }
+
 
 // forum specific values
-.forum-body {
-    .forum-meta {
-        .topic-name, .topic-stats, .topic-last-post {
-            font-weight: bold;
-        }
+.forum-panel {
+    border: 1px solid $forum-border;
+
+    .forum-head {
+        background-color: $forum-head-background;
     }
-    .forum-row {
-        .topic-info {
-            position: relative;
-            .topic-status {
-                float: left;
-                font-size: 1.5em;
-                padding-right: 0.5em;
+    .forum-body {
+        background-color: $forum-panel;
 
-                // why is this?
-                .topic-locked {
-                    font-size: 1.5em;
-                }
+        .forum-meta {
+            background-color: $forum-meta-background;
+            border-bottom: 1px solid $forum-meta-border;
 
-            }
-            .topic-name {
+            .topic-name, .topic-stats, .topic-last-post {
                 font-weight: bold;
             }
-            .topic-pages {
-                font-size: small;
+        }
+        .forum-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $forum-border;
+            }
+            .topic-info {
+                position: relative;
+                .topic-status {
+                    float: left;
+                    font-size: 1.5em;
+                    padding-right: 0.5em;
+
+                    // why is this?
+                    .topic-locked {
+                        font-size: 1.5em;
+                    }
+
+                }
+                .topic-name {
+                    font-weight: bold;
+                }
+                .topic-pages {
+                    font-size: small;
+                }
             }
         }
     }
 }
 
+
 // category specific values
-.category-body {
-    .category-meta, {
-        .forum-name, .forum-stats, .forum-last-post {
-            font-weight: bold;
+.category-panel {
+    border: 1px solid $category-border;
+
+    .category-head {
+        background-color: $category-head-background;
+    }
+    .category-body {
+        background-color: $category-panel;
+
+        .category-meta, {
+            background-color: $category-meta-background;
+            border-bottom: 1px solid $category-meta-border;
+
+            .forum-name, .forum-stats, .forum-last-post {
+                font-weight: bold;
+            }
+        }
+        .category-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $category-border;
+            }
+            .forum-info {
+                position: relative;
+                .forum-status {
+                    float: left;
+                    font-size: 2em;
+                    padding-right: 0.5em;
+                }
+                .forum-name {
+                    font-weight: bold;
+                }
+                .forum-moderators {
+                    font-style: italic;
+                }
+            }
+            .forum-last-post {
+                .last-post-title {
+                    font-weight: bold;
+                }
+            }
         }
     }
-    .category-row {
-        .forum-info {
-            position: relative;
-            .forum-status {
-                float: left;
-                font-size: 2em;
-                padding-right: 0.5em;
-            }
-            .forum-name {
-                font-weight: bold;
-            }
-            .forum-moderators {
-                font-style: italic;
-            }
+}
+
+
+// widget specific values
+.widget-panel {
+    border: 1px solid $widget-border;
+
+    .widgety-head {
+        background-color: $widget-head-background;
+    }
+    .widget-body {
+        background-color: $widget-panel;
+
+        .widget-meta, {
+            background-color: $widget-meta-background;
+            border-bottom: 1px solid $widget-meta-border;
+
         }
-        .forum-last-post {
-            .last-post-title {
-                font-weight: bold;
+        .widget-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $widget-border;
             }
         }
     }
@@ -334,29 +468,28 @@ p.flaskbb-stats {
 
 .icon-delete:before {
     content: "\f014";
-    color: #d9534f;
+    color: $red;
 }
 
 .icon-report:before {
     content: "\f024";
-    color: #f0ad4e;
+    color: $orange;
 }
 
 .icon-edit:before {
     content: "\f040";
-    color: #5cb85c;
+    color: $green;
 }
 
 .icon-reply:before {
     content: "\f10e";
-    color: #337ab7;
+    color: $blue;
 }
 
 .icon-replyall:before {
     content: "\f122";
-    color: #5bc0de;
+    color: $light-blue;
 }
-
 
 .dropdown-messages {
     min-width: 15em;
@@ -367,7 +500,6 @@ p.flaskbb-stats {
         font-weight: bold;
     }
 }
-
 
 
 /* Markdown Editor */
@@ -403,15 +535,15 @@ p.flaskbb-stats {
     }
 
     & >textarea {
-        border-top: 1px solid #cad7e1;
+        border-top: 1px solid $border-color;
         border-bottom: none;
         background: #fff;
         padding-left: 3px;
     }
 
     & >.md-preview {
-        border-top: 1px solid #cad7e1;
-        border-right: 1px solid #cad7e1;
+        border-top: 1px solid $border-color;
+        border-right: 1px solid $border-color;
         border-bottom: none;
         background: #eee;
     }
