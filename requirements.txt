@@ -20,11 +20,7 @@ Jinja2==2.7.3
 Mako==1.0.1
 MarkupSafe==0.23
 mistune==0.6
-py==1.4.29
 Pygments==2.0.2
-pytest==2.7.2
-pytest-cov==1.8.1
-pytest-random==0.2
 pytz==2015.4
 redis==2.10.3
 requests==2.7.0

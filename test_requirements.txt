@@ -1,0 +1,5 @@
+-r requirements.txt
+py==1.4.29
+pytest==2.7.2
+pytest-cov==1.8.1
+pytest-random==0.2

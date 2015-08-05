@@ -24,6 +24,27 @@ Resources
 
 """
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
+import sys
+
+
+class PyTestCommand(TestCommand):
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
+
+    def initialize_options(self):
+        super(PyTestCommand, self).initialize_options()
+        self.pytest_args = []
+
+    def finalize_options(self):
+        super(PyTestCommand, self).finalize_options()
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
+
 
 setup(
     name='FlaskBB',
@@ -69,16 +90,19 @@ setup(
         'coverage',
         'itsdangerous',
         'mistune',
-        'py',
-        'pytest',
-        'pytest-cov',
-        'pytest-random',
         'pytz',
         'redis',
         'requests',
         'simplejson',
         'speaklater',
         'sqlalchemy-utils'
+    ],
+    test_suite='tests',
+    tests_require=[
+        'py',
+        'pytest',
+        'pytest-cov',
+        'pytest-random'
     ],
     dependency_links=[
         'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy',
@@ -94,5 +118,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
-    ]
+    ],
+    cmdclass={'test': PyTestCommand}
 )
