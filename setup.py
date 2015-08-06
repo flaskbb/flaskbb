@@ -32,11 +32,11 @@ class PyTestCommand(TestCommand):
     user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
 
     def initialize_options(self):
-        super(PyTestCommand, self).initialize_options()
+        TestCommand.initialize_options(self)
         self.pytest_args = []
 
     def finalize_options(self):
-        super(PyTestCommand, self).finalize_options()
+        TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 
