@@ -10,6 +10,6 @@
     :license: BSD, see LICENSE for more details.
 """
 
-__version__ = '0.1-dev'
+__version__ = '1.0.dev0'
 
 from flaskbb.app import create_app
