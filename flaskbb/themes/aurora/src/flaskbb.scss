@@ -349,6 +349,7 @@ body {
                     font-weight: bold;
                 }
                 .topic-pages {
+                    font-weight: normal;
                     font-size: small;
                 }
             }
@@ -531,20 +532,23 @@ p.flaskbb-stats {
     }
 
     & > .md-footer, & >.md-header {
-        background: #F6F9FC;
+        background: $navigation-background-color;
     }
 
     & >textarea {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 1em;
         border-top: 1px solid $border-color;
         border-bottom: none;
         background: #fff;
-        padding-left: 3px;
+        padding: 0 0.25em;
     }
 
     & >.md-preview {
         border-top: 1px solid $border-color;
         border-right: 1px solid $border-color;
         border-bottom: none;
+        padding: 0 0.25em;
         background: #eee;
     }
 }

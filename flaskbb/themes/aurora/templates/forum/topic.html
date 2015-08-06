@@ -154,8 +154,8 @@
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
         <div class="row">
-            <div class="editor-box col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10 col-xs-12">
-                <div class="editor col-md-12 col-sm-12 col-xs-12">
+            <div class="editor-box col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-10 col-xs-12">
+                <div class="editor col-md-12 col-sm-11 col-xs-12">
                         {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
                 </div>
                 <div class="editor-submit">

@@ -386,7 +386,7 @@
 {%- if topic_pages >  1 -%}
 [
     {%- for page in range(0, topic_pages) -%}
-            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }} </a>
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }}</a>{% if not loop.last %} {% endif %}
     {%- endfor -%}
 ]
 {%- endif -%}

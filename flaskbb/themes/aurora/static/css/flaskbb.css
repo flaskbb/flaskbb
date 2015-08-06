@@ -187,6 +187,7 @@ body {
       .forum-panel .forum-body .forum-row .topic-info .topic-name {
         font-weight: bold; }
       .forum-panel .forum-body .forum-row .topic-info .topic-pages {
+        font-weight: normal;
         font-size: small; }
 
 .category-panel {
@@ -304,16 +305,19 @@ p.flaskbb-stats {
   border-color: none;
   box-shadow: none; }
 .editor > .md-editor > .md-footer, .editor > .md-editor > .md-header {
-  background: #F6F9FC; }
+  background: #f8f8f8; }
 .editor > .md-editor > textarea {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1em;
   border-top: 1px solid #cad7e1;
   border-bottom: none;
   background: #fff;
-  padding-left: 3px; }
+  padding: 0 0.25em; }
 .editor > .md-editor > .md-preview {
   border-top: 1px solid #cad7e1;
   border-right: 1px solid #cad7e1;
   border-bottom: none;
+  padding: 0 0.25em;
   background: #eee; }
 
 .emoji {
