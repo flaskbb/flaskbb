@@ -15,19 +15,23 @@
 
             {% if forum.external %}
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                <!-- Icon -->
-                <div class="forum-status">
-                    <span class="fa fa-external-link forum-external"></span>
-                </div>
+                <div class="row">
+                    <!-- Icon -->
+                    <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                        <span class="fa fa-external-link forum-external"></span>
+                    </div>
 
-                <!-- Forum Name -->
-                <div class="forum-name">
-                    <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
-                </div>
+                    <div class="col-md-11 col-sm-10 col-xs-10">
+                        <!-- Forum Name -->
+                        <div class="forum-name">
+                            <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
+                        </div>
 
-                <!-- Forum Description -->
-                <div class="forum-description">
-                    {{ forum.description|markup|safe }}
+                        <!-- Forum Description -->
+                        <div class="forum-description">
+                            {{ forum.description|markup|safe }}
+                        </div>
+                    </div>
                 </div>
             </div> <!-- end forum-info -->
 
@@ -46,37 +50,41 @@
                 ---
             </div>
             {% else %}
-
             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                <!-- Icon -->
-                <div class="forum-status">
-                    {% if forum.locked %}
-                        <span class="fa fa-lock forum-locked"></span>
-                    {% elif forum|forum_is_unread(forumsread, current_user) %}
-                        <span class="fa fa-comments forum-unread"></span>
-                    {% else %}
-                        <span class="fa fa-comments-o forum-read"></span>
-                    {% endif %}
-                </div>
-                <!-- Forum Name -->
-                <div class="forum-name">
-                    <a href="{{ forum.url }}">{{ forum.title }}</a>
-                </div>
+                <div class="row">
+                    <!-- Icon -->
+                    <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                        {% if forum.locked %}
+                            <span class="fa fa-lock forum-locked"></span>
+                        {% elif forum|forum_is_unread(forumsread, current_user) %}
+                            <span class="fa fa-comments forum-unread"></span>
+                        {% else %}
+                            <span class="fa fa-comments-o forum-read"></span>
+                        {% endif %}
+                    </div>
 
-                <!-- Forum Description -->
-                <div class="forum-description">
-                    {{ forum.description|markup|safe }}
-                </div>
+                    <div class="col-md-11 col-sm-10 col-xs-10">
+                        <!-- Forum Name -->
+                        <div class="forum-name">
+                            <a href="{{ forum.url }}">{{ forum.title }}</a>
+                        </div>
 
-                <!-- Forum Moderators -->
-                {% if forum.show_moderators %}
-                <div class="forum-moderators">
-                    {% trans %}Moderators{% endtrans %}:
-                    {% for moderator in forum.moderators %}
-                    <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
-                    {% endfor %}
+                        <!-- Forum Description -->
+                        <div class="forum-description">
+                            {{ forum.description|markup|safe }}
+                        </div>
+
+                        <!-- Forum Moderators -->
+                        {% if forum.show_moderators %}
+                        <div class="forum-moderators">
+                            {% trans %}Moderators{% endtrans %}:
+                            {% for moderator in forum.moderators %}
+                            <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
             </div> <!-- end forum-info -->
 
             <!-- Post Cunt -->
@@ -113,7 +121,7 @@
 
                 {% else %}
                 {% trans %}No posts.{% endtrans %}
-                {% endif %}
+                {% endif %} {# endif forum.last_post_id #}
             </div>
 
         {% endif %} {# endif forum.external #}
