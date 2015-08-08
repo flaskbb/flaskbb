@@ -377,7 +377,7 @@ def format_quote(username, content):
     """
     profile_url = url_for('user.profile', username=username)
     content = "\n> ".join(content.strip().split('\n'))
-    quote = "**[{username}]({profile_url}) wrote:**\n> {content}\n".\
+    quote = u"**[{username}]({profile_url}) wrote:**\n> {content}\n".\
             format(username=username, profile_url=profile_url, content=content)
 
     return quote
