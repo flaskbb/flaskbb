@@ -124,13 +124,27 @@ def edit_user(user_id):
         flash(_("You are not allowed to edit this user."), "danger")
         return redirect(url_for("management.users"))
 
-    secondary_group_query = Group.query.filter(
-        db.not_(Group.id == user.primary_group_id),
-        db.not_(Group.banned),
-        db.not_(Group.guest == True))
+    member_group = db.and_(*[db.not_(getattr(Group, p)) for p in ['admin',
+                                              'mod',
+                                              'super_mod',
+                                              'banned',
+                                              'guest'
+                                              ]])
+
+    filt = db.or_(Group.id.in_(g.id for g in user.groups),
+                   member_group)
+
+    if any(user.permissions[p] for p in ['super_mod', 'admin']):
+        filt = db.or_(filt, Group.mod)
+
+    if user.permissions['admin']:
+        filt = db.or_(filt, Group.admin, Group.super_mod)
+
+    group_query = Group.query.filter(filt)
 
     form = EditUserForm(user)
-    form.secondary_groups.query = secondary_group_query
+    form.primary_group.query = group_query
+    form.secondary_groups.query = group_query
     if form.validate_on_submit():
         form.populate_obj(user)
         user.primary_group_id = form.primary_group.data.id
