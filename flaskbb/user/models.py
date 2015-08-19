@@ -69,9 +69,6 @@ class Group(db.Model, CRUDMixin):
             Group.id, Group.name
         ).all()
 
-    @classmethod
-    def get_guest_group(cls):
-        return Group.query.filter(cls.guest == True).first()
 
 
 class User(db.Model, UserMixin, CRUDMixin):
@@ -337,33 +334,19 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
-        """Returns a dictionary with all the permissions the user has.
-
-        :param exclude: a list with excluded permissions. default is None.
-        """
-
-        exclude = exclude or []
-        exclude.extend(['id', 'name', 'description'])
+        """Returns a dictionary with all permissions the user has"""
+        if exclude:
+            exclude = set(exclude)
+        else:
+            exclude = set()
+        exclude.update(['id', 'name', 'description'])
 
         perms = {}
-        groups = self.secondary_groups.all()
-        groups.append(self.primary_group)
-        for group in groups:
-            for c in group.__table__.columns:
-                # try if the permission already exists in the dictionary
-                # and if the permission is true, set it to True
-                try:
-                    if not perms[c.name] and getattr(group, c.name):
-                        perms[c.name] = True
-
-                # if the permission doesn't exist in the dictionary
-                # add it to the dictionary
-                except KeyError:
-                    # if the permission is in the exclude list,
-                    # skip to the next permission
-                    if c.name in exclude:
-                        continue
-                    perms[c.name] = getattr(group, c.name)
+        # Get the Guest group
+        for group in self.groups:
+            columns = set(group.__table__.columns.keys()) - set(exclude)
+            for c in columns:
+                perms[c] = getattr(group, c)
         return perms
 
     def invalidate_cache(self):
@@ -461,19 +444,29 @@ class Guest(AnonymousUserMixin):
     def permissions(self):
         return self.get_permissions()
 
+    @property
+    def groups(self):
+        return self.get_groups()
+
+    @cache.memoize(timeout=max_integer)
+    def get_groups(self):
+        return Group.query.filter(Group.guest == True).all()
+
     @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
-        exclude = exclude or []
-        exclude.extend(['id', 'name', 'description'])
+        if exclude:
+            exclude = set(exclude)
+        else:
+            exclude = set()
+        exclude.update(['id', 'name', 'description'])
 
         perms = {}
         # Get the Guest group
-        group = Group.query.filter_by(guest=True).first()
-        for c in group.__table__.columns:
-            if c.name in exclude:
-                continue
-            perms[c.name] = getattr(group, c.name)
+        for group in self.groups:
+            columns = set(group.__table__.columns.keys()) - set(exclude)
+            for c in columns:
+                perms[c] = getattr(group, c)
         return perms
 
     @classmethod
