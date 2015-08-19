@@ -61,7 +61,7 @@ class Group(db.Model, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return "<{} {} {}>".format(self.__class__.__name__, self.id, self.name)
 
     @classmethod
     def selectable_groups_choices(cls):
