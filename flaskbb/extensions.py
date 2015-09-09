@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flask_allows import Allows
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -20,6 +21,11 @@ from flask_plugins import PluginManager
 from flask_babelex import Babel
 from flask_wtf.csrf import CsrfProtect
 
+from flaskbb.exceptions import AuthorizationRequired
+
+
+# Permissions Manager
+allows = Allows(throws=AuthorizationRequired)
 
 # Database
 db = SQLAlchemy()

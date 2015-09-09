@@ -35,7 +35,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, csrf
+    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, allows
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -156,6 +156,10 @@ def configure_extensions(app):
             return current_user.language
         # otherwise we will just fallback to the default language
         return flaskbb_config["DEFAULT_LANGUAGE"]
+
+    # Flask-Allows
+    allows.init_app(app)
+    allows.identity_loader(lambda: current_user)
 
 
 def configure_template_filters(app):
