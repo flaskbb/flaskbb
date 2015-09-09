@@ -17,15 +17,16 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
 from flask_login import current_user
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelex import gettext as _
+from flask_allows import Permission
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import render_template
-from flaskbb.utils.decorators import admin_required, moderator_required
-from flaskbb.utils.permissions import can_ban_user, can_edit_user
-from flaskbb.extensions import db
+from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
+                                        CanBanUser, CanEditUser)
+from flaskbb.extensions import db, allows
 from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
@@ -38,7 +39,7 @@ management = Blueprint("management", __name__)
 
 
 @management.route("/")
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def overview():
     python_version = "%s.%s" % (sys.version_info[0], sys.version_info[1])
     user_count = User.query.count()
@@ -55,7 +56,7 @@ def overview():
 
 @management.route("/settings", methods=["GET", "POST"])
 @management.route("/settings/<path:slug>", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def settings(slug=None):
     slug = slug if slug else "general"
 
@@ -96,7 +97,7 @@ def settings(slug=None):
 
 # Users
 @management.route("/users", methods=['GET', 'POST'])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def users():
     page = request.args.get("page", 1, type=int)
     search_form = UserSearchForm()
@@ -116,23 +117,18 @@ def users():
 
 
 @management.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
 
-    if not can_edit_user(current_user):
+    if not Permission(CanEditUser):
         flash(_("You are not allowed to edit this user."), "danger")
         return redirect(url_for("management.users"))
 
-    member_group = db.and_(*[db.not_(getattr(Group, p)) for p in ['admin',
-                                              'mod',
-                                              'super_mod',
-                                              'banned',
-                                              'guest'
-                                              ]])
+    member_group = db.and_(*[db.not_(getattr(Group, p)) for p in
+                             ['admin', 'mod', 'super_mod', 'banned', 'guest']])
 
-    filt = db.or_(Group.id.in_(g.id for g in user.groups),
-                   member_group)
+    filt = db.or_(Group.id.in_(g.id for g in user.groups), member_group)
 
     if any(user.permissions[p] for p in ['super_mod', 'admin']):
         filt = db.or_(filt, Group.mod)
@@ -164,7 +160,7 @@ def edit_user(user_id):
 
 @management.route("/users/delete", methods=["POST"])
 @management.route("/users/<int:user_id>/delete", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def delete_user(user_id=None):
     # ajax request
     if request.is_xhr:
@@ -203,7 +199,7 @@ def delete_user(user_id=None):
 
 
 @management.route("/users/add", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def add_user():
     form = AddUserForm()
     if form.validate_on_submit():
@@ -216,7 +212,7 @@ def add_user():
 
 
 @management.route("/users/banned", methods=["GET", "POST"])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def banned_users():
     page = request.args.get("page", 1, type=int)
     search_form = UserSearchForm()
@@ -239,9 +235,9 @@ def banned_users():
 
 @management.route("/users/ban", methods=["POST"])
 @management.route("/users/<int:user_id>/ban", methods=["POST"])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def ban_user(user_id=None):
-    if not can_ban_user(current_user):
+    if not Permission(CanBanUser):
         flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
 
@@ -297,9 +293,9 @@ def ban_user(user_id=None):
 
 @management.route("/users/unban", methods=["POST"])
 @management.route("/users/<int:user_id>/unban", methods=["POST"])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def unban_user(user_id=None):
-    if not can_ban_user(current_user):
+    if not Permission(CanBanUser):
         flash(_("You do not have the permissions to unban this user."),
               "danger")
         return redirect(url_for("management.overview"))
@@ -339,7 +335,7 @@ def unban_user(user_id=None):
 
 # Reports
 @management.route("/reports")
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def reports():
     page = request.args.get("page", 1, type=int)
     reports = Report.query.\
@@ -350,7 +346,7 @@ def reports():
 
 
 @management.route("/reports/unread")
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def unread_reports():
     page = request.args.get("page", 1, type=int)
     reports = Report.query.\
@@ -363,7 +359,7 @@ def unread_reports():
 
 @management.route("/reports/<int:report_id>/markread", methods=["POST"])
 @management.route("/reports/markread", methods=["POST"])
-@moderator_required
+@allows.requires(IsAtleastModerator)
 def report_markread(report_id=None):
     # AJAX request
     if request.is_xhr:
@@ -420,7 +416,7 @@ def report_markread(report_id=None):
 
 # Groups
 @management.route("/groups")
-@admin_required
+@allows.requires(IsAdmin())
 def groups():
     page = request.args.get("page", 1, type=int)
 
@@ -432,7 +428,7 @@ def groups():
 
 
 @management.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def edit_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
 
@@ -454,7 +450,7 @@ def edit_group(group_id):
 
 @management.route("/groups/<int:group_id>/delete", methods=["POST"])
 @management.route("/groups/delete", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def delete_group(group_id=None):
     if request.is_xhr:
         ids = request.get_json()["ids"]
@@ -499,7 +495,7 @@ def delete_group(group_id=None):
 
 
 @management.route("/groups/add", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def add_group():
     form = AddGroupForm()
     if form.validate_on_submit():
@@ -513,14 +509,14 @@ def add_group():
 
 # Forums and Categories
 @management.route("/forums")
-@admin_required
+@allows.requires(IsAdmin())
 def forums():
     categories = Category.query.order_by(Category.position.asc()).all()
     return render_template("management/forums.html", categories=categories)
 
 
 @management.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
@@ -542,7 +538,7 @@ def edit_forum(forum_id):
 
 
 @management.route("/forums/<int:forum_id>/delete", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def delete_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
@@ -557,7 +553,7 @@ def delete_forum(forum_id):
 
 @management.route("/forums/add", methods=["GET", "POST"])
 @management.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def add_forum(category_id=None):
     form = AddForumForm()
 
@@ -576,7 +572,7 @@ def add_forum(category_id=None):
 
 
 @management.route("/category/add", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def add_category():
     form = CategoryForm()
 
@@ -590,7 +586,7 @@ def add_category():
 
 
 @management.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def edit_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
@@ -606,7 +602,7 @@ def edit_category(category_id):
 
 
 @management.route("/category/<int:category_id>/delete", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def delete_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
@@ -621,14 +617,14 @@ def delete_category(category_id):
 
 # Plugins
 @management.route("/plugins")
-@admin_required
+@allows.requires(IsAdmin())
 def plugins():
     plugins = get_all_plugins()
     return render_template("management/plugins.html", plugins=plugins)
 
 
 @management.route("/plugins/<path:plugin>/enable", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if not plugin.enabled:
@@ -660,7 +656,7 @@ def enable_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/disable", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def disable_plugin(plugin):
     try:
         plugin = get_plugin(plugin)
@@ -688,7 +684,7 @@ def disable_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/uninstall", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.uninstallable:
@@ -703,7 +699,7 @@ def uninstall_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/install", methods=["POST"])
-@admin_required
+@allows.requires(IsAdmin())
 def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.installable and not plugin.uninstallable:
