@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flask import request
 
 
 def check_perm(user, perm, forum, post_user_id=None):
@@ -34,7 +35,7 @@ def check_perm(user, perm, forum, post_user_id=None):
     return not user.permissions['banned'] and user.permissions[perm]
 
 
-def is_moderator(user):
+def is_moderator(user, request=request):
     """Returns ``True`` if the user is in a moderator or super moderator group.
 
     :param user: The user who should be checked.
@@ -42,7 +43,7 @@ def is_moderator(user):
     return user.permissions['mod'] or user.permissions['super_mod']
 
 
-def is_admin(user):
+def is_admin(user, request=request):
     """Returns ``True`` if the user is a administrator.
 
     :param user:  The user who should be checked.
@@ -50,7 +51,7 @@ def is_admin(user):
     return user.permissions['admin']
 
 
-def is_admin_or_moderator(user):
+def is_admin_or_moderator(user, request=request):
     """Returns ``True`` if the user is either a admin or in a moderator group
 
     :param user: The user who should be checked.
@@ -58,7 +59,7 @@ def is_admin_or_moderator(user):
     return is_admin(user) or is_moderator(user)
 
 
-def can_moderate(user, forum=None, perm=None):
+def can_moderate(user, forum=None, perm=None, request=request):
     """Checks if a user can moderate a forum or a user.
     He needs to be super moderator or a moderator of the
     specified forum.
@@ -94,7 +95,7 @@ def can_moderate(user, forum=None, perm=None):
     return user.permissions['super_mod'] or user.permissions['admin']
 
 
-def can_edit_post(user, post):
+def can_edit_post(user, post, request=request):
     """Check if the post can be edited by the user."""
     topic = post.topic
 
@@ -108,19 +109,19 @@ def can_edit_post(user, post):
                       post_user_id=post.user_id)
 
 
-def can_delete_post(user, post):
+def can_delete_post(user, post, request=request):
     """Check if the post can be deleted by the user."""
     return check_perm(user=user, perm='deletepost', forum=post.topic.forum,
                       post_user_id=post.user_id)
 
 
-def can_delete_topic(user, topic):
+def can_delete_topic(user, topic, request=request):
     """Check if the topic can be deleted by the user."""
     return check_perm(user=user, perm='deletetopic', forum=topic.forum,
                       post_user_id=topic.user_id)
 
 
-def can_post_reply(user, topic):
+def can_post_reply(user, topic, request=request):
     """Check if the user is allowed to post in the forum."""
     if can_moderate(user, topic.forum):
         return True
@@ -131,20 +132,20 @@ def can_post_reply(user, topic):
     return check_perm(user=user, perm='postreply', forum=topic.forum)
 
 
-def can_post_topic(user, forum):
+def can_post_topic(user, forum, request=request):
     """Checks if the user is allowed to create a new topic in the forum."""
     return check_perm(user=user, perm='posttopic', forum=forum)
 
 
 # Moderator permission checks
-def can_edit_user(user):
+def can_edit_user(user, request=request):
     """Check if the user is allowed to edit another users profile.
     Requires at least ``mod`` permissions.
     """
     return can_moderate(user=user, perm="mod_edituser")
 
 
-def can_ban_user(user):
+def can_ban_user(user, request=request):
     """Check if the user is allowed to ban another user.
     Requires at least ``mod`` permissions.
     """
