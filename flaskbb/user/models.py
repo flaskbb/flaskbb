@@ -69,6 +69,10 @@ class Group(db.Model, CRUDMixin):
             Group.id, Group.name
         ).all()
 
+    @classmethod
+    def get_guest_group(cls):
+        return cls.query.filter(cls.guest==True).first()
+
 
 
 class User(db.Model, UserMixin, CRUDMixin):
