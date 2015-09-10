@@ -6,13 +6,13 @@
         {% include theme("forum/category_layout.html") %}
     {% endfor %}
 
-    <div class="panel panel-default widget-panel">
-        <div class="panel-heading widget-head">
+    <div class="panel panel-default page-panel">
+        <div class="panel-heading page-head">
             {% trans %}Board Statistics{% endtrans %}
             [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
         </div>
-        <div class="panel-body">
-            <div class="row widget-row">
+        <div class="panel-body page-body">
+            <div class="row page-row">
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <p class="flaskbb-stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
                     <p class="flaskbb-stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>

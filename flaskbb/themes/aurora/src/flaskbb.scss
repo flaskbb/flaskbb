@@ -29,11 +29,11 @@ $panel-meta-background: #e8f1f2;    // panel meta background
 $panel-meta-border: $border-color;  // panel meta (bottom) border
 $panel-border: $border-color;       // panel border (all over)
 
-$widget-panel: $panel-background;
-$widget-head-background: $panel-head-background;
-$widget-meta-background: $panel-meta-background;
-$widget-meta-border: $panel-border;
-$widget-border: $panel-border;
+$page-panel: $panel-background;
+$page-head-background: $panel-head-background;
+$page-meta-background: $panel-meta-background;
+$page-meta-border: $panel-border;
+$page-border: $panel-border;
 
 $category-panel: $panel-background;
 $category-head-background: $panel-head-background;
@@ -169,26 +169,26 @@ body {
 }
 
 // default values for the panels
-.category-panel, .forum-panel, .topic-panel, .widget-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel {
     border: 1px solid $panel-border;
     border-radius: 0;
     margin-bottom: 0;
-    .category-head, .forum-head, .topic-head, .widget-head {
+    .category-head, .forum-head, .topic-head, .page-head {
         background-color: $panel-head-background;
         font-weight: bold;
     }
 }
 
-.category-body, .forum-body, .topic-body, .widget-body {
+.category-body, .forum-body, .topic-body, .page-body {
     padding: 0;
     background-color: $panel-background;
-    .category-meta, .forum-meta, .topic-meta, .widget-meta {
+    .category-meta, .forum-meta, .topic-meta, .page-meta {
         padding-top: 0.5em;
         height: 2.5em;
         background-color: $panel-meta-background;
         border-bottom: 1px solid $panel-meta-border;
     }
-    .category-row, .forum-row, .topic-row, .widget-row, .post-row {
+    .category-row, .forum-row, .topic-row, .page-row, .post-row {
         margin-top: 0.5em;
         padding-bottom: 0.5em;
         &:not(:last-child) {
@@ -405,23 +405,22 @@ body {
 
 
 // widget specific values
-.widget-panel {
-    border: 1px solid $widget-border;
+.page-panel {
+    border: 1px solid $page-border;
 
-    .widgety-head {
-        background-color: $widget-head-background;
+    .page-head {
+        background-color: $page-head-background;
     }
-    .widget-body {
-        background-color: $widget-panel;
+    .page-body {
+        background-color: $page-panel;
 
-        .widget-meta, {
-            background-color: $widget-meta-background;
-            border-bottom: 1px solid $widget-meta-border;
-
+        .page-meta, {
+            background-color: $page-meta-background;
+            border-bottom: 1px solid $page-meta-border;
         }
-        .widget-row {
+        .page-row {
             &:not(:last-child) {
-                border-bottom: 1px solid $widget-border;
+                border-bottom: 1px solid $page-border;
             }
         }
     }

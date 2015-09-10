@@ -10,12 +10,12 @@
     <div class="row">
         <!-- left column -->
         <div class="col-md-2 col-sm-3 col-xs-12">
-            <div class="panel panel-default panel-widget">
-                <div class="panel-heading panel-widget-heading">
+            <div class="panel panel-default page-panel">
+                <div class="panel-heading page-head">
                     <a href="{{ user.url }}">{{ user.username }}</a>
                 </div>
 
-                <div class="panel-body panel-widget-body">
+                <div class="panel-body page-body">
                     <div class="profile-picture">
                         {% if user.avatar %}
                         <img src="{{ user.avatar }}" alt="Avatar" class="profile-avatar">
@@ -51,9 +51,9 @@
 
         <!-- middle column -->
         <div class="col-md-7 col-sm-5 col-xs-12">
-            <div class="panel panel-default panel-widget">
-                <div class="panel-heading panel-widget-heading">{% trans %}Info{% endtrans %}</div>
-                <div class="panel-body panel-widget-body">
+            <div class="panel panel-default page-panel">
+                <div class="panel-heading page-head">{% trans %}Info{% endtrans %}</div>
+                <div class="panel-body page-body">
 
                     {% if user.notes %}
                         {{ user.notes|markup|safe }}
@@ -65,9 +65,9 @@
             </div> <!-- end profile widget -->
 
             {% if user.signature %}
-            <div class="panel panel-default panel-widget">
-                <div class="panel-heading panel-widget-heading">{% trans %}Signature{% endtrans %}</div>
-                <div class="panel-body panel-widget-body">
+            <div class="panel panel-default page-panel">
+                <div class="panel-heading page-head">{% trans %}Signature{% endtrans %}</div>
+                <div class="panel-body page-body">
 
                     {{ user.signature|markup|safe }}
 
@@ -79,7 +79,7 @@
 
         <!-- right column -->
         <div class="col-md-3 col-sm-4 col-xs-12">
-            <div class="panel panel-default panel-widget">
+            <div class="panel panel-default page-panel">
                 <div class="panel-heading panel-widget-heading">{% trans %}User Stats{% endtrans %}</div>
                 <div class="panel-body panel-widget-body">
 
