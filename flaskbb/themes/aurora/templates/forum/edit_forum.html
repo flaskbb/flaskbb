@@ -39,38 +39,40 @@
                 <div class="row forum-row clearfix">
 
                     <div class="col-md-4 col-sm-4 col-xs-6 topic-info">
-
-                        <div class="topic-status">
-                        {% if topic.locked %}
-                            <span class="fa fa-lock topic-locked"></span>
-                        {% elif topic.important %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-star topic-starred-unread"></span>
+                        <div class="row">
+                            <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
+                            {% if topic.locked %}
+                                <span class="fa fa-lock topic-locked"></span>
+                            {% elif topic.important %}
+                                {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                    <span class="fa fa-star topic-starred-unread"></span>
+                                {% else %}
+                                    <span class="fa fa-star-o topic-starred-read"></span>
+                                {% endif %}
                             {% else %}
-                                <span class="fa fa-star-o topic-starred-read"></span>
+                                {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                    <span class="fa fa-comment topic-unread"></span>
+                                {% else %}
+                                    <span class="fa fa-comment-o topic-read"></span>
+                                {% endif %}
                             {% endif %}
-                        {% else %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-comment topic-unread"></span>
-                            {% else %}
-                                <span class="fa fa-comment-o topic-read"></span>
-                            {% endif %}
-                        {% endif %}
-                        </div>
+                            </div>
+                            <div class="col-md-11 col-sm-10 col-xs-10">
+                                <div class="topic-name">
+                                    <a href="{{ topic.url }}">{{ topic.title }}</a>
+                                    <!-- Topic Pagination -->
+                                    <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+                                </div>
 
-                        <div class="topic-name">
-                            <a href="{{ topic.url }}">{{ topic.title }}</a>
-                            <!-- Topic Pagination -->
-                            <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
-                        </div>
-
-                        <div class="topic-author">
-                            {% trans %}by{% endtrans %}
-                            {% if topic.user_id %}
-                             <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
-                            {% else %}
-                            {{ topic.username }}
-                            {% endif %}
+                                <div class="topic-author">
+                                    {% trans %}by{% endtrans %}
+                                    {% if topic.user_id %}
+                                     <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                                    {% else %}
+                                    {{ topic.username }}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
