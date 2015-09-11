@@ -67,30 +67,33 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.index-view .forum-row, .index-view .category-row, .index-view .post-row, .forum-view .forum-row, .forum-view .category-row, .forum-view .post-row, .topic-view .forum-row, .topic-view .category-row, .topic-view .post-row {
+.index-view .forum-row, .index-view .category-row, .index-view .post-row, .index-view .page-row, .forum-view .forum-row, .forum-view .category-row, .forum-view .post-row, .forum-view .page-row, .topic-view .forum-row, .topic-view .category-row, .topic-view .post-row, .topic-view .page-row, .page-view .forum-row, .page-view .category-row, .page-view .post-row, .page-view .page-row {
   margin: 0; }
 
-.category-panel, .forum-panel, .topic-panel, .widget-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel {
   border: 1px solid #cad7e1;
   border-radius: 0;
   margin-bottom: 0; }
-  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .widget-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .widget-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .widget-head, .widget-panel .category-head, .widget-panel .forum-head, .widget-panel .topic-head, .widget-panel .widget-head {
+  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .page-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .page-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .page-head, .page-panel .category-head, .page-panel .forum-head, .page-panel .topic-head, .page-panel .page-head {
     background-color: #f5f5f5;
     font-weight: bold; }
 
-.category-body, .forum-body, .topic-body, .widget-body {
+.category-body, .forum-body, .topic-body, .page-body {
   padding: 0;
   background-color: #fff; }
-  .category-body .category-meta, .category-body .forum-meta, .category-body .topic-meta, .category-body .widget-meta, .forum-body .category-meta, .forum-body .forum-meta, .forum-body .topic-meta, .forum-body .widget-meta, .topic-body .category-meta, .topic-body .forum-meta, .topic-body .topic-meta, .topic-body .widget-meta, .widget-body .category-meta, .widget-body .forum-meta, .widget-body .topic-meta, .widget-body .widget-meta {
+  .category-body .category-meta, .category-body .forum-meta, .category-body .topic-meta, .category-body .page-meta, .forum-body .category-meta, .forum-body .forum-meta, .forum-body .topic-meta, .forum-body .page-meta, .topic-body .category-meta, .topic-body .forum-meta, .topic-body .topic-meta, .topic-body .page-meta, .page-body .category-meta, .page-body .forum-meta, .page-body .topic-meta, .page-body .page-meta {
+    font-weight: bold;
     padding-top: 0.5em;
     height: 2.5em;
     background-color: #e8f1f2;
     border-bottom: 1px solid #cad7e1; }
-  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .widget-row, .category-body .post-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .widget-row, .forum-body .post-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .widget-row, .topic-body .post-row, .widget-body .category-row, .widget-body .forum-row, .widget-body .topic-row, .widget-body .widget-row, .widget-body .post-row {
-    margin-top: 0.5em;
+  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .page-row, .category-body .post-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .page-row, .forum-body .post-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .page-row, .topic-body .post-row, .page-body .category-row, .page-body .forum-row, .page-body .topic-row, .page-body .page-row, .page-body .post-row {
+    padding-top: 0.5em;
     padding-bottom: 0.5em; }
-    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .widget-row:not(:last-child), .category-body .post-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .widget-row:not(:last-child), .forum-body .post-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .widget-row:not(:last-child), .topic-body .post-row:not(:last-child), .widget-body .category-row:not(:last-child), .widget-body .forum-row:not(:last-child), .widget-body .topic-row:not(:last-child), .widget-body .widget-row:not(:last-child), .widget-body .post-row:not(:last-child) {
+    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .page-row:not(:last-child), .category-body .post-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .page-row:not(:last-child), .forum-body .post-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .page-row:not(:last-child), .topic-body .post-row:not(:last-child), .page-body .category-row:not(:last-child), .page-body .forum-row:not(:last-child), .page-body .topic-row:not(:last-child), .page-body .page-row:not(:last-child), .page-body .post-row:not(:last-child) {
       border-bottom: 1px solid #cad7e1; }
+    .category-body .category-row:hover, .category-body .forum-row:hover, .category-body .topic-row:hover, .category-body .page-row:hover, .category-body .post-row:hover, .forum-body .category-row:hover, .forum-body .forum-row:hover, .forum-body .topic-row:hover, .forum-body .page-row:hover, .forum-body .post-row:hover, .topic-body .category-row:hover, .topic-body .forum-row:hover, .topic-body .topic-row:hover, .topic-body .page-row:hover, .topic-body .post-row:hover, .page-body .category-row:hover, .page-body .forum-row:hover, .page-body .topic-row:hover, .page-body .page-row:hover, .page-body .post-row:hover {
+      background-color: #e8f1f2; }
 
 .topic-body .post-row {
   background: #e8ecf1;
@@ -216,16 +219,16 @@ body {
     .category-panel .category-body .category-row .forum-last-post .last-post-title {
       font-weight: bold; }
 
-.widget-panel {
+.page-panel {
   border: 1px solid #cad7e1; }
-  .widget-panel .widgety-head {
+  .page-panel .page-head {
     background-color: #f5f5f5; }
-  .widget-panel .widget-body {
+  .page-panel .page-body {
     background-color: #fff; }
-    .widget-panel .widget-body .widget-meta {
+    .page-panel .page-body .page-meta {
       background-color: #e8f1f2;
       border-bottom: 1px solid #cad7e1; }
-    .widget-panel .widget-body .widget-row:not(:last-child) {
+    .page-panel .page-body .page-row:not(:last-child) {
       border-bottom: 1px solid #cad7e1; }
 
 p.flaskbb-stats {
