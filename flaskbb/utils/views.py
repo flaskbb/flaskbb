@@ -1,4 +1,4 @@
-from flask import render_template
+from flaskbb.utils.helpers import render_template
 from flask.views import View
 
 
