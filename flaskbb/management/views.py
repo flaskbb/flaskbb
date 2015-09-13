@@ -56,7 +56,7 @@ def overview():
 
 @management.route("/settings", methods=["GET", "POST"])
 @management.route("/settings/<path:slug>", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def settings(slug=None):
     slug = slug if slug else "general"
 
@@ -160,7 +160,7 @@ def edit_user(user_id):
 
 @management.route("/users/delete", methods=["POST"])
 @management.route("/users/<int:user_id>/delete", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def delete_user(user_id=None):
     # ajax request
     if request.is_xhr:
@@ -199,7 +199,7 @@ def delete_user(user_id=None):
 
 
 @management.route("/users/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def add_user():
     form = AddUserForm()
     if form.validate_on_submit():
@@ -416,7 +416,7 @@ def report_markread(report_id=None):
 
 # Groups
 @management.route("/groups")
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def groups():
     page = request.args.get("page", 1, type=int)
 
@@ -428,7 +428,7 @@ def groups():
 
 
 @management.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def edit_group(group_id):
     group = Group.query.filter_by(id=group_id).first_or_404()
 
@@ -450,7 +450,7 @@ def edit_group(group_id):
 
 @management.route("/groups/<int:group_id>/delete", methods=["POST"])
 @management.route("/groups/delete", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def delete_group(group_id=None):
     if request.is_xhr:
         ids = request.get_json()["ids"]
@@ -495,7 +495,7 @@ def delete_group(group_id=None):
 
 
 @management.route("/groups/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def add_group():
     form = AddGroupForm()
     if form.validate_on_submit():
@@ -509,14 +509,14 @@ def add_group():
 
 # Forums and Categories
 @management.route("/forums")
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def forums():
     categories = Category.query.order_by(Category.position.asc()).all()
     return render_template("management/forums.html", categories=categories)
 
 
 @management.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def edit_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
@@ -538,7 +538,7 @@ def edit_forum(forum_id):
 
 
 @management.route("/forums/<int:forum_id>/delete", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def delete_forum(forum_id):
     forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
@@ -553,7 +553,7 @@ def delete_forum(forum_id):
 
 @management.route("/forums/add", methods=["GET", "POST"])
 @management.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def add_forum(category_id=None):
     form = AddForumForm()
 
@@ -572,7 +572,7 @@ def add_forum(category_id=None):
 
 
 @management.route("/category/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def add_category():
     form = CategoryForm()
 
@@ -586,7 +586,7 @@ def add_category():
 
 
 @management.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def edit_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
@@ -602,7 +602,7 @@ def edit_category(category_id):
 
 
 @management.route("/category/<int:category_id>/delete", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def delete_category(category_id):
     category = Category.query.filter_by(id=category_id).first_or_404()
 
@@ -617,14 +617,14 @@ def delete_category(category_id):
 
 # Plugins
 @management.route("/plugins")
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def plugins():
     plugins = get_all_plugins()
     return render_template("management/plugins.html", plugins=plugins)
 
 
 @management.route("/plugins/<path:plugin>/enable", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if not plugin.enabled:
@@ -656,7 +656,7 @@ def enable_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/disable", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def disable_plugin(plugin):
     try:
         plugin = get_plugin(plugin)
@@ -684,7 +684,7 @@ def disable_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/uninstall", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.uninstallable:
@@ -699,7 +699,7 @@ def uninstall_plugin(plugin):
 
 
 @management.route("/plugins/<path:plugin>/install", methods=["POST"])
-@allows.requires(IsAdmin())
+@allows.requires(IsAdmin)
 def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
     if plugin.installable and not plugin.uninstallable:

@@ -13,27 +13,17 @@ from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.models import Post, Topic, Forum
 
 
+class Has(Requirement):
+    def __init__(self, permission):
+        self.permission = permission
+
+    def fulfill(self, user, request):
+        return user.permissions.get(self.permission, False)
+
+
 class IsAuthed(Requirement):
     def fulfill(self, user, request):
         return user.is_authenticated()
-
-
-class IsMod(IsAuthed):
-    def fulfill(self, user, request):
-        return (super(IsMod, self).fulfill(user, request) and
-                user.permissions.get('mod'))
-
-
-class IsSuperMod(IsAuthed):
-    def fulfill(self, user, request):
-        return (super(IsSuperMod, self).fulfill(user, request) and
-                user.permissions.get('super_mod'))
-
-
-class IsAdmin(IsAuthed):
-    def fulfill(self, user, request):
-        return (super(IsAdmin, self).fulfill(user, request) and
-                user.permissions.get('admin'))
 
 
 class IsModeratorInForum(IsAuthed):
@@ -75,14 +65,6 @@ class IsSameUser(IsAuthed):
             raise FlaskBBError
 
 
-class Has(Requirement):
-    def __init__(self, permission):
-        self.permission = permission
-
-    def fulfill(self, user, request):
-        return user.permissions.get(self.permission)
-
-
 class TopicNotLocked(Requirement):
     def fulfill(self, user, request):
         return not self._is_topic_or_forum_locked(request)
@@ -118,9 +100,13 @@ class ForumNotLocked(Requirement):
             return Forum.query.get(view_args['forum_id'])
 
 
-IsAtleastModerator = Or(IsAdmin(), IsSuperMod(), IsMod())
+IsMod = And(IsAuthed(), Has('mod'))
+IsSuperMod = And(IsAuthed(), Has('super_mod'))
+IsAdmin = And(IsAuthed(), Has('admin'))
 
-IsAtleastSuperModerator = Or(IsAdmin(), IsSuperMod())
+IsAtleastModerator = Or(IsAdmin, IsSuperMod, IsMod)
+
+IsAtleastSuperModerator = Or(IsAdmin, IsSuperMod)
 
 CanBanUser = Or(IsAtleastSuperModerator, Has('mod_banuser'))
 
