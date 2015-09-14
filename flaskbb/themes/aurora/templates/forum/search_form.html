@@ -1,0 +1,27 @@
+{% set page_title = _("Search") %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+{% from theme("macros.html") import horizontal_field %}
+
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="active">{% trans %}Search{% endtrans %}</li>
+</ol>
+
+<div class="page-view">
+    <div class="panel panel-default page-panel">
+        <div class="panel-heading page-head">
+            {% trans %}Search{% endtrans %}
+        </div>
+        <div class="panel-body page-body">
+            <form class="form-horizontal" role="form" method="post">
+                {{ form.hidden_tag() }}
+                {{ horizontal_field(form.search_types)}}
+                {{ horizontal_field(form.search_query)}}
+                {{ horizontal_field(form.submit) }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
