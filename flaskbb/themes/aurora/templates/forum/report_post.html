@@ -1,0 +1,23 @@
+{% set page_title = _("Report Post") %}
+
+{% extends theme("layout.html") %}
+
+{% block header %}
+{% endblock %}
+
+{% block navigation %}
+{% endblock %}
+
+{% block content %}
+{% from theme("macros.html") import render_field %}
+
+<form class="form" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <h3>{% trans %}Report Post{% endtrans %}</h3>
+
+    {{ render_field(form.reason) }}
+
+    <button type="submit" class="btn btn-success">{% trans %}Report{% endtrans %}</button>
+    <a class="btn btn-info" href="#" onclick="window.close();return false;">{% trans %}Close{% endtrans %}</a>
+</form>
+{% endblock %}
