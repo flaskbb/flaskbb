@@ -175,7 +175,6 @@ body {
 .category-panel, .forum-panel, .topic-panel, .page-panel {
     border: 1px solid $panel-border;
     border-radius: 0;
-    margin-bottom: 0;
     .category-head, .forum-head, .topic-head, .page-head {
         background-color: $panel-head-background;
         font-weight: bold;
@@ -206,6 +205,10 @@ body {
 
 
 // Topic
+.topic-panel {
+    margin-bottom: 0;
+}
+
 .topic-body {
     .post-row {
         background: $author-box-background;
@@ -320,6 +323,7 @@ body {
 // forum specific values
 .forum-panel {
     border: 1px solid $forum-border;
+    margin-bottom: 0;
 
     .forum-head {
         background-color: $forum-head-background;
@@ -424,10 +428,14 @@ body {
             background-color: $page-meta-background;
             border-bottom: 1px solid $page-meta-border;
         }
-        .page-row {
+        .row > .page-row {
             &:not(:last-child) {
                 border-bottom: 1px solid $page-border;
             }
+        }
+        // if no meta information is to show, reset padding-top
+        & > :not(.page-meta) {
+            padding-top: 0.5em;
         }
     }
 }
@@ -555,8 +563,11 @@ p.flaskbb-stats {
     margin: 0.75em 0.25em 0 0;
 }
 
-.editor {
+.editor-box > .quickreply {
     padding: 0;
+}
+
+.editor {
     min-height: 0;
 
     .editor-options {

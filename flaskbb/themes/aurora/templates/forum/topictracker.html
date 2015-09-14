@@ -8,12 +8,12 @@
 <form class="form" role="form" method="POST">
     <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
 
-    <div class="forum-view">
-        <ol class="breadcrumb flaskbb-breadcrumb">
-            <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-            <li class="active">{% trans %}Topic Tracker{% endtrans %}</li>
-        </ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Topic Tracker{% endtrans %}</li>
+    </ol>
 
+    <div class="forum-view">
         <div class="row controls-row">
             <div class="pull-left">
                 {{ render_pagination(topics, url_for('forum.topictracker')) }}
