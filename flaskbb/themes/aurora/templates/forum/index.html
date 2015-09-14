@@ -6,7 +6,7 @@
         {% include theme("forum/category_layout.html") %}
     {% endfor %}
 
-    <div class="panel panel-default page-panel">
+    <div class="panel page-panel">
         <div class="panel-heading page-head">
             {% trans %}Board Statistics{% endtrans %}
             [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]

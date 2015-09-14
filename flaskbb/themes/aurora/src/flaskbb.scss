@@ -168,6 +168,7 @@ body {
 }
 
 
+
 // default values for the panels
 .category-panel, .forum-panel, .topic-panel, .page-panel {
     border: 1px solid $panel-border;
@@ -176,6 +177,25 @@ body {
         background-color: $panel-head-background;
         font-weight: bold;
     }
+    & > .panel-heading {
+      color: #333;
+      background-color: $panel-head-background;
+      border-color: $panel-border;
+    }
+
+    & > .panel-heading + .panel-collapse > .panel-body {
+      border-top-color: $panel-border;
+    }
+
+    & > .panel-heading .badge {
+      color: $panel-head-background;
+      background-color: #333;
+    }
+
+    & > .panel-footer + .panel-collapse > .panel-body {
+      border-bottom-color: $panel-border;
+    }
+
 }
 
 .category-body, .forum-body, .topic-body, .page-body {
@@ -211,6 +231,7 @@ body {
     .post-row {
         background: $author-box-background;
         margin-top: 0;
+        padding-top: 0;
         padding-bottom: 0;
         &:not(:last-child) {
             border-bottom: 1px solid $topic-border;
