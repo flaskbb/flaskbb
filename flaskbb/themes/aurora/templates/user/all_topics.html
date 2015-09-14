@@ -1,0 +1,97 @@
+{% extends theme('layout.html') %}
+{% block content %}
+{% from theme('macros.html') import render_pagination, topic_pages %}
+
+<div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li ><a href="{{ user.url }}">{{ user.username }}</a></li>
+    <li class="active">{% trans %}All Topics{% endtrans %}</li>
+    </ol>
+
+    <div class="row controls-row">
+        <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
+            <div class="pull-left">
+                {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default forum-panel">
+        <div class="panel-heading forum-head">
+            {% trans user=user.username %}All Topics created by {{user}}{% endtrans %}
+        </div>
+
+        <div class="panel-body forum-body">
+            <div class="forum-meta">
+                <div class="col-md-5 col-sm-5 col-xs-8 topic-name">{% trans %}Topic{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Views{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+            </div>
+
+            {% for topic in topics.items %}
+            <div class="row forum-row hover clearfix">
+
+                <div class="col-md-5 col-sm-5 col-xs-8 topic-info">
+                    <div class="row">
+                        <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
+                        {% if topic.locked %}
+                            <span class="fa fa-lock topic-locked"></span>
+                        {% elif topic.important %}
+                            <span class="fa fa-star-o topic-starred-read"></span>
+                        {% else %}
+                            <span class="fa fa-comment-o topic-read"></span>
+                        {% endif %}
+                        </div>
+                        <div class="col-md-11 col-sm-10 col-xs-10">
+                            <div class="topic-name">
+                                <a href="{{ topic.url }}">{{ topic.title }}</a>
+                                <!-- Topic Pagination -->
+                                <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+                            </div>
+
+                            <div class="topic-author">
+                                {% trans %}by{% endtrans %}
+                                {% if topic.user_id %}
+                                 <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                                {% else %}
+                                {{ topic.username }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                    {{ topic.post_count }}
+                </div>
+
+                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                    {{ topic.views }}
+                </div>
+
+                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
+                    <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+
+                    <div class="topic-author">
+                        {% trans %}by{% endtrans %}
+                        {% if topic.last_post.user_id %}
+                        <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                        {% else %}
+                        {{ topic.last_post.username }}
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>  <!-- end forum-row -->
+            {% else %}
+            <div class="row forum-row clearfix">
+                <div class="col-md-12 col-sm-12 co-xs-12">
+                    {% trans %}No topics.{% endtrans %}
+                </div>
+            </div> <!-- end forum-row -->
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

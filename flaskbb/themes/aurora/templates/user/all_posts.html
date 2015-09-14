@@ -1,0 +1,46 @@
+{% extends theme('layout.html') %}
+{% block content %}
+{% from theme('macros.html') import render_pagination %}
+
+<div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li ><a href="{{ user.url }}">{{ user.username }}</a></li>
+        <li class="active">{% trans %}All Posts{% endtrans %}</li>
+    </ol>
+
+    <div class="row controls-row">
+        <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
+            <div class="pull-left">
+                {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default page-panel">
+        <div class="panel-heading page-head">
+            {% trans user=user.username %}All Posts created by {{user}}{% endtrans %}
+        </div>
+        <div class="panel-body page-body">
+            {% for post in posts.items %}
+            <div class="row page-row clearfix">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <strong><a href="{{ post.topic.url }}">{{ post.topic.title }}</a></strong>
+                    in <a href="{{ post.topic.forum.url }}">{{ post.topic.forum.title }}</a>
+                    <span class="divider"> - </span><small>{{ post.date_created|time_since }}</small>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    {{ post.content|markup|safe }}
+                </div>
+            </div>
+            {% else %}
+            <div class="row page-row clearfix">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    {% trans %}No posts.{% endtrans %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
