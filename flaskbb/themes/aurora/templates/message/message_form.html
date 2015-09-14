@@ -1,0 +1,21 @@
+{% set page_title = title %}
+
+{% extends theme("message/message_layout.html") %}
+
+{% block message_content %}
+{% from theme("macros.html") import horizontal_field, render_submit_field %}
+<form class="form-horizontal" role="form" method="post" name="new">
+    <legend>{{ title }}</legend>
+    {{ form.hidden_tag() }}
+    {{ horizontal_field(form.to_user)}}
+    {{ horizontal_field(form.subject)}}
+    {{ horizontal_field(form.message, rows=7)}}
+
+    <div class="form-group row">
+        <div class="col-sm-offset-3 col-lg-9">
+            {{ render_submit_field(form.send_message, input_class="btn btn-success") }}
+            {{ render_submit_field(form.save_message, input_class="btn btn-info") }}
+        </div>
+    </div>
+</form>
+{% endblock %}

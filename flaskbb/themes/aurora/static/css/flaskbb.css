@@ -67,40 +67,40 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.category-panel, .forum-panel, .topic-panel, .page-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel {
   border: 1px solid #cad7e1;
   border-radius: 0; }
-  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .page-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .page-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .page-head, .page-panel .category-head, .page-panel .forum-head, .page-panel .topic-head, .page-panel .page-head {
+  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .page-head, .category-panel .conversation-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .page-head, .forum-panel .conversation-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .page-head, .topic-panel .conversation-head, .page-panel .category-head, .page-panel .forum-head, .page-panel .topic-head, .page-panel .page-head, .page-panel .conversation-head, .conversation-panel .category-head, .conversation-panel .forum-head, .conversation-panel .topic-head, .conversation-panel .page-head, .conversation-panel .conversation-head {
     background-color: #f5f5f5;
     font-weight: bold; }
-  .category-panel > .panel-heading, .forum-panel > .panel-heading, .topic-panel > .panel-heading, .page-panel > .panel-heading {
+  .category-panel > .panel-heading, .forum-panel > .panel-heading, .topic-panel > .panel-heading, .page-panel > .panel-heading, .conversation-panel > .panel-heading {
     color: #333;
     background-color: #f5f5f5;
     border-color: #cad7e1; }
-  .category-panel > .panel-heading + .panel-collapse > .panel-body, .forum-panel > .panel-heading + .panel-collapse > .panel-body, .topic-panel > .panel-heading + .panel-collapse > .panel-body, .page-panel > .panel-heading + .panel-collapse > .panel-body {
+  .category-panel > .panel-heading + .panel-collapse > .panel-body, .forum-panel > .panel-heading + .panel-collapse > .panel-body, .topic-panel > .panel-heading + .panel-collapse > .panel-body, .page-panel > .panel-heading + .panel-collapse > .panel-body, .conversation-panel > .panel-heading + .panel-collapse > .panel-body {
     border-top-color: #cad7e1; }
-  .category-panel > .panel-heading .badge, .forum-panel > .panel-heading .badge, .topic-panel > .panel-heading .badge, .page-panel > .panel-heading .badge {
+  .category-panel > .panel-heading .badge, .forum-panel > .panel-heading .badge, .topic-panel > .panel-heading .badge, .page-panel > .panel-heading .badge, .conversation-panel > .panel-heading .badge {
     color: #f5f5f5;
     background-color: #333; }
-  .category-panel > .panel-footer + .panel-collapse > .panel-body, .forum-panel > .panel-footer + .panel-collapse > .panel-body, .topic-panel > .panel-footer + .panel-collapse > .panel-body, .page-panel > .panel-footer + .panel-collapse > .panel-body {
+  .category-panel > .panel-footer + .panel-collapse > .panel-body, .forum-panel > .panel-footer + .panel-collapse > .panel-body, .topic-panel > .panel-footer + .panel-collapse > .panel-body, .page-panel > .panel-footer + .panel-collapse > .panel-body, .conversation-panel > .panel-footer + .panel-collapse > .panel-body {
     border-bottom-color: #cad7e1; }
 
-.category-body, .forum-body, .topic-body, .page-body {
+.category-body, .forum-body, .topic-body, .page-body, .conversation-body {
   padding: 0;
   background-color: #fff; }
-  .category-body .category-meta, .category-body .forum-meta, .category-body .topic-meta, .category-body .page-meta, .forum-body .category-meta, .forum-body .forum-meta, .forum-body .topic-meta, .forum-body .page-meta, .topic-body .category-meta, .topic-body .forum-meta, .topic-body .topic-meta, .topic-body .page-meta, .page-body .category-meta, .page-body .forum-meta, .page-body .topic-meta, .page-body .page-meta {
+  .category-body .category-meta, .category-body .forum-meta, .category-body .topic-meta, .category-body .page-meta, .forum-body .category-meta, .forum-body .forum-meta, .forum-body .topic-meta, .forum-body .page-meta, .topic-body .category-meta, .topic-body .forum-meta, .topic-body .topic-meta, .topic-body .page-meta, .page-body .category-meta, .page-body .forum-meta, .page-body .topic-meta, .page-body .page-meta, .conversation-body .category-meta, .conversation-body .forum-meta, .conversation-body .topic-meta, .conversation-body .page-meta {
     font-weight: bold;
     padding-top: 0.5em;
     height: 2.5em;
     background-color: #e8f1f2;
     border-bottom: 1px solid #cad7e1; }
-  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .page-row, .category-body .post-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .page-row, .forum-body .post-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .page-row, .topic-body .post-row, .page-body .category-row, .page-body .forum-row, .page-body .topic-row, .page-body .page-row, .page-body .post-row {
+  .category-body .category-row, .category-body .forum-row, .category-body .topic-row, .category-body .page-row, .category-body .post-row, .category-body .conversation-row, .forum-body .category-row, .forum-body .forum-row, .forum-body .topic-row, .forum-body .page-row, .forum-body .post-row, .forum-body .conversation-row, .topic-body .category-row, .topic-body .forum-row, .topic-body .topic-row, .topic-body .page-row, .topic-body .post-row, .topic-body .conversation-row, .page-body .category-row, .page-body .forum-row, .page-body .topic-row, .page-body .page-row, .page-body .post-row, .page-body .conversation-row, .conversation-body .category-row, .conversation-body .forum-row, .conversation-body .topic-row, .conversation-body .page-row, .conversation-body .post-row, .conversation-body .conversation-row {
     margin: 0;
     padding-top: 0.5em;
     padding-bottom: 0.5em; }
-    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .page-row:not(:last-child), .category-body .post-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .page-row:not(:last-child), .forum-body .post-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .page-row:not(:last-child), .topic-body .post-row:not(:last-child), .page-body .category-row:not(:last-child), .page-body .forum-row:not(:last-child), .page-body .topic-row:not(:last-child), .page-body .page-row:not(:last-child), .page-body .post-row:not(:last-child) {
+    .category-body .category-row:not(:last-child), .category-body .forum-row:not(:last-child), .category-body .topic-row:not(:last-child), .category-body .page-row:not(:last-child), .category-body .post-row:not(:last-child), .category-body .conversation-row:not(:last-child), .forum-body .category-row:not(:last-child), .forum-body .forum-row:not(:last-child), .forum-body .topic-row:not(:last-child), .forum-body .page-row:not(:last-child), .forum-body .post-row:not(:last-child), .forum-body .conversation-row:not(:last-child), .topic-body .category-row:not(:last-child), .topic-body .forum-row:not(:last-child), .topic-body .topic-row:not(:last-child), .topic-body .page-row:not(:last-child), .topic-body .post-row:not(:last-child), .topic-body .conversation-row:not(:last-child), .page-body .category-row:not(:last-child), .page-body .forum-row:not(:last-child), .page-body .topic-row:not(:last-child), .page-body .page-row:not(:last-child), .page-body .post-row:not(:last-child), .page-body .conversation-row:not(:last-child), .conversation-body .category-row:not(:last-child), .conversation-body .forum-row:not(:last-child), .conversation-body .topic-row:not(:last-child), .conversation-body .page-row:not(:last-child), .conversation-body .post-row:not(:last-child), .conversation-body .conversation-row:not(:last-child) {
       border-bottom: 1px solid #cad7e1; }
-    .category-body .category-row.hover:hover, .category-body .forum-row.hover:hover, .category-body .topic-row.hover:hover, .category-body .page-row.hover:hover, .category-body .post-row.hover:hover, .forum-body .category-row.hover:hover, .forum-body .forum-row.hover:hover, .forum-body .topic-row.hover:hover, .forum-body .page-row.hover:hover, .forum-body .post-row.hover:hover, .topic-body .category-row.hover:hover, .topic-body .forum-row.hover:hover, .topic-body .topic-row.hover:hover, .topic-body .page-row.hover:hover, .topic-body .post-row.hover:hover, .page-body .category-row.hover:hover, .page-body .forum-row.hover:hover, .page-body .topic-row.hover:hover, .page-body .page-row.hover:hover, .page-body .post-row.hover:hover {
+    .category-body .category-row.hover:hover, .category-body .forum-row.hover:hover, .category-body .topic-row.hover:hover, .category-body .page-row.hover:hover, .category-body .post-row.hover:hover, .category-body .conversation-row.hover:hover, .forum-body .category-row.hover:hover, .forum-body .forum-row.hover:hover, .forum-body .topic-row.hover:hover, .forum-body .page-row.hover:hover, .forum-body .post-row.hover:hover, .forum-body .conversation-row.hover:hover, .topic-body .category-row.hover:hover, .topic-body .forum-row.hover:hover, .topic-body .topic-row.hover:hover, .topic-body .page-row.hover:hover, .topic-body .post-row.hover:hover, .topic-body .conversation-row.hover:hover, .page-body .category-row.hover:hover, .page-body .forum-row.hover:hover, .page-body .topic-row.hover:hover, .page-body .page-row.hover:hover, .page-body .post-row.hover:hover, .page-body .conversation-row.hover:hover, .conversation-body .category-row.hover:hover, .conversation-body .forum-row.hover:hover, .conversation-body .topic-row.hover:hover, .conversation-body .page-row.hover:hover, .conversation-body .post-row.hover:hover, .conversation-body .conversation-row.hover:hover {
       background-color: #f8f8f8; }
 
 .topic-panel {
@@ -246,6 +246,16 @@ body {
     .page-panel .page-body > :not(.page-meta) {
       padding-top: 0.5em; }
 
+.conversation-panel {
+  border: 1px solid #cad7e1;
+  margin-bottom: 0; }
+  .conversation-panel .conversation-head {
+    background-color: #f5f5f5; }
+  .conversation-panel .conversation-body {
+    background-color: #fff; }
+    .conversation-panel .conversation-body .row > .conversation-row:not(:last-child) {
+      border-bottom: 1px solid #cad7e1; }
+
 p.flaskbb-stats {
   margin: 0;
   padding: 0; }
@@ -333,7 +343,7 @@ p.flaskbb-stats {
 /* Sidebar Nav */
 .sidebar {
   padding-top: 1em;
-  padding-bottom: 0;
+  padding-bottom: 1em;
   text-shadow: none;
   background-color: #f8f8f8;
   border: 1px solid #cad7e1; }
@@ -346,9 +356,10 @@ p.flaskbb-stats {
     line-height: 20px;
     color: #999999;
     text-transform: uppercase; }
-  .sidebar .btn-compose {
-    margin-left: 20px;
-    margin-bottom: 5px; }
+  .sidebar .sidenav-btn {
+    padding-bottom: 1em;
+    text-transform: uppercase;
+    text-align: center; }
   .sidebar .nav > li > a {
     display: block; }
   .sidebar .nav > li > a:hover,

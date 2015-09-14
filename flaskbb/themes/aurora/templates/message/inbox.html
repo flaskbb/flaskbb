@@ -1,0 +1,12 @@
+{% set page_title = _("Inbox") %}
+
+{% from theme('macros.html') import render_pagination %}
+{% extends theme("message/message_layout.html") %}
+{% block message_content %}
+
+{% set include_move = True %}
+{% include theme("message/conversation_list.html") %}
+
+{{ render_pagination(conversations, url_for("message.inbox")) }}
+
+{% endblock %}

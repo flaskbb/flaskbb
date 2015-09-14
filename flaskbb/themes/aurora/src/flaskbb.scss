@@ -171,10 +171,10 @@ body {
 
 
 // default values for the panels
-.category-panel, .forum-panel, .topic-panel, .page-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel {
     border: 1px solid $panel-border;
     border-radius: 0;
-    .category-head, .forum-head, .topic-head, .page-head {
+    .category-head, .forum-head, .topic-head, .page-head, .conversation-head {
         background-color: $panel-head-background;
         font-weight: bold;
     }
@@ -199,7 +199,7 @@ body {
 
 }
 
-.category-body, .forum-body, .topic-body, .page-body {
+.category-body, .forum-body, .topic-body, .page-body, .conversation-body {
     padding: 0;
     background-color: $panel-background;
     .category-meta, .forum-meta, .topic-meta, .page-meta {
@@ -209,7 +209,7 @@ body {
         background-color: $panel-meta-background;
         border-bottom: 1px solid $panel-meta-border;
     }
-    .category-row, .forum-row, .topic-row, .page-row, .post-row {
+    .category-row, .forum-row, .topic-row, .page-row, .post-row, .conversation-row {
         margin: 0;
         padding-top: 0.5em;
         padding-bottom: 0.5em;
@@ -460,6 +460,24 @@ body {
     }
 }
 
+// conversation specific values
+.conversation-panel {
+    border: 1px solid $page-border;
+    margin-bottom: 0;
+
+    .conversation-head {
+        background-color: $page-head-background;
+    }
+    .conversation-body {
+        background-color: $page-panel;
+        .row > .conversation-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $page-border;
+            }
+        }
+    }
+}
+
 
 p.flaskbb-stats {
     margin: 0;
@@ -581,26 +599,26 @@ p.flaskbb-stats {
 /* Sidebar Nav */
 .sidebar {
     padding-top: 1em;
-    padding-bottom: 0;
+    padding-bottom: 1em;
     text-shadow: none;
     background-color: $navigation-background-color;
     border: 1px solid $border-color;
 
     .sidenav-header {
-      display: block;
-      padding-left: 1.25em;
-      padding-bottom: 1em;
-      font-size: 12px;
-      font-weight: bold;
-      line-height: 20px;
-      color: #999999;
-      text-transform: uppercase;
+        display: block;
+        padding-left: 1.25em;
+        padding-bottom: 1em;
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 20px;
+        color: #999999;
+        text-transform: uppercase;
     }
 
-
-    .btn-compose {
-        margin-left: 20px;
-        margin-bottom: 5px;
+    .sidenav-btn {
+        padding-bottom: 1em;
+        text-transform: uppercase;
+        text-align: center;
     }
 
     .nav > li > a {
@@ -621,7 +639,6 @@ p.flaskbb-stats {
         background-color: $navigation-hover-color;
     }
 }
-
 
 
 /* Markdown Editor */
