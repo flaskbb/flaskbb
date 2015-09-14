@@ -4,33 +4,33 @@
 {% block content %}
 {% from theme('macros.html') import render_pagination, group_field %}
 
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="active">{% trans %}Memberlist{% endtrans %}</li>
-</ol>
-
-<div class="row controls-row">
-    <div class="col-md-8 col-sm-8 col-xs-8 controls-col">
-        <div class="pull-left">
-            {{ render_pagination(users, url_for('forum.memberlist')) }}
-        </div>
-    </div>
-    <div class="col-md-4 col-sm-4 col-xs-4 controls-col">
-        <div class="pull-right">
-          <form class="inline-form" role="form" method="post">
-              <div class="input-group">
-                  {{ search_form.hidden_tag() }}
-                  {{ group_field(search_form.search_query) }}
-                  <span class="input-group-btn">
-                    <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
-                  </span>
-              </div>
-          </form>
-        </div>
-    </div>
-</div>
-
 <div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Memberlist{% endtrans %}</li>
+    </ol>
+
+    <div class="row controls-row">
+        <div class="col-md-8 col-sm-8 col-xs-8 controls-col">
+            <div class="pull-left">
+                {{ render_pagination(users, url_for('forum.memberlist')) }}
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-4 controls-col">
+            <div class="pull-right">
+              <form class="inline-form" role="form" method="post">
+                  <div class="input-group">
+                      {{ search_form.hidden_tag() }}
+                      {{ group_field(search_form.search_query) }}
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
+                      </span>
+                  </div>
+              </form>
+            </div>
+        </div>
+    </div>
+
     <div class="panel panel-default page-panel">
         <div class="panel-heading page-head">
             <a href="{{ url_for('forum.memberlist') }}">{% trans %}Memberlist{% endtrans %}</a>

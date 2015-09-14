@@ -163,11 +163,8 @@ body {
 }
 
 
-// right now it doesn't matter which one you use
+// they don't have a purpose at the moment.. but this might change
 .index-view, .forum-view, .topic-view, .page-view {
-    .forum-row, .category-row, .post-row, .page-row {
-        margin: 0;
-    }
 }
 
 
@@ -192,6 +189,7 @@ body {
         border-bottom: 1px solid $panel-meta-border;
     }
     .category-row, .forum-row, .topic-row, .page-row, .post-row {
+        margin: 0;
         padding-top: 0.5em;
         padding-bottom: 0.5em;
         &:not(:last-child) {

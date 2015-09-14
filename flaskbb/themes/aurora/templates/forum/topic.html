@@ -9,14 +9,14 @@
 {% block content %}
 {% from theme('macros.html') import render_pagination, form_field, generate_post_id, generate_post_url %}
 
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
-    <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-    <li class="active">{{ topic.title }}</li>
-</ol>
-
 <div class="topic-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
+        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        <li class="active">{{ topic.title }}</li>
+    </ol>
+
     {% include theme('forum/topic_controls.html') %}
 
     <div class="panel panel-default topic-panel">

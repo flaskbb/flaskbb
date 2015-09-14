@@ -4,12 +4,12 @@
 {% block content %}
 {% from theme("macros.html") import horizontal_field %}
 
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="active">{% trans %}Search{% endtrans %}</li>
-</ol>
-
 <div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Search{% endtrans %}</li>
+    </ol>
+
     <div class="panel panel-default page-panel">
         <div class="panel-heading page-head">
             {% trans %}Search{% endtrans %}
