@@ -1,0 +1,28 @@
+{% extends theme("layout.html") %}
+{% block content %}
+{%- from theme('macros.html') import navlink with context -%}
+
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
+    <li class="active">{% trans %}Settings{% endtrans %}</li>
+</ol>
+
+<div class="row">
+    <div class="col-sm-3">
+        <div class="sidebar">
+            <ul class="nav sidenav">
+                <li class="sidenav-header">{% trans %}Account Settings{% endtrans %}</li>
+                {{ navlink('user.settings', _('General Settings')) }}
+                {{ navlink('user.change_user_details', _('Change User Details')) }}
+                {{ navlink('user.change_email', _('Change E-Mail Address')) }}
+                {{ navlink('user.change_password', _('Change Password')) }}
+            </ul>
+        </div>
+    </div><!--/.col-sm-3 -->
+    <div class="col-sm-9">
+        {% block settings_content %}{% endblock %}
+    </div><!--/.col-sm-9 -->
+</div><!--/row-->
+
+{% endblock %}
