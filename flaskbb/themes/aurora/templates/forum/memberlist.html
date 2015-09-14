@@ -44,7 +44,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Group{% endtrans %}</div>
             </div>
             {% for user in users.items %}
-            <div class="row forum-row clearfix">
+            <div class="row page-row hover clearfix">
                 <div class="col-md-1 col-sm-1 col-xs-1">{{ user.id }}</div>
                 <div class="col-md-3 col-sm-3 col-xs-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
                 <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>

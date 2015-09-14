@@ -28,7 +28,7 @@ $panel-head-background: #f5f5f5;    // panel head background
 $panel-meta-background: #e8f1f2;    // panel meta background
 $panel-meta-border: $border-color;  // panel meta (bottom) border
 $panel-border: $border-color;       // panel border (all over)
-$panel-hover: #e8f1f2;
+$panel-hover: #f8f8f8;
 
 $page-panel: $panel-background;
 $page-head-background: $panel-head-background;
@@ -198,7 +198,7 @@ body {
         &:not(:last-child) {
             border-bottom: 1px solid $panel-border;
         }
-        &:hover {
+        &.hover:hover {
             background-color: $panel-hover;
         }
     }
