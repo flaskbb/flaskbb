@@ -115,7 +115,7 @@ $(document).ready(function () {
         var message_id = $(this).attr('data-message-id');
 
         $.get('/message/message/' + message_id + '/raw', function(text) {
-            var $contents = $('.message-content .md-editor textarea');
+            var $contents = $('#quickreply-editor');
             $contents.val(($contents.val() + '\n' + text).trim() + '\n');
             $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
             $contents[0].scrollTop = $contents[0].scrollHeight;
@@ -129,7 +129,6 @@ $(document).ready(function () {
 
         $.get('/post/' + post_id + '/raw', function(text) {
             var $contents = $('#quickreply-editor');
-            console.log($contents);
             $contents.val(($contents.val() + '\n' + text).trim() + '\n');
             $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
             $contents[0].scrollTop = $contents[0].scrollHeight;

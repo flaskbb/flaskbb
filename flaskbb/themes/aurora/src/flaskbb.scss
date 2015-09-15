@@ -476,8 +476,78 @@ body {
             }
         }
     }
+    .conversation-message {
+        min-height: 16em;
+        padding: 0.5em;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+
+        .message-content {
+            padding-top: 0.5em;
+        }
+
+        .message-footer {
+            width: 100%;
+            bottom: 0;
+            position: absolute;
+            .right {
+                margin-right: 46px;
+                float: right;
+            }
+            .left {
+                float: left;
+            }
+        }
+
+    }
+    @media (min-width: 992px) {
+        .arrow:after, .arrow:before {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-color: transparent;
+        }
+        .arrow.left:after, .arrow.left:before {
+            border-left: 0;
+        }
+
+        // Left Arrow
+        .arrow.left:before {
+            left: 0px;
+            top: 40px;
+            border-right-color: inherit;
+            border-width: 16px;
+        }
+
+        .arrow.left:after {
+            left: 1px;
+            top: 41px;
+            border-right-color: #FFFFFF;
+            border-width: 15px;
+        }
+
+        // Right Arrow
+        .arrow.right:before {
+            right: -16px;
+            top: 40px;
+            border-left-color: inherit;
+            border-width: 16px;
+        }
+        .arrow.right:after {
+            right: -14px;
+            top: 41px;
+            border-left-color: #FFFFFF;
+            border-width: 15px;
+        }
+    }
+
 }
 
+.conversation-reply {
+    padding-top: 2em;
+}
 
 p.flaskbb-stats {
     margin: 0;

@@ -2,20 +2,53 @@
 
 {% extends theme("message/message_layout.html") %}
 
-{% block message_content %}
-{% from theme("macros.html") import horizontal_field, render_submit_field %}
-<form class="form-horizontal" role="form" method="post" name="new">
-    <legend>{{ title }}</legend>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.to_user)}}
-    {{ horizontal_field(form.subject)}}
-    {{ horizontal_field(form.message, rows=7)}}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
+{% endblock %}
 
-    <div class="form-group row">
-        <div class="col-sm-offset-3 col-lg-9">
-            {{ render_submit_field(form.send_message, input_class="btn btn-success") }}
-            {{ render_submit_field(form.save_message, input_class="btn btn-info") }}
+{% block message_content %}
+{% from theme("macros.html") import render_submit_field, render_quickreply, render_field %}
+<form class="form-horizontal" role="form" method="post">
+    {{ form.hidden_tag() }}
+    <div class="panel page-panel">
+        <div class="panel-heading page-head">
+            {{ title }}
+        </div>
+
+        <div class="panel-body page-body">
+            {{ form.hidden_tag() }}
+            <div class="col-md-12 col-sm-12 col-xs-12">
+
+                {{ render_field(form.to_user, div_class="col-md-6 col-sm-6 col-xs-6") }}
+                {{ render_field(form.subject, div_class="col-md-6 col-sm-6 col-xs-6") }}
+
+                <div class="form-group">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="editor-box">
+                            <div class="editor">
+                                {{ render_quickreply(form.message, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
+                            </div>
+                            <div class="editor-submit">
+                                <div class="editor-options pull-left">
+                                    <span class="label label-info">Markdown</span>
+                                    <a class="label label-success" href="#">help</a> <!-- TODO: add markdown cheat sheet -->
+                                    <a class="label label-success" href="#">emojis</a> <!-- TODO: add emoji cheat sheet -->
+                                </div>
+                                <div class="pull-right">
+                                    {{ render_submit_field(form.send_message, input_class="btn btn-success") }}
+                                    {{ render_submit_field(form.save_message, input_class="btn btn-info") }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
