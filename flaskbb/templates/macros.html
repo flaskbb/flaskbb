@@ -114,12 +114,8 @@
 
 {%- macro render_field(field, with_label=True, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
-    {% if div_class %}
-    <div class="{{ div_class }}">
-    {% else %}
-    <div class="col-sm-5">
-    {% endif %}
 
+    <div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-5{%- endif -%}">
         {% if with_label %}
             <label>{{ field.label.text }}</label>
         {% endif %}
@@ -222,25 +218,14 @@
 
 
 {%- macro horizontal_boolean_field(field, div_class='') -%}
-{%- if div_class %}
-<div class="{{ div_class }}">
-{%- else %}
-<div class="col-sm-offset-3 col-sm-3">
-{%- endif %}
-    <div class="checkbox">
-        {{ field(**kwargs) }}
-        {{ field_label(field) }}
-    </div>
+<div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-offset-3 col-sm-3{%- endif -%}">
+    {{ render_boolean_field(field, **kwargs) }}
 </div>
 {%- endmacro -%}
 
 
 {%- macro horizontal_submit_field(field, div_class='', input_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% else %}
-<div class="col-sm-offset-3 col-sm-9">
-{% endif %}
+<div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-offset-3 col-sm-3{%- endif -%}">
     {{ field(class=input_class or 'btn btn-success') }}
 </div>
 {%- endmacro -%}
