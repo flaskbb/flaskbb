@@ -24,9 +24,9 @@
 
                         <div class="profile-online">
                             {% if user|is_online %}
-                            <span class="label label-success">Online</span>
+                            <span class="label label-success" data-toggle="tooltip" data-placement="right" title="online">Online</span>
                             {% else %}
-                            <span class="label label-default">Offline</span>
+                            <span class="label label-default" data-toggle="tooltip" data-placement="right" title="offline">Offline</span>
                             {% endif %}
                         </div>
 
@@ -80,7 +80,7 @@
         <!-- right column -->
         <div class="col-md-3 col-sm-4 col-xs-12">
             <div class="panel page-panel">
-                <div class="panel-heading page-page">{% trans %}User Stats{% endtrans %}</div>
+                <div class="panel-heading page-head">{% trans %}User Stats{% endtrans %}</div>
                 <div class="panel-body page-body">
 
                     <div class="profile-stats">
@@ -130,4 +130,12 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 {% endblock %}

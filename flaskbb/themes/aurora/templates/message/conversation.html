@@ -1,7 +1,6 @@
 {% extends theme("message/message_layout.html") %}
 
 {% block css %}
-    {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
 {% endblock %}
 
@@ -142,6 +141,11 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
