@@ -1,0 +1,16 @@
+{% set page_title = _("Oh noes! 404") %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+
+<div class="panel page-panel">
+    <div class="panel-body page-body">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h1>{% trans %}Oops, Page not found!{% endtrans %}</h1>
+            <p>{% trans %}The page you were looking for does not exist.{% endtrans %}</p>
+            <p><a href="{{url_for('forum.index')}}">{% trans %}Back to the Forums{% endtrans %}</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

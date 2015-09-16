@@ -1,0 +1,16 @@
+{% set page_title = _("No Access - 403") %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+
+<div class="panel page-panel">
+    <div class="panel-body page-body">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h1>{% trans %}Forbidden Page{% endtrans %}</h1>
+            <p>{% trans %}You do not have the permission to view this page.{% endtrans %}</p>
+            <p><a href="{{url_for('forum.index')}}">{% trans %}Back to the Forums{% endtrans %}</a></p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
