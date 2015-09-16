@@ -121,6 +121,9 @@ body {
   padding-right: 0;
   min-height: 19em;
   position: relative; }
+  .topic-body .post-box.post-horizontal {
+    border-left: none;
+    min-height: 14em; }
   .topic-body .post-box .post-meta {
     padding-top: 0.5em;
     padding-left: 0.5em;
@@ -153,6 +156,19 @@ body {
       .topic-body .post-box .post-footer .post-menu .inline-form {
         padding: 6px 12px; }
 
+.author.author-horizontal {
+  min-height: 9em;
+  border-bottom: 1px solid #cad7e1; }
+  .author.author-horizontal .author-box {
+    float: left;
+    margin-top: 0.5em; }
+    .author.author-horizontal .author-box .author-avatar {
+      margin-top: 0em;
+      margin-right: 1em; }
+    .author.author-horizontal .author-box .author-online, .author.author-horizontal .author-box .author-offline {
+      margin-top: 0.5em; }
+    .author.author-horizontal .author-box .author-name {
+      margin-top: -0.5em; }
 .author .author-name h4 {
   float: left;
   margin-bottom: 0; }
