@@ -21,9 +21,9 @@ body {
   color: #fff;
   text-align: left;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
-  background-color: #3276b1;
-  background-image: -webkit-linear-gradient(top, #285e8e 0%, #3276b1 100%);
-  background-image: linear-gradient(to bottom, #285e8e 0%, #3276b1 100%);
+  background-color: #0088cc;
+  background-image: -webkit-linear-gradient(top, #285e8e 0%, #0088cc 100%);
+  background-image: linear-gradient(to bottom, #285e8e 0%, #0088cc 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$header-background-secondary', endColorstr='$header-background-primary', GradientType=0);
   border: 1px solid #cad7e1;
