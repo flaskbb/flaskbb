@@ -86,7 +86,7 @@
                         </div>
                     </div>
 
-                    <div class="post-content post_body clearfix" id="pid{{ post.id }}">
+                    <div class="post-content clearfix" id="pid{{ post.id }}">
                         {{ post.content|markup|safe }}
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}

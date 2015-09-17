@@ -268,6 +268,12 @@ body {
             padding-left: 0.5em;
             padding-right: 0.5em;
             padding-top: 0.5em;
+
+            // scale larger (than the div) images to the size of the div
+            img {
+                max-width:100%;
+                max-height:100%;
+            }
         }
 
         .post-signature {
