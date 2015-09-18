@@ -27,8 +27,8 @@ $navigation-background-color: #f8f8f8;
 $panel-background: #fff;            // panel body background
 $panel-head-background: #f5f5f5;    // panel head background
 $panel-meta-background: #e8f1f2;    // panel meta background
-$panel-meta-border: $border-color;  // panel meta (bottom) border
-$panel-border: $border-color;       // panel border (all over)
+$panel-meta-border: #cad7e1;  // panel meta (bottom) border
+$panel-border: #cad7e1;       // panel border (all over)
 $panel-hover: #f8f8f8;
 
 $page-panel: $panel-background;
@@ -171,10 +171,10 @@ body {
 
 
 // default values for the panels
-.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel, .management-panel {
     border: 1px solid $panel-border;
     border-radius: 0;
-    .category-head, .forum-head, .topic-head, .page-head, .conversation-head {
+    .category-head, .forum-head, .topic-head, .page-head, .conversation-head, .management-head {
         background-color: $panel-head-background;
         font-weight: bold;
     }
@@ -581,6 +581,54 @@ body {
     padding-top: 2em;
 }
 
+// Management Panel
+.management-panel {
+
+    .search-form {
+        display: none;
+        padding: 15px;
+    }
+    .management-head {
+        border-radius: 0;
+        background-color: $blue;
+    }
+    .management-body {
+        border-radius: 0;
+        padding: 0;
+        .panel.settings-panel {
+            border-right: 0;
+            border-top: 0;
+            border-bottom: 0;
+            border-radius: 0;
+            margin-bottom: 0;
+            border-left: 1px solid $border-color;
+
+            .settings-head {
+                border-radius: 0;
+                background-color: $panel-hover;
+                border-bottom: 1px solid $border-color;
+            }
+            .settings-body {
+                padding: 0px;
+                padding-top: 10px;
+                .settings-search {
+                    margin-top: -10px;
+                }
+            }
+
+            .settings-footer {
+                padding-top: 5px;
+                padding-left: 5px;
+                padding-bottom: 0px;
+                .pagination {
+                    margin: 0;
+                }
+            }
+        }
+    }
+}
+
+
 p.flaskbb-stats {
     margin: 0;
     padding: 0;
@@ -598,6 +646,10 @@ p.flaskbb-stats {
 
 .controls-col {
     margin: 0;
+    padding: 0;
+}
+
+.settings-col {
     padding: 0;
 }
 
@@ -739,6 +791,84 @@ p.flaskbb-stats {
         font-weight: normal;
         color: #777;
         background-color: $navigation-hover-color;
+    }
+}
+
+.nav-sidebar {
+    width: 100%;
+    padding: 0;
+    a {
+        color: $navigation-font-color;
+        border-radius: 0;
+    }
+    .active a {
+        cursor: default;
+        background-color: $navigation-background-color;
+        color: $navigation-font-color;
+    }
+
+    li.active {
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+        &:first-child {
+            border-top: none;
+        }
+    }
+    .active a:hover {
+        background-color: $navigation-background-color;
+    }
+}
+
+
+/* Panel tabs */
+.panel {
+    &.panel-tabs {
+        > .panel-heading {
+            padding: 0;
+            font-weight: 500;
+        }
+        .nav-tabs {
+            border-bottom: none;
+        }
+        .nav-justified {
+            margin-bottom: -1px;
+        }
+    }
+}
+
+.panel-tabs {
+    .nav-tabs {
+        &.nav-justified > li > a {
+            border-radius: 0;
+            border-top: none;
+            border-bottom: 1px solid $border-color;
+        }
+        // non-active and hover
+        > li {
+            > a {
+                color: $header-subtitle-font-color;
+                // different background color when hovering
+                &:hover, &:focus {
+                    background-color: $fresh-blue;
+                    border-color: transparent;
+                    border-top: none;
+                    border-bottom: 1px solid $border-color;
+                }
+            }
+        }
+        // active and hover
+        > li.active {
+            > a, a:hover, a:focus {
+                color: $header-title-font-color;
+                background-color: $fresh-blue;
+                border-color: $border-color;
+                border-bottom-color: transparent;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom: 1px solid $border-color;
+            }
+        }
     }
 }
 

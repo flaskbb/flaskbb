@@ -1,0 +1,28 @@
+{% extends theme("layout.html") %}
+
+{% block content %}
+{%- from theme('macros.html') import navlink with context -%}
+
+{% block breadcrumb %}
+{% endblock %}
+
+<div class="panel panel-tabs management-panel">
+    <div class="panel-heading management-head">
+        <ul class="nav nav-tabs nav-justified">
+        {{ navlink('management.overview', _('Overview'), 'fa fa-tasks') }}
+        {{ navlink('management.users', _('Users'), 'fa fa-user', active=active_management_user_nav) }}
+        {{ navlink('management.unread_reports', _('Reports'), 'fa fa-flag', active=active_management_report_nav) }}
+
+        {% if current_user|is_admin %}
+            {{ navlink('management.settings', _('Settings'), 'fa fa-cogs') }}
+            {{ navlink('management.groups', _('Groups'), 'fa fa-users', active=active_management_group_nav) }}
+            {{ navlink('management.forums', _('Forums'), 'fa fa-comments',active=active_management_forum_nav) }}
+            {{ navlink('management.plugins', _('Plugins'), 'fa fa-puzzle-piece') }}
+        {% endif %}
+        </ul>
+    </div>
+    <div class="panel-body management-body">
+        {% block management_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

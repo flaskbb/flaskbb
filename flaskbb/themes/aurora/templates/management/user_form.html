@@ -1,0 +1,57 @@
+{% set page_title = title %}
+{% set active_management_user_nav=True %}
+
+{% extends theme("management/management_layout.html") %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="active">{% trans %}Manage Users{% endtrans %}</li>
+</ol>
+{% endblock %}
+
+{% block management_content %}
+{% from theme("macros.html") import horizontal_field, horizontal_select_field, navlink with context %}
+
+<div class="col-md-3 settings-col">
+    <div class="nav-sidebar">
+        <ul class="nav">
+            {{ navlink('management.users', _("Manage Users")) }}
+            {{ navlink('management.banned_users', _('Banned Users')) }}
+
+            {% if current_user|is_admin %}
+                {{ navlink('management.add_user', _("Add User")) }}
+            {% endif %}
+        </ul>
+    </div>
+</div><!--/.col-md-3 -->
+
+<div class="col-md-9 settings-col">
+    <div class="panel settings-panel">
+        <div class="panel-heading settings-head">
+            <span class="fa fa-user-plus"></span> {{ title }}
+        </div>
+        <div class="panel-body settings-body">
+            <div class="settings-content">
+                <form class="form-horizontal" role="form" method="post">
+                    {{ form.hidden_tag() }}
+                    {{ horizontal_field(form.username) }}
+                    {{ horizontal_field(form.email) }}
+                    {{ horizontal_field(form.password) }}
+                    {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
+                    {{ horizontal_field(form.gender) }}
+                    {{ horizontal_field(form.location) }}
+                    {{ horizontal_field(form.website) }}
+                    {{ horizontal_field(form.avatar) }}
+                    {{ horizontal_field(form.primary_group) }}
+                    {{ horizontal_field(form.secondary_groups) }}
+                    {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
+                    {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
+                    {{ horizontal_field(form.submit) }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

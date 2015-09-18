@@ -67,22 +67,22 @@ body {
   border: 1px solid #cad7e1;
   border-radius: 0; }
 
-.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel {
+.category-panel, .forum-panel, .topic-panel, .page-panel, .conversation-panel, .management-panel {
   border: 1px solid #cad7e1;
   border-radius: 0; }
-  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .page-head, .category-panel .conversation-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .page-head, .forum-panel .conversation-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .page-head, .topic-panel .conversation-head, .page-panel .category-head, .page-panel .forum-head, .page-panel .topic-head, .page-panel .page-head, .page-panel .conversation-head, .conversation-panel .category-head, .conversation-panel .forum-head, .conversation-panel .topic-head, .conversation-panel .page-head, .conversation-panel .conversation-head {
+  .category-panel .category-head, .category-panel .forum-head, .category-panel .topic-head, .category-panel .page-head, .category-panel .conversation-head, .category-panel .management-head, .forum-panel .category-head, .forum-panel .forum-head, .forum-panel .topic-head, .forum-panel .page-head, .forum-panel .conversation-head, .forum-panel .management-head, .topic-panel .category-head, .topic-panel .forum-head, .topic-panel .topic-head, .topic-panel .page-head, .topic-panel .conversation-head, .topic-panel .management-head, .page-panel .category-head, .page-panel .forum-head, .page-panel .topic-head, .page-panel .page-head, .page-panel .conversation-head, .page-panel .management-head, .conversation-panel .category-head, .conversation-panel .forum-head, .conversation-panel .topic-head, .conversation-panel .page-head, .conversation-panel .conversation-head, .conversation-panel .management-head, .management-panel .category-head, .management-panel .forum-head, .management-panel .topic-head, .management-panel .page-head, .management-panel .conversation-head, .management-panel .management-head {
     background-color: #f5f5f5;
     font-weight: bold; }
-  .category-panel > .panel-heading, .forum-panel > .panel-heading, .topic-panel > .panel-heading, .page-panel > .panel-heading, .conversation-panel > .panel-heading {
+  .category-panel > .panel-heading, .forum-panel > .panel-heading, .topic-panel > .panel-heading, .page-panel > .panel-heading, .conversation-panel > .panel-heading, .management-panel > .panel-heading {
     color: #333;
     background-color: #f5f5f5;
     border-color: #cad7e1; }
-  .category-panel > .panel-heading + .panel-collapse > .panel-body, .forum-panel > .panel-heading + .panel-collapse > .panel-body, .topic-panel > .panel-heading + .panel-collapse > .panel-body, .page-panel > .panel-heading + .panel-collapse > .panel-body, .conversation-panel > .panel-heading + .panel-collapse > .panel-body {
+  .category-panel > .panel-heading + .panel-collapse > .panel-body, .forum-panel > .panel-heading + .panel-collapse > .panel-body, .topic-panel > .panel-heading + .panel-collapse > .panel-body, .page-panel > .panel-heading + .panel-collapse > .panel-body, .conversation-panel > .panel-heading + .panel-collapse > .panel-body, .management-panel > .panel-heading + .panel-collapse > .panel-body {
     border-top-color: #cad7e1; }
-  .category-panel > .panel-heading .badge, .forum-panel > .panel-heading .badge, .topic-panel > .panel-heading .badge, .page-panel > .panel-heading .badge, .conversation-panel > .panel-heading .badge {
+  .category-panel > .panel-heading .badge, .forum-panel > .panel-heading .badge, .topic-panel > .panel-heading .badge, .page-panel > .panel-heading .badge, .conversation-panel > .panel-heading .badge, .management-panel > .panel-heading .badge {
     color: #f5f5f5;
     background-color: #333; }
-  .category-panel > .panel-footer + .panel-collapse > .panel-body, .forum-panel > .panel-footer + .panel-collapse > .panel-body, .topic-panel > .panel-footer + .panel-collapse > .panel-body, .page-panel > .panel-footer + .panel-collapse > .panel-body, .conversation-panel > .panel-footer + .panel-collapse > .panel-body {
+  .category-panel > .panel-footer + .panel-collapse > .panel-body, .forum-panel > .panel-footer + .panel-collapse > .panel-body, .topic-panel > .panel-footer + .panel-collapse > .panel-body, .page-panel > .panel-footer + .panel-collapse > .panel-body, .conversation-panel > .panel-footer + .panel-collapse > .panel-body, .management-panel > .panel-footer + .panel-collapse > .panel-body {
     border-bottom-color: #cad7e1; }
 
 .category-body, .forum-body, .topic-body, .page-body, .conversation-body {
@@ -324,6 +324,38 @@ body {
 .conversation-reply {
   padding-top: 2em; }
 
+.management-panel .search-form {
+  display: none;
+  padding: 15px; }
+.management-panel .management-head {
+  border-radius: 0;
+  background-color: #337ab7; }
+.management-panel .management-body {
+  border-radius: 0;
+  padding: 0; }
+  .management-panel .management-body .panel.settings-panel {
+    border-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+    border-left: 1px solid #cad7e1; }
+    .management-panel .management-body .panel.settings-panel .settings-head {
+      border-radius: 0;
+      background-color: #f8f8f8;
+      border-bottom: 1px solid #cad7e1; }
+    .management-panel .management-body .panel.settings-panel .settings-body {
+      padding: 0px;
+      padding-top: 10px; }
+      .management-panel .management-body .panel.settings-panel .settings-body .settings-search {
+        margin-top: -10px; }
+    .management-panel .management-body .panel.settings-panel .settings-footer {
+      padding-top: 5px;
+      padding-left: 5px;
+      padding-bottom: 0px; }
+      .management-panel .management-body .panel.settings-panel .settings-footer .pagination {
+        margin: 0; }
+
 p.flaskbb-stats {
   margin: 0;
   padding: 0; }
@@ -337,6 +369,9 @@ p.flaskbb-stats {
 
 .controls-col {
   margin: 0;
+  padding: 0; }
+
+.settings-col {
   padding: 0; }
 
 .inline-form {
@@ -440,6 +475,54 @@ p.flaskbb-stats {
     font-weight: normal;
     color: #777;
     background-color: #e7e7e7; }
+
+.nav-sidebar {
+  width: 100%;
+  padding: 0; }
+  .nav-sidebar a {
+    color: #555;
+    border-radius: 0; }
+  .nav-sidebar .active a {
+    cursor: default;
+    background-color: #f8f8f8;
+    color: #555; }
+  .nav-sidebar li.active {
+    border-top: 1px solid #cad7e1;
+    border-bottom: 1px solid #cad7e1; }
+    .nav-sidebar li.active:first-child {
+      border-top: none; }
+  .nav-sidebar .active a:hover {
+    background-color: #f8f8f8; }
+
+/* Panel tabs */
+.panel.panel-tabs > .panel-heading {
+  padding: 0;
+  font-weight: 500; }
+.panel.panel-tabs .nav-tabs {
+  border-bottom: none; }
+.panel.panel-tabs .nav-justified {
+  margin-bottom: -1px; }
+
+.panel-tabs .nav-tabs.nav-justified > li > a {
+  border-radius: 0;
+  border-top: none;
+  border-bottom: 1px solid #cad7e1; }
+.panel-tabs .nav-tabs > li > a {
+  color: #E8F1F2; }
+  .panel-tabs .nav-tabs > li > a:hover, .panel-tabs .nav-tabs > li > a:focus {
+    background-color: #0088cc;
+    border-color: transparent;
+    border-top: none;
+    border-bottom: 1px solid #cad7e1; }
+.panel-tabs .nav-tabs > li.active > a, .panel-tabs .nav-tabs > li.active a:hover, .panel-tabs .nav-tabs > li.active a:focus {
+  color: #fff;
+  background-color: #0088cc;
+  border-color: #cad7e1;
+  border-bottom-color: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #cad7e1; }
 
 /* Markdown Editor */
 .editor-box .editor-submit .btn {
