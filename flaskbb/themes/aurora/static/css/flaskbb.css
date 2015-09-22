@@ -338,17 +338,30 @@ body {
     border-top: 0;
     border-bottom: 0;
     border-radius: 0;
-    margin-bottom: 0;
-    border-left: 1px solid #cad7e1; }
+    margin-bottom: 0; }
+    .management-panel .management-body .panel.settings-panel.with-left-border {
+      border-left: 1px solid #cad7e1; }
     .management-panel .management-body .panel.settings-panel .settings-head {
       border-radius: 0;
       background-color: #f8f8f8;
       border-bottom: 1px solid #cad7e1; }
     .management-panel .management-body .panel.settings-panel .settings-body {
-      padding: 0px;
-      padding-top: 10px; }
-      .management-panel .management-body .panel.settings-panel .settings-body .settings-search {
-        margin-top: -10px; }
+      padding: 0; }
+      .management-panel .management-body .panel.settings-panel .settings-body .settings-form {
+        padding-top: 10px; }
+    .management-panel .management-body .panel.settings-panel .settings-meta {
+      margin: 0;
+      padding: 5px 0 5px 0;
+      border-bottom: 1px solid #cad7e1; }
+      .management-panel .management-body .panel.settings-panel .settings-meta .meta-item {
+        font-weight: bold; }
+    .management-panel .management-body .panel.settings-panel .settings-row {
+      padding: 5px 0 5px 0;
+      margin: 0; }
+      .management-panel .management-body .panel.settings-panel .settings-row:last-child {
+        padding-bottom: 10px; }
+      .management-panel .management-body .panel.settings-panel .settings-row.hover:hover {
+        background-color: #f8f8f8; }
     .management-panel .management-body .panel.settings-panel .settings-footer {
       padding-top: 5px;
       padding-left: 5px;
@@ -565,5 +578,92 @@ p.flaskbb-stats {
   vertical-align: middle;
   width: 20px;
   height: 20px; }
+
+.btn.btn-link {
+  margin: 0 5px 0 5px;
+  padding: 0; }
+
+.stats {
+  margin-top: 15px;
+  margin-bottom: 15px; }
+  .stats .stats-widget {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border: 1px solid #cad7e1; }
+    .stats .stats-widget .icon {
+      display: block;
+      font-size: 96px;
+      line-height: 96px;
+      margin-bottom: 10px;
+      text-align: center; }
+    .stats .stats-widget var {
+      display: block;
+      height: 64px;
+      font-size: 64px;
+      line-height: 64px;
+      font-style: normal; }
+    .stats .stats-widget label {
+      font-size: 17px; }
+    .stats .stats-widget .options {
+      margin-top: 10px; }
+  .stats .stats-heading {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 0;
+    border-bottom: 1px solid #cad7e1; }
+  .stats .stats-row {
+    margin: 0 0 15px 0;
+    padding-bottom: 15px; }
+    .stats .stats-row .stats-item {
+      margin: 0;
+      padding-top: 5px; }
+    .stats .stats-row:last-child {
+      border: none; }
+
+.alert-message {
+  margin: 0;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #3C763D;
+  border-left: 3px solid #eee; }
+  .alert-message h4 {
+    margin-top: 0;
+    margin-bottom: 5px; }
+  .alert-message p:last-child {
+    margin-bottom: 0; }
+  .alert-message code {
+    background-color: #fff;
+    border-radius: 3px; }
+  .alert-message.alert-message-success {
+    background-color: #F4FDF0;
+    border-color: #3C763D; }
+  .alert-message.alert-message-success h4 {
+    color: #3C763D; }
+  .alert-message.alert-message-danger {
+    background-color: #fdf7f7;
+    border-color: #d9534f; }
+  .alert-message.alert-message-danger h4 {
+    color: #d9534f; }
+  .alert-message.alert-message-warning {
+    background-color: #fcf8f2;
+    border-color: #f0ad4e; }
+  .alert-message.alert-message-warning h4 {
+    color: #f0ad4e; }
+  .alert-message.alert-message-info {
+    background-color: #f4f8fa;
+    border-color: #5bc0de; }
+  .alert-message.alert-message-info h4 {
+    color: #5bc0de; }
+  .alert-message.alert-message-default {
+    background-color: #EEE;
+    border-color: #555; }
+  .alert-message.alert-message-default h4 {
+    color: #000; }
+  .alert-message.alert-message-notice {
+    background-color: #FCFCDD;
+    border-color: #BDBD89; }
+  .alert-message.alert-message-notice h4 {
+    color: #444; }
 
 /*# sourceMappingURL=flaskbb.css.map */

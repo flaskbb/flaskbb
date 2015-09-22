@@ -28,13 +28,13 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9 settings-col">
-    <div class="panel settings-panel">
+    <div class="panel settings-panel with-left-border">
         <div class="panel-heading settings-head">
             <span class="fa fa-user-plus"></span> {{ title }}
         </div>
         <div class="panel-body settings-body">
             <div class="settings-content">
-                <form class="form-horizontal" role="form" method="post">
+                <form class="form-horizontal settings-form" role="form" method="post">
                     {{ form.hidden_tag() }}
                     {{ horizontal_field(form.username) }}
                     {{ horizontal_field(form.email) }}

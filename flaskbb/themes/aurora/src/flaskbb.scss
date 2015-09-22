@@ -3,6 +3,7 @@ $blue: #337ab7;
 $fresh-blue: #0088cc;
 $light-blue: #5bc0de;
 $green: #5cb85c;
+$dark-green: #3C763D;
 $orange: #f0ad4e;
 $red: #d9534f;
 $gray: #555;
@@ -601,7 +602,10 @@ body {
             border-bottom: 0;
             border-radius: 0;
             margin-bottom: 0;
-            border-left: 1px solid $border-color;
+
+            &.with-left-border {
+                border-left: 1px solid $border-color;
+            }
 
             .settings-head {
                 border-radius: 0;
@@ -609,10 +613,30 @@ body {
                 border-bottom: 1px solid $border-color;
             }
             .settings-body {
-                padding: 0px;
-                padding-top: 10px;
-                .settings-search {
-                    margin-top: -10px;
+                padding: 0;
+                .settings-form {
+                    padding-top: 10px;
+                }
+            }
+
+            .settings-meta {
+                margin: 0;
+                padding: 5px 0 5px 0;
+                border-bottom: 1px solid $border-color;
+                .meta-item {
+                    font-weight: bold;
+                }
+            }
+            .settings-row {
+                padding: 5px 0 5px 0;
+                margin: 0;
+
+                &:last-child {
+                    padding-bottom: 10px;
+                }
+
+                &.hover:hover {
+                    background-color: $panel-hover;
                 }
             }
 
@@ -930,4 +954,128 @@ p.flaskbb-stats {
     vertical-align: middle;
     width: 20px;
     height: 20px;
+}
+
+.btn.btn-link {
+    margin: 0 5px 0 5px;
+    padding: 0;
+}
+
+
+
+.stats {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    .stats-widget {
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        //background-color: $panel-hover;
+        border: 1px solid $border-color;
+
+        .icon {
+            display: block;
+            font-size: 96px;
+            line-height: 96px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        var {
+            display: block;
+            height: 64px;
+            font-size: 64px;
+            line-height: 64px;
+            font-style: normal;
+        }
+        label {
+            font-size: 17px;
+        }
+        .options {
+            margin-top: 10px;
+        }
+    }
+
+    .stats-heading {
+        font-size: 1.25em;
+        font-weight: bold;
+        margin: 0;
+        border-bottom: 1px solid $border-color;
+    }
+
+    .stats-row {
+        margin: 0 0 15px 0;
+        padding-bottom: 15px;
+        //border-bottom: 1px solid $border-color;
+
+        .stats-item {
+            margin: 0;
+            padding-top: 5px;
+        }
+
+        &:last-child {
+            border: none;
+        }
+    }
+}
+
+.alert-message {
+    margin: 0;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid $dark-green;
+    border-left: 3px solid #eee;
+    h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+    p:last-child {
+        margin-bottom: 0;
+    }
+    code {
+        background-color: #fff;
+        border-radius: 3px;
+    }
+
+    &.alert-message-success {
+        background-color: #F4FDF0;
+        border-color: $dark-green;
+    }
+    &.alert-message-success h4 {
+        color: $dark-green;
+    }
+    &.alert-message-danger {
+        background-color: #fdf7f7;
+        border-color: $red;
+    }
+    &.alert-message-danger h4 {
+        color: $red;
+    }
+    &.alert-message-warning {
+        background-color: #fcf8f2;
+        border-color: $orange;
+    }
+    &.alert-message-warning h4 {
+        color: $orange;
+    }
+    &.alert-message-info {
+        background-color: #f4f8fa;
+        border-color: $light-blue;
+    }
+    &.alert-message-info h4 {
+        color: $light-blue;
+    }
+    &.alert-message-default {
+        background-color: #EEE;
+        border-color: $gray;
+    }
+    &.alert-message-default h4 {
+        color: #000;
+    }
+    &.alert-message-notice {
+        background-color: #FCFCDD;
+        border-color: #BDBD89;
+    }
+    &.alert-message-notice h4 {
+        color: #444;
+    }
 }
