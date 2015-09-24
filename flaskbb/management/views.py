@@ -128,12 +128,12 @@ def edit_user(user_id):
     member_group = db.and_(*[db.not_(getattr(Group, p)) for p in
                              ['admin', 'mod', 'super_mod', 'banned', 'guest']])
 
-    filt = db.or_(Group.id.in_(g.id for g in user.groups), member_group)
+    filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
 
-    if any(user.permissions[p] for p in ['super_mod', 'admin']):
+    if any(current_user.permissions[p] for p in ['super_mod', 'admin']):
         filt = db.or_(filt, Group.mod)
 
-    if user.permissions['admin']:
+    if current_user.permissions['admin']:
         filt = db.or_(filt, Group.admin, Group.super_mod)
 
     group_query = Group.query.filter(filt)
