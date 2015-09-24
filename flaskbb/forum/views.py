@@ -15,7 +15,7 @@ from flask import (Blueprint, redirect, url_for, current_app,
                    request, flash)
 from flask_login import login_required, current_user
 from flask_babelex import gettext as _
-from flask_allows import Permission, Or
+from flask_allows import Permission, And
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
@@ -343,8 +343,8 @@ def manage_forum(forum_id, slug=None):
             new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
             # check the permission in the current forum and in the new forum
 
-            if not Permission(Or(IsAtleastModeratorInForum(new_forum_id),
-                                 IsAtleastModeratorInForum(forum_instance.id))):
+            if not Permission(And(IsAtleastModeratorInForum(new_forum_id),
+                                  IsAtleastModeratorInForum(forum_instance.id))):
                 flash(_("You do not have the permissions to move this topic."),
                       "danger")
                 return redirect(mod_forum_url)
