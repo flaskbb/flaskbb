@@ -27,6 +27,9 @@ class IsAuthed(Requirement):
 
 
 class IsModeratorInForum(IsAuthed):
+    def __init__(self, forum_id=None):
+        self.forum_id = forum_id
+
     def fulfill(self, user, request):
         moderators = self._get_forum_moderators(request)
         return (super(IsModeratorInForum, self).fulfill(user, request) and
@@ -36,7 +39,15 @@ class IsModeratorInForum(IsAuthed):
         return user in moderators
 
     def _get_forum_moderators(self, request):
-        return self._get_forum_from_request(request).moderators
+        return self._get_forum(request).moderators
+
+    def _get_forum(self, request):
+        if self.forum_id is not None:
+            return self._get_forum_from_id()
+        return self._get_forum_from_request()
+
+    def _get_forum_from_id(self):
+        return Forum.query.get(self.forum_id)
 
     def _get_forum_from_request(self, request):
         view_args = request.view_args
@@ -100,6 +111,9 @@ class ForumNotLocked(Requirement):
             return Forum.query.get(view_args['forum_id'])
 
 
+def IsAtleastModeratorInForum(forum_id=None):
+    return Or(IsAtleastSuperModerator, IsModeratorInForum(forum_id))
+
 IsMod = And(IsAuthed(), Has('mod'))
 IsSuperMod = And(IsAuthed(), Has('super_mod'))
 IsAdmin = And(IsAuthed(), Has('admin'))
@@ -130,4 +144,4 @@ CanPostTopic = Or(And(Has('posttopic'), ForumNotLocked()),
 
 CanDeleteTopic = Or(And(IsSameUser(), Has('deletetopic'), TopicNotLocked()),
                     IsAtleastSuperModerator,
-                    And(IsModeratorInForum, Has('deletetopic')))
+                    And(IsModeratorInForum(), Has('deletetopic')))

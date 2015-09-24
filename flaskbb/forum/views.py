@@ -12,17 +12,21 @@
 import datetime
 
 from flask import (Blueprint, redirect, url_for, current_app,
-                   request, flash, jsonify)
+                   request, flash)
 from flask_login import login_required, current_user
 from flask_babelex import gettext as _
-
+from flask_allows import Permission, Or
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
                                    render_template, do_topic_action)
-from flaskbb.utils.permissions import (can_post_reply, can_post_topic,
-                                       can_delete_topic, can_delete_post,
-                                       can_edit_post, can_moderate)
+
+from flaskbb.utils.requirements import (CanPostReply, CanPostTopic,
+                                        IsAtleastModeratorInForum,
+                                        CanDeleteTopic, CanEditPost,
+                                        CanDeletePost)
+
+
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
@@ -125,7 +129,7 @@ def view_topic(topic_id, slug=None):
     topic.update_read(current_user, topic.forum, forumsread)
 
     form = None
-    if can_post_reply(user=current_user, topic=topic):
+    if Permission(CanPostReply):
         form = QuickreplyForm()
         if form.validate_on_submit():
             post = form.save(current_user, topic)
@@ -155,7 +159,7 @@ def view_post(post_id):
 def new_topic(forum_id, slug=None):
     forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
 
-    if not can_post_topic(user=current_user, forum=forum_instance):
+    if not Permission(CanPostTopic):
         flash(_("You do not have the permissions to create a new topic."),
               "danger")
         return redirect(forum.url)
@@ -183,7 +187,7 @@ def new_topic(forum_id, slug=None):
 def delete_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_delete_topic(user=current_user, topic=topic):
+    if not Permission(CanDeleteTopic):
         flash(_("You do not have the permissions to delete this topic."),
               "danger")
         return redirect(topic.forum.url)
@@ -200,7 +204,7 @@ def delete_topic(topic_id=None, slug=None):
 def lock_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_moderate(user=current_user, forum=topic.forum):
+    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
         flash(_("You do not have the permissions to lock this topic."),
               "danger")
         return redirect(topic.url)
@@ -216,7 +220,7 @@ def lock_topic(topic_id=None, slug=None):
 def unlock_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_moderate(user=current_user, forum=topic.forum):
+    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
         flash(_("You do not have the permissions to unlock this topic."),
               "danger")
         return redirect(topic.url)
@@ -232,7 +236,7 @@ def unlock_topic(topic_id=None, slug=None):
 def highlight_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_moderate(user=current_user, forum=topic.forum):
+    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
         flash(_("You do not have the permissions to highlight this topic."),
               "danger")
         return redirect(topic.url)
@@ -249,7 +253,7 @@ def trivialize_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     # Unlock is basically the same as lock
-    if not can_moderate(user=current_user, forum=topic.forum):
+    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
         flash(_("You do not have the permissions to trivialize this topic."),
               "danger")
         return redirect(topic.url)
@@ -272,7 +276,7 @@ def manage_forum(forum_id, slug=None):
     available_forums = Forum.query.order_by(Forum.position).all()
     available_forums.remove(forum_instance)
 
-    if not can_moderate(current_user, forum=forum_instance):
+    if not Permission(IsAtleastModeratorInForum()):
         flash(_("You do not have the permissions to moderate this forum."),
               "danger")
         return redirect(forum_instance.url)
@@ -338,8 +342,9 @@ def manage_forum(forum_id, slug=None):
 
             new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
             # check the permission in the current forum and in the new forum
-            if not can_moderate(current_user, forum_instance) or \
-                    not can_moderate(current_user, new_forum):
+
+            if not Permission(Or(IsAtleastModeratorInForum(new_forum_id),
+                                 IsAtleastModeratorInForum(forum_instance.id))):
                 flash(_("You do not have the permissions to move this topic."),
                       "danger")
                 return redirect(mod_forum_url)
@@ -359,7 +364,7 @@ def manage_forum(forum_id, slug=None):
 def new_post(topic_id, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not can_post_reply(user=current_user, topic=topic):
+    if not Permission(CanPostReply):
         flash(_("You do not have the permissions to post in this topic."),
               "danger")
         return redirect(topic.forum.url)
@@ -386,7 +391,7 @@ def reply_post(topic_id, post_id):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
     post = Post.query.filter_by(id=post_id).first_or_404()
 
-    if not can_post_reply(user=current_user, topic=topic):
+    if not Permission(CanPostReply):
         flash(_("You do not have the permissions to post in this topic."),
               "danger")
         return redirect(topic.forum.url)
@@ -412,7 +417,7 @@ def reply_post(topic_id, post_id):
 def edit_post(post_id):
     post = Post.query.filter_by(id=post_id).first_or_404()
 
-    if not can_edit_post(user=current_user, post=post):
+    if not Permission(CanEditPost):
         flash(_("You do not have the permissions to edit this post."),
               "danger")
         return redirect(post.topic.url)
@@ -443,7 +448,7 @@ def delete_post(post_id):
 
     # TODO: Bulk delete
 
-    if not can_delete_post(user=current_user, post=post):
+    if not Permission(CanDeletePost):
         flash(_("You do not have the permissions to delete this post."),
               "danger")
         return redirect(post.topic.url)
