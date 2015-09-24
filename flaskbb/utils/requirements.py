@@ -44,7 +44,7 @@ class IsModeratorInForum(IsAuthed):
     def _get_forum(self, request):
         if self.forum_id is not None:
             return self._get_forum_from_id()
-        return self._get_forum_from_request()
+        return self._get_forum_from_request(request)
 
     def _get_forum_from_id(self):
         return Forum.query.get(self.forum_id)
