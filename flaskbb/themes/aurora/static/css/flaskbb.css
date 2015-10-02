@@ -355,6 +355,16 @@ body {
       border-bottom: 1px solid #cad7e1; }
       .management-panel .management-body .panel.settings-panel .settings-meta .meta-item {
         font-weight: bold; }
+    .management-panel .management-body .panel.settings-panel .settings-content > .category-panel {
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      margin-bottom: 0; }
+      .management-panel .management-body .panel.settings-panel .settings-content > .category-panel:first-child {
+        border-top: none; }
+      .management-panel .management-body .panel.settings-panel .settings-content > .category-panel:last-child {
+        border-bottom: 1px solid #cad7e1;
+        margin-bottom: 1em; }
     .management-panel .management-body .panel.settings-panel .settings-row {
       padding: 5px 0 5px 0;
       margin: 0; }
@@ -582,6 +592,9 @@ p.flaskbb-stats {
 .btn.btn-link {
   margin: 0 5px 0 5px;
   padding: 0; }
+
+.dropdown-menu .btn-link {
+  margin: 0; }
 
 .stats {
   margin-top: 15px;

@@ -627,6 +627,19 @@ body {
                     font-weight: bold;
                 }
             }
+            .settings-content > .category-panel {
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                margin-bottom: 0;
+                &:first-child {
+                    border-top: none;
+                }
+                &:last-child {
+                    border-bottom: 1px solid $category-border;
+                    margin-bottom: 1em;
+                }
+            }
             .settings-row {
                 padding: 5px 0 5px 0;
                 margin: 0;
@@ -960,7 +973,9 @@ p.flaskbb-stats {
     margin: 0 5px 0 5px;
     padding: 0;
 }
-
+.dropdown-menu .btn-link {
+    margin: 0;
+}
 
 
 .stats {
