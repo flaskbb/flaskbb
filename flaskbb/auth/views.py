@@ -19,6 +19,8 @@ from flaskbb.email import send_reset_token
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm)
 from flaskbb.user.models import User
+from flaskbb.fixtures.settings import available_languages
+from flaskbb.utils.settings import flaskbb_config
 
 auth = Blueprint("auth", __name__)
 
@@ -88,6 +90,10 @@ def register():
     else:
         from flaskbb.auth.forms import RegisterForm
         form = RegisterForm(request.form)
+
+    form.language.choices = available_languages()
+    form.language.default = flaskbb_config['DEFAULT_LANGUAGE']
+    form.process()  # needed because a default is overriden
 
     if form.validate_on_submit():
         user = form.save()
