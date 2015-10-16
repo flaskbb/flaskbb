@@ -301,9 +301,10 @@ body {
             .post-menu {
                 padding-left: 0;
 
-                .inline-form {
-                    padding: 6px 12px;
+                .btn-icon:hover {
+                    background-color: $panel-hover;
                 }
+
             }
         }
 
@@ -638,6 +639,10 @@ body {
                 &.hover:hover {
                     background-color: $panel-hover;
                 }
+
+                .btn-icon {
+                    padding: 0 6px;
+                }
             }
 
             .settings-footer {
@@ -679,10 +684,10 @@ p.flaskbb-stats {
 
 .inline-form {
     display: inline;
-    padding: 0;
 }
 
-.inline-form .btn-icon {
+// a "link" that is actually a button
+.btn.btn-link {
     padding: 0;
 }
 
@@ -955,12 +960,6 @@ p.flaskbb-stats {
     width: 20px;
     height: 20px;
 }
-
-.btn.btn-link {
-    margin: 0 5px 0 5px;
-    padding: 0;
-}
-
 
 
 .stats {
