@@ -25,8 +25,8 @@
 </div>
 
 
-<div class="col-md-9 settings-col">
-    <div class="panel settings-panel with-left-border">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
         <div class="panel-heading settings-head">
             <span class="fa fa-flag"></span> {% trans %}Unread Reports{% endtrans %}
         </div>
@@ -65,7 +65,7 @@
                     <div class="col-md-2 col-sm-2 col-xs-2">
                         <form class="inline-form" id="read-{{report.id}}" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-flag-o text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Mark as Read{% endtrans %}"></span>
                             </button>
                         </form>

@@ -22,8 +22,8 @@
     </div>
 </div>
 
-<div class="col-md-9 settings-col">
-    <div class="panel settings-panel with-left-border">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
         <div class="panel-heading settings-head">
             <span class="fa fa-users"></span> {% trans %}Groups{% endtrans %}
         </div>
@@ -55,12 +55,12 @@
                     <div class="col-md-4 col-sm-4 col-xs-5">{{ group.name }}</div>
                     <div class="col-md-5 col-sm-5 hidden-xs">{{ group.description }}</div>
                     <div class="col-md-2 col-sm-2 col-xs-5">
-                        <a href="{{ url_for('management.edit_group', group_id = group.id) }}" class="btn btn-link">
+                        <a href="{{ url_for('management.edit_group', group_id = group.id) }}" class="btn btn-icon">
                             <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
                         <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
                             </button>
                         </form>

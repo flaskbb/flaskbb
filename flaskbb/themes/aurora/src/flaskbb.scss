@@ -373,6 +373,15 @@ body {
     }
 }
 
+.profile-picture {
+    margin: 0.5em 0;
+
+    img {
+        border-radius: 0.25em;
+        height: auto;
+        width: 8em;
+    }
+}
 
 // forum specific values
 .forum-panel {
@@ -590,6 +599,12 @@ body {
         display: none;
         padding: 15px;
     }
+
+    // overwrite default
+    .category-head {
+        font-weight: normal;
+    }
+
     .management-head {
         border-radius: 0;
         background-color: $blue;
@@ -598,15 +613,8 @@ body {
         border-radius: 0;
         padding: 0;
         .panel.settings-panel {
-            border-right: 0;
-            border-top: 0;
-            border-bottom: 0;
-            border-radius: 0;
+            border: none;
             margin-bottom: 0;
-
-            &.with-left-border {
-                border-left: 1px solid $border-color;
-            }
 
             .settings-head {
                 border-radius: 0;
@@ -621,6 +629,7 @@ body {
             }
 
             .settings-meta {
+                background-color: $panel-meta-background;
                 margin: 0;
                 padding: 5px 0 5px 0;
                 border-bottom: 1px solid $border-color;
@@ -647,6 +656,7 @@ body {
 
                 &:last-child {
                     padding-bottom: 10px;
+                    border-bottom: none !important;
                 }
 
                 &.hover:hover {
@@ -670,6 +680,13 @@ body {
     }
 }
 
+.with-left-border {
+    border-left: 1px solid $border-color;
+}
+
+.with-border-bottom {
+    border-bottom: 1px solid $border-color;
+}
 
 p.flaskbb-stats {
     margin: 0;
@@ -701,7 +718,18 @@ p.flaskbb-stats {
 
 // a "link" that is actually a button
 .btn.btn-link {
+    border: none;
+    color: #337ab7;
+    text-decoration: none;
     padding: 0;
+    // for some (yet for me unkown) reasons this required to be on the same
+    // height as for normal links (happens when using the inline-forms)
+    margin-bottom: 2px;
+
+    &:focus, &:hover {
+    color: #23527c;
+    text-decoration: underline;
+}
 }
 
 .btn-icon {
@@ -872,6 +900,7 @@ p.flaskbb-stats {
             border-bottom: none;
         }
         .nav-justified {
+            //padding-bottom: 1px;
             margin-bottom: -1px;
         }
     }
@@ -880,34 +909,28 @@ p.flaskbb-stats {
 .panel-tabs {
     .nav-tabs {
         &.nav-justified > li > a {
-            border-radius: 0;
-            border-top: none;
-            border-bottom: 1px solid $border-color;
         }
         // non-active and hover
         > li {
-            > a {
+            a {
                 color: $header-subtitle-font-color;
+                border: 1px solid $blue;
+
                 // different background color when hovering
                 &:hover, &:focus {
                     background-color: $fresh-blue;
-                    border-color: transparent;
-                    border-top: none;
-                    border-bottom: 1px solid $border-color;
+                    border: 1px solid $fresh-blue;
+                    border-radius: 0;
                 }
             }
         }
         // active and hover
         > li.active {
-            > a, a:hover, a:focus {
+            a, a:hover, a:focus {
                 color: $header-title-font-color;
                 background-color: $fresh-blue;
-                border-color: $border-color;
-                border-bottom-color: transparent;
-                border-top: none;
-                border-left: none;
-                border-right: none;
-                border-bottom: 1px solid $border-color;
+                border: 1px solid $fresh-blue;
+                border-radius: 0;
             }
         }
     }

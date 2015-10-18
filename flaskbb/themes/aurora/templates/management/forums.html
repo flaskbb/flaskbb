@@ -24,8 +24,8 @@
 </div>
 
 
-<div class="col-md-9 settings-col">
-    <div class="panel settings-panel with-left-border">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
         <div class="panel-heading settings-head">
             <span class="fa fa-comments"></span> {% trans %}Manage Forums{% endtrans %}
         </div>
@@ -37,15 +37,21 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-left">
-                                    <a href="{{ category.url }}">{{ category.title }}</a>
+                                    <a href="{{ category.url }}"><strong>{{ category.title }}</strong></a>
                                 </div>
                                 <div class="pull-right">
-                                <a href="{{ url_for('management.add_forum', category_id=category.id) }}">{% trans %}Add Forum{% endtrans %}</a>
-                                <a href="{{ url_for('management.edit_category', category_id = category.id) }}">{% trans %}Edit{% endtrans %}</a>
-                                <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                                </form>
+                                    <a class="btn btn-xs btn-default" href="{{ url_for('management.add_forum', category_id=category.id) }}">
+                                        <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
+                                    </a>
+                                    <a class="btn btn-xs btn-success" href="{{ url_for('management.edit_category', category_id = category.id) }}">
+                                        <span class="fa fa-pencil"></span> {% trans %}Edit Category{% endtrans %}
+                                    </a>
+                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-xs btn-danger">
+                                            <span class="fa fa-trash"></span> {% trans %}Delete Category{% endtrans %}
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -54,11 +60,8 @@
                     <div class="panel-body category-body">
                         <div class="category-meta">
                             <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Forum{% endtrans %}</div>
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics{% endtrans %}</div>
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Posts{% endtrans %}</div>
-                            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
-
-                            </div>
+                            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics / Posts{% endtrans %}</div>
+                            <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post"></div>
                         </div>
                         {% for forum in category.forums %}
                         <div class="row category-row hover">
@@ -87,17 +90,21 @@
 
                             <!-- Post Cunt -->
                             <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
-                                -
+                                - -
                             </div>
 
-                            <!-- Topic Count -->
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
-                                -
-                            </div>
+                            <!-- Forum Actions -->
+                            <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
+                                <div class="forum-actions pull-right">
+                                    <a class="btn btn-sm btn-success" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
+                                        <span class="fa fa-pencil"></span> {% trans %}Edit Link{% endtrans %}
+                                    </a>
 
-                            <!-- Last Post -->
-                            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
-                                ---
+                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-sm btn-danger"><span class="fa fa-trash"></span> {% trans %}Delete Link{% endtrans %}</button>
+                                    </form>
+                                </div>
                             </div>
                             {% else %}
                             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
@@ -137,39 +144,21 @@
 
                             <!-- Post Cunt -->
                             <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
-                            {{ forum.topic_count }}
+                                {{ forum.topic_count }} / {{ forum.post_count }}
                             </div>
 
-                            <!-- Topic Count -->
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
-                            {{ forum.post_count }}
-                            </div>
-
-                            <!-- Last Post -->
-                            <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
-                                {% if forum.last_post_id %}
-                                <div class="last-post-title">
-                                    <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
-                                        {{ forum.last_post_title|crop_title }}
+                            <!-- Forum Actions -->
+                            <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
+                                <div class="forum-actions pull-right">
+                                    <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
+                                        <span class="fa fa-pencil"></span> {% trans %}Edit Forum{% endtrans %}
                                     </a>
-                                </div>
 
-                                <div class="last-post-time">
-                                    {{ forum.last_post_created|time_since }}
+                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-sm btn-danger"><span class="fa fa-trash"></span> {% trans %}Delete Forum{% endtrans %}</button>
+                                    </form>
                                 </div>
-
-                                <div class="last-post-author">
-                                    {% trans %}by{% endtrans %}
-                                    {% if forum.last_post_user_id %}
-                                    <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
-                                    {% else %}
-                                    {{ forum.last_post_username }}
-                                    {% endif %}
-                                </div>
-
-                                {% else %}
-                                {% trans %}No posts.{% endtrans %}
-                                {% endif %} {# endif forum.last_post_id #}
                             </div>
 
                         {% endif %} {# endif forum.external #}
@@ -183,14 +172,4 @@
         </div>
     </div>
 </div>
-{#
-
-
-                                    <a href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button>
-                                    </form>
-#}
-
 {% endblock %}

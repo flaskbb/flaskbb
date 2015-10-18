@@ -27,8 +27,8 @@
     </div>
 </div><!--/.col-md-3 -->
 
-<div class="col-md-9 settings-col">
-    <div class="panel settings-panel with-left-border">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
         <div class="panel-heading settings-head">
 
             <span class="fa fa-user-times"></span> {% trans %}Banned Users{% endtrans %}
@@ -92,7 +92,7 @@
                         <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
                             </button>
                         </form>

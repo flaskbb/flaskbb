@@ -27,8 +27,8 @@
     </div>
 </div><!--/.col-md-3 -->
 
-<div class="col-md-9 settings-col">
-    <div class="panel settings-panel with-left-border">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
         <div class="panel-heading settings-head">
 
             <span class="fa fa-user"></span> {% trans %}Users{% endtrans %}
@@ -99,7 +99,7 @@
                     <div class="col-md-2 col-sm-2 col-xs-3">{{ user.primary_group.name }}</div>
                     <div class="col-md-2 col-sm-2 col-xs-2">
                     {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
-                        <a href="{{ url_for('management.edit_user', user_id = user.id) }}" class="btn btn-link">
+                        <a href="{{ url_for('management.edit_user', user_id = user.id) }}" class="btn btn-icon">
                             <span class="fa fa-pencil" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
                     {% endif %}
@@ -108,7 +108,7 @@
                         <form class="inline-form" id="ban-{{user.id}}" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="{% trans %}Ban{% endtrans %}"></span>
                             </button>
                         </form>
@@ -118,7 +118,7 @@
                         <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
                             </button>
                         </form>
@@ -128,7 +128,7 @@
                         <form class="inline-form" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-link">
+                            <button class="btn btn-icon">
                                 <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
                             </button>
                         </form>
