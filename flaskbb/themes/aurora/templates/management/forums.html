@@ -1,6 +1,15 @@
 {% set page_title = _("Forums") %}
 
 {% extends theme("management/management_layout.html") %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="active">{% trans %}Forums{% endtrans %}</li>
+</ol>
+{% endblock %}
+
 {% block management_content %}
 {% from theme('macros.html') import render_pagination, navlink with context %}
 

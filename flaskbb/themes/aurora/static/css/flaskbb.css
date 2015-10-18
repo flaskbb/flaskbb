@@ -156,8 +156,8 @@ body {
     position: absolute; }
     .topic-body .post-box .post-footer .post-menu {
       padding-left: 0; }
-      .topic-body .post-box .post-footer .post-menu .inline-form {
-        padding: 6px 12px; }
+      .topic-body .post-box .post-footer .post-menu .btn-icon:hover {
+        background-color: #f8f8f8; }
 
 .author.author-horizontal {
   min-height: 9em;
@@ -372,6 +372,8 @@ body {
         padding-bottom: 10px; }
       .management-panel .management-body .panel.settings-panel .settings-row.hover:hover {
         background-color: #f8f8f8; }
+      .management-panel .management-body .panel.settings-panel .settings-row .btn-icon {
+        padding: 0 6px; }
     .management-panel .management-body .panel.settings-panel .settings-footer {
       padding-top: 5px;
       padding-left: 5px;
@@ -398,10 +400,9 @@ p.flaskbb-stats {
   padding: 0; }
 
 .inline-form {
-  display: inline;
-  padding: 0; }
+  display: inline; }
 
-.inline-form .btn-icon {
+.btn.btn-link {
   padding: 0; }
 
 .btn-icon {
@@ -588,13 +589,6 @@ p.flaskbb-stats {
   vertical-align: middle;
   width: 20px;
   height: 20px; }
-
-.btn.btn-link {
-  margin: 0 5px 0 5px;
-  padding: 0; }
-
-.dropdown-menu .btn-link {
-  margin: 0; }
 
 .stats {
   margin-top: 15px;
