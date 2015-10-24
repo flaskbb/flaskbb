@@ -1,0 +1,81 @@
+{% extends theme("layout.html") %}
+{% block content %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+<div class="page-view">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="panel page-panel">
+                <div class="panel-heading page-head">
+                    <a href="{{ user.url }}">{{ user.username }}</a>
+                </div>
+                <div class="panel-body page-body">
+                    {% block profile_sidebar %}
+                    <div class="col-md-3 col-sm-3 col-xs-12 profile-sidebar">
+                        <div class="profile-picture">
+                            {% if user.avatar %}
+                            <img src="{{ user.avatar }}" alt="{{ user.username }}'s Avatar">
+                            {% endif %}
+                        </div>
+
+                        <div class="profile-groupname">
+                            {{ user.primary_group.name }}
+                        </div>
+
+                        <div class="profile-buttons">
+                            {% if current_user.is_authenticated() %}
+                            <a class="btn btn-primary" href="{{ url_for('message.new_conversation') }}?to_user={{ user.username }}">
+                                {% trans %}Message{% endtrans %}
+                            </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="profile-lastseen"></div>
+
+                        <ul class="nav profile-sidenav">
+                            <li class="active">
+                                <a href="#overview" role="tab" data-toggle="tab">
+                                    <span class="fa fa-home"></span> {% trans %}Overview{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#info" role="tab" data-toggle="tab">
+                                    <span class="fa fa-line-chart"></span> {% trans %}Statistics{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('user.view_all_topics', username=user.username) }}">
+                                    <span class="fa fa-comments"></span> {% trans %}All Topics{% endtrans %}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ url_for('user.view_all_posts', username=user.username) }}">
+                                    <span class="fa fa-comment"></span> {% trans %}All Posts{% endtrans %}
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+                    {% endblock %}
+
+                    {% block profile_content %}
+                    {% endblock %}
+
+                </div> <!-- end profile widget -->
+            </div> <!-- end page-panel -->
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+</div> <!-- end page-view -->
+
+{% endblock %} {# content #}
+
+{% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
+{% endblock %}
