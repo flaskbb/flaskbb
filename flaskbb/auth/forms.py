@@ -83,7 +83,7 @@ class RegisterRecaptchaForm(RegisterForm):
 
 
 class ReauthForm(Form):
-    password = PasswordField(_('Password'), valdidators=[
+    password = PasswordField(_('Password'), validators=[
         DataRequired(message=_("A Password is required."))])
 
     submit = SubmitField(_("Refresh Login"))
