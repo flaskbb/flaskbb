@@ -46,7 +46,12 @@ Required Dependencies
 Now you can install the required dependencies.
 ::
 
-     $ pip install -r requirements.txt
+    $ pip install -r requirements.txt
+
+Alternatively, you can use the `make` command to install the dependencies.
+::
+
+    $ make dependencies
 
 
 Optional Dependencies
@@ -150,29 +155,19 @@ Both methods are included in the example configs.
 Installation
 ------------
 
-
-Development
-~~~~~~~~~~~
-
-For development you can create the database with the command below. This will
-additional to the database also create a few users with some example content.
+For a guided install, run
 ::
 
-    python manage.py createall
+    $ make install
 
-To test if everything has worked, run the development server with
-``python manage.py runserver``.
+or:
 
-Production
-~~~~~~~~~~
-
-Now, you can start the installation process with
-::
-
-    python manage.py initflaskbb
+    python manage.py install
 
 During the installation process you are asked about your username,
-your email address and the password for your administrator user.
+your email address and the password for your administrator user. Using the 
+`make install` command is recommended as it checks that the dependencies are also
+installed.
 
 
 Upgrading

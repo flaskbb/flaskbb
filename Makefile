@@ -1,22 +1,26 @@
-.PHONY: clean
+.PHONY: clean install help test run dependencies
 
 help:
-	    @echo "  clean      remove unwanted stuff"
-	    @echo "  install    install testend"
-	    @echo "  tests       run the testsuite"
-	    @echo "  run        run the development server"
+	@echo "  clean      remove unwanted stuff"
+	@echo "  install    install flaskbb and setup"
+	@echo "  tests      run the testsuite"
+	@echo "  run        run the development server"
+
+dependencies:requirements.txt
+	pip install -r requirements.txt
 
 clean:
-	    find . -name '*.pyc' -exec rm -f {} +
-	    find . -name '*.pyo' -exec rm -f {} +
-	    find . -name '*~' -exec rm -f {} +
-	    find . -name '__pycache__' -exec rm -rf {} +
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -rf {} +
 
 test:
-	    py.test --cov=flaskbb --cov-report=term-missing tests
+	py.test --cov=flaskbb --cov-report=term-missing tests
 
 run:
-	    python manage.py runserver
+	python manage.py runserver -dr
 
-install:
-	    python manage.py install
+install:dependencies
+	clear
+	python manage.py install
