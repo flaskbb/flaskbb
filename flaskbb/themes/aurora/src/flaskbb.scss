@@ -314,6 +314,8 @@ body {
 
 // author
 .author {
+    text-shadow: 0px 1px 0px #fff;
+
     // probably not the best name but i couldn't come up with a better one
     &.author-horizontal {
         min-height: 9em;
@@ -442,7 +444,7 @@ body {
     .category-body {
         background-color: $category-panel;
 
-        .category-meta, {
+        .category-meta {
             background-color: $category-meta-background;
             border-bottom: 1px solid $category-meta-border;
 
@@ -487,7 +489,7 @@ body {
     }
     .page-body {
         background-color: $page-panel;
-        .page-meta, {
+        .page-meta {
             background-color: $page-meta-background;
             border-bottom: 1px solid $page-meta-border;
         }
@@ -549,8 +551,7 @@ body {
             position: absolute;
             width: 0;
             height: 0;
-            border-style: solid;
-            border-color: transparent;
+            border: solid transparent;
         }
         .arrow.left:after, .arrow.left:before {
             border-left: 0;
@@ -964,7 +965,7 @@ p.flaskbb-stats {
 
 .editor > .md-editor {
     &.active {
-        border-color: none;
+        border-color: transparent;
         box-shadow: none;
     }
 
@@ -1114,8 +1115,23 @@ p.flaskbb-stats {
 }
 
 
-.profile-content {
+.page-body.profile-body {
+    background-color: $author-box-background;
+}
 
+.profile-content {
+    background-color: #fff;
+    border-left: 1px solid $border-color;
+    min-height: 34.5em;
+
+    .topic-head {
+        font-weight: normal;
+    }
+
+    .topic-created {
+        font-size: 0.75em;
+        padding-bottom: 0.75em;
+    }
 }
 
 .profile-picture {
@@ -1137,13 +1153,22 @@ p.flaskbb-stats {
 
 }
 
+.profile-sidebar-stats {
+    text-shadow: 0 1px 0 #fff;
+}
+
+.profile-groupname, .profile-online, .profile-location,
+.profile-posts, .profile-date, .profile-buttons {
+    text-align: center;
+    margin-top: 0.2em;
+}
 
 
 .profile-groupname {
     text-align: center;
-    margin-top: 20px;
-    color: #5b9bd1;
-    font-size: 16px;
+    margin-top: 0.75em;
+    color: $fresh-blue;
+    font-size: 1.2em;
     font-weight: 600;
 }
 
@@ -1153,9 +1178,10 @@ p.flaskbb-stats {
     margin-bottom: 15px;
 
     .btn {
+        text-shadow: none;
         text-transform: uppercase;
         font-size: 11px;
-        font-weight: 600;
+        font-weight: 700;
         padding: 6px 15px;
         margin-right: 5px;
     }
@@ -1164,22 +1190,24 @@ p.flaskbb-stats {
 
 .profile-sidebar {
     padding: 7px 0;
-    border-right: 1px solid $border-color;
-    ul li {
-        border-bottom: 1px solid #f0f4f7;
+    //border-right: 1px solid $border-color;
+    //background-color: $author-box-background;
 
+    ul li {
         &:last-child {
             border-bottom: none;
         }
 
         a {
-            color: #93a3b5;
+            color: $navigation-font-color;
             font-size: 14px;
             font-weight: 400;
+            border-left: 2px solid transparent;
 
             &:hover {
-                background-color: #fafcfd;
-                color: #5b9bd1;
+                background-color: $author-box-background;
+                border-right: 2px solid $fresh-blue;
+                border-left: 2px solid $fresh-blue;
             }
 
             i {
@@ -1189,12 +1217,10 @@ p.flaskbb-stats {
         }
 
         &.active {
-            border-bottom: none;
-
             a {
-                color: #5b9bd1;
-                background-color: #f6f9fb;
-                //border-right: 2px solid #5b9bd1;
+                background-color: $author-box-background;
+                border-right: 2px solid $fresh-blue;
+                border-left: 2px solid $fresh-blue;
             }
 
         }

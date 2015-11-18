@@ -11,7 +11,7 @@
                 <div class="panel-heading page-head">
                     <a href="{{ user.url }}">{{ user.username }}</a>
                 </div>
-                <div class="panel-body page-body">
+                <div class="panel-body page-body profile-body">
                     {% block profile_sidebar %}
                     <div class="col-md-3 col-sm-3 col-xs-12 profile-sidebar">
                         <div class="profile-picture">
@@ -24,40 +24,59 @@
                             {{ user.primary_group.name }}
                         </div>
 
-                        <div class="profile-buttons">
-                            {% if current_user.is_authenticated() %}
-                            <a class="btn btn-primary" href="{{ url_for('message.new_conversation') }}?to_user={{ user.username }}">
-                                {% trans %}Message{% endtrans %}
-                            </a>
-                            {% endif %}
+                        <div class="profile-online" data-toggle="tooltip" data-placement="top" title="{%- if user.lastseen -%} {{ user.lastseen|time_since }} {%- else -%} {% trans %}Never seen{% endtrans %} {%- endif -%}">
+                            {%- if user|is_online %}
+                            <span class="label label-success">online</span>
+                            {%- else %}
+                            <span class="label label-default">offline</span>
+                            {%- endif %}
                         </div>
 
-                        <div class="profile-lastseen"></div>
+                        <div class="profile-sidebar-stats">
+                            <div class="profile-posts">
+                                {{ user.post_count }} posts
+                            </div>
 
-                        <ul class="nav profile-sidenav">
+                            <div class="profile-date">
+                                {{ user.date_joined|format_date('%b %d %Y') }}
+                            </div>
+
+                            <div class="profile-buttons">
+                                {% if current_user.is_authenticated() %}
+                                <a class="btn btn-primary" href="{{url_for('message.new_conversation') }}?to_user={{ user.username }}">
+                                    {% trans %}Message{% endtrans %}
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% block profile_navigation %}
+                        <ul class="nav profile-sidenav" id="profile-tabs" role="tablist">
                             <li class="active">
-                                <a href="#overview" role="tab" data-toggle="tab">
+                                <a href="{{ user.url }}#overview" role="tab" data-toggle="tab">
                                     <span class="fa fa-home"></span> {% trans %}Overview{% endtrans %}
                                 </a>
                             </li>
+                            {#
                             <li>
-                                <a href="#info" role="tab" data-toggle="tab">
+                                <a href="{{ user.url }}#info" role="tab" data-toggle="tab">
                                     <span class="fa fa-line-chart"></span> {% trans %}Statistics{% endtrans %}
                                 </a>
                             </li>
+                            #}
                             <li>
                                 <a href="{{ url_for('user.view_all_topics', username=user.username) }}">
-                                    <span class="fa fa-comments"></span> {% trans %}All Topics{% endtrans %}
+                                    <span class="fa fa-comments"></span> {% trans %}Topics{% endtrans %}
                                 </a>
                             </li>
 
                             <li>
                                 <a href="{{ url_for('user.view_all_posts', username=user.username) }}">
-                                    <span class="fa fa-comment"></span> {% trans %}All Posts{% endtrans %}
+                                    <span class="fa fa-comment"></span> {% trans %}Posts{% endtrans %}
                                 </a>
                             </li>
                         </ul>
-
+                        {% endblock %}
                     </div>
                     {% endblock %}
 
@@ -77,5 +96,8 @@
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
+
+    $('#profile-tabs a[href="#overview"]').tab('show') // Select tab by name
+    //$('#profile-tabs a[href="#info"]').tab('show') // Select tab by name
     </script>
 {% endblock %}
