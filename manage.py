@@ -37,7 +37,7 @@ from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_default_settings, insert_mass_data,
                                     update_settings_from_fixture)
 
-# Use the development configuration if available
+# Use the production configuration if available, then development or default
 try:
     from flaskbb.configs.production import ProductionConfig as Config
 except ImportError:
