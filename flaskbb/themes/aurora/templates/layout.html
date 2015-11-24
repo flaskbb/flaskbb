@@ -20,11 +20,10 @@
         </title>
 
         {% block stylesheets %}
-        <!-- libraries and dependencies -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" >
+        <!-- syntax highlighting -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
         <!-- aurora theme -->
+        <link rel="stylesheet" href="{{ theme_static('css/styles.css') }}">
         <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
         {% endblock %}
 
