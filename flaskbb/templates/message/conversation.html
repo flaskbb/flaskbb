@@ -1,86 +1,151 @@
 {% extends theme("message/message_layout.html") %}
 
 {% block css %}
-    {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
 {% endblock %}
 
 {% block message_content %}
-<div class="panel panel-default">
-    <div class="panel-heading">Subject: <strong>{{ conversation.subject }}</strong></div>
-    <div class="panel-body">
-        <section class="conversation-list">
-            {% if conversation.draft %}
-                {% set messages = [conversation.first_message] %}
-            {% else %}
-                {% set messages = conversation.messages %}
-            {% endif %}
+{# quick check if the conversation is a draft #}
+{% if conversation.draft %}
+    {% set messages = [conversation.first_message] %}
+{% else %}
+    {% set messages = conversation.messages %}
+{% endif %}
+
+<div class="panel conversation-panel">
+    <div class="panel-heading conversation-head">
+        Subject: <strong>{{ conversation.subject }}</strong>
+    </div>
+
+    <div class="panel-body conversation-body">
+        <div class="conversation-box">
             {% for message in messages %}
             <!-- First Comment -->
-            <article class="row" id="mid{{message.id}}">
+            <div class="row conversation-row" id="mid{{message.id}}">
                 {% if current_user.id == message.user_id %}
-                <div class="col-md-2 col-sm-2 hidden-xs">
-                        <figure class="thumbnail">
-                        {% if message.user.avatar %}
-                            <img class="img-responsive" src="{{ message.user.avatar }}" />
+                <div class="col-md-2 col-sm-3 col-xs-12">
+                    <div class="conversation-author author">
+                        <!-- Registered User -->
+                        <div class="author-name"><h4><a href="{{ message.user.url }}">{{ message.user.username }}</a></h4></div>
+
+                        <!-- check if user is online or not -->
+                        {% if message.user|is_online %}
+                        <div class="author-online" data-toggle="tooltip" data-placement="top" title="online"></div>
                         {% else %}
-                            <!-- "no" avatar proudly made with Google Drawing.. because lol -->
-                            <img src="{{ url_for('static', filename='img/avatar100x100.png') }}" class="img-responsive" alt="avatar" />
+                        <div class="author-offline" data-toggle="tooltip" data-placement="top" title="offline"></div>
                         {% endif %}
-                        <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
-                    </figure>
+                        <div class="author-title"><h5>{{ message.user.primary_group.name }}</h5></div>
+
+                        {% if message.user.avatar %}
+                            <div class="author-avatar"><img src="{{ message.user.avatar }}" alt="avatar"></div>
+                        {% endif %}
+
+                        <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ message.user.date_joined|format_date('%b %d %Y') }}</div>
+                        <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ message.user.post_count }}</div>
+
+                        {% if message.user.website %}
+                        <div class="author-website"><a href="{{ message.user.website }}" rel="nofollow">{% trans %}Website{% endtrans %}</a></div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endif %}
-                <div class="col-md-10 col-sm-10">
-                    <div class="panel panel-default arrow {% if current_user.id == message.user_id %}left{% else %}right{% endif %}">
-                        <div class="panel-body">
-                            <header class="text-left">
+                <div class="col-md-10 col-sm-9 col-xs-12">
+                    <div class="conversation-message arrow {% if current_user.id == message.user_id %}left{% else %}right{% endif %}">
+                        <div class="message-box">
+
+                            <div class="text-left message-header">
                                 <time class="conversation-date" datetime="{{ message.date_created }}"><i class="fa fa-clock-o"></i> {{ message.date_created|format_date("%d %B %Y - %H:%M") }}</time>
-                            </header>
-                            <div class="conversation-message">
+                            </div>
+
+                            <div class="message-content">
                                 {{ message.message|markup|safe }}
                             </div>
+
+                            <div class="message-footer">
                             {% if conversation.draft %}
                                 <p class="text-right"><a href="{{ url_for('message.edit_conversation', conversation_id=conversation.id) }}" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i> edit</a></p>
                             {% else %}
-                                <p class="text-right"><a href="#" class="btn btn-default btn-sm reply-btn" data-message-id="{{ message.id }}"><i class="fa fa-reply"></i> reply</a></p>
+                                <p class="{% if current_user.id == message.user_id %}left{% else %}right{% endif %}"><a href="#" class="btn btn-default btn-sm reply-btn" data-message-id="{{ message.id }}"><i class="fa fa-reply"></i> reply</a></p>
                             {% endif %}
+                            </div>
+
                         </div>
                     </div>
                 </div>
                 {% if current_user.id != message.user_id %}
-                <div class="col-md-2 col-sm-2 hidden-xs">
-                        <figure class="thumbnail">
-                            {% if message.user.avatar %}
-                                <img class="img-responsive" src="{{ message.user.avatar }}" />
-                            {% else %}
-                                <img src="{{ url_for('static', filename='img/avatar100x100.png') }}" class="img-responsive" alt="avatar" />
-                            {% endif %}
-                        <figcaption class="text-center"><strong><a href="{{ message.user.url }}" class="conversation-username">{{ message.user.username }}</a></strong></figcaption>
-                    </figure>
+                <div class="col-md-2 col-sm-3 col-xs-12">
+                    <div class="conversation-author author">
+                        {% if message.user_id and message.user %}
+                        <!-- Registered User -->
+                        <div class="author-name"><h4><a href="{{ message.user.url }}">{{ message.user.username }}</a></h4></div>
+
+                        <!-- check if user is online or not -->
+                        {% if message.user|is_online %}
+                        <div class="author-online" data-toggle="tooltip" data-placement="top" title="online"></div>
+                        {% else %}
+                        <div class="author-offline" data-toggle="tooltip" data-placement="top" title="offline"></div>
+                        {% endif %}
+                        <div class="author-title"><h5>{{ message.user.primary_group.name }}</h5></div>
+
+                        {% if message.user.avatar %}
+                            <div class="author-avatar"><img src="{{ message.user.avatar }}" alt="avatar"></div>
+                        {% endif %}
+
+                        <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ message.user.date_joined|format_date('%b %d %Y') }}</div>
+                        <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ message.user.post_count }}</div>
+                        <div class="author-pm">
+                        <a href="{{ url_for('message.new_conversation') }}?to_user={{ message.user.username }}">{% trans %}Message{% endtrans %}</a>
+                        </div>
+
+                        {% if message.user.website %}
+                        <div class="author-website"><a href="{{ message.user.website }}" rel="nofollow">{% trans %}Website{% endtrans %}</a></div>
+                        {% endif %}
+
+                        {% else %}
+                        <div class="author-name"><h4>{% trans %}Deleted{% endtrans %}</h4></div>
+                        <div class="author-title"><h5>{% trans %}Guest{% endtrans %}</h5></div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endif %}
-            </article>
+            </div>
         {% endfor %}
-        </section>
+        </div>
     </div>
 </div>
+
 {% if not conversation.draft %}
-    {% from "macros.html" import render_field, render_submit_field %}
-    <form class="form" action="#" method="post">
-        {{ form.hidden_tag() }}
-
-        {{ render_field(form.message, div_class="col-sm-12 message-content", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
-
-        <div class="col-sm-12" style="padding-top: 5px">
-        {{ render_submit_field(form.submit) }}
+{% from "macros.html" import render_quickreply, render_submit_field %}
+<form class="form" action="#" method="post">
+    {{ form.hidden_tag() }}
+    <div class="row conversation-reply">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="editor-box">
+                <div class="editor">
+                    {{ render_quickreply(form.message, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
+                </div>
+                <div class="editor-submit">
+                    <div class="editor-options pull-left">
+                        <span class="label label-info">Markdown</span>
+                        <a class="label label-success" href="#">help</a> <!-- TODO: add markdown cheat sheet -->
+                        <a class="label label-success" href="#">emojis</a> <!-- TODO: add emoji cheat sheet -->
+                    </div>
+                    {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
+</form>
 {% endif %}
 
 {% endblock %}
 
 {% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
