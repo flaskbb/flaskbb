@@ -8,9 +8,9 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-// $gray-base:              #000
+$gray-base:              #000;
 // $gray-darker:            lighten($gray-base, 13.5%) // #222
-// $gray-dark:              lighten($gray-base, 20%)   // #333
+$gray-dark:              lighten($gray-base, 20%);   // #333
 // $gray:                   lighten($gray-base, 33.5%) // #555
 // $gray-light:             lighten($gray-base, 46.7%) // #777
 // $gray-lighter:           lighten($gray-base, 93.5%) // #eee
@@ -26,9 +26,9 @@
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-// $body-bg:               #fff
+$body-bg:               #e8f1f2;
 //** Global text color on `<body>`.
-// $text-color:            $gray-dark
+$text-color:            $gray-dark;
 
 //** Global textual link color.
 // $link-color:            $brand-primary
@@ -351,23 +351,23 @@
 // Basics of a navbar
 // $navbar-height:                    50px
 // $navbar-margin-bottom:             $line-height-computed
-// $navbar-border-radius:             $border-radius-base
+$navbar-border-radius:             0; //$border-radius-base
 // $navbar-padding-horizontal:        floor(($grid-gutter-width / 2))
 // $navbar-padding-vertical:          (($navbar-height - $line-height-computed) / 2)
 // $navbar-collapse-max-height:       340px
 
-// $navbar-default-color:             #777
-// $navbar-default-bg:                #f8f8f8
-// $navbar-default-border:            darken($navbar-default-bg, 6.5%)
+$navbar-default-color:             #555; //#777
+$navbar-default-bg:                #f8f8f8;
+$navbar-default-border:            #cad7e1; //darken($navbar-default-bg, 6.5%)
 
 // Navbar links
-// $navbar-default-link-color:                #777
-// $navbar-default-link-hover-color:          #333
-// $navbar-default-link-hover-bg:             transparent
-// $navbar-default-link-active-color:         #555
-// $navbar-default-link-active-bg:            darken($navbar-default-bg, 6.5%)
-// $navbar-default-link-disabled-color:       #ccc
-// $navbar-default-link-disabled-bg:          transparent
+$navbar-default-link-color:                #555;
+$navbar-default-link-hover-color:          #555;
+$navbar-default-link-hover-bg:             #e7e7e7;
+$navbar-default-link-active-color:         #555;
+$navbar-default-link-active-bg:            #e7e7e7 ;// darken($navbar-default-bg, 6.5%)
+$navbar-default-link-disabled-color:       #ccc;
+$navbar-default-link-disabled-bg:          transparent;
 
 // Navbar brand label
 // $navbar-default-brand-color:               $navbar-default-link-color
@@ -428,7 +428,7 @@
 // $nav-tabs-justified-active-link-border-color:     $body-bg
 
 //== Pills
-// $nav-pills-border-radius:                   $border-radius-base
+$nav-pills-border-radius:                    0;//$border-radius-base
 // $nav-pills-active-link-hover-bg:            $component-active-bg
 // $nav-pills-active-link-hover-color:         $component-active-color
 
@@ -684,15 +684,15 @@
 // $panel-body-padding:          15px
 // $panel-heading-padding:       10px 15px
 // $panel-footer-padding:        $panel-heading-padding
-// $panel-border-radius:         $border-radius-base
+$panel-border-radius:         0; //$border-radius-base
 
 //** Border color for elements within panels
-// $panel-inner-border:          #ddd
-// $panel-footer-bg:             #f5f5f5
+$panel-inner-border:          #cad7e1; // #ddd
+// $panel-footer-bg:             #f5f5f5;
 
 // $panel-default-text:          $gray-dark
-// $panel-default-border:        #ddd
-// $panel-default-heading-bg:    #f5f5f5
+$panel-default-border:        #cad7e1; //#ddd
+// $panel-default-heading-bg:    #f5f5f5;
 
 // $panel-primary-text:          #fff
 // $panel-primary-border:        $brand-primary

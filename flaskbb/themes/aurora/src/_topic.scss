@@ -1,0 +1,161 @@
+.topic-panel {
+    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+    margin-bottom: 0;
+    .panel-heading {
+        font-weight: bold;
+    }
+}
+
+.post-row {
+    background: $author-box-bg;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    &:not(:last-child) {
+        border-bottom: 1px solid $panel-border;
+    }
+}
+
+.post-box {
+    background: $post-box-bg;
+    border-left: 1px solid $post-box-border;
+    padding-bottom: 3em;
+    padding-left: 0;
+    padding-right: 0;
+    min-height: 19em;
+    position: relative;
+
+    &.post-horizontal {
+        border-left: none;
+        min-height: 14em;
+    }
+
+    // post meta information
+    .post-meta {
+        padding-top: 0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        margin: 0;
+        background-color: $post-meta-bg;
+        border-bottom: 1px solid $post-meta-border;
+    }
+
+    // post content
+    .post-content {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        padding-top: 0.5em;
+
+        // scale larger (than the div) images to the size of the div
+        img {
+            max-width:100%;
+            max-height:100%;
+        }
+    }
+
+    .post-signature {
+        margin-top: 2em;
+        hr {
+            height: 1px;
+            color: $post-signature-border;
+            background-color: $post-signature-border;
+            border: none;
+            margin: 0;
+            width: 25%;
+        }
+    }
+    // post footer
+    .post-footer {
+        border-top: 1px solid $post-footer-border;
+        background-color: $post-footer-bg;
+        width: 100%;
+        left: 0;
+        // push to bottom
+        bottom: 0;
+        position: absolute;
+
+        .post-menu {
+            padding-left: 0;
+
+            .btn-icon:hover {
+                background-color: $panel-hover;
+            }
+
+        }
+    }
+
+}
+
+
+// author
+.author {
+    text-shadow: 0px 1px 0px #fff;
+
+    // probably not the best name but i couldn't come up with a better one
+    &.author-horizontal {
+        min-height: 9em;
+        border-bottom: 1px solid $post-box-border;
+        .author-box {
+            float: left;
+            margin-top: 0.5em;
+            .author-avatar {
+                margin-top: 0em;
+                margin-right: 1em;
+            }
+            .author-online, .author-offline {
+                margin-top: 0.5em;
+            }
+            .author-name {
+                margin-top: -0.5em;
+            }
+        }
+    }
+
+    .author-name h4 {
+        float: left;
+        margin-bottom: 0;
+    }
+
+    .author-title h5 {
+        margin-top: 0;
+        font-weight: 600;
+        clear: both;
+    }
+
+    .author-avatar {
+        margin: 0.5em 0;
+
+        img {
+            border-radius: 0.25em;
+            height: auto;
+            width: 8em;
+        }
+    }
+
+    .author-online, .author-offline {
+        margin-top: 0.75em;
+        margin-left: 0.25em;
+        float: left;
+        width: 0.5em;
+        height: 0.5em;
+        border-radius: 50%;
+    }
+
+    .author-online {
+        background: $author-online;
+    }
+
+    .author-offline {
+        background: $author-offline;
+    }
+}
+
+.profile-picture {
+    margin: 0.5em 0;
+
+    img {
+        border-radius: 0.25em;
+        height: auto;
+        width: 8em;
+    }
+}

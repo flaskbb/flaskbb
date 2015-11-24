@@ -22,9 +22,10 @@
         {% block stylesheets %}
         <!-- syntax highlighting -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
-        <!-- aurora theme -->
+        <!-- fontawesome -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" >
+        <!-- bootstrap & aurora theme -->
         <link rel="stylesheet" href="{{ theme_static('css/styles.css') }}">
-        <link rel="stylesheet" href="{{ theme_static('css/flaskbb.css') }}">
         {% endblock %}
 
         {# for extra stylesheets. e.q. a template has to add something #}
@@ -54,7 +55,7 @@
 
                 <!-- forum menu - contains all the navigation items -->
                 {% block navigation %}
-                <div class="navbar navbar-default forum-navigation" role="navigation">
+                <div class="navbar navbar-default" role="navigation">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
                       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">

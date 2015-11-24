@@ -1,0 +1,49 @@
+// default values for the panels
+.category-body, .forum-body, .topic-body, .page-body, .conversation-body {
+    padding: 0;
+    background-color: $panel-bg;
+    .category-meta, .forum-meta, .topic-meta, .page-meta {
+        font-weight: bold;
+        padding-top: 0.5em;
+        height: 2.5em;
+        background-color: $panel-meta-bg;
+        border-bottom: 1px solid $panel-meta-border;
+    }
+    .category-row, .forum-row, .topic-row, .page-row, .post-row, .conversation-row {
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        &:not(:last-child) {
+            border-bottom: 1px solid $panel-border;
+        }
+        &.hover:hover {
+            background-color: $panel-hover;
+        }
+    }
+}
+
+// widget specific values
+.page-panel {
+    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+    .panel-heading {
+        font-weight: bold;
+    }
+}
+
+.page-panel {
+    .page-body {
+        .page-meta {
+            background-color: $panel-meta-bg;
+            border-bottom: 1px solid $panel-meta-border;
+        }
+        .row > .page-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $panel-border;
+            }
+        }
+        // if no meta information is to show, reset padding-top
+        & > :not(.page-meta) {
+            padding-top: 0.5em;
+        }
+    }
+}
