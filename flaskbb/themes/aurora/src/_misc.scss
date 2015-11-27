@@ -91,3 +91,34 @@ p.flaskbb-stats {
 .inline-form {
     display: inline;
 }
+
+.cheatsheet {
+    height: 620px;
+    h2 {
+        text-align: center;
+        font-size: 1.6em;
+        -webkit-border-radius: 2px;
+        -webkit-background-clip: padding-box;
+        -moz-border-radius: 2px;
+        -moz-background-clip: padding;
+        padding: 10px 0;
+    }
+    .typography {
+        -webkit-column-count: 3;
+           -moz-column-count: 3;
+                column-count: 3;
+        -webkit-column-gap: 4px;
+           -moz-column-gap: 4px;
+                column-gap: 4px;
+        text-align: center;
+    }
+    .code-example {
+        width: 100%;
+        position: relative;
+        span {
+            width: 50%;
+            float: left;
+            padding: 0;
+        }
+    }
+}
