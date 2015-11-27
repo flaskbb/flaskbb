@@ -18,8 +18,8 @@
             {{ horizontal_field(form.location) }}
             {{ horizontal_field(form.website) }}
             {{ horizontal_field(form.avatar) }}
-            {{ horizontal_field(form.signature, div_class="col-sm-8", rows="5", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
-            {{ horizontal_field(form.notes, div_class="col-sm-8", rows="12", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
+            {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'id': 'quickreply-editor'}) }}
+            {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'id': 'quickreply-editor'}) }}
 
             {{ horizontal_field(form.submit) }}
         </form>

@@ -3,6 +3,10 @@
 
 {% extends theme("management/management_layout.html") %}
 
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
+{% endblock %}
+
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
@@ -35,8 +39,7 @@
                         {{ form.hidden_tag() }}
                         {{ render_field(form.name) }}
 
-                        {{ render_field(form.description, rows="4", div_class="col-md-10") }}
-
+                        {{ render_field(form.description, div_class="col-sm-10 editor", rows="4", placeholder="", **{'data-provide': 'markdown', 'id': 'quickreply-editor'}) }}
                         {{ render_boolean_field(form.admin) }}
                         {{ render_boolean_field(form.super_mod) }}
 
@@ -60,4 +63,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
 {% endblock %}
