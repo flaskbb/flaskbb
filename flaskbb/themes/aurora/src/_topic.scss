@@ -1,16 +1,24 @@
 .topic-panel {
     @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
     margin-bottom: 0;
+
     .panel-heading {
         font-weight: bold;
+    }
+
+    .topic-body {
+        padding-top: 0;
+        padding-bottom: 0;
     }
 }
 
 .post-row {
     background: $author-box-bg;
     margin-top: 0;
+    margin-bottom: 0;
     padding-top: 0;
     padding-bottom: 0;
+
     &:not(:last-child) {
         border-bottom: 1px solid $panel-border;
     }
@@ -64,6 +72,7 @@
             width: 25%;
         }
     }
+
     // post footer
     .post-footer {
         border-top: 1px solid $post-footer-border;
@@ -80,12 +89,9 @@
             .btn-icon:hover {
                 background-color: $panel-hover;
             }
-
         }
     }
-
 }
-
 
 // author
 .author {
@@ -102,9 +108,11 @@
                 margin-top: 0em;
                 margin-right: 1em;
             }
+
             .author-online, .author-offline {
                 margin-top: 0.5em;
             }
+
             .author-name {
                 margin-top: -0.5em;
             }
@@ -147,15 +155,5 @@
 
     .author-offline {
         background: $author-offline;
-    }
-}
-
-.profile-picture {
-    margin: 0.5em 0;
-
-    img {
-        border-radius: 0.25em;
-        height: auto;
-        width: 8em;
     }
 }

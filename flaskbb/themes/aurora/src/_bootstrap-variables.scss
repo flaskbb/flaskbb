@@ -26,7 +26,9 @@ $gray-dark:              lighten($gray-base, 20%);   // #333
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-$body-bg:               #e8f1f2;
+//$body-bg:               #f5f8fa;
+// --- or ---
+$body-bg:               #e8f1f2;;
 //** Global text color on `<body>`.
 $text-color:            $gray-dark;
 
@@ -681,6 +683,7 @@ $nav-pills-border-radius:                    0;//$border-radius-base
 //##
 
 // $panel-bg:                    #fff
+
 // $panel-body-padding:          15px
 // $panel-heading-padding:       10px 15px
 // $panel-footer-padding:        $panel-heading-padding
