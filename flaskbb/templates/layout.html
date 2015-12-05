@@ -22,8 +22,6 @@
         {% block stylesheets %}
         <!-- syntax highlighting -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
-        <!-- fontawesome -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" >
         <!-- bootstrap & aurora theme -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
         {% endblock %}
@@ -174,11 +172,8 @@
         </div> <!-- end flaskbb-layout -->
 
         {% block javascript %}
-        <!-- libraries and dependencies -->
-        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-        <!-- flaskbb's javascript -->
-        <script src="{{ url_for('static', filename='js/flaskbb.js') }}"></script>
+        <!-- jquery and bootstrap and flaskbb.js -->
+        <script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
         {% endblock %}
 
         {# for extra scripts in other templates. #}

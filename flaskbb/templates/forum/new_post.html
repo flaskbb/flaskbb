@@ -3,10 +3,6 @@
 
 {% extends theme("layout.html") %}
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
 {% block content %}
 {% from theme("macros.html") import render_quickreply, render_submit_field %}
 
@@ -55,6 +51,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}

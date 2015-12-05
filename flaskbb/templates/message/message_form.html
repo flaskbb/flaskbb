@@ -2,10 +2,6 @@
 
 {% extends theme("message/message_layout.html") %}
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
 {% block message_content %}
 {% from theme("macros.html") import render_submit_field, render_quickreply, render_field %}
 <form class="form-horizontal" role="form" method="post">
@@ -49,6 +45,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}
