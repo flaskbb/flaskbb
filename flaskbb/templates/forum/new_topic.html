@@ -31,14 +31,9 @@
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="editor-box">
                                 <div class="editor">
-                                    {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
+                                    {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                                 </div>
                                 <div class="editor-submit">
-                                    <div class="editor-options pull-left">
-                                        <span class="label label-info">Markdown</span>
-                                        <a class="label label-success" href="#">help</a> <!-- TODO: add markdown cheat sheet -->
-                                        <a class="label label-success" href="#">emojis</a> <!-- TODO: add emoji cheat sheet -->
-                                    </div>
                                     {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                                 </div>
                             </div>
@@ -47,6 +42,7 @@
                 </div>
             </div>
         </div>
+        {% include theme('editor_help.html') %}
     </form>
 </div>
 {% endblock %}

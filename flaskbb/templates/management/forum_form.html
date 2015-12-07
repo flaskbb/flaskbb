@@ -35,7 +35,7 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.title) }}
-                        {{ render_field(form.description, div_class="col-sm-10 editor", rows="4", placeholder="", **{'data-provide': 'markdown', 'id': 'quickreply-editor'}) }}
+                        {{ render_field(form.description, div_class="col-sm-10 editor", rows="4", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
                         {{ render_field(form.category) }}
                         {{ render_field(form.position) }}
                         {{ render_field(form.external) }}
@@ -45,6 +45,8 @@
                         {{ render_select_field(form.groups) }}
                         {{ render_submit_field(form.submit, div_class="form-group col-sm-5") }}
                     </div>
+
+                    {% include theme('editor_help.html') %}
                 </form>
             </div>
         </div>

@@ -152,7 +152,7 @@
             <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
                 <div class="editor-box">
                     <div class="editor quickreply">
-                            {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
+                            {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                     </div>
                     <div class="editor-submit">
                         {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
@@ -161,7 +161,7 @@
             </div>
         </div>
     </form>
-    {% include theme('markdown_help.html') %}
+    {% include theme('editor_help.html') %}
     {% endif %}
 
 </div>
