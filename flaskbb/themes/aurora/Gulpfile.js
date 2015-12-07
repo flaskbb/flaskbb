@@ -71,7 +71,8 @@ gulp.task('editor-scripts', function() {
                      config.bowerDir + '/marked/lib/marked.js',
                      config.bowerDir + '/bootstrap-markdown/js/bootstrap-markdown.js',
                      config.bowerDir + '/jquery-textcomplete/dist/jquery.textcomplete.min.js',
-                     config.jsPath + '/emoji.js'])
+                     config.jsPath + '/emoji.js',
+                     config.jsPath + '/editor.js'])
         .pipe(concat('editor.min.js'))
         .pipe(uglify())
         .pipe(gulp.dest(config.jsPath));
