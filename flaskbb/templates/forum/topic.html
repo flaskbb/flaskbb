@@ -155,36 +155,13 @@
                             {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'id': 'quickreply-editor'}) }}
                     </div>
                     <div class="editor-submit">
-                        <div class="editor-options pull-left">
-                            <span class="label label-info">Markdown</span>
-
-                            <a href="#" class="label label-success" data-toggle="modal" data-target="#markdown-cheatsheet">
-                                help
-                            </a>
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="markdown-cheatsheet" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="myModalLabel">Markdown Cheatsheet</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            {% include theme("markdown_help.html") %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a class="label label-success" href="#">emojis</a> <!-- TODO: add emoji cheat sheet -->
-                        </div>
                         {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                     </div>
                 </div>
             </div>
         </div>
     </form>
+    {% include theme('markdown_help.html') %}
     {% endif %}
 
 </div>
@@ -192,33 +169,10 @@
 
 {% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
+
     <script>
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     })
-
-    $('#quickreply-editor').textcomplete([
-        { // emoji strategy
-            match: /\B:([\-+\w]*)$/,
-            search: function (term, callback) {
-                callback($.map(emojies, function (emoji) {
-                    return emoji.indexOf(term) === 0 ? emoji : null;
-                }));
-            },
-            template: function (value) {
-                return '<img class="emoji" src="/static/emoji/' + value + '.png"></img>' + value;
-            },
-            replace: function (value) {
-                return ':' + value + ': ';
-            },
-            index: 1
-        },
-    ], {
-        onKeydown: function (e, commands) {
-            if (e.ctrlKey && e.keyCode === 74) { // CTRL-J
-                return commands.KEY_ENTER;
-            }
-        }
-    });
     </script>
 {% endblock %}

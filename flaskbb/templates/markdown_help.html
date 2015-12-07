@@ -1,43 +1,60 @@
-<div class="cheatsheet">
-    <h2>Typography</h2>
-    <div class="typography">
-        <span >
-            # Header1 <br>
-            ## Header2 <br>
-        </span>
-        <span>
-            * Unordered item1 <br>
-            * Unordered item2 <br>
-        </span>
-        <span>
-            1. Ordered item1 <br>
-            2. Ordered item2 <br>
-        </span>
+<!-- Modal -->
+<div class="modal fade" id="editor-help" tabindex="-1" role="dialog" aria-labelledby="editor-help">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="editor-help">Editor Cheatsheet</h4>
+            </div>
+            <div class="modal-body">
+                <div class="cheatsheet">
+                    <h2>Emojis</h2>
+                    <div class="emojis">
+                        A full list of available emojis can be found <a href="http://www.emoji-cheat-sheet.com/">here</a>.
+                    </div>
 
-    </div>
-    <p class="text-center" style="margin-top: 1em;">*<em>Emphasized text</em>*</p>
-    <p class="text-center">**<strong>Bold Text</strong>**</p>
-    <p class="text-center">*** (Horizontal rule)</p>
-    <p class="text-center">> Blockquote</p>
-    <h2>Links</h2>
-    <p class="text-center">[Google](http://www.google.com)</p>
-    <p class="text-center">[Google](http://www.google.com "Google")</p>
-    <p class="text-center">&hellip;</p>
-    <p class="text-center">![Img Description](/path/to/kittens.jpg)</p>
-    <p class="text-center">[![Description](http://kittens.com/kitty.jpg)](http://google.com)</p>
-    <h2>Code</h2>
-    <div class="code-hints" style="margin-top: 2em;">
-        <div class="code-example">
-            <span style="padding: 0.6em 0 0 2em;">
-                ``` python <br>
-                print "Hello world"<br>
-                ```
-            </span>
-            <span>{{ '``` python\r print "Hello World" \n```' | markup | safe }}</span>
+                    <h2>Typography</h2>
+                    <div class="typography">
+                        <span >
+                            # Header1 <br>
+                            ## Header2 <br>
+                        </span>
+                        <span>
+                            * Unordered item1 <br>
+                            * Unordered item2 <br>
+                        </span>
+                        <span>
+                            1. Ordered item1 <br>
+                            2. Ordered item2 <br>
+                        </span>
+                    </div>
+                    <p class="text-center" style="margin-top: 1em;">*<em>Emphasized text</em>*</p>
+                    <p class="text-center">**<strong>Bold Text</strong>**</p>
+                    <p class="text-center">*** (Horizontal rule)</p>
+                    <p class="text-center">> Blockquote</p>
+                    <h2>Links</h2>
+                    <p class="text-center">[Google](http://www.google.com)</p>
+                    <p class="text-center">[Google](http://www.google.com "Google")</p>
+                    <p class="text-center">&hellip;</p>
+                    <p class="text-center">![Img Description](/path/to/kittens.jpg)</p>
+                    <p class="text-center">[![Description](http://kittens.com/kitty.jpg)](http://google.com)</p>
+                    <h2>Code</h2>
+                    <div class="code-hints" style="margin-top: 2em;">
+                        <div class="code-example">
+                            <span>
+                            ```python <br>
+                            print "Hello world"<br>
+                            ```
+                            </span>
+
+                            <span class="markup">{{ '```python\r print "Hello World"\n```' | markup | safe }}</span>
+                        </div>
+                    </div>
+                    <p class="credit text-center" style="bottom: 10px; position: absolute; left: 0; right: 0; margin: 0 auto">
+                        <small>For a more detailed info visit the <a href="http://daringfireball.net/projects/markdown/basics">official Markdown website</a></small>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-
-    <p class="credit text-center" style="bottom: 10px; position: absolute; left: 0; right: 0; margin: 0 auto">
-        <small>For a more detailed info visit the <a href="http://daringfireball.net/projects/markdown/basics">official Markdown website</a></small>
-    </p>
 </div>
