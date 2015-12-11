@@ -3,9 +3,13 @@
 {% extends theme("layout.html") %}
 {% block content %}
 
-<div class="well">
-    <h1>{% trans %}Server Error{% endtrans %}</h1>
-    <p>{% trans %}Something went wrong!{% endtrans %}</p>
+<div class="panel page-panel">
+    <div class="panel-body page-body">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h1>{% trans %}Server Error{% endtrans %}</h1>
+            <p>{% trans %}Something went wrong!{% endtrans %}</p>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

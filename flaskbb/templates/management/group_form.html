@@ -2,29 +2,40 @@
 {% set active_management_group_nav=True %}
 
 {% extends theme("management/management_layout.html") %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="active">{% trans %}Manage Groups{% endtrans %}</li>
+</ol>
+{% endblock %}
+
 {% block management_content %}
 {% from theme("macros.html") import render_field, render_boolean_field, render_submit_field, navlink with context %}
 
-<div class="col-md-3">
-    <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.groups', _("Manage Groups")) }}
-        {{ navlink('management.add_group', _("Add Group")) }}
-    </ul>
+<div class="col-md-3 settings-col">
+    <div class="nav-sidebar">
+        <ul class="nav">
+            {{ navlink('management.groups', _("Manage Groups")) }}
+            {{ navlink('management.add_group', _("Add Group")) }}
+        </ul>
+    </div>
 </div>
 
-<div class="col-md-9">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <span class="fa fa-user-plus"></span> {{ title }}
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="post">
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
+        <div class="panel-heading settings-head">
+            <span class="fa fa-user-plus"></span> {{ title }}
+        </div>
+        <div class="panel-body settings-body">
+            <div class="settings-content">
+                <form class="form-horizontal settings-form" role="form" method="post">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.name) }}
-                        {{ render_field(form.description, rows="4", div_class="col-md-12") }}
 
+                        {{ render_field(form.description, div_class="col-sm-10 editor", rows="4", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
                         {{ render_boolean_field(form.admin) }}
                         {{ render_boolean_field(form.super_mod) }}
 
@@ -40,13 +51,18 @@
                         {{ render_boolean_field(form.deletetopic) }}
                         {{ render_boolean_field(form.posttopic) }}
                         {{ render_boolean_field(form.postreply) }}
-                        <div class="row">
-                            {{ render_submit_field(form.submit, div_class="col-lg-offset-0 col-lg-9") }}
-                        </div>
-                    </form>
-                </div>
+
+                        {{ render_submit_field(form.submit, div_class="form-group col-sm-5") }}
+                    </div>
+
+                    {% include theme('editor_help.html') %}
+                </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}

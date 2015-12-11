@@ -22,7 +22,7 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import render_template
+from flaskbb.utils.helpers import render_template, time_diff, get_online_users
 from flaskbb.utils.decorators import admin_required, moderator_required
 from flaskbb.utils.permissions import can_ban_user, can_edit_user
 from flaskbb.extensions import db
@@ -40,17 +40,34 @@ management = Blueprint("management", __name__)
 @management.route("/")
 @moderator_required
 def overview():
-    python_version = "%s.%s" % (sys.version_info[0], sys.version_info[1])
-    user_count = User.query.count()
-    topic_count = Topic.query.count()
-    post_count = Post.query.count()
-    return render_template("management/overview.html",
-                           python_version=python_version,
-                           flask_version=flask_version,
-                           flaskbb_version=flaskbb_version,
-                           user_count=user_count,
-                           topic_count=topic_count,
-                           post_count=post_count)
+    # user and group stats
+    banned_users = User.query.filter(
+        Group.banned == True,
+        Group.id == User.primary_group_id
+    ).count()
+    if not current_app.config["REDIS_ENABLED"]:
+        online_users = User.query.filter(User.lastseen >= time_diff()).count()
+    else:
+        online_users = len(get_online_users())
+
+    stats = {
+        # user stats
+        "all_users": User.query.count(),
+        "banned_users": banned_users,
+        "online_users": online_users,
+        "all_groups": Group.query.count(),
+        # forum stats
+        "report_count": Report.query.count(),
+        "topic_count": Topic.query.count(),
+        "post_count": Post.query.count(),
+        # misc stats
+        "plugins": get_all_plugins(),
+        "python_version": "%s.%s" % (sys.version_info[0], sys.version_info[1]),
+        "flask_version": flask_version,
+        "flaskbb_version": flaskbb_version
+    }
+
+    return render_template("management/overview.html", **stats)
 
 
 @management.route("/settings", methods=["GET", "POST"])

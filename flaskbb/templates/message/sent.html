@@ -5,7 +5,7 @@
 {% block message_content %}
 
 {% set include_move = True %}
-{% include "message/conversation_list.html" %}
+{% include theme("message/conversation_list.html") %}
 
 {{ render_pagination(conversations, url_for("message.sent")) }}
 

@@ -114,12 +114,8 @@
 
 {%- macro render_field(field, with_label=True, div_class='', rows='') -%}
 <div class="form-group{%- if field.errors %} has-error{%- endif %}">
-    {% if div_class %}
-    <div class="{{ div_class }}">
-    {% else %}
-    <div class="col-sm-5">
-    {% endif %}
 
+    <div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-5{%- endif -%}">
         {% if with_label %}
             <label>{{ field.label.text }}</label>
         {% endif %}
@@ -222,25 +218,14 @@
 
 
 {%- macro horizontal_boolean_field(field, div_class='') -%}
-{%- if div_class %}
-<div class="{{ div_class }}">
-{%- else %}
-<div class="col-sm-offset-3 col-sm-3">
-{%- endif %}
-    <div class="checkbox">
-        {{ field(**kwargs) }}
-        {{ field_label(field) }}
-    </div>
+<div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-offset-3 col-sm-3{%- endif -%}">
+    {{ render_boolean_field(field, **kwargs) }}
 </div>
 {%- endmacro -%}
 
 
 {%- macro horizontal_submit_field(field, div_class='', input_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% else %}
-<div class="col-sm-offset-3 col-sm-9">
-{% endif %}
+<div class="{%- if div_class -%}{{ div_class }}{%- else -%}col-sm-offset-3 col-sm-3{%- endif -%}">
     {{ field(class=input_class or 'btn btn-success') }}
 </div>
 {%- endmacro -%}
@@ -300,10 +285,15 @@
 </li>
 {% endmacro %}
 
+{% macro is_active(endpoint, active=False) %}
+    {%- if endpoint == request.endpoint or active == True -%}
+        active
+    {%- endif -%}
+{% endmacro %}
 
-{% macro navlink(endpoint, name, active=False) %}
+{% macro navlink(endpoint, name, icon='', active=False) %}
 <li {% if endpoint == request.endpoint or active %}class="active"{% endif %}>
-    <a href={{ url_for(endpoint) }}>{{ name }}</a>
+    <a href="{{ url_for(endpoint) }}">{% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}</a>
 </li>
 {% endmacro %}
 
@@ -375,13 +365,34 @@
 {% endmacro %}
 
 
+{# Generates a some kind of pagination for the posts in topic in the forum view. #}
 {%- macro topic_pages(topic_obj, per_page=10) -%}
 {% set topic_pages = (topic_obj.post_count / per_page)|round|int %}
 {%- if topic_pages >  1 -%}
-<small>[
-    {% for page in range(0, topic_pages) %}
-            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }} </a>
-    {% endfor %}
-]</small>
+[
+    {%- for page in range(0, topic_pages) -%}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page+1 }}">{{ page+1 }}</a>{% if not loop.last %} {% endif %}
+    {%- endfor -%}
+]
 {%- endif -%}
+{%- endmacro -%}
+
+
+{# Generates a topic url with an anchor to the post #}
+{%- macro generate_post_url(topic, post, page) -%}
+    {%- if page > 1 -%}
+        {{ topic.url }}?page={{ page }}#pid{{ post.id }}
+    {%- else -%}
+        {{ topic.url }}#pid{{ post.id }}
+    {%- endif -%}
+{%- endmacro -%}
+
+
+{# Generates the post id for the topic. Each topic starts with the post id 1 #}
+{%- macro generate_post_id(posts, page, per_page) -%}
+    {%- if posts.page == 1 -%}
+        {{ page }}
+    {%- else -%}
+        {{ page + (posts.page - 1) * per_page }}
+    {%- endif -%}
 {%- endmacro -%}

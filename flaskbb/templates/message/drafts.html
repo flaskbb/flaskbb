@@ -6,7 +6,7 @@
 
 {% set include_move = True %}
 {% set include_edit = True %}
-{% include "message/conversation_list.html" %}
+{% include theme("message/conversation_list.html") %}
 
 {{ render_pagination(conversations, url_for("message.drafts")) }}
 

@@ -1,0 +1,49 @@
+// a "link" that is actually a button
+.btn.btn-link {
+    border: none;
+    color: #337ab7;
+    text-decoration: none;
+    padding: 0;
+    // for some (yet for me unkown) reasons this required to be on the same
+    // height as for normal links (happens when using the inline-forms)
+    margin-bottom: 2px;
+
+    &:focus, &:hover {
+    color: #23527c;
+    text-decoration: underline;
+}
+}
+
+.btn-icon {
+    font-family: 'FontAwesome';
+    font-size: 1.15em;
+    line-height: 1.50em;
+    font-weight: normal;
+    background: none;
+    border-radius: 0;
+}
+
+.icon-delete:before {
+    content: "\f014";
+    color: $red;
+}
+
+.icon-report:before {
+    content: "\f024";
+    color: $orange;
+}
+
+.icon-edit:before {
+    content: "\f040";
+    color: $green;
+}
+
+.icon-reply:before {
+    content: "\f10e";
+    color: $blue;
+}
+
+.icon-replyall:before {
+    content: "\f122";
+    color: $light-blue;
+}

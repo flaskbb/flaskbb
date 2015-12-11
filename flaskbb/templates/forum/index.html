@@ -1,41 +1,32 @@
 {% extends theme("layout.html") %}
 {% block content %}
 
-<ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-</ol>
+<div class="index-view">
+    {% for category, forums in categories %}
+        {% include theme("forum/category_layout.html") %}
+    {% endfor %}
 
-{% for category, forums in categories %}
-    {% include theme("forum/category_layout.html") %}
-{% endfor %}
-
-<!-- Forum Stats -->
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <td colspan="2">
-                <strong>{% trans %}Board Statistics{% endtrans %}</strong>
-                [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
-            </td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                {% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong> <br />
-                {% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong> <br />
-                {% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong> <br />
-            </td>
-            <td>
-                {% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}<br />
-                {% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong> <br />
-                {% if config["REDIS_ENABLED"] %}
-                {% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong> <br />
-                {% endif %}
-            </td>
-        </tr>
-
-    </tbody>
-</table>
-
+    <div class="panel page-panel">
+        <div class="panel-heading page-head">
+            {% trans %}Board Statistics{% endtrans %}
+            [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+        </div>
+        <div class="panel-body page-body">
+            <div class="row page-row">
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <p class="flaskbb-stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
+                    <p class="flaskbb-stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>
+                    <p class="flaskbb-stats">{% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong></p>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <p class="flaskbb-stats">{% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}</p>
+                    <p class="flaskbb-stats">{% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong></p>
+                    {% if config["REDIS_ENABLED"] %}
+                    <p class="flaskbb-stats">{% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

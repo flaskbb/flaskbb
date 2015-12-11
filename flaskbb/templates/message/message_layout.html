@@ -2,17 +2,19 @@
 {% block content %}
 {%- from theme('macros.html') import navlink with context -%}
 
-<ul class="breadcrumb">
+<ol class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ url_for('user.profile', username=current_user.username) }}">{{ current_user.username }}</a></li>
     <li class="active">{% trans %}Private Message{% endtrans %}</li>
-</ul>
+</ol>
 
 <div class="row">
     <div class="col-sm-2">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <a href="{{ url_for('message.new_conversation') }}" class="btn btn-success btn-compose">Compose</a>
+                <div class="sidenav-btn">
+                    <a href="{{ url_for('message.new_conversation') }}" class="btn btn-success">{% trans %}New Message{% endtrans %}</a>
+                </div>
                 {{ navlink('message.inbox', _('Inbox')) }}
                 {{ navlink('message.sent', _('Sent')) }}
                 {{ navlink('message.drafts', _('Drafts')) }}

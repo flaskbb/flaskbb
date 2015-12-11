@@ -1,0 +1,62 @@
+// category specific values
+.category-panel {
+    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+
+    .panel-heading {
+        font-weight: bold;
+    }
+
+    .category-body {
+        padding: 0;
+    }
+
+    .category-meta {
+        font-weight: bold;
+        padding-top: 0.5em;
+        height: 2.5em;
+        background-color: $panel-meta-bg;
+        border-bottom: 1px solid $panel-meta-border;
+
+        .forum-name, .forum-stats, .forum-last-post {
+            font-weight: bold;
+        }
+    }
+
+    .category-row {
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid $panel-border;
+        }
+
+        &.hover:hover {
+            background-color: $panel-hover;
+        }
+    }
+
+    .forum-info {
+        position: relative;
+
+        .forum-status {
+            float: left;
+            font-size: 2em;
+            padding-right: 0.5em;
+        }
+
+        .forum-name {
+            font-weight: bold;
+        }
+
+        .forum-moderators {
+            font-style: italic;
+        }
+    }
+
+    .forum-last-post {
+        .last-post-title {
+            font-weight: bold;
+        }
+    }
+}

@@ -1,80 +1,80 @@
 {% set page_title = _("Groups") %}
 
 {% extends theme("management/management_layout.html") %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="active">{% trans %}Manage Groups{% endtrans %}</li>
+</ol>
+{% endblock %}
+
 {% block management_content %}
 {% from theme('macros.html') import render_pagination, navlink with context %}
 
-<div class="col-md-3">
-    <ul class="nav nav-pills nav-stacked">
-        {{ navlink('management.groups', _("Manage Groups")) }}
-        {{ navlink('management.add_group', _("Add Group")) }}
-    </ul>
+<div class="col-md-3 settings-col">
+    <div class="nav-sidebar">
+        <ul class="nav">
+            {{ navlink('management.groups', _("Manage Groups")) }}
+            {{ navlink('management.add_group', _("Add Group")) }}
+        </ul>
+    </div>
 </div>
 
-<div class="col-md-9">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <span class="fa fa-users"></span> {% trans %}Groups{% endtrans %}
-                </div>
-                <div class="panel-body management-body"></div>
-
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></th>
-                                <th>#</th>
-                                <th>{% trans %}Group Name{% endtrans %}</th>
-                                <th>{% trans %}Description{% endtrans %}</th>
-                                <th>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                            <span class="fa fa-cog" style="margin-right: 0px;"></span> {% trans %}Actions{% endtrans %}
-                                        </button>
-                                        <ul class="dropdown-menu slidedown">
-                                            <li>
-                                                <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.delete_group') }}', '{% trans %}Are you sure you want to delete these Groups?{% endtrans %}')">
-                                                    <span class="fa fa-trash text-danger"></span> {% trans %}Delete selected Groups{% endtrans %}
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for group in groups.items %}
-                            <tr class="action-row">
-                                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ group.id }}" title="Select Group"/></td>
-                                <td>{{ group.id }}</td>
-                                <td><a href="#">{{ group.name }}</a></td>
-                                <td>{{ group.description }}</td>
-                                <td>
-                                    <a href="{{ url_for('management.edit_group', group_id = group.id) }}">
-                                        <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
+<div class="col-md-9 settings-col with-left-border">
+    <div class="panel settings-panel">
+        <div class="panel-heading settings-head">
+            <span class="fa fa-users"></span> {% trans %}Groups{% endtrans %}
+        </div>
+        <div class="panel-body settings-body">
+            <div class="settings-content">
+                <div class="settings-meta row">
+                    <div class="col-md-1 col-sm-1 col-xs-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
+                    <div class="col-md-4 col-sm-4 col-xs-5 meta-item">{% trans %}Group Name{% endtrans %}</div>
+                    <div class="col-md-5 col-sm-5 hidden-xs meta-item">{% trans %}Description{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 col-xs-5">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                <span class="fa fa-cog"></span> {% trans %}Actions{% endtrans %}
+                            </button>
+                            <ul class="dropdown-menu slidedown">
+                                <li>
+                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.delete_group') }}', '{% trans %}Are you sure you want to delete these Groups?{% endtrans %}')">
+                                        <span class="fa fa-trash text-danger"></span> {% trans %}Delete selected Groups{% endtrans %}
                                     </a>
-                                    <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-link">
-                                            <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-
-                    <div class="panel-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                {{ render_pagination(groups, url_for('management.groups')) }}
-                            </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+
+            {% for group in groups.items %}
+                <div class="row settings-row hover clearfix">
+                    <div class="col-md-1 col-sm-1 col-xs-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ group.id }}" title="Select Group"/></div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">{{ group.name }}</div>
+                    <div class="col-md-5 col-sm-5 hidden-xs">{{ group.description }}</div>
+                    <div class="col-md-2 col-sm-2 col-xs-5">
+                        <a href="{{ url_for('management.edit_group', group_id = group.id) }}" class="btn btn-icon">
+                            <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
+                        </a>
+                        <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-icon">
+                                <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row settings-row clearfix">
+                    <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No groups found.{% endtrans %}</div>
+                </div>
+            {% endfor %}
             </div>
+        </div>
+        <div class="panel-footer settings-footer">
+            {{ render_pagination(groups, url_for('management.groups')) }}
         </div>
     </div>
 </div>

@@ -1,0 +1,125 @@
+/* The private messages in the main navbar */
+.dropdown-messages {
+    min-width: 15em;
+    .message-subject {
+        font-style: italic;
+    }
+    .author-name {
+        font-weight: bold;
+    }
+}
+
+/* Sidebar Nav */
+.sidebar {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-shadow: none;
+    background-color: $navigation-bg;
+    border: 1px solid $border-color;
+
+    .sidenav-header {
+        display: block;
+        padding-left: 1.25em;
+        padding-bottom: 1em;
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 20px;
+        color: $navigation-color;
+        text-transform: uppercase;
+    }
+
+    .sidenav-btn {
+        padding-bottom: 1em;
+        text-transform: uppercase;
+        text-align: center;
+    }
+
+    .nav > li > a {
+        display: block;
+    }
+
+    .nav > li > a:hover,
+    .nav > li > a:focus {
+        text-decoration: none;
+        background-color: $navigation-hover-color;
+    }
+
+    .nav > .active > a,
+    .nav > .active:hover > a,
+    .nav > .active:focus > a {
+        font-weight: normal;
+        color: $navigation-color;
+        background-color: $navigation-hover-color;
+    }
+}
+
+.nav-sidebar {
+    width: 100%;
+    padding: 0;
+    a {
+        color: $navigation-color;
+    }
+    .active a {
+        cursor: default;
+        background-color: $navigation-bg;
+        color: $navigation-color;
+    }
+
+    li.active {
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+        &:first-child {
+            border-top: none;
+        }
+    }
+    .active a:hover {
+        background-color: $navigation-bg;
+    }
+}
+
+
+/* Panel tabs */
+.panel {
+    &.panel-tabs {
+        > .panel-heading {
+            padding: 0;
+            font-weight: 500;
+        }
+        .nav-tabs {
+            border-bottom: none;
+        }
+        .nav-justified {
+            //padding-bottom: 1px;
+            margin-bottom: -1px;
+        }
+    }
+}
+
+.panel-tabs {
+    .nav-tabs {
+        &.nav-justified > li > a {
+        }
+        // non-active and hover
+        > li {
+            a {
+                color: $header-subtitle-color;
+                border: 1px solid $blue;
+
+                // different background color when hovering
+                &:hover, &:focus {
+                    background-color: $fresh-blue;
+                    border: 1px solid $fresh-blue;
+                }
+            }
+        }
+        // active and hover
+        > li.active {
+            a, a:hover, a:focus {
+                color: $header-title-color;
+                background-color: $fresh-blue;
+                border: 1px solid $fresh-blue;
+            }
+        }
+    }
+}
+

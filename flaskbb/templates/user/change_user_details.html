@@ -1,17 +1,31 @@
 {% extends theme("user/settings_layout.html") %}
-{% from theme("macros.html") import horizontal_field, horizontal_select_field %}
 
 {% block settings_content %}
-<form class="form-horizontal" role="form" method="POST">
-    <legend class="">{% trans %}Change User Details{% endtrans %}</legend>
-    {{ form.hidden_tag() }}
-    {{ horizontal_select_field(form.birthday, select_class="form-control", surrounded_div="col-sm-4") }}
-    {{ horizontal_field(form.gender) }}
-    {{ horizontal_field(form.location) }}
-    {{ horizontal_field(form.website) }}
-    {{ horizontal_field(form.avatar) }}
-    {{ horizontal_field(form.signature, rows=5, div_class="col-sm-9") }}
-    {{ horizontal_field(form.notes, rows=12, div_class="col-sm-9") }}
-    {{ horizontal_field(form.submit) }}
-</form>
+{% from theme("macros.html") import horizontal_field, horizontal_select_field %}
+
+<div class="panel page-panel">
+    <div class="panel-heading page-head">
+        {% trans %}Change User Details{% endtrans %}
+    </div>
+    <div class="panel-body page-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_select_field(form.birthday, select_class="form-control", surrounded_div="col-sm-4") }}
+            {{ horizontal_field(form.gender) }}
+            {{ horizontal_field(form.location) }}
+            {{ horizontal_field(form.website) }}
+            {{ horizontal_field(form.avatar) }}
+            {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
+            {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
+
+            {{ horizontal_field(form.submit) }}
+
+            {% include theme('editor_help.html') %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}

@@ -2,179 +2,177 @@
 {% set page_title = _("%(title)s - Topic", title=topic.title) %}
 {% set active_forum_nav=True %}
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
 {% block content %}
-{% from theme('macros.html') import render_pagination, form_field %}
+{% from theme('macros.html') import render_pagination, form_field, generate_post_id, generate_post_url %}
 
-<ol class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
-    <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-    <li class="active">{{ topic.title }}</li>
-</ol>
+<div class="topic-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
+        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        <li class="active">{{ topic.title }}</li>
+    </ol>
 
-{% include 'forum/topic_controls.html' %}
+    {% include theme('forum/topic_controls.html') %}
 
-<table class="table table-bordered">
-    <tbody>
-        {% for post, user in posts.items %}
-        <tr>
-            <td >
-                <span class="pull-right">
-                    <strong>#{%- if posts.page == 1 -%} {{ loop.index }} {%- else -%} {{ loop.index + (posts.page - 1) * flaskbb_config["POSTS_PER_PAGE"] }} {%- endif -%}</strong>
-                </span>
-                <span class="pull-left">
-                    <a href="
-                    {%- if posts.page > 1 -%}
-                        {{ topic.url }}?page={{ posts.page }}#pid{{ post.id }}
-                    {%- else -%}
-                        {{ topic.url }}#pid{{ post.id }}
-                    {%- endif -%}
-                        ">{{ post.date_created|format_date('%d %B %Y') }}</a>
-                    {% if post.user_id and post.date_modified %}
-                    <small>
-                        ({% trans %}Last modified{% endtrans %}: {{ post.date_modified|format_date }} {% trans %}by{% endtrans %}
-                        <a href="{{ url_for('user.profile', username=post.modified_by) }}">
-                            {{ post.modified_by }}
-                        </a>.)
-                    </small>
-                    {% endif %}
-                </span>
-            </td>
-        </tr>
+    <div class="panel topic-panel">
+        <div class="panel-heading topic-head">
+            <a href="{{ topic.url }}">{{ topic.title }}</a>
+        </div>
+        <div class="panel-body topic-body">
+            {% for post, user in posts.items %}
+            <div id="{{ post.id }}" class="row post-row clearfix">
 
-        <tr>
-        <td>
-            <table class="table table-borderless">
-                <tr>
-                {% if post.user_id %}
-                    {% if user.avatar %}
-                    <td width="1">
-                        <img src="{{ user.avatar }}" alt="Avatar" height="100" width="100">
-                    </td>
-                    {% endif %}
-                    <td>
-                        <a href="{{ user.url }}">
-                            <span style="font-weight:bold">{{ user.username }}</span> <!-- TODO: Implement userstyles -->
-                        </a>
-                            {%- if user|is_online %}
-                            <span class="label label-success">Online</span>
-                            {%- else %}
-                            <span class="label label-default">Offline</span>
-                            {%- endif %}
-                            <div class="profile primary-group">
-                            {{ user.primary_group.name }}
-                            </div>
-                    </td>
+                <div class="author col-md-2 col-sm-3 col-xs-12">
+                    <!-- Registered User -->
+                    {% if post.user_id %}
+                    <div class="author-name"><h4><a href="{{ user.url }}">{{ user.username }}</a></h4></div>
 
-                    <td class="pull-right">
-                        {% trans %}Posts{% endtrans %}: {{ user.post_count }}<br />
-                        {% trans %}Registered since{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}<br />
-                    </td>
-                {% else %}
-                    <td>
-                        <strong>{{ post.username }}</strong>
-                        <br />
-                        {% trans %}Guest{% endtrans %}
-                    </td>
-                {% endif %}
-                </tr>
-            </table>
-        </td>
-        </tr>
-
-        <tr>
-            <td>
-                <div class="post_body" id="pid{{ post.id }}">
-                {% autoescape false %}
-                    {{ post.content|markup }}
-                    <!-- Signature Begin -->
-                    {% if post.user_id and user.signature %}
-                    <div class="signature">
-                        <hr>
-                        {{ user.signature|markup }}
-                    </div>
-                    {% endif %}
-                    <!-- Signature End -->
-                {% endautoescape %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <span class="pull-left">
-                    {% if current_user.is_authenticated() and post.user_id and post.user_id != current_user.id %}
-                    <a href="{{ url_for('message.new_conversation', to_user=post.user.username) }}">{% trans %}PM{% endtrans %}</a>
-                    {% endif %}
-                    {% if user.website %}
-                    {% if current_user.is_authenticated() %}| {% endif %}<a href="{{ user.website }}">{% trans %}Website{% endtrans %}</a>
-                    {% endif %}
-                </span>
-
-                <span class="pull-right">
-                    {% if current_user.is_authenticated() %}
-                    <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">
-                        {% trans %}Report{% endtrans %}
-                    </a> |
-                    {% endif %}
-                    {% if current_user|edit_post(post) %}
-                    <a href="{{ url_for('forum.edit_post', post_id=post.id) }}">{% trans %}Edit{% endtrans %}</a> |
-                    {% endif %}
-                    {% if topic.first_post_id == post.id %}
-                        {% if current_user|delete_topic(topic) %}
-                        <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button> |
-                        </form>
-                        {% endif %}
+                    <!-- check if user is online or not -->
+                    {% if user|is_online %}
+                    <div class="author-online" data-toggle="tooltip" data-placement="top" title="online"></div>
                     {% else %}
-                        {% if current_user|delete_post(post) %}
-                        <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">{% trans %}Delete{% endtrans %}</button> |
-                        </form>
+                    <div class="author-offline" data-toggle="tooltip" data-placement="top" title="offline"></div>
+                    {% endif %}
+                    <div class="author-title"><h5>{{ user.primary_group.name }}</h5></div>
+
+                    {% if user.avatar %}
+                        <div class="author-avatar"><img src="{{ user.avatar }}" alt="avatar"></div>
+                    {% endif %}
+
+                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}</div>
+                    <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
+                    <div class="author-pm">
+                        {% if current_user.is_authenticated() and post.user_id %}
+                        <a href="{{ url_for('message.new_conversation') }}?to_user={{ user.username }}">{% trans %}Message{% endtrans %}</a>
                         {% endif %}
-                    {% endif %}
-                    {% if current_user|can_moderate(topic.forum) %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-link">{% trans %}Ban user{% endtrans %}</button> |
-                        </form>
-                    {% endif %}
-                    {% if current_user|post_reply(topic) %}
-                        <!-- Quick quote -->
-                        <a href="#" class="quote_btn" data-post-id="{{ post.id }}">{% trans %}Quote{% endtrans %}</a> |
-                        <!-- Full quote/reply -->
-                        <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}">{% trans %}Reply{% endtrans %}</a>
-                    {% endif %}
-                </span>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    </div>
 
-{% include 'forum/topic_controls.html' %}
+                    {% if user.website %}
+                    <div class="author-website"><a href="{{ user.website }}" rel="nofollow">{% trans %}Website{% endtrans %}</a></div>
+                    {% endif %}
 
-{% if form %}
-    {% from "macros.html" import render_field, render_submit_field %}
+                    {% else %}
+                    <!-- user deleted or guest -->
+                    <div class="author-name"><h4><a href="{{ user.url }}">{{ post.username }}</a></h4></div>
+                    <div class="author-title"><h5>{% trans %}Guest{% endtrans %}</h5></div>
+                    {% endif %}
+
+                </div>
+
+                <div class="post-box col-md-10 col-sm-9 col-xs-12">
+
+                    <div class="post-meta clearfix">
+                        <div class="pull-left">
+                            <!-- Creation date / Date modified -->
+                            <a href="{{ generate_post_url(topic, post, posts.page) }}">
+                                {{ post.date_created|format_date('%d %B %Y - %H:%M') }}
+                            </a>
+                            {% if post.user_id and post.date_modified %}
+                            <small>
+                                (Last modified: {{ post.date_modified|format_date('%d %B %Y - %H:%M') }} by
+                                <a href="{{ url_for('user.profile', username=post.modified_by) }}">{{ post.modified_by }}</a>.)
+                            </small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Post number -->
+                        <div class="pull-right">
+                            <strong>#{{ generate_post_id(posts, loop.index, flaskbb_config["POSTS_PER_PAGE"]) }}</strong>
+                        </div>
+                    </div>
+
+                        <div class="post-content clearfix" id="pid{{ post.id }}">
+                        {{ post.content|markup|safe }}
+                        <!-- Signature Begin -->
+                        {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
+                        <div class="post-signature hidden-xs">
+                        <hr />
+                            {{ user.signature|markup|safe }}
+                        </div>
+                        {% endif %}
+                        <!-- Signature End -->
+                    </div>
+
+                        <div class="post-footer clearfix">
+
+                            <!-- Report/Edit/Delete/Quote Post-->
+                            <div class="post-menu pull-right">
+
+                            {% if current_user|post_reply(topic) %}
+                            <!-- Quick quote -->
+                                <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Quote this post"></a>
+                            <!-- Full quote/reply -->
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="Full Reply"></a>
+                            {% endif %}
+
+                            {% if current_user|edit_post(post) %}
+                            <!-- Edit Post -->
+                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="Edit this post"></a>
+                            {% endif %}
+                            {% if topic.first_post_id == post.id %}
+                                {% if current_user|delete_topic(topic) %}
+                                <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this topic"></button>
+                                </form>
+                                {% endif %}
+                            {% else %}
+                                {% if current_user|delete_post(post) %}
+                            <!-- Delete Post -->
+                                <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button  class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this post"></button>
+                                </form>
+                                {% endif %}
+
+                            {% endif %}
+
+                            {% if current_user.is_authenticated() %}
+                            <!-- Report post -->
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="Report this post"></a>
+                            {% endif %}
+
+                            </div> <!-- end post-menu -->
+                        </div> <!-- end footer -->
+
+                </div>
+            </div>
+            {% endfor %}
+
+        </div> <!-- end topic-body -->
+    </div> <!-- end topic-panel -->
+
+    {% include theme('forum/topic_controls.html') %}
+    {% from theme("macros.html") import render_field, render_quickreply, render_submit_field %}
+    {% if form %}
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
-
-        {{ render_field(form.content, div_class="col-sm-12 reply-content", rows="10", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
-
-        <div class="col-sm-12" style="padding-top: 5px">
-        {{ render_submit_field(form.submit) }}
+        <div class="row">
+            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
+                <div class="editor-box">
+                    <div class="editor quickreply">
+                            {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
+                    </div>
+                    <div class="editor-submit">
+                        {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
-{% endif %}
+    {% include theme('editor_help.html') %}
+    {% endif %}
 
+</div>
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
+
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 {% endblock %}

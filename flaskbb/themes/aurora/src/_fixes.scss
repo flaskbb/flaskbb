@@ -1,0 +1,67 @@
+// fix for button in <a>
+.navbar {
+    .navbar-btn {
+        &>a.btn-primary {
+          color: #fff;
+          background-color: #337ab7;
+          border-color: #2e6da4;
+        }
+        &>a.btn-primary:focus {
+          color: #fff;
+          background-color: #286090;
+          border-color: #122b40;
+        }
+        &>a.btn-primary:hover {
+          color: #fff;
+          background-color: #286090;
+          border-color: #204d74;
+        }
+    }
+
+    .navbar-nav .user-btn {
+        padding-right: 2em;
+        padding-left: 1em;
+    }
+}
+
+
+// apply the same changes as for "a" for the btn-link
+.dropdown-menu {
+    & > li .btn-link {
+        display: block;
+        padding: 3px 20px;
+        width: 100%;
+        text-align: left;
+        clear: both;
+        font-weight: normal;
+        line-height: 1.42857143;
+        color: #333;
+        white-space: nowrap;
+
+        &:hover, &:focus {
+            color: #262626;
+            text-decoration: none;
+            background-color: #f5f5f5;
+        }
+    }
+
+    & > .active {
+        .btn-link, .btn-link:hover, .btn-link:focus {
+            color: #fff;
+            text-decoration: none;
+            background-color: #337ab7;
+            outline: 0;
+        }
+    }
+
+    & > .disabled {
+        .btn-link, .btn-link:hover, .btn-link:focus {
+            color: #777;
+            text-decoration: none;
+            cursor: not-allowed;
+            background-color: transparent;
+            background-image: none;
+            filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+        }
+    }
+}
