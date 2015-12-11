@@ -10,6 +10,9 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import sys
+
+_VERSION_STR = '{0.major}{0.minor}'.format(sys.version_info)
 
 
 class DefaultConfig(object):
@@ -50,7 +53,7 @@ class DefaultConfig(object):
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
     # Searching
-    WHOOSH_BASE = os.path.join(_basedir, "whoosh_index")
+    WHOOSH_BASE = os.path.join(_basedir, "whoosh_index", _VERSION_STR)
 
     # Auth
     LOGIN_VIEW = "auth.login"

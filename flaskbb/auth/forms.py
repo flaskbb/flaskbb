@@ -12,11 +12,10 @@ from datetime import datetime
 
 from flask_wtf import Form, RecaptchaField
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
-                     SubmitField)
+                     SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
 from flask_babelex import lazy_gettext as _
-
 from flaskbb.user.models import User
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -52,6 +51,9 @@ class RegisterForm(Form):
 
     confirm_password = PasswordField(_('Confirm Password'))
 
+
+    language = SelectField(_('Language'))
+
     accept_tos = BooleanField(_("I accept the Terms of Service"), default=True)
 
     submit = SubmitField(_("Register"))
@@ -71,7 +73,8 @@ class RegisterForm(Form):
                     email=self.email.data,
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
-                    primary_group_id=4)
+                    primary_group_id=4,
+                    language=self.language.data)
         return user.save()
 
 
@@ -80,7 +83,7 @@ class RegisterRecaptchaForm(RegisterForm):
 
 
 class ReauthForm(Form):
-    password = PasswordField(_('Password'), valdidators=[
+    password = PasswordField(_('Password'), validators=[
         DataRequired(message=_("A Password is required."))])
 
     submit = SubmitField(_("Refresh Login"))
