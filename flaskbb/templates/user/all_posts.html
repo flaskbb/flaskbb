@@ -61,9 +61,20 @@
     {% else %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            {% trans %}The user has not written any posts yet.{% endtrans %}
+            <div class="alert-message alert-message-info" role="alert">
+                {% trans %}The user has not written any posts yet.{% endtrans %}
+            </div>
         </div>
     </div>
     {% endfor %}
+
+    {% if posts.items|length > 1 %}
+    <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
+        <div class="pull-left">
+            {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

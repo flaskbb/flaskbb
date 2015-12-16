@@ -189,6 +189,23 @@
 {%- endmacro -%}
 
 
+{%- macro input_group_field(field, label_text='', css_class='form-control') -%}
+    {%- if kwargs['required'] or field.flags.required -%}
+        {% if label_text %}
+            {{field(class=css_class, placeholder=label_text, required="required", **kwargs)}}
+        {% else %}
+            {{field(class=css_class, placeholder=field.label.text, required="required", **kwargs)}}
+        {% endif %}
+    {%- else -%}
+        {% if label_text %}
+            {{field(class=css_class, placeholder=label_text, **kwargs)}}
+        {% else %}
+            {{field(class=css_class, placeholder=field.label.text, **kwargs)}}
+        {% endif %}
+    {%- endif -%}
+{%- endmacro -%}
+
+
 {%- macro horizontal_select_field(field, div_class='', label_class='', select_class="form-control", surrounded_div="col-sm-4") -%}
 <div class="form-group row {%- if field.errors %} has-error{%- endif %}">
     {% if label_class %}

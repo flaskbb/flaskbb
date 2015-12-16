@@ -2,7 +2,7 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme('macros.html') import render_pagination, group_field %}
+{% from theme('macros.html') import render_pagination, input_group_field %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
@@ -18,15 +18,15 @@
         </div>
         <div class="col-md-4 col-sm-4 col-xs-4 controls-col">
             <div class="pull-right">
-              <form class="inline-form" role="form" method="post">
-                  <div class="input-group">
-                      {{ search_form.hidden_tag() }}
-                      {{ group_field(search_form.search_query) }}
-                      <span class="input-group-btn">
-                        <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
-                      </span>
-                  </div>
-              </form>
+                <form class="inline-form" role="form" method="post">
+                    {{ search_form.hidden_tag() }}
+                    <div class="input-group">
+                        {{ input_group_field(search_form.search_query) }}
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
+                        </span>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

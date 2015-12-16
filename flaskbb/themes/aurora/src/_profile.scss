@@ -12,7 +12,7 @@
             font-weight: 400;
             border-left: 2px solid transparent;
 
-            &:hover {
+            &:hover, &:visited {
                 background-color: $author-box-bg;
                 border-right: 2px solid $fresh-blue;
                 border-left: 2px solid $fresh-blue;

@@ -63,12 +63,14 @@
     {% else %}
     <div class="row">
         <div class="col-md-12 col-sm-12 co-xs-12">
-            {% trans %}The user has not opened any topics yet.{% endtrans %}
+            <div class="alert-message alert-message-info" role="alert">
+                {% trans %}The user has not opened any topics yet.{% endtrans %}
+            </div>
         </div>
     </div> <!-- end forum-row -->
     {% endfor %}
 
-    {% if topics.items|length >= 1 %}
+    {% if topics.items|length > 1 %}
     <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
         <div class="pull-left">
             {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}

@@ -55,7 +55,7 @@ gulp.task('css', ['sass'], function() {
         .pipe(gulp.dest(config.sassDestPath));
 })
 
-gulp.task('scripts', function() {
+gulp.task('main-scripts', function() {
     return gulp.src([config.bowerDir + '/jquery/dist/jquery.min.js',
                      config.bowerDir + '/bootstrap-sass/assets/javascripts/bootstrap.min.js',
                      config.jsPath + '/flaskbb.js'])
@@ -78,9 +78,12 @@ gulp.task('editor-scripts', function() {
         .pipe(gulp.dest(config.jsPath));
 })
 
+gulp.task('scripts', ['main-scripts', 'editor-scripts'], function() {});
+
 // Rerun the task when a file changes
  gulp.task('watch', function() {
      gulp.watch(config.sassPath + '/*.scss', ['css']); 
+    gulp.watch(config.jsPath + '/*.js', ['scripts'])
 });
 
-  gulp.task('default', ['bower', 'icons', 'css', 'scripts', 'editor-scripts']);
+  gulp.task('default', ['bower', 'icons', 'css', 'scripts']);
