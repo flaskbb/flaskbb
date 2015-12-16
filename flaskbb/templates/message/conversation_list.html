@@ -50,7 +50,7 @@
                     {% if include_move %}
                     <form class="inline-form" method="POST" action="{{ url_for('message.move_conversation', conversation_id=conversation.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-info btn-xs" title="Move to Trash">
+                        <button type="submit" class="btn btn-info btn-xs" title="Move to Trash" data-toggle="tooltip" data-placement="top">
                             <span class="fa fa-archive"></span>
                         </button>
                     </form>
@@ -59,7 +59,7 @@
                     {% if include_delete %}
                     <form class="inline-form" method="POST" action="{{ url_for('message.delete_conversation', conversation_id=conversation.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-danger btn-xs" title="Delete">
+                        <button type="submit" class="btn btn-danger btn-xs" title="Delete this conversation" data-toggle="tooltip" data-placement="top">
                             <span class="fa fa-trash"></span>
                         </button>
                     </form>
@@ -68,14 +68,14 @@
                     {% if include_restore %}
                     <form class="inline-form" method="POST" action="{{ url_for('message.restore_conversation', conversation_id=conversation.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                        <button type="submit" class="btn btn-success btn-xs" title="Restore">
+                        <button type="submit" class="btn btn-success btn-xs" title="Restore this conversation" data-toggle="tooltip" data-placement="top">
                             <span class="fa fa-undo"></span>
                         </button>
                     </form>
                     {% endif %}
 
                     {% if include_edit %}
-                    <a class="btn btn-success btn-xs" alt="Edit" title="Edit" href="{{ url_for('message.edit_conversation', conversation_id = conversation.id) }}">
+                    <a class="btn btn-success btn-xs" alt="Edit" title="Edit this conversation" href="{{ url_for('message.edit_conversation', conversation_id = conversation.id) }}" data-toggle="tooltip" data-placement="top">
                         <span class="fa fa-pencil"></span>
                     </a>
                     {% endif %}

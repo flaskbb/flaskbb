@@ -27,3 +27,12 @@
     </div><!--/.col-sm-9 -->
 </div><!--/.row -->
 {% endblock %}
+
+
+{% block scripts %}
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
+{% endblock %}
