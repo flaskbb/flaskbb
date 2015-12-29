@@ -141,7 +141,7 @@ fixture = (
         "description": "Change the theme and language for your forum.",
         "settings": (
             ('default_theme', {
-                'value':        "bootstrap3",
+                'value':        "aurora",
                 'value_type':   "select",
                 'extra':        {'choices': available_themes},
                 'name':         "Default Theme",
