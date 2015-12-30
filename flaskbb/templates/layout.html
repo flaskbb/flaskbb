@@ -45,8 +45,8 @@
                 {% block header %}
                 <div class="flaskbb-header">
                     <div class="flaskbb-meta">
-                        <div class="flaskbb-title">FlaskBB</div>
-                        <div class="flaskbb-subtitle">A lightweight forum software in Flask.</div>
+                        <div class="flaskbb-title">{{ flaskbb_config["PROJECT_TITLE"] }}</div>
+                        <div class="flaskbb-subtitle">{{ flaskbb_config["PROJECT_SUBTITLE"] }}</div>
                     </div>
                 </div>
                 {% endblock %}
