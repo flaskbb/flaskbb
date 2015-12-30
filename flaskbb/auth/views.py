@@ -93,7 +93,6 @@ def register():
 
     form.language.choices = available_languages()
     form.language.default = flaskbb_config['DEFAULT_LANGUAGE']
-    form.process()  # needed because a default is overriden
 
     if form.validate_on_submit():
         user = form.save()
@@ -101,6 +100,8 @@ def register():
 
         flash(_("Thanks for registering."), "success")
         return redirect(url_for("user.profile", username=current_user.username))
+
+    form.process()  # needed because a default is overriden
     return render_template("auth/register.html", form=form)
 
 
