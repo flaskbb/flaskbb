@@ -35,3 +35,60 @@ or see the list below:
 You can run a task with gulp like this:
 
 ``node_modules/gulp/bin/gulp.js watch``
+
+
+# CREATING YOUR OWN THEME
+
+If you want to create your own theme based on this theme you have to take care
+of a few things first.
+
+1. Create a new folder within the ``themes/`` folder and give it the name
+of your theme.
+2. Copy the content of the ``aurora/`` folder into your folder theme's folder.
+3. Create a new folder called ``static/`` in your themes folder.
+4. (Optional) If you plan on modifying templates you also need to create a
+``templates/`` folder where your templates are located. To edit a template,
+you have to copy them over from flaskbb's template folder into your template
+folder
+5. Add some information about your theme using the ``info.json``. Have look at
+aurora's ``info.json`` for an example.
+6. Edit the ``bower.json`` and ``package.json`` to your needs.
+7. Happy theming!
+
+In the end your folder structure should look like this:
+
+    ── example_theme/
+        ├── bower_components
+        │   └── ...
+        ├── node_modules
+        │   └── ...
+        ├── src
+        │   ├── styles.scss
+        │   ├── _aurora.scss
+        │   ├── _bootstrap-variables.scss
+        │   ├── _button.scss
+        │   ├── _category.scss
+        │   ├── _editor.scss
+        │   ├── _fixes.scss
+        │   ├── _forum.scss
+        │   ├── _management.scss
+        │   ├── _misc.scss
+        │   ├── _mixins.scss
+        │   ├── _navigation.scss
+        │   ├── _panel.scss
+        │   ├── _profile.scss
+        │   ├── _topic.scss
+        │   └── _variables.scss
+        ├── static
+        │   ├── css
+        │   ├── fonts
+        │   └── js
+        ├── templates
+        │   └── layout.html
+        ├── bower.json
+        ├── Gulpfile.js
+        ├── info.json
+        ├── LICENSE
+        ├── package.json
+        └── README.md
+
