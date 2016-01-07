@@ -1,7 +1,7 @@
 {
-    "application": "flaskbb",   // The name of the application, in our case this should always be flaskbb
-    "identifier": "aurora",     // The unique name of the theme. This identifier should match the themes folder name!
-    "name": "Aurora",           // Human readable name of the theme
+    "application": "flaskbb",
+    "identifier": "aurora",
+    "name": "Aurora",
     "author": "sh4nks",
     "license": "BSD 3-Clause",
     "description": "The default theme for FlaskBB.",

@@ -92,3 +92,15 @@ In the end your folder structure should look like this:
         ├── package.json
         └── README.md
 
+
+## info.json
+
+This file should contain following information about a theme:
+
+* ``"application": "flaskbb"`` - The name of the application, in our case this should always be flaskbb
+* ``"identifier": "aurora"`` - The unique name of the theme. This identifier should match the themes folder name!
+* ``"name": "Aurora"`` - Human readable name of the theme
+* ``"author": "sh4nks"`` - The name of the author.
+* ``"license": "BSD 3-Clause"`` - Every theme should include define a license under which terms the theme can be used.
+* ``"description": "The default theme for FlaskBB."`` - A short description about the theme. For example: "A minimalistic blue theme".
+* ``"version": "1.0.0"`` - The version of the theme.
