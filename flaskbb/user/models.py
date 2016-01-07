@@ -189,6 +189,8 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def _set_password(self, password):
         """Generates a password hash for the provided password."""
+        if not password:
+            return
         self._password = generate_password_hash(password)
 
     # Hide password encryption by exposing password field only.
