@@ -6,7 +6,7 @@
 
 {% set include_restore = True %}
 {% set include_delete = True %}
-{% include "message/conversation_list.html" %}
+{% include theme("message/conversation_list.html") %}
 
 {{ render_pagination(conversations, url_for("message.trash")) }}
 

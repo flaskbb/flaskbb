@@ -1,47 +1,80 @@
-{% extends theme('layout.html') %}
-{% from theme('macros.html') import render_pagination %}
+{% extends theme("user/profile_layout.html") %}
+{% from theme('macros.html') import render_pagination, topic_pages %}
 
-{% block content %}
-<ul class="breadcrumb">
+{% block breadcrumb %}
+<ul class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li ><a href="{{ user.url }}">{{ user.username }}</a></li>
-    <li class="active">{% trans %}All Posts{% endtrans %}</li>
+    <li><a href="{{ user.url }}">{{ user.username }}</a></li>
+    <li class="active">{% trans %}Posts{% endtrans %}</li>
 </ul>
+{% endblock %}
 
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
-</div> <!-- end span pagination -->
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>
-                {% trans user=user.username %}All Posts created by {{user}}{% endtrans %}
-            </th>
-        </tr>
-    </thead>
-    <tbody>
+{% block profile_navigation %}
+<ul class="nav profile-sidenav" id="profile-tabs" role="tablist">
+    <li>
+        <a href="{{ user.url }}">
+            <span class="fa fa-home"></span> {% trans %}Overview{% endtrans %}
+        </a>
+    </li>
+    {#
+    <li>
+        <a href="{{ user.url }}">
+            <span class="fa fa-line-chart"></span> {% trans %}Statistics{% endtrans %}
+        </a>
+    </li>
+    #}
+    <li>
+        <a href="{{ url_for('user.view_all_topics', username=user.username) }}">
+            <span class="fa fa-comments"></span> {% trans %}Topics{% endtrans %}
+        </a>
+    </li>
+
+    <li class="active">
+        <a href="{{ url_for('user.view_all_posts', username=user.username) }}">
+            <span class="fa fa-comment"></span> {% trans %}Posts{% endtrans %}
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+
+{% block profile_content %}
+<!-- middle column -->
+<div class="col-md-9 col-sm-9 col-xs-12 profile-content">
+
     {% for post in posts.items %}
-        <tr>
-            <td>
-                <strong><a href="{{ post.topic.url }}">{{ post.topic.title }}</a></strong>
-                in <a href="{{ post.topic.forum.url }}">{{ post.topic.forum.title }}</a>
-                <span class="divider"> - </span>
-                <small>{{ post.date_created|time_since }}</small>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{ post.content }}
-            </td>
-        </tr>
+    <div class="panel page-panel">
+        <div class="panel-heading page-head">
+            <a href="{{ post.topic.url }}">{{ post.topic.title }}</a>
+        </div>
+        <div class="panel-body page-body topic-content">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="topic-created">
+                    {{ post.date_created|format_date('%d %B %Y - %H:%M') }}
+                </div>
+                <div class="topic-content">
+                    {{ post.content|markup|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
     {% else %}
-        <tr>
-            <td>
-                {% trans %}No posts.{% endtrans %}
-            </td>
-        </tr>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="alert-message alert-message-info" role="alert">
+                {% trans %}The user has not written any posts yet.{% endtrans %}
+            </div>
+        </div>
+    </div>
     {% endfor %}
 
-    </tbody>
-</table>
+    {% if posts.items|length > 1 %}
+    <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
+        <div class="pull-left">
+            {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
 {% endblock %}

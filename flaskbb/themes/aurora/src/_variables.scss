@@ -1,0 +1,51 @@
+// bootstrap colros
+$blue: #337ab7;
+$fresh-blue: #0088cc;
+$light-blue: #5bc0de;
+$green: #5cb85c;
+$dark-green: #3C763D;
+$orange: #f0ad4e;
+$red: #d9534f;
+$gray: #555;
+
+
+// main colors
+$background-color: #f6f9fc; // old: #e8f1f2
+$font-color: #333;
+$border-color: #cad7e1;
+$head-background: #f5f5f5;
+$meta-background: #eaf1f5;
+$hover: #f8f8f8;
+
+$navigation-color: #555;
+$navigation-bg: #f8f8f8;
+$navigation-hover-color: #e7e7e7;
+
+// header colors
+$header-title-color: #fff;
+$header-subtitle-color: #E8F1F2;
+$header-background-primary: #0088cc;  // old: #3276b1
+$header-background-secondary: #285e8e;
+
+// panel colors
+$panel-bg: #fff;            // panel body background
+$panel-head-bg: $head-background;    // panel head background
+$panel-meta-bg: $meta-background;    // panel meta background
+$panel-meta-border: $border-color;   // panel meta (bottom) border
+$panel-border: $border-color;        // panel border (all over)
+$panel-hover: $hover;
+
+
+// post colors
+$post-box-bg: $panel-bg;
+$post-box-border: $border-color;
+$post-meta-border: $panel-meta-bg;
+$post-meta-bg: $panel-bg;
+$post-signature-border: $panel-meta-bg;
+$post-footer-border: $border-color;
+$post-footer-bg: $panel-bg;
+
+
+$author-box-bg: #e8ecf1;
+$author-online: $green;
+$author-offline: $gray;

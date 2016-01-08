@@ -3,46 +3,49 @@
 
 {% extends theme("layout.html") %}
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
 {% block content %}
-{% from theme("macros.html") import render_field, render_submit_field %}
+{% from theme("macros.html") import render_quickreply, render_submit_field %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-    <li><a href="{{ topic.url }}">{{ topic.title }} </a></li>
-    <li class="active">{% trans %}New Post{% endtrans %}</li>
-</ul>
+<div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        <li><a href="{{ topic.url }}">{{ topic.title }} </a></li>
+        <li class="active">{% trans %}New Post{% endtrans %}</li>
+    </ol>
 
-<form class="form" role="form" method="post">
-    {{ form.hidden_tag() }}
-    <h3>{% trans %}New Post{% endtrans %}</h3>
+    <form class="form-horizontal" role="form" method="post">
+        {{ form.hidden_tag() }}
+        <div class="panel page-panel">
+            <div class="panel-heading page-head">
+                {% trans %}New Post{% endtrans %}
+            </div>
 
-    {% if preview %}
-    <div class="form-group">
-        <div class="col-sm-12">
-            <label>{% trans %}Preview{% endtrans %}</label>
-            <div class="form-control preview-body">
-                {% autoescape false %}
-                {{ preview|markup }}
-                {% endautoescape %}
+            <div class="panel-body page-body">
+                {{ form.hidden_tag() }}
+                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                    <div class="form-group">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="editor-box">
+                                <div class="editor">
+                                    {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
+                                </div>
+                                <div class="editor-submit">
+                                    {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    {% endif %}
-
-    {{ render_field(form.content, div_class="col-sm-12", rows="12", placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'true', 'id': 'quickreply-editor'}) }}
-
-    {{ render_submit_field(form.submit) }}
-
-</form>
+        {% include theme('editor_help.html') %}
+    </form>
+</div>
 
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='js/marked.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-markdown.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}

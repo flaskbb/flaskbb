@@ -34,15 +34,12 @@ For a complete installation guide please visit the installation documentation
 [here](https://flaskbb.readthedocs.org/en/latest/installation.html).
 
 * Create a virtualenv
-* Install the dependencies
-    * `pip install -r requirements.txt`
 * Configuration (_adjust them accordingly to your needs_)
     * For development copy `flaskbb/configs/development.py.example` to `flaskbb/configs/development.py`
-* Create the database & populate it
-    * `python manage.py initdb`
-    * `python manage.py populate`
+* Install dependencies and FlaskBB
+    * `make install`
 * Run the development server
-    * `python manage.py runserver`
+    * `make runserver`
 * Visit [localhost:8080](http://localhost:8080)
 
 

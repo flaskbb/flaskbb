@@ -4,22 +4,28 @@
 {% block content %}
 {% from theme("macros.html") import horizontal_field %}
 
-<form class="form-horizontal" role="form" method="POST">
-    <h2>{% trans %}Register{% endtrans %}</h2>
-    <hr>
-    {{ form.hidden_tag() }}
-    {{ horizontal_field(form.username)}}
-    {{ horizontal_field(form.email)}}
-    {{ horizontal_field(form.password)}}
-    {{ horizontal_field(form.confirm_password)}}
+<div class="panel page-panel">
+    <div class="panel-heading page-head">
+        {% trans %}Register{% endtrans %}
+    </div>
 
-    {% if config["RECAPTCHA_ENABLED"] %}
-        {{ horizontal_field(form.recaptcha) }}
-    {% endif %}
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.username)}}
+            {{ horizontal_field(form.email)}}
+            {{ horizontal_field(form.password)}}
+            {{ horizontal_field(form.confirm_password)}}
 
-    {{ horizontal_field(form.accept_tos)}}
-    {{ horizontal_field(form.submit)}}
+            {% if config["RECAPTCHA_ENABLED"] %}
+                {{ horizontal_field(form.recaptcha) }}
+            {% endif %}
 
-</form>
+            {{ horizontal_field(form.language) }}
+            {{ horizontal_field(form.accept_tos)}}
+            {{ horizontal_field(form.submit)}}
+        </form>
+    </div>
+</div>
 
 {% endblock %}

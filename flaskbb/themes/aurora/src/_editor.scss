@@ -1,0 +1,53 @@
+/* Markdown Editor */
+.editor-box .editor-submit .btn {
+    margin: 0.75em 0.25em 0 0;
+}
+
+.editor-box > .quickreply {
+    padding: 0;
+}
+
+.editor {
+    min-height: 0;
+
+    .editor-options {
+        margin-top: 0.5em;
+    }
+
+    .new-message {
+        background: #fff;
+        border: 0;
+        height: 12em;
+        outline: none;
+        width: 100%
+    }
+}
+
+.editor > .md-editor {
+    border-color: $border-color;
+
+    &.active {
+        border-color: $border-color;
+    }
+
+    & > .md-footer, & >.md-header {
+        background: $navigation-bg;
+    }
+
+    & >textarea {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 1em;
+        border-top: 1px solid $border-color;
+        border-bottom: none;
+        background: #fff;
+        padding: 0 0.25em;
+    }
+
+    & >.md-preview {
+        border-top: 1px solid $border-color;
+        border-right: 1px solid $border-color;
+        border-bottom: none;
+        padding: 0 0.25em;
+        background: #eee;
+    }
+}

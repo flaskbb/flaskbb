@@ -1,0 +1,132 @@
+html {
+    // push footer to bottom
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    // Margin bottom by footer height
+    margin-bottom: 60px;
+}
+
+.emoji {
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+}
+
+.flaskbb-footer {
+    position: absolute;
+    bottom: 0;
+    // Set the fixed height of the footer here
+    height: 60px;
+    width: 100%;
+    // use the same width as container
+    padding-top: 1em;
+}
+
+.flaskbb-layout {
+    padding-top: 20px;
+}
+
+.flaskbb-header {
+    color: #fff;
+    text-align: left;
+    text-shadow: 0 1px 0 rgba(0,0,0,.1);
+    background-color: $header-background-primary;
+    background-image: -webkit-linear-gradient(top, $header-background-secondary 0%, $header-background-primary 100%);
+    background-image: linear-gradient(to bottom, $header-background-secondary 0%, $header-background-primary 100%);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$header-background-secondary', endColorstr='$header-background-primary', GradientType=0);
+    border: 1px solid $border-color;
+    border-bottom: 0;
+
+    position: relative;
+    height: 12em;
+    padding: 2.5em 2em;
+    margin-top: 2.5em;
+
+    .flaskbb-meta {
+        .flaskbb-title {
+            color: $header-title-color;
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .flaskbb-subtitle {
+            color: $header-subtitle-color;
+        }
+    }
+}
+
+.flaskbb-breadcrumb {
+    border: 1px solid $border-color;
+    border-radius: 0;
+}
+
+p.flaskbb-stats {
+    margin: 0;
+    padding: 0;
+}
+
+
+.controls-row {
+    padding: 0.5em 0;
+    margin: 0;
+
+    .pagination {
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.controls-col {
+    margin: 0;
+    padding: 0;
+}
+
+.settings-col {
+    padding: 0;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.cheatsheet {
+    h2 {
+        text-align: center;
+        font-size: 1.6em;
+        -webkit-border-radius: 2px;
+        -webkit-background-clip: padding-box;
+        -moz-border-radius: 2px;
+        -moz-background-clip: padding;
+        padding: 10px 0;
+    }
+    .emojis {
+        text-align: center;
+    }
+
+    .typography {
+        -webkit-column-count: 3;
+           -moz-column-count: 3;
+                column-count: 3;
+        -webkit-column-gap: 4px;
+           -moz-column-gap: 4px;
+                column-gap: 4px;
+        text-align: center;
+    }
+    .code-example {
+        width: 100%;
+        position: relative;
+        margin-bottom: 1em;
+        -webkit-column-count: 2;
+           -moz-column-count: 2;
+                column-count: 2;
+        -webkit-column-gap: -4px;
+           -moz-column-gap: -4px;
+                column-gap: -4px;
+        .markup {
+            padding: 0;
+        }
+    }
+}

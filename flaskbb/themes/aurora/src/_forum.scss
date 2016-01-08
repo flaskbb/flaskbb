@@ -1,0 +1,64 @@
+// forum specific values
+.forum-panel {
+    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+    margin-bottom: 0;
+
+    .panel-heading {
+        font-weight: bold;
+    }
+
+    .forum-body {
+        padding: 0;
+    }
+
+    .forum-meta {
+        font-weight: bold;
+        padding-top: 0.5em;
+        height: 2.5em;
+        background-color: $panel-meta-bg;
+        border-bottom: 1px solid $panel-meta-border;
+
+        .topic-name, .topic-stats, .topic-last-post {
+            font-weight: bold;
+        }
+    }
+
+    .topic-info {
+        position: relative;
+
+        .topic-status {
+            float: left;
+            font-size: 1.5em;
+            padding-right: 0.5em;
+
+            // why is this?
+            .topic-locked {
+                font-size: 1.5em;
+            }
+
+        }
+
+        .topic-name {
+            font-weight: bold;
+        }
+
+        .topic-pages {
+            font-weight: normal;
+            font-size: small;
+        }
+    }
+
+    .forum-row {
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid $panel-border;
+        }
+
+        &.hover:hover {
+            background-color: $panel-hover;
+        }
+    }
+}

@@ -2,10 +2,12 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="FlaskBB is a forum software written in Flask">
         <meta name="author" content="FlaskBB Team">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
         <title>
         {% block title %}
@@ -17,13 +19,11 @@
         {% endblock %}
         </title>
 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
         {% block stylesheets %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" >
+        <!-- syntax highlighting -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/flaskbb.css') }}">
+        <!-- bootstrap & aurora theme -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
         {% endblock %}
 
         {# for extra stylesheets. e.q. a template has to add something #}
@@ -36,42 +36,147 @@
     </head>
 
     <body>
-        {% block navigation %}
-            {% include theme('navigation.html') %}
-        {% endblock %}
 
+        <!-- main forum layout -->
+        <div class="flaskbb-layout">
+            <div class="container">
 
-        <div class="container">
-            {% block messages %}
+                <!-- forum header - place for the project title and subtitle -->
+                {% block header %}
+                <div class="flaskbb-header">
+                    <div class="flaskbb-meta">
+                        <div class="flaskbb-title">{{ flaskbb_config["PROJECT_TITLE"] }}</div>
+                        <div class="flaskbb-subtitle">{{ flaskbb_config["PROJECT_SUBTITLE"] }}</div>
+                    </div>
+                </div>
+                {% endblock %}
+
+                <!-- forum menu - contains all the navigation items -->
+                {% block navigation %}
+                <div class="navbar navbar-default" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                      </button>
+                    </div>
+
+                    <div class="collapse navbar-collapse">
+                        <!-- navbar left -->
+                        <ul class="nav navbar-nav forum-nav">
+                            {%- from theme("macros.html") import is_active, topnav with context -%}
+                            {{ emit_event("before-first-navigation-element") }}
+
+                            {{ topnav(endpoint='forum.index', name=_('Forum'), icon='fa fa-comment', active=active_forum_nav) }}
+                            {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='fa fa-user') }}
+                            {{ topnav(endpoint='forum.search', name=_('Search'), icon='fa fa-search') }}
+
+                            {{ emit_event("after-last-navigation-element") }}
+                        </ul>
+
+                        <!-- navbar right -->
+                        <ul class="nav navbar-nav navbar-right">
+
+                            {% if current_user and current_user.is_authenticated() %}
+                            <!-- Inbox -->
+                            <li class="dropdown {{ is_active('message.inbox') }}">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="fa fa-envelope"></span> Inbox <span class="label label-info">{{ current_user.unread_count }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-messages">
+                                    {% for message in current_user.unread_messages %}
+                                    <li>
+                                        <a href="{{ url_for('message.view_conversation', conversation_id=message.id) }}">
+                                            <div>
+                                                <span class="author-name">{{ message.from_user.username }}</span> <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
+                                                <div class="message-subject">{{ message.subject }}</div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li><a href="#">No unread messages.</a></li>
+                                    {% endfor %}
+                                    <li class="divider"></li>
+                                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Inbox{% endtrans %}</a></li>
+                                    <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- User Menu -->
+                            <li>
+                                <div class="btn-group navbar-btn user-btn">
+                                    <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
+                                        <span class="fa fa-user"></span> {{ current_user.username }}
+                                    </a>
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="{{ url_for('forum.topictracker') }}"><span class="fa fa-book"></span> {% trans %}Topic Tracker{% endtrans %}</a></li>
+                                        <li class="divider"></li>
+
+                                        <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs"></span> {% trans %}Settings{% endtrans %}</a></li>
+                                        {% if current_user|is_admin_or_moderator %}
+                                        <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog"></span> {% trans %}Management{% endtrans %}</a></li>
+                                        <li class="divider"></li>
+                                        {% endif %}
+
+                                        <li><a href="{{ url_for('auth.logout') }}"><span class="fa fa-power-off"></span> {% trans %}Logout{% endtrans %}</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            {% else %}
+                            <!-- Not logged in - Login/Register -->
+                            <li>
+                                <div class="btn-group navbar-btn user-btn">
+                                    <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
+                                        <span class="fa fa-user"></span> {% trans %}Login{% endtrans %}
+                                    </a>
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="{{ url_for('auth.register') }}">{% trans %}Register{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('auth.forgot_password') }}">{% trans %}Reset Password{% endtrans %}</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            {% endif %}
+
+                        </ul> <!-- end navbar right -->
+                    </div> <!-- end navbar-collapse -->
+                </div> <!-- end navbar -->
+                {% endblock %}
+
+                <!-- Place for all the (flashed) messages -->
+                {% block messages %}
                 <div id="flashed-messages">
                     {% include theme('flashed_messages.html') %}
                 </div>
+                {% endblock %}
+
+                <!-- the actual content block -->
+                {% block content %}
+                {% endblock %}
+            </div> <!-- end container -->
+
+            <!-- the forum footer -->
+            {% block footer %}
+            <footer class="flaskbb-footer">
+                <div class="container">
+                    <p class="text-muted pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
+                    <p class="text-muted pull-right">&copy; 2013 - 2015 <a href="http://flaskbb.org">FlaskBB.org</a></p>
+                </div>
+            </footer>
             {% endblock %}
 
-            {% block content %}
-            {% endblock %}
-        </div> <!-- /container -->
+        </div> <!-- end flaskbb-layout -->
 
-
-        {% block footer %}
-        <div id="footer">
-            <div class="container">
-                <p class="text-muted credit pull-left">powered by <a href="http://flask.pocoo.org">Flask</a></p>
-                <p class="text-muted credit pull-right">&copy; 2013 - 2015 - <a href="http://flaskbb.org">FlaskBB.org</a></p>
-            </div>
-        </div>
-        {% endblock %}
-
-
-        {# standard javascript libs #}
         {% block javascript %}
-        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/flaskbb.js') }}"></script>
+        <!-- jquery and bootstrap and flaskbb.js -->
+        <script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
         {% endblock %}
 
-
-        {# space for extra scripts - to use in other templates #}
+        {# for extra scripts in other templates. #}
         {% block scripts %}
         {% endblock %}
     </body>

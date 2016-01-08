@@ -50,3 +50,6 @@ flaskbb/configs/development.py
 *.mo
 .coverage
 flaskbb/static/emoji/*
+.sass-cache
+bower_components
+node_modules

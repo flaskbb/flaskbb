@@ -124,25 +124,35 @@ class User(db.Model, UserMixin, CRUDMixin):
     # Properties
     @property
     def last_post(self):
-        """Returns the latest post from the user"""
+        """Returns the latest post from the user."""
 
         return Post.query.filter(Post.user_id == self.id).\
             order_by(Post.date_created.desc()).first()
 
     @property
     def url(self):
-        """Returns the url for the user"""
+        """Returns the url for the user."""
         return url_for("user.profile", username=self.username)
 
     @property
     def permissions(self):
-        """Returns the permissions for the user"""
+        """Returns the permissions for the user."""
         return self.get_permissions()
 
     @property
     def groups(self):
-        """Returns user groups"""
+        """Returns the user groups."""
         return self.get_groups()
+
+    @property
+    def unread_messages(self):
+        """Returns the unread messages for the user."""
+        return self.get_unread_messages()
+
+    @property
+    def unread_count(self):
+        """Returns the unread message count for the user."""
+        return len(self.unread_messages)
 
     @property
     def days_registered(self):
@@ -154,17 +164,17 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     @property
     def topic_count(self):
-        """Returns the thread count"""
+        """Returns the thread count."""
         return Topic.query.filter(Topic.user_id == self.id).count()
 
     @property
     def posts_per_day(self):
-        """Returns the posts per day count"""
+        """Returns the posts per day count."""
         return round((float(self.post_count) / float(self.days_registered)), 1)
 
     @property
     def topics_per_day(self):
-        """Returns the topics per day count"""
+        """Returns the topics per day count."""
         return round((float(self.topic_count) / float(self.days_registered)), 1)
 
     # Methods
@@ -175,11 +185,13 @@ class User(db.Model, UserMixin, CRUDMixin):
         return "<{} {}>".format(self.__class__.__name__, self.username)
 
     def _get_password(self):
-        """Returns the hashed password"""
+        """Returns the hashed password."""
         return self._password
 
     def _set_password(self, password):
-        """Generates a password hash for the provided password"""
+        """Generates a password hash for the provided password."""
+        if not password:
+            return
         self._password = generate_password_hash(password)
 
     # Hide password encryption by exposing password field only.
@@ -188,7 +200,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                                               _set_password))
 
     def check_password(self, password):
-        """Check passwords. If passwords match it returns true, else false"""
+        """Check passwords. If passwords match it returns true, else false."""
 
         if self.password is None:
             return False
@@ -196,7 +208,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     @classmethod
     def authenticate(cls, login, password):
-        """A classmethod for authenticating users
+        """A classmethod for authenticating users.
         It returns true if the user exists and has entered a correct password
 
         :param login: This can be either a username or a email address.
@@ -239,7 +251,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def verify_reset_token(self, token):
         """Verifies a reset token. It returns three boolean values based on
-        the state of the token (expired, invalid, data)
+        the state of the token (expired, invalid, data).
 
         :param token: The reset token that should be checked.
         """
@@ -273,7 +285,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     def track_topic(self, topic):
-        """Tracks the specified topic
+        """Tracks the specified topic.
 
         :param topic: The topic which should be added to the topic tracker.
         """
@@ -283,7 +295,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             return self
 
     def untrack_topic(self, topic):
-        """Untracks the specified topic
+        """Untracks the specified topic.
 
         :param topic: The topic which should be removed from the
                       topic tracker.
@@ -294,7 +306,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             return self
 
     def is_tracking_topic(self, topic):
-        """Checks if the user is already tracking this topic
+        """Checks if the user is already tracking this topic.
 
         :param topic: The topic which should be checked.
         """
@@ -323,7 +335,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             return self
 
     def in_group(self, group):
-        """Returns True if the user is in the specified group
+        """Returns True if the user is in the specified group.
 
         :param group: The group which should be checked.
         """
@@ -353,11 +365,27 @@ class User(db.Model, UserMixin, CRUDMixin):
                 perms[c] = getattr(group, c)
         return perms
 
-    def invalidate_cache(self):
-        """Invalidates this objects cached metadata."""
+    @cache.memoize(timeout=max_integer)
+    def get_unread_messages(self):
+        """Returns all unread messages for the user."""
+        unread_messages = Conversation.query.\
+            filter(Conversation.unread, Conversation.user_id == self.id).all()
+        return unread_messages
 
-        cache.delete_memoized(self.get_permissions, self)
-        cache.delete_memoized(self.get_groups, self)
+    def invalidate_cache(self, permissions=True, messages=True):
+        """Invalidates this objects cached metadata.
+
+        :param permissions_only: If set to ``True`` it will only invalidate
+                                 the permissions cache. Otherwise it will
+                                 also invalidate the user's unread message
+                                 cache.
+        """
+        if messages:
+            cache.delete_memoized(self.get_unread_messages, self)
+
+        if permissions:
+            cache.delete_memoized(self.get_permissions, self)
+            cache.delete_memoized(self.get_groups, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
@@ -458,6 +486,7 @@ class Guest(AnonymousUserMixin):
 
     @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
+
         """Returns a dictionary with all permissions the user has"""
         if exclude:
             exclude = set(exclude)

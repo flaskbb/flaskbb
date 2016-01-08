@@ -2,49 +2,57 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme('macros.html') import render_pagination, group_field %}
+{% from theme('macros.html') import render_pagination, input_group_field %}
 
-<ul class="breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="active">{% trans %}Memberlist{% endtrans %}</li>
-</ul>
+<div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="active">{% trans %}Memberlist{% endtrans %}</li>
+    </ol>
 
-<div class="pull-left" style="padding-bottom: 10px">
-    {{ render_pagination(users, url_for('forum.memberlist')) }}
-</div><!-- /.col-pull-left -->
-<div class="pull-right" style="padding-bottom: 10px">
-  <form role="form" method="post">
-      <div class="input-group">
-          {{ search_form.hidden_tag() }}
-          {{ group_field(search_form.search_query) }}
-          <span class="input-group-btn">
-            <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
-          </span>
-      </div>
-  </form>
+    <div class="row controls-row">
+        <div class="col-md-8 col-sm-8 col-xs-8 controls-col">
+            <div class="pull-left">
+                {{ render_pagination(users, url_for('forum.memberlist')) }}
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-4 col-xs-4 controls-col">
+            <div class="pull-right">
+                <form class="inline-form" role="form" method="post">
+                    {{ search_form.hidden_tag() }}
+                    <div class="input-group">
+                        {{ input_group_field(search_form.search_query) }}
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel page-panel">
+        <div class="panel-heading page-head">
+            <a href="{{ url_for('forum.memberlist') }}">{% trans %}Memberlist{% endtrans %}</a>
+        </div>
+        <div class="panel-body page-body">
+            <div class="page-meta">
+                <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
+                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Username{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 hidden-xs meta-item">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 hidden-xs meta-item">{% trans %}Date registered{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Group{% endtrans %}</div>
+            </div>
+            {% for user in users.items %}
+            <div class="row page-row hover clearfix">
+                <div class="col-md-1 col-sm-1 col-xs-1">{{ user.id }}</div>
+                <div class="col-md-3 col-sm-3 col-xs-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
+                <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>
+                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date('%b %d %Y') }}</div>
+                <div class="col-md-3 col-sm-3 col-xs-5">{{ user.primary_group.name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>{% trans %}Username{% endtrans %}</th>
-            <th>{% trans %}Posts{% endtrans %}</th>
-            <th>{% trans %}Date registered{% endtrans %}</th>
-            <th>{% trans %}Group{% endtrans %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users.items %}
-        <tr>
-            <td>{{ user.id }}</td>
-            <td><a href="{{ user.url }}">{{ user.username }}</a></td>
-            <td>{{ user.post_count }}</td>
-            <td>{{ user.date_joined|format_date('%b %d %Y') }}</td>
-            <td>{{ user.primary_group.name }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
 {% endblock %}
