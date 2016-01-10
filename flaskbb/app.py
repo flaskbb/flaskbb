@@ -43,9 +43,9 @@ from flaskbb.utils.helpers import format_date, time_since, crop_title, \
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (
-    IsAdmin, IsAtleastModerator, IsAtleastModeratorInForum,
-    CanBanUser, CanEditUser, CanEditPost, CanDeletePost, CanDeleteTopic,
-    CanPostReply, CanPostTopic
+    IsAdmin, IsAtleastModerator, TplCanModerate,
+    CanBanUser, CanEditUser, TplCanDeletePost, TplCanDeleteTopic,
+    TplCanEditPost, TplCanPostTopic, TplCanPostReply
 )
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
@@ -176,18 +176,19 @@ def configure_template_filters(app):
         ('is_admin_or_moderator', IsAtleastModerator),
         ('can_edit_user', CanEditUser),
         ('can_ban_user', CanBanUser),
-        ('edit_post', CanEditPost),
-        ('delete_post', CanDeletePost),
-        ('delete_topic', CanDeleteTopic),
-        ('post_reply', CanPostReply),
-        ('post_topic', CanPostTopic),
-        # will pull forum ID from request
-        ('can_moderate', IsAtleastModeratorInForum(None))
     ]
 
     filters.update([
         (name, partial(perm, request=request)) for name, perm in permissions
     ])
+
+    # these create closures
+    filters['can_moderate'] = TplCanModerate(request)
+    filters['post_reply'] = TplCanPostReply(request)
+    filters['edit_post'] = TplCanEditPost(request)
+    filters['delete_post'] = TplCanDeletePost(request)
+    filters['post_topic'] = TplCanPostTopic(request)
+    filters['delete_topic'] = TplCanDeleteTopic(request)
 
     app.jinja_env.filters.update(filters)
 
