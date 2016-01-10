@@ -82,6 +82,10 @@ class RegisterRecaptchaForm(RegisterForm):
     recaptcha = RecaptchaField(_("Captcha"))
 
 
+class LoginRecaptchaForm(LoginForm):
+    recaptcha = RecaptchaField(_("Captcha"))
+
+
 class ReauthForm(Form):
     password = PasswordField(_('Password'), validators=[
         DataRequired(message=_("A Password is required."))])
@@ -95,6 +99,10 @@ class ForgotPasswordForm(Form):
         Email()])
 
     submit = SubmitField(_("Request Password"))
+
+
+class ForgotPasswordRecaptchaForm(ForgotPasswordForm):
+    recaptcha = RecaptchaField(_("Captcha"))
 
 
 class ResetPasswordForm(Form):

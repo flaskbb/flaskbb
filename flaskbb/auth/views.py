@@ -34,7 +34,11 @@ def login():
     if current_user is not None and current_user.is_authenticated():
         return redirect(url_for("user.profile"))
 
-    form = LoginForm(request.form)
+    if current_app.config["RECAPTCHA_ENABLED"]:
+        from flaskbb.auth.forms import LoginRecaptchaForm
+        form = LoginRecaptchaForm(request.form)
+    else:
+        form = LoginForm(request.form)
     if form.validate_on_submit():
         user, authenticated = User.authenticate(form.login.data,
                                                 form.password.data)
@@ -114,7 +118,12 @@ def forgot_password():
     if not current_user.is_anonymous():
         return redirect(url_for("forum.index"))
 
-    form = ForgotPasswordForm()
+    if current_app.config["RECAPTCHA_ENABLED"]:
+        from flaskbb.auth.forms import ForgotPasswordRecaptchaForm
+        form = ForgotPasswordRecaptchaForm(request.form)
+    else:
+        form = ForgotPasswordForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
 
