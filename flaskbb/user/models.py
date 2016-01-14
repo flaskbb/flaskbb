@@ -362,7 +362,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         for group in self.groups:
             columns = set(group.__table__.columns.keys()) - set(exclude)
             for c in columns:
-                perms[c] = getattr(group, c)
+                perms[c] = getattr(group, c) or perms.get(c, False)
         return perms
 
     @cache.memoize(timeout=max_integer)
@@ -499,7 +499,7 @@ class Guest(AnonymousUserMixin):
         for group in self.groups:
             columns = set(group.__table__.columns.keys()) - set(exclude)
             for c in columns:
-                perms[c] = getattr(group, c)
+                perms[c] = getattr(group, c) or perms.get(c, False)
         return perms
 
     @classmethod

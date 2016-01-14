@@ -11,26 +11,39 @@
 """
 import datetime
 
-from flask import (Blueprint, redirect, url_for, current_app,
-                   request, flash)
+from flask import Blueprint, redirect, url_for, current_app, request, flash
 from flask_login import login_required, current_user
 from flask_babelex import gettext as _
 from flask_allows import Permission, And
-from flaskbb.extensions import db
+from flaskbb.extensions import db, allows
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
-                                   render_template, do_topic_action)
+from flaskbb.utils.helpers import (
+    get_online_users, time_diff, format_quote, render_template, do_topic_action
+)
 
-from flaskbb.utils.requirements import (CanPostReply, CanPostTopic,
-                                        IsAtleastModeratorInForum,
-                                        CanDeleteTopic, CanEditPost,
-                                        CanDeletePost)
+from flaskbb.utils.requirements import (
+    CanAccessForum,
+    CanAccessTopic,
+    CanDeletePost,
+    CanDeleteTopic,
+    CanEditPost,
+    CanPostReply,
+    CanPostTopic,
+    IsAtleastModeratorInForum,
+)
 
 
-from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
-                                  TopicsRead)
-from flaskbb.forum.forms import (QuickreplyForm, ReplyForm, NewTopicForm,
-                                 ReportForm, UserSearchForm, SearchPageForm)
+from flaskbb.forum.models import (
+    Category, Forum, Topic, Post, ForumsRead, TopicsRead
+)
+from flaskbb.forum.forms import (
+    NewTopicForm,
+    QuickreplyForm,
+    ReplyForm,
+    ReportForm,
+    SearchPageForm,
+    UserSearchForm,
+)
 from flaskbb.user.models import User
 
 forum = Blueprint("forum", __name__)
@@ -79,11 +92,13 @@ def view_category(category_id, slug=None):
 
 @forum.route("/forum/<int:forum_id>")
 @forum.route("/forum/<int:forum_id>-<slug>")
+@allows.requires(CanAccessForum())
 def view_forum(forum_id, slug=None):
     page = request.args.get('page', 1, type=int)
 
-    forum_instance, forumsread = Forum.get_forum(forum_id=forum_id,
-                                                 user=current_user)
+    forum_instance, forumsread = Forum.get_forum(
+        forum_id=forum_id, user=current_user
+    )
 
     if forum_instance.external:
         return redirect(forum_instance.external)
@@ -101,6 +116,7 @@ def view_forum(forum_id, slug=None):
 
 @forum.route("/topic/<int:topic_id>", methods=["POST", "GET"])
 @forum.route("/topic/<int:topic_id>-<slug>", methods=["POST", "GET"])
+@allows.requires(CanAccessTopic())
 def view_topic(topic_id, slug=None):
     page = request.args.get('page', 1, type=int)
 

@@ -9,21 +9,27 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_wtf import Form
-from wtforms import (StringField, TextAreaField, PasswordField, IntegerField,
-                     BooleanField, SelectField, SubmitField,
-		     HiddenField)
-from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
-                                URL, ValidationError)
-from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
-                                           QuerySelectMultipleField)
+from wtforms import (
+    BooleanField, HiddenField, IntegerField, PasswordField,
+    SelectField, StringField, SubmitField, TextAreaField,
+)
+from wtforms.validators import (
+    DataRequired, Optional, Email, regexp, Length, URL, ValidationError
+)
+from wtforms.ext.sqlalchemy.fields import (
+    QuerySelectField, QuerySelectMultipleField
+)
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from flask_babelex import lazy_gettext as _
 
 from flaskbb.utils.fields import BirthdayField
-from flaskbb.utils.widgets import SelectBirthdayWidget, MultiSelect
+from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
+from flaskbb.utils.requirements import IsAtleastModerator
+from flask_allows import Permission
+
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -337,35 +343,20 @@ class ForumForm(Form):
                                     "moderators."))
 
     def validate_moderators(self, field):
-        approved_moderators = list()
+        approved_moderators = []
 
         if field.data:
-            # convert the CSV string in a list
-            moderators = field.data.split(",")
-            # remove leading and ending spaces
-            moderators = [mod.strip() for mod in moderators]
-            for moderator in moderators:
-                # Check if the usernames exist
-                user = User.query.filter_by(username=moderator).first()
-
-                # Check if the user has the permissions to moderate a forum
-                if user:
-                    if not (user.get_permissions()["mod"] or
-                            user.get_permissions()["admin"] or
-                            user.get_permissions()["super_mod"]):
-                        raise ValidationError(
-                            _("%(user)s is not in a moderators group.",
-                              user=user.username)
-                        )
-                    else:
-                        approved_moderators.append(user)
+            moderators = [mod.strip() for mod in field.data.split(',')]
+            users = User.query.filter(User.username.in_(moderators))
+            for user in users:
+                if not Permission(IsAtleastModerator, identity=user):
+                    raise ValidationError(
+                        _("%(user)s is not in a moderators group.",
+                            user=user.username)
+                    )
                 else:
-                    raise ValidationError(_("User %(moderator)s not found.",
-                                            moderator=moderator))
-            field.data = approved_moderators
-
-        else:
-            field.data = approved_moderators
+                    approved_moderators.append(user)
+        field.data = approved_moderators
 
     def save(self):
         data = self.data

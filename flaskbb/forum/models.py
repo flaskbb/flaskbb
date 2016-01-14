@@ -14,7 +14,6 @@ from flask import url_for, abort
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
-from flaskbb.utils.decorators import can_access_forum, can_access_topic
 from flaskbb.utils.helpers import slugify, get_categories_and_forums, \
     get_forums
 from flaskbb.utils.database import CRUDMixin
@@ -324,7 +323,6 @@ class Topic(db.Model, CRUDMixin):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
     @classmethod
-    @can_access_topic
     def get_topic(cls, topic_id, user):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         return topic
@@ -805,7 +803,6 @@ class Forum(db.Model, CRUDMixin):
 
     # Classmethods
     @classmethod
-    @can_access_forum
     def get_forum(cls, forum_id, user):
         """Returns the forum and forumsread object as a tuple for the user.
 

@@ -11,6 +11,7 @@
 from flask_allows import Requirement, Or, And
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.models import Post, Topic, Forum
+from flaskbb.user.models import Group
 
 
 class Has(Requirement):
@@ -160,6 +161,28 @@ class ForumNotLocked(Requirement):
 
         elif 'forum_id' in view_args:
             return Forum.query.get(view_args['forum_id'])
+
+
+class CanAccessForum(Requirement):
+    def fulfill(self, user, request):
+        forum_id = request.view_args['forum_id']
+        group_ids = [g.id for g in user.groups]
+
+        return Forum.query.filter(
+            Forum.id == forum_id,
+            Forum.groups.any(Group.id.in_(group_ids))
+        ).count()
+
+
+class CanAccessTopic(Requirement):
+    def fulfill(self, user, request):
+        topic_id = request.view_args['topic_id']
+        group_ids = [g.id for g in user.groups]
+
+        return Forum.query.join(Topic, Topic.forum_id == Forum.id).filter(
+            Topic.id == topic_id,
+            Forum.groups.any(Group.id.in_(group_ids))
+        ).count()
 
 
 def IsAtleastModeratorInForum(forum_id=None, forum=None):

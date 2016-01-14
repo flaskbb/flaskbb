@@ -17,14 +17,15 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
 from flask_login import current_user
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelex import gettext as _
-from flask_allows import Permission
+from flask_allows import Permission, Not
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
-                                        CanBanUser, CanEditUser)
+from flaskbb.utils.requirements import (
+    IsAtleastModerator, IsAdmin, CanBanUser, CanEditUser, IsAtleastSuperModerator
+)
 from flaskbb.extensions import db, allows
 from flaskbb.utils.helpers import render_template, time_diff, get_online_users
 from flaskbb.user.models import Guest, User, Group
@@ -138,7 +139,7 @@ def users():
 def edit_user(user_id):
     user = User.query.filter_by(id=user_id).first_or_404()
 
-    if not Permission(CanEditUser):
+    if not Permission(CanEditUser, identity=current_user):
         flash(_("You are not allowed to edit this user."), "danger")
         return redirect(url_for("management.users"))
 
@@ -147,11 +148,14 @@ def edit_user(user_id):
 
     filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
 
-    if any(current_user.permissions[p] for p in ['super_mod', 'admin']):
+    if Permission(IsAtleastSuperModerator, identity=current_user):
         filt = db.or_(filt, Group.mod)
 
-    if current_user.permissions['admin']:
+    if Permission(IsAdmin, identity=current_user):
         filt = db.or_(filt, Group.admin, Group.super_mod)
+
+    if Permission(CanBanUser, identity=current_user):
+        filt = db.or_(filt, Group.banned)
 
     group_query = Group.query.filter(filt)
 
@@ -254,7 +258,7 @@ def banned_users():
 @management.route("/users/<int:user_id>/ban", methods=["POST"])
 @allows.requires(IsAtleastModerator)
 def ban_user(user_id=None):
-    if not Permission(CanBanUser):
+    if not Permission(CanBanUser, identity=current_user):
         flash(_("You do not have the permissions to ban this user."), "danger")
         return redirect(url_for("management.overview"))
 
@@ -267,10 +271,11 @@ def ban_user(user_id=None):
         for user in users:
             # don't let a user ban himself and do not allow a moderator to ban
             # a admin user
-            if current_user.id == user.id or \
-                    user.get_permissions()['admin'] and \
-                    (current_user.permissions['mod'] or
-                     current_user.permissions['super_mod']):
+            if (
+                current_user.id == user.id or
+                Permission(IsAdmin, identity=user)
+                and Permission(Not(IsAdmin), current_user)
+            ):
                 continue
 
             elif user.ban():
@@ -293,9 +298,8 @@ def ban_user(user_id=None):
     user = User.query.filter_by(id=user_id).first_or_404()
 
     # Do not allow moderators to ban admins
-    if user.get_permissions()['admin'] and \
-            (current_user.permissions['mod'] or
-             current_user.permissions['super_mod']):
+    if Permission(IsAdmin, identity=user) and \
+       Permission(Not(IsAdmin), identity=current_user):
 
         flash(_("A moderator cannot ban an admin user."), "danger")
         return redirect(url_for("management.overview"))
@@ -312,7 +316,7 @@ def ban_user(user_id=None):
 @management.route("/users/<int:user_id>/unban", methods=["POST"])
 @allows.requires(IsAtleastModerator)
 def unban_user(user_id=None):
-    if not Permission(CanBanUser):
+    if not Permission(CanBanUser, identity=current_user):
         flash(_("You do not have the permissions to unban this user."),
               "danger")
         return redirect(url_for("management.overview"))
