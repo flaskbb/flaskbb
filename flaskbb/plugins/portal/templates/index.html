@@ -32,12 +32,15 @@
   .portal-content h5 {
       font-weight:500;
   }
+  .portal-content img {
+      max-width:100%;
+      max-height:100%;
+  }
 
   /* recent topics */
   .portal-topic:not(:first-child) {
     padding-top: 5px;
     clear: both;
-
     border-top: 1px solid #ddd;
   }
 
@@ -53,7 +56,6 @@
     color:#999999;
     clear: both;
     float: right;
-
   }
 
   /* stats */
@@ -199,7 +201,4 @@
   </div>
 
 </div>
-
-
-
 {% endblock %}
