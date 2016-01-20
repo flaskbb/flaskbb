@@ -327,7 +327,7 @@ class ForumForm(Form):
 
     def validate_external(self, field):
         if hasattr(self, "forum"):
-            if self.forum.topics:
+            if self.forum.topics.count() > 0:
                 raise ValidationError(_("You cannot convert a forum that "
                                         "contain topics in a external link."))
 
