@@ -18,6 +18,9 @@ class Has(Requirement):
     def __init__(self, permission):
         self.permission = permission
 
+    def __repr__(self):
+        return "<Has({!s})>".format(self.permission)
+
     def fulfill(self, user, request):
         return user.permissions.get(self.permission, False)
 
@@ -86,17 +89,26 @@ class TopicNotLocked(Requirement):
         self._topic_id = topic_id
 
     def fulfill(self, user, request):
-        return not self._is_topic_or_forum_locked(request)
+        return not any(self._determine_locked(request))
 
-    def _is_topic_or_forum_locked(self, request):
-        topic = self._determine_topic(request)
-        return topic.locked or topic.forum.locked
+    def _determine_locked(self, request):
+        """
+        Returns a pair of booleans:
+            * Is the topic locked?
+            * Is the forum the topic belongs to locked?
 
-    def _determine_topic(self, request):
+        Except in the case of a topic instance being provided to the constructor,
+        all of these tuples are SQLA KeyedTuples
+        """
         if self._topic is not None:
-            return self._topic
+            return self._topic.locked, self._topic.forum.locked
         elif self._topic_id is not None:
-            return Topic.query.get(self._topic_id)
+            return (
+                Topic.query.join(Forum, Forum.id == Topic.forum_id)
+                .filter(Topic.id == self._topic_id)
+                .with_entities(Topic.locked, Forum.locked)
+                .first()
+            )
         else:
             return self._get_topic_from_request(request)
 
@@ -105,14 +117,20 @@ class TopicNotLocked(Requirement):
         if 'post_id' in view_args:
             return (
                 Topic.query.join(Post, Post.topic_id == Topic.id)
+                .join(Forum, Forum.id == Topic.forum_id)
                 .filter(Post.id == view_args['post_id'])
-                .with_entities(Topic.locked)
+                .with_entities(Topic.locked, Forum.locked)
                 .first()
             )
         elif 'topic_id' in view_args:
-            return Topic.query.get(view_args['topic_id'])
+            return (
+                Topic.query.join(Forum, Forum.id == Topic.forum_id)
+                .filter(Topic.id == view_args['topic_id'])
+                .with_entities(Topic.locked, Forum.locked)
+                .first()
+            )
         else:
-            raise FlaskBBError
+            raise FlaskBBError("How did you get this to happen?")
 
 
 class ForumNotLocked(Requirement):
@@ -201,9 +219,8 @@ CanBanUser = Or(IsAtleastSuperModerator, Has('mod_banuser'))
 
 CanEditUser = Or(IsAtleastSuperModerator, Has('mod_edituser'))
 
-CanEditPost = Or(And(IsSameUser(), Has('editpost'), TopicNotLocked()),
-                 IsAtleastSuperModerator,
-                 And(IsModeratorInForum(), Has('editpost')))
+CanEditPost = Or(IsAtleastSuperModerator, And(IsModeratorInForum(), Has('editpost')),
+                 And(IsSameUser(), Has('editpost'), TopicNotLocked()))
 
 CanDeletePost = CanEditPost
 
@@ -215,9 +232,9 @@ CanPostTopic = Or(And(Has('posttopic'), ForumNotLocked()),
                   IsAtleastSuperModerator,
                   IsModeratorInForum())
 
-CanDeleteTopic = Or(And(IsSameUser(), Has('deletetopic'), TopicNotLocked()),
-                    IsAtleastSuperModerator,
-                    And(IsModeratorInForum(), Has('deletetopic')))
+CanDeleteTopic = Or(IsAtleastSuperModerator,
+                    And(IsModeratorInForum(), Has('deletetopic')),
+                    And(IsSameUser(), Has('deletetopic'), TopicNotLocked()))
 
 
 # Template Allowances -- gross, I know

@@ -75,14 +75,15 @@ def do_topic_action(topics, user, action, reverse):
     from flaskbb.user.models import User
     from flaskbb.forum.models import Post
 
+    if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
+        flash(_("You do not have the permissions to execute this "
+                "action."), "danger")
+        return False
+
     modified_topics = 0
     if action != "delete":
-        for topic in topics:
-            if not Permission(IsAtleastModeratorInForum(topic.forum)):
-                flash(_("You do not have the permissions to execute this "
-                        "action."), "danger")
-                return False
 
+        for topic in topics:
             if getattr(topic, action) and not reverse:
                 continue
 

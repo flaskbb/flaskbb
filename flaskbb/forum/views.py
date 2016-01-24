@@ -220,7 +220,7 @@ def delete_topic(topic_id=None, slug=None):
 def lock_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
+    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have the permissions to lock this topic."),
               "danger")
         return redirect(topic.url)
@@ -236,7 +236,7 @@ def lock_topic(topic_id=None, slug=None):
 def unlock_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
+    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have the permissions to unlock this topic."),
               "danger")
         return redirect(topic.url)
@@ -252,7 +252,7 @@ def unlock_topic(topic_id=None, slug=None):
 def highlight_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
-    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
+    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have the permissions to highlight this topic."),
               "danger")
         return redirect(topic.url)
@@ -269,7 +269,7 @@ def trivialize_topic(topic_id=None, slug=None):
     topic = Topic.query.filter_by(id=topic_id).first_or_404()
 
     # Unlock is basically the same as lock
-    if not Permission(IsAtleastModeratorInForum(topic.forum.id)):
+    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have the permissions to trivialize this topic."),
               "danger")
         return redirect(topic.url)
@@ -292,7 +292,7 @@ def manage_forum(forum_id, slug=None):
     available_forums = Forum.query.order_by(Forum.position).all()
     available_forums.remove(forum_instance)
 
-    if not Permission(IsAtleastModeratorInForum()):
+    if not Permission(IsAtleastModeratorInForum(forum=forum_instance)):
         flash(_("You do not have the permissions to moderate this forum."),
               "danger")
         return redirect(forum_instance.url)
@@ -359,8 +359,12 @@ def manage_forum(forum_id, slug=None):
             new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
             # check the permission in the current forum and in the new forum
 
-            if not Permission(And(IsAtleastModeratorInForum(new_forum_id),
-                                  IsAtleastModeratorInForum(forum_instance.id))):
+            if not Permission(
+                And(
+                    IsAtleastModeratorInForum(forum_id=new_forum_id),
+                    IsAtleastModeratorInForum(forum=forum_instance)
+                )
+            ):
                 flash(_("You do not have the permissions to move this topic."),
                       "danger")
                 return redirect(mod_forum_url)
