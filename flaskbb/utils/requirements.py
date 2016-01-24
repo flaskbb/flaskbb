@@ -69,9 +69,17 @@ class IsModeratorInForum(IsAuthed):
 
 
 class IsSameUser(IsAuthed):
+    def __init__(self, topic_or_post=None):
+        self._topic_or_post = topic_or_post
+
     def fulfill(self, user, request):
         return (super(IsSameUser, self).fulfill(user, request) and
-                user.id == self._get_user_id_from_post(request))
+                user.id == self._determine_user(request))
+
+    def _determine_user(self, request):
+        if self._topic_or_post is not None:
+            return self._topic_or_post.user_id
+        return self._get_user_id_from_post(request)
 
     def _get_user_id_from_post(self, request):
         view_args = request.view_args
@@ -84,9 +92,11 @@ class IsSameUser(IsAuthed):
 
 
 class TopicNotLocked(Requirement):
-    def __init__(self, topic=None, topic_id=None):
+    def __init__(self, topic=None, topic_id=None, post_id=None, post=None):
         self._topic = topic
         self._topic_id = topic_id
+        self._post = post
+        self._post_id = post_id
 
     def fulfill(self, user, request):
         return not any(self._determine_locked(request))
@@ -102,6 +112,8 @@ class TopicNotLocked(Requirement):
         """
         if self._topic is not None:
             return self._topic.locked, self._topic.forum.locked
+        elif self._post is not None:
+            return self._post.topic.locked, self._post.topic.forum.locked
         elif self._topic_id is not None:
             return (
                 Topic.query.join(Forum, Forum.id == Topic.forum_id)
@@ -219,7 +231,8 @@ CanBanUser = Or(IsAtleastSuperModerator, Has('mod_banuser'))
 
 CanEditUser = Or(IsAtleastSuperModerator, Has('mod_edituser'))
 
-CanEditPost = Or(IsAtleastSuperModerator, And(IsModeratorInForum(), Has('editpost')),
+CanEditPost = Or(IsAtleastSuperModerator,
+                 And(IsModeratorInForum(), Has('editpost')),
                  And(IsSameUser(), Has('editpost'), TopicNotLocked()))
 
 CanDeletePost = CanEditPost
@@ -270,18 +283,24 @@ def TplCanPostReply(request):
 
 
 def TplCanEditPost(request):
-    def _(user, topic=None):
+    def _(user, topic_or_post=None):
         kwargs = {}
 
-        if isinstance(topic, int):
-            kwargs['topic_id'] = topic
-        elif isinstance(topic, Topic):
-            kwargs['topic'] = topic
+        if isinstance(topic_or_post, int):
+            kwargs['topic_id'] = topic_or_post
+        elif isinstance(topic_or_post, Topic):
+            kwargs['topic'] = topic_or_post
+        elif isinstance(topic_or_post, Post):
+            kwargs['post'] = topic_or_post
 
         return Or(
             IsAtleastSuperModerator,
             And(IsModeratorInForum(), Has('editpost')),
-            And(IsSameUser(), Has('editpost'), TopicNotLocked(**kwargs)),
+            And(
+                IsSameUser(topic_or_post),
+                Has('editpost'),
+                TopicNotLocked(**kwargs)
+            ),
         )(user, request)
     return _
 
