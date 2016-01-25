@@ -11,6 +11,7 @@
 """
 import datetime
 
+from sqlalchemy import asc, desc
 from flask import Blueprint, redirect, url_for, current_app, request, flash
 from flask_login import login_required, current_user
 from flask_babelex import gettext as _
@@ -569,16 +570,31 @@ def who_is_online():
 @forum.route("/memberlist", methods=['GET', 'POST'])
 def memberlist():
     page = request.args.get('page', 1, type=int)
+    sort_by = request.args.get('sort_by', 'reg_date')
+    order_by = request.args.get('order_by', 'asc')
+
+    sort_obj = None
+    order_func = None
+    if order_by == 'asc':
+        order_func = asc
+    else:
+        order_func = desc
+
+    if sort_by == 'reg_date':
+        sort_obj = User.id
+    elif sort_by == 'post_count':
+        sort_obj = User.post_count
+    else:
+        sort_obj = User.username
 
     search_form = UserSearchForm()
-
     if search_form.validate():
         users = search_form.get_results().\
             paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
         return render_template("forum/memberlist.html", users=users,
                                search_form=search_form)
     else:
-        users = User.query.\
+        users = User.query.order_by(order_func(sort_obj)).\
             paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
         return render_template("forum/memberlist.html", users=users,
                                search_form=search_form)

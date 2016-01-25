@@ -37,19 +37,26 @@
         </div>
         <div class="panel-body page-body">
             <div class="page-meta">
+                {% set order_by = 'desc' if request.args.get('order_by') == 'asc' else 'asc' %}
                 <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
-                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Username{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs meta-item">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 hidden-xs meta-item">{% trans %}Date registered{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">
+                    <a href="{{ url_for('forum.memberlist') }}?sort_by=username&order_by={{ order_by }}">{% trans %}Username{% endtrans %}</a>
+                </div>
+                <div class="col-md-3 col-sm-3 hidden-xs meta-item">
+                    <a href="{{ url_for('forum.memberlist') }}?sort_by=reg_date&order_by={{ order_by }}">{% trans %}Date registered{% endtrans %}</a>
+                </div>
                 <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Group{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 hidden-xs meta-item">
+                    <a href="{{ url_for('forum.memberlist') }}?sort_by=post_count&order_by={{ order_by }}">{% trans %}Posts{% endtrans %}</a>
+                </div>
             </div>
             {% for user in users.items %}
             <div class="row page-row hover clearfix">
                 <div class="col-md-1 col-sm-1 col-xs-1">{{ user.id }}</div>
                 <div class="col-md-3 col-sm-3 col-xs-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
-                <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>
-                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date('%b %d %Y') }}</div>
+                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date('%b %d %Y, %I:%M %p') }}</div>
                 <div class="col-md-3 col-sm-3 col-xs-5">{{ user.primary_group.name }}</div>
+                <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>
             </div>
             {% endfor %}
         </div>
