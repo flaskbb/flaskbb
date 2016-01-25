@@ -12,6 +12,7 @@ import os
 import logging
 import datetime
 import time
+from functools import partial
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -25,7 +26,6 @@ from flaskbb.user.views import user
 from flaskbb.user.models import User, Guest
 # Import the (private) message blueprint
 from flaskbb.message.views import message
-from flaskbb.message.models import Conversation
 # Import the auth blueprint
 from flaskbb.auth.views import auth
 # Import the admin blueprint
@@ -35,16 +35,18 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, csrf
+    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, allows
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
     render_template
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
-from flaskbb.utils.permissions import can_post_reply, can_post_topic, \
-    can_delete_topic, can_delete_post, can_edit_post, can_edit_user, \
-    can_ban_user, can_moderate, is_admin, is_moderator, is_admin_or_moderator
+from flaskbb.utils.requirements import (
+    IsAdmin, IsAtleastModerator, TplCanModerate,
+    CanBanUser, CanEditUser, TplCanDeletePost, TplCanDeleteTopic,
+    TplCanEditPost, TplCanPostTopic, TplCanPostReply
+)
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
@@ -151,31 +153,44 @@ def configure_extensions(app):
         # otherwise we will just fallback to the default language
         return flaskbb_config["DEFAULT_LANGUAGE"]
 
+    # Flask-Allows
+    allows.init_app(app)
+    allows.identity_loader(lambda: current_user)
+
 
 def configure_template_filters(app):
     """Configures the template filters."""
+    filters = {}
 
-    app.jinja_env.filters['markup'] = render_markup
-    app.jinja_env.filters['format_date'] = format_date
-    app.jinja_env.filters['time_since'] = time_since
-    app.jinja_env.filters['is_online'] = is_online
-    app.jinja_env.filters['crop_title'] = crop_title
-    app.jinja_env.filters['forum_is_unread'] = forum_is_unread
-    app.jinja_env.filters['topic_is_unread'] = topic_is_unread
-    # Permission filters
-    app.jinja_env.filters['edit_post'] = can_edit_post
-    app.jinja_env.filters['delete_post'] = can_delete_post
-    app.jinja_env.filters['delete_topic'] = can_delete_topic
-    app.jinja_env.filters['post_reply'] = can_post_reply
-    app.jinja_env.filters['post_topic'] = can_post_topic
-    # Moderator permission filters
-    app.jinja_env.filters['is_admin'] = is_admin
-    app.jinja_env.filters['is_moderator'] = is_moderator
-    app.jinja_env.filters['is_admin_or_moderator'] = is_admin_or_moderator
-    app.jinja_env.filters['can_moderate'] = can_moderate
+    filters['markup'] = render_markup
+    filters['format_date'] = format_date
+    filters['time_since'] = time_since
+    filters['is_online'] = is_online
+    filters['crop_title'] = crop_title
+    filters['forum_is_unread'] = forum_is_unread
+    filters['topic_is_unread'] = topic_is_unread
 
-    app.jinja_env.filters['can_edit_user'] = can_edit_user
-    app.jinja_env.filters['can_ban_user'] = can_ban_user
+    permissions = [
+        ('is_admin', IsAdmin),
+        ('is_moderator', IsAtleastModerator),
+        ('is_admin_or_moderator', IsAtleastModerator),
+        ('can_edit_user', CanEditUser),
+        ('can_ban_user', CanBanUser),
+    ]
+
+    filters.update([
+        (name, partial(perm, request=request)) for name, perm in permissions
+    ])
+
+    # these create closures
+    filters['can_moderate'] = TplCanModerate(request)
+    filters['post_reply'] = TplCanPostReply(request)
+    filters['edit_post'] = TplCanEditPost(request)
+    filters['delete_post'] = TplCanDeletePost(request)
+    filters['post_topic'] = TplCanPostTopic(request)
+    filters['delete_topic'] = TplCanDeleteTopic(request)
+
+    app.jinja_env.filters.update(filters)
 
 
 def configure_context_processors(app):

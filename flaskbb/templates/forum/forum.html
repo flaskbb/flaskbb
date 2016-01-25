@@ -124,10 +124,12 @@
         </div>
     </div>
 
+    {% if current_user|can_moderate(forum) %}
     <div class="row controls-row">
         <a class="btn btn-default" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
             <span class="fa fa-tasks"></span> {% trans %}Moderation Mode{% endtrans %}
         </a>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

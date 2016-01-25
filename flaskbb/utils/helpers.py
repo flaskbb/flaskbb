@@ -28,7 +28,7 @@ from flaskbb._compat import range_method, text_type
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
-
+from flask_allows import Permission
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -70,18 +70,20 @@ def do_topic_action(topics, user, action, reverse):
                     For example, to unlock a topic, ``reverse`` should be
                     set to ``True``.
     """
-    from flaskbb.utils.permissions import can_moderate, can_delete_topic
+    from flaskbb.utils.requirements import IsAtleastModeratorInForum, CanDeleteTopic
+
     from flaskbb.user.models import User
     from flaskbb.forum.models import Post
 
+    if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
+        flash(_("You do not have the permissions to execute this "
+                "action."), "danger")
+        return False
+
     modified_topics = 0
     if action != "delete":
-        for topic in topics:
-            if not can_moderate(user, topic.forum):
-                flash(_("You do not have the permissions to execute this "
-                        "action."), "danger")
-                return False
 
+        for topic in topics:
             if getattr(topic, action) and not reverse:
                 continue
 
@@ -90,7 +92,7 @@ def do_topic_action(topics, user, action, reverse):
             topic.save()
     elif action == "delete":
         for topic in topics:
-            if not can_delete_topic(user, topic):
+            if not Permission(CanDeleteTopic):
                 flash(_("You do not have the permissions to delete this "
                         "topic."), "danger")
                 return False
