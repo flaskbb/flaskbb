@@ -3,7 +3,7 @@ import os
 import babel
 
 from flask_babelex import Domain, get_locale
-from flask_plugins import get_plugins_list
+from flask_plugins import get_enabled_plugins
 
 from flaskbb._compat import PY2
 
@@ -26,7 +26,7 @@ class FlaskBBDomain(Domain):
         with self.app.app_context():
             self.plugin_translations = [
                 os.path.join(plugin.path, "translations")
-                for plugin in get_plugins_list()
+                for plugin in get_enabled_plugins()
             ]
 
     def get_translations(self):

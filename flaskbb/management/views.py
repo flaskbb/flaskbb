@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
-import os
 from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
@@ -24,7 +23,8 @@ from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.requirements import (
-    IsAtleastModerator, IsAdmin, CanBanUser, CanEditUser, IsAtleastSuperModerator
+    IsAtleastModerator, IsAdmin, CanBanUser, CanEditUser,
+    IsAtleastSuperModerator
 )
 from flaskbb.extensions import db, allows
 from flaskbb.utils.helpers import render_template, time_diff, get_online_users
@@ -146,7 +146,9 @@ def edit_user(user_id):
     member_group = db.and_(*[db.not_(getattr(Group, p)) for p in
                              ['admin', 'mod', 'super_mod', 'banned', 'guest']])
 
-    filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
+    filt = db.or_(
+        Group.id.in_(g.id for g in current_user.groups), member_group
+    )
 
     if Permission(IsAtleastSuperModerator, identity=current_user):
         filt = db.or_(filt, Group.mod)
@@ -273,8 +275,8 @@ def ban_user(user_id=None):
             # a admin user
             if (
                 current_user.id == user.id or
-                Permission(IsAdmin, identity=user)
-                and Permission(Not(IsAdmin), current_user)
+                Permission(IsAdmin, identity=user) and
+                Permission(Not(IsAdmin), current_user)
             ):
                 continue
 
@@ -648,30 +650,19 @@ def plugins():
 @allows.requires(IsAdmin)
 def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
-    if not plugin.enabled:
-        plugin_dir = os.path.join(
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-            "plugins", plugin.identifier
-        )
 
-        disabled_file = os.path.join(plugin_dir, "DISABLED")
+    if plugin.enabled:
+        flash(_("Plugin is already enabled."), "danger")
+        return redirect(url_for("management.plugins"))
 
-        try:
-            if os.path.exists(disabled_file):
-                os.remove(disabled_file)
-                flash(_("Plugin is enabled. Please reload your app."),
-                      "success")
-            else:
-                flash(_("Plugin is already enabled. Please reload  your app."),
-                      "warning")
-
-        except OSError:
-            flash(_("If you are using a host which doesn't support writting "
-                    "on the disk, this won't work - than you need to delete "
-                    "the 'DISABLED' file by yourself."), "danger")
-
-    else:
-        flash(_("Couldn't enable Plugin."), "danger")
+    try:
+        plugin.enable()
+        flash(_("Plugin %(plugin)s enabled. Please restart FlaskBB now.",
+                plugin=plugin.name), "success")
+    except OSError:
+        flash(_("It seems that FlaskBB does not have enough filesystem "
+                "permissions. Try removing the 'DISABLED' file by "
+                "yourself."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -685,21 +676,14 @@ def disable_plugin(plugin):
         flash(_("Plugin %(plugin)s not found.", plugin=plugin.name), "danger")
         return redirect(url_for("management.plugins"))
 
-    plugin_dir = os.path.join(
-        os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-        "plugins", plugin.identifier
-    )
-
-    disabled_file = os.path.join(plugin_dir, "DISABLED")
-
     try:
-        open(disabled_file, "a").close()
-        flash(_("Plugin is disabled. Please reload your app."), "success")
-
+        plugin.disable()
+        flash(_("Plugin %(plugin)s disabled. Please restart FlaskBB now.",
+                plugin=plugin.name), "success")
     except OSError:
-        flash(_("If you are using a host which doesn't "
-                "support writting on the disk, this won't work - than you "
-                "need to create a 'DISABLED' file by yourself."), "info")
+        flash(_("It seems that FlaskBB does not have enough filesystem "
+                "permissions. Try creating the 'DISABLED' file by "
+                "yourself."), "danger")
 
     return redirect(url_for("management.plugins"))
 
