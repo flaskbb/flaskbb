@@ -138,7 +138,7 @@ def view_topic(topic_id, slug=None):
 
     # Update the topicsread status if the user hasn't read it
     forumsread = None
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         forumsread = ForumsRead.query.\
             filter_by(user_id=current_user.id,
                       forum_id=topic.forum.id).first()

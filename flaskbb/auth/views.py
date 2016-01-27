@@ -31,7 +31,7 @@ def login():
     Logs the user in
     """
 
-    if current_user is not None and current_user.is_authenticated():
+    if current_user is not None and current_user.is_authenticated:
         return redirect(url_for("user.profile"))
 
     form = LoginForm(request.form)
@@ -81,8 +81,9 @@ def register():
     Register a new user
     """
 
-    if current_user is not None and current_user.is_authenticated():
-        return redirect(url_for("user.profile", username=current_user.username))
+    if current_user is not None and current_user.is_authenticated:
+        return redirect(url_for("user.profile",
+                                username=current_user.username))
 
     if current_app.config["RECAPTCHA_ENABLED"]:
         from flaskbb.auth.forms import RegisterRecaptchaForm
@@ -100,7 +101,8 @@ def register():
         login_user(user)
 
         flash(_("Thanks for registering."), "success")
-        return redirect(url_for("user.profile", username=current_user.username))
+        return redirect(url_for("user.profile",
+                                username=current_user.username))
 
     return render_template("auth/register.html", form=form)
 
@@ -111,7 +113,7 @@ def forgot_password():
     Sends a reset password token to the user.
     """
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         return redirect(url_for("forum.index"))
 
     form = ForgotPasswordForm()
@@ -136,7 +138,7 @@ def reset_password(token):
     Handles the reset password process.
     """
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         return redirect(url_for("forum.index"))
 
     form = ResetPasswordForm()

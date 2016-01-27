@@ -23,7 +23,7 @@
                 {{ emit_event("after-last-navigation-element") }}
             </ul>
 
-        {% if current_user and current_user.is_authenticated() %}
+        {% if current_user and current_user.is_authenticated %}
             <div class="btn-group navbar-btn navbar-right" style="padding-left: 15px; margin-right: -10px">
                 <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
                     <span class="fa fa-user"></span> {{ current_user.username }}

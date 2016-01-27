@@ -27,7 +27,7 @@ class Has(Requirement):
 
 class IsAuthed(Requirement):
     def fulfill(self, user, request):
-        return user.is_authenticated()
+        return user.is_authenticated
 
 
 class IsModeratorInForum(IsAuthed):

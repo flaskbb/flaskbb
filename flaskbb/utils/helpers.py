@@ -52,7 +52,7 @@ def render_template(template, **context):  # pragma: no cover
     """A helper function that uses the `render_theme_template` function
     without needing to edit all the views
     """
-    if current_user.is_authenticated() and current_user.theme:
+    if current_user.is_authenticated and current_user.theme:
         theme = current_user.theme
     else:
         theme = session.get('theme', flaskbb_config['DEFAULT_THEME'])
@@ -140,7 +140,7 @@ def get_categories_and_forums(query_result, user):
 
     forums = []
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         for key, value in it:
             forums.append((key, [(item[1], item[2]) for item in value]))
     else:
@@ -167,7 +167,7 @@ def get_forums(query_result, user):
     """
     it = itertools.groupby(query_result, operator.itemgetter(0))
 
-    if user.is_authenticated():
+    if user.is_authenticated:
         for key, value in it:
             forums = key, [(item[1], item[2]) for item in value]
     else:
@@ -187,7 +187,7 @@ def forum_is_unread(forum, forumsread, user):
     :param user: The user who should be checked if he has read the forum
     """
     # If the user is not signed in, every forum is marked as read
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     read_cutoff = datetime.utcnow() - timedelta(
@@ -234,7 +234,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
                        read, than you will also need to pass an forumsread
                        object.
     """
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     read_cutoff = datetime.utcnow() - timedelta(
@@ -365,7 +365,7 @@ def time_since(time):  # pragma: no cover
     delta = time - datetime.utcnow()
 
     locale = "en"
-    if current_user.is_authenticated() and current_user.language is not None:
+    if current_user.is_authenticated and current_user.language is not None:
         locale = current_user.language
 
     return format_timedelta(delta, add_direction=True, locale=locale)

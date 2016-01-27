@@ -54,7 +54,7 @@
                             <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}</div>
                             <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
                             <div class="author-pm">
-                                {% if current_user.is_authenticated() and post.user_id %}
+                                {% if current_user.is_authenticated and post.user_id %}
                                 <a href="{{ url_for('message.new_conversation') }}?to_user={{ user.username }}">{% trans %}Message{% endtrans %}</a>
                                 {% endif %}
                             </div>
@@ -133,7 +133,7 @@
 
                             {% endif %}
 
-                            {% if current_user.is_authenticated() %}
+                            {% if current_user.is_authenticated %}
                             <!-- Report post -->
                                 <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="Report this post"></a>
                             {% endif %}

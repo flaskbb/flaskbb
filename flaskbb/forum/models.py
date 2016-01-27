@@ -374,7 +374,7 @@ class Topic(db.Model, CRUDMixin):
                            read.
         """
         # User is not logged in - abort
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
 
         topicsread = TopicsRead.query.\
@@ -676,7 +676,7 @@ class Forum(db.Model, CRUDMixin):
                            forumsread relation should be updated and
                            therefore is unread.
         """
-        if not user.is_authenticated() or topicsread is None:
+        if not user.is_authenticated or topicsread is None:
             return False
 
         read_cutoff = None
@@ -810,7 +810,7 @@ class Forum(db.Model, CRUDMixin):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
-        if user.is_authenticated():
+        if user.is_authenticated:
             forum, forumsread = Forum.query.\
                 filter(Forum.id == forum_id).\
                 options(db.joinedload("category")).\
@@ -836,7 +836,7 @@ class Forum(db.Model, CRUDMixin):
         :param page: The page whom should be loaded
         :param per_page: How many topics per page should be shown
         """
-        if user.is_authenticated():
+        if user.is_authenticated:
             topics = Topic.query.filter_by(forum_id=forum_id).\
                 outerjoin(TopicsRead,
                           db.and_(TopicsRead.topic_id == Topic.id,
@@ -924,7 +924,7 @@ class Category(db.Model, CRUDMixin):
         """
         # import Group model locally to avoid cicular imports
         from flaskbb.user.models import Group
-        if user.is_authenticated():
+        if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
@@ -976,7 +976,7 @@ class Category(db.Model, CRUDMixin):
                      forumsread object.
         """
         from flaskbb.user.models import Group
-        if user.is_authenticated():
+        if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
