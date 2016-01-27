@@ -5,8 +5,6 @@ import babel
 from flask_babelex import Domain, get_locale
 from flask_plugins import get_enabled_plugins
 
-from flaskbb._compat import PY2
-
 
 class FlaskBBDomain(Domain):
     def __init__(self, app):
@@ -50,15 +48,6 @@ class FlaskBBDomain(Domain):
             # If no compiled translations are found, return the
             # NullTranslations object.
             if not isinstance(translations, babel.support.Translations):
-                return translations
-
-            # Plugin translations are at the moment not supported under
-            # Python 3. There is currently a bug in Babel where it is
-            # not possible to merge two message catalogs.
-            # https://github.com/mitsuhiko/babel/pull/92
-            # So instead of adding/merging them, we are just skipping them
-            # Better then no python3 support though..
-            if not PY2:
                 return translations
 
             # now load and add the plugin translations
