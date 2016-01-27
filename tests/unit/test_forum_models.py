@@ -68,7 +68,7 @@ def test_category_get_forums(forum, user):
     with current_app.test_request_context():
         # Test with logged in user
         login_user(user)
-        assert current_user.is_authenticated()
+        assert current_user.is_authenticated
         cat, forums = Category.get_forums(category.id, current_user)
 
         # Check if it is a list because in a category there are normally more
@@ -80,7 +80,7 @@ def test_category_get_forums(forum, user):
 
         # Test the same thing with a logged out user
         logout_user()
-        assert not current_user.is_authenticated()
+        assert not current_user.is_authenticated
         cat, forums = Category.get_forums(category.id, current_user)
 
         # Check if it is a list because in a category there are normally more
@@ -97,7 +97,7 @@ def test_category_get_all(forum, user):
     with current_app.test_request_context():
         # Test with logged in user
         login_user(user)
-        assert current_user.is_authenticated()
+        assert current_user.is_authenticated
         categories = Category.get_all(current_user)
 
         # All categories are stored in a list
@@ -109,7 +109,7 @@ def test_category_get_all(forum, user):
 
         # Test with logged out user
         logout_user()
-        assert not current_user.is_authenticated()
+        assert not current_user.is_authenticated
         categories = Category.get_all(current_user)
 
         # All categories are stored in a list
@@ -435,7 +435,7 @@ def test_topic_update_read(database, user, topic):
     with current_app.test_request_context():
         # Test with logged in user
         login_user(user)
-        assert current_user.is_authenticated()
+        assert current_user.is_authenticated
 
         # Update the tracker
         assert topic.update_read(current_user, topic.forum, forumsread)
@@ -459,7 +459,7 @@ def test_topic_update_read(database, user, topic):
 
         # Test with logged out user
         logout_user()
-        assert not current_user.is_authenticated()
+        assert not current_user.is_authenticated
         assert not topic.update_read(current_user, topic.forum, forumsread)
 
 
