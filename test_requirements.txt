@@ -1,5 +1,5 @@
 -r requirements.txt
-py==1.4.29
-pytest==2.7.2
-pytest-cov==1.8.1
+py==1.4.31
+pytest==2.8.7
+pytest-cov==2.2.0
 pytest-random==0.2
