@@ -13,7 +13,7 @@ def test_custom_renderer():
 
     # custom block code with pygments highlighting
     b_expected = """\n<pre><code>print("Hello World")</code></pre>\n"""
-    b_expected_lang = """<div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s">&quot;Hello World&quot;</span><span class="p">)</span>\n</pre></div>\n"""
+    b_expected_lang = """<div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Hello World&quot;</span><span class="p">)</span>\n</pre></div>\n"""
     b_plain = """
 ```
 print("Hello World")
