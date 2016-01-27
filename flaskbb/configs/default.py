@@ -40,6 +40,9 @@ class DefaultConfig(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
                               'flaskbb.sqlite'
 
+    # This option will be removed as soon as Flask-SQLAlchemy removes it.
+    # At the moment it is just used to suppress the super annoying warning
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
 
