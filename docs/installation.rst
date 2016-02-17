@@ -234,7 +234,7 @@ This can be done with:
 
 ::
 
-    $ sudo apt-get install uwsgi uwsgi-plugins-python
+    $ sudo apt-get install uwsgi uwsgi-plugin-python
 
 For the configuration, you need to create a file in the
 ``/etc/uwsgi/apps-available`` directory. In this example, I will call the
