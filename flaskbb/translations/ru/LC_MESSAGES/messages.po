@@ -1677,7 +1677,7 @@ msgstr "Информация"
 
 #: flaskbb/templates/user/profile.html:25
 msgid "User has not added any notes about him."
-msgstr "Пользователь не добавил комментариев о себе"
+msgstr "Пользователь не добавил комментарий о себе"
 
 #: flaskbb/templates/user/profile.html:34
 msgid "Signature"
