@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, current_app, flash, request
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 from flask_login import current_user
 
 from flaskbb.utils.helpers import render_template

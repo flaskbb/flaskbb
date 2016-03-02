@@ -20,7 +20,7 @@ import requests
 import unidecode
 from flask import session, url_for, flash
 from babel.dates import format_timedelta
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
 from flask_login import current_user
 

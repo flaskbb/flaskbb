@@ -2,7 +2,7 @@ import os
 
 import babel
 
-from flask_babelex import Domain, get_locale
+from flask_babelplus import Domain, get_locale
 from flask_plugins import get_enabled_plugins
 
 

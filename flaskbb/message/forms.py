@@ -12,7 +12,7 @@ from flask_login import current_user
 from flask_wtf import Form
 from wtforms import StringField, TextAreaField, ValidationError, SubmitField
 from wtforms.validators import DataRequired
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
 from flaskbb.message.models import Conversation, Message

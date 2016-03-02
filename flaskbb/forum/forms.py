@@ -12,7 +12,7 @@ from flask_wtf import Form
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
                      BooleanField, SubmitField)
 from wtforms.validators import DataRequired, Optional, Length
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User

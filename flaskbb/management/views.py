@@ -15,7 +15,7 @@ from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
 from flask_login import current_user
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 from flask_allows import Permission, Not
 
 from flaskbb import __version__ as flaskbb_version

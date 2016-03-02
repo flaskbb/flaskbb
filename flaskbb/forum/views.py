@@ -14,7 +14,7 @@ import datetime
 from sqlalchemy import asc, desc
 from flask import Blueprint, redirect, url_for, current_app, request, flash
 from flask_login import login_required, current_user
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 from flask_allows import Permission, And
 from flaskbb.extensions import db, allows
 from flaskbb.utils.settings import flaskbb_config
