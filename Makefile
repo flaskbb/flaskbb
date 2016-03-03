@@ -3,7 +3,7 @@
 help:
 	@echo "  clean      remove unwanted stuff"
 	@echo "  install    install flaskbb and setup"
-	@echo "  tests      run the testsuite"
+	@echo "  test      run the testsuite"
 	@echo "  run        run the development server"
 
 dependencies:requirements.txt
