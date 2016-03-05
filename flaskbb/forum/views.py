@@ -179,7 +179,7 @@ def new_topic(forum_id, slug=None):
     if not Permission(CanPostTopic):
         flash(_("You do not have the permissions to create a new topic."),
               "danger")
-        return redirect(forum.url)
+        return redirect(forum_instance.url)
 
     form = NewTopicForm()
     if request.method == "POST":
