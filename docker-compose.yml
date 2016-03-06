@@ -1,0 +1,6 @@
+flaskbb:
+    build: .
+    volumes:
+        - .:/flaskbb
+    ports:
+        - "8000:8000"

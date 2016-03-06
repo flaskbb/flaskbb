@@ -1,10 +1,11 @@
-.PHONY: clean install help test run dependencies
+.PHONY: clean install help test run dependencies uinstall
 
 help:
 	@echo "  clean      remove unwanted stuff"
 	@echo "  install    install flaskbb and setup"
-	@echo "  test      run the testsuite"
+	@echo "  test       run the testsuite"
 	@echo "  run        run the development server"
+	@echo "  uinstall   unattended install"
 
 dependencies:requirements.txt
 	pip install -r requirements.txt
@@ -24,3 +25,6 @@ run:
 install:dependencies
 	clear
 	python manage.py install
+
+uinstall:
+	python manage.py unattended_install
