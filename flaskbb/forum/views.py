@@ -315,6 +315,11 @@ def manage_forum(forum_id, slug=None):
         ids = request.form.getlist("rowid")
         tmp_topics = Topic.query.filter(Topic.id.in_(ids)).all()
 
+        if not len(tmp_topics) > 0:
+            flash(_("In order to perform this action you have to select at "
+                    " least one topic."), "danger")
+            return redirect(mod_forum_url)
+
         # locking/unlocking
         if "lock" in request.form:
             changed = do_topic_action(topics=tmp_topics, user=current_user,
