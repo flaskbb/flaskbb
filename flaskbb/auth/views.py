@@ -58,13 +58,14 @@ def reauth():
     if not login_fresh():
         form = ReauthForm(request.form)
         if form.validate_on_submit():
-            confirm_login()
-            flash(_("Reauthenticated."), "success")
-            return redirect(request.args.get("next") or
-                            url_for("user.profile"))
+            if current_user.check_password(form.password.data):
+                confirm_login()
+                flash(_("Reauthenticated."), "success")
+                return redirect(request.args.get("next") or current_user.url)
+
+            flash(_("Wrong password."), "danger")
         return render_template("auth/reauth.html", form=form)
-    return redirect(request.args.get("next") or
-                    url_for("user.profile", username=current_user.username))
+    return redirect(request.args.get("next") or current_user.url)
 
 
 @auth.route("/logout")
