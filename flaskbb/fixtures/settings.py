@@ -67,6 +67,51 @@ fixture = (
             }),
         ),
     }),
+    ('auth', {
+        'name': 'Authentication Settings',
+        'description': 'Configurations for the Login and Register process.',
+        'settings': (
+            ('registration_enabled', {
+                'value':        True,
+                'value_type':   "boolean",
+                'name':         "Enable Registration",
+                'description':  "Enable or disable the registration",
+            }),
+            ('login_attempts', {
+                'value':        5,
+                'value_type':   "integer",
+                'extra':        {'min': 1},
+                'name':         "Login Attempts",
+                'description':  "Number of failed login attempts before the account will be suspended for a specified time.",
+            }),
+            ('login_timeout', {
+                'value':        15,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Login Timeout",
+                'description':  "The time of how long a account will stay suspended until the user can try to login again (in minutes).",
+            }),
+            ('recaptcha_enabled', {
+                'value':        False,
+                'value_type':   "boolean",
+                'name':         "Enable reCAPTCHA",
+                'description':  ("Helps to prevent bots from creating accounts. "
+                                 "For more information visit this link: <a href=http://www.google.com/recaptcha>http://www.google.com/recaptcha</a>"),
+            }),
+            ('recaptcha_public_key', {
+                'value':        "",
+                'value_type':   "string",
+                'name':         "reCAPTCHA Site Key",
+                'description':  "Your public recaptcha key ('Site key').",
+            }),
+            ('recaptcha_private_key', {
+                'value':        "",
+                'value_type':   "string",
+                'name':         "reCAPTCHA Secret Key",
+                'description':  "The private key ('Secret key'). Keep this a secret!",
+            }),
+        ),
+    }),
     ('misc', {
         'name': "Misc Settings",
         'description': "Miscellaneous settings.",

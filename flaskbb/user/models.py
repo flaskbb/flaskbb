@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import os
 from datetime import datetime
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -18,6 +19,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
+from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -71,8 +73,7 @@ class Group(db.Model, CRUDMixin):
 
     @classmethod
     def get_guest_group(cls):
-        return cls.query.filter(cls.guest==True).first()
-
+        return cls.query.filter(cls.guest == True).first()
 
 
 class User(db.Model, UserMixin, CRUDMixin):
@@ -92,6 +93,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     signature = db.Column(db.Text)
     avatar = db.Column(db.String(200))
     notes = db.Column(db.Text)
+
+    last_failed_login = db.Column(db.DateTime)
+    login_attempts = db.Column(db.Integer, default=0)
 
     theme = db.Column(db.String(15))
     language = db.Column(db.String(15), default="en")
@@ -209,21 +213,28 @@ class User(db.Model, UserMixin, CRUDMixin):
     @classmethod
     def authenticate(cls, login, password):
         """A classmethod for authenticating users.
-        It returns true if the user exists and has entered a correct password
+        It returns true if the user exists and has entered a correct password.
 
         :param login: This can be either a username or a email address.
-
         :param password: The password that is connected to username and email.
         """
-
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
         if user:
-            authenticated = user.check_password(password)
-        else:
-            authenticated = False
-        return user, authenticated
+            if user.check_password(password):
+                return user
+
+            # user exists, wrong password
+            user.login_attempts += 1
+            user.last_failed_login = datetime.utcnow()
+            user.save()
+
+        # protection against account enumeration timing attacks
+        dummy_password = os.urandom(15).encode("base-64")
+        check_password_hash(dummy_password, password)
+
+        raise AuthenticationError
 
     def _make_token(self, data, timeout):
         s = Serializer(current_app.config['SECRET_KEY'], timeout)

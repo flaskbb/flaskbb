@@ -166,13 +166,15 @@ def insertmassdata():
     insert_mass_data()
 
 
-@manager.option('-s', '--settings', dest="settings")
 @manager.option('-f', '--force', dest="force", default=False)
+@manager.option('-s', '--settings', dest="settings")
 def update(settings=None, force=False):
     """Updates the settings via a fixture. All fixtures have to be placed
     in the `fixture`.
     Usage: python manage.py update -s your_fixture
     """
+    if settings is None:
+        settings = "settings"
 
     try:
         fixture = import_string(

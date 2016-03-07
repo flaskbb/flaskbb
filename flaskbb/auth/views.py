@@ -14,10 +14,12 @@ from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
 from flask_babelplus import gettext as _
 
-from flaskbb.utils.helpers import render_template
+from flaskbb.utils.helpers import render_template, redirect_or_next
 from flaskbb.email import send_reset_token
-from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
-                                ResetPasswordForm)
+from flaskbb.exceptions import AuthenticationError
+from flaskbb.auth.forms import (LoginForm, LoginRecaptchaForm, ReauthForm,
+                                ForgotPasswordForm, ResetPasswordForm,
+                                RegisterRecaptchaForm, RegisterForm)
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
@@ -27,24 +29,19 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
-    """
-    Logs the user in
-    """
-
+    """Logs the user in."""
     if current_user is not None and current_user.is_authenticated:
-        return redirect(url_for("user.profile"))
+        return redirect(current_user.url)
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user, authenticated = User.authenticate(form.login.data,
-                                                form.password.data)
-
-        if user and authenticated:
+        try:
+            user = User.authenticate(form.login.data, form.password.data)
             login_user(user, remember=form.remember_me.data)
-            return redirect(request.args.get("next") or
-                            url_for("forum.index"))
+            return redirect_or_next(url_for("forum.index"))
+        except AuthenticationError:
+            flash(_("Wrong Username or Password."), "danger")
 
-        flash(_("Wrong Username or Password."), "danger")
     return render_template("auth/login.html", form=form)
 
 
@@ -52,16 +49,15 @@ def login():
 @login_required
 def reauth():
     """
-    Reauthenticates a user
+    Reauthenticates a user.
     """
-
     if not login_fresh():
         form = ReauthForm(request.form)
         if form.validate_on_submit():
             if current_user.check_password(form.password.data):
                 confirm_login()
                 flash(_("Reauthenticated."), "success")
-                return redirect(request.args.get("next") or current_user.url)
+                return redirect_or_next(current_user.url)
 
             flash(_("Wrong password."), "danger")
         return render_template("auth/reauth.html", form=form)
@@ -79,18 +75,18 @@ def logout():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     """
-    Register a new user
+    Register a new user.
     """
-
     if current_user is not None and current_user.is_authenticated:
         return redirect(url_for("user.profile",
                                 username=current_user.username))
 
+    if not flaskbb_config["REGISTRATION_ENABLED"]:
+        flash(_("The registration has been disabled."), "info")
+
     if current_app.config["RECAPTCHA_ENABLED"]:
-        from flaskbb.auth.forms import RegisterRecaptchaForm
         form = RegisterRecaptchaForm(request.form)
     else:
-        from flaskbb.auth.forms import RegisterForm
         form = RegisterForm(request.form)
 
     form.language.choices = available_languages()

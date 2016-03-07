@@ -36,6 +36,10 @@ class LoginForm(Form):
     submit = SubmitField(_("Login"))
 
 
+class LoginRecaptchaForm(LoginForm):
+    recaptcha = RecaptchaField(_("Captcha"))
+
+
 class RegisterForm(Form):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A Username is required.")),
@@ -50,7 +54,6 @@ class RegisterForm(Form):
         EqualTo('confirm_password', message=_('Passwords must match.'))])
 
     confirm_password = PasswordField(_('Confirm Password'))
-
 
     language = SelectField(_('Language'))
 

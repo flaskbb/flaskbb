@@ -17,3 +17,7 @@ class FlaskBBError(HTTPException):
 
 class AuthorizationRequired(FlaskBBError, Forbidden):
     description = "Authorization is required to access this area."
+
+
+class AuthenticationError(FlaskBBError):
+    description = "Invalid username and password combination."

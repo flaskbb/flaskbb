@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 
 import requests
 import unidecode
-from flask import session, url_for, flash
+from flask import session, url_for, flash, redirect, request
 from babel.dates import format_timedelta
 from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
@@ -46,6 +46,17 @@ def slugify(text, delim=u'-'):
         if word:
             result.append(word)
     return text_type(delim.join(result))
+
+
+def redirect_or_next(endpoint, **kwargs):
+    """Redirects the user back to the page they were viewing or to a specified
+    endpoint. Wraps Flasks :func:`Flask.redirect` function.
+
+    :param endpoint: The fallback endpoint.
+    """
+    return redirect(
+        request.args.get('next') or endpoint, **kwargs
+    )
 
 
 def render_template(template, **context):  # pragma: no cover
