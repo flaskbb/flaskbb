@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
@@ -19,7 +19,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
-from flaskbb.exceptions import AuthenticationError
+from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -179,7 +179,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def topics_per_day(self):
         """Returns the topics per day count."""
-        return round((float(self.topic_count) / float(self.days_registered)), 1)
+        return round(
+            (float(self.topic_count) / float(self.days_registered)), 1
+        )
 
     # Methods
     def __repr__(self):
@@ -213,7 +215,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     @classmethod
     def authenticate(cls, login, password):
         """A classmethod for authenticating users.
-        It returns true if the user exists and has entered a correct password.
+        It returns the user object if the user/password combination is ok.
+        If the user has entered too often a wrong password, he will be locked
+        out of his account for a specified time.
 
         :param login: This can be either a username or a email address.
         :param password: The password that is connected to username and email.
@@ -222,7 +226,19 @@ class User(db.Model, UserMixin, CRUDMixin):
                                        User.email == login)).first()
 
         if user:
+            # check for the login attempts first
+            login_timeout = datetime.utcnow() - timedelta(
+                    minutes=flaskbb_config["LOGIN_TIMEOUT"]
+            )
+            if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"] and \
+                    user.last_failed_login > login_timeout:
+                raise LoginAttemptsExceeded
+
             if user.check_password(password):
+                if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"]:
+                    # reset them after a successful login attempt
+                    user.login_attempts = 0
+                    user.save()
                 return user
 
             # user exists, wrong password

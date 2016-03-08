@@ -21,3 +21,7 @@ class AuthorizationRequired(FlaskBBError, Forbidden):
 
 class AuthenticationError(FlaskBBError):
     description = "Invalid username and password combination."
+
+
+class LoginAttemptsExceeded(FlaskBBError):
+    description = "The user has entered the wrong password too many times."
