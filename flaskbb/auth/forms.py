@@ -10,13 +10,14 @@
 """
 from datetime import datetime
 
-from flask_wtf import Form, RecaptchaField
+from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
 from flask_babelplus import lazy_gettext as _
 from flaskbb.user.models import User
+from flaskbb.utils.recaptcha import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -36,10 +37,6 @@ class LoginForm(Form):
     submit = SubmitField(_("Login"))
 
 
-class LoginRecaptchaForm(LoginForm):
-    recaptcha = RecaptchaField(_("Captcha"))
-
-
 class RegisterForm(Form):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A Username is required.")),
@@ -54,6 +51,8 @@ class RegisterForm(Form):
         EqualTo('confirm_password', message=_('Passwords must match.'))])
 
     confirm_password = PasswordField(_('Confirm Password'))
+
+    recaptcha = RecaptchaField(_("Captcha"))
 
     language = SelectField(_('Language'))
 
@@ -79,10 +78,6 @@ class RegisterForm(Form):
                     primary_group_id=4,
                     language=self.language.data)
         return user.save()
-
-
-class RegisterRecaptchaForm(RegisterForm):
-    recaptcha = RecaptchaField(_("Captcha"))
 
 
 class ReauthForm(Form):

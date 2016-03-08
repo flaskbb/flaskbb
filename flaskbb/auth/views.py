@@ -11,7 +11,7 @@
 """
 from datetime import datetime, timedelta
 
-from flask import Blueprint, flash, redirect, url_for, request, current_app
+from flask import Blueprint, flash, redirect, url_for, request
 from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
 from flask_babelplus import gettext as _
@@ -19,9 +19,8 @@ from flask_babelplus import gettext as _
 from flaskbb.utils.helpers import render_template, redirect_or_next
 from flaskbb.email import send_reset_token
 from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
-from flaskbb.auth.forms import (LoginForm, LoginRecaptchaForm, ReauthForm,
-                                ForgotPasswordForm, ResetPasswordForm,
-                                RegisterRecaptchaForm, RegisterForm)
+from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
+                                ResetPasswordForm, RegisterForm)
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
@@ -94,10 +93,7 @@ def register():
         flash(_("The registration has been disabled."), "info")
         return redirect(url_for("forum.index"))
 
-    if current_app.config["RECAPTCHA_ENABLED"]:
-        form = RegisterRecaptchaForm(request.form)
-    else:
-        form = RegisterForm(request.form)
+    form = RegisterForm(request.form)
 
     form.language.choices = available_languages()
     form.language.default = flaskbb_config['DEFAULT_LANGUAGE']
