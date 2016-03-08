@@ -88,11 +88,11 @@ def register():
     Register a new user.
     """
     if current_user is not None and current_user.is_authenticated:
-        return redirect(url_for("user.profile",
-                                username=current_user.username))
+        return redirect_or_next(current_user.url)
 
     if not flaskbb_config["REGISTRATION_ENABLED"]:
         flash(_("The registration has been disabled."), "info")
+        return redirect(url_for("forum.index"))
 
     if current_app.config["RECAPTCHA_ENABLED"]:
         form = RegisterRecaptchaForm(request.form)
@@ -108,8 +108,7 @@ def register():
         login_user(user)
 
         flash(_("Thanks for registering."), "success")
-        return redirect(url_for("user.profile",
-                                username=current_user.username))
+        return redirect_or_next(current_user.url)
 
     return render_template("auth/register.html", form=form)
 

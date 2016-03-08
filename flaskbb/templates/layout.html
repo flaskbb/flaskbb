@@ -135,7 +135,9 @@
                                     </a>
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
+                                        {% if flaskbb_config["REGISTRATION_ENABLED"] %}
                                         <li><a href="{{ url_for('auth.register') }}">{% trans %}Register{% endtrans %}</a></li>
+                                        {% endif %}
                                         <li><a href="{{ url_for('auth.forgot_password') }}">{% trans %}Reset Password{% endtrans %}</a></li>
                                     </ul>
                                 </div>
