@@ -13,9 +13,12 @@ from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail
+from flaskbb.utils.tokens import (generate_password_reset_token,
+                                  generate_email_confirmation_token)
 
 
-def send_reset_token(user, token):
+def send_reset_token(user):
+    token = generate_password_reset_token(user)
     send_email(
         subject=_("Password Reset"),
         recipients=[user.email],
@@ -26,6 +29,24 @@ def send_reset_token(user, token):
         ),
         html_body=render_template(
             "email/reset_password.html",
+            user=user,
+            token=token
+        )
+    )
+
+
+def send_email_confirmation(user):
+    token = generate_email_confirmation_token()
+    send_email(
+        subject=_("E-Mail Confirmation"),
+        recipients=[user.email],
+        text_body=render_template(
+            "email/confirm_email.txt",
+            user=user,
+            token=token
+        ),
+        html_body=render_template(
+            "email/confirm_email.html",
             user=user,
             token=token
         )

@@ -1,0 +1,10 @@
+{% set link = url_for('auth.email_confirmation', token=token, _external=True) %}
+
+<p>{% trans user=user.username %}Dear {{ user }},{% endtrans %}</p>
+
+<p>{% trans %}Click the link below to confirm your email:{% endtrans %}</p>
+
+<p><a href="{{ link }}"</a></p>
+
+<p>{% trans %}Sincerely,{% endtrans %}</p>
+<p>{% trans %}The Administration{% endtrans %}</p>

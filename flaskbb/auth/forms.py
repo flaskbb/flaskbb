@@ -114,3 +114,7 @@ class ResetPasswordForm(Form):
         email = User.query.filter_by(email=field.data).first()
         if not email:
             raise ValidationError(_("Wrong E-Mail Address."))
+
+
+class EmailConfirmationForm(Form):
+    pass

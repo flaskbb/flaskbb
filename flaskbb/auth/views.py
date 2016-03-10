@@ -20,10 +20,12 @@ from flaskbb.utils.helpers import render_template, redirect_or_next
 from flaskbb.email import send_reset_token
 from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
-                                ResetPasswordForm, RegisterForm)
+                                ResetPasswordForm, RegisterForm,
+                                EmailConfirmationForm)
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.tokens import get_token_status
 
 auth = Blueprint("auth", __name__)
 
@@ -164,3 +166,12 @@ def reset_password(token):
 
     form.token.data = token
     return render_template("auth/reset_password.html", form=form)
+
+
+@auth.route("/confirm-email/<token>", methods=["GET", "POST"])
+def email_confirmation(token):
+    """Handles the email verification process."""
+    if current_user.is_authenticated and current_user.confirmed is not None:
+        return redirect(url_for('forum.index'))
+
+    return render_template("auth/email_verification.html")
