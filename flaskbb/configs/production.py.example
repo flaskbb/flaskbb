@@ -51,23 +51,24 @@ class ProductionConfig(DefaultConfig):
 
     ## Mail
     # Local SMTP Server
-    #MAIL_SERVER = "localhost"
-    #MAIL_PORT = 25
-    #MAIL_USE_SSL = False
-    #MAIL_USERNAME = ""
-    #MAIL_PASSWORD = ""
-    #MAIL_DEFAULT_SENDER = "noreply@example.org"
+    MAIL_SERVER = "localhost"
+    MAIL_PORT = 25
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = ""
+    MAIL_PASSWORD = ""
+    MAIL_DEFAULT_SENDER = ("FlaskBB Mailer", "noreply@example.org")
+
 
     # Google Mail Example
-    MAIL_SERVER = "smtp.gmail.com"
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
-    MAIL_USERNAME = "your_username@gmail.com"
-    MAIL_PASSWORD = "your_password"
-    MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
+    #MAIL_SERVER = "smtp.gmail.com"
+    #MAIL_PORT = 465
+    #MAIL_USE_SSL = True
+    #MAIL_USERNAME = "your_username@gmail.com"
+    #MAIL_PASSWORD = "your_password"
+    #MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
 
     # The user who should recieve the error logs
-    ADMINS = ["your_admin_user@gmail.com"]
+    #ADMINS = ["your_admin_user@gmail.com"]
 
 
     ## Error/Info Logging
