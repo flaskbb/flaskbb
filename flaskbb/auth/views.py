@@ -25,7 +25,7 @@ from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.tokens import get_token_status
+from flaskbb.utils.tokens import get_token_status, make_token
 
 auth = Blueprint("auth", __name__)
 
@@ -105,13 +105,17 @@ def register():
         user = form.save()
         login_user(user)
 
-        flash(_("Thanks for registering."), "success")
+        if flaskbb_config["VERFIY_EMAIL"]:
+
+            flash(_("verify your email by blablaabla"))
+        else:
+            flash(_("Thanks for registering."), "success")
         return redirect_or_next(current_user.url)
 
     return render_template("auth/register.html", form=form)
 
 
-@auth.route('/resetpassword', methods=["GET", "POST"])
+@auth.route('/reset-password', methods=["GET", "POST"])
 def forgot_password():
     """
     Sends a reset password token to the user.
@@ -125,7 +129,7 @@ def forgot_password():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            token = user.make_reset_token()
+            token = make_token(user, "reset_password")
             send_reset_token(user, token=token)
 
             flash(_("E-Mail sent! Please check your inbox."), "info")
@@ -136,7 +140,7 @@ def forgot_password():
     return render_template("auth/forgot_password.html", form=form)
 
 
-@auth.route("/resetpassword/<token>", methods=["GET", "POST"])
+@auth.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     """
     Handles the reset password process.
@@ -147,8 +151,8 @@ def reset_password(token):
 
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        expired, invalid, data = user.verify_reset_token(form.token.data)
+        expired, invalid, user = get_token_status(form.token.data,
+                                                  "reset_password")
 
         if invalid:
             flash(_("Your Password Token is invalid."), "danger")
@@ -158,7 +162,7 @@ def reset_password(token):
             flash(_("Your Password Token is expired."), "danger")
             return redirect(url_for("auth.forgot_password"))
 
-        if user and data:
+        if user:
             user.password = form.password.data
             user.save()
             flash(_("Your Password has been updated."), "success")
@@ -169,9 +173,19 @@ def reset_password(token):
 
 
 @auth.route("/confirm-email/<token>", methods=["GET", "POST"])
-def email_confirmation(token):
+def email_confirmation(token=None):
     """Handles the email verification process."""
     if current_user.is_authenticated and current_user.confirmed is not None:
         return redirect(url_for('forum.index'))
 
-    return render_template("auth/email_verification.html")
+    if token is not None:
+        expired, invalid, user = get_token_status(token, "verify_email")
+        return
+
+    form = None
+    if token is None:
+        form = EmailConfirmationForm()
+        if form.validate_on_submit():
+            pass
+
+    return render_template("auth/email_verification.html", form=form)

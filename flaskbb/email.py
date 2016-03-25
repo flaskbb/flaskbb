@@ -20,7 +20,7 @@ from flaskbb.utils.tokens import (generate_password_reset_token,
 def send_reset_token(user):
     token = generate_password_reset_token(user)
     send_email(
-        subject=_("Password Reset"),
+        subject=_("Password Recovery Confirmation"),
         recipients=[user.email],
         text_body=render_template(
             "email/reset_password.txt",

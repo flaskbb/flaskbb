@@ -67,13 +67,3 @@ def get_token_status(token, operation, return_data):
         return expired, invalid, user, data
 
     return expired, invalid, user
-
-
-def generate_email_confirmation_token(user):
-    """Generates a E-Mail confirmation token."""
-    return make_token(user=user, operation="confirm_email")
-
-
-def generate_password_reset_token(user):
-    """Generates a password reset token."""
-    return make_token(user=user, operation="reset_password")
