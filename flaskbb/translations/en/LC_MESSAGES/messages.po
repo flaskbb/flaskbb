@@ -119,7 +119,7 @@ msgid "Refresh Login"
 msgstr ""
 
 #: flaskbb/auth/forms.py:91
-msgid "A E-Mail Address is reguired."
+msgid "A E-Mail Address is required."
 msgstr ""
 
 #: flaskbb/auth/forms.py:94 flaskbb/templates/auth/forgot_password.html:1
@@ -333,7 +333,7 @@ msgid "Could not merge the topics."
 msgstr ""
 
 #: flaskbb/forum/views.py:314
-msgid "Topics succesfully merged."
+msgid "Topics successfully merged."
 msgstr ""
 
 #: flaskbb/forum/views.py:325 flaskbb/forum/views.py:352
@@ -582,7 +582,7 @@ msgstr ""
 
 #: flaskbb/management/forms.py:294
 msgid ""
-"Comma seperated usernames. Leave it blank if you do not want to set any "
+"Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
 
@@ -780,7 +780,7 @@ msgstr ""
 
 #: flaskbb/management/views.py:485
 msgid ""
-"If you are using a host which doesn't support writting on the disk, this "
+"If you are using a host which doesn't support writing on the disk, this "
 "won't work - than you need to delete the 'DISABLED' file by yourself."
 msgstr ""
 
@@ -799,7 +799,7 @@ msgstr ""
 
 #: flaskbb/management/views.py:514
 msgid ""
-"If you are using a host which doesn't support writting on the disk, this "
+"If you are using a host which doesn't support writing on the disk, this "
 "won't work - than you need to create a 'DISABLED' file by yourself."
 msgstr ""
 
@@ -1702,7 +1702,7 @@ msgstr ""
 #~ msgid "Could not merge the topic."
 #~ msgstr ""
 
-#~ msgid "Topic succesfully merged."
+#~ msgid "Topic successfully merged."
 #~ msgstr ""
 
 #~ msgid "You do not have the permissions to post here"
@@ -1825,7 +1825,7 @@ msgstr ""
 #~ msgid "No Posts so far."
 #~ msgstr ""
 
-#~ msgid "Change E-Mail Adress"
+#~ msgid "Change E-Mail Address"
 #~ msgstr ""
 
 #~ msgid "This E-Mail is invalid"
