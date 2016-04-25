@@ -77,11 +77,11 @@ fixture = (
                 'name':         "Enable Registration",
                 'description':  "Enable or disable the registration",
             }),
-            ('verify_email', {
+            ('activate_account', {
                 'value':        True,
                 'value_type':   "boolean",
-                'name':         "Verify E-Mail Address",
-                'description':  "Enable to let the user verify the email address by sending a verification email."
+                'name':         "Enable Account Activation",
+                'description':  "Enable to let the user activate their account by sending a email with an activation link."
             }),
             ('login_attempts', {
                 'value':        5,

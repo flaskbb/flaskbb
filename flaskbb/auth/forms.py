@@ -116,5 +116,26 @@ class ResetPasswordForm(Form):
             raise ValidationError(_("Wrong E-Mail Address."))
 
 
-class EmailConfirmationForm(Form):
-    pass
+class RequestActivationForm(Form):
+    username = StringField(_("Username"), validators=[
+        DataRequired(message=_("A Username is required.")),
+        is_username])
+
+    email = StringField(_("E-Mail Address"), validators=[
+        DataRequired(message=_("A E-Mail Address is required.")),
+        Email(message=_("Invalid E-Mail Address."))])
+
+    password = PasswordField(_('Password'), validators=[
+        InputRequired(),
+        EqualTo('confirm_password', message=_('Passwords must match.'))])
+
+    submit = SubmitField(_("Send Confirmation Mail"))
+
+
+class AccountActivationForm(Form):
+    token = StringField(_("E-Mail Confirmation Token"), validators=[
+        DataRequired(message=_("Please enter the token that we have sent to "
+                               "you."))
+    ])
+
+    submit = SubmitField(_("Confirm E-Mail"))

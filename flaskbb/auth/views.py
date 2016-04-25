@@ -21,7 +21,7 @@ from flaskbb.email import send_reset_token
 from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm, RegisterForm,
-                                EmailConfirmationForm)
+                                AccountActivationForm, RequestActivationForm)
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
@@ -59,9 +59,7 @@ def login():
 @auth.route("/reauth", methods=["GET", "POST"])
 @login_required
 def reauth():
-    """
-    Reauthenticates a user.
-    """
+    """Reauthenticates a user."""
     if not login_fresh():
         form = ReauthForm(request.form)
         if form.validate_on_submit():
@@ -78,6 +76,7 @@ def reauth():
 @auth.route("/logout")
 @login_required
 def logout():
+    """Logs the user out."""
     logout_user()
     flash(("Logged out"), "success")
     return redirect(url_for("forum.index"))
@@ -85,9 +84,7 @@ def logout():
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
-    """
-    Register a new user.
-    """
+    """Register a new user."""
     if current_user is not None and current_user.is_authenticated:
         return redirect_or_next(current_user.url)
 
@@ -105,7 +102,7 @@ def register():
         user = form.save()
         login_user(user)
 
-        if flaskbb_config["VERFIY_EMAIL"]:
+        if flaskbb_config["ACTIVATE_ACCOUNT"]:
 
             flash(_("verify your email by blablaabla"))
         else:
@@ -117,10 +114,7 @@ def register():
 
 @auth.route('/reset-password', methods=["GET", "POST"])
 def forgot_password():
-    """
-    Sends a reset password token to the user.
-    """
-
+    """Sends a reset password token to the user."""
     if not current_user.is_anonymous:
         return redirect(url_for("forum.index"))
 
@@ -142,10 +136,7 @@ def forgot_password():
 
 @auth.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
-    """
-    Handles the reset password process.
-    """
-
+    """Handles the reset password process."""
     if not current_user.is_anonymous:
         return redirect(url_for("forum.index"))
 
@@ -172,20 +163,48 @@ def reset_password(token):
     return render_template("auth/reset_password.html", form=form)
 
 
-@auth.route("/confirm-email/<token>", methods=["GET", "POST"])
-def email_confirmation(token=None):
-    """Handles the email verification process."""
-    if current_user.is_authenticated and current_user.confirmed is not None:
+@auth.route("/activate", methods=["GET", "POST"])
+def request_activation_token(token=None):
+    """Requests a new account activation token."""
+    if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
         return redirect(url_for('forum.index'))
 
-    if token is not None:
-        expired, invalid, user = get_token_status(token, "verify_email")
-        return
+    form = RequestActivationForm()
+    if form.validate_on_submit():
+        # TODO: make sure validate some data (make sure this is the user whose
+        # token expired and/or is invalid).
+        pass
+
+    return render_template("auth/request_account_activation.html", form=form)
+
+
+@auth.route("/activate/<token>", methods=["GET", "POST"])
+def activate_account(token=None):
+    """Handles the account activation process."""
+    if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
+        return redirect(url_for('forum.index'))
 
     form = None
-    if token is None:
-        form = EmailConfirmationForm()
+    if token is not None:
+        expired, invalid, user = get_token_status(token, "activate_account")
+    else:
+        form = AccountActivationForm()
         if form.validate_on_submit():
-            pass
+            expired, invalid, user = get_token_status(form.token.data,
+                                                      "activate_account")
 
-    return render_template("auth/email_verification.html", form=form)
+    if invalid:
+        flash(_("Your account activation token is invalid."), "danger")
+        return redirect(url_for("auth.request_email_confirmation"))
+
+    if expired:
+        flash(_("Your account activation token is expired."), "danger")
+        return redirect(url_for("auth.request_activation_token"))
+
+    if user:
+        user.activated = datetime.utcnow()
+        user.save()
+        flash(_("Your Account has been activated.", "success"))
+        return redirect(url_for("forum.index"))
+
+    return render_template("auth/account_activation.html", form=form)
