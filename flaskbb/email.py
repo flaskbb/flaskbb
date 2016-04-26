@@ -34,18 +34,18 @@ def send_reset_token(user):
     )
 
 
-def send_email_confirmation(user):
-    token = make_token(user=user, operation="confirm_email")
+def send_activation_token(user):
+    token = make_token(user=user, operation="activate_account")
     send_email(
-        subject=_("E-Mail Confirmation"),
+        subject=_("Account Activation"),
         recipients=[user.email],
         text_body=render_template(
-            "email/confirm_email.txt",
+            "email/activate_account.txt",
             user=user,
             token=token
         ),
         html_body=render_template(
-            "email/confirm_email.html",
+            "email/activate_account.html",
             user=user,
             token=token
         )

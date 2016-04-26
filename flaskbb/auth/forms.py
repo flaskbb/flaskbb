@@ -125,11 +125,16 @@ class RequestActivationForm(Form):
         DataRequired(message=_("A E-Mail Address is required.")),
         Email(message=_("Invalid E-Mail Address."))])
 
-    password = PasswordField(_('Password'), validators=[
-        InputRequired(),
-        EqualTo('confirm_password', message=_('Passwords must match.'))])
-
     submit = SubmitField(_("Send Confirmation Mail"))
+
+    def validate_email(self, field):
+        self.user = User.query.filter_by(email=field.data).first()
+        # check if the username matches the one found in the database
+        if not self.user.username == self.username.data:
+            raise ValidationError(_("Account does not exist."))
+
+        if self.user.activated is not None:
+            raise ValidationError(_("Account is already active."))
 
 
 class AccountActivationForm(Form):

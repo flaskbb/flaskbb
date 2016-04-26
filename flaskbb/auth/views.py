@@ -17,7 +17,7 @@ from flask_login import (current_user, login_user, login_required,
 from flask_babelplus import gettext as _
 
 from flaskbb.utils.helpers import render_template, redirect_or_next
-from flaskbb.email import send_reset_token
+from flaskbb.email import send_reset_token, send_activation_token
 from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm, RegisterForm,
@@ -100,13 +100,15 @@ def register():
 
     if form.validate_on_submit():
         user = form.save()
-        login_user(user)
 
         if flaskbb_config["ACTIVATE_ACCOUNT"]:
-
-            flash(_("verify your email by blablaabla"))
+            send_activation_token(user)
+            flash(_("An account activation email has been sent to %(email)s",
+                    email=user.email), "success")
         else:
+            login_user(user)
             flash(_("Thanks for registering."), "success")
+
         return redirect_or_next(current_user.url)
 
     return render_template("auth/register.html", form=form)
@@ -167,13 +169,16 @@ def reset_password(token):
 def request_activation_token(token=None):
     """Requests a new account activation token."""
     if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
+        flash(_("This account is already activated."), "info")
         return redirect(url_for('forum.index'))
 
     form = RequestActivationForm()
     if form.validate_on_submit():
-        # TODO: make sure validate some data (make sure this is the user whose
-        # token expired and/or is invalid).
-        pass
+        user = User.query.filter_by(email=form.email.data).first()
+        send_activation_token(user)
+        flash(_("A new account activation token has been sent to "
+                "your email address."), "success")
+        return redirect(url_for("auth.activate_account"))
 
     return render_template("auth/request_account_activation.html", form=form)
 
@@ -182,6 +187,7 @@ def request_activation_token(token=None):
 def activate_account(token=None):
     """Handles the account activation process."""
     if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
+        flash(_("This account is already activated."), "info")
         return redirect(url_for('forum.index'))
 
     form = None
@@ -204,6 +210,11 @@ def activate_account(token=None):
     if user:
         user.activated = datetime.utcnow()
         user.save()
+
+        if current_user != user:
+            logout_user()
+            login_user(user)
+
         flash(_("Your Account has been activated.", "success"))
         return redirect(url_for("forum.index"))
 
