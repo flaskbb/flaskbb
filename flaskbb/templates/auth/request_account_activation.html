@@ -1,0 +1,23 @@
+{% set page_title = _("Request Account Activation") %}
+{% set active_forum_nav=True %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+{% from theme("macros.html") import horizontal_field %}
+
+<div class="panel page-panel">
+    <div class="panel-heading page-head">
+        {% trans %}Request Account Activation{% endtrans %}
+    </div>
+
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="POST">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.username) }}
+            {{ horizontal_field(form.email) }}
+            {{ horizontal_field(form.submit)}}
+        </form>
+    </div>
+</div>
+
+{% endblock %}
