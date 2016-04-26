@@ -127,9 +127,17 @@ class User(db.Model, UserMixin, CRUDMixin):
     # Properties
     @property
     def is_active(self):
-        if flaskbb_config["ACTIVATE_ACCOUNT"] and self.activated is not None:
-            return True
-        return False
+        """Returns the state of the account.
+        If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always
+        return ``True``. Is the option activated, it will, depending on the
+        state of the account, either return ``True`` or ``False``.
+        """
+        if flaskbb_config["ACTIVATE_ACCOUNT"]:
+            if self.activated is not None:
+                return True
+            return False
+
+        return True
 
     @property
     def last_post(self):
