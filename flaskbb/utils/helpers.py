@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 import requests
 import unidecode
 from flask import session, url_for, flash
+from jinja2 import Markup
 from babel.dates import format_timedelta
 from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
@@ -324,7 +325,7 @@ def render_markup(text):
 
     :param text: The text that should be rendered as markdown
     """
-    return markdown.render(text)
+    return Markup(markdown.render(text))
 
 
 def is_online(user):

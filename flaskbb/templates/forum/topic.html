@@ -83,12 +83,12 @@
                     </div>
 
                         <div class="post-content clearfix" id="pid{{ post.id }}">
-                        {{ post.content|markup|safe }}
+                        {{ post.content|markup }}
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
                         <div class="post-signature hidden-xs">
                         <hr />
-                            {{ user.signature|markup|safe }}
+                            {{ user.signature|markup }}
                         </div>
                         {% endif %}
                         <!-- Signature End -->
