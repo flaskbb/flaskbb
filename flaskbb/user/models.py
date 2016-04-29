@@ -94,7 +94,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     last_failed_login = db.Column(db.DateTime)
     login_attempts = db.Column(db.Integer, default=0)
-    activated = db.Column(db.DateTime)
+    activated = db.Column(db.Boolean, default=False)
 
     theme = db.Column(db.String(15))
     language = db.Column(db.String(15), default="en")
@@ -133,7 +133,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         state of the account, either return ``True`` or ``False``.
         """
         if flaskbb_config["ACTIVATE_ACCOUNT"]:
-            if self.activated is not None:
+            if self.activated:
                 return True
             return False
 

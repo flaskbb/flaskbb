@@ -176,7 +176,7 @@ def create_admin_user(username, password, email):
     user.password = password
     user.email = email
     user.primary_group_id = admin_group.id
-    user.activated = datetime.utcnow()
+    user.activated = True
 
     user.save()
     return user
@@ -234,7 +234,7 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
         email = "test%s@example.org" % u
         user = User(username=username, password="test", email=email)
         user.primary_group_id = u
-        user.activated = datetime.utcnow()
+        user.activated = True
         user.save()
         data_created['users'] += 1
 
