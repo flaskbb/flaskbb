@@ -88,6 +88,9 @@ class UserForm(Form):
     notes = TextAreaField(_("Notes"), validators=[
         Optional(), Length(min=0, max=5000)])
 
+    activated = BooleanField(_("Is active?"), validators=[
+        Optional()])
+
     primary_group = QuerySelectField(
         _("Primary Group"),
         query_factory=select_primary_group,
