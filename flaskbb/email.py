@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from threading import Thread
-from flask import render_templatec, copy_current_request_context
+from flask import render_template, copy_current_request_context
 from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
