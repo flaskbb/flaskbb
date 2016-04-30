@@ -8,7 +8,8 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask import render_template
+from threading import Thread
+from flask import render_templatec, copy_current_request_context
 from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
@@ -36,4 +37,9 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
     msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = text_body
     msg.html = html_body
-    mail.send(msg)
+
+    @copy_current_request_context
+    def send(msg):
+        mail.send(msg)
+    thr = Thread(target=send, args=[msg])
+    thr.start()
