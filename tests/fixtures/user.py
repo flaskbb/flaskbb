@@ -63,6 +63,6 @@ def Fred(default_groups):
     """
     fred = User(username='Fred', email='fred@fred.fred',
                 password='fred', primary_group=default_groups[3],
-                activated=datetime.datetime.utcnow())
+                activated=True)
     fred.save()
     return fred
