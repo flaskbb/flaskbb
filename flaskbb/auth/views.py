@@ -127,9 +127,7 @@ def forgot_password():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            token = make_token(user, "reset_password")
-            send_reset_token(user, token=token)
-
+            send_reset_token(user)
             flash(_("E-Mail sent! Please check your inbox."), "info")
             return redirect(url_for("auth.forgot_password"))
         else:
