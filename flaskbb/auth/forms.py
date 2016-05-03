@@ -92,6 +92,8 @@ class ForgotPasswordForm(Form):
         DataRequired(message=_("A E-Mail Address is reguired.")),
         Email()])
 
+    recaptcha = RecaptchaField(_("Captcha"))
+
     submit = SubmitField(_("Request Password"))
 
 
