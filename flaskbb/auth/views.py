@@ -16,7 +16,8 @@ from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
 from flask_babelplus import gettext as _
 
-from flaskbb.utils.helpers import render_template, redirect_or_next
+from flaskbb.utils.helpers import (render_template, redirect_or_next,
+                                   format_timedelta)
 from flaskbb.email import send_reset_token, send_activation_token
 from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
@@ -44,14 +45,15 @@ def login():
             return redirect_or_next(url_for("forum.index"))
         except AuthenticationError:
             flash(_("Wrong Username or Password."), "danger")
-        except LoginAttemptsExceeded:
-            #timeout = (user.last_failed_login +
-            #           timedelta(minutes=flaskbb_config["LOGIN_TIMEOUT"]))
-            #timeout_left = datetime.utcnow() - timeout
+        except LoginAttemptsExceeded as e:
+            user = e.user
+            timeout_till = (user.last_failed_login +
+                            timedelta(minutes=flaskbb_config["LOGIN_TIMEOUT"]))
+            timeout_left = timeout_till - datetime.utcnow()
 
-            flash(_("Your account has been locked for %(minutes)s minutes "
-                    "for too many failed login attempts.",
-                    minutes=flaskbb_config["LOGIN_TIMEOUT"]), "warning")
+            flash(_("Your account has been temporarily locked due to failed "
+                    "login attempts. Try again in %(timeout_left)s.",
+                    timeout_left=format_timedelta(timeout_left)), "warning")
 
     return render_template("auth/login.html", form=form)
 

@@ -25,3 +25,7 @@ class AuthenticationError(FlaskBBError):
 
 class LoginAttemptsExceeded(FlaskBBError):
     description = "The user has entered the wrong password too many times."
+
+    def __init__(self, user):
+        super(LoginAttemptsExceeded, self).__init__()
+        self.user = user

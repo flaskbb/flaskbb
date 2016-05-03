@@ -245,7 +245,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             )
             if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"] and \
                     user.last_failed_login > login_timeout:
-                raise LoginAttemptsExceeded
+                raise LoginAttemptsExceeded(user)
 
             if user.check_password(password):
                 if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"]:
