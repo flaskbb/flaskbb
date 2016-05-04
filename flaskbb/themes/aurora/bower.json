@@ -21,11 +21,11 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.1.4",
+    "jquery": "~2.2.3",
     "bootstrap-sass": "~3.3.6",
     "font-awesome": "fontawesome#~4.5.0",
-    "bootstrap-markdown": "~2.9.0",
+    "bootstrap-markdown": "~2.10.0",
     "marked": "~0.3.5",
-    "jquery-textcomplete": "~0.8.1"
+    "jquery-textcomplete": "~1.3.4"
   }
 }
