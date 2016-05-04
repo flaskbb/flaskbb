@@ -38,7 +38,7 @@ def make_token(user, operation, expire=3600):
     return s.dumps(data)
 
 
-def get_token_status(token, operation, return_data):
+def get_token_status(token, operation, return_data=False):
     """Returns the expired status, invalid status, the user and optionally
     the content of the JSON Web Signature token.
 

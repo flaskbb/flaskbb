@@ -26,7 +26,7 @@ from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.tokens import get_token_status, make_token
+from flaskbb.utils.tokens import get_token_status
 
 auth = Blueprint("auth", __name__)
 
