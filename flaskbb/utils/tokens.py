@@ -48,7 +48,7 @@ def get_token_status(token, operation, return_data=False):
                         of the token.
     """
     s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
-    user, data = None
+    user, data = None, None
     expired, invalid = False, False
 
     try:
@@ -58,10 +58,12 @@ def get_token_status(token, operation, return_data=False):
     except (BadSignature, TypeError, ValueError):
         invalid = True
 
-    if data:
-        user = User.query.filter_by(id=data.get('id')).first()
-
-    expired = expired and (user is not None)
+    if data is not None:
+        # check if the operation matches the one from the token
+        if operation == data.get("op", None):
+            user = User.query.filter_by(id=data.get('id')).first()
+        else:
+            invalid = True
 
     if return_data:
         return expired, invalid, user, data
