@@ -35,7 +35,7 @@ auth = Blueprint("auth", __name__)
 def login():
     """Logs the user in."""
     if current_user is not None and current_user.is_authenticated:
-        return redirect(current_user.url)
+        return redirect_or_next(url_for("forum.index"))
 
     form = LoginForm(request.form)
     if form.validate_on_submit():
@@ -80,7 +80,7 @@ def reauth():
 def logout():
     """Logs the user out."""
     logout_user()
-    flash(("Logged out"), "success")
+    flash(_("Logged out"), "success")
     return redirect(url_for("forum.index"))
 
 
@@ -88,11 +88,11 @@ def logout():
 def register():
     """Register a new user."""
     if current_user is not None and current_user.is_authenticated:
-        return redirect_or_next(current_user.url)
+        return redirect_or_next(url_for("forum.index"))
 
     if not flaskbb_config["REGISTRATION_ENABLED"]:
         flash(_("The registration has been disabled."), "info")
-        return redirect(url_for("forum.index"))
+        return redirect_or_next(url_for("forum.index"))
 
     form = RegisterForm(request.form)
 
