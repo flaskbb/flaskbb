@@ -35,7 +35,7 @@ from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, allows
+    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, allows, limiter
 # various helpers
 from flaskbb.utils.helpers import format_date, time_since, crop_title, \
     is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
@@ -116,6 +116,9 @@ def configure_extensions(app):
 
     # Flask-And-Redis
     redis_store.init_app(app)
+
+    # Flask-Limiter
+    limiter.init_app(app)
 
     # Flask-WhooshAlchemy
     with app.app_context():

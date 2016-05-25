@@ -14,8 +14,10 @@ from datetime import datetime, timedelta
 from flask import Blueprint, flash, redirect, url_for, request
 from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
+from flask_limiter.util import get_remote_address
 from flask_babelplus import gettext as _
 
+from flaskbb.extensions import limiter
 from flaskbb.utils.helpers import (render_template, redirect_or_next,
                                    format_timedelta)
 from flaskbb.email import send_reset_token, send_activation_token
@@ -29,6 +31,17 @@ from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
 
 auth = Blueprint("auth", __name__)
+
+
+def login_rate_limiting():
+    """Dynamically load the rate limiting config from the database."""
+    # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
+    return "{count}/{timeout}minutes".format(
+        count=flaskbb_config["LOGIN_ATTEMPTS"],
+        timeout=flaskbb_config["LOGIN_TIMEOUT"]
+    )
+
+limiter.limit(login_rate_limiting, key_func=get_remote_address)(auth)
 
 
 @auth.route("/login", methods=["GET", "POST"])
