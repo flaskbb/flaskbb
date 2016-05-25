@@ -97,6 +97,13 @@ fixture = (
                 'name':         "Login Timeout",
                 'description':  "The time of how long a account will stay suspended until the user can try to login again (in minutes).",
             }),
+            ('login_recaptcha', {
+                'value':        3,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Login reCAPTCHA",
+                'description':  "Use a CAPTCHA after a specified amount of failed login attempts."
+            }),
             ('recaptcha_enabled', {
                 'value':        False,
                 'value_type':   "boolean",
