@@ -54,7 +54,7 @@
                     {{ topic.date_created|format_date('%d %B %Y - %H:%M') }}
                 </div>
                 <div class="topic-content">
-                {{ topic.first_post.content|markup|safe }}
+                {{ topic.first_post.content|markup }}
                 </div>
             </div>
         </div>

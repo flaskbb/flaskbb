@@ -20,7 +20,7 @@ from wtforms.ext.sqlalchemy.fields import (
     QuerySelectField, QuerySelectMultipleField
 )
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 
 from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.widgets import SelectBirthdayWidget

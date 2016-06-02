@@ -151,7 +151,7 @@ class ForumNotLocked(Requirement):
         self._forum_id = forum_id
 
     def fulfill(self, user, request):
-        return not self._is_forum_locked(request)
+        return self._is_forum_locked(request)
 
     def _is_forum_locked(self, request):
         forum = self._determine_forum(request)

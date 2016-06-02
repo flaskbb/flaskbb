@@ -18,7 +18,7 @@ from flask_redis import Redis
 from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
-from flask_babelex import Babel
+from flask_babelplus import Babel
 from flask_wtf.csrf import CsrfProtect
 
 from flaskbb.exceptions import AuthorizationRequired

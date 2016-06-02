@@ -14,7 +14,7 @@ import datetime
 from sqlalchemy import asc, desc
 from flask import Blueprint, redirect, url_for, current_app, request, flash
 from flask_login import login_required, current_user
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 from flask_allows import Permission, And
 from flaskbb.extensions import db, allows
 from flaskbb.utils.settings import flaskbb_config
@@ -179,7 +179,7 @@ def new_topic(forum_id, slug=None):
     if not Permission(CanPostTopic):
         flash(_("You do not have the permissions to create a new topic."),
               "danger")
-        return redirect(forum.url)
+        return redirect(forum_instance.url)
 
     form = NewTopicForm()
     if request.method == "POST":
@@ -314,6 +314,11 @@ def manage_forum(forum_id, slug=None):
     if request.method == "POST":
         ids = request.form.getlist("rowid")
         tmp_topics = Topic.query.filter(Topic.id.in_(ids)).all()
+
+        if not len(tmp_topics) > 0:
+            flash(_("In order to perform this action you have to select at "
+                    " least one topic."), "danger")
+            return redirect(mod_forum_url)
 
         # locking/unlocking
         if "lock" in request.form:

@@ -13,9 +13,9 @@ from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
-from flask_login import current_user
+from flask_login import current_user, login_fresh
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 from flask_allows import Permission, Not
 
 from flaskbb import __version__ as flaskbb_version
@@ -37,6 +37,14 @@ from flaskbb.management.forms import (AddUserForm, EditUserForm, AddGroupForm,
 
 
 management = Blueprint("management", __name__)
+
+
+@management.before_request
+def check_fresh_login():
+    """Checks if the login is fresh for the current user, otherwise the user
+    has to reauthenticate."""
+    if not login_fresh():
+        return current_app.login_manager.needs_refresh()
 
 
 @management.route("/")

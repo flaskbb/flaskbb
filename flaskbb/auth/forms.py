@@ -15,7 +15,7 @@ from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 from flaskbb.user.models import User
 
 USERNAME_RE = r'^[\w.+-]+$'

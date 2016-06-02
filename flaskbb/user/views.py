@@ -12,7 +12,7 @@
 from flask import Blueprint, flash, request
 from flask_login import login_required, current_user
 from flask_themes2 import get_themes_list
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 
 from flaskbb.extensions import babel
 from flaskbb.utils.helpers import render_template

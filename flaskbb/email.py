@@ -10,7 +10,7 @@
 """
 from flask import render_template
 from flask_mail import Message
-from flask_babelex import lazy_gettext as _
+from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail
 

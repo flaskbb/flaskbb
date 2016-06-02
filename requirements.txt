@@ -5,6 +5,7 @@ cov-core==1.15.0
 coverage==4.0.3
 Flask==0.10.1
 flask-allows==0.1.0
+Flask-BabelPlus==1.0.1
 Flask-Cache==0.13.1
 Flask-DebugToolbar==0.10.0
 Flask-Login==0.3.2
@@ -34,5 +35,4 @@ Unidecode==0.04.19
 Werkzeug==0.11.3
 Whoosh==2.7.0
 WTForms==2.1
-https://github.com/sh4nks/flask-babelex/tarball/master#egg=Flask-BabelEx
 https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-Whooshalchemy

@@ -20,7 +20,7 @@
                 <div class="panel-body page-body">
                     <div class="col-md-12 col-sm-12 col-xs-12 profile-field">
                     {% if user.notes %}
-                        {{ user.notes|markup|safe }}
+                        {{ user.notes|markup }}
                     {% else %}
                         <p>{% trans %}User has not added any notes about him.{% endtrans %}</p>
                     {% endif %}
@@ -34,7 +34,7 @@
                 <div class="panel-heading page-head">{% trans %}Signature{% endtrans %}</div>
                 <div class="panel-body page-body">
                     <div class="col-md-12 col-sm-12 col-xs-12 profile-field">
-                        {{ user.signature|markup|safe }}
+                        {{ user.signature|markup }}
                     </div>
                 </div>
             </div> <!-- end profile widget -->

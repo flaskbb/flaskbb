@@ -1,8 +1,16 @@
 /* This file just holds some configuration values for the editor */
+marked.setOptions({
+    gfm: true,
+    tables: true,
+    breaks: true,
+    pedantic: false,
+    sanitize: true,
+    smartLists: true,
+    smartypants: false
+});
 
 $(".flaskbb-editor").markdown({
     iconlibrary: "fa",
-    hiddenButtons: "cmdPreview",
     additionalButtons: [
         [{
             name: "groupHelp",
@@ -14,29 +22,6 @@ $(".flaskbb-editor").markdown({
                 btnClass: 'btn btn-success',
                 callback: function(e){
                     $('#editor-help').modal('show')
-                }
-            }]
-        },{
-            name: 'groupPreview',
-            data: [{
-                name: 'cmdNewPreview',
-                toggle: true,
-                hotkey: 'Ctrl+P',
-                title: 'Preview',
-                btnText: 'Preview',
-                btnClass: 'btn btn-primary btn-sm',
-                icon: 'fa fa-search',
-                callback: function(e){
-                    // Check the preview mode and toggle based on this flag
-                    var isPreview = e.$isPreview,content;
-
-                    if (isPreview === false) {
-                      // Give flag that tell the editor enter preview mode
-                      e.showPreview();
-                      e.enableButtons('cmdNewPreview');
-                    } else {
-                      e.hidePreview();
-                    }
                 }
             }]
         }]

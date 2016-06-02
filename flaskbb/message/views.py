@@ -13,7 +13,7 @@ from datetime import datetime
 
 from flask import Blueprint, redirect, request, url_for, flash, abort
 from flask_login import login_required, current_user
-from flask_babelex import gettext as _
+from flask_babelplus import gettext as _
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
