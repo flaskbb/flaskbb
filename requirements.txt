@@ -8,6 +8,7 @@ flask-allows==0.1.0
 Flask-BabelPlus==1.0.1
 Flask-Cache==0.13.1
 Flask-DebugToolbar==0.10.0
+Flask-Limiter==0.9.3
 Flask-Login==0.3.2
 Flask-Mail==0.9.1
 Flask-Migrate==1.7.0
@@ -19,10 +20,12 @@ Flask-Themes2==0.1.4
 Flask-WTF==0.12
 itsdangerous==0.24
 Jinja2==2.8
+limits==1.1.1
 Mako==1.0.3
 MarkupSafe==0.23
 mistune==0.7.1
 Pygments==2.1
+python-editor==1.0
 pytz==2015.7
 redis==2.10.5
 requests==2.9.1
@@ -31,7 +34,7 @@ six==1.10.0
 speaklater==1.3
 SQLAlchemy==1.0.11
 SQLAlchemy-Utils==0.31.6
-Unidecode==0.04.19
+Unidecode==0.4.19
 Werkzeug==0.11.3
 Whoosh==2.7.0
 WTForms==2.1

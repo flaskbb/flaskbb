@@ -33,7 +33,21 @@ from flaskbb.utils.tokens import get_token_status
 auth = Blueprint("auth", __name__)
 
 
-def login_rate_limiting():
+@auth.before_request
+def check_rate_limiting():
+    """Check the the rate limits for each request for this blueprint."""
+    return limiter.check()
+
+
+@auth.errorhandler(429)
+def login_rate_limit_error(error):
+    """Register a custom error handler for a 'Too Many Requests'
+    (HTTP CODE 429) error."""
+    return render_template("errors/too_many_logins.html",
+                           timeout=error.description)
+
+
+def login_rate_limit():
     """Dynamically load the rate limiting config from the database."""
     # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
     return "{count}/{timeout}minutes".format(
@@ -41,7 +55,15 @@ def login_rate_limiting():
         timeout=flaskbb_config["LOGIN_TIMEOUT"]
     )
 
-limiter.limit(login_rate_limiting, key_func=get_remote_address)(auth)
+
+def login_rate_limit_message():
+    """Display the amount of time left until the user can access the requested
+    resource again."""
+    return _("%(minutes)s minutes", minutes=flaskbb_config["LOGIN_TIMEOUT"])
+
+
+# Activate rate limiting on the whole blueprint
+limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 
 
 @auth.route("/login", methods=["GET", "POST"])

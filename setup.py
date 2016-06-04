@@ -62,8 +62,11 @@ setup(
     install_requires=[
         'Babel',
         'Flask',
+        'Flask-Allows',
+        'Flask-BabelPlus',
         'Flask-Cache',
         'Flask-DebugToolbar',
+        'Flask-Limiter',
         'Flask-Login',
         'Flask-Mail',
         'Flask-Migrate',
@@ -106,7 +109,6 @@ setup(
     ],
     dependency_links=[
         'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy',
-        'https://github.com/sh4nks/flask-babelex/tarball/master#egg=Flask-BabelEx'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

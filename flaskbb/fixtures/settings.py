@@ -84,18 +84,18 @@ fixture = (
                 'description':  "Enable to let the user activate their account by sending a email with an activation link."
             }),
             ('login_attempts', {
-                'value':        5,
+                'value':        15,
                 'value_type':   "integer",
                 'extra':        {'min': 1},
                 'name':         "Login Attempts",
-                'description':  "Number of failed login attempts before the account will be suspended for a specified time.",
+                'description':  "Number of requests on each 'auth' route before the user can try to access the route again.",
             }),
             ('login_timeout', {
                 'value':        15,
                 'value_type':   "integer",
                 'extra':        {'min': 0},
                 'name':         "Login Timeout",
-                'description':  "The time of how long a account will stay suspended until the user can try to login again (in minutes).",
+                'description':  "The timeout for how long the user has to wait until he can access the resource again (in minutes).",
             }),
             ('login_recaptcha', {
                 'value':        3,
