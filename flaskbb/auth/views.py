@@ -100,6 +100,7 @@ def login():
 
 
 @auth.route("/reauth", methods=["GET", "POST"])
+@limiter.exempt
 @login_required
 def reauth():
     """Reauthenticates a user."""
@@ -117,6 +118,7 @@ def reauth():
 
 
 @auth.route("/logout")
+@limiter.exempt
 @login_required
 def logout():
     """Logs the user out."""
