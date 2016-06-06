@@ -239,19 +239,10 @@ class User(db.Model, UserMixin, CRUDMixin):
                                        User.email == login)).first()
 
         if user:
-            # check for the login attempts first
-            login_timeout = datetime.utcnow() - timedelta(
-                minutes=flaskbb_config["LOGIN_TIMEOUT"]
-            )
-            if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"] and \
-                    user.last_failed_login > login_timeout:
-                raise LoginAttemptsExceeded(user)
-
             if user.check_password(password):
-                if user.login_attempts >= flaskbb_config["LOGIN_ATTEMPTS"]:
-                    # reset them after a successful login attempt
-                    user.login_attempts = 0
-                    user.save()
+                # reset them after a successful login attempt
+                user.login_attempts = 0
+                user.save()
                 return user
 
             # user exists, wrong password

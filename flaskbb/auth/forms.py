@@ -32,6 +32,8 @@ class LoginForm(Form):
     password = PasswordField(_("Password"), validators=[
         DataRequired(message=_("A Password is required."))])
 
+    recaptcha = RecaptchaField(_("Captcha"))
+
     remember_me = BooleanField(_("Remember Me"), default=False)
 
     submit = SubmitField(_("Login"))

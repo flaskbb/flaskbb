@@ -9,19 +9,18 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from flask import Blueprint, flash, redirect, url_for, request
+from flask import Blueprint, flash, redirect, url_for, request, g
 from flask_login import (current_user, login_user, login_required,
                          logout_user, confirm_login, login_fresh)
-from flask_limiter.util import get_remote_address
 from flask_babelplus import gettext as _
 
 from flaskbb.extensions import limiter
 from flaskbb.utils.helpers import (render_template, redirect_or_next,
                                    format_timedelta)
 from flaskbb.email import send_reset_token, send_activation_token
-from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
+from flaskbb.exceptions import AuthenticationError
 from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
                                 ResetPasswordForm, RegisterForm,
                                 AccountActivationForm, RequestActivationForm)
@@ -61,7 +60,12 @@ def login_rate_limit():
 def login_rate_limit_message():
     """Display the amount of time left until the user can access the requested
     resource again."""
-    return _("%(minutes)s minutes", minutes=flaskbb_config["LOGIN_TIMEOUT"])
+    current_limit = getattr(g, 'view_rate_limit', None)
+    if current_limit is not None:
+        window_stats = limiter.limiter.get_window_stats(*current_limit)
+        reset_time = datetime.utcfromtimestamp(window_stats[0])
+        timeout = reset_time - datetime.utcnow()
+    return "{timeout}".format(timeout=format_timedelta(timeout))
 
 
 # Activate rate limiting on the whole blueprint
@@ -71,6 +75,14 @@ limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     """Logs the user in."""
+
+    current_limit = getattr(g, 'view_rate_limit', None)
+    login_recaptcha = False
+    if current_limit is not None:
+        window_stats = limiter.limiter.get_window_stats(*current_limit)
+        stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
+        login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
+
     if current_user is not None and current_user.is_authenticated:
         return redirect_or_next(url_for("forum.index"))
 
@@ -82,17 +94,9 @@ def login():
             return redirect_or_next(url_for("forum.index"))
         except AuthenticationError:
             flash(_("Wrong Username or Password."), "danger")
-        except LoginAttemptsExceeded as e:
-            user = e.user
-            timeout_till = (user.last_failed_login +
-                            timedelta(minutes=flaskbb_config["LOGIN_TIMEOUT"]))
-            timeout_left = timeout_till - datetime.utcnow()
 
-            flash(_("Your account has been temporarily locked due to failed "
-                    "login attempts. Try again in %(timeout_left)s.",
-                    timeout_left=format_timedelta(timeout_left)), "warning")
-
-    return render_template("auth/login.html", form=form)
+    return render_template("auth/login.html", form=form,
+                           login_recaptcha=login_recaptcha)
 
 
 @auth.route("/reauth", methods=["GET", "POST"])
