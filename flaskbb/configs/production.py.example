@@ -86,6 +86,19 @@ class ProductionConfig(DefaultConfig):
     REDIS_URL = "redis://:password@localhost:6379"
     REDIS_DATABASE = 0
 
+    # Flask-Limiter
+    # A full list with configuration values is available here:
+    # http://flask-limiter.readthedocs.io/en/stable/#configuration
+
+    # You can choose from:
+    #   memory:// (default)
+    #   redis://host:port
+    #   memcached://host:port
+    # Using the redis storage requires the installation of the redis package,
+    # which will be installed if you enable REDIS_ENABLE while memcached
+    # relies on the pymemcache package.
+    #RATELIMIT_STORAGE_URL = "redis://localhost:6379"
+
     # URL Prefixes. Only change it when you know what you are doing.
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
