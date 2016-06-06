@@ -67,6 +67,70 @@ fixture = (
             }),
         ),
     }),
+    ('auth', {
+        'name': 'Authentication Settings',
+        'description': 'Configurations for the Login and Register process.',
+        'settings': (
+            ('registration_enabled', {
+                'value':        True,
+                'value_type':   "boolean",
+                'name':         "Enable Registration",
+                'description':  "Enable or disable the registration",
+            }),
+            ('activate_account', {
+                'value':        True,
+                'value_type':   "boolean",
+                'name':         "Enable Account Activation",
+                'description':  "Enable to let the user activate their account by sending a email with an activation link."
+            }),
+            ('auth_ratelimit_enabled', {
+                'value':        True,
+                'value_type':   "boolean",
+                'name':         "Enable Auth Rate Limiting",
+                'description':  "Enable rate limiting on 'auth' routes. This will limit the amount of requests per minute to a given amount and time.",
+            }),
+            ('auth_requests', {
+                'value':        20,
+                'value_type':   "integer",
+                'extra':        {'min': 1},
+                'name':         "Auth Requests",
+                'description':  "Number of requests on each 'auth' route before the user has to wait a given timeout until he can access the resource again.",
+            }),
+            ('auth_timeout', {
+                'value':        15,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Auth Timeout",
+                'description':  "The timeout for how long the user has to wait until he can access the resource again (in minutes).",
+            }),
+            ('login_recaptcha', {
+                'value':        5,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Login reCAPTCHA",
+                'description':  "Use a CAPTCHA after a specified amount of failed login attempts."
+            }),
+            ('recaptcha_enabled', {
+                'value':        False,
+                'value_type':   "boolean",
+                'name':         "Enable reCAPTCHA",
+                'description':  ("Helps to prevent bots from creating accounts. "
+                                 "For more information visit this link: <a href=http://www.google.com/recaptcha>http://www.google.com/recaptcha</a>"),
+            }),
+            ('recaptcha_public_key', {
+                'value':        "",
+                'value_type':   "string",
+                'name':         "reCAPTCHA Site Key",
+                'description':  "Your public recaptcha key ('Site key').",
+            }),
+            ('recaptcha_private_key', {
+                'value':        "",
+                'value_type':   "string",
+                'name':         "reCAPTCHA Secret Key",
+                'description':  "The private key ('Secret key'). Keep this a secret!",
+            }),
+        ),
+    }),
     ('misc', {
         'name': "Misc Settings",
         'description': "Miscellaneous settings.",

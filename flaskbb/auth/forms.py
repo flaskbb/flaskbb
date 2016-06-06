@@ -10,13 +10,14 @@
 """
 from datetime import datetime
 
-from flask_wtf import Form, RecaptchaField
+from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
 from flask_babelplus import lazy_gettext as _
 from flaskbb.user.models import User
+from flaskbb.utils.recaptcha import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -30,6 +31,8 @@ class LoginForm(Form):
 
     password = PasswordField(_("Password"), validators=[
         DataRequired(message=_("A Password is required."))])
+
+    recaptcha = RecaptchaField(_("Captcha"))
 
     remember_me = BooleanField(_("Remember Me"), default=False)
 
@@ -51,6 +54,7 @@ class RegisterForm(Form):
 
     confirm_password = PasswordField(_('Confirm Password'))
 
+    recaptcha = RecaptchaField(_("Captcha"))
 
     language = SelectField(_('Language'))
 
@@ -78,10 +82,6 @@ class RegisterForm(Form):
         return user.save()
 
 
-class RegisterRecaptchaForm(RegisterForm):
-    recaptcha = RecaptchaField(_("Captcha"))
-
-
 class ReauthForm(Form):
     password = PasswordField(_('Password'), validators=[
         DataRequired(message=_("A Password is required."))])
@@ -93,6 +93,8 @@ class ForgotPasswordForm(Form):
     email = StringField(_('E-Mail Address'), validators=[
         DataRequired(message=_("A E-Mail Address is reguired.")),
         Email()])
+
+    recaptcha = RecaptchaField(_("Captcha"))
 
     submit = SubmitField(_("Request Password"))
 
@@ -116,3 +118,33 @@ class ResetPasswordForm(Form):
         email = User.query.filter_by(email=field.data).first()
         if not email:
             raise ValidationError(_("Wrong E-Mail Address."))
+
+
+class RequestActivationForm(Form):
+    username = StringField(_("Username"), validators=[
+        DataRequired(message=_("A Username is required.")),
+        is_username])
+
+    email = StringField(_("E-Mail Address"), validators=[
+        DataRequired(message=_("A E-Mail Address is required.")),
+        Email(message=_("Invalid E-Mail Address."))])
+
+    submit = SubmitField(_("Send Confirmation Mail"))
+
+    def validate_email(self, field):
+        self.user = User.query.filter_by(email=field.data).first()
+        # check if the username matches the one found in the database
+        if not self.user.username == self.username.data:
+            raise ValidationError(_("Account does not exist."))
+
+        if self.user.activated is not None:
+            raise ValidationError(_("Account is already active."))
+
+
+class AccountActivationForm(Form):
+    token = StringField(_("E-Mail Confirmation Token"), validators=[
+        DataRequired(message=_("Please enter the token that we have sent to "
+                               "you."))
+    ])
+
+    submit = SubmitField(_("Confirm E-Mail"))

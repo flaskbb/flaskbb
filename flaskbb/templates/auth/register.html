@@ -17,7 +17,7 @@
             {{ horizontal_field(form.password)}}
             {{ horizontal_field(form.confirm_password)}}
 
-            {% if config["RECAPTCHA_ENABLED"] %}
+            {% if flaskbb_config["RECAPTCHA_ENABLED"] %}
                 {{ horizontal_field(form.recaptcha) }}
             {% endif %}
 

@@ -15,6 +15,10 @@
             {{ horizontal_field(form.login)}}
             {{ horizontal_field(form.password)}}
             {{ horizontal_field(form.remember_me) }}
+            {% if flaskbb_config["RECAPTCHA_ENABLED"] and login_recaptcha %}
+                {{ horizontal_field(form.recaptcha) }}
+            {% endif %}
+
             {{ horizontal_field(form.submit) }}
 
             <div class="form-group">

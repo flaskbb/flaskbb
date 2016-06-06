@@ -1,4 +1,4 @@
-{% set page_title = _("Reset Password") %}
+{% set page_title = _("Request Account Activation") %}
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
@@ -7,16 +7,14 @@
 
 <div class="panel page-panel">
     <div class="panel-heading page-head">
-        {% trans %}Reset Password{% endtrans %}
+        {% trans %}Request Account Activation{% endtrans %}
     </div>
 
     <div class="panel-body">
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
-            {{ form.token }}
+            {{ horizontal_field(form.username) }}
             {{ horizontal_field(form.email) }}
-            {{ horizontal_field(form.password) }}
-            {{ horizontal_field(form.confirm_password)}}
             {{ horizontal_field(form.submit)}}
         </form>
     </div>

@@ -8,16 +8,16 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
+import os
+from datetime import datetime, timedelta
 
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from itsdangerous import SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import current_app, url_for
+from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
 
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
+from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
@@ -71,8 +71,7 @@ class Group(db.Model, CRUDMixin):
 
     @classmethod
     def get_guest_group(cls):
-        return cls.query.filter(cls.guest==True).first()
-
+        return cls.query.filter(cls.guest == True).first()
 
 
 class User(db.Model, UserMixin, CRUDMixin):
@@ -92,6 +91,10 @@ class User(db.Model, UserMixin, CRUDMixin):
     signature = db.Column(db.Text)
     avatar = db.Column(db.String(200))
     notes = db.Column(db.Text)
+
+    last_failed_login = db.Column(db.DateTime)
+    login_attempts = db.Column(db.Integer, default=0)
+    activated = db.Column(db.Boolean, default=False)
 
     theme = db.Column(db.String(15))
     language = db.Column(db.String(15), default="en")
@@ -122,6 +125,20 @@ class User(db.Model, UserMixin, CRUDMixin):
                         lazy="dynamic")
 
     # Properties
+    @property
+    def is_active(self):
+        """Returns the state of the account.
+        If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always
+        return ``True``. Is the option activated, it will, depending on the
+        state of the account, either return ``True`` or ``False``.
+        """
+        if flaskbb_config["ACTIVATE_ACCOUNT"]:
+            if self.activated:
+                return True
+            return False
+
+        return True
+
     @property
     def last_post(self):
         """Returns the latest post from the user."""
@@ -175,7 +192,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def topics_per_day(self):
         """Returns the topics per day count."""
-        return round((float(self.topic_count) / float(self.days_registered)), 1)
+        return round(
+            (float(self.topic_count) / float(self.days_registered)), 1
+        )
 
     # Methods
     def __repr__(self):
@@ -209,59 +228,33 @@ class User(db.Model, UserMixin, CRUDMixin):
     @classmethod
     def authenticate(cls, login, password):
         """A classmethod for authenticating users.
-        It returns true if the user exists and has entered a correct password
+        It returns the user object if the user/password combination is ok.
+        If the user has entered too often a wrong password, he will be locked
+        out of his account for a specified time.
 
         :param login: This can be either a username or a email address.
-
         :param password: The password that is connected to username and email.
         """
-
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
         if user:
-            authenticated = user.check_password(password)
-        else:
-            authenticated = False
-        return user, authenticated
+            if user.check_password(password):
+                # reset them after a successful login attempt
+                user.login_attempts = 0
+                user.save()
+                return user
 
-    def _make_token(self, data, timeout):
-        s = Serializer(current_app.config['SECRET_KEY'], timeout)
-        return s.dumps(data)
+            # user exists, wrong password
+            user.login_attempts += 1
+            user.last_failed_login = datetime.utcnow()
+            user.save()
 
-    def _verify_token(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        data = None
-        expired, invalid = False, False
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            expired = True
-        except Exception:
-            invalid = True
-        return expired, invalid, data
+        # protection against account enumeration timing attacks
+        dummy_password = os.urandom(15).encode("base-64")
+        check_password_hash(dummy_password, password)
 
-    def make_reset_token(self, expiration=3600):
-        """Creates a reset token. The duration can be configured through the
-        expiration parameter.
-
-        :param expiration: The time in seconds how long the token is valid.
-        """
-        return self._make_token({'id': self.id, 'op': 'reset'}, expiration)
-
-    def verify_reset_token(self, token):
-        """Verifies a reset token. It returns three boolean values based on
-        the state of the token (expired, invalid, data).
-
-        :param token: The reset token that should be checked.
-        """
-
-        expired, invalid, data = self._verify_token(token)
-        if data and data.get('id') == self.id and data.get('op') == 'reset':
-            data = True
-        else:
-            data = False
-        return expired, invalid, data
+        raise AuthenticationError
 
     def recalculate(self):
         """Recalculates the post count from the user."""

@@ -1,7 +1,8 @@
-{% set link = url_for('auth.reset_password', token=token, _external=True) %}
+{% set link = url_for('auth.activate_account', token=token, _external=True) %}
+
 <p>{% trans user=user.username %}Dear {{ user }},{% endtrans %}</p>
 
-<p>{% trans %}Click the link below to reset your password:{% endtrans %}</p>
+<p>{% trans %}Click the link below to activate your account:{% endtrans %}</p>
 
 <p><a href="{{ link }}">{{ link }}</a></p>
 

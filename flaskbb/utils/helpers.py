@@ -18,9 +18,9 @@ from datetime import datetime, timedelta
 
 import requests
 import unidecode
-from flask import session, url_for, flash
+from flask import session, url_for, flash, redirect, request
 from jinja2 import Markup
-from babel.dates import format_timedelta
+from babel.dates import format_timedelta as babel_format_timedelta
 from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
 from flask_login import current_user
@@ -47,6 +47,17 @@ def slugify(text, delim=u'-'):
         if word:
             result.append(word)
     return text_type(delim.join(result))
+
+
+def redirect_or_next(endpoint, **kwargs):
+    """Redirects the user back to the page they were viewing or to a specified
+    endpoint. Wraps Flasks :func:`Flask.redirect` function.
+
+    :param endpoint: The fallback endpoint.
+    """
+    return redirect(
+        request.args.get('next') or endpoint, **kwargs
+    )
 
 
 def render_template(template, **context):  # pragma: no cover
@@ -357,6 +368,17 @@ def format_date(value, format='%Y-%m-%d'):
     return value.strftime(format)
 
 
+def format_timedelta(delta, **kwargs):
+    """Wrapper around babel's format_timedelta to make it user language
+    aware.
+    """
+    locale = flaskbb_config.get("DEFAULT_LANGUAGE", "en")
+    if current_user.is_authenticated and current_user.language is not None:
+        locale = current_user.language
+
+    return babel_format_timedelta(delta, locale=locale, **kwargs)
+
+
 def time_since(time):  # pragma: no cover
     """Returns a string representing time since e.g.
     3 days ago, 5 hours ago.
@@ -364,12 +386,7 @@ def time_since(time):  # pragma: no cover
     :param time: A datetime object
     """
     delta = time - datetime.utcnow()
-
-    locale = "en"
-    if current_user.is_authenticated and current_user.language is not None:
-        locale = current_user.language
-
-    return format_timedelta(delta, add_direction=True, locale=locale)
+    return format_timedelta(delta, add_direction=True)
 
 
 def format_quote(username, content):
