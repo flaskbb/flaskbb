@@ -36,6 +36,8 @@ auth = Blueprint("auth", __name__)
 @auth.before_request
 def check_rate_limiting():
     """Check the the rate limits for each request for this blueprint."""
+    if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
+        return None
     return limiter.check()
 
 
@@ -51,8 +53,8 @@ def login_rate_limit():
     """Dynamically load the rate limiting config from the database."""
     # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
     return "{count}/{timeout}minutes".format(
-        count=flaskbb_config["LOGIN_ATTEMPTS"],
-        timeout=flaskbb_config["LOGIN_TIMEOUT"]
+        count=flaskbb_config["AUTH_REQUESTS"],
+        timeout=flaskbb_config["AUTH_TIMEOUT"]
     )
 
 

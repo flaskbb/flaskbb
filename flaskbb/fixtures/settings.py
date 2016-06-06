@@ -83,22 +83,28 @@ fixture = (
                 'name':         "Enable Account Activation",
                 'description':  "Enable to let the user activate their account by sending a email with an activation link."
             }),
-            ('login_attempts', {
-                'value':        15,
+            ('auth_ratelimit_enabled', {
+                'value':        True,
+                'value_type':   "boolean",
+                'name':         "Enable Auth Rate Limiting",
+                'description':  "Enable rate limiting on 'auth' routes. This will limit the amount of requests per minute to a given amount and time.",
+            }),
+            ('auth_requests', {
+                'value':        20,
                 'value_type':   "integer",
                 'extra':        {'min': 1},
-                'name':         "Login Attempts",
-                'description':  "Number of requests on each 'auth' route before the user can try to access the route again.",
+                'name':         "Auth Requests",
+                'description':  "Number of requests on each 'auth' route before the user has to wait a given timeout until he can access the resource again.",
             }),
-            ('login_timeout', {
+            ('auth_timeout', {
                 'value':        15,
                 'value_type':   "integer",
                 'extra':        {'min': 0},
-                'name':         "Login Timeout",
+                'name':         "Auth Timeout",
                 'description':  "The timeout for how long the user has to wait until he can access the resource again (in minutes).",
             }),
             ('login_recaptcha', {
-                'value':        3,
+                'value':        5,
                 'value_type':   "integer",
                 'extra':        {'min': 0},
                 'name':         "Login reCAPTCHA",
