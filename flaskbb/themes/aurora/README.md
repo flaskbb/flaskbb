@@ -21,16 +21,22 @@ and afterwards
 To get a list of all available tasks you can either read the ``Gulpfile.js``
 or see the list below:
 
-- ``bower`` - installs all bower dependencies
-- ``update`` - updates all bower dependencies
-- ``icons`` - copies the icons (fonts) from the bower directory to the ``static/fonts`` directory.
-- ``sass`` - compiles all sass files found in the ``src/`` directory and copies them to ``static/css``
-- ``css`` - includes the task ``sass`` **and** will also add the css file ``pygemnts.css`` to the compiled file.
-- ``scripts`` - compiles the always needed javascript files (including jquery and bootstrap) into one.
-- ``editor-scripts`` - compiles all javascript files needed for the editor to one.
-- ``watch`` - watches of any changes happening in ``src/``
-- ``default`` - runs all the above tasks in correct order.
+    Usage
+      gulp [TASK] [OPTIONS...]
 
+    Available tasks
+      bower           runs bower
+      default         default command [bower, icons, sass, scripts, image]
+      editor-scripts  concates all editor related scripts to one file
+      help            Display this help text.
+      icons           copies the icons to destDir
+      image           optimizes the images
+      main-scripts    concates all main js files to one js file
+      sass            compiles all scss files to one css file
+      scripts         [main-scripts, editor-scripts]
+      update          updates the bower dependencies
+      vendor-scripts  concates all vendor js files to one js file (useful for debugging)
+      watch           watches for .scss and .js changes
 
 You can run a task with gulp like this:
 

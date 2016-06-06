@@ -86,5 +86,5 @@ class FlaskBBRenderer(mistune.Renderer):
         return highlight(code, lexer, formatter)
 
 
-renderer = FlaskBBRenderer()
+renderer = FlaskBBRenderer(escape=True, hard_wrap=True)
 markdown = mistune.Markdown(renderer=renderer)
