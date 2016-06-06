@@ -1,7 +1,7 @@
 """Add user authentication infos
 
 Revision ID: 221d918aa9f0
-Revises: 94b3d7958114
+Revises: 127be3fb000
 Create Date: 2016-06-06 13:45:52.915050
 
 """
