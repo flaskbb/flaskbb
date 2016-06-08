@@ -14,8 +14,8 @@ from flask import url_for, abort
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
-from flaskbb.utils.helpers import slugify, get_categories_and_forums, \
-    get_forums
+from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
+                                   get_forums)
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.settings import flaskbb_config
 

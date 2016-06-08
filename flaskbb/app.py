@@ -34,19 +34,21 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
-from flaskbb.extensions import db, login_manager, mail, cache, redis_store, \
-    debugtoolbar, migrate, themes, plugin_manager, babel, csrf, allows, limiter
+from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
+                                debugtoolbar, migrate, themes, plugin_manager,
+                                babel, csrf, allows, limiter)
 # various helpers
-from flaskbb.utils.helpers import format_date, time_since, crop_title, \
-    is_online, render_markup, mark_online, forum_is_unread, topic_is_unread, \
-    render_template
+from flaskbb.utils.helpers import (format_date, time_since, crop_title,
+                                   is_online, render_markup, mark_online,
+                                   forum_is_unread, topic_is_unread,
+                                   render_template)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
-from flaskbb.utils.requirements import (
-    IsAdmin, IsAtleastModerator, TplCanModerate,
-    CanBanUser, CanEditUser, TplCanDeletePost, TplCanDeleteTopic,
-    TplCanEditPost, TplCanPostTopic, TplCanPostReply
-)
+from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
+                                        CanBanUser, CanEditUser,
+                                        TplCanModerate, TplCanDeletePost,
+                                        TplCanDeleteTopic, TplCanEditPost,
+                                        TplCanPostTopic, TplCanPostReply)
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 

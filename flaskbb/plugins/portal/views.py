@@ -36,7 +36,6 @@ def index():
         flash(_("Please install the plugin first to configure the forums "
               "which should be displayed"), "warning")
 
-
     group_ids = [group.id for group in current_user.groups]
     forums = Forum.query.filter(Forum.groups.any(Group.id.in_(group_ids)))
 
@@ -66,7 +65,8 @@ def index():
         online_users = len(get_online_users())
         online_guests = len(get_online_users(guest=True))
 
-    return render_template("index.html", news=news, recent_topics=recent_topics,
+    return render_template("index.html", news=news,
+                           recent_topics=recent_topics,
                            user_count=user_count, topic_count=topic_count,
                            post_count=post_count, newest_user=newest_user,
                            online_guests=online_guests,

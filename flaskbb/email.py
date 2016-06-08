@@ -17,6 +17,10 @@ from flaskbb.utils.tokens import make_token
 
 
 def send_reset_token(user):
+    """Sends the reset token to the user's email address.
+
+    :param user: The user object to whom the email should be sent.
+    """
     token = make_token(user=user, operation="reset_password")
     send_email(
         subject=_("Password Recovery Confirmation"),
@@ -35,6 +39,10 @@ def send_reset_token(user):
 
 
 def send_activation_token(user):
+    """Sends the activation token to the user's email address.
+
+    :param user: The user object to whom the email should be sent.
+    """
     token = make_token(user=user, operation="activate_account")
     send_email(
         subject=_("Account Activation"),
@@ -53,6 +61,16 @@ def send_activation_token(user):
 
 
 def send_email(subject, recipients, text_body, html_body, sender=None):
+    """Sends an email to the given recipients.
+
+    :param subject: The subject of the email.
+    :param recipients: A list of recipients.
+    :param text_body: The text body of the email.
+    :param html_body: The html body of the email.
+    :param sender: A two-element tuple consisting of name and address.
+                   If no sender is given, it will fall back to the one you
+                   have configured with ``MAIL_DEFAULT_SENDER``.
+    """
     msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = text_body
     msg.html = html_body

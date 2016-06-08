@@ -22,10 +22,9 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb._compat import iteritems
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.requirements import (
-    IsAtleastModerator, IsAdmin, CanBanUser, CanEditUser,
-    IsAtleastSuperModerator
-)
+from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
+                                        CanBanUser, CanEditUser,
+                                        IsAtleastSuperModerator)
 from flaskbb.extensions import db, allows
 from flaskbb.utils.helpers import render_template, time_diff, get_online_users
 from flaskbb.user.models import Guest, User, Group

@@ -74,9 +74,9 @@ class RecaptchaValidator(object):
             raise RuntimeError("No RECAPTCHA_PRIVATE_KEY config set")
 
         data = url_encode({
-            'secret':     private_key,
-            'remoteip':   remote_addr,
-            'response':   response
+            'secret': private_key,
+            'remoteip': remote_addr,
+            'response': response
         })
 
         http_response = http.urlopen(RECAPTCHA_VERIFY_SERVER, to_bytes(data))

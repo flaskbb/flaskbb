@@ -75,6 +75,8 @@ limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     """Logs the user in."""
+    if current_user is not None and current_user.is_authenticated:
+        return redirect_or_next(url_for("forum.index"))
 
     current_limit = getattr(g, 'view_rate_limit', None)
     login_recaptcha = False
@@ -82,9 +84,6 @@ def login():
         window_stats = limiter.limiter.get_window_stats(*current_limit)
         stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
         login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
-
-    if current_user is not None and current_user.is_authenticated:
-        return redirect_or_next(url_for("forum.index"))
 
     form = LoginForm(request.form)
     if form.validate_on_submit():

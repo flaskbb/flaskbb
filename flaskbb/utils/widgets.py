@@ -80,7 +80,9 @@ class SelectBirthdayWidget(object):
 
                     # Defaults to blank
                     if value == 1 or value == 1930:
-                        html.append(Select.render_option("None", " ", selected))
+                        html.append(
+                            Select.render_option("None", " ", selected)
+                        )
 
                     html.append(Select.render_option(value, label, selected))
 

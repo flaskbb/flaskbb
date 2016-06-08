@@ -18,33 +18,20 @@ from flask_babelplus import gettext as _
 from flask_allows import Permission, And
 from flaskbb.extensions import db, allows
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import (
-    get_online_users, time_diff, format_quote, render_template, do_topic_action
-)
+from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
+                                   render_template, do_topic_action)
 
-from flaskbb.utils.requirements import (
-    CanAccessForum,
-    CanAccessTopic,
-    CanDeletePost,
-    CanDeleteTopic,
-    CanEditPost,
-    CanPostReply,
-    CanPostTopic,
-    IsAtleastModeratorInForum,
-)
+from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
+                                        CanDeletePost, CanDeleteTopic,
+                                        CanEditPost, CanPostReply,
+                                        CanPostTopic,
+                                        IsAtleastModeratorInForum)
 
 
-from flaskbb.forum.models import (
-    Category, Forum, Topic, Post, ForumsRead, TopicsRead
-)
-from flaskbb.forum.forms import (
-    NewTopicForm,
-    QuickreplyForm,
-    ReplyForm,
-    ReportForm,
-    SearchPageForm,
-    UserSearchForm,
-)
+from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
+                                  TopicsRead)
+from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
+                                 ReportForm, SearchPageForm, UserSearchForm)
 from flaskbb.user.models import User
 
 forum = Blueprint("forum", __name__)

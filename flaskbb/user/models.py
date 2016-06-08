@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for
@@ -17,7 +17,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
-from flaskbb.exceptions import AuthenticationError, LoginAttemptsExceeded
+from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,

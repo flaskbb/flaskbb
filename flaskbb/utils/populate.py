@@ -8,7 +8,6 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category

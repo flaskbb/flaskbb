@@ -9,16 +9,12 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_wtf import Form
-from wtforms import (
-    BooleanField, HiddenField, IntegerField, PasswordField,
-    SelectField, StringField, SubmitField, TextAreaField,
-)
-from wtforms.validators import (
-    DataRequired, Optional, Email, regexp, Length, URL, ValidationError
-)
-from wtforms.ext.sqlalchemy.fields import (
-    QuerySelectField, QuerySelectMultipleField
-)
+from wtforms import (BooleanField, HiddenField, IntegerField, PasswordField,
+                     SelectField, StringField, SubmitField, TextAreaField)
+from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
+                                URL, ValidationError)
+from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
+                                           QuerySelectMultipleField)
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from flask_babelplus import lazy_gettext as _
 
@@ -187,21 +183,23 @@ class GroupForm(Form):
     )
     deletepost = BooleanField(
         _("Can delete posts"),
-        description=_("Check this is the users in this group can delete posts.")
+        description=_("Check this if the users in this group can delete "
+                      "posts.")
     )
     deletetopic = BooleanField(
         _("Can delete topics"),
-        description=_("Check this is the users in this group can delete "
+        description=_("Check this if the users in this group can delete "
                       "topics.")
     )
     posttopic = BooleanField(
         _("Can create topics"),
-        description=_("Check this is the users in this group can create "
+        description=_("Check this if the users in this group can create "
                       "topics.")
     )
     postreply = BooleanField(
         _("Can post replies"),
-        description=_("Check this is the users in this group can post replies.")
+        description=_("Check this if the users in this group can post "
+                      "replies.")
     )
 
     mod_edituser = BooleanField(
@@ -311,8 +309,8 @@ class ForumForm(Form):
 
     moderators = StringField(
         _("Moderators"),
-        description=_("Comma seperated usernames. Leave it blank if you do not "
-                      "want to set any moderators.")
+        description=_("Comma seperated usernames. Leave it blank if you do "
+                      "not want to set any moderators.")
     )
 
     show_moderators = BooleanField(

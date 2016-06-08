@@ -32,7 +32,9 @@ class FlaskBBPlugin(Plugin):
     def uninstallable(self):
         """Is ``True`` if the Plugin can be uninstalled."""
         if self.installable:
-            group = SettingsGroup.query.filter_by(key=self.settings_key).first()
+            group = SettingsGroup.query.\
+                filter_by(key=self.settings_key).\
+                first()
             if group and len(group.settings.all()) > 0:
                 return True
             return False

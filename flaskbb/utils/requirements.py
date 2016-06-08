@@ -7,8 +7,8 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
-
 from flask_allows import Requirement, Or, And
+
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.models import Post, Topic, Forum
 from flaskbb.user.models import Group
@@ -107,8 +107,8 @@ class TopicNotLocked(Requirement):
             * Is the topic locked?
             * Is the forum the topic belongs to locked?
 
-        Except in the case of a topic instance being provided to the constructor,
-        all of these tuples are SQLA KeyedTuples
+        Except in the case of a topic instance being provided to the
+        constructor, all of these tuples are SQLA KeyedTuples.
         """
         if self._topic is not None:
             return self._topic.locked, self._topic.forum.locked

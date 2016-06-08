@@ -82,7 +82,8 @@ def do_topic_action(topics, user, action, reverse):
                     For example, to unlock a topic, ``reverse`` should be
                     set to ``True``.
     """
-    from flaskbb.utils.requirements import IsAtleastModeratorInForum, CanDeleteTopic
+    from flaskbb.utils.requirements import (IsAtleastModeratorInForum,
+                                            CanDeleteTopic)
 
     from flaskbb.user.models import User
     from flaskbb.forum.models import Post
@@ -263,7 +264,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     # topicsread is none if the user has marked the forum as read
     # or if he hasn't visited yet
     if topicsread is None:
-        # user has cleared the forum sometime ago - check if there is a new post
+        # user has cleared the forum - check if there is a new post
         if forumsread and forumsread.cleared is not None:
             return forumsread.cleared < topic.last_post.date_created
 
@@ -469,7 +470,7 @@ def get_image_info(url):
                     h, w = struct.unpack(b">HH", jpeg.read(4))
                     break
                 else:
-                    jpeg.read(int(struct.unpack(b">H", jpeg.read(2))[0])-2)
+                    jpeg.read(int(struct.unpack(b">H", jpeg.read(2))[0]) - 2)
                 b = jpeg.read(1)
             width = int(w)
             height = int(h)
