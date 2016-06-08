@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+    flaskbb.plugins.portal.views
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This module contains the portal view.
+
+    :copyright: (c) 2014 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 from flask import Blueprint, current_app, flash, request
 from flask_babelplus import gettext as _
 from flask_login import current_user

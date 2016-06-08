@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.user.views
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     The user view handles the user profile
     and the user settings from a signed in user.

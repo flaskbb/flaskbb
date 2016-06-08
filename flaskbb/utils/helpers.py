@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.utils.helpers
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~
 
     A few helpers that are used by flaskbb
 

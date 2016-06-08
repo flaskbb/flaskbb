@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.user.forms
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     It provides the forms that are needed for the user views.
 

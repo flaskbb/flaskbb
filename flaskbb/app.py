@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.app
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~
 
     manages the app creation and configuration process
 

@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.plugins.portal
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    A Portal Plugin for FlaskBB.
+
+    :copyright: (c) 2014 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 from flask.ext.plugins import connect_event
 
 from flaskbb.plugins import FlaskBBPlugin

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.emails
-    ~~~~~~~~~~~~~~~~~~~~
+    flaskbb.email
+    ~~~~~~~~~~~~~
 
     This module adds the functionality to send emails
 

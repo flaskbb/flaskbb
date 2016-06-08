@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.user.models
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~
 
     This module provides the models for the user.
 

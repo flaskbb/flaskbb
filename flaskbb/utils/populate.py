@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.utils.populate
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~
 
     A module that makes creating data more easily
 

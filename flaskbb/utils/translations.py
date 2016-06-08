@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.utils.translations
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This module contains the translation Domain used by FlaskBB.
+
+    :copyright: (c) 2016 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 import os
 
 import babel

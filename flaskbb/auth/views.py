@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.auth.views
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     This view provides user authentication, registration and a view for
     resetting the password of a user if he has lost his password

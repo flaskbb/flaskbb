@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.extensions
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     The extensions that are used by FlaskBB.
 

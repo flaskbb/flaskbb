@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.forum.views
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~
 
     This module handles the forum logic like creating and viewing
     topics and posts.

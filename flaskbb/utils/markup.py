@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.utils.markup
+    ~~~~~~~~~~~~~~~~~~~~
+
+    A module for all markup related stuff like markdown and emojis.
+
+    :copyright: (c) 2016 by the FlaskBB Team.
+    :license: BSD, see LICENSE for more details.
+"""
 import os
 import re
 

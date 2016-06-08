@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~
 
     FlaskBB is a forum software written in python using the
     microframework Flask.

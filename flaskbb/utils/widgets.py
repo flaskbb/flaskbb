@@ -3,7 +3,7 @@
     flaskbb.utils.widgets
     ~~~~~~~~~~~~~~~~~~~~~
 
-    Additional widgets for wtforms
+    Additional widgets for wtforms.
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
