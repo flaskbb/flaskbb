@@ -76,11 +76,9 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
     Returns the updated groups and settings.
 
     :param fixture: The fixture which should be inserted/updated.
-
     :param overwrite_group: Set this to ``True`` if you want to overwrite
                             the group if it already exists.
                             Defaults to ``False``.
-
     :param overwrite_setting: Set this to ``True`` if you want to overwrite the
                               setting if it already exists.
                               Defaults to ``False``.
@@ -162,12 +160,9 @@ def create_admin_user(username, password, email):
     Returns the created admin user.
 
     :param username: The username of the user.
-
     :param password: The password of the user.
-
     :param email: The email address of the user.
     """
-
     admin_group = Group.query.filter_by(admin=True).first()
     user = User()
 
@@ -185,7 +180,6 @@ def create_welcome_forum():
     """This will create the `welcome forum` with a welcome topic.
     Returns True if it's created successfully.
     """
-
     if User.query.count() < 1:
         return False
 
@@ -212,13 +206,9 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
     as a dict.
 
     :param users: The number of users.
-
     :param categories: The number of categories.
-
     :param forums: The number of forums which are created in each category.
-
     :param topics: The number of topics which are created in each forum.
-
     :param posts: The number of posts which are created in each topic.
     """
     create_default_groups()
