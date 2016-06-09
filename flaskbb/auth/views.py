@@ -92,7 +92,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect_or_next(url_for("forum.index"))
         except AuthenticationError:
-            flash(_("Wrong Username or Password."), "danger")
+            flash(_("Wrong username or password."), "danger")
 
     return render_template("auth/login.html", form=form,
                            login_recaptcha=login_recaptcha)
@@ -170,10 +170,10 @@ def forgot_password():
 
         if user:
             send_reset_token(user)
-            flash(_("E-Mail sent! Please check your inbox."), "info")
+            flash(_("Email sent! Please check your inbox."), "info")
             return redirect(url_for("auth.forgot_password"))
         else:
-            flash(_("You have entered a Username or E-Mail Address that is "
+            flash(_("You have entered an username or email address that is "
                     "not linked with your account."), "danger")
     return render_template("auth/forgot_password.html", form=form)
 
@@ -190,17 +190,17 @@ def reset_password(token):
                                                   "reset_password")
 
         if invalid:
-            flash(_("Your Password Token is invalid."), "danger")
+            flash(_("Your password token is invalid."), "danger")
             return redirect(url_for("auth.forgot_password"))
 
         if expired:
-            flash(_("Your Password Token is expired."), "danger")
+            flash(_("Your password token is expired."), "danger")
             return redirect(url_for("auth.forgot_password"))
 
         if user:
             user.password = form.password.data
             user.save()
-            flash(_("Your Password has been updated."), "success")
+            flash(_("Your password has been updated."), "success")
             return redirect(url_for("auth.login"))
 
     form.token.data = token
@@ -257,7 +257,7 @@ def activate_account(token=None):
             logout_user()
             login_user(user)
 
-        flash(_("Your Account has been activated.", "success"))
+        flash(_("Your account has been activated.", "success"))
         return redirect(url_for("forum.index"))
 
     return render_template("auth/account_activation.html", form=form)

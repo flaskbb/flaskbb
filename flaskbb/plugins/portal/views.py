@@ -34,7 +34,7 @@ def index():
     except KeyError:
         forum_ids = []
         flash(_("Please install the plugin first to configure the forums "
-              "which should be displayed"), "warning")
+                "which should be displayed."), "warning")
 
     group_ids = [group.id for group in current_user.groups]
     forums = Forum.query.filter(Forum.groups.any(Group.id.in_(group_ids)))

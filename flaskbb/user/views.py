@@ -91,7 +91,7 @@ def change_email():
         current_user.email = form.new_email.data
         current_user.save()
 
-        flash(_("E-Mail Address updated."), "success")
+        flash(_("Email address updated."), "success")
     return render_template("user/change_email.html", form=form)
 
 
@@ -104,6 +104,6 @@ def change_user_details():
         form.populate_obj(current_user)
         current_user.save()
 
-        flash(_("Details updated."), "success")
+        flash(_("User details updated."), "success")
 
     return render_template("user/change_user_details.html", form=form)

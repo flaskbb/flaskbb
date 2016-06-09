@@ -304,7 +304,7 @@ def manage_forum(forum_id, slug=None):
 
         if not len(tmp_topics) > 0:
             flash(_("In order to perform this action you have to select at "
-                    " least one topic."), "danger")
+                    "least one topic."), "danger")
             return redirect(mod_forum_url)
 
         # locking/unlocking
@@ -312,33 +312,33 @@ def manage_forum(forum_id, slug=None):
             changed = do_topic_action(topics=tmp_topics, user=current_user,
                                       action="locked", reverse=False)
 
-            flash(_("%(count)s Topics locked.", count=changed), "success")
+            flash(_("%(count)s topics locked.", count=changed), "success")
             return redirect(mod_forum_url)
 
         elif "unlock" in request.form:
             changed = do_topic_action(topics=tmp_topics, user=current_user,
                                       action="locked", reverse=True)
-            flash(_("%(count)s Topics unlocked.", count=changed), "success")
+            flash(_("%(count)s topics unlocked.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # highlighting/trivializing
         elif "highlight" in request.form:
             changed = do_topic_action(topics=tmp_topics, user=current_user,
                                       action="important", reverse=False)
-            flash(_("%(count)s Topics highlighted.", count=changed), "success")
+            flash(_("%(count)s topics highlighted.", count=changed), "success")
             return redirect(mod_forum_url)
 
         elif "trivialize" in request.form:
             changed = do_topic_action(topics=tmp_topics, user=current_user,
                                       action="important", reverse=True)
-            flash(_("%(count)s Topics trivialized.", count=changed), "success")
+            flash(_("%(count)s topics trivialized.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # deleting
         elif "delete" in request.form:
             changed = do_topic_action(topics=tmp_topics, user=current_user,
                                       action="delete", reverse=False)
-            flash(_("%(count)s Topics deleted.", count=changed), "success")
+            flash(_("%(count)s topics deleted.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # moving

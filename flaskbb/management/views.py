@@ -181,7 +181,7 @@ def edit_user(user_id):
 
         user.save(groups=form.secondary_groups.data)
 
-        flash(_("User successfully updated."), "success")
+        flash(_("User updated."), "success")
         return redirect(url_for("management.edit_user", user_id=user.id))
 
     return render_template("management/user_form.html", form=form,
@@ -212,7 +212,7 @@ def delete_user(user_id=None):
                 })
 
         return jsonify(
-            message="{} Users deleted.".format(len(data)),
+            message="{} users deleted.".format(len(data)),
             category="success",
             data=data,
             status=200
@@ -224,7 +224,7 @@ def delete_user(user_id=None):
         return redirect(url_for("management.users"))
 
     user.delete()
-    flash(_("User successfully deleted."), "success")
+    flash(_("User deleted."), "success")
     return redirect(url_for("management.users"))
 
 
@@ -234,7 +234,7 @@ def add_user():
     form = AddUserForm()
     if form.validate_on_submit():
         form.save()
-        flash(_("User successfully added."), "success")
+        flash(_("User added."), "success")
         return redirect(url_for("management.users"))
 
     return render_template("management/user_form.html", form=form,
@@ -298,7 +298,7 @@ def ban_user(user_id=None):
                 })
 
         return jsonify(
-            message="{} Users banned.".format(len(data)),
+            message="{} users banned.".format(len(data)),
             category="success",
             data=data,
             status=200
@@ -347,7 +347,7 @@ def unban_user(user_id=None):
                 })
 
         return jsonify(
-            message="{} Users unbanned.".format(len(data)),
+            message="{} users unbanned.".format(len(data)),
             category="success",
             data=data,
             status=200
@@ -409,7 +409,7 @@ def report_markread(report_id=None):
             })
 
         return jsonify(
-            message="{} Reports marked as read.".format(len(data)),
+            message="{} reports marked as read.".format(len(data)),
             category="success",
             data=data,
             status=200
@@ -471,7 +471,7 @@ def edit_group(group_id):
         if group.guest:
             Guest.invalidate_cache()
 
-        flash(_("Group successfully updated."), "success")
+        flash(_("Group updated."), "success")
         return redirect(url_for("management.groups", group_id=group.id))
 
     return render_template("management/group_form.html", form=form,
@@ -497,7 +497,7 @@ def delete_group(group_id=None):
                 })
 
             return jsonify(
-                message="{} Groups deleted.".format(len(data)),
+                message="{} groups deleted.".format(len(data)),
                 category="success",
                 data=data,
                 status=200
@@ -512,15 +512,15 @@ def delete_group(group_id=None):
     if group_id is not None:
         if group_id <= 5:  # there are 5 standard groups
             flash(_("You cannot delete the standard groups. "
-                    "Try renaming them instead.", "danger"))
+                    "Try renaming it instead.", "danger"))
             return redirect(url_for("management.groups"))
 
         group = Group.query.filter_by(id=group_id).first_or_404()
         group.delete()
-        flash(_("Group successfully deleted."), "success")
+        flash(_("Group deleted."), "success")
         return redirect(url_for("management.groups"))
 
-    flash(_("No group choosen.."), "danger")
+    flash(_("No group chosen."), "danger")
     return redirect(url_for("management.groups"))
 
 
@@ -530,7 +530,7 @@ def add_group():
     form = AddGroupForm()
     if form.validate_on_submit():
         form.save()
-        flash(_("Group successfully added."), "success")
+        flash(_("Group added."), "success")
         return redirect(url_for("management.groups"))
 
     return render_template("management/group_form.html", form=form,
@@ -553,7 +553,7 @@ def edit_forum(forum_id):
     form = EditForumForm(forum)
     if form.validate_on_submit():
         form.save()
-        flash(_("Forum successfully updated."), "success")
+        flash(_("Forum updated."), "success")
         return redirect(url_for("management.edit_forum", forum_id=forum.id))
     else:
         if forum.moderators:
@@ -577,7 +577,7 @@ def delete_forum(forum_id):
 
     forum.delete(involved_users)
 
-    flash(_("Forum successfully deleted."), "success")
+    flash(_("Forum deleted."), "success")
     return redirect(url_for("management.forums"))
 
 
@@ -589,7 +589,7 @@ def add_forum(category_id=None):
 
     if form.validate_on_submit():
         form.save()
-        flash(_("Forum successfully added."), "success")
+        flash(_("Forum added."), "success")
         return redirect(url_for("management.forums"))
     else:
         form.groups.data = Group.query.order_by(Group.id.asc()).all()
@@ -608,7 +608,7 @@ def add_category():
 
     if form.validate_on_submit():
         form.save()
-        flash(_("Category successfully added."), "success")
+        flash(_("Category added."), "success")
         return redirect(url_for("management.forums"))
 
     return render_template("management/category_form.html", form=form,
@@ -624,7 +624,7 @@ def edit_category(category_id):
 
     if form.validate_on_submit():
         form.populate_obj(category)
-        flash(_("Category successfully updated."), "success")
+        flash(_("Category updated."), "success")
         category.save()
 
     return render_template("management/category_form.html", form=form,
@@ -659,7 +659,8 @@ def enable_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
 
     if plugin.enabled:
-        flash(_("Plugin is already enabled."), "danger")
+        flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name),
+              "info")
         return redirect(url_for("management.plugins"))
 
     try:
@@ -669,7 +670,7 @@ def enable_plugin(plugin):
     except OSError:
         flash(_("It seems that FlaskBB does not have enough filesystem "
                 "permissions. Try removing the 'DISABLED' file by "
-                "yourself."), "danger")
+                "yourself instead."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -690,7 +691,7 @@ def disable_plugin(plugin):
     except OSError:
         flash(_("It seems that FlaskBB does not have enough filesystem "
                 "permissions. Try creating the 'DISABLED' file by "
-                "yourself."), "danger")
+                "yourself instead."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -705,7 +706,7 @@ def uninstall_plugin(plugin):
 
         flash(_("Plugin has been uninstalled."), "success")
     else:
-        flash(_("Cannot uninstall Plugin."), "danger")
+        flash(_("Cannot uninstall plugin."), "danger")
 
     return redirect(url_for("management.plugins"))
 
@@ -720,6 +721,6 @@ def install_plugin(plugin):
 
         flash(_("Plugin has been installed."), "success")
     else:
-        flash(_("Cannot install Plugin."), "danger")
+        flash(_("Cannot install plugin."), "danger")
 
     return redirect(url_for("management.plugins"))

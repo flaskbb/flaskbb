@@ -68,7 +68,7 @@ def view_conversation(conversation_id):
             count()
 
         if message_count >= flaskbb_config["MESSAGE_QUOTA"]:
-            flash(_("You cannot send any messages anymore because you have"
+            flash(_("You cannot send any messages anymore because you have "
                     "reached your message limit."), "danger")
             return redirect(url_for("message.view_conversation",
                                     conversation_id=conversation.id))
@@ -124,7 +124,7 @@ def new_conversation():
         count()
 
     if message_count >= flaskbb_config["MESSAGE_QUOTA"]:
-        flash(_("You cannot send any messages anymore because you have"
+        flash(_("You cannot send any messages anymore because you have "
                 "reached your message limit."), "danger")
         return redirect(url_for("message.inbox"))
 

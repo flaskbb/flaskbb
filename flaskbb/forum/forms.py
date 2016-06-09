@@ -19,7 +19,7 @@ from flaskbb.user.models import User
 
 
 class QuickreplyForm(Form):
-    content = TextAreaField(_("Quick Reply"), validators=[
+    content = TextAreaField(_("Quick reply"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
     submit = SubmitField(_("Reply"))
@@ -33,7 +33,7 @@ class ReplyForm(Form):
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
-    track_topic = BooleanField(_("Track this Topic"), default=False,
+    track_topic = BooleanField(_("Track this topic"), default=False,
                                validators=[Optional()])
 
     submit = SubmitField(_("Reply"))
@@ -48,13 +48,13 @@ class ReplyForm(Form):
 
 
 class NewTopicForm(ReplyForm):
-    title = StringField(_("Topic Title"), validators=[
-        DataRequired(message=_("Please choose a Topic Title."))])
+    title = StringField(_("Topic title"), validators=[
+        DataRequired(message=_("Please choose a title for your topic."))])
 
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
-    track_topic = BooleanField(_("Track this Topic"), default=False,
+    track_topic = BooleanField(_("Track this topic"), default=False,
                                validators=[Optional()])
 
     submit = SubmitField(_("Post Topic"))
@@ -71,10 +71,10 @@ class NewTopicForm(ReplyForm):
 
 class ReportForm(Form):
     reason = TextAreaField(_("Reason"), validators=[
-        DataRequired(message=_("What's the reason for reporting this post?"))
+        DataRequired(message=_("What is the reason for reporting this post?"))
     ])
 
-    submit = SubmitField(_("Report Post"))
+    submit = SubmitField(_("Report post"))
 
     def save(self, user, post):
         report = Report(reason=self.reason.data)

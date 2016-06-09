@@ -19,14 +19,14 @@ from flaskbb.message.models import Conversation, Message
 
 
 class ConversationForm(Form):
-    to_user = StringField(_("To User"), validators=[
-        DataRequired(message=_("A Username is required."))])
+    to_user = StringField(_("Recipient"), validators=[
+        DataRequired(message=_("A valid username is required."))])
 
     subject = StringField(_("Subject"), validators=[
         DataRequired(message=_("A Subject is required."))])
 
     message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A Message is required."))])
+        DataRequired(message=_("A message is required."))])
 
     send_message = SubmitField(_("Start Conversation"))
     save_message = SubmitField(_("Save Conversation"))
@@ -34,7 +34,8 @@ class ConversationForm(Form):
     def validate_to_user(self, field):
         user = User.query.filter_by(username=field.data).first()
         if not user:
-            raise ValidationError(_("The Username you entered doesn't exist"))
+            raise ValidationError(_("The username you entered does not "
+                                    "exist."))
         if user.id == current_user.id:
             raise ValidationError(_("You cannot send a PM to yourself."))
 
@@ -56,7 +57,7 @@ class ConversationForm(Form):
 
 class MessageForm(Form):
     message = TextAreaField(_("Message"), validators=[
-        DataRequired(message=_("A Message is required."))])
+        DataRequired(message=_("A message is required."))])
     submit = SubmitField(_("Send Message"))
 
     def save(self, conversation, user_id, unread=False):
