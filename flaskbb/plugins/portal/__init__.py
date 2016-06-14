@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask.ext.plugins import connect_event
+from flask_plugins import connect_event
 
 from flaskbb.plugins import FlaskBBPlugin
 from flaskbb.utils.populate import (create_settings_from_fixture,
