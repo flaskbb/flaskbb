@@ -12,7 +12,7 @@ from flask import render_template
 from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
-from flaskbb.extensions import mail
+from flaskbb.extensions import mail, celery
 from flaskbb.utils.tokens import make_token
 
 
@@ -60,6 +60,11 @@ def send_activation_token(user):
     )
 
 
+@celery.task
+def send_async_email(msg):
+    mail.send(msg)
+
+
 def send_email(subject, recipients, text_body, html_body, sender=None):
     """Sends an email to the given recipients.
 
@@ -74,4 +79,4 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
     msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = text_body
     msg.html = html_body
-    mail.send(msg)
+    send_async_email.delay(msg)

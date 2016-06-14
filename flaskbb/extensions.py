@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from celery import Celery
 from flask_allows import Allows
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -22,7 +23,6 @@ from flask_babelplus import Babel
 from flask_wtf.csrf import CsrfProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-
 from flaskbb.exceptions import AuthorizationRequired
 
 
@@ -64,3 +64,6 @@ csrf = CsrfProtect()
 
 # Rate Limiting
 limiter = Limiter(auto_check=False, key_func=get_remote_address)
+
+# Celery
+celery = Celery("flaskbb")

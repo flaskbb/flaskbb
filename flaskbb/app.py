@@ -16,27 +16,23 @@ from functools import partial
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-
 from flask import Flask, request
 from flask_login import current_user
 from flask_whooshalchemy import whoosh_index
 
-# Import the user blueprint
+# views
 from flaskbb.user.views import user
-from flaskbb.user.models import User, Guest
-# Import the (private) message blueprint
 from flaskbb.message.views import message
-# Import the auth blueprint
 from flaskbb.auth.views import auth
-# Import the admin blueprint
 from flaskbb.management.views import management
-# Import the forum blueprint
 from flaskbb.forum.views import forum
+# models
+from flaskbb.user.models import User, Guest
 from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
                                 debugtoolbar, migrate, themes, plugin_manager,
-                                babel, csrf, allows, limiter)
+                                babel, csrf, allows, limiter, celery)
 # various helpers
 from flaskbb.utils.helpers import (format_date, time_since, crop_title,
                                    is_online, render_markup, mark_online,
@@ -54,7 +50,10 @@ from flaskbb.utils.settings import flaskbb_config
 
 
 def create_app(config=None):
-    """Creates the app."""
+    """Creates the app.
+
+    :param config: The configuration object.
+    """
 
     # Initialize the app
     app = Flask("flaskbb")
@@ -66,6 +65,7 @@ def create_app(config=None):
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
+    configure_celery_app(app, celery)
     configure_blueprints(app)
     configure_extensions(app)
     configure_template_filters(app)
@@ -75,6 +75,22 @@ def create_app(config=None):
     configure_logging(app)
 
     return app
+
+
+def configure_celery_app(app, celery):
+    """Configures the celery app."""
+    app.config.update({'BROKER_URL': app.config["CELERY_BROKER_URL"]})
+    celery.conf.update(app.config)
+
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
 
 
 def configure_blueprints(app):

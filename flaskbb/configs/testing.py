@@ -60,5 +60,10 @@ class TestingConfig(DefaultConfig):
     MAIL_PASSWORD = "your_password"
     MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
 
+    CELERY_ALWAYS_EAGER = True
+    CELERY_RESULT_BACKEND = "cache"
+    CELERY_CACHE_BACKEND = "memory"
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
     # The user who should recieve the error logs
     ADMINS = ["your_admin_user@gmail.com"]
