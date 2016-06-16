@@ -1,4 +1,3 @@
-import datetime
 import pytest
 from flaskbb.user.models import User, Guest
 

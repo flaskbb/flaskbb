@@ -2,7 +2,7 @@
 import datetime
 from flaskbb.utils.helpers import slugify, forum_is_unread, topic_is_unread, \
     crop_title, render_markup, is_online, format_date, format_quote, \
-    get_image_info, check_image
+    get_image_info, check_image, time_utcnow
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.forum.models import Forum
 
@@ -59,8 +59,8 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     assert topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
 
     # lets mark the forum as read
-    forumsread.cleared = datetime.datetime.utcnow()
-    forumsread.last_read = datetime.datetime.utcnow()
+    forumsread.cleared = time_utcnow()
+    forumsread.last_read = time_utcnow()
     forumsread.save()
     assert not topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
 
@@ -69,7 +69,7 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     assert not topic_is_unread(topic, None, user, None)
 
     # post is older than tracker length
-    time_posted = datetime.datetime.utcnow() - datetime.timedelta(days=2)
+    time_posted = time_utcnow() - datetime.timedelta(days=2)
     flaskbb_config["TRACKER_LENGTH"] = 1
     topic.last_post.date_created = time_posted
     topic.save()

@@ -8,12 +8,11 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
-
 from sqlalchemy_utils import UUIDType
 
 from flaskbb.extensions import db
-from flaskbb.utils.database import CRUDMixin
+from flaskbb.utils.helpers import time_utcnow
+from flaskbb.utils.database import CRUDMixin, UTCDateTime
 
 
 class Conversation(db.Model, CRUDMixin):
@@ -25,7 +24,7 @@ class Conversation(db.Model, CRUDMixin):
     to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255))
-    date_created = db.Column(db.DateTime, default=datetime.utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
     trash = db.Column(db.Boolean, nullable=False, default=False)
     draft = db.Column(db.Boolean, nullable=False, default=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
@@ -63,7 +62,7 @@ class Conversation(db.Model, CRUDMixin):
         """
         if message is not None:
             # create the conversation
-            self.date_created = datetime.utcnow()
+            self.date_created = time_utcnow()
             db.session.add(self)
             db.session.commit()
 
@@ -86,7 +85,7 @@ class Message(db.Model, CRUDMixin):
     # the user who wrote the message
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
 
     user = db.relationship("User", lazy="joined")
 
@@ -98,7 +97,7 @@ class Message(db.Model, CRUDMixin):
         """
         if conversation is not None:
             self.conversation_id = conversation.id
-            self.date_created = datetime.utcnow()
+            self.date_created = time_utcnow()
 
         db.session.add(self)
         db.session.commit()

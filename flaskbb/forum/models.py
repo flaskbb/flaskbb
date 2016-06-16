@@ -8,15 +8,15 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import url_for, abort
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
-                                   get_forums)
-from flaskbb.utils.database import CRUDMixin
+                                   get_forums, time_utcnow)
+from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -70,7 +70,7 @@ class TopicsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_tr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(db.DateTime, default=datetime.utcnow())
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
 
 
 class ForumsRead(db.Model, CRUDMixin):
@@ -82,8 +82,8 @@ class ForumsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(db.DateTime, default=datetime.utcnow())
-    cleared = db.Column(db.DateTime)
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    cleared = db.Column(UTCDateTime(timezone=True))
 
 
 class Report(db.Model, CRUDMixin):
@@ -92,9 +92,9 @@ class Report(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                             nullable=False)
-    reported = db.Column(db.DateTime, default=datetime.utcnow())
+    reported = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
-    zapped = db.Column(db.DateTime)
+    zapped = db.Column(UTCDateTime(timezone=True))
     zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
     reason = db.Column(db.Text)
 
@@ -121,7 +121,7 @@ class Report(db.Model, CRUDMixin):
 
         if post and user:
             self.reporter_id = user.id
-            self.reported = datetime.utcnow()
+            self.reported = time_utcnow()
             self.post_id = post.id
 
         db.session.add(self)
@@ -142,8 +142,8 @@ class Post(db.Model, CRUDMixin):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    date_modified = db.Column(db.DateTime)
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    date_modified = db.Column(UTCDateTime(timezone=True))
     modified_by = db.Column(db.String(200))
 
     # Properties
@@ -180,7 +180,7 @@ class Post(db.Model, CRUDMixin):
 
         # Adding a new post
         if user and topic:
-            created = datetime.utcnow()
+            created = time_utcnow()
             self.user_id = user.id
             self.username = user.username
             self.topic_id = topic.id
@@ -270,8 +270,8 @@ class Topic(db.Model, CRUDMixin):
     title = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     username = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow())
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
     locked = db.Column(db.Boolean, default=False)
     important = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
@@ -340,7 +340,7 @@ class Topic(db.Model, CRUDMixin):
         """
         read_cutoff = None
         if flaskbb_config['TRACKER_LENGTH'] > 0:
-            read_cutoff = datetime.utcnow() - timedelta(
+            read_cutoff = time_utcnow() - timedelta(
                 days=flaskbb_config['TRACKER_LENGTH'])
 
         # The tracker is disabled - abort
@@ -391,7 +391,7 @@ class Topic(db.Model, CRUDMixin):
         # A new post has been submitted that the user hasn't read.
         # Updating...
         if topicsread:
-            topicsread.last_read = datetime.utcnow()
+            topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
 
@@ -402,7 +402,7 @@ class Topic(db.Model, CRUDMixin):
             topicsread.user_id = user.id
             topicsread.topic_id = self.id
             topicsread.forum_id = self.forum_id
-            topicsread.last_read = datetime.utcnow()
+            topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
 
@@ -471,9 +471,9 @@ class Topic(db.Model, CRUDMixin):
         self.username = user.username
 
         # Set the last_updated time. Needed for the readstracker
-        self.last_updated = datetime.utcnow()
+        self.last_updated = time_utcnow()
 
-        self.date_created = datetime.utcnow()
+        self.date_created = time_utcnow()
 
         # Insert and commit the topic
         db.session.add(self)
@@ -577,7 +577,8 @@ class Forum(db.Model, CRUDMixin):
     last_post_title = db.Column(db.String(255))
     last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     last_post_username = db.Column(db.String(255))
-    last_post_created = db.Column(db.DateTime, default=datetime.utcnow())
+    last_post_created = db.Column(UTCDateTime(timezone=True),
+                                  default=time_utcnow())
 
     # One-to-many
     topics = db.relationship(
@@ -681,7 +682,7 @@ class Forum(db.Model, CRUDMixin):
 
         read_cutoff = None
         if flaskbb_config['TRACKER_LENGTH'] > 0:
-            read_cutoff = datetime.utcnow() - timedelta(
+            read_cutoff = time_utcnow() - timedelta(
                 days=flaskbb_config['TRACKER_LENGTH'])
 
         # fetch the unread posts in the forum
@@ -708,7 +709,7 @@ class Forum(db.Model, CRUDMixin):
             # has been submitted and has read everything (obviously, else the
             # unread_count would be useless).
             elif forumsread:
-                forumsread.last_read = datetime.utcnow()
+                forumsread.last_read = time_utcnow()
                 forumsread.save()
                 return True
 
@@ -716,7 +717,7 @@ class Forum(db.Model, CRUDMixin):
             forumsread = ForumsRead()
             forumsread.user_id = user.id
             forumsread.forum_id = self.id
-            forumsread.last_read = datetime.utcnow()
+            forumsread.last_read = time_utcnow()
             forumsread.save()
             return True
 

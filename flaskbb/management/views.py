@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
-from datetime import datetime
 
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
@@ -26,7 +25,8 @@ from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
                                         CanBanUser, CanEditUser,
                                         IsAtleastSuperModerator)
 from flaskbb.extensions import db, allows
-from flaskbb.utils.helpers import render_template, time_diff, get_online_users
+from flaskbb.utils.helpers import (render_template, time_diff, time_utcnow,
+                                   get_online_users)
 from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
@@ -398,7 +398,7 @@ def report_markread(report_id=None):
 
         for report in Report.query.filter(Report.id.in_(ids)).all():
             report.zapped_by = current_user.id
-            report.zapped = datetime.utcnow()
+            report.zapped = time_utcnow()
             report.save()
             data.append({
                 "id": report.id,
@@ -424,7 +424,7 @@ def report_markread(report_id=None):
             return redirect(url_for("management.reports"))
 
         report.zapped_by = current_user.id
-        report.zapped = datetime.utcnow()
+        report.zapped = time_utcnow()
         report.save()
         flash(_("Report %(id)s marked as read.", id=report.id), "success")
         return redirect(url_for("management.reports"))
@@ -434,7 +434,7 @@ def report_markread(report_id=None):
     report_list = []
     for report in reports:
         report.zapped_by = current_user.id
-        report.zapped = datetime.utcnow()
+        report.zapped = time_utcnow()
         report_list.append(report)
 
     db.session.add_all(report_list)

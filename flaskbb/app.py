@@ -10,7 +10,6 @@
 """
 import os
 import logging
-import datetime
 import time
 from functools import partial
 
@@ -34,10 +33,10 @@ from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
                                 debugtoolbar, migrate, themes, plugin_manager,
                                 babel, csrf, allows, limiter, celery)
 # various helpers
-from flaskbb.utils.helpers import (format_date, time_since, crop_title,
-                                   is_online, render_markup, mark_online,
+from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
+                                   crop_title, is_online, mark_online,
                                    forum_is_unread, topic_is_unread,
-                                   render_template)
+                                   render_template, render_markup)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
@@ -238,7 +237,7 @@ def configure_before_handlers(app):
         authenticated."""
 
         if current_user.is_authenticated:
-            current_user.lastseen = datetime.datetime.utcnow()
+            current_user.lastseen = time_utcnow()
             db.session.add(current_user)
             db.session.commit()
 

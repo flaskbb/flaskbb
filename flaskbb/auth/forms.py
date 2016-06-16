@@ -8,15 +8,15 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
-
 from flask_wtf import Form
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
 from flask_babelplus import lazy_gettext as _
+
 from flaskbb.user.models import User
+from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.recaptcha import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -76,7 +76,7 @@ class RegisterForm(Form):
         user = User(username=self.username.data,
                     email=self.email.data,
                     password=self.password.data,
-                    date_joined=datetime.utcnow(),
+                    date_joined=time_utcnow(),
                     primary_group_id=4,
                     language=self.language.data)
         return user.save()

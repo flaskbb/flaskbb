@@ -9,25 +9,22 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import datetime
-
 from sqlalchemy import asc, desc
 from flask import Blueprint, redirect, url_for, current_app, request, flash
 from flask_login import login_required, current_user
 from flask_babelplus import gettext as _
 from flask_allows import Permission, And
+
 from flaskbb.extensions import db, allows
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import (get_online_users, time_diff, format_quote,
-                                   render_template, do_topic_action)
-
+from flaskbb.utils.helpers import (get_online_users, time_diff, time_utcnow,
+                                   format_quote, render_template,
+                                   do_topic_action)
 from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
                                         CanDeletePost, CanDeleteTopic,
                                         CanEditPost, CanPostReply,
                                         CanPostTopic,
                                         IsAtleastModeratorInForum)
-
-
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
 from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
@@ -444,7 +441,7 @@ def edit_post(post_id):
             )
         else:
             form.populate_obj(post)
-            post.date_modified = datetime.datetime.utcnow()
+            post.date_modified = time_utcnow()
             post.modified_by = current_user.username
             post.save()
             return redirect(post.topic.url)
@@ -516,8 +513,8 @@ def markread(forum_id=None, slug=None):
             forumsread.user_id = current_user.id
             forumsread.forum_id = forum_instance.id
 
-        forumsread.last_read = datetime.datetime.utcnow()
-        forumsread.cleared = datetime.datetime.utcnow()
+        forumsread.last_read = time_utcnow()
+        forumsread.cleared = time_utcnow()
 
         db.session.add(forumsread)
         db.session.commit()
@@ -537,8 +534,8 @@ def markread(forum_id=None, slug=None):
         forumsread = ForumsRead()
         forumsread.user_id = current_user.id
         forumsread.forum_id = forum_instance.id
-        forumsread.last_read = datetime.datetime.utcnow()
-        forumsread.cleared = datetime.datetime.utcnow()
+        forumsread.last_read = time_utcnow()
+        forumsread.cleared = time_utcnow()
         forumsread_list.append(forumsread)
 
     db.session.add_all(forumsread_list)
