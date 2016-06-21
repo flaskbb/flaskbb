@@ -84,6 +84,7 @@ setup(
         'Flask-Script',
         'Flask-SQLAlchemy',
         'Flask-Themes2',
+        'Flask-WhooshAlchemy',
         'Flask-WTF',
         'itsdangerous',
         'Jinja2',
@@ -113,9 +114,6 @@ setup(
         'pytest',
         'pytest-cov',
         'pytest-random'
-    ],
-    dependency_links=[
-        'https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-WhooshAlchemy',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
