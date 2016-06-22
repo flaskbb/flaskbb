@@ -24,7 +24,7 @@ class Conversation(db.Model, CRUDMixin):
     to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255))
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     trash = db.Column(db.Boolean, nullable=False, default=False)
     draft = db.Column(db.Boolean, nullable=False, default=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
@@ -85,7 +85,7 @@ class Message(db.Model, CRUDMixin):
     # the user who wrote the message
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
 
     user = db.relationship("User", lazy="joined")
 

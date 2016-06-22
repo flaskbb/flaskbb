@@ -70,7 +70,7 @@ class TopicsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_tr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
 
 
 class ForumsRead(db.Model, CRUDMixin):
@@ -82,7 +82,7 @@ class ForumsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     cleared = db.Column(UTCDateTime(timezone=True))
 
 
@@ -92,7 +92,7 @@ class Report(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                             nullable=False)
-    reported = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    reported = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
     zapped = db.Column(UTCDateTime(timezone=True))
     zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
@@ -142,7 +142,7 @@ class Post(db.Model, CRUDMixin):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     date_modified = db.Column(UTCDateTime(timezone=True))
     modified_by = db.Column(db.String(200))
 
@@ -270,8 +270,8 @@ class Topic(db.Model, CRUDMixin):
     title = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     username = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
-    last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow())
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
+    last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     locked = db.Column(db.Boolean, default=False)
     important = db.Column(db.Boolean, default=False)
     views = db.Column(db.Integer, default=0)
@@ -578,7 +578,7 @@ class Forum(db.Model, CRUDMixin):
     last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     last_post_username = db.Column(db.String(255))
     last_post_created = db.Column(UTCDateTime(timezone=True),
-                                  default=time_utcnow())
+                                  default=time_utcnow)
 
     # One-to-many
     topics = db.relationship(
