@@ -44,6 +44,7 @@ class Group(db.Model, CRUDMixin):
     mod = db.Column(db.Boolean, default=False, nullable=False)
     guest = db.Column(db.Boolean, default=False, nullable=False)
     banned = db.Column(db.Boolean, default=False, nullable=False)
+    default_group = db.Column(db.Boolean, default=False, nullable=False)
 
     # Moderator permissions (only available when the user a moderator)
     mod_edituser = db.Column(db.Boolean, default=False, nullable=False)
