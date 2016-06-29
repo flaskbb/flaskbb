@@ -16,7 +16,7 @@ from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
                                 regexp, ValidationError)
 from flask_babelplus import lazy_gettext as _
-from flaskbb.user.models import User
+from flaskbb.user.models import User, Group
 from flaskbb.utils.recaptcha import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
@@ -73,11 +73,12 @@ class RegisterForm(Form):
             raise ValidationError(_("This email address is already taken."))
 
     def save(self):
+        group = Group.query.filter_by(default_group=True).first()
         user = User(username=self.username.data,
                     email=self.email.data,
                     password=self.password.data,
                     date_joined=datetime.utcnow(),
-                    primary_group_id=4,
+                    primary_group_id=group.id,
                     language=self.language.data)
         return user.save()
 

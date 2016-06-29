@@ -177,6 +177,10 @@ class GroupForm(Form):
         _("Is 'Guest' group?"),
         description=_("Only one group of type 'Guest' is allowed.")
     )
+    default_group = BooleanField(
+        _("Is Default User Group?"),
+        description=_("Check this if this is the default group when a user registers.")
+    )
     editpost = BooleanField(
         _("Can edit posts"),
         description=_("Check this, if the users in this group can edit posts.")
@@ -258,6 +262,19 @@ class GroupForm(Form):
         if field.data and group > 0:
             raise ValidationError(_("There is already a group of type "
                                     "'Guest'."))
+                                    
+    def validate_default_group(self, field):
+        if hasattr(self, "group"):
+            group = Group.query.filter(
+                db.and_(
+                    Group.default_group,
+                    db.not_(Group.id == self.group.id)
+                )
+            ).count()
+        else:
+            group = Group.query.filter_by(default_group=True).count()
+        if field.data and group > 0:
+            raise ValidationError(_("There is already a default member group."))                                    
 
     def save(self):
         data = self.data
