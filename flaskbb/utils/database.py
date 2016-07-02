@@ -8,6 +8,8 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import pytz
+
 from flaskbb.extensions import db
 
 
@@ -26,3 +28,25 @@ class CRUDMixin(object):
         db.session.delete(self)
         db.session.commit()
         return self
+
+
+class UTCDateTime(db.TypeDecorator):
+    impl = db.DateTime
+
+    def process_bind_param(self, value, dialect):
+        """Way into the database."""
+        if value is not None:
+            # store naive datetime for sqlite and mysql
+            if dialect.name in ("sqlite", "mysql"):
+                return value.replace(tzinfo=None)
+
+            return value.astimezone(pytz.UTC)
+
+    def process_result_value(self, value, dialect):
+        """Way out of the database."""
+        # convert naive datetime to non naive datetime
+        if dialect.name in ("sqlite", "mysql") and value is not None:
+            return value.replace(tzinfo=pytz.UTC)
+
+        # other dialects are already non-naive
+        return value

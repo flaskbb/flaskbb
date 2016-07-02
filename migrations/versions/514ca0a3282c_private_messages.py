@@ -56,7 +56,7 @@ def downgrade():
     sa.Column('to_user_id', sa.INTEGER(), nullable=True),
     sa.Column('subject', sa.VARCHAR(length=255), nullable=True),
     sa.Column('message', sa.TEXT(), nullable=True),
-    sa.Column('date_created', sa.DATETIME(), nullable=True),
+    sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.Column('trash', sa.BOOLEAN(), nullable=False),
     sa.Column('draft', sa.BOOLEAN(), nullable=False),
     sa.Column('unread', sa.BOOLEAN(), nullable=False),

@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for
@@ -18,8 +17,9 @@ from flask_login import UserMixin, AnonymousUserMixin
 from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.exceptions import AuthenticationError
+from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.database import CRUDMixin
+from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
@@ -82,9 +82,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
     _password = db.Column('password', db.String(120), nullable=False)
-    date_joined = db.Column(db.DateTime, default=datetime.utcnow())
-    lastseen = db.Column(db.DateTime, default=datetime.utcnow())
-    birthday = db.Column(db.DateTime)
+    date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
+    lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
+    birthday = db.Column(UTCDateTime(timezone=True))
     gender = db.Column(db.String(10))
     website = db.Column(db.String(200))
     location = db.Column(db.String(100))
@@ -92,7 +92,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     avatar = db.Column(db.String(200))
     notes = db.Column(db.Text)
 
-    last_failed_login = db.Column(db.DateTime)
+    last_failed_login = db.Column(UTCDateTime(timezone=True))
     login_attempts = db.Column(db.Integer, default=0)
     activated = db.Column(db.Boolean, default=False)
 
@@ -174,7 +174,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def days_registered(self):
         """Returns the amount of days the user is registered."""
-        days_registered = (datetime.utcnow() - self.date_joined).days
+        days_registered = (time_utcnow() - self.date_joined).days
         if not days_registered:
             return 1
         return days_registered
@@ -247,7 +247,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
             # user exists, wrong password
             user.login_attempts += 1
-            user.last_failed_login = datetime.utcnow()
+            user.last_failed_login = time_utcnow()
             user.save()
 
         # protection against account enumeration timing attacks

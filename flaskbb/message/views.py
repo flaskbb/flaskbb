@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import uuid
-from datetime import datetime
 
 from flask import Blueprint, redirect, request, url_for, flash, abort
 from flask_login import login_required, current_user
@@ -17,7 +16,7 @@ from flask_babelplus import gettext as _
 
 from flaskbb.extensions import db
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import render_template, format_quote
+from flaskbb.utils.helpers import render_template, format_quote, time_utcnow
 from flaskbb.message.forms import ConversationForm, MessageForm
 from flaskbb.message.models import Conversation, Message
 from flaskbb.user.models import User
@@ -228,7 +227,7 @@ def edit_conversation(conversation_id):
             # Move the message from ``Drafts`` to ``Sent``.
             conversation.draft = False
             conversation.to_user = to_user
-            conversation.date_created = datetime.utcnow()
+            conversation.date_created = time_utcnow()
             conversation.save()
 
             flash(_("Message sent."), "success")

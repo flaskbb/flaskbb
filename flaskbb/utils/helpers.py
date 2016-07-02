@@ -15,6 +15,7 @@ import operator
 import struct
 from io import BytesIO
 from datetime import datetime, timedelta
+from pytz import UTC
 
 import requests
 import unidecode
@@ -203,7 +204,7 @@ def forum_is_unread(forum, forumsread, user):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = datetime.utcnow() - timedelta(
+    read_cutoff = time_utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if TRACKER_LENGTH is set to 0
@@ -250,7 +251,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = datetime.utcnow() - timedelta(
+    read_cutoff = time_utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if read_cutoff is set to 0
@@ -349,11 +350,16 @@ def is_online(user):
     return user.lastseen >= time_diff()
 
 
+def time_utcnow():
+    """Returns a timezone aware utc timestamp."""
+    return datetime.now(UTC)
+
+
 def time_diff():
     """Calculates the time difference between now and the ONLINE_LAST_MINUTES
     variable from the configuration.
     """
-    now = datetime.utcnow()
+    now = time_utcnow()
     diff = now - timedelta(minutes=flaskbb_config['ONLINE_LAST_MINUTES'])
     return diff
 
@@ -386,7 +392,7 @@ def time_since(time):  # pragma: no cover
 
     :param time: A datetime object
     """
-    delta = time - datetime.utcnow()
+    delta = time - time_utcnow()
     return format_timedelta(delta, add_direction=True)
 
 

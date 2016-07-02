@@ -22,6 +22,7 @@ Flask-Redis==0.1.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 Flask-Themes2==0.1.4
+Flask-WhooshAlchemy==0.56
 Flask-WTF==0.12
 itsdangerous==0.24
 Jinja2==2.8
@@ -44,4 +45,3 @@ Unidecode==0.4.19
 Werkzeug==0.11.10
 Whoosh==2.7.4
 WTForms==2.1
-https://github.com/jshipley/Flask-WhooshAlchemy/archive/master.zip#egg=Flask-Whooshalchemy
