@@ -63,7 +63,7 @@ class ProductionConfig(DefaultConfig):
     MAIL_PORT = 465
     MAIL_USE_SSL = True
     MAIL_USERNAME = "indy_lux@sina.com"
-    MAIL_PASSWORD = "781276"
+    MAIL_PASSWORD = "indy7721"
     MAIL_DEFAULT_SENDER = ("Herbert Liu", "indy_lux@sina.com")
 
     # The user who should recieve the error logs
