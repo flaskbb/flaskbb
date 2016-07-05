@@ -1,5 +1,5 @@
 """
-    flaskbb.configs.example
+    flaskbb.configs
     ~~~~~~~~~~~~~~~~~~~~
 
     This is how a production configuration can look like.
@@ -23,13 +23,13 @@ class ProductionConfig(DefaultConfig):
     ## Security
     # This is the secret key that is used for session signing.
     # You can generate a secure key with os.urandom(24)
-    SECRET_KEY = 'secret key'
+    SECRET_KEY = 'shineranran'
 
     # You can generate the WTF_CSRF_SECRET_KEY the same way as you have
     # generated the SECRET_KEY. If no WTF_CSRF_SECRET_KEY is provided, it will
     # use the SECRET_KEY.
     WTF_CSRF_ENABLED = True
-    WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
+    WTF_CSRF_SECRET_KEY = "shineranran"
 
 
     ## Caching
@@ -44,8 +44,8 @@ class ProductionConfig(DefaultConfig):
     # https://www.google.com/recaptcha/admin/create
     RECAPTCHA_ENABLED = False
     RECAPTCHA_USE_SSL = False
-    RECAPTCHA_PUBLIC_KEY = "your_public_recaptcha_key"
-    RECAPTCHA_PRIVATE_KEY = "your_private_recaptcha_key"
+    RECAPTCHA_PUBLIC_KEY = "shine_ran_ran"
+    RECAPTCHA_PRIVATE_KEY = "shine_ran_ran"
     RECAPTCHA_OPTIONS = {"theme": "white"}
 
 
@@ -58,16 +58,16 @@ class ProductionConfig(DefaultConfig):
     #MAIL_PASSWORD = ""
     #MAIL_DEFAULT_SENDER = "noreply@example.org"
 
-    # Google Mail Example
-    MAIL_SERVER = "smtp.gmail.com"
+    # Sina Mail Example
+    MAIL_SERVER = "smtp.sina.com"
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_USERNAME = "your_username@gmail.com"
-    MAIL_PASSWORD = "your_password"
-    MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
+    MAIL_USERNAME = "indy_lux@sina.com"
+    MAIL_PASSWORD = "781276"
+    MAIL_DEFAULT_SENDER = ("Herbert Liu", "indy_lux@sina.com")
 
     # The user who should recieve the error logs
-    ADMINS = ["your_admin_user@gmail.com"]
+    ADMINS = ["indy_lux@sina.com"]
 
 
     ## Error/Info Logging
