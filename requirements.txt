@@ -33,5 +33,5 @@ Unidecode==0.4.18
 Werkzeug==0.10.4
 Whoosh==2.7.0
 WTForms==2.0.2
-https://github.com/mrjoes/flask-babelex/tarball/master#egg=Flask-BabelEx
+Flask-BabelEx
 Flask-WhooshAlchemy
