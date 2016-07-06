@@ -459,6 +459,7 @@ def get_image_info(url):
     # handle JPEGs
     elif (size >= 2) and data.startswith(b'\377\330'):
         content_type = 'image/jpeg'
+        w, h = struct.unpack(">HH", data[0:4])
         jpeg = BytesIO(data)
         jpeg.read(2)
         b = jpeg.read(1)
