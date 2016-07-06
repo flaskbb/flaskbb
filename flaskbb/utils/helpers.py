@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     flaskbb.utils.helpers
-    ~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~
 
     A few helpers that are used by flaskbb
 
@@ -15,12 +15,13 @@ import operator
 import struct
 from io import BytesIO
 from datetime import datetime, timedelta
+from pytz import UTC
 
 import requests
 import unidecode
-from flask import session, url_for, flash
+from flask import session, url_for, flash, redirect, request
 from jinja2 import Markup
-from babel.dates import format_timedelta
+from babel.dates import format_timedelta as babel_format_timedelta
 from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
 from flask_login import current_user
@@ -49,6 +50,17 @@ def slugify(text, delim=u'-'):
     return text_type(delim.join(result))
 
 
+def redirect_or_next(endpoint, **kwargs):
+    """Redirects the user back to the page they were viewing or to a specified
+    endpoint. Wraps Flasks :func:`Flask.redirect` function.
+
+    :param endpoint: The fallback endpoint.
+    """
+    return redirect(
+        request.args.get('next') or endpoint, **kwargs
+    )
+
+
 def render_template(template, **context):  # pragma: no cover
     """A helper function that uses the `render_theme_template` function
     without needing to edit all the views
@@ -71,7 +83,8 @@ def do_topic_action(topics, user, action, reverse):
                     For example, to unlock a topic, ``reverse`` should be
                     set to ``True``.
     """
-    from flaskbb.utils.requirements import IsAtleastModeratorInForum, CanDeleteTopic
+    from flaskbb.utils.requirements import (IsAtleastModeratorInForum,
+                                            CanDeleteTopic)
 
     from flaskbb.user.models import User
     from flaskbb.forum.models import Post
@@ -191,7 +204,7 @@ def forum_is_unread(forum, forumsread, user):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = datetime.utcnow() - timedelta(
+    read_cutoff = time_utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if TRACKER_LENGTH is set to 0
@@ -238,7 +251,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = datetime.utcnow() - timedelta(
+    read_cutoff = time_utcnow() - timedelta(
         days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if read_cutoff is set to 0
@@ -252,7 +265,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     # topicsread is none if the user has marked the forum as read
     # or if he hasn't visited yet
     if topicsread is None:
-        # user has cleared the forum sometime ago - check if there is a new post
+        # user has cleared the forum - check if there is a new post
         if forumsread and forumsread.cleared is not None:
             return forumsread.cleared < topic.last_post.date_created
 
@@ -337,11 +350,16 @@ def is_online(user):
     return user.lastseen >= time_diff()
 
 
+def time_utcnow():
+    """Returns a timezone aware utc timestamp."""
+    return datetime.now(UTC)
+
+
 def time_diff():
     """Calculates the time difference between now and the ONLINE_LAST_MINUTES
     variable from the configuration.
     """
-    now = datetime.utcnow()
+    now = time_utcnow()
     diff = now - timedelta(minutes=flaskbb_config['ONLINE_LAST_MINUTES'])
     return diff
 
@@ -357,19 +375,25 @@ def format_date(value, format='%Y-%m-%d'):
     return value.strftime(format)
 
 
+def format_timedelta(delta, **kwargs):
+    """Wrapper around babel's format_timedelta to make it user language
+    aware.
+    """
+    locale = flaskbb_config.get("DEFAULT_LANGUAGE", "en")
+    if current_user.is_authenticated and current_user.language is not None:
+        locale = current_user.language
+
+    return babel_format_timedelta(delta, locale=locale, **kwargs)
+
+
 def time_since(time):  # pragma: no cover
     """Returns a string representing time since e.g.
     3 days ago, 5 hours ago.
 
     :param time: A datetime object
     """
-    delta = time - datetime.utcnow()
-
-    locale = "en"
-    if current_user.is_authenticated and current_user.language is not None:
-        locale = current_user.language
-
-    return format_timedelta(delta, add_direction=True, locale=locale)
+    delta = time - time_utcnow()
+    return format_timedelta(delta, add_direction=True)
 
 
 def format_quote(username, content):
@@ -453,7 +477,7 @@ def get_image_info(url):
                     h, w = struct.unpack(b">HH", jpeg.read(4))
                     break
                 else:
-                    jpeg.read(int(struct.unpack(b">H", jpeg.read(2))[0])-2)
+                    jpeg.read(int(struct.unpack(b">H", jpeg.read(2))[0]) - 2)
                 b = jpeg.read(1)
             width = int(w)
             height = int(h)
