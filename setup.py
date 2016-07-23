@@ -73,7 +73,7 @@ setup(
         'Flask',
         'flask-allows',
         'Flask-BabelPlus',
-        'Flask-Cache',
+        'Flask-Caching',
         'Flask-DebugToolbar',
         'Flask-Limiter',
         'Flask-Login',
