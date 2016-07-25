@@ -11,6 +11,7 @@
 from celery import Celery
 from flask_allows import Allows
 from flask_sqlalchemy import SQLAlchemy
+from flask_whooshee import Whooshee
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_caching import Cache
@@ -31,6 +32,9 @@ allows = Allows(throws=AuthorizationRequired)
 
 # Database
 db = SQLAlchemy()
+
+# Whooshee (Full Text Search)
+whooshee = Whooshee()
 
 # Login
 login_manager = LoginManager()

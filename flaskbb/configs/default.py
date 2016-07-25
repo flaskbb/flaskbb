@@ -57,7 +57,11 @@ class DefaultConfig(object):
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
     # Searching
-    WHOOSH_BASE = os.path.join(_basedir, "whoosh_index", _VERSION_STR)
+    WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _VERSION_STR)
+    # How long should whooshee try to acquire write lock? (defaults to 2)
+    WHOOSHEE_WRITER_TIMEOUT = 2
+    # Minimum number of characters for the search (defaults to 3)
+    WHOOSHEE_MIN_STRING_LEN = 3
 
     # Auth
     LOGIN_VIEW = "auth.login"

@@ -17,7 +17,6 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from flask import Flask, request
 from flask_login import current_user
-from flask_whooshalchemy import whoosh_index
 
 # views
 from flaskbb.user.views import user
@@ -27,11 +26,10 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 # models
 from flaskbb.user.models import User, Guest
-from flaskbb.forum.models import Post, Topic, Category, Forum
 # extensions
 from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
                                 debugtoolbar, migrate, themes, plugin_manager,
-                                babel, csrf, allows, limiter, celery)
+                                babel, csrf, allows, limiter, celery, whooshee)
 # various helpers
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
@@ -137,13 +135,10 @@ def configure_extensions(app):
     # Flask-Limiter
     limiter.init_app(app)
 
-    # Flask-WhooshAlchemy
-    with app.app_context():
-        whoosh_index(app, Post)
-        whoosh_index(app, Topic)
-        whoosh_index(app, Forum)
-        whoosh_index(app, Category)
-        whoosh_index(app, User)
+    # Flask-Whooshee
+    whooshee.init_app(app)
+    from flaskbb.utils.search import PostWhoosheer
+    whooshee.register_whoosheer(PostWhoosheer)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]

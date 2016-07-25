@@ -84,7 +84,7 @@ setup(
         'Flask-Script',
         'Flask-SQLAlchemy',
         'Flask-Themes2',
-        'Flask-WhooshAlchemy',
+        'flask-whooshee',
         'Flask-WTF',
         'itsdangerous',
         'Jinja2',
