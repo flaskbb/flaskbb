@@ -40,6 +40,13 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
     flaskbb_config["TRACKER_LENGTH"] = 0
     assert not forum_is_unread(forum, forumsread, user)
 
+    # there haven't been a post since TRACKER_LENGTH and thus the forum is read
+    flaskbb_config["TRACKER_LENGTH"] = 1
+    # this is cheating; don't do this.
+    forum.last_post_created = forum.last_post_created - datetime.timedelta(hours=48)
+    forum.save()
+    assert not forum_is_unread(forum, forumsread, user)
+
     # no topics in this forum
     topic.delete()
     forum = Forum.query.filter_by(id=forum.id).first()

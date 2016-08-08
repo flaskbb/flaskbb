@@ -215,6 +215,10 @@ def forum_is_unread(forum, forumsread, user):
     if forum and forum.topic_count == 0:
         return False
 
+    # check if the last post is newer than the tracker length
+    if forum.last_post_created < read_cutoff:
+        return False
+
     # If the user hasn't visited a topic in the forum - therefore,
     # forumsread is None and we need to check if it is still unread
     if forum and not forumsread:
@@ -263,7 +267,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
         return False
 
     # topicsread is none if the user has marked the forum as read
-    # or if he hasn't visited yet
+    # or if he hasn't visited the topic yet
     if topicsread is None:
         # user has cleared the forum - check if there is a new post
         if forumsread and forumsread.cleared is not None:
