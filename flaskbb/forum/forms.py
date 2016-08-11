@@ -90,7 +90,7 @@ class UserSearchForm(Form):
 
     def get_results(self):
         query = self.search_query.data
-        return User.query.whoosh_search(query)
+        return User.query.whooshee_search(query)
 
 
 class SearchPageForm(Form):
@@ -107,10 +107,10 @@ class SearchPageForm(Form):
         # Because the DB is not yet initialized when this form is loaded,
         # the query objects cannot be instantiated in the class itself
         search_actions = {
-            'post': Post.query.whoosh_search,
-            'topic': Topic.query.whoosh_search,
-            'forum': Forum.query.whoosh_search,
-            'user': User.query.whoosh_search
+            'post': Post.query.whooshee_search,
+            'topic': Topic.query.whooshee_search,
+            'forum': Forum.query.whooshee_search,
+            'user': User.query.whooshee_search
         }
 
         query = self.search_query.data

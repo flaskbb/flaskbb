@@ -42,6 +42,9 @@ from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
                                         TplCanModerate, TplCanDeletePost,
                                         TplCanDeleteTopic, TplCanEditPost,
                                         TplCanPostTopic, TplCanPostReply)
+# whooshees
+from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
+                                  ForumWhoosheer, UserWhoosheer)
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
@@ -137,8 +140,10 @@ def configure_extensions(app):
 
     # Flask-Whooshee
     whooshee.init_app(app)
-    from flaskbb.utils.search import PostWhoosheer
     whooshee.register_whoosheer(PostWhoosheer)
+    whooshee.register_whoosheer(TopicWhoosheer)
+    whooshee.register_whoosheer(ForumWhoosheer)
+    whooshee.register_whoosheer(UserWhoosheer)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
