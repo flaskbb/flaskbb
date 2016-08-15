@@ -104,6 +104,7 @@ def view_conversation(conversation_id):
 
         form.save(conversation=conversation, user_id=current_user.id,
                   unread=True)
+        conversation.to_user.invalidate_cache(permissions=False)
 
         return redirect(url_for("message.view_conversation",
                                 conversation_id=old_conv.id))
