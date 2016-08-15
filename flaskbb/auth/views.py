@@ -89,7 +89,10 @@ def login():
     if form.validate_on_submit():
         try:
             user = User.authenticate(form.login.data, form.password.data)
-            login_user(user, remember=form.remember_me.data)
+            if not login_user(user, remember=form.remember_me.data):
+                flash(_("In order to use your account you have to activate it "
+                        "through the link we have sent to your email "
+                        "address."), "danger")
             return redirect_or_next(url_for("forum.index"))
         except AuthenticationError:
             flash(_("Wrong username or password."), "danger")
@@ -153,7 +156,7 @@ def register():
             login_user(user)
             flash(_("Thanks for registering."), "success")
 
-        return redirect_or_next(current_user.url)
+        return redirect_or_next(url_for('forum.index'))
 
     return render_template("auth/register.html", form=form)
 
