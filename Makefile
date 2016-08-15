@@ -16,7 +16,7 @@ clean:
 	find . -name '__pycache__' -exec rm -rf {} +
 
 test:
-	py.test --cov=flaskbb --cov-report=term-missing tests
+	py.test
 
 run:
 	python manage.py runserver -dr
