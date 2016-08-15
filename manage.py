@@ -31,7 +31,7 @@ from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
 from flask_migrate import MigrateCommand, upgrade
 
 from flaskbb import create_app
-from flaskbb.extensions import db, plugin_manager
+from flaskbb.extensions import db, plugin_manager, whooshee
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
                                     create_default_settings, insert_mass_data,
@@ -92,6 +92,13 @@ def populate(dropdb=False, createdb=False):
 
     app.logger.info("Creating test data...")
     create_test_data()
+
+
+@manager.command
+def reindex():
+    """Reindexes the search index."""
+    print("Reindexing search index...")
+    whooshee.reindex()
 
 
 @manager.option('-u', '--username', dest='username')
