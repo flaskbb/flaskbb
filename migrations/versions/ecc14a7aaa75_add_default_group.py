@@ -1,4 +1,4 @@
-"""empty message
+"""add default group
 
 Revision ID: ecc14a7aaa75
 Revises: eddcabd0baee
