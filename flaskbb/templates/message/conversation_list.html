@@ -14,7 +14,7 @@
     </div>
     <div class="panel-body conversation-body">
         {% for conversation in conversations.items %}
-        <div class="row conversation-row hover">
+        <div class="row conversation-row hover {% if conversation.unread %}unread{% endif %}">
             <!-- avatar -->
             <div class="col-md-1 col-sm-2 col-xs-2 conversation-avatar">
                 {% if conversation.from_user.avatar %}
@@ -39,11 +39,11 @@
                 <div class="conversation-meta">
                     From <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
                     to <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
-                    on {{ conversation.date_created|format_date("%d %B %Y - %H:%M") }}
+                    on {{ conversation.last_message.date_created|format_date("%d %B %Y - %H:%M") }}
                 </div>
                 <!-- actual content -->
                 <div class="conversation-content">
-                    {{ conversation.first_message.message|crop_title(150)|markup }}
+                    {{ conversation.last_message.message|crop_title(150)|markup }}
                 </div>
                 <!-- actions -->
                 <div class="conversation-actions">

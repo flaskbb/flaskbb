@@ -127,6 +127,9 @@
         &.hover:hover {
             background-color: $panel-hover;
         }
+        &.unread {
+            background-color: $panel-head-bg;
+        }
     }
 }
 

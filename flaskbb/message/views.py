@@ -32,11 +32,12 @@ def inbox():
 
     conversations = Conversation.query.\
         filter(
+            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == False,
             Conversation.trash == False
         ).\
-        order_by(Conversation.id.asc()).\
+        order_by(Message.date_created.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     message_count = Conversation.query.\
@@ -288,11 +289,13 @@ def sent():
 
     conversations = Conversation.query.\
         filter(
+            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == False,
             Conversation.trash == False,
             db.not_(Conversation.to_user_id == current_user.id)
         ).\
+        order_by(Message.date_created.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     message_count = Conversation.query.\
@@ -310,10 +313,12 @@ def drafts():
 
     conversations = Conversation.query.\
         filter(
+            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == True,
             Conversation.trash == False
         ).\
+        order_by(Message.date_created.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     message_count = Conversation.query.\
@@ -331,9 +336,11 @@ def trash():
 
     conversations = Conversation.query.\
         filter(
+            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.trash == True,
         ).\
+        order_by(Message.date_created.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     message_count = Conversation.query.\
