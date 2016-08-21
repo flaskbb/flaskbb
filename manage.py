@@ -166,6 +166,21 @@ def install(username=None, password=None, email=None):
 
 
 @manager.command
+def unattended_install():
+    print("Creating/upgrading database...")
+    initdb()
+    print("Creating default groups, settings, user and forum...")
+    create_default_groups()
+    create_default_settings()
+    create_admin('admin', 'admin', 'admin@admin')
+    create_welcome_forum()
+    print("Compiling translations...")
+    compile_translations()
+    print("Downloading emojis....")
+    download_emoji()
+
+
+@manager.command
 def insertmassdata():
     """Warning: This can take a long time!.
     Creates 100 topics and each topic contains 100 posts.

@@ -1,0 +1,54 @@
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+*.tar.gz
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+whoosh_index
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Project Related #
+###################
+.project
+.geanyprj
+.pydevproject
+.idea
+__pycache__
+*.nja
+*.pyc
+*.db
+.venv
+*.sublime-workspace
+*.sublime-project
+*.egg-info
+*.iml
+.tox
+*.rdb
+.cache
+*.mo
+.coverage
+flaskbb/static/emoji/*
+.sass-cache
+bower_components
+node_modules
+.git
