@@ -84,7 +84,7 @@
                             <!-- Inbox -->
                             <li class="dropdown {{ is_active('message.inbox') }}">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <span class="fa fa-envelope"></span> {% trans %}Inbox{% endtrans %}
+                                    <span class="fa fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}
                                     {% if current_user.unread_count > 0 %}
                                     <span class="label label-danger">{{ current_user.unread_count }}</span>
                                     {% else %}
@@ -105,8 +105,8 @@
                                     <li><a href="#">No unread messages.</a></li>
                                     {% endfor %}
                                     <li class="divider"></li>
-                                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope"></span> {% trans %}Inbox{% endtrans %}</a></li>
-                                    <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil"></span> {% trans %}New Message{% endtrans %}</a></li>
+                                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}</a></li>
+                                    <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
                                 </ul>
                             </li>
 
@@ -114,20 +114,20 @@
                             <li>
                                 <div class="btn-group navbar-btn user-btn">
                                     <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
-                                        <span class="fa fa-user"></span> {{ current_user.username }}
+                                        <span class="fa fa-user fa-fw"></span> {{ current_user.username }}
                                     </a>
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li><a href="{{ url_for('forum.topictracker') }}"><span class="fa fa-book"></span> {% trans %}Topic Tracker{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('forum.topictracker') }}"><span class="fa fa-book fa-fw"></span> {% trans %}Topic Tracker{% endtrans %}</a></li>
                                         <li class="divider"></li>
 
-                                        <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs"></span> {% trans %}Settings{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('user.settings') }}"><span class="fa fa-cogs fa-fw"></span> {% trans %}Settings{% endtrans %}</a></li>
                                         {% if current_user|is_admin_or_moderator %}
-                                        <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog"></span> {% trans %}Management{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('management.overview') }}"><span class="fa fa-cog fa-fw"></span> {% trans %}Management{% endtrans %}</a></li>
                                         <li class="divider"></li>
                                         {% endif %}
 
-                                        <li><a href="{{ url_for('auth.logout') }}"><span class="fa fa-power-off"></span> {% trans %}Logout{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('auth.logout') }}"><span class="fa fa-power-off fa-fw"></span> {% trans %}Logout{% endtrans %}</a></li>
                                     </ul>
                                 </div>
                             </li>
@@ -136,14 +136,14 @@
                             <li>
                                 <div class="btn-group navbar-btn user-btn">
                                     <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
-                                        <span class="fa fa-user"></span> {% trans %}Login{% endtrans %}
+                                        <span class="fa fa-user fa-fw"></span> {% trans %}Login{% endtrans %}
                                     </a>
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
                                         {% if flaskbb_config["REGISTRATION_ENABLED"] %}
-                                        <li><a href="{{ url_for('auth.register') }}">{% trans %}Register{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('auth.register') }}"><span class="fa fa-user-plus fa-fw"></span> {% trans %}Register{% endtrans %}</a></li>
                                         {% endif %}
-                                        <li><a href="{{ url_for('auth.forgot_password') }}">{% trans %}Reset Password{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('auth.forgot_password') }}"><span class="fa fa-undo fa-fw"></span> {% trans %}Reset Password{% endtrans %}</a></li>
                                     </ul>
                                 </div>
                             </li>

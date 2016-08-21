@@ -18,7 +18,7 @@
                 <div class="row">
                     <!-- Icon -->
                     <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
-                        <span class="fa fa-external-link forum-external"></span>
+                        <span class="fa fa-external-link fa-fw forum-external"></span>
                     </div>
 
                     <div class="col-md-11 col-sm-10 col-xs-10">
@@ -55,11 +55,11 @@
                     <!-- Icon -->
                     <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
                         {% if forum.locked %}
-                            <span class="fa fa-lock forum-locked"></span>
+                            <span class="fa fa-lock fa-fw forum-locked"></span>
                         {% elif forum|forum_is_unread(forumsread, current_user) %}
-                            <span class="fa fa-comments forum-unread"></span>
+                            <span class="fa fa-comments fa-fwforum-unread"></span>
                         {% else %}
-                            <span class="fa fa-comments-o forum-read"></span>
+                            <span class="fa fa-comments-o fa-fw forum-read"></span>
                         {% endif %}
                     </div>
 

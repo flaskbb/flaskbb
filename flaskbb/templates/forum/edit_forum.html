@@ -42,18 +42,18 @@
                         <div class="row">
                             <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
                             {% if topic.locked %}
-                                <span class="fa fa-lock topic-locked"></span>
+                                <span class="fa fa-lock fa-fw topic-locked"></span>
                             {% elif topic.important %}
                                 {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                    <span class="fa fa-star topic-starred-unread"></span>
+                                    <span class="fa fa-star fa-fw topic-starred-unread"></span>
                                 {% else %}
-                                    <span class="fa fa-star-o topic-starred-read"></span>
+                                    <span class="fa fa-star-o fa-fw topic-starred-read"></span>
                                 {% endif %}
                             {% else %}
                                 {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                    <span class="fa fa-comment topic-unread"></span>
+                                    <span class="fa fa-comment fa-fw topic-unread"></span>
                                 {% else %}
-                                    <span class="fa fa-comment-o topic-read"></span>
+                                    <span class="fa fa-comment-o fa-fw topic-read"></span>
                                 {% endif %}
                             {% endif %}
                             </div>
@@ -125,24 +125,24 @@
 
                         <div class="btn-group" role="group">
                             <button name="lock" class="btn btn-warning">
-                                <span class="fa fa-lock"></span> {% trans %}Lock{% endtrans %}
+                                <span class="fa fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
                             </button>
                             <button name="unlock" class="btn btn-warning">
-                                <span class="fa fa-unlock"></span> {% trans %}Unlock{% endtrans %}
+                                <span class="fa fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
                             </button>
                         </div>
 
                         <div class="btn-group" role="group">
                             <button name="highlight" class="btn btn-success">
-                                <span class="fa fa-star"></span> {% trans %}Highlight{% endtrans %}
+                                <span class="fa fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
                             </button>
                             <button name="trivialize" class="btn btn-success">
-                                <span class="fa fa-star-o"></span> {% trans %}Trivialize{% endtrans %}
+                                <span class="fa fa-star-o fa-fw"></span> {% trans %}Trivialize{% endtrans %}
                             </button>
                         </div>
 
                         <button name="delete" class="btn btn-danger">
-                            <span class="fa fa-trash-o"></span> {% trans %}Delete{% endtrans %}
+                            <span class="fa fa-trash-o fa-fw"></span> {% trans %}Delete{% endtrans %}
                         </button>
 
                     </div>

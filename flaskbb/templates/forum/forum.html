@@ -22,17 +22,17 @@
             <form class="inline-form" method="post" action="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button class="btn btn-default">
-                    <span class="fa fa-check"></span> {% trans %}Mark as Read{% endtrans %}
+                    <span class="fa fa-check fa-fw"></span> {% trans %}Mark as Read{% endtrans %}
                 </button>
             </form>
 
             {% if forum.locked %}
             <span class="btn btn-primary">
-                <span class="fa fa-lock"></span> {% trans %}Locked{% endtrans %}
+                <span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}
             </span>
             {% else %}
             <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-primary">
-                <span class="fa fa-pencil"></span> {% trans %}New Topic{% endtrans %}
+                <span class="fa fa-pencil fa-fw"></span> {% trans %}New Topic{% endtrans %}
             </a>
             {% endif %}
         </div>
@@ -59,18 +59,18 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
                         {% if topic.locked %}
-                            <span class="fa fa-lock topic-locked"></span>
+                            <span class="fa fa-lock fa-fw topic-locked"></span>
                         {% elif topic.important %}
                             {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-star topic-starred-unread"></span>
+                                <span class="fa fa-star fa-fw topic-starred-unread"></span>
                             {% else %}
-                                <span class="fa fa-star-o topic-starred-read"></span>
+                                <span class="fa fa-star-o fa-fw topic-starred-read"></span>
                             {% endif %}
                         {% else %}
                             {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-comment topic-unread"></span>
+                                <span class="fa fa-comment fa-fw topic-unread"></span>
                             {% else %}
-                                <span class="fa fa-comment-o topic-read"></span>
+                                <span class="fa fa-comment-o fa-fw topic-read"></span>
                             {% endif %}
                         {% endif %}
                         </div>
@@ -127,7 +127,7 @@
     {% if current_user|can_moderate(forum) %}
     <div class="row controls-row">
         <a class="btn btn-default" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
-            <span class="fa fa-tasks"></span> {% trans %}Moderation Mode{% endtrans %}
+            <span class="fa fa-tasks fa-fw"></span> {% trans %}Moderation Mode{% endtrans %}
         </a>
     </div>
     {% endif %}

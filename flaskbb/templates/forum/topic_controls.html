@@ -12,7 +12,7 @@
             <!-- Moderation buttons -->
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="fa fa-bars" aria-hidden="true"></span> {% trans %}Moderate{% endtrans %} <span class="caret"></span>
+                    <span class="fa fa-bars fa-fw" aria-hidden="true"></span> {% trans %}Moderate{% endtrans %} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
 
@@ -21,7 +21,7 @@
                     <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="btn btn-link">
-                            <span class="fa fa-trash-o"></span> {% trans %}Delete Topic{% endtrans %}
+                            <span class="fa fa-trash-o fa-fw"></span> {% trans %}Delete Topic{% endtrans %}
                         </button>
                     </form>
                 </li>
@@ -33,7 +33,7 @@
                         <form class="inline-form" method="post" action="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-link">
-                                <span class="fa fa-lock"></span> {% trans %}Lock Topic{% endtrans %}
+                                <span class="fa fa-lock fa-fw"></span> {% trans %}Lock Topic{% endtrans %}
                             </button>
                         </form>
                     </li>
@@ -42,7 +42,7 @@
                         <form class="inline-form" method="post" action="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-link">
-                                <span class="fa fa-unlock"></span> {% trans %}Unlock Topic{% endtrans %}
+                                <span class="fa fa-unlock fa-fw"></span> {% trans %}Unlock Topic{% endtrans %}
                             </button>
                         </form>
                     </li>
@@ -53,7 +53,7 @@
                         <form class="inline-form" method="post" action="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-link">
-                                <span class="fa fa-star"></span> {% trans %}Highlight Topic{% endtrans %}
+                                <span class="fa fa-star fa-fw"></span> {% trans %}Highlight Topic{% endtrans %}
                             </button>
                         </form>
                     </li>
@@ -62,7 +62,7 @@
                         <form class="inline-form" method="post" action="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-link">
-                                <span class="fa fa-star-o"></span> {% trans %}Trivialize Topic{% endtrans %}
+                                <span class="fa fa-star-o fa-fw"></span> {% trans %}Trivialize Topic{% endtrans %}
                             </button>
                         </form>
                     </li>
@@ -77,24 +77,24 @@
             <form class="inline-form" method="post" action="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button class="btn btn-default">
-                    <span class="fa fa-tag" aria-hidden="true"></span> {% trans %}Untrack Topic{% endtrans %}
+                    <span class="fa fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Untrack Topic{% endtrans %}
                 </button>
             </form>
             {% else %}
             <form class="inline-form" method="post" action="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button class="btn btn-default">
-                    <span class="fa fa-tag" aria-hidden="true"></span> {% trans %}Track Topic{% endtrans %}
+                    <span class="fa fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Track Topic{% endtrans %}
                 </button>
             </form>
             {% endif %}
 
             {% if current_user|post_reply(topic) %}
             <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}" class="btn btn-primary">
-                <span class="fa fa-pencil"></span> {% trans %}Reply{% endtrans %}
+                <span class="fa fa-pencil fa-fw"></span> {% trans %}Reply{% endtrans %}
             </a>
             {% else %}
-            <div class="btn btn-primary"><span class="fa fa-lock"></span> {% trans %}Locked{% endtrans %}</div>
+            <div class="btn btn-primary"><span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}</div>
             {% endif %}
         </div>
     </div>
