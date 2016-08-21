@@ -1,9 +1,5 @@
 {% extends theme("message/message_layout.html") %}
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-markdown.min.css') }}">
-{% endblock %}
-
 {% block message_content %}
 {# quick check if the conversation is a draft #}
 {% if conversation.draft %}
@@ -142,5 +138,4 @@
       $('[data-toggle="tooltip"]').tooltip()
     })
     </script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/editor.min.js') }}"></script>
 {% endblock %}
