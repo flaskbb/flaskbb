@@ -1,0 +1,10 @@
+uglifyjs \
+    node_modules/jquery/dist/jquery.min.js \
+    node_modules/bootstrap-sass/assets/javascripts/bootstrap.min.js \
+    node_modules/bootstrap-markdown/js/bootstrap-markdown.js \
+    node_modules/marked/lib/marked.js \
+    node_modules/jquery-textcomplete/dist/jquery.textcomplete.min.js \
+    src/js/*.js \
+    -m \
+    -c \
+    -o static/js/scripts.min.js

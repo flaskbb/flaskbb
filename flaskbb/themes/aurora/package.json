@@ -3,20 +3,41 @@
   "description": "The default theme for FlaskBB.",
   "version": "1.0.0",
   "license": "BSD-3-Clause",
-  "author": "Peter Justin",
+  "author": "Peter Justin <peter.justin@outlook.com>",
   "url": "https://flaskbb.org",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sh4nks/flaskbb"
+  },
+  "bugs": "https://github.com/sh4nks/flaskbb/issues",
+  "keywords": [
+    "flaskbb",
+    "theme",
+    "aurora"
+  ],
+  "scripts": {
+    "clean": "rm -f node_modules",
+    "autoprefixer": "postcss -u autoprefixer -r static/css/*",
+    "scss": "./tools/build_css",
+    "uglify": "./tools/build_js",
+    "imagemin": "imagemin src/img/* -o static/img",
+    "fonts": "./tools/build_fonts",
+    "build:css": "npm run scss && npm run autoprefixer",
+    "build:js": "npm run uglify",
+    "build:images": "npm run imagemin && npm run fonts",
+    "build:all": "npm run build:css && npm run build:js && npm run build:images",
+    "watch:css": "onchange 'src/scss' -- npm run build:css",
+    "watch:js": "onchange 'src/js' -- npm run build:js",
+    "watch:all": "npm-run-all -p watch:css watch:js"
+  },
   "devDependencies": {
-    "bower": "^1.6.9",
-    "gulp": "^3.8.11",
-    "gulp-autoprefixer": "^3.1.0",
-    "gulp-bower": "0.0.13",
-    "gulp-concat": "~2.6.0",
-    "gulp-help": "^1.6.1",
-    "gulp-imagemin": "^2.4.0",
-    "gulp-notify": "^2.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^2.2.0",
-    "gulp-uglify": "~1.5.3"
+    "autoprefixer": "^6.4.0",
+    "imagemin-cli": "^3.0.0",
+    "node-sass": "^3.8.0",
+    "npm-run-all": "^3.0.0",
+    "onchange": "^2.5.0",
+    "postcss-cli": "^2.5.2",
+    "uglify-js": "^2.7.3"
   }
 }

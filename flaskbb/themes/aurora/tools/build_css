@@ -1,0 +1,6 @@
+node-sass \
+    src/scss/styles.scss \
+    --include-path 'src/scss node_modules/bootstrap-sass/assets/stylesheets/bootstrap node_modules/font-awesome/scss/font-awesome' \
+    --precision 8 \
+    --output-style compressed \
+    --output static/css/
