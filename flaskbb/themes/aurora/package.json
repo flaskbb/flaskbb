@@ -39,5 +39,13 @@
     "onchange": "^2.5.0",
     "postcss-cli": "^2.5.2",
     "uglify-js": "^2.7.3"
+  },
+  "dependencies": {
+    "bootstrap-sass": "^3.3.7",
+    "bootstrap-markdown": "^2.10.0",
+    "font-awesome": "^4.6.3",
+    "jquery-textcomplete": "^1.6.2",
+    "jquery": "^3.1.0",
+    "marked": "^0.3.6"
   }
 }
