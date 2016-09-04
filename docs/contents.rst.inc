@@ -12,3 +12,15 @@ Contents
    settings
    permissions
    models
+
+
+Additional Information
+----------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   changelog
+   license
+
+* :ref:`search`

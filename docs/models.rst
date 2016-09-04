@@ -61,7 +61,18 @@ The user modules contains all related models for the users.
 .. autoclass:: Group
    :members:
 
-.. autoclass:: PrivateMessage
+
+Message Models
+--------------
+
+.. module:: flaskbb.message.models
+
+The message modules contains all the related models for the conversations
+
+.. autoclass:: Conversation
+   :members:
+
+.. autoclass:: Message
    :members:
 
 

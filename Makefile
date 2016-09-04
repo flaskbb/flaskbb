@@ -1,10 +1,11 @@
-.PHONY: clean install help test run dependencies
+.PHONY: clean install help test run dependencies docs
 
 help:
 	@echo "  clean      remove unwanted stuff"
 	@echo "  install    install flaskbb and setup"
-	@echo "  test      run the testsuite"
+	@echo "  test       run the testsuite"
 	@echo "  run        run the development server"
+	@echo "  docs       build the documentation"
 
 dependencies:requirements.txt
 	pip install -r requirements.txt
@@ -24,3 +25,6 @@ run:
 install:dependencies
 	clear
 	python manage.py install
+
+docs:
+	$(MAKE) -C docs html

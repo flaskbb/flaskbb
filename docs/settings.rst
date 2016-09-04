@@ -20,6 +20,7 @@ The available fields are shown below.
 
 
 .. autoclass:: Setting
+    :noindex:
 
     .. attribute:: key
 
