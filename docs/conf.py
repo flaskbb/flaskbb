@@ -145,7 +145,7 @@ html_theme_options = {
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'FlaskBB v1.0.0'
+html_title = u'FlaskBB Documentation'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -157,8 +157,8 @@ html_theme_options = {
 # html_logo = None
 
 # The name of an image file (relative to this directory) to use as a favicon of
-# the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
+# the docs.  This file should be a Windows icon file (.ico) being 16x16 or
+# 32x32 pixels large.
 #
 # html_favicon = None
 
@@ -265,21 +265,21 @@ htmlhelp_basename = 'FlaskBBdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-     # The paper size ('letterpaper' or 'a4paper').
-     #
-     # 'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
 
-     # The font size ('10pt', '11pt' or '12pt').
-     #
-     # 'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
 
-     # Additional stuff for the LaTeX preamble.
-     #
-     # 'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
 
-     # Latex figure (float) alignment
-     #
-     # 'figure_align': 'htbp',
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -344,7 +344,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'FlaskBB', u'FlaskBB Documentation',
-     author, 'FlaskBB', 'One line description of project.',
+     author, 'FlaskBB', 'Community Forums.',
      'Miscellaneous'),
 ]
 
@@ -367,10 +367,11 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/': None,
-    'http://flask.pocoo.org/docs/latest/': None,
-    'http://werkzeug.pocoo.org/docs/latest/': None,
-    'http://jinja.pocoo.org/docs/latest/': None,
-    'http://click.pocoo.org/6/': None
+    'python': ('https://docs.python.org/3/', None),
+    'flask': ('http://flask.pocoo.org/docs/latest/', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/latest/', None),
+    'click': ('http://click.pocoo.org/', None),
+    'jinja': ('http://jinja.pocoo.org/docs/latest', None),
 }
+
 autodoc_member_order = 'bysource'
