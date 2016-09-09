@@ -53,3 +53,4 @@ flaskbb/static/emoji/*
 .sass-cache
 bower_components
 node_modules
+.directory
