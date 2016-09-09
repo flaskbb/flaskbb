@@ -142,7 +142,6 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def last_post(self):
         """Returns the latest post from the user."""
-
         return Post.query.filter(Post.user_id == self.id).\
             order_by(Post.date_created.desc()).first()
 
@@ -283,7 +282,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param topic: The topic which should be added to the topic tracker.
         """
-
         if not self.is_tracking_topic(topic):
             self.tracked_topics.append(topic)
             return self
@@ -294,7 +292,6 @@ class User(db.Model, UserMixin, CRUDMixin):
         :param topic: The topic which should be removed from the
                       topic tracker.
         """
-
         if self.is_tracking_topic(topic):
             self.tracked_topics.remove(topic)
             return self
@@ -304,7 +301,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param topic: The topic which should be checked.
         """
-
         return self.tracked_topics.filter(
             topictracker.c.topic_id == topic.id).count() > 0
 
@@ -313,7 +309,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param group: The group which should be added to the user.
         """
-
         if not self.in_group(group):
             self.secondary_groups.append(group)
             return self
@@ -323,7 +318,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param group: The group which should be removed from the user.
         """
-
         if self.in_group(group):
             self.secondary_groups.remove(group)
             return self
@@ -333,7 +327,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param group: The group which should be checked.
         """
-
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
@@ -383,7 +376,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def ban(self):
         """Bans the user. Returns True upon success."""
-
         if not self.get_permissions()['banned']:
             banned_group = Group.query.filter(
                 Group.banned == True
@@ -397,7 +389,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
-
         if self.get_permissions()['banned']:
             member_group = Group.query.filter(
                 Group.admin == False,
@@ -420,7 +411,6 @@ class User(db.Model, UserMixin, CRUDMixin):
         :param groups: A list with groups that should be added to the
                        secondary groups from user.
         """
-
         if groups is not None:
             # TODO: Only remove/add groups that are selected
             secondary_groups = self.secondary_groups.all()
@@ -442,7 +432,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def delete(self):
         """Deletes the User."""
-
         # This isn't done automatically...
         Conversation.query.filter_by(user_id=self.id).delete()
         ForumsRead.query.filter_by(user_id=self.id).delete()
@@ -480,7 +469,6 @@ class Guest(AnonymousUserMixin):
 
     @cache.memoize(timeout=max_integer)
     def get_permissions(self, exclude=None):
-
         """Returns a dictionary with all permissions the user has"""
         if exclude:
             exclude = set(exclude)
@@ -499,5 +487,4 @@ class Guest(AnonymousUserMixin):
     @classmethod
     def invalidate_cache(cls):
         """Invalidates this objects cached metadata."""
-
         cache.delete_memoized(cls.get_permissions, cls)
