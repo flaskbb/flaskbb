@@ -81,19 +81,19 @@ Field Explanation
 Templates
 ~~~~~~~~~
 
-`Flask`_ and therefore also FlaskBB uses the `Jinja2`_ template engine,
+`Flask`_ and therefore also FlaskBB uses the `Jinja2`_ templating engine,
 so you should read `its documentation <http://jinja.pocoo.org/docs/templates>`_
 to learn about the actual syntax of the templates.
 
 All templates are by default loaded from FlaskBB's ``templates/`` folder. In
-order to create your theme, you have to create a ``templates/`` folder in your
-themes directory and preferably copy the ``layout.html`` file from FlaskBBs
-template folder over to yours. This ``layout.html`` file is your starting
-point. Every template is will extend it. If you want to overwrite other
+order to create your own theme, you have to create a ``templates/`` folder in
+your themes directory and optionally also copy the ``layout.html`` file from
+FlaskBB's template folder over to yours. This ``layout.html`` file is your
+starting point. Every template will extend it. If you want to overwrite other
 templates, just copy them over from the templates folder and modify them
 to your liking.
 
-Each template loaded will have a global function named `theme`
+Each loaded template will have a global function named `theme`
 available to look up the theme's templates. For example, if you want to
 extend, import, or include another template from your theme, you can use
 ``theme(template_name)``, like this:
@@ -129,8 +129,8 @@ function:
 
     <link rel=stylesheet href="{{ theme_static('style.css') }}">
 
-To include the static files that FlaskBB ships with, you just use
-the usual way of including them:
+To include the static files that FlaskBB ships with, you just proceed as
+normal:
 
 .. sourcecode:: html+jinja
 
@@ -149,11 +149,11 @@ that with the `theme_get_info` function:
 Advanced Example
 -----------------
 
-A more advanced example is our own default theme called **Aurora**. It does
-not provide an ``layout.html`` because I want to avoid code duplication (and
-it is easier to maintain as well). For your own theme, please copy the
-``layout.html`` from FlaskBB's templates fodler into your themes templates
-folder.
+A more advanced example of a theme, is our own default theme called
+**Aurora**. It does not provide an ``layout.html`` because I want to avoid
+code duplication and it is easier to maintain as well. For your own theme,
+please copy the ``layout.html`` from FlaskBB's ``templates/`` folder into your
+themes ``templates/`` folder.
 
 
 Prerequisites
@@ -166,20 +166,20 @@ following the official
 
 The theme also uses `SASS <https://sass-lang.com/libsass>`_,
 a CSS preprocessor, to make development easier. If you are not familar with
-SASS and want to use SASS (which I really recommend), follow this basic
-`guide <http://sass-lang.com/guide>`__ to get a basic understanding of it.
+SASS but want to use it, which I can really recommend, follow this
+`guide <http://sass-lang.com/guide>`_ to get a basic understanding of it.
 
 As explained in `Field Explanation <#field-explanation>`_, each theme must
 have a unique theme **identifier** - so open up ``info.json`` (from your
 themes folder) with your favorite editor and adjust all the fields properly.
 
-Next, do the same thing for the ``package.json`` file (this one is used by
-npm to install some libraries like Bootstrap). A detailed explanation about
+Next, do the same thing for the ``package.json`` file. This file is used by
+npm to install some libraries like Bootstrap. A detailed explanation about
 all the fields is available from `package.json documentation page`_.
 
-To install the stated requirements in ``package.json`` like, Bootstrap,
-JQuery and some other libraries just run the ``npm install`` command in the directory where the ``package.json`` file lies. Now you have set up the
-toolchain which is used for the Aurora theme.
+To install the stated requirements in ``package.json`` just run the
+``npm install`` command in the directory where the ``package.json`` file is
+located. Now you have set up the toolchain which is used for the Aurora theme.
 
 
 Toolchain Commands
@@ -235,7 +235,7 @@ TL;DR
 1. Create a new folder within the ``themes/`` folder and give it the name
    of your theme.
 2. Copy the content of the ``aurora/`` folder into your folder theme's folder.
-3. Create **2** new folders called ``static/`` and ``templates`` in your
+3. Create **2** new folders called ``static/`` and ``templates/`` in your
    themes folder.
 4. Copy ``layout.html`` from FlaskBB's ``templates/`` into your themes
    ``templates/`` folder and modified to your liking. Feel free to copy
