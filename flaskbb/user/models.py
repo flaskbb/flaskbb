@@ -275,6 +275,8 @@ class User(db.Model, UserMixin, CRUDMixin):
         """Returns a paginated result with all posts the user has created."""
 
         return Post.query.filter(Post.user_id == self.id).\
+            filter(Post.id == Post.id).\
+            order_by(Post.id.desc()).\
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     def track_topic(self, topic):
