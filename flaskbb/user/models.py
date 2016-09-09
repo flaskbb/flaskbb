@@ -265,17 +265,16 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def all_topics(self, page):
         """Returns a paginated result with all topics the user has created."""
-
-        return Topic.query.filter(Topic.user_id == self.id).\
-            filter(Post.topic_id == Topic.id).\
+        return Topic.query.\
+            filter(Topic.user_id == self.id,
+                   Topic.id == Post.topic_id).\
             order_by(Post.id.desc()).\
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
     def all_posts(self, page):
         """Returns a paginated result with all posts the user has created."""
-
-        return Post.query.filter(Post.user_id == self.id).\
-            filter(Post.id == Post.id).\
+        return Post.query.\
+            filter(Post.user_id == self.id).\
             order_by(Post.id.desc()).\
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
