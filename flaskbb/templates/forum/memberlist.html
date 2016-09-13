@@ -4,6 +4,9 @@
 {% block content %}
 {% from theme('macros.html') import render_pagination, input_group_field %}
 
+{% set order_by = 'desc' if request.args.get('order_by') == 'asc' else 'asc' %}
+{% set sort_by = request.args.get('sort_by') %}
+
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
         <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
@@ -13,7 +16,7 @@
     <div class="row controls-row">
         <div class="col-md-8 col-sm-8 col-xs-8 controls-col">
             <div class="pull-left">
-                {{ render_pagination(users, url_for('forum.memberlist')) }}
+                {{ render_pagination(users, url_for('forum.memberlist'), sort_by=sort_by, asc=(order_by == 'desc')) }}
             </div>
         </div>
         <div class="col-md-4 col-sm-4 col-xs-4 controls-col">
@@ -37,7 +40,6 @@
         </div>
         <div class="panel-body page-body">
             <div class="page-meta">
-                {% set order_by = 'desc' if request.args.get('order_by') == 'asc' else 'asc' %}
                 <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
                 <div class="col-md-3 col-sm-3 col-xs-5 meta-item">
                     <a href="{{ url_for('forum.memberlist') }}?sort_by=username&order_by={{ order_by }}">{% trans %}Username{% endtrans %}</a>
