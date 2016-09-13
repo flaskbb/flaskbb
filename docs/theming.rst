@@ -150,10 +150,17 @@ Advanced Example
 -----------------
 
 A more advanced example of a theme, is our own default theme called
-**Aurora**. It does not provide an ``layout.html`` because I want to avoid
-code duplication and it is easier to maintain as well. For your own theme,
-please copy the ``layout.html`` from FlaskBB's ``templates/`` folder into your
-themes ``templates/`` folder.
+**Aurora**. We do not have a ``layout.html`` file because we want to avoid code
+duplication and are just falling back to the one that FlaskBB ships with in
+its ``templates/`` folder. In order to use your own stylesheets you have to
+create a ``layout.html`` file. It's probably the easiest to just copy the
+``layout.html`` from FlaskBB's ``templates/`` folder into your themes
+``templates/`` folder.
+
+For example, the `forums <https://forums.flaskbb.org>`_ on FlaskBB are using
+a slightly modified version of the Aurora theme. It is available on GitHub
+here: `Aurora Mod <https://github.com/sh4nks/flaskbb-theme-aurora-mod>`_.
+The modified version just adds a top navigation and uses a different footer.
 
 
 Prerequisites
