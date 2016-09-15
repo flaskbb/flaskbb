@@ -320,13 +320,15 @@
 </li>
 {% endmacro %}
 
-{% macro render_pagination(page_obj, url, ul_class='') %}
+{% macro render_pagination(page_obj, url, ul_class='', sort_by=None, asc=True) %}
 <ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}'>
+    {% set ordering = 'asc' if asc == True else 'desc' %}
+    {% set sorting = '&sort_by='+(sort_by|urlencode)+'&order_by='+ordering if sort_by is string else '' %}
     <li class="disabled"><a href="#"><span class="pages-label">{% trans %}Pages{% endtrans %}:</span></a></li>
     {%- for page in page_obj.iter_pages() %}
         {% if page %}
             {% if page != page_obj.page %}
-                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+                <li><a href="{{ url }}?page={{ page }}{{ sorting }}">{{ page }}</a></li>
             {% else %}
                 <li class="active"><a href="#">{{ page }}</a></li>
             {% endif %}
@@ -335,11 +337,10 @@
         <li class="active"><a href="#">1</a></li>
     {%- endfor %}
     {% if page_obj.has_next %}
-        <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}{{ sorting }}">&raquo;</a></li>
     {% endif %}
 </ul>
 {% endmacro %}
-
 
 {% macro render_topic_pagination(page_obj, url) %}
 <ul class="pagination pagelink pull-left">
