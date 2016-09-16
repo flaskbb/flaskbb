@@ -40,8 +40,10 @@ class DefaultConfig(object):
     # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.org"
     #SERVER_NAME =
 
-    # Prefer HTTPS over HTTP
-    PREFERRED_URL_SCHEME = "https"
+    # The preferred url scheme. In a productive environment it is highly
+    # recommended to use 'https'.
+    # This only affects the url generation with 'url_for'.
+    PREFERRED_URL_SCHEME = "http"
 
     # If SEND_LOGS is set to True, the admins (see the mail configuration) will
     # recieve the error logs per email.
