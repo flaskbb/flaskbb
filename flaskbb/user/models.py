@@ -8,8 +8,6 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import os
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
@@ -237,7 +235,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         user = cls.query.filter(db.or_(User.username == login,
                                        User.email == login)).first()
 
-        if user:
+        if user is not None:
             if user.check_password(password):
                 # reset them after a successful login attempt
                 user.login_attempts = 0
@@ -245,13 +243,16 @@ class User(db.Model, UserMixin, CRUDMixin):
                 return user
 
             # user exists, wrong password
-            user.login_attempts += 1
+            # never had a bad login before
+            if user.login_attempts is None:
+                user.login_attempts = 1
+            else:
+                user.login_attempts += 1
             user.last_failed_login = time_utcnow()
             user.save()
 
         # protection against account enumeration timing attacks
-        dummy_password = os.urandom(15).encode("base-64")
-        check_password_hash(dummy_password, password)
+        check_password_hash("dummy password", password)
 
         raise AuthenticationError
 
