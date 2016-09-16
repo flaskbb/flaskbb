@@ -171,7 +171,8 @@ def configure_extensions(app):
     @babel.localeselector
     def get_locale():
         # if a user is logged in, use the locale from the user settings
-        if current_user.is_authenticated and current_user.language:
+        if current_user and \
+                current_user.is_authenticated and current_user.language:
             return current_user.language
         # otherwise we will just fallback to the default language
         return flaskbb_config["DEFAULT_LANGUAGE"]

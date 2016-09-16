@@ -16,6 +16,7 @@ from flaskbb.extensions import mail, celery
 from flaskbb.utils.tokens import make_token
 
 
+@celery.task
 def send_reset_token(user):
     """Sends the reset token to the user's email address.
 
@@ -38,6 +39,7 @@ def send_reset_token(user):
     )
 
 
+@celery.task
 def send_activation_token(user):
     """Sends the activation token to the user's email address.
 
@@ -61,8 +63,8 @@ def send_activation_token(user):
 
 
 @celery.task
-def send_async_email(msg):
-    mail.send(msg)
+def send_async_email(*args, **kwargs):
+    send_email(*args, **kwargs)
 
 
 def send_email(subject, recipients, text_body, html_body, sender=None):
@@ -79,4 +81,4 @@ def send_email(subject, recipients, text_body, html_body, sender=None):
     msg = Message(subject, recipients=recipients, sender=sender)
     msg.body = text_body
     msg.html = html_body
-    send_async_email.delay(msg)
+    mail.send(msg)

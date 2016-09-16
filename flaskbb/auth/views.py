@@ -149,7 +149,7 @@ def register():
         user = form.save()
 
         if flaskbb_config["ACTIVATE_ACCOUNT"]:
-            send_activation_token(user)
+            send_activation_token.delay(user)
             flash(_("An account activation email has been sent to %(email)s",
                     email=user.email), "success")
         else:
@@ -172,7 +172,7 @@ def forgot_password():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            send_reset_token(user)
+            send_reset_token.delay(user)
             flash(_("Email sent! Please check your inbox."), "info")
             return redirect(url_for("auth.forgot_password"))
         else:
@@ -220,7 +220,7 @@ def request_activation_token(token=None):
     form = RequestActivationForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        send_activation_token(user)
+        send_activation_token.delay(user)
         flash(_("A new account activation token has been sent to "
                 "your email address."), "success")
         return redirect(url_for("auth.activate_account"))
