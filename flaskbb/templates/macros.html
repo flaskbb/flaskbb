@@ -389,7 +389,8 @@
 {% set max_pages = 4 %}
 {% set page_count = pages if pages <= max_pages else max_pages %}
 
-{%- if pages > 0 -%}
+{%- if pages > 1 -%}
+[
     {%- for page in range(1, page_count+1) -%}
         {% if pages > max_pages and page == max_pages-1 %}
             <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page }}">{{ page }}</a> ...
@@ -399,6 +400,7 @@
             <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page }}">{{ page }}</a>
         {% endif %}
     {%- endfor -%}
+]
 {%- endif -%}
 {%- endmacro -%}
 
