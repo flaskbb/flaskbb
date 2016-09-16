@@ -10,7 +10,8 @@
     :license: BSD, see LICENSE for more details.
 """
 from sqlalchemy import asc, desc
-from flask import Blueprint, redirect, url_for, current_app, request, flash
+from flask import (Blueprint, redirect, url_for, current_app, request, flash,
+                   abort)
 from flask_login import login_required, current_user
 from flask_babelplus import gettext as _
 from flask_allows import Permission, And
@@ -119,6 +120,10 @@ def view_topic(topic_id, slug=None):
         add_entity(User).\
         order_by(Post.id.asc()).\
         paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
+
+    # Abort if there are no posts on this page
+    if len(posts.items) == 0:
+        abort(404)
 
     # Update the topicsread status if the user hasn't read it
     forumsread = None
