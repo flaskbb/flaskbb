@@ -11,7 +11,10 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flaskbb.configs.development import DevelopmentConfig as Config
+try:
+    from flaskbb.configs.production import ProductionConfig as Config
+except ImportError:
+    from flaskbb.configs.default import DefaultConfig as Config
 from flaskbb.app import create_app
 from flaskbb.extensions import celery
 
