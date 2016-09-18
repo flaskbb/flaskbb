@@ -594,7 +594,7 @@ def memberlist():
                                search_form=search_form)
 
 
-@forum.route("/topictracker")
+@forum.route("/topictracker", methods=["GET", "POST"])
 @login_required
 def topictracker():
     page = request.args.get("page", 1, type=int)
@@ -605,6 +605,19 @@ def topictracker():
         add_entity(TopicsRead).\
         order_by(Topic.last_updated.desc()).\
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
+
+    # bulk untracking
+    if request.method == "POST":
+        topic_ids = request.form.getlist("rowid")
+        tmp_topics = Topic.query.filter(Topic.id.in_(topic_ids)).all()
+
+        for topic in tmp_topics:
+            current_user.untrack_topic(topic)
+        current_user.save()
+
+        flash(_("%(topic_count)s topics untracked.",
+                topic_count=len(tmp_topics)), "success")
+        return redirect(url_for("forum.topictracker"))
 
     return render_template("forum/topictracker.html", topics=topics)
 
