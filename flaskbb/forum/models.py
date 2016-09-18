@@ -153,9 +153,24 @@ class Post(db.Model, CRUDMixin):
         return url_for("forum.view_post", post_id=self.id)
 
     # Methods
-    def __init__(self, content=None):
+    def __init__(self, content=None, user=None, topic=None):
+        """Creates a post object with some initial values.
+
+        :param content: The content of the post.
+        :param user: The user of the post.
+        :param topic: Can either be the topic_id or the topic object.
+        """
         if content:
             self.content = content
+
+        if user:
+            self.user_id = user.id
+            self.username = user.username
+
+        if topic:
+            self.topic_id = topic if isinstance(topic, int) else topic.id
+
+        self.date_created = time_utcnow()
 
     def __repr__(self):
         """
@@ -311,9 +326,20 @@ class Topic(db.Model, CRUDMixin):
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     # Methods
-    def __init__(self, title=None):
+    def __init__(self, title=None, user=None):
+        """Creates a topic object with some initial values.
+
+        :param title: The title of the topic.
+        :param user: The user of the post.
+        """
         if title:
             self.title = title
+
+        if user:
+            self.user_id = user.id
+            self.username = user.username
+
+        self.date_created = self.last_updated = time_utcnow()
 
     def __repr__(self):
         """
