@@ -131,7 +131,6 @@ class Report(db.Model, CRUDMixin):
 
 class Post(db.Model, CRUDMixin):
     __tablename__ = "posts"
-    __searchable__ = ['content', 'username']
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
@@ -149,7 +148,7 @@ class Post(db.Model, CRUDMixin):
     # Properties
     @property
     def url(self):
-        """Returns the url for the post"""
+        """Returns the url for the post."""
         return url_for("forum.view_post", post_id=self.id)
 
     # Methods
@@ -173,8 +172,7 @@ class Post(db.Model, CRUDMixin):
         self.date_created = time_utcnow()
 
     def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
+        """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
@@ -274,7 +272,6 @@ class Post(db.Model, CRUDMixin):
 
 class Topic(db.Model, CRUDMixin):
     __tablename__ = "topics"
-    __searchable__ = ['title', 'username']
 
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer,
@@ -317,12 +314,12 @@ class Topic(db.Model, CRUDMixin):
 
     @property
     def slug(self):
-        """Returns a slugified version from the topic title"""
+        """Returns a slugified version of the topic title."""
         return slugify(self.title)
 
     @property
     def url(self):
-        """Returns the slugified url for the topic"""
+        """Returns the slugified url for the topic."""
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     # Methods
@@ -342,8 +339,7 @@ class Topic(db.Model, CRUDMixin):
         self.date_created = self.last_updated = time_utcnow()
 
     def __repr__(self):
-        """
-        Set to a unique key specific to the object in the database.
+        """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
@@ -497,9 +493,8 @@ class Topic(db.Model, CRUDMixin):
         self.username = user.username
 
         # Set the last_updated time. Needed for the readstracker
-        self.last_updated = time_utcnow()
-
-        self.date_created = time_utcnow()
+        created = time_utcnow()
+        self.date_created = self.last_updated = created
 
         # Insert and commit the topic
         db.session.add(self)
@@ -514,7 +509,6 @@ class Topic(db.Model, CRUDMixin):
         # Update the topic count
         forum.topic_count += 1
         db.session.commit()
-
         return self
 
     def delete(self, users=None):
@@ -579,7 +573,6 @@ class Topic(db.Model, CRUDMixin):
 
 class Forum(db.Model, CRUDMixin):
     __tablename__ = "forums"
-    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
@@ -883,7 +876,6 @@ class Forum(db.Model, CRUDMixin):
 
 class Category(db.Model, CRUDMixin):
     __tablename__ = "categories"
-    __searchable__ = ['title', 'description']
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)

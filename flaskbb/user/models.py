@@ -74,7 +74,6 @@ class Group(db.Model, CRUDMixin):
 
 class User(db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"
-    __searchable__ = ['username', 'email']
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(200), unique=True, nullable=False)
