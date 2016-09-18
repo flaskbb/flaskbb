@@ -11,6 +11,7 @@
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
+from flaskbb.extensions import db
 
 
 def delete_settings_from_fixture(fixture):
@@ -256,28 +257,25 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
 
             for t in range(1, topics + 1):
                 # create a topic
-                topic = Topic()
-                post = Post()
+                topic = Topic(title="Test Title %s" % j)
+                post = Post(content="Test Content")
 
-                topic.title = "Test Title %s" % j
-                post.content = "Test Content"
                 topic.save(post=post, user=user1, forum=forum)
                 data_created['topics'] += 1
 
                 for p in range(1, posts + 1):
                     # create a second post in the forum
-                    post = Post()
-                    post.content = "Test Post"
+                    post = Post(content="Test Post")
                     post.save(user=user2, topic=topic)
                     data_created['posts'] += 1
 
     return data_created
 
 
-def insert_mass_data(topics=100, posts=100):
-    """Creates a few topics in the first forum and each topic has
-    a few posts. WARNING: This might take very long!
-    Returns the count of created topics and posts.
+def insert_bulk_data(topic_count=10, post_count=100):
+    """Creates a specified number of topics in the first forum with
+    each topic containing a specified amount of posts.
+    Returns the number of created topics and posts.
 
     :param topics: The amount of topics in the forum.
     :param posts: The number of posts in each topic.
@@ -286,29 +284,60 @@ def insert_mass_data(topics=100, posts=100):
     user2 = User.query.filter_by(id=2).first()
     forum = Forum.query.filter_by(id=1).first()
 
+    last_post = Post.query.order_by(Post.id.desc()).first()
+    last_post_id = 1 if last_post is None else last_post.id
+
     created_posts = 0
     created_topics = 0
+    posts = []
 
     if not (user1 or user2 or forum):
         return False
 
-    # create 1000 topics
-    for i in range(1, topics + 1):
+    db.session.begin(subtransactions=True)
+
+    for i in range(1, topic_count + 1):
+        last_post_id += 1
 
         # create a topic
-        topic = Topic()
-        post = Post()
-
-        topic.title = "Test Title %s" % i
-        post.content = "Test Content"
+        topic = Topic(title="Test Title %s" % i)
+        post = Post(content="First Post")
         topic.save(post=post, user=user1, forum=forum)
         created_topics += 1
 
-        # create 100 posts in each topic
-        for j in range(1, posts + 1):
-            post = Post()
-            post.content = "Test Post"
-            post.save(user=user2, topic=topic)
+        # create some posts in the topic
+        for j in range(1, post_count + 1):
+            last_post_id += 1
+            post = Post(content="Some other Post", user=user2, topic=topic.id)
+            topic.last_updated = post.date_created
+            topic.post_count += 1
+
+            # FIXME: Is there a way to ignore IntegrityErrors?
+            # At the moment, the first_post_id is also the last_post_id.
+            # This does no harm, except that in the forums view, you see
+            # the information for the first post instead of the last one.
+            # I run a little benchmark:
+            # 5.3643078804 seconds to create 100 topics and 10000 posts
+            # Using another method (where data integrity is ok) I benchmarked
+            # these stats:
+            # 49.7832770348 seconds to create 100 topics and 10000 posts
+
+            # Uncomment the line underneath and the other line to reduce
+            # performance but fixes the above mentioned problem.
+            #topic.last_post_id = last_post_id
+
             created_posts += 1
+            posts.append(post)
+
+        # uncomment this and delete the one below, also uncomment the
+        # topic.last_post_id line above. This will greatly reduce the
+        # performance.
+        #db.session.bulk_save_objects(posts)
+    db.session.bulk_save_objects(posts)
+
+    # and finally, lets update some stats
+    forum.recalculate(last_post=True)
+    user1.recalculate()
+    user2.recalculate()
 
     return created_topics, created_posts

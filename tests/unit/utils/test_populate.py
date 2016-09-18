@@ -66,13 +66,13 @@ def test_create_test_data(database):
     assert Category.query.count() == data_created['categories']
 
 
-def test_insert_mass_data(database):
-    assert not insert_mass_data(topics=1, posts=1)
+def test_insert_bulk_data(database):
+    assert not insert_bulk_data(topic_count=1, post_count=1)
 
     create_test_data(categories=1, forums=1, topics=0)
     assert Topic.query.count() == 0
 
-    topics, posts = insert_mass_data(topics=1, posts=1)
+    topics, posts = insert_bulk_data(topic_count=1, post_count=1)
     assert Topic.query.count() == topics
     # -1 bc the topic post also counts as post
     assert Post.query.count() - 1 == posts

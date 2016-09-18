@@ -22,6 +22,7 @@ import sys
 import os
 import subprocess
 import requests
+import time
 
 from flask import current_app
 from werkzeug.utils import import_string
@@ -34,7 +35,7 @@ from flaskbb import create_app
 from flaskbb.extensions import db, plugin_manager, whooshee
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
-                                    create_default_settings, insert_mass_data,
+                                    create_default_settings, insert_bulk_data,
                                     update_settings_from_fixture)
 
 # Use the development configuration if available
@@ -63,16 +64,19 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 
 @manager.command
-def initdb():
+def initdb(default_settings=True):
     """Creates the database."""
-
     upgrade()
+
+    if default_settings:
+        print("Creating default data...")
+        create_default_groups()
+        create_default_settings()
 
 
 @manager.command
 def dropdb():
     """Deletes the database."""
-
     db.drop_all()
 
 
@@ -81,7 +85,6 @@ def populate(dropdb=False, createdb=False):
     """Creates the database with some default data.
     To drop or create the databse use the '-d' or '-c' options.
     """
-
     if dropdb:
         print("Dropping database...")
         db.drop_all()
@@ -90,7 +93,7 @@ def populate(dropdb=False, createdb=False):
         print("Creating database...")
         upgrade()
 
-    app.logger.info("Creating test data...")
+    print("Creating test data...")
     create_test_data()
 
 
@@ -165,12 +168,19 @@ def install(username=None, password=None, email=None):
     print("Congratulations! FlaskBB has been successfully installed")
 
 
-@manager.command
-def insertmassdata():
+@manager.option('-t', '--topics', dest="topics", default=100)
+@manager.option('-p', '--posts', dest="posts", default=100)
+def insertbulkdata(topics, posts):
     """Warning: This can take a long time!.
     Creates 100 topics and each topic contains 100 posts.
     """
-    insert_mass_data()
+    timer = time.time()
+    created_topics, created_posts = insert_bulk_data(int(topics), int(posts))
+    elapsed = time.time() - timer
+
+    print("It took {time} seconds to create {topics} topics and "
+          "{posts} posts"
+          .format(time=elapsed, topics=created_topics, posts=created_posts))
 
 
 @manager.option('-f', '--force', dest="force", default=False)
