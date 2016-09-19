@@ -9,6 +9,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import math
 from sqlalchemy import asc, desc
 from flask import (Blueprint, redirect, url_for, current_app, request, flash,
                    abort)
@@ -147,14 +148,14 @@ def view_topic(topic_id, slug=None):
 
 @forum.route("/post/<int:post_id>")
 def view_post(post_id):
+    """Redirects to a post in a topic."""
     post = Post.query.filter_by(id=post_id).first_or_404()
-    count = post.topic.post_count
-    page = count / flaskbb_config["POSTS_PER_PAGE"]
-
-    if count > flaskbb_config["POSTS_PER_PAGE"]:
-        page += 1
-    else:
-        page = 1
+    post_in_topic = Post.query.\
+        filter(Post.topic_id == post.topic_id,
+               Post.id <= post_id).\
+        order_by(Post.id.asc()).\
+        count()
+    page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
 
     return redirect(post.topic.url + "?page=%d#pid%s" % (page, post.id))
 
