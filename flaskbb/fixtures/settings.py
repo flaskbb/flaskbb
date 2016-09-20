@@ -18,7 +18,7 @@ def available_themes():
 
 
 def available_avatar_types():
-    return [("image/png", "PNG"), ("image/jpeg", "JPG"), ("image/gif", "GIF")]
+    return [("PNG", "PNG"), ("JPEG", "JPG"), ("GIF", "GIF")]
 
 
 def available_languages():
@@ -185,7 +185,7 @@ fixture = (
                 'description':  "The allowed size of the avatar in kilobytes."
             }),
             ('avatar_types', {
-                'value':        ["image/png", "image/jpeg", "image/gif"],
+                'value':        ["PNG", "JPEG", "GIF"],
                 'value_type':   "selectmultiple",
                 'extra':        {"choices": available_avatar_types},
                 'name':         "Avatar Types",

@@ -118,31 +118,36 @@ def test_get_image_info():
     gif = "http://i.imgur.com/l3Vmp4m.gif"
     png = "http://i.imgur.com/JXzKxNs.png"
 
+    # Issue #207 Image - This works now
+    #issue_img = "http://b.reich.io/gtlbjc.jpg"
+    #issue_img = get_image_info(issue_img)
+    #assert issue_img["content_type"] == "JPEG"
+
     jpg_img = get_image_info(jpg)
-    assert jpg_img["content-type"] == "image/jpeg"
+    assert jpg_img["content_type"] == "JPEG"
     assert jpg_img["height"] == 1024
     assert jpg_img["width"] == 1280
     assert jpg_img["size"] == 209.06
 
     gif_img = get_image_info(gif)
-    assert gif_img["content-type"] == "image/gif"
+    assert gif_img["content_type"] == "GIF"
     assert gif_img["height"] == 168
     assert gif_img["width"] == 400
     assert gif_img["size"] == 576.138
 
     png_img = get_image_info(png)
-    assert png_img["content-type"] == "image/png"
+    assert png_img["content_type"] == "PNG"
     assert png_img["height"] == 1080
     assert png_img["width"] == 1920
     assert png_img["size"] == 269.409
 
 
 def test_check_image(default_settings):
-    # test200x100.png
+    # test200_100.png
     img_width = "http://i.imgur.com/4dAWAZI.png"
-    # test100x200.png
+    # test100_200.png
     img_height = "http://i.imgur.com/I7GwF3D.png"
-    # test100x100.png
+    # test100_100.png
     img_ok = "http://i.imgur.com/CYV6NzT.png"
     # random too big image
     img_size = "http://i.imgur.com/l3Vmp4m.gif"

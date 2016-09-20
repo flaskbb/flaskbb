@@ -93,6 +93,7 @@ setup(
         'Mako',
         'MarkupSafe',
         'mistune',
+        'Pillow',
         'Pygments',
         'python-editor',
         'pytz',
