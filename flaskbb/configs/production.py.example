@@ -7,6 +7,8 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import os
+import datetime
 from flaskbb.configs.default import DefaultConfig
 
 
@@ -26,7 +28,7 @@ class ProductionConfig(DefaultConfig):
     # Note that localhost does not support subdomains so setting this to
     # “localhost” does not help.
     # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.org"
-    #SERVER_NAME =
+    SERVER_NAME =
 
     # Prefer HTTPS over HTTP
     PREFERRED_URL_SCHEME = "https"
@@ -45,7 +47,7 @@ class ProductionConfig(DefaultConfig):
     # For PostgresSQL:
     #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
     # For SQLite:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DefaultConfig._basedir + '/' + \
                               'flaskbb.sqlite'
 
     # This option will be removed as soon as Flask-SQLAlchemy removes it.
@@ -70,7 +72,7 @@ class ProductionConfig(DefaultConfig):
     # Full-Text-Search
     # ------------------------------
     # This will use the "whoosh_index" directory to store the search indexes
-    WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _VERSION_STR)
+    WHOOSHEE_DIR = os.path.join(DefaultConfig._basedir, "whoosh_index", DefaultConfig._version_str)
     # How long should whooshee try to acquire write lock? (defaults to 2)
     WHOOSHEE_WRITER_TIMEOUT = 2
     # Minimum number of characters for the search (defaults to 3)
@@ -84,31 +86,26 @@ class ProductionConfig(DefaultConfig):
     REFRESH_MESSAGE_CATEGORY = "info"
 
     # The name of the cookie to store the “remember me” information in.
-    # Default: remember_token
-    #REMEMBER_COOKIE_NAME = "remember_token"
+    REMEMBER_COOKIE_NAME = "remember_token"
     # The amount of time before the cookie expires, as a datetime.timedelta object.
     # Default: 365 days (1 non-leap Gregorian year)
-    #REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
+    REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
     # If the “Remember Me” cookie should cross domains,
     # set the domain value here (i.e. .example.com would allow the cookie
     # to be used on all subdomains of example.com).
-    # Default: None
-    #REMEMBER_COOKIE_DOMAIN = None
+    REMEMBER_COOKIE_DOMAIN = None
     # Limits the “Remember Me” cookie to a certain path.
-    # Default: /
-    #REMEMBER_COOKIE_PATH = "/"
+    REMEMBER_COOKIE_PATH = "/"
     # Restricts the “Remember Me” cookie’s scope to secure channels (typically HTTPS).
-    # Default: None
-    #REMEMBER_COOKIE_SECURE = None
+    REMEMBER_COOKIE_SECURE = None
     # Prevents the “Remember Me” cookie from being accessed by client-side scripts.
-    # Default: False
-    #REMEMBER_COOKIE_HTTPONLY = False
+    REMEMBER_COOKIE_HTTPONLY = False
 
     # Rate Limiting via Flask-Limiter
     # -------------------------------
-    # A full list with configuration values is available here:
-    # http://flask-limiter.readthedocs.io/en/stable/#configuration
-
+    # A full list with configuration values is available at the flask-limiter
+    # docs, but you actually just need those settings below.
+    RATELIMIT_ENABLED = True
     # You can choose from:
     #   memory:// (default)
     #   redis://host:port
@@ -120,7 +117,7 @@ class ProductionConfig(DefaultConfig):
 
     # Caching
     # ------------------------------
-    # For all available caching types, take a look at the Flask-Cache docs
+    # For all available caching types, have a look at the Flask-Cache docs
     # https://pythonhosted.org/Flask-Caching/#configuring-flask-caching
     CACHE_TYPE = "simple"
     # For redis:

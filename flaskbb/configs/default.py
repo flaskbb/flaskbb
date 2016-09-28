@@ -11,8 +11,7 @@
 """
 import os
 import sys
-
-_VERSION_STR = '{0.major}{0.minor}'.format(sys.version_info)
+import datetime
 
 
 class DefaultConfig(object):
@@ -22,6 +21,9 @@ class DefaultConfig(object):
     # ../../ -->  flaskbb/flaskbb/configs/base.py
     _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
                             os.path.dirname(__file__)))))
+
+    # Python version
+    _version_str = '{0.major}{0.minor}'.format(sys.version_info)
 
     # Flask Settings
     # ------------------------------
@@ -83,7 +85,7 @@ class DefaultConfig(object):
     # Full-Text-Search
     # ------------------------------
     # This will use the "whoosh_index" directory to store the search indexes
-    WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _VERSION_STR)
+    WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _version_str)
     # How long should whooshee try to acquire write lock? (defaults to 2)
     WHOOSHEE_WRITER_TIMEOUT = 2
     # Minimum number of characters for the search (defaults to 3)
@@ -97,31 +99,25 @@ class DefaultConfig(object):
     REFRESH_MESSAGE_CATEGORY = "info"
 
     # The name of the cookie to store the “remember me” information in.
-    # Default: remember_token
-    #REMEMBER_COOKIE_NAME = "remember_token"
+    REMEMBER_COOKIE_NAME = "remember_token"
     # The amount of time before the cookie expires, as a datetime.timedelta object.
-    # Default: 365 days (1 non-leap Gregorian year)
-    #REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
+    REMEMBER_COOKIE_DURATION = datetime.timedelta(days=365)
     # If the “Remember Me” cookie should cross domains,
     # set the domain value here (i.e. .example.com would allow the cookie
     # to be used on all subdomains of example.com).
-    # Default: None
-    #REMEMBER_COOKIE_DOMAIN = None
+    REMEMBER_COOKIE_DOMAIN = None
     # Limits the “Remember Me” cookie to a certain path.
-    # Default: /
-    #REMEMBER_COOKIE_PATH = "/"
+    REMEMBER_COOKIE_PATH = "/"
     # Restricts the “Remember Me” cookie’s scope to secure channels (typically HTTPS).
-    # Default: None
-    #REMEMBER_COOKIE_SECURE = None
+    REMEMBER_COOKIE_SECURE = None
     # Prevents the “Remember Me” cookie from being accessed by client-side scripts.
-    # Default: False
-    #REMEMBER_COOKIE_HTTPONLY = False
+    REMEMBER_COOKIE_HTTPONLY = False
 
     # Rate Limiting via Flask-Limiter
     # -------------------------------
-    # A full list with configuration values is available here:
-    # http://flask-limiter.readthedocs.io/en/stable/#configuration
-
+    # A full list with configuration values is available at the flask-limiter
+    # docs, but you actually just need those settings below.
+    RATELIMIT_ENABLED = True
     # You can choose from:
     #   memory:// (default)
     #   redis://host:port
@@ -133,7 +129,7 @@ class DefaultConfig(object):
 
     # Caching
     # ------------------------------
-    # For all available caching types, take a look at the Flask-Cache docs
+    # For all available caching types, have a look at the Flask-Cache docs
     # https://pythonhosted.org/Flask-Caching/#configuring-flask-caching
     CACHE_TYPE = "simple"
     # For redis:
