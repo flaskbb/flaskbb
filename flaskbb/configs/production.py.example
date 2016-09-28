@@ -105,7 +105,9 @@ class ProductionConfig(DefaultConfig):
     # -------------------------------
     # A full list with configuration values is available at the flask-limiter
     # docs, but you actually just need those settings below.
-    RATELIMIT_ENABLED = True
+    # You can disabled the Rate Limiter here as well - it will overwrite
+    # the setting from the admin panel!
+    # RATELIMIT_ENABLED = True
     # You can choose from:
     #   memory:// (default)
     #   redis://host:port
