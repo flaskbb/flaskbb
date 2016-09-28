@@ -149,6 +149,13 @@ def register():
         user = form.save()
 
         if flaskbb_config["ACTIVATE_ACCOUNT"]:
+            # Any call to an expired model requires a database hit, so
+            # accessing user.id would cause an DetachedInstanceError.
+            # This happens because the `user`'s session does no longer exist.
+            # So we just fire up another query to make sure that the session
+            # for the newly created user is fresh.
+            # PS: `db.session.merge(user)` did not work for me.
+            user = User.query.filter_by(email=user.email).first()
             send_activation_token.delay(user)
             flash(_("An account activation email has been sent to %(email)s",
                     email=user.email), "success")
