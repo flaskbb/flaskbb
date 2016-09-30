@@ -260,14 +260,14 @@ def activate_account(token=None):
         return redirect(url_for("auth.request_activation_token"))
 
     if user:
-        user.activated = datetime.utcnow()
+        user.activated = True
         user.save()
 
         if current_user != user:
             logout_user()
             login_user(user)
 
-        flash(_("Your account has been activated.", "success"))
+        flash(_("Your account has been activated."), "success")
         return redirect(url_for("forum.index"))
 
     return render_template("auth/account_activation.html", form=form)
