@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
 from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
@@ -24,7 +24,7 @@ is_username = regexp(USERNAME_RE,
                      message=_("You can only use letters, numbers or dashes."))
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     login = StringField(_("Username or Email address"), validators=[
         DataRequired(message=_("Please enter your username or email address."))
     ])
@@ -39,7 +39,7 @@ class LoginForm(Form):
     submit = SubmitField(_("Login"))
 
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A valid username is required.")),
         is_username])
@@ -82,14 +82,14 @@ class RegisterForm(Form):
         return user.save()
 
 
-class ReauthForm(Form):
+class ReauthForm(FlaskForm):
     password = PasswordField(_('Password'), validators=[
         DataRequired(message=_("Please enter your password."))])
 
     submit = SubmitField(_("Refresh Login"))
 
 
-class ForgotPasswordForm(Form):
+class ForgotPasswordForm(FlaskForm):
     email = StringField(_('Email address'), validators=[
         DataRequired(message=_("A valid email address is required.")),
         Email()])
@@ -99,7 +99,7 @@ class ForgotPasswordForm(Form):
     submit = SubmitField(_("Request Password"))
 
 
-class ResetPasswordForm(Form):
+class ResetPasswordForm(FlaskForm):
     token = HiddenField('Token')
 
     email = StringField(_('Email address'), validators=[
@@ -120,7 +120,7 @@ class ResetPasswordForm(Form):
             raise ValidationError(_("Wrong email address."))
 
 
-class RequestActivationForm(Form):
+class RequestActivationForm(FlaskForm):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A valid username is required.")),
         is_username])
@@ -141,7 +141,7 @@ class RequestActivationForm(Form):
             raise ValidationError(_("User is already active."))
 
 
-class AccountActivationForm(Form):
+class AccountActivationForm(FlaskForm):
     token = StringField(_("Email confirmation token"), validators=[
         DataRequired(message=_("Please enter the token that we have sent to "
                                "you."))

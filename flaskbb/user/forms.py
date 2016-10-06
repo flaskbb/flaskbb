@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, TextAreaField, SelectField,
                      ValidationError, SubmitField)
 from wtforms.validators import (Length, DataRequired, InputRequired, Email,
@@ -23,7 +23,7 @@ from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
 
 
-class GeneralSettingsForm(Form):
+class GeneralSettingsForm(FlaskForm):
     # The choices for those fields will be generated in the user view
     # because we cannot access the current_app outside of the context
     language = SelectField(_("Language"))
@@ -32,7 +32,7 @@ class GeneralSettingsForm(Form):
     submit = SubmitField(_("Save"))
 
 
-class ChangeEmailForm(Form):
+class ChangeEmailForm(FlaskForm):
     old_email = StringField(_("Old email address"), validators=[
         DataRequired(message=_("A valid email address is required.")),
         Email(message=_("Invalid email address."))])
@@ -60,7 +60,7 @@ class ChangeEmailForm(Form):
             raise ValidationError(_("This email address is already taken."))
 
 
-class ChangePasswordForm(Form):
+class ChangePasswordForm(FlaskForm):
     old_password = PasswordField(_("Password"), validators=[
         DataRequired(message=_("Please enter your password."))])
 
@@ -78,7 +78,7 @@ class ChangePasswordForm(Form):
             raise ValidationError(_("Old password is wrong."))
 
 
-class ChangeUserDetailsForm(Form):
+class ChangeUserDetailsForm(FlaskForm):
     birthday = BirthdayField(_("Birthday"), format="%d %m %Y",
                              validators=[Optional()],
                              widget=SelectBirthdayWidget())

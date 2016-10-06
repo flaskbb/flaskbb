@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, ValidationError, SubmitField
 from wtforms.validators import DataRequired
 from flask_babelplus import lazy_gettext as _
@@ -18,7 +18,7 @@ from flaskbb.user.models import User
 from flaskbb.message.models import Conversation, Message
 
 
-class ConversationForm(Form):
+class ConversationForm(FlaskForm):
     to_user = StringField(_("Recipient"), validators=[
         DataRequired(message=_("A valid username is required."))])
 
@@ -55,7 +55,7 @@ class ConversationForm(Form):
         return conversation.save(message=message)
 
 
-class MessageForm(Form):
+class MessageForm(FlaskForm):
     message = TextAreaField(_("Message"), validators=[
         DataRequired(message=_("A message is required."))])
     submit = SubmitField(_("Send Message"))

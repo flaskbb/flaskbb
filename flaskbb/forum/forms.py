@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
                      BooleanField, SubmitField)
 from wtforms.validators import DataRequired, Optional, Length
@@ -18,7 +18,7 @@ from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User
 
 
-class QuickreplyForm(Form):
+class QuickreplyForm(FlaskForm):
     content = TextAreaField(_("Quick reply"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
@@ -29,7 +29,7 @@ class QuickreplyForm(Form):
         return post.save(user=user, topic=topic)
 
 
-class ReplyForm(Form):
+class ReplyForm(FlaskForm):
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
@@ -69,7 +69,7 @@ class NewTopicForm(ReplyForm):
         return topic.save(user=user, forum=forum, post=post)
 
 
-class ReportForm(Form):
+class ReportForm(FlaskForm):
     reason = TextAreaField(_("Reason"), validators=[
         DataRequired(message=_("What is the reason for reporting this post?"))
     ])
@@ -81,7 +81,7 @@ class ReportForm(Form):
         return report.save(post=post, user=user)
 
 
-class UserSearchForm(Form):
+class UserSearchForm(FlaskForm):
     search_query = StringField(_("Search"), validators=[
         Optional(), Length(min=3, max=50)
     ])
@@ -93,7 +93,7 @@ class UserSearchForm(Form):
         return User.query.whooshee_search(query)
 
 
-class SearchPageForm(Form):
+class SearchPageForm(FlaskForm):
     search_query = StringField(_("Criteria"), validators=[
         DataRequired(), Length(min=3, max=50)])
 

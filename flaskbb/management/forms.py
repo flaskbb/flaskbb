@@ -8,7 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, PasswordField,
                      SelectField, StringField, SubmitField, TextAreaField)
 from wtforms.validators import (DataRequired, Optional, Email, regexp, Length,
@@ -48,7 +48,7 @@ def select_primary_group():
     return Group.query.filter(Group.guest != True).order_by(Group.id)
 
 
-class UserForm(Form):
+class UserForm(FlaskForm):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A valid username is required.")),
         is_username])
@@ -147,7 +147,7 @@ class EditUserForm(UserForm):
         UserForm.__init__(self, *args, **kwargs)
 
 
-class GroupForm(Form):
+class GroupForm(FlaskForm):
     name = StringField(_("Group name"), validators=[
         DataRequired(message=_("Please enter a name for the group."))])
 
@@ -277,7 +277,7 @@ class AddGroupForm(GroupForm):
     pass
 
 
-class ForumForm(Form):
+class ForumForm(FlaskForm):
     title = StringField(
         _("Forum title"),
         validators=[DataRequired(message=_("Please enter a forum title."))]
@@ -396,7 +396,7 @@ class AddForumForm(ForumForm):
     pass
 
 
-class CategoryForm(Form):
+class CategoryForm(FlaskForm):
     title = StringField(_("Category title"), validators=[
         DataRequired(message=_("Please enter a category title."))])
 
