@@ -38,8 +38,8 @@ var flash_message = function(message) {
 };
 
 var BulkActions = function() {
-    this.execute = function(url, confirm_message) {
-        var selected = $('input.action-checkbox:checked').size();
+    this.execute = function(endpoint) {
+        var selected = $('input.action-checkbox:checked').length;
         var data = {"ids": []};
 
         // don't do anything if nothing is selected
@@ -51,16 +51,20 @@ var BulkActions = function() {
             data.ids.push($(v).val());
         });
 
-        // http://stackoverflow.com/questions/784929/what-is-the-not-not-operator-in-javascript
-        if(!!confirm_message) {
-            if(!confirm(confirm_message)) {
-                return false;
-            }
-        }
-
-        send_data(url, data);
-
+        this.confirm(endpoint, data);
         return false;
+    };
+
+    this.confirm = function(endpoint, data) {
+        $('.confirmModal').modal({ keyboard: false })
+            .one('click', '.confirmBtn', function() {
+                $('.confirmModal').modal('hide');
+                send_data(endpoint, data);
+            })
+            .on('hidden.bs.modal', function() {
+                $('.confirmBtn').unbind();
+            }
+        );
     };
 };
 
@@ -122,6 +126,7 @@ $(document).ready(function () {
             window.location.href = '#content';
         });
     });
+
     // Reply to post
     $('.quote-btn').click(function (event) {
         event.preventDefault();
@@ -134,5 +139,20 @@ $(document).ready(function () {
             $contents[0].scrollTop = $contents[0].scrollHeight;
             window.location.href = '#content';
         });
+    });
+
+    // Triggers the confirm dialog
+    $('button[name="confirmDialog"]').on('click', function(e){
+        var $form = $(this).closest('form');
+        e.preventDefault();
+        $('.confirmModal').modal({ keyboard: true })
+            .one('click', '.confirmBtn', function() {
+                $form.trigger('submit'); // submit the form
+            })
+            // .one() is NOT a typo of .on()
+            .on('hidden.bs.modal', function () {
+                $('.confirmBtn').unbind();
+            }
+        );
     });
 });

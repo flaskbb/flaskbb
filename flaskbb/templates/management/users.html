@@ -66,25 +66,25 @@
                     <div class="col-md-2 col-sm-2 col-xs-2">
                         <div class="btn-group">
                             <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                <span class="fa fa-cog"></span> {% trans %}Actions{% endtrans %}
+                                <span class="fa fa-fw fa-cog"></span> {% trans %}Actions{% endtrans %}
                             </button>
                             <ul class="dropdown-menu slidedown">
                                 <li>
-                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.ban_user') }}', '{% trans %}Are you sure you want to ban these Users?{% endtrans %}')">
-                                        <span class="fa fa-flag text-warning"></span> {% trans %}Ban selected Users{% endtrans %}
-                                    </a>
+                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.ban_user') }}')">
+                                        <span class="fa fa-fw fa-flag text-warning"></span> {% trans %}Ban selected Users{% endtrans %}
+                                    </button>
                                 </li>
 
                                 <li>
-                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}', '{% trans %}Are you sure you want to unban these Users?{% endtrans %}')">
-                                        <span class="fa fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
-                                    </a>
+                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}')">
+                                        <span class="fa fa-fw fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
+                                    </button>
                                 </li>
 
                                 <li>
-                                    <a href="javascript:void(0)" onclick="return bulk_actions.execute('{{ url_for('management.delete_user') }}', '{% trans %}Are you sure you want to delete these Users?{% endtrans %}')">
-                                        <span class="fa fa-trash text-danger"></span> {% trans %}Delete selected Users{% endtrans %}
-                                    </a>
+                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.delete_user') }}')">
+                                        <span class="fa fa-fw fa-trash text-danger"></span> {% trans %}Delete selected Users{% endtrans %}
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -108,7 +108,7 @@
                         <form class="inline-form" id="ban-{{user.id}}" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-icon">
+                            <button class="btn btn-icon" name="confirmDialog">
                                 <span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="{% trans %}Ban{% endtrans %}"></span>
                             </button>
                         </form>
@@ -118,7 +118,7 @@
                         <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-icon">
+                            <button class="btn btn-icon" name="confirmDialog">
                                 <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
                             </button>
                         </form>
@@ -128,7 +128,7 @@
                         <form class="inline-form" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-icon">
+                            <button class="btn btn-icon" name="confirmDialog">
                                 <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
                             </button>
                         </form>
@@ -149,6 +149,7 @@
         </div>
     </div>
 </div>
+{% include theme('confirm_dialog.html') %}
 {% endblock %}
 
 {% block scripts %}

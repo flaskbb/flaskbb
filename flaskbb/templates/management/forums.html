@@ -23,7 +23,6 @@
     </div>
 </div>
 
-
 <div class="col-md-9 settings-col with-left-border">
     <div class="panel settings-panel">
         <div class="panel-heading settings-head">
@@ -48,7 +47,7 @@
                                     </a>
                                     <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-xs btn-danger">
+                                        <button class="btn btn-xs btn-danger" name="confirmDialog">
                                             <span class="fa fa-trash"></span> {% trans %}Delete Category{% endtrans %}
                                         </button>
                                     </form>
@@ -102,7 +101,9 @@
 
                                     <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-sm btn-danger"><span class="fa fa-trash"></span> {% trans %}Delete Link{% endtrans %}</button>
+                                        <button class="btn btn-sm btn-danger" name="confirmDialog">
+                                            <span class="fa fa-trash"></span> {% trans %}Delete Link{% endtrans %}
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -156,7 +157,9 @@
 
                                     <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-sm btn-danger"><span class="fa fa-trash"></span> {% trans %}Delete Forum{% endtrans %}</button>
+                                        <button class="btn btn-sm btn-danger" name="confirmDialog">
+                                            <span class="fa fa-trash"></span> {% trans %}Delete Forum{% endtrans %}
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -172,4 +175,5 @@
         </div>
     </div>
 </div>
+{% include theme('confirm_dialog.html') %}
 {% endblock %}

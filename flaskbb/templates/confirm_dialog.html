@@ -1,0 +1,17 @@
+<div class="modal fade confirmModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="confirmModalLabel">{% trans %}Are you sure?{% endtrans %}</h4>
+            </div>
+            <div class="modal-body">
+                <p>{% trans %}Are you sure that you want to perform this action? This action is irreversible.{% endtrans %}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                <button type="button" class="btn btn-danger btn-ok confirmBtn">{% trans %}Yes{% endtrans %}</button>
+            </div>
+        </div>
+    </div>
+</div>

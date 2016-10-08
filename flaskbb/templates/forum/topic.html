@@ -114,7 +114,7 @@
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this topic"></button>
+                                    <button class="btn btn-icon icon-delete" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="Delete this topic"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
@@ -122,7 +122,7 @@
                             <!-- Delete Post -->
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this post"></button>
+                                    <button  class="btn btn-icon icon-delete" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="Delete this post"></button>
                                 </form>
                                 {% endif %}
 
@@ -165,6 +165,7 @@
     {% endif %}
 
 </div>
+{% include theme('confirm_dialog.html') %}
 {% endblock %}
 
 {% block scripts %}
