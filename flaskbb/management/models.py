@@ -10,7 +10,7 @@
 """
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 from flaskbb._compat import max_integer, text_type, iteritems
 from flaskbb.extensions import db, cache
@@ -62,7 +62,7 @@ class Setting(db.Model, CRUDMixin):
                       which are in the specified group.
         """
 
-        class SettingsForm(Form):
+        class SettingsForm(FlaskForm):
             pass
 
         # now parse the settings in this group
