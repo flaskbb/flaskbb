@@ -1,8 +1,8 @@
 alembic==0.8.8
-amqp==2.1.0
+amqp==1.4.9
 anyjson==0.3.3
 Babel==2.3.4
-billiard==3.5.0.1
+billiard==3.3.0.23
 blinker==1.4
 celery==3.1.24
 click==6.6
@@ -24,7 +24,7 @@ flask-whooshee==0.2.3
 Flask-WTF==0.13.1
 itsdangerous==0.24
 Jinja2==2.8
-kombu==3.0.36
+kombu==3.0.37
 limits==1.1.1
 Mako==1.0.4
 MarkupSafe==0.23
@@ -38,7 +38,7 @@ requests==2.11.1
 simplejson==3.8.2
 six==1.10.0
 speaklater==1.3
-SQLAlchemy==1.1.0
+SQLAlchemy==1.1.1
 SQLAlchemy-Utils==0.32.9
 Unidecode==0.4.19
 vine==1.1.2
