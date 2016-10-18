@@ -109,6 +109,10 @@ setup(
         'Whoosh',
         'WTForms'
     ],
+    entry_points='''
+        [console_scripts]
+        flaskbb=flaskbb.cli:cli
+    ''',
     test_suite='tests',
     tests_require=[
         'py',
