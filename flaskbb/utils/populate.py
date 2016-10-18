@@ -156,7 +156,7 @@ def create_default_groups():
     return result
 
 
-def create_admin_user(username, password, email):
+def create_user(username, password, email, groupname):
     """Creates the administrator user.
     Returns the created admin user.
 
@@ -164,16 +164,9 @@ def create_admin_user(username, password, email):
     :param password: The password of the user.
     :param email: The email address of the user.
     """
-    admin_group = Group.query.filter_by(admin=True).first()
-    user = User()
-
-    user.username = username
-    user.password = password
-    user.email = email
-    user.primary_group_id = admin_group.id
-    user.activated = True
-
-    user.save()
+    group = Group.query.filter(getattr(Group, groupname) == True).first()
+    user = User.create(username=username, password=password, email=email,
+                       primary_group_id=group.id, activated=True)
     return user
 
 

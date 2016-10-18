@@ -42,12 +42,12 @@ def test_update_settings_from_fixture(database):
     assert len(force_updated) == SettingsGroup.query.count()
 
 
-def test_create_admin_user(default_groups):
+def test_create_user(default_groups):
     user = User.query.filter_by(username="admin").first()
     assert not user
 
-    user = create_admin_user(username="admin", password="test",
-                             email="test@example.org")
+    user = create_user(username="admin", password="test",
+                       email="test@example.org", groupname="admin")
     assert user.username == "admin"
     assert user.permissions["admin"]
 
@@ -55,8 +55,8 @@ def test_create_admin_user(default_groups):
 def test_create_welcome_forum(default_groups):
     assert not create_welcome_forum()
 
-    create_admin_user(username="admin", password="test",
-                      email="test@example.org")
+    create_user(username="admin", password="test",
+                email="test@example.org", groupname="admin")
     assert create_welcome_forum()
 
 
