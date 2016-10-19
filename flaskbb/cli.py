@@ -22,17 +22,14 @@ from flask_migrate import upgrade as upgrade_database
 
 from flaskbb import create_app
 from flaskbb._compat import iteritems
-from flaskbb.extensions import db, plugin_manager, whooshee
+from flaskbb.extensions import db, whooshee
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_user, create_default_groups,
                                     create_default_settings, insert_bulk_data,
                                     update_settings_from_fixture)
-from flaskbb.utils.translations import (add_translations,
-                                        compile_translations,
+from flaskbb.utils.translations import (add_translations, compile_translations,
                                         update_translations,
-                                        add_plugin_translations,
-                                        compile_plugin_translations,
-                                        update_plugin_translations)
+                                        add_plugin_translations)
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
@@ -68,9 +65,12 @@ def install(welcome_forum):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
+    click.secho("[+] Installing FlaskBB...", fg="cyan")
     if database_exists(db.engine.url):
-        if click.confirm("Existing database found. Do you want to delete "
-                         "the old one and create a new one?"):
+        if click.confirm(click.style(
+            "Existing database found. Do you want to delete the old one and "
+            "create a new one?", fg="magenta")
+        ):
             drop_database(db.engine.url)
             upgrade_database()
         else:
@@ -78,34 +78,38 @@ def install(welcome_forum):
     else:
         upgrade_database()
 
-    click.echo("Creating default settings...")
+    click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
     create_default_settings()
 
-    click.echo("Creating user...")
+    click.secho("[+] Creating admin user...", fg="cyan")
     username = click.prompt(
-        "Username", type=int, default=os.environ.get("USER", "")
+        click.style("Username", fg="magenta"), type=str,
+        default=os.environ.get("USER", "")
     )
     email = click.prompt(
-        "Email address", type=EmailType()
+        click.style("Email address", fg="magenta"), type=EmailType()
     )
     password = click.prompt(
-        "Password", hide_input=True, confirmation_prompt=True
+        click.style("Password", fg="magenta"), hide_input=True,
+        confirmation_prompt=True
     )
     group = click.prompt(
-        "Group", type=click.Choice(["admin", "super_mod", "mod", "member"]),
+        click.style("Group", fg="magenta"),
+        type=click.Choice(["admin", "super_mod", "mod", "member"]),
         default="admin"
     )
     create_user(username, password, email, group)
 
     if welcome_forum:
-        click.echo("Creating welcome forum...")
+        click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
 
-    click.echo("Compiling translations...")
+    click.secho("[+] Compiling translations...", fg="cyan")
     compile_translations()
 
-    click.echo("FlaskBB has been successfully installed!")
+    click.secho("[+] FlaskBB has been successfully installed!",
+                fg="green", bold=True)
 
 
 @cli.command()
@@ -124,7 +128,7 @@ def install(welcome_forum):
 def populate(bulk_data, test_data, posts, topics, force, initdb):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
-        click.echo("Recreating database...")
+        click.secho("[+] Recreating database...", fg="cyan")
         drop_database(db.engine.url)
         upgrade_database()
 
@@ -132,15 +136,15 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
         upgrade_database()
 
     if test_data:
-        click.echo("Adding some test data...")
+        click.secho("[+] Adding some test data...", fg="cyan")
         create_test_data()
 
     if bulk_data:
         timer = time.time()
         topic_count, post_count = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
-        click.echo("It took {} seconds to create {} topics and {} posts"
-                   .format(elapsed, topic_count, post_count))
+        click.secho("[+] It took {} seconds to create {} topics and {} posts"
+                    .format(elapsed, topic_count, post_count), fg="cyan")
 
 
 @cli.group()
@@ -149,9 +153,66 @@ def translations():
     pass
 
 
+@translations.command("new")
+@click.option("--plugin", "-p", type=click.STRING,
+              help="The plugin for which a language should be added.")
+@click.argument("lang")
+def new_translation(lang, plugin):
+    """Adds a new language to the translations. 'lang' is the language code
+    of the language, like, 'de_AT'."""
+    if plugin:
+        click.secho("[+] Adding new language {} for plugin {}..."
+                    .format(lang, plugin), fg='cyan')
+        add_plugin_translations(plugin, lang)
+    else:
+        click.secho("[+] Adding new language {}...".format(lang), fg='cyan')
+        add_translations(lang)
+
+
+@translations.command("update")
+def update_translation():
+    """Updates all translations."""
+    click.secho("[+] Updating language files...", fg='cyan')
+    update_translations()
+
+
+@translations.command("compile")
+def compile_translation(lang):
+    """Compiles all translations."""
+    click.secho("[+] Compiling language files...", fg='cyan')
+    compile_translations()
+
+
 @cli.group()
 def plugins():
     """Plugins command sub group."""
+    pass
+
+
+@plugins.command("new")
+@click.argument("plugin")
+def new_plugin(plugin):
+    """Creates a new plugin based on the plugin template."""
+    click.secho("[+] Creating new Plugin {}...".format(plugin), fg='cyan')
+
+
+@plugins.command("install")
+@click.argument("plugin")
+def install_plugin(plugin):
+    """Installs a new plugin from FlaskBB's Plugin Repository."""
+    click.secho("[+] Installing plugin {}...".format(plugin), fg='cyan')
+
+
+@plugins.command("uninstall")
+@click.argument("plugin")
+def uninstall_plugin(plugin):
+    """Uninstalls a plugin from FlaskBB."""
+    click.secho("[+] Uninstalling plugin {}...".format(plugin), fg='cyan')
+
+
+@plugins.command("list")
+def list_plugins():
+    """Lists all installed plugins."""
     pass
 
 
@@ -183,18 +244,20 @@ def new_user(username, email, password, group):
     try:
         user = create_user(username, password, email, group)
 
-        click.echo("[+] User {} with Email {} in Group {} created.".format(
-            user.username, user.email, user.primary_group.name)
+        click.secho("[+] User {} with Email {} in Group {} created.".format(
+            user.username, user.email, user.primary_group.name), fg="cyan"
         )
     except IntegrityError:
-        click.Abort("Couldn't create the user because the username or "
-                    "email address is already taken.")
+        click.Abort(click.style(
+            "Couldn't create the user because the username or "
+            "email address is already taken.", fg="red")
+        )
 
 
 @cli.command()
 def reindex():
     """Reindexes the search index."""
-    click.echo("Reindexing search index...")
+    click.secho("Reindexing search index...", fg="cyan")
     whooshee.reindex()
 
 
@@ -207,7 +270,7 @@ def reindex():
               help="Forcefully upgrades the fixtures.")
 def upgrade(all, fixture, force_fixture):
     """Updates the migrations and fixtures."""
-    click.echo("FlaskBB has been successfully upgraded.")
+    update_settings_from_fixture(fixture, overwrite_setting=force_fixture)
 
 
 @cli.command()
@@ -257,20 +320,22 @@ def start(server, host, port, workers, config, daemon):
             }
             FlaskBBApplication(create_app(config=config), options).run()
         except ImportError:
-            raise click.ClickException("Cannot import gunicorn. "
-                                       "Make sure it is installed.")
+            raise click.ClickException(click.style(
+                "Cannot import gunicorn. Make sure it is installed."), fg="red"
+            )
 
     elif server == "gevent":
         try:
             from gevent import __version__
             from gevent.pywsgi import WSGIServer
-            click.echo("* Starting gevent {}".format(__version__))
-            click.echo("* Listening on http://{}:{}/".format(host, port))
+            click.secho("* Starting gevent {}".format(__version__))
+            click.secho("* Listening on http://{}:{}/".format(host, port))
             http_server = WSGIServer((host, port), create_app(config=config))
             http_server.serve_forever()
         except ImportError:
-            raise click.ClickException("Cannot import gevent. "
-                                       "Make sure it is installed.")
+            raise click.ClickException(click.style(
+                "Cannot import gevent. Make sure it is installed."), fg="red"
+            )
 
 
 @cli.command("shell", short_help="Runs a shell in the app context.")
@@ -289,11 +354,9 @@ def shell_command():
     import code
     from flask import _app_ctx_stack
     app = _app_ctx_stack.top.app
-    banner = "Python %s on %s\nApp: %s%s\nInstance: %s" % (
+    banner = "Python %s on %s\nInstance Path: %s" % (
         sys.version,
         sys.platform,
-        app.import_name,
-        app.debug and " [debug]" or "",
         app.instance_path,
     )
     ctx = {"db": db}
