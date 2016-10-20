@@ -78,8 +78,12 @@ class FlaskBBDomain(Domain):
         return translations
 
 
-def update_translations():
-    """Updates all translations."""
+def update_translations(include_plugins=False):
+    """Updates all translations.
+
+    :param include_plugins: If set to `True` it will also update the
+                            translations for all plugins.
+    """
 
     # update flaskbb translations
     translations_folder = os.path.join(current_app.root_path, "translations")
@@ -90,9 +94,10 @@ def update_translations():
     subprocess.call(["pybabel", "update", "-i", source_file,
                      "-d", translations_folder])
 
-    # updates all plugin translations too
-    for plugin in plugin_manager.all_plugins:
-        update_plugin_translations(plugin)
+    if include_plugins:
+        # updates all plugin translations too
+        for plugin in plugin_manager.all_plugins:
+            update_plugin_translations(plugin)
 
 
 def add_translations(translation):
@@ -107,16 +112,21 @@ def add_translations(translation):
                      "-d", translations_folder, "-l", translation])
 
 
-def compile_translations():
-    """Compiles all translations."""
+def compile_translations(include_plugins=False):
+    """Compiles all translations.
+
+    :param include_plugins: If set to `True` it will also compile the
+                            translations for all plugins.
+    """
 
     # compile flaskbb translations
     translations_folder = os.path.join(current_app.root_path, "translations")
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
 
-    # compile all plugin translations
-    for plugin in plugin_manager.all_plugins:
-        compile_plugin_translations(plugin)
+    if include_plugins:
+        # compile all plugin translations
+        for plugin in plugin_manager.all_plugins:
+            compile_plugin_translations(plugin)
 
 
 def add_plugin_translations(plugin, translation):

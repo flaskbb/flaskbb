@@ -22,14 +22,16 @@ from flask_migrate import upgrade as upgrade_database
 
 from flaskbb import create_app
 from flaskbb._compat import iteritems
-from flaskbb.extensions import db, whooshee
+from flaskbb.extensions import db, whooshee, plugin_manager
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_user, create_default_groups,
                                     create_default_settings, insert_bulk_data,
                                     update_settings_from_fixture)
 from flaskbb.utils.translations import (add_translations, compile_translations,
                                         update_translations,
-                                        add_plugin_translations)
+                                        add_plugin_translations,
+                                        compile_plugin_translations,
+                                        update_plugin_translations)
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
@@ -56,17 +58,17 @@ class EmailType(click.ParamType):
     supported values.  All of these values have to be strings.
     See :ref:`choice-opts` for an example.
     """
-    name = 'email'
+    name = "email"
 
     def convert(self, value, param, ctx):
         # Exact match
         if re.match(_email_regex, value):
             return value
         else:
-            self.fail(('invalid email: %s' % value), param, ctx)
+            self.fail(("invalid email: %s" % value), param, ctx)
 
     def __repr__(self):
-        return 'email'
+        return "email"
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
@@ -175,29 +177,57 @@ def translations():
               help="The plugin for which a language should be added.")
 @click.argument("lang")
 def new_translation(lang, plugin):
-    """Adds a new language to the translations. 'lang' is the language code
-    of the language, like, 'de_AT'."""
+    """Adds a new language to the translations. "lang" is the language code
+    of the language, like, "de_AT"."""
     if plugin:
+        if plugin not in plugin_manager.all_plugins:
+            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
+                                  fg="red")
         click.secho("[+] Adding new language {} for plugin {}..."
-                    .format(lang, plugin), fg='cyan')
+                    .format(lang, plugin), fg="cyan")
         add_plugin_translations(plugin, lang)
     else:
-        click.secho("[+] Adding new language {}...".format(lang), fg='cyan')
+        click.secho("[+] Adding new language {}...".format(lang), fg="cyan")
         add_translations(lang)
 
 
 @translations.command("update")
-def update_translation():
+@click.option("is_all", "--all", "-a", default=True, is_flag=True,
+              help="Updates the plugin translations as well.")
+@click.option("--plugin", "-p", type=click.STRING,
+              help="The plugin for which the translations should be updated.")
+def update_translation(is_all, plugin):
     """Updates all translations."""
-    click.secho("[+] Updating language files...", fg='cyan')
-    update_translations()
+    if plugin is not None:
+        if plugin not in plugin_manager.all_plugins:
+            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
+                                  fg="red")
+
+        click.secho("[+] Updating language files for plugin {}..."
+                    .format(plugin), fg="cyan")
+        update_plugin_translations(plugin)
+    else:
+        click.secho("[+] Updating language files...", fg="cyan")
+        update_translations(include_plugins=is_all)
 
 
 @translations.command("compile")
-def compile_translation(lang):
+@click.option("is_all", "--all", "-a", default=True, is_flag=True,
+              help="Compiles the plugin translations as well.")
+@click.option("--plugin", "-p", type=click.STRING,
+              help="The plugin for which the translations should be compiled.")
+def compile_translation(is_all, plugin):
     """Compiles all translations."""
-    click.secho("[+] Compiling language files...", fg='cyan')
-    compile_translations()
+    if plugin is not None:
+        if plugin not in plugin_manager.all_plugins:
+            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
+                                  fg="red")
+        click.secho("[+] Compiling language files for plugin {}..."
+                    .format(plugin), fg="cyan")
+        compile_plugin_translations(plugin)
+    else:
+        click.secho("[+] Compiling language files...", fg="cyan")
+        compile_translations(include_plugins=is_all)
 
 
 @cli.group()
@@ -210,21 +240,21 @@ def plugins():
 @click.argument("plugin")
 def new_plugin(plugin):
     """Creates a new plugin based on the plugin template."""
-    click.secho("[+] Creating new Plugin {}...".format(plugin), fg='cyan')
+    click.secho("[+] Creating new Plugin {}...".format(plugin), fg="cyan")
 
 
 @plugins.command("install")
 @click.argument("plugin")
 def install_plugin(plugin):
-    """Installs a new plugin from FlaskBB's Plugin Repository."""
-    click.secho("[+] Installing plugin {}...".format(plugin), fg='cyan')
+    """Installs a new plugin from FlaskBB"s Plugin Repository."""
+    click.secho("[+] Installing plugin {}...".format(plugin), fg="cyan")
 
 
 @plugins.command("uninstall")
 @click.argument("plugin")
 def uninstall_plugin(plugin):
     """Uninstalls a plugin from FlaskBB."""
-    click.secho("[+] Uninstalling plugin {}...".format(plugin), fg='cyan')
+    click.secho("[+] Uninstalling plugin {}...".format(plugin), fg="cyan")
 
 
 @plugins.command("list")
