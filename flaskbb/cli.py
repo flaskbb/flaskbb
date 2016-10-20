@@ -162,9 +162,13 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
         drop_database(db.engine.url)
-        upgrade_database()
+
+        # do not initialize the db if -i is passed
+        if not initdb:
+            upgrade_database()
 
     if initdb:
+        click.secho("[+] Initializing database...", fg="cyan")
         upgrade_database()
 
     if test_data:
@@ -177,6 +181,14 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
         elapsed = time.time() - timer
         click.secho("[+] It took {} seconds to create {} topics and {} posts"
                     .format(elapsed, topic_count, post_count), fg="cyan")
+
+    # this just makes the most sense for the command name; use -i to
+    # init the db as well
+    if not test_data:
+        click.secho("[+] Populating the database with some defaults...",
+                    fg="cyan")
+        create_default_groups()
+        create_default_settings()
 
 
 @cli.group()
