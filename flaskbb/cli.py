@@ -19,6 +19,8 @@ from flask.cli import FlaskGroup, with_appcontext
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_utils.functions import database_exists, drop_database
 from flask_migrate import upgrade as upgrade_database
+from flask_plugins import (get_all_plugins, get_enabled_plugins,
+                           get_plugin_from_all)
 
 from flaskbb import create_app
 from flaskbb._compat import iteritems
@@ -69,6 +71,17 @@ class EmailType(click.ParamType):
 
     def __repr__(self):
         return "email"
+
+
+def validate_plugin(plugin):
+    """Checks if a plugin is installed.
+    TODO: Figure out how to use this in a callback. Doesn't work because
+          the appcontext can't be found and using with_appcontext doesn't
+          help either.
+    """
+    if plugin not in plugin_manager.all_plugins.keys():
+        raise FlaskBBCLIError("Plugin {} not found.".format(plugin), fg="red")
+    return True
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
@@ -180,9 +193,7 @@ def new_translation(lang, plugin):
     """Adds a new language to the translations. "lang" is the language code
     of the language, like, "de_AT"."""
     if plugin:
-        if plugin not in plugin_manager.all_plugins:
-            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
-                                  fg="red")
+        validate_plugin(plugin)
         click.secho("[+] Adding new language {} for plugin {}..."
                     .format(lang, plugin), fg="cyan")
         add_plugin_translations(plugin, lang)
@@ -199,10 +210,7 @@ def new_translation(lang, plugin):
 def update_translation(is_all, plugin):
     """Updates all translations."""
     if plugin is not None:
-        if plugin not in plugin_manager.all_plugins:
-            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
-                                  fg="red")
-
+        validate_plugin(plugin)
         click.secho("[+] Updating language files for plugin {}..."
                     .format(plugin), fg="cyan")
         update_plugin_translations(plugin)
@@ -219,9 +227,7 @@ def update_translation(is_all, plugin):
 def compile_translation(is_all, plugin):
     """Compiles all translations."""
     if plugin is not None:
-        if plugin not in plugin_manager.all_plugins:
-            raise FlaskBBCLIError("Plugin {} not found.".format(plugin),
-                                  fg="red")
+        validate_plugin(plugin)
         click.secho("[+] Compiling language files for plugin {}..."
                     .format(plugin), fg="cyan")
         compile_plugin_translations(plugin)
@@ -237,30 +243,56 @@ def plugins():
 
 
 @plugins.command("new")
-@click.argument("plugin")
-def new_plugin(plugin):
-    """Creates a new plugin based on the plugin template."""
-    click.secho("[+] Creating new Plugin {}...".format(plugin), fg="cyan")
+@click.argument("plugin_identifier")
+def new_plugin(plugin_identifier):
+    """Not implemented yet. Creates a new plugin based on the plugin
+    template.
+    """
+    click.secho("[+] Creating new Plugin {}...".format(plugin_identifier),
+                fg="cyan")
 
 
 @plugins.command("install")
-@click.argument("plugin")
-def install_plugin(plugin):
-    """Installs a new plugin from FlaskBB"s Plugin Repository."""
-    click.secho("[+] Installing plugin {}...".format(plugin), fg="cyan")
+@click.argument("plugin_identifier")
+def install_plugin(plugin_identifier):
+    """Installs a new plugin."""
+    validate_plugin(plugin_identifier)
+    plugin = get_plugin_from_all(plugin_identifier)
+    click.secho("[+] Installing plugin {}...".format(plugin.name), fg="cyan")
+    plugin_manager.install_plugins([plugin])
 
 
 @plugins.command("uninstall")
-@click.argument("plugin")
-def uninstall_plugin(plugin):
+@click.argument("plugin_identifier")
+def uninstall_plugin(plugin_identifier):
     """Uninstalls a plugin from FlaskBB."""
-    click.secho("[+] Uninstalling plugin {}...".format(plugin), fg="cyan")
+    validate_plugin(plugin_identifier)
+    plugin = get_plugin_from_all(plugin_identifier)
+    click.secho("[+] Uninstalling plugin {}...".format(plugin.name), fg="cyan")
+    plugin_manager.uninstall_plugins([plugin])
 
 
 @plugins.command("list")
 def list_plugins():
     """Lists all installed plugins."""
-    pass
+    click.secho("[+] Listing all installed plugins...", fg="cyan")
+
+    # This is subject to change as I am not happy with the current
+    # plugin system
+    enabled_plugins = get_enabled_plugins()
+    disabled_plugins = set(get_all_plugins()) - set(enabled_plugins)
+    if len(enabled_plugins) > 0:
+        click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
+        for plugin in enabled_plugins:
+            click.secho("   * {} (version {})".format(
+                plugin.name, plugin.version)
+            )
+    if len(disabled_plugins) > 0:
+        click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
+        for plugin in disabled_plugins:
+            click.secho("   * {} (version {})".format(
+                plugin.name, plugin.version)
+            )
 
 
 @cli.group()
