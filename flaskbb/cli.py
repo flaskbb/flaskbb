@@ -34,6 +34,23 @@ from flaskbb.utils.translations import (add_translations, compile_translations,
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
 
+class FlaskBBCLIError(click.ClickException):
+    """An exception that signals a usage error including color support.
+    This aborts any further handling.
+
+    :param styles: The style kwargs which should be forwarded to click.secho.
+    """
+    def __init__(self, message, **styles):
+        click.ClickException.__init__(self, message)
+        self.styles = styles
+
+    def show(self, file=None):
+        if file is None:
+            file = click._compat.get_text_stderr()
+        click.secho("[-] Error: %s" % self.format_message(), file=file,
+                    **self.styles)
+
+
 class EmailType(click.ParamType):
     """The choice type allows a value to be checked against a fixed set of
     supported values.  All of these values have to be strings.
@@ -248,10 +265,9 @@ def new_user(username, email, password, group):
             user.username, user.email, user.primary_group.name), fg="cyan"
         )
     except IntegrityError:
-        click.Abort(click.style(
-            "Couldn't create the user because the username or "
-            "email address is already taken.", fg="red")
-        )
+        raise FlaskBBCLIError("Couldn't create the user because the "
+                              "username or email address is already taken.",
+                              fg="red")
 
 
 @cli.command()
@@ -320,9 +336,8 @@ def start(server, host, port, workers, config, daemon):
             }
             FlaskBBApplication(create_app(config=config), options).run()
         except ImportError:
-            raise click.ClickException(click.style(
-                "Cannot import gunicorn. Make sure it is installed."), fg="red"
-            )
+            raise FlaskBBCLIError("Cannot import gunicorn. "
+                                  "Make sure it is installed.", fg="red")
 
     elif server == "gevent":
         try:
@@ -333,9 +348,8 @@ def start(server, host, port, workers, config, daemon):
             http_server = WSGIServer((host, port), create_app(config=config))
             http_server.serve_forever()
         except ImportError:
-            raise click.ClickException(click.style(
-                "Cannot import gevent. Make sure it is installed."), fg="red"
-            )
+            raise FlaskBBCLIError("Cannot import gevent. "
+                                  "Make sure it is installed.", fg="red")
 
 
 @cli.command("shell", short_help="Runs a shell in the app context.")
