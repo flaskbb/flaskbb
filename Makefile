@@ -20,11 +20,11 @@ test:
 	py.test
 
 run:
-	python manage.py runserver -dr
+	flaskbb run
 
 install:dependencies
 	clear
-	python manage.py install
+	pip install -e .
 
 docs:
 	$(MAKE) -C docs html
