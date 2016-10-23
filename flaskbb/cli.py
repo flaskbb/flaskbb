@@ -13,8 +13,11 @@ import sys
 import os
 import re
 import time
+import requests
 
 import click
+from werkzeug.utils import import_string
+from flask import current_app
 from flask.cli import FlaskGroup, with_appcontext
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_utils.functions import database_exists, drop_database
@@ -297,7 +300,7 @@ def list_plugins():
 
 @cli.group()
 def themes():
-    """Themes command sub group."""
+    """Themes command sub group - Not implemented yet."""
     pass
 
 
@@ -335,20 +338,77 @@ def new_user(username, email, password, group):
 @cli.command()
 def reindex():
     """Reindexes the search index."""
-    click.secho("Reindexing search index...", fg="cyan")
+    click.secho("[+] Reindexing search index...", fg="cyan")
     whooshee.reindex()
 
 
 @cli.command()
-@click.option("--all", "-a", default=True, is_flag=True,
+@click.option("all_latest", "--all", "-a", default=False, is_flag=True,
               help="Upgrades migrations AND fixtures to the latest version.")
 @click.option("--fixture/", "-f", default=None,
               help="The fixture which should be upgraded or installed.")
-@click.option("--force-fixture", "-ff", default=False, is_flag=True,
+@click.option("--force", default=False, is_flag=True,
               help="Forcefully upgrades the fixtures.")
-def upgrade(all, fixture, force_fixture):
+def upgrade(all_latest, fixture, force):
     """Updates the migrations and fixtures."""
-    update_settings_from_fixture(fixture, overwrite_setting=force_fixture)
+    if all_latest:
+        click.secho("[+] Upgrading migrations to the latest version...",
+                    fg="cyan")
+        upgrade_database()
+
+    if fixture or all_latest:
+        try:
+            settings = import_string(
+                "flaskbb.fixtures.{}".format(fixture)
+            )
+            settings = settings.fixture
+        except ImportError:
+            raise FlaskBBCLIError("{} fixture is not available"
+                                  .format(fixture), fg="red")
+
+        click.secho("[+] Updating fixtures...")
+        count = update_settings_from_fixture(
+            fixture=settings, overwrite_group=force, overwrite_setting=force
+        )
+        click.secho("[+] {} groups and {} settings updated.".format(
+            len(count.keys()), len(count.values()), fg="green")
+        )
+
+
+@cli.command("download-emojis")
+@with_appcontext
+def download_emoji():
+    """Downloads emojis from emoji-cheat-sheet.com.
+    This command is probably going to be removed in future version.
+    """
+    click.secho("[+] Downloading emojis...", fg="cyan")
+    HOSTNAME = "https://api.github.com"
+    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"
+    FULL_URL = "{}{}".format(HOSTNAME, REPO)
+    DOWNLOAD_PATH = os.path.join(current_app.static_folder, "emoji")
+    response = requests.get(FULL_URL)
+
+    cached_count = 0
+    count = 0
+    for image in response.json():
+        if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
+            raise FlaskBBCLIError(
+                "{} does not exist.".format(os.path.abspath(DOWNLOAD_PATH)),
+                fg="red")
+
+        full_path = os.path.join(DOWNLOAD_PATH, image["name"])
+        if not os.path.exists(full_path):
+            count += 1
+            f = open(full_path, 'wb')
+            f.write(requests.get(image["download_url"]).content)
+            f.close()
+            if count == cached_count + 50:
+                cached_count = count
+                click.secho("[+] {} out of {} Emojis downloaded...".format(
+                            cached_count, len(response.json())), fg="cyan")
+
+    click.secho("[+] Finished downloading {} Emojis.".format(count),
+                fg="green")
 
 
 @cli.command()
@@ -428,12 +488,10 @@ def shell_command():
     available.
     """
     import code
-    from flask import _app_ctx_stack
-    app = _app_ctx_stack.top.app
     banner = "Python %s on %s\nInstance Path: %s" % (
         sys.version,
         sys.platform,
-        app.instance_path,
+        current_app.instance_path,
     )
     ctx = {"db": db}
 
@@ -444,7 +502,7 @@ def shell_command():
         with open(startup, "r") as f:
             eval(compile(f.read(), startup, "exec"), ctx)
 
-    ctx.update(app.make_shell_context())
+    ctx.update(current_app.make_shell_context())
 
     try:
         import IPython
