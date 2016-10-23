@@ -81,7 +81,6 @@ setup(
         'Flask-Migrate',
         'Flask-Plugins',
         'Flask-Redis',
-        'Flask-Script',
         'Flask-SQLAlchemy',
         'Flask-Themes2',
         'flask-whooshee',
