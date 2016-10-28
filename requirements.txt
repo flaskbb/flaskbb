@@ -25,7 +25,7 @@ Flask-WTF==0.13.1
 itsdangerous==0.24
 Jinja2==2.8
 kombu==3.0.37
-limits==1.1.1
+limits==1.2.0
 Mako==1.0.4
 MarkupSafe==0.23
 mistune==0.7.3
