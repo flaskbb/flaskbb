@@ -12,7 +12,7 @@ Flask-BabelPlus==1.0.1
 Flask-Caching==1.0.1
 Flask-DebugToolbar==0.10.0
 Flask-Limiter==0.9.3
-Flask-Login==0.3.2
+Flask-Login==0.4.0
 Flask-Mail==0.9.1
 Flask-Migrate==2.0.0
 Flask-Plugins==1.6.1
