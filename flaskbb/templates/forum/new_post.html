@@ -4,25 +4,39 @@
 {% extends theme("layout.html") %}
 
 {% block content %}
-{% from theme("macros.html") import render_quickreply, render_submit_field %}
+{% from theme("macros.html") import render_quickreply, render_submit_field, render_field %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
         <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
         <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
         <li><a href="{{ topic.url }}">{{ topic.title }}</a></li>
-        <li class="active">{% trans %}New Post{% endtrans %}</li>
+        <li class="active">
+            {% if edit_mode %}
+                {% trans %}Edit Post{% endtrans %}
+            {% else %}
+                {% trans %}New Post{% endtrans %}
+            {% endif %}
+        </li>
     </ol>
 
     <form class="form-horizontal" role="form" method="post">
         {{ form.hidden_tag() }}
         <div class="panel page-panel">
             <div class="panel-heading page-head">
-                {% trans %}New Post{% endtrans %}
+                {% if edit_mode %}
+                    {% trans %}Edit Post{% endtrans %}
+                {% else %}
+                    {% trans %}New Post{% endtrans %}
+                {% endif %}
             </div>
 
             <div class="panel-body page-body">
                 <div class="col-md-12 col-sm-12 col-xs-12">
+
+                    {% if form.title %}
+                        {{ render_field(form.title, div_class="col-md-12 col-sm-12 col-xs-12") }}
+                    {% endif %}
 
                     <div class="form-group">
                         <div class="col-md-12 col-sm-12 col-xs-12">
