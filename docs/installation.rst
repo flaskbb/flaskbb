@@ -4,7 +4,7 @@ Installation
 -  `Basic Setup <#basic-setup>`_
 -  `Configuration <#configuration>`_
 -  `Deploying <#deploying>`_
--  `Deploying to PythonAnywhere <#pythonanywhere>`
+-  `Deploying to PythonAnywhere <#pythonanywhere>`_
 
 
 
@@ -339,11 +339,12 @@ Here's what to do:
 
 * Sign up for a PythonAnywhere account at [https://www.pythonanywhere.com/](https://www.pythonanywhere.com/).
 * On the "Consoles" tab, start a Bash console and install/configure FlaskBB like this:
+
 ::
-        git clone https://github.com/sh4nks/flaskbb.git
-        cd flaskbb
-        pip3.5 install --user -r requirements.txt
-        python3.5 manage.py initdb
+    git clone https://github.com/sh4nks/flaskbb.git
+    cd flaskbb
+    pip3.5 install --user -r requirements.txt
+    python3.5 manage.py initdb
 
 * Click the PythonAnywhere logo to go back to the dashboard, then go to the "Web" tab, and click the "Add a new web app" button.
 * Just click "Next" on the first page.
@@ -355,12 +356,14 @@ Here's what to do:
 * Click on the "WSGI configuration file" filename, and wait for an editor to load.
 * Change the line that sets `project_home` to replace `mysite` with `flaskbb` again.
 * Change the line that says
+
 ::
-         from flask_app import app as application
+     from flask_app import app as application
  
      to say
+     
 ::
-         from manage import app as application
+     from manage import app as application
          
 * Click the green "Save" button near the top right.
 * Go back to the "Web" tab.
