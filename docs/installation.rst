@@ -4,7 +4,7 @@ Installation
 -  `Basic Setup <#basic-setup>`_
 -  `Configuration <#configuration>`_
 -  `Deploying <#deploying>`_
--  `Deploying to PythonAnywhere <#pythonanywhere>`_
+-  `Deploying to PythonAnywhere <#deploying-to-pythonanywhere>`_
 
 
 
@@ -333,11 +333,11 @@ Like in the `uWSGI <#uwsgi>`_ chapter, don't forget to create a symlink to
 Deploying to PythonAnywhere
 ---------------------------
 
-[PythonAnywhere](https://www.pythonanywhere.com/) is a platform-as-a-service, which basically means they have a bunch of servers pre-configured with Python, nginx and uWSGI.  You can run a low-traffic website with them for free, so it's an easy way to get quickly FlaskBB running publicly.
+`PythonAnywhere <https://www.pythonanywhere.com/>`_ is a platform-as-a-service, which basically means they have a bunch of servers pre-configured with Python, nginx and uWSGI.  You can run a low-traffic website with them for free, so it's an easy way to get quickly FlaskBB running publicly.
 
 Here's what to do:
 
-* Sign up for a PythonAnywhere account at [https://www.pythonanywhere.com/](https://www.pythonanywhere.com/).
+* Sign up for a PythonAnywhere account at `https://www.pythonanywhere.com/ <https://www.pythonanywhere.com/>`_.
 * On the "Consoles" tab, start a Bash console and install/configure FlaskBB like this:
 
 ::
