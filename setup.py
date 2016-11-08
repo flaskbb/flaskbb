@@ -110,7 +110,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        flaskbb=flaskbb.cli:cli
+        flaskbb=flaskbb.cli:main
     ''',
     test_suite='tests',
     tests_require=[

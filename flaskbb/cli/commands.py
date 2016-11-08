@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.cli
-    ~~~~~~~~~~~
+    flaskbb.cli.commands
+    ~~~~~~~~~~~~~~~~~~~~
 
-    FlaskBB's Command Line Interface.
-    To make it work, you have to install FlaskBB via ``pip install -e .``.
+    This module contains all commands.
+
+    Plugin and Theme templates are generated via cookiecutter.
+    In order to generate those project templates you have to
+    cookiecutter first::
+
+        pip install cookiecutter
 
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
@@ -37,6 +42,13 @@ from flaskbb.utils.translations import (add_translations, compile_translations,
                                         add_plugin_translations,
                                         compile_plugin_translations,
                                         update_plugin_translations)
+
+cookiecutter_available = False
+try:
+    import cookiecutter
+    cookiecutter_available = True
+except ImportError:
+    pass
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
@@ -88,12 +100,12 @@ def validate_plugin(plugin):
 
 
 @click.group(cls=FlaskGroup, create_app=create_app)
-def cli():
+def main():
     """This is the commandline interface for flaskbb."""
     pass
 
 
-@cli.command()
+@main.command()
 @click.option("--welcome-forum", default=True, is_flag=True,
               help="Creates a welcome forum.")
 def install(welcome_forum):
@@ -147,7 +159,7 @@ def install(welcome_forum):
                 fg="green", bold=True)
 
 
-@cli.command()
+@main.command()
 @click.option("--test-data", "-t", default=False, is_flag=True,
               help="Adds some test data.")
 @click.option("--bulk-data", "-b", default=False, is_flag=True,
@@ -194,7 +206,7 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
         create_default_settings()
 
 
-@cli.group()
+@main.group()
 def translations():
     """Translations command sub group."""
     pass
@@ -251,7 +263,7 @@ def compile_translation(is_all, plugin):
         compile_translations(include_plugins=is_all)
 
 
-@cli.group()
+@main.group()
 def plugins():
     """Plugins command sub group."""
     pass
@@ -263,6 +275,12 @@ def new_plugin(plugin_identifier):
     """Not implemented yet. Creates a new plugin based on the plugin
     template.
     """
+    if not cookiecutter_available:
+        raise FlaskBBCLIError("Can't create {} plugin because cookiecutter "
+                              "is not installed. Please install "
+                              "it with 'pip install cookiecutter' first.".
+                              format(plugin_identifier),
+                              fg="red")
     click.secho("[+] Creating new Plugin {}...".format(plugin_identifier),
                 fg="cyan")
 
@@ -310,13 +328,13 @@ def list_plugins():
             )
 
 
-@cli.group()
+@main.group()
 def themes():
     """Themes command sub group - Not implemented yet."""
     pass
 
 
-@cli.group()
+@main.group()
 def users():
     """Create, update or delete users."""
     pass
@@ -347,14 +365,14 @@ def new_user(username, email, password, group):
                               fg="red")
 
 
-@cli.command()
+@main.command()
 def reindex():
     """Reindexes the search index."""
     click.secho("[+] Reindexing search index...", fg="cyan")
     whooshee.reindex()
 
 
-@cli.command()
+@main.command()
 @click.option("all_latest", "--all", "-a", default=False, is_flag=True,
               help="Upgrades migrations AND fixtures to the latest version.")
 @click.option("--fixture/", "-f", default=None,
@@ -387,7 +405,7 @@ def upgrade(all_latest, fixture, force):
         )
 
 
-@cli.command("download-emojis")
+@main.command("download-emojis")
 @with_appcontext
 def download_emoji():
     """Downloads emojis from emoji-cheat-sheet.com.
@@ -423,7 +441,7 @@ def download_emoji():
                 fg="green")
 
 
-@cli.command()
+@main.command()
 @click.option("--server", "-s", default="gunicorn",
               type=click.Choice(["gunicorn", "gevent"]),
               help="The WSGI Server to run FlaskBB on.")
@@ -486,7 +504,7 @@ def start(server, host, port, workers, config, daemon):
                                   "Make sure it is installed.", fg="red")
 
 
-@cli.command("shell", short_help="Runs a shell in the app context.")
+@main.command("shell", short_help="Runs a shell in the app context.")
 @with_appcontext
 def shell_command():
     """Runs an interactive Python shell in the context of a given
@@ -523,7 +541,7 @@ def shell_command():
         code.interact(banner=banner, local=ctx)
 
 
-@cli.command("urls")
+@main.command("urls")
 @click.option("--order", default="rule", help="Property on Rule to order by.")
 def list_urls(order):
     """Lists all available routes.
