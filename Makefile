@@ -2,7 +2,7 @@
 
 help:
 	@echo "  clean      remove unwanted stuff"
-	@echo "  install    install flaskbb and setup"
+	@echo "  install    install dependencies and flaskbb"
 	@echo "  test       run the testsuite"
 	@echo "  run        run the development server"
 	@echo "  docs       build the documentation"
@@ -25,6 +25,7 @@ run:
 install:dependencies
 	clear
 	pip install -e .
+	flaskbb install
 
 docs:
 	$(MAKE) -C docs html

@@ -3,13 +3,13 @@
 [![Code Health](https://landscape.io/github/sh4nks/flaskbb/master/landscape.svg?style=flat)](https://landscape.io/github/sh4nks/flaskbb/master)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://flaskbb.org)
 
-# INTRODUCTION
+# Introduction
 
 [FlaskBB](http://flaskbb.org) is a forum software written in python
 using the micro framework Flask.
 
 
-## FEATURES
+## Features
 
 * A Bulletin Board like FluxBB or DjangoBB in Flask
 * Private Messages
@@ -23,12 +23,7 @@ using the micro framework Flask.
 * Plugin System
 
 
-## TODO
-
-* See the github [issues](https://github.com/sh4nks/flaskbb/issues?state=open)
-
-
-## INSTALLATION
+## Quickstart
 
 For a complete installation guide please visit the installation documentation
 [here](https://flaskbb.readthedocs.org/en/latest/installation.html).
@@ -39,20 +34,20 @@ For a complete installation guide please visit the installation documentation
 * Install dependencies and FlaskBB
     * `make install`
 * Run the development server
-    * `make runserver`
+    * `make run`
 * Visit [localhost:8080](http://localhost:8080)
 
 
-## DOCUMENTATION
+## Documentation
 
 The documentation is located [here](http://flaskbb.readthedocs.org/en/latest/).
 
 
-## LICENSE
+## License
 
 [BSD LICENSE](http://flask.pocoo.org/docs/license/#flask-license)
 
 
-## ACKNOWLEDGEMENTS
+## Acknowledgements
 
 [/r/flask](http://reddit.com/r/flask), [Flask](http://flask.pocoo.org), it's [extensions](http://flask.pocoo.org/extensions/) and everyone who has helped me!
