@@ -54,3 +54,8 @@ flaskbb/static/emoji/*
 bower_components
 node_modules
 .directory
+
+# Ignore plugins
+flaskbb/plugins/*
+!flaskbb/plugins/__init__.py
+!flaskbb/plugins/portal/
