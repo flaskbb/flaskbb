@@ -42,15 +42,27 @@ from flaskbb.utils.translations import (add_translations, compile_translations,
                                         add_plugin_translations,
                                         compile_plugin_translations,
                                         update_plugin_translations)
+# Not optimal and subject to change
+try:
+    from flaskbb.configs.production import ProductionConfig as Config
+except ImportError:
+    try:
+        from flaskbb.configs.development import DevelopmentConfig as Config
+    except ImportError:
+        from flaskbb.configs.default import DefaultConfig as Config
 
 cookiecutter_available = False
 try:
-    import cookiecutter
+    from cookiecutter.main import cookiecutter
     cookiecutter_available = True
 except ImportError:
     pass
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
+
+
+def make_app(config):
+    return create_app(Config)
 
 
 class FlaskBBCLIError(click.ClickException):
@@ -59,6 +71,7 @@ class FlaskBBCLIError(click.ClickException):
 
     :param styles: The style kwargs which should be forwarded to click.secho.
     """
+
     def __init__(self, message, **styles):
         click.ClickException.__init__(self, message)
         self.styles = styles
@@ -99,7 +112,17 @@ def validate_plugin(plugin):
     return True
 
 
-@click.group(cls=FlaskGroup, create_app=create_app)
+def check_cookiecutter(ctx, param, value):
+    if not cookiecutter_available:
+        raise FlaskBBCLIError(
+            "Can't create {} because cookiecutter is not installed. "
+            "You can install it with 'pip install cookiecutter'.".
+            format(value), fg="red"
+        )
+    return value
+
+
+@click.group(cls=FlaskGroup, create_app=lambda app: create_app(Config))
 def main():
     """This is the commandline interface for flaskbb."""
     pass
@@ -270,19 +293,23 @@ def plugins():
 
 
 @plugins.command("new")
-@click.argument("plugin_identifier")
-def new_plugin(plugin_identifier):
-    """Not implemented yet. Creates a new plugin based on the plugin
-    template.
+@click.argument("plugin_identifier", callback=check_cookiecutter)
+@click.option("--template", "-t", type=click.STRING,
+              default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
+              help="Path to a cookiecutter template or to a valid git repo.")
+def new_plugin(plugin_identifier, template):
+    """Creates a new plugin based on the cookiecutter plugin
+    template. Defaults to this template:
+    https://github.com:sh4nks/cookiecutter-flaskbb-plugin.
+    It will either accept a valid path on the filesystem
+    or a URL to a Git repository which contains the cookiecutter template.
     """
-    if not cookiecutter_available:
-        raise FlaskBBCLIError("Can't create {} plugin because cookiecutter "
-                              "is not installed. Please install "
-                              "it with 'pip install cookiecutter' first.".
-                              format(plugin_identifier),
-                              fg="red")
-    click.secho("[+] Creating new Plugin {}...".format(plugin_identifier),
+    out_dir = os.path.join(current_app.root_path, "plugins", plugin_identifier)
+    click.secho("[+] Creating new plugin {}".format(plugin_identifier),
                 fg="cyan")
+    cookiecutter(template, output_dir=out_dir)
+    click.secho("[+] Done. Created in {}".format(out_dir),
+                fg="green", bold=True)
 
 
 @plugins.command("install")
