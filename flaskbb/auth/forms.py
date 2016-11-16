@@ -58,7 +58,8 @@ class RegisterForm(FlaskForm):
 
     language = SelectField(_('Language'))
 
-    accept_tos = BooleanField(_("I accept the Terms of Service"), default=True)
+    accept_tos = BooleanField(_("I accept the Terms of Service"), validators=[
+        DataRequired(message=_("Please accept the TOS."))], default=True)
 
     submit = SubmitField(_("Register"))
 
