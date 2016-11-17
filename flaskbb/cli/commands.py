@@ -18,6 +18,7 @@ import sys
 import os
 import re
 import time
+import shutil
 import requests
 
 import click
@@ -319,7 +320,11 @@ def install_plugin(plugin_identifier):
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
     click.secho("[+] Installing plugin {}...".format(plugin.name), fg="cyan")
-    plugin_manager.install_plugins([plugin])
+    try:
+        plugin_manager.install_plugins([plugin])
+    except Exception as e:
+        click.secho("[-] Couldn't install plugin because of following "
+                    "exception: \n{}".format(e), fg="red")
 
 
 @plugins.command("uninstall")
@@ -329,7 +334,37 @@ def uninstall_plugin(plugin_identifier):
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
     click.secho("[+] Uninstalling plugin {}...".format(plugin.name), fg="cyan")
-    plugin_manager.uninstall_plugins([plugin])
+    try:
+        plugin_manager.uninstall_plugins([plugin])
+    except AttributeError:
+        pass
+
+
+@plugins.command("remove")
+@click.argument("plugin_identifier")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Removes the plugin without asking for confirmation.")
+def remove_plugin(plugin_identifier, force):
+    """Removes a plugin from the filesystem."""
+    validate_plugin(plugin_identifier)
+    if not force and not \
+            click.confirm(click.style("Are you sure?", fg="magenta")):
+        sys.exit(0)
+
+    plugin = get_plugin_from_all(plugin_identifier)
+    click.secho("[+] Uninstalling plugin {}...".format(plugin.name), fg="cyan")
+    try:
+        plugin_manager.uninstall_plugins([plugin])
+    except Exception as e:
+        click.secho("[-] Couldn't uninstall plugin because of following "
+                    "exception: \n{}".format(e), fg="red")
+        if not click.confirm(click.style(
+            "Do you want to continue anyway?", fg="magenta")
+        ):
+            sys.exit(0)
+
+    click.secho("[+] Removing plugin from filesystem...", fg="cyan")
+    shutil.rmtree(plugin.path, ignore_errors=False, onerror=None)
 
 
 @plugins.command("list")
@@ -357,7 +392,7 @@ def list_plugins():
 
 @main.group()
 def themes():
-    """Themes command sub group - Not implemented yet."""
+    """Themes command sub group."""
     pass
 
 
@@ -390,6 +425,18 @@ def new_user(username, email, password, group):
         raise FlaskBBCLIError("Couldn't create the user because the "
                               "username or email address is already taken.",
                               fg="red")
+
+
+@users.command("update")
+def update_user():
+    """Updates an user."""
+    pass
+
+
+@users.command("delete")
+def delete_user():
+    """Deletes an user."""
+    pass
 
 
 @main.command()
