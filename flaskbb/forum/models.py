@@ -340,9 +340,10 @@ class Topic(db.Model, CRUDMixin):
         # If the topic is unread try to get the first unread post
         if topic_is_unread(self, topicsread, user, forumsread):
             # 
-            post = Post.query.filter(Post.topic_id == self.id).\
-                filter(Post.date_created > topicsread.last_read).\
-                order_by(Post.id.asc()).first()
+            query = Post.query.filter(Post.topic_id == self.id)
+            if topicsread is not None:
+                query = query.filter(Post.date_created > topicsread.last_read)
+            post = query.order_by(Post.id.asc()).first()
             if post is not None:
                 return post.url
         
