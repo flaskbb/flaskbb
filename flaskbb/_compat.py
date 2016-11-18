@@ -16,7 +16,6 @@ if not PY2:     # pragma: no cover
     iterkeys = lambda d: iter(d.keys())
     itervalues = lambda d: iter(d.values())
     iteritems = lambda d: iter(d.items())
-    max_integer = sys.maxsize
 else:           # pragma: no cover
     text_type = unicode
     string_types = (str, unicode)
@@ -26,7 +25,6 @@ else:           # pragma: no cover
     iterkeys = lambda d: d.iterkeys()
     itervalues = lambda d: d.itervalues()
     iteritems = lambda d: d.iteritems()
-    max_integer = sys.maxint
 
 
 def to_bytes(text):

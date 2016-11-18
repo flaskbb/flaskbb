@@ -12,7 +12,7 @@ from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
 
-from flaskbb._compat import max_integer, text_type, iteritems
+from flaskbb._compat import text_type, iteritems
 from flaskbb.extensions import db, cache
 from flaskbb.utils.database import CRUDMixin
 
@@ -204,7 +204,7 @@ class Setting(db.Model, CRUDMixin):
         return settings
 
     @classmethod
-    @cache.memoize(timeout=max_integer)
+    @cache.cached(key_prefix="settings")
     def as_dict(cls, from_group=None, upper=True):
         """Returns all settings as a dict. This method is cached. If you want
         to invalidate the cache, simply execute ``self.invalidate_cache()``.

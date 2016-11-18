@@ -12,7 +12,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
 
-from flaskbb._compat import max_integer
 from flaskbb.extensions import db, cache
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.helpers import time_utcnow
@@ -330,12 +329,12 @@ class User(db.Model, UserMixin, CRUDMixin):
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
-    @cache.memoize(timeout=max_integer)
+    @cache.memoize()
     def get_groups(self):
         """Returns all the groups the user is in."""
         return [self.primary_group] + list(self.secondary_groups)
 
-    @cache.memoize(timeout=max_integer)
+    @cache.memoize()
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
         if exclude:
@@ -352,7 +351,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                 perms[c] = getattr(group, c) or perms.get(c, False)
         return perms
 
-    @cache.memoize(timeout=max_integer)
+    @cache.memoize()
     def get_unread_messages(self):
         """Returns all unread messages for the user."""
         unread_messages = Conversation.query.\
@@ -463,11 +462,11 @@ class Guest(AnonymousUserMixin):
     def groups(self):
         return self.get_groups()
 
-    @cache.memoize(timeout=max_integer)
+    @cache.memoize()
     def get_groups(self):
         return Group.query.filter(Group.guest == True).all()
 
-    @cache.memoize(timeout=max_integer)
+    @cache.memoize()
     def get_permissions(self, exclude=None):
         """Returns a dictionary with all permissions the user has"""
         if exclude:
