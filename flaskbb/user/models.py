@@ -80,7 +80,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     _password = db.Column('password', db.String(120), nullable=False)
     date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
     lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    birthday = db.Column(UTCDateTime(timezone=True))
+    birthday = db.Column(db.DateTime)
     gender = db.Column(db.String(10))
     website = db.Column(db.String(200))
     location = db.Column(db.String(100))
