@@ -18,7 +18,6 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
 from flaskbb.extensions import db
-from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
 
@@ -79,9 +78,8 @@ class ChangePasswordForm(FlaskForm):
 
 
 class ChangeUserDetailsForm(FlaskForm):
-    birthday = BirthdayField(_("Birthday"), format="%d %m %Y",
-                             validators=[Optional()],
-                             widget=SelectBirthdayWidget())
+    birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
+        Optional()])
 
     gender = SelectField(_("Gender"), default="None", choices=[
         ("None", ""),

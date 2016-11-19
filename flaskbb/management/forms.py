@@ -19,7 +19,6 @@ from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.utils.fields import BirthdayField
-from flaskbb.utils.widgets import SelectBirthdayWidget
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
@@ -60,9 +59,8 @@ class UserForm(FlaskForm):
     password = PasswordField("Password", validators=[
         Optional()])
 
-    birthday = BirthdayField(_("Birthday"), format="%d %m %Y",
-                             widget=SelectBirthdayWidget(),
-                             validators=[Optional()])
+    birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
+        Optional()])
 
     gender = SelectField(_("Gender"), default="None", choices=[
         ("None", ""),
