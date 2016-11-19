@@ -17,7 +17,7 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
-from flaskbb.utils.recaptcha import RecaptchaField
+from flaskbb.utils.fields import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
