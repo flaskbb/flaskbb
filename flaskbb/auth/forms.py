@@ -32,11 +32,13 @@ class LoginForm(FlaskForm):
     password = PasswordField(_("Password"), validators=[
         DataRequired(message=_("Please enter your password."))])
 
-    recaptcha = RecaptchaField(_("Captcha"))
-
     remember_me = BooleanField(_("Remember me"), default=False)
 
     submit = SubmitField(_("Login"))
+
+
+class LoginRecaptchaForm(LoginForm):
+    recaptcha = RecaptchaField(_("Captcha"))
 
 
 class RegisterForm(FlaskForm):
