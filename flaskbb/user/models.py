@@ -71,6 +71,14 @@ class Group(db.Model, CRUDMixin):
     def get_guest_group(cls):
         return cls.query.filter(cls.guest == True).first()
 
+    @classmethod
+    def get_member_group(cls):
+        """Returns the first member group."""
+        # This feels ugly..
+        return cls.query.filter(cls.admin == False, cls.super_mod == False,
+                                cls.mod == False, cls.guest == False,
+                                cls.banned == False).first()
+
 
 class User(db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"

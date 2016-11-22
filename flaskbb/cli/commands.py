@@ -35,9 +35,11 @@ from flask_themes2 import get_themes_list, get_theme
 from flaskbb import create_app
 from flaskbb._compat import iteritems
 from flaskbb.extensions import db, whooshee, plugin_manager
+from flaskbb.user.models import User
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
-                                    create_user, create_default_groups,
+                                    create_user, update_user,
+                                    create_default_groups,
                                     create_default_settings, insert_bulk_data,
                                     update_settings_from_fixture)
 from flaskbb.utils.translations import (add_translations, compile_translations,
@@ -490,15 +492,45 @@ def new_user(username, email, password, group):
 
 
 @users.command("update")
-def update_user():
-    """Updates an user."""
-    pass
+@click.option("--username", prompt=True,
+              help="The username of the user.")
+@click.option("--email", prompt=True, type=EmailType(),
+              help="The new email address of the user.")
+@click.option("--password", prompt=True, hide_input=True,
+              confirmation_prompt=True,
+              help="The new password of the user.")
+@click.option("--group", prompt=True, default="member",
+              help="The new primary group of the user",
+              type=click.Choice(["admin", "super_mod", "mod", "member"]))
+def change_user(username, password, email, group):
+    """Updates an user. Omit any options to use the interactive mode."""
+
+    user = update_user(username, password, email, group)
+    if user is None:
+        raise FlaskBBCLIError("The user with username {} does not exist."
+                              .format(username), fg="red")
+
+    click.secho("[+] User {} updated.".format(user.username), fg="cyan")
 
 
 @users.command("delete")
-def delete_user():
+@click.option("--username", prompt=True,
+              help="The username of the user.")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Removes the user without asking for confirmation.")
+def delete_user(username, force):
     """Deletes an user."""
-    pass
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        raise FlaskBBCLIError("The user with username {} does not exist."
+                              .format(username), fg="red")
+
+    if not force and not \
+            click.confirm(click.style("Are you sure?", fg="magenta")):
+        sys.exit(0)
+
+    user.delete()
+    click.secho("[+] User {} deleted.".format(user.username), fg="cyan")
 
 
 @main.command()
