@@ -709,49 +709,41 @@ def shell_command():
         code.interact(banner=banner, local=ctx)
 
 
-@main.command("urls")
-@click.option("--order", default="rule", help="Property on Rule to order by.")
-def list_urls(order):
-    """Lists all available routes.
-    Taken from Flask-Script: https://goo.gl/K6NCAz"""
+@main.command("urls", short_help="Show routes for the app.")
+@click.option("-r", "order_by", flag_value="rule", default=True,
+              help="Order by route")
+@click.option("-e", "order_by", flag_value="endpoint",
+              help="Order by endpoint")
+@click.option("-m", "order_by", flag_value="methods",
+              help="Order by methods")
+@with_appcontext
+def list_urls(order_by):
+    """Lists all available routes."""
     from flask import current_app
-
-    rows = []
-    column_length = 0
-    column_headers = ("Rule", "Endpoint", "Arguments")
 
     rules = sorted(
         current_app.url_map.iter_rules(),
-        key=lambda rule: getattr(rule, order)
+        key=lambda rule: getattr(rule, order_by)
     )
+
+    max_rule_len = max(len(rule.rule) for rule in rules)
+    max_rule_len = max(max_rule_len, len("Route"))
+
+    max_endpoint_len = max(len(rule.endpoint) for rule in rules)
+    max_endpoint_len = max(max_endpoint_len, len("Endpoint"))
+
+    max_method_len = max(len(", ".join(rule.methods)) for rule in rules)
+    max_method_len = max(max_method_len, len("Methods"))
+
+    column_header_len = max_rule_len + max_endpoint_len + max_method_len + 4
+    column_template = "{:<%s}  {:<%s}  {:<%s}" % (
+        max_rule_len, max_endpoint_len, max_method_len
+    )
+
+    click.secho(column_template.format("Route", "Endpoint", "Methods"),
+                fg="blue", bold=True)
+    click.secho("=" * column_header_len, bold=True)
+
     for rule in rules:
-        rows.append((rule.rule, rule.endpoint, None))
-    column_length = 2
-
-    str_template = ""
-    table_width = 0
-
-    if column_length >= 1:
-        max_rule_length = max(len(r[0]) for r in rows)
-        max_rule_length = max_rule_length if max_rule_length > 4 else 4
-        str_template += "%-" + str(max_rule_length) + "s"
-        table_width += max_rule_length
-
-    if column_length >= 2:
-        max_endpoint_len = max(len(str(r[1])) for r in rows)
-        # max_endpoint_len = max(rows, key=len)
-        max_endpoint_len = max_endpoint_len if max_endpoint_len > 8 else 8
-        str_template += "  %-" + str(max_endpoint_len) + "s"
-        table_width += 2 + max_endpoint_len
-
-    if column_length >= 3:
-        max_args_len = max(len(str(r[2])) for r in rows)
-        max_args_len = max_args_len if max_args_len > 9 else 9
-        str_template += "  %-" + str(max_args_len) + "s"
-        table_width += 2 + max_args_len
-
-    print(str_template % (column_headers[:column_length]))
-    print("-" * table_width)
-
-    for row in rows:
-        print(str_template % row[:column_length])
+        methods = ", ".join(rule.methods)
+        click.echo(column_template.format(rule.rule, rule.endpoint, methods))
