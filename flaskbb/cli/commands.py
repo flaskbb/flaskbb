@@ -23,7 +23,7 @@ import requests
 
 import click
 from werkzeug.utils import import_string
-from flask import current_app
+from flask import current_app, __version__ as flask_version
 from flask.cli import FlaskGroup, with_appcontext
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_utils.functions import database_exists, drop_database
@@ -32,7 +32,7 @@ from flask_plugins import (get_all_plugins, get_enabled_plugins,
                            get_plugin_from_all)
 from flask_themes2 import get_themes_list, get_theme
 
-from flaskbb import create_app
+from flaskbb import create_app, __version__
 from flaskbb._compat import iteritems
 from flaskbb.extensions import db, whooshee, plugin_manager
 from flaskbb.user.models import User
@@ -131,7 +131,22 @@ def check_cookiecutter(ctx, param, value):
     return value
 
 
+def get_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    message = ("FlaskBB %(version)s using Flask %(flask_version)s on "
+               "Python %(python_version)s")
+    click.echo(message % {
+        'version': __version__,
+        'flask_version': flask_version,
+        'python_version': sys.version.split("\n")[0]
+    }, color=ctx.color)
+    ctx.exit()
+
+
 @click.group(cls=FlaskGroup, create_app=lambda app: create_app(Config))
+@click.option("--version", expose_value=False, callback=get_version,
+              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
 def main():
     """This is the commandline interface for flaskbb."""
     pass
