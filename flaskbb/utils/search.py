@@ -65,7 +65,7 @@ class TopicWhoosheer(AbstractWhoosheer):
             topic_id=topic.id,
             title=topic.title,
             username=topic.username,
-            content=topic.first_post.content
+            content=getattr(topic.first_post,'content',None)
         )
 
     @classmethod
@@ -74,7 +74,7 @@ class TopicWhoosheer(AbstractWhoosheer):
             topic_id=topic.id,
             title=topic.title,
             username=topic.username,
-            content=topic.first_post.content
+            content=getattr(topic.first_post,'content',None)
         )
 
     @classmethod
