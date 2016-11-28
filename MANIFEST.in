@@ -1,0 +1,10 @@
+include LICENSE
+include AUTHORS
+include CHANGES
+include README.md
+graft flaskbb
+prune flaskbb/themes/*/node_modules
+prune flaskbb/themes/*/.sass-cache
+prune flaskbb/themes/*/src/*
+global-exclude __pycache__
+global-exclude *.py[co]

@@ -23,7 +23,7 @@ Resources
 * `issues <https://github.com/sh4nks/flaskbb/issues>`_
 
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import sys
 
@@ -51,11 +51,11 @@ setup(
     version='1.0.dev0',
     url='http://github.com/sh4nks/flaskbb/',
     license='BSD',
-    author='sh4nks',
-    author_email='sh4nks7@gmail.com',
-    description='A forum software written with flask',
+    author='Peter Justin',
+    author_email='peter.justin@outlook.com',
+    description='A classic Forum Software in Python using Flask.',
     long_description=__doc__,
-    packages=['flaskbb'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     platforms='any',
