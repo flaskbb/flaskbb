@@ -34,7 +34,7 @@ from flask_themes2 import get_themes_list, get_theme
 
 from flaskbb import create_app, __version__
 from flaskbb._compat import iteritems
-from flaskbb.extensions import db, whooshee, plugin_manager
+from flaskbb.extensions import db, whooshee, plugin_manager, celery
 from flaskbb.user.models import User
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
@@ -622,6 +622,30 @@ def download_emoji():
 
     click.secho("[+] Finished downloading {} Emojis.".format(count),
                 fg="green")
+
+
+@main.command("celery", context_settings=dict(ignore_unknown_options=True,))
+@click.argument('celery_args', nargs=-1, type=click.UNPROCESSED)
+@click.option("show_help", "--help", "-h", is_flag=True,
+              help="Shows this message and exits")
+@click.option("show_celery_help", "--help-celery", is_flag=True,
+              help="Shows the celery help message")
+@click.pass_context
+@with_appcontext
+def start_celery(ctx, show_help, show_celery_help, celery_args):
+    """Preconfigured wrapper around the 'celery' command.
+    Additional CELERY_ARGS arguments are passed to celery."""
+    if show_help:
+        click.echo(ctx.get_help())
+        sys.exit(0)
+
+    if show_celery_help:
+        click.echo(celery.start(argv=["--help"]))
+        sys.exit(0)
+
+    default_args = ['celery']
+    default_args = default_args + list(celery_args)
+    celery.start(argv=default_args)
 
 
 @main.command()
