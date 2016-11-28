@@ -1,7 +1,7 @@
 -r requirements.txt
-cov-core
-coverage
-py
-pytest
-pytest-cov
-pytest-random
+cov-core==1.15.0
+coverage==4.2
+py==1.4.31
+pytest==3.0.3
+pytest-cov==2.4.0
+pytest-random==0.02
