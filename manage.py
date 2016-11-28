@@ -114,9 +114,9 @@ def create_admin(username=None, password=None, email=None):
     """Creates the admin user."""
 
     if not (username and password and email):
-        username = prompt("Username")
-        email = prompt("A valid email address")
-        password = prompt_pass("Password")
+        username = unicode(prompt("Username"))
+        email = unicode(prompt("A valid email address"))
+        password = unicode(prompt_pass("Password"))
 
     create_admin_user(username=username, password=password, email=email)
 
