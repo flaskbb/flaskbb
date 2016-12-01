@@ -148,8 +148,8 @@ def get_version(ctx, param, value):
 def createapp(info):
     config_to_use=getattr(info,'config_to_use',Config)
     
-    click.echo('creating app with config: {}'.format(Config))
-    return create_app(Config)
+    click.echo('creating app with config: {}'.format(config_to_use))
+    return create_app(config_to_use)
 
 def set_config(ctx,param,value):
     if value:
@@ -158,14 +158,14 @@ def set_config(ctx,param,value):
             mod,obj=config_to_use.rsplit('.',1)
             import importlib
             m=importlib.import_module(mod)
-            Config=getattr(m,obj)
+            config=getattr(m,obj)
         except (ValueError,ImportError):
             click.echo('Cannot load module specified')
             ctx.exit()
         except AttributeError:
             click.echo('Cannot find config object in specified module')
         
-        ctx.ensure_object(ScriptInfo).config_to_use=Config
+        ctx.ensure_object(ScriptInfo).config_to_use=config
         
 
 @click.group(cls=FlaskGroup, create_app=createapp)
