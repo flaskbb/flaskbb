@@ -144,29 +144,16 @@ def get_version(ctx, param, value):
     ctx.exit()
 
 
-def createapp(info):
-    config_to_use = getattr(info, 'config_to_use', Config)
-
-    click.echo('creating app with config: {}'.format(config_to_use))
-    return create_app(config_to_use)
+def createapp(script_info):
+    config_file = getattr(script_info, 'config_file')
+    if config_file is not None:
+        click.secho('[+] Using config: {}'.format(config_file), fg="cyan")
+    return create_app(config_file)
 
 
 def set_config(ctx, param, value):
-    if value:
-        config_to_use = value
-        try:
-            mod, obj = config_to_use.rsplit('.', 1)
-            import importlib
-            m = importlib.import_module(mod)
-            config = getattr(m, obj)
-        except (ValueError, ImportError):
-            raise FlaskBBCLIError("Cannot load the specified module.",
-                                  fg="red")
-        except AttributeError:
-            raise FlaskBBCLIError("Cannot find the config object in "
-                                  "the specified module.", fg="red")
-
-        ctx.ensure_object(ScriptInfo).config_to_use = config
+    """This will pass the config file to the create_app function."""
+    ctx.ensure_object(ScriptInfo).config_file = value
 
 
 @click.group(cls=FlaskGroup, create_app=createapp)

@@ -18,6 +18,7 @@ from sqlalchemy.engine import Engine
 from flask import Flask, request
 from flask_login import current_user
 
+from flaskbb._compat import string_types
 # views
 from flaskbb.user.views import user
 from flaskbb.message.views import message
@@ -52,16 +53,26 @@ from flaskbb.utils.settings import flaskbb_config
 def create_app(config=None):
     """Creates the app.
 
-    :param config: The configuration object.
+    :param config: The configuration file or object.
+                   The environment variable is weightet as the heaviest.
+                   For example, if the config is specified via an file
+                   and a ENVVAR, it will load the config via the file and
+                   later overwrite it from the ENVVAR.
     """
-
     # Initialize the app
     app = Flask("flaskbb")
 
     # Use the default config and override it afterwards
     app.config.from_object('flaskbb.configs.default.DefaultConfig')
-    # Update the config
-    app.config.from_object(config)
+
+    if isinstance(config, string_types):
+        # config has to be of type string (str, unicode) in order
+        # to be recognized as file
+        app.config.from_pyfile(config)
+    else:
+        # try to update the config from the object
+        app.config.from_object(config)
+
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 

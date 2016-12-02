@@ -3,6 +3,8 @@ include AUTHORS
 include CHANGES
 include README.md
 graft flaskbb
+graft tests
+graft migrations
 prune flaskbb/themes/*/node_modules
 prune flaskbb/themes/*/.sass-cache
 prune flaskbb/themes/*/src/*
