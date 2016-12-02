@@ -24,7 +24,7 @@ import requests
 import click
 from werkzeug.utils import import_string
 from flask import current_app, __version__ as flask_version
-from flask.cli import FlaskGroup, with_appcontext
+from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy_utils.functions import database_exists, drop_database
 from flask_migrate import upgrade as upgrade_database
@@ -142,11 +142,38 @@ def get_version(ctx, param, value):
         'python_version': sys.version.split("\n")[0]
     }, color=ctx.color)
     ctx.exit()
+    
+    
 
+def createapp(info):
+    config_to_use=getattr(info,'config_to_use',Config)
+    
+    click.echo('creating app with config: {}'.format(config_to_use))
+    return create_app(config_to_use)
 
-@click.group(cls=FlaskGroup, create_app=lambda app: create_app(Config))
+def set_config(ctx,param,value):
+    if value:
+        config_to_use=value
+        try:
+            mod,obj=config_to_use.rsplit('.',1)
+            import importlib
+            m=importlib.import_module(mod)
+            config=getattr(m,obj)
+        except (ValueError,ImportError):
+            click.echo('Cannot load module specified')
+            ctx.exit()
+        except AttributeError:
+            click.echo('Cannot find config object in specified module')
+        
+        ctx.ensure_object(ScriptInfo).config_to_use=config
+        
+
+@click.group(cls=FlaskGroup, create_app=createapp)
 @click.option("--version", expose_value=False, callback=get_version,
               is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click.option("--config",expose_value=False, callback=set_config, required=False,
+              is_flag=False, is_eager=True, 
+              help="Specify the config to use in dotted module notation eg flaskbb.configs.default.DefaultConfig ")
 def main():
     """This is the commandline interface for flaskbb."""
     pass
