@@ -20,7 +20,7 @@ Flask-Redis==0.3.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 Flask-Themes2==0.1.4
-flask-whooshee==0.2.3
+flask-whooshee==0.4.0
 Flask-WTF==0.13.1
 itsdangerous==0.24
 Jinja2==2.8
