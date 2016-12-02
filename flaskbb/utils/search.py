@@ -30,18 +30,18 @@ class PostWhoosheer(AbstractWhoosheer):
     def update_post(cls, writer, post):
         writer.update_document(
             post_id=post.id,
-            username=post.username,
-            modified_by=post.modified_by,
-            content=post.content
+            username=unicode(post.username),
+            modified_by=unicode(post.modified_by),
+            content=unicode(post.content)
         )
 
     @classmethod
     def insert_post(cls, writer, post):
         writer.add_document(
             post_id=post.id,
-            username=post.username,
-            modified_by=post.modified_by,
-            content=post.content
+            username=unicode(post.username),
+            modified_by=unicode(post.modified_by),
+            content=unicode(post.content)
         )
 
     @classmethod
@@ -63,18 +63,18 @@ class TopicWhoosheer(AbstractWhoosheer):
     def update_topic(cls, writer, topic):
         writer.update_document(
             topic_id=topic.id,
-            title=topic.title,
-            username=topic.username,
-            content=getattr(topic.first_post,'content',None)
+            title=unicode(topic.title),
+            username=unicode(topic.username),
+            content=getattr(topic.first_post,u'content',None)
         )
 
     @classmethod
     def insert_topic(cls, writer, topic):
         writer.add_document(
             topic_id=topic.id,
-            title=topic.title,
-            username=topic.username,
-            content=getattr(topic.first_post,'content',None)
+            title=unicode(topic.title),
+            username=unicode(topic.username),
+            content=getattr(topic.first_post,u'content',None)
         )
 
     @classmethod
@@ -95,16 +95,16 @@ class ForumWhoosheer(AbstractWhoosheer):
     def update_forum(cls, writer, forum):
         writer.update_document(
             forum_id=forum.id,
-            title=forum.title,
-            description=forum.description
+            title=unicode(forum.title),
+            description=unicode(forum.description)
         )
 
     @classmethod
     def insert_forum(cls, writer, forum):
         writer.add_document(
             forum_id=forum.id,
-            title=forum.title,
-            description=forum.description
+            title=unicode(forum.title),
+            description=unicode(forum.description)
         )
 
     @classmethod
@@ -125,16 +125,16 @@ class UserWhoosheer(AbstractWhoosheer):
     def update_user(cls, writer, user):
         writer.update_document(
             user_id=user.id,
-            username=user.username,
-            email=user.email
+            username=unicode(user.username),
+            email=unicode(user.email)
         )
 
     @classmethod
     def insert_user(cls, writer, user):
         writer.add_document(
             user_id=user.id,
-            username=user.username,
-            email=user.email
+            username=unicode(user.username),
+            email=unicode(user.email)
         )
 
     @classmethod
