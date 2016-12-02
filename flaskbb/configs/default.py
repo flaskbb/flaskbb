@@ -87,7 +87,7 @@ class DefaultConfig(object):
     # This will use the "whoosh_index" directory to store the search indexes
     WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _version_str)
     # How long should whooshee try to acquire write lock? (defaults to 2)
-    WHOOSHEE_WRITER_TIMEOUT = 2
+    WHOOSHEE_WRITER_TIMEOUT = 10
     # Minimum number of characters for the search (defaults to 3)
     WHOOSHEE_MIN_STRING_LEN = 3
 
