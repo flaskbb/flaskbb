@@ -102,6 +102,33 @@ class EmailType(click.ParamType):
         return "email"
 
 
+def save_user_prompt(username, email, password, group, only_update=False):
+    if not username:
+        username = click.prompt(
+            click.style("Username", fg="magenta"), type=str,
+            default=os.environ.get("USER", "")
+        )
+    if not email:
+        email = click.prompt(
+            click.style("Email address", fg="magenta"), type=EmailType()
+        )
+    if not password:
+        password = click.prompt(
+            click.style("Password", fg="magenta"), hide_input=True,
+            confirmation_prompt=True
+        )
+    if not group:
+        group = click.prompt(
+            click.style("Group", fg="magenta"),
+            type=click.Choice(["admin", "super_mod", "mod", "member"]),
+            default="admin"
+        )
+
+    if only_update:
+        return update_user(username, password, email, group)
+    return create_user(username, password, email, group)
+
+
 def validate_plugin(plugin):
     """Checks if a plugin is installed.
     TODO: Figure out how to use this in a callback. Doesn't work because
@@ -186,15 +213,23 @@ def main():
 
 
 @main.command()
-@click.option("--welcome-forum", default=True, is_flag=True,
-              help="Creates a welcome forum.")
-def install(welcome_forum):
+@click.option("--welcome", "-w", default=True, is_flag=True,
+              help="Disable the welcome forum.")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Doesn't ask for confirmation.")
+@click.option("--username", "-u", help="The username of the user.")
+@click.option("--email", "-e", type=EmailType(),
+              help="The email address of the user.")
+@click.option("--password", "-p", help="The password of the user.")
+@click.option("--group", "-g", help="The group of the user.",
+              type=click.Choice(["admin", "super_mod", "mod", "member"]))
+def install(welcome, force, username, email, password, group):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
     click.secho("[+] Installing FlaskBB...", fg="cyan")
     if database_exists(db.engine.url):
-        if click.confirm(click.style(
+        if force or click.confirm(click.style(
             "Existing database found. Do you want to delete the old one and "
             "create a new one?", fg="magenta")
         ):
@@ -210,25 +245,9 @@ def install(welcome_forum):
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    username = click.prompt(
-        click.style("Username", fg="magenta"), type=str,
-        default=os.environ.get("USER", "")
-    )
-    email = click.prompt(
-        click.style("Email address", fg="magenta"), type=EmailType()
-    )
-    password = click.prompt(
-        click.style("Password", fg="magenta"), hide_input=True,
-        confirmation_prompt=True
-    )
-    group = click.prompt(
-        click.style("Group", fg="magenta"),
-        type=click.Choice(["admin", "super_mod", "mod", "member"]),
-        default="admin"
-    )
-    create_user(username, password, email, group)
+    save_user_prompt(username, email, password, group)
 
-    if welcome_forum:
+    if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
 
@@ -294,7 +313,7 @@ def translations():
 
 @translations.command("new")
 @click.option("--plugin", "-p", type=click.STRING,
-              help="The plugin for which a language should be added.")
+              help="Adds a new language to a plugin.")
 @click.argument("lang")
 def new_translation(lang, plugin):
     """Adds a new language to the translations. "lang" is the language code
@@ -313,7 +332,7 @@ def new_translation(lang, plugin):
 @click.option("is_all", "--all", "-a", default=True, is_flag=True,
               help="Updates the plugin translations as well.")
 @click.option("--plugin", "-p", type=click.STRING,
-              help="The plugin for which the translations should be updated.")
+              help="Updates the language of the given plugin.")
 def update_translation(is_all, plugin):
     """Updates all translations."""
     if plugin is not None:
@@ -330,9 +349,9 @@ def update_translation(is_all, plugin):
 @click.option("is_all", "--all", "-a", default=True, is_flag=True,
               help="Compiles the plugin translations as well.")
 @click.option("--plugin", "-p", type=click.STRING,
-              help="The plugin for which the translations should be compiled.")
+              help="Compiles the translations for a given plugin.")
 def compile_translation(is_all, plugin):
-    """Compiles all translations."""
+    """Compiles the translations."""
     if plugin is not None:
         validate_plugin(plugin)
         click.secho("[+] Compiling language files for plugin {}..."
@@ -357,7 +376,7 @@ def plugins():
 def new_plugin(plugin_identifier, template):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
-    https://github.com:sh4nks/cookiecutter-flaskbb-plugin.
+    https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
@@ -480,7 +499,7 @@ def list_themes():
 def new_theme(theme_identifier, template):
     """Creates a new theme based on the cookiecutter theme
     template. Defaults to this template:
-    https://github.com:sh4nks/cookiecutter-flaskbb-theme.
+    https://github.com/sh4nks/cookiecutter-flaskbb-theme.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
@@ -515,20 +534,16 @@ def users():
 
 
 @users.command("new")
-@click.option("--username", prompt=True,
-              default=lambda: os.environ.get("USER", ""),
-              help="The username of the new user.")
-@click.option("--email", prompt=True, type=EmailType(),
-              help="The email address of the new user.")
-@click.option("--password", prompt=True, hide_input=True,
-              confirmation_prompt=True,
-              help="The password of the new user.")
-@click.option("--group", prompt=True, default="member",
+@click.option("--username", "-u", help="The username of the user.")
+@click.option("--email", "-e", type=EmailType(),
+              help="The email address of the user.")
+@click.option("--password", "-p", help="The password of the user.")
+@click.option("--group", "-g", help="The group of the user.",
               type=click.Choice(["admin", "super_mod", "mod", "member"]))
 def new_user(username, email, password, group):
     """Creates a new user. Omit any options to use the interactive mode."""
     try:
-        user = create_user(username, password, email, group)
+        user = save_user_prompt(username, email, password, group)
 
         click.secho("[+] User {} with Email {} in Group {} created.".format(
             user.username, user.email, user.primary_group.name), fg="cyan"
@@ -540,20 +555,16 @@ def new_user(username, email, password, group):
 
 
 @users.command("update")
-@click.option("--username", prompt=True,
-              help="The username of the user.")
-@click.option("--email", prompt=True, type=EmailType(),
-              help="The new email address of the user.")
-@click.option("--password", prompt=True, hide_input=True,
-              confirmation_prompt=True,
-              help="The new password of the user.")
-@click.option("--group", prompt=True, default="member",
-              help="The new primary group of the user",
+@click.option("--username", "-u", help="The username of the user.")
+@click.option("--email", "-e", type=EmailType(),
+              help="The email address of the user.")
+@click.option("--password", "-p", help="The password of the user.")
+@click.option("--group", "-g", help="The group of the user.",
               type=click.Choice(["admin", "super_mod", "mod", "member"]))
 def change_user(username, password, email, group):
     """Updates an user. Omit any options to use the interactive mode."""
 
-    user = update_user(username, password, email, group)
+    user = save_user_prompt(username, password, email, group)
     if user is None:
         raise FlaskBBCLIError("The user with username {} does not exist."
                               .format(username), fg="red")
@@ -562,12 +573,17 @@ def change_user(username, password, email, group):
 
 
 @users.command("delete")
-@click.option("--username", prompt=True,
-              help="The username of the user.")
+@click.option("--username", "-u", help="The username of the user.")
 @click.option("--force", "-f", default=False, is_flag=True,
               help="Removes the user without asking for confirmation.")
 def delete_user(username, force):
     """Deletes an user."""
+    if not username:
+        username = click.prompt(
+            click.style("Username", fg="magenta"), type=str,
+            default=os.environ.get("USER", "")
+        )
+
     user = User.query.filter_by(username=username).first()
     if user is None:
         raise FlaskBBCLIError("The user with username {} does not exist."
@@ -782,11 +798,11 @@ def shell_command():
 
 
 @main.command("urls", short_help="Show routes for the app.")
-@click.option("-r", "order_by", flag_value="rule", default=True,
+@click.option("--route", "-r", "order_by", flag_value="rule", default=True,
               help="Order by route")
-@click.option("-e", "order_by", flag_value="endpoint",
+@click.option("--endpoint", "-e", "order_by", flag_value="endpoint",
               help="Order by endpoint")
-@click.option("-m", "order_by", flag_value="methods",
+@click.option("--methods", "-m", "order_by", flag_value="methods",
               help="Order by methods")
 @with_appcontext
 def list_urls(order_by):
