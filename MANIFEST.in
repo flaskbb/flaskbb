@@ -1,7 +1,4 @@
-include LICENSE
-include AUTHORS
-include CHANGES
-include README.md
+include LICENSE AUTHORS CHANGES README.md celery_worker.py babel.cfg pytest.ini
 graft flaskbb
 graft tests
 graft migrations
