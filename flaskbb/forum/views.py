@@ -438,23 +438,39 @@ def edit_post(post_id):
               "danger")
         return redirect(post.topic.url)
 
-    form = ReplyForm()
+    if post.first_post:
+        form = NewTopicForm()
+    else:
+        form = ReplyForm()
+
     if form.validate_on_submit():
         if "preview" in request.form:
             return render_template(
                 "forum/new_post.html", topic=post.topic,
-                form=form, preview=form.content.data
+                form=form, preview=form.content.data, edit_mode=True
             )
         else:
             form.populate_obj(post)
             post.date_modified = time_utcnow()
             post.modified_by = current_user.username
             post.save()
+
+            if post.first_post:
+                post.topic.title = form.title.data
+                post.topic.save()
             return redirect(post.topic.url)
     else:
+        if post.first_post:
+            form.title.data = post.topic.title
+
         form.content.data = post.content
 
-    return render_template("forum/new_post.html", topic=post.topic, form=form)
+    return render_template(
+        "forum/new_post.html",
+        topic=post.topic,
+        form=form,
+        edit_mode=True
+    )
 
 
 @forum.route("/post/<int:post_id>/delete", methods=["POST"])

@@ -17,7 +17,7 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
-from flaskbb.utils.recaptcha import RecaptchaField
+from flaskbb.utils.fields import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_username = regexp(USERNAME_RE,
@@ -32,11 +32,13 @@ class LoginForm(FlaskForm):
     password = PasswordField(_("Password"), validators=[
         DataRequired(message=_("Please enter your password."))])
 
-    recaptcha = RecaptchaField(_("Captcha"))
-
     remember_me = BooleanField(_("Remember me"), default=False)
 
     submit = SubmitField(_("Login"))
+
+
+class LoginRecaptchaForm(LoginForm):
+    recaptcha = RecaptchaField(_("Captcha"))
 
 
 class RegisterForm(FlaskForm):
@@ -58,7 +60,8 @@ class RegisterForm(FlaskForm):
 
     language = SelectField(_('Language'))
 
-    accept_tos = BooleanField(_("I accept the Terms of Service"), default=True)
+    accept_tos = BooleanField(_("I accept the Terms of Service"), validators=[
+        DataRequired(message=_("Please accept the TOS."))], default=True)
 
     submit = SubmitField(_("Register"))
 

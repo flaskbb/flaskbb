@@ -3,7 +3,7 @@ Installation
 
 -  `Basic Setup <#basic-setup>`_
 -  `Configuration <#configuration>`_
--  `Deplyoing <#deploying>`_
+-  `Deploying <#deploying>`_
 
 
 

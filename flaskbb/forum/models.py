@@ -15,7 +15,7 @@ from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
-                                   get_forums, time_utcnow)
+                                   get_forums, time_utcnow, topic_is_unread)
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
 from flaskbb.utils.settings import flaskbb_config
 
@@ -321,6 +321,33 @@ class Topic(db.Model, CRUDMixin):
     def url(self):
         """Returns the slugified url for the topic."""
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
+
+    def first_unread(self, topicsread, user, forumsread=None):
+        """Returns the url to the first unread post if any else to the topic
+        itself.
+
+        :param topicsread: The topicsread object for the topic
+
+        :param user: The user who should be checked if he has read the last post
+                    in the topic
+
+        :param forumsread: The forumsread object in which the topic is. If you
+                        also want to check if the user has marked the forum as
+                        read, than you will also need to pass an forumsread
+                        object.
+        """
+
+        # If the topic is unread try to get the first unread post
+        if topic_is_unread(self, topicsread, user, forumsread):
+            # 
+            query = Post.query.filter(Post.topic_id == self.id)
+            if topicsread is not None:
+                query = query.filter(Post.date_created > topicsread.last_read)
+            post = query.order_by(Post.id.asc()).first()
+            if post is not None:
+                return post.url
+        
+        return self.url
 
     # Methods
     def __init__(self, title=None, user=None):

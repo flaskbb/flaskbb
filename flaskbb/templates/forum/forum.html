@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-md-11 col-sm-10 col-xs-10">
                             <div class="topic-name">
-                                <a href="{{ topic.url }}">{{ topic.title }}</a>
+                                <a href="{{ topic.first_unread(topicread, current_user, forumsread) }}">{{ topic.title }}</a>
                                 <!-- Topic Pagination -->
                                 <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
                             </div>

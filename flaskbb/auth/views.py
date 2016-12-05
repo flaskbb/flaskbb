@@ -21,9 +21,10 @@ from flaskbb.utils.helpers import (render_template, redirect_or_next,
                                    format_timedelta)
 from flaskbb.email import send_reset_token, send_activation_token
 from flaskbb.exceptions import AuthenticationError
-from flaskbb.auth.forms import (LoginForm, ReauthForm, ForgotPasswordForm,
-                                ResetPasswordForm, RegisterForm,
-                                AccountActivationForm, RequestActivationForm)
+from flaskbb.auth.forms import (LoginForm, LoginRecaptchaForm, ReauthForm,
+                                ForgotPasswordForm, ResetPasswordForm,
+                                RegisterForm, AccountActivationForm,
+                                RequestActivationForm)
 from flaskbb.user.models import User
 from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
@@ -85,7 +86,10 @@ def login():
         stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
         login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
 
-    form = LoginForm(request.form)
+    form = LoginForm()
+    if login_recaptcha and flaskbb_config["RECAPTCHA_ENABLED"]:
+        form = LoginRecaptchaForm()
+
     if form.validate_on_submit():
         try:
             user = User.authenticate(form.login.data, form.password.data)

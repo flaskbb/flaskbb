@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from __future__ import unicode_literals
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
