@@ -32,6 +32,7 @@ from flask_script import (Manager, Shell, Server, prompt, prompt_pass,
 from flask_migrate import MigrateCommand, upgrade
 
 from flaskbb import create_app
+from flaskbb._compat import to_unicode
 from flaskbb.extensions import db, plugin_manager, whooshee
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_admin_user, create_default_groups,
@@ -114,9 +115,9 @@ def create_admin(username=None, password=None, email=None):
     """Creates the admin user."""
 
     if not (username and password and email):
-        username = unicode(prompt("Username"))
-        email = unicode(prompt("A valid email address"))
-        password = unicode(prompt_pass("Password"))
+        username = to_unicode(prompt("Username"))
+        email = to_unicode(prompt("A valid email address"))
+        password = to_unicode(prompt_pass("Password"))
 
     create_admin_user(username=username, password=password, email=email)
 

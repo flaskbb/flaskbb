@@ -36,6 +36,6 @@ def to_bytes(text):
 
 def to_unicode(input_bytes, encoding='utf-8'):
     """Decodes input_bytes to text if needed."""
-    if not isinstance(input_bytes, string_types):
+    if not isinstance(input_bytes, text_type):
         input_bytes = input_bytes.decode(encoding)
     return input_bytes
