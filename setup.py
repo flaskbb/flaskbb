@@ -9,19 +9,20 @@ And Easy to Setup
 -----------------
 
 .. code:: bash
-    $ python manage.py createall
+    $ pip install -e .
 
-    $ python manage.py runserver
+    $ flaskbb install
+
+    $ flaskbb runserver
      * Running on http://localhost:8080/
 
 
 Resources
 ---------
 
-* `website <http://flaskbb.org>`_
+* `website <https://flaskbb.org>`_
 * `source <https://github.com/sh4nks/flaskbb>`_
 * `issues <https://github.com/sh4nks/flaskbb/issues>`_
-
 """
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
@@ -110,7 +111,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        flaskbb=flaskbb.cli:main
+        flaskbb=flaskbb.cli:flaskbb
     ''',
     test_suite='tests',
     tests_require=[
