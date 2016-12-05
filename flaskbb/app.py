@@ -18,6 +18,7 @@ from sqlalchemy.engine import Engine
 from flask import Flask, request
 from flask_login import current_user
 
+from flaskbb._compat import string_types
 # views
 from flaskbb.user.views import user
 from flaskbb.message.views import message
@@ -58,21 +59,9 @@ def create_app(config=None):
                    and a ENVVAR, it will load the config via the file and
                    later overwrite it from the ENVVAR.
     """
-    # Initialize the app
     app = Flask("flaskbb")
 
-    # Use the default config and override it afterwards
-    app.config.from_object('flaskbb.configs.default.DefaultConfig')
-
-    if config is not None and os.path.exists(os.path.abspath(config)):
-        app.config.from_pyfile(os.path.abspath(config))
-    else:
-        # try to update the config from the object
-        app.config.from_object(config)
-
-    # try to update the config via the environment variable
-    app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
-
+    configure_app(app, config)
     configure_celery_app(app, celery)
     configure_blueprints(app)
     configure_extensions(app)
@@ -83,6 +72,22 @@ def create_app(config=None):
     configure_logging(app)
 
     return app
+
+
+def configure_app(app, config):
+    """Configures FlaskBB."""
+    # Use the default config and override it afterwards
+    app.config.from_object('flaskbb.configs.default.DefaultConfig')
+
+    if isinstance(config, string_types) and \
+            os.path.exists(os.path.abspath(config)):
+        app.config.from_pyfile(os.path.abspath(config))
+    else:
+        # try to update the config from the object
+        app.config.from_object(config)
+
+    # try to update the config via the environment variable
+    app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
 
 def configure_celery_app(app, celery):
