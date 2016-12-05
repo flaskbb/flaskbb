@@ -15,12 +15,13 @@ using the micro framework Flask.
 * Private Messages
 * Admin Interface
 * Group based permissions
-* BBCode Support
+* Markdown Support
 * Topic Tracker
 * Unread Topics/Forums
 * i18n Support
 * Completely Themeable
 * Plugin System
+* Command Line Interface
 
 
 ## Quickstart
