@@ -22,7 +22,7 @@ import shutil
 import requests
 
 import click
-from werkzeug.utils import import_string
+from werkzeug.utils import import_string, ImportStringError
 from flask import current_app, __version__ as flask_version
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from sqlalchemy.exc import IntegrityError
@@ -144,10 +144,25 @@ def get_version(ctx, param, value):
     ctx.exit()
 
 
-def createapp(script_info):
-    config_file = getattr(script_info, 'config_file')
+def make_app(script_info):
+    config_file = getattr(script_info, "config_file")
     if config_file is not None:
-        click.secho('[+] Using config: {}'.format(config_file), fg="cyan")
+        # check if config file exists
+        if os.path.exists(os.path.abspath(config_file)):
+            click.secho("[+] Using config from: {}".format(
+                        os.path.abspath(config_file)), fg="cyan")
+        # config file doesn't exist, maybe it's a module
+        else:
+            try:
+                import_string(config_file)
+                click.secho("[+] Using config from: {}".format(config_file),
+                            fg="cyan")
+            except ImportStringError:
+                click.secho("[~] Config '{}' doesn't exist. "
+                            "Using default config.".format(config_file),
+                            fg="red")
+                config_file = None
+
     return create_app(config_file)
 
 
@@ -156,7 +171,7 @@ def set_config(ctx, param, value):
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-@click.group(cls=FlaskGroup, create_app=createapp)
+@click.group(cls=FlaskGroup, create_app=make_app)
 @click.option("--version", expose_value=False, callback=get_version,
               is_flag=True, is_eager=True, help="Show the FlaskBB version.")
 @click.option("--config", expose_value=False, callback=set_config,

@@ -18,7 +18,6 @@ from sqlalchemy.engine import Engine
 from flask import Flask, request
 from flask_login import current_user
 
-from flaskbb._compat import string_types
 # views
 from flaskbb.user.views import user
 from flaskbb.message.views import message
@@ -65,10 +64,8 @@ def create_app(config=None):
     # Use the default config and override it afterwards
     app.config.from_object('flaskbb.configs.default.DefaultConfig')
 
-    if isinstance(config, string_types):
-        # config has to be of type string (str, unicode) in order
-        # to be recognized as file
-        app.config.from_pyfile(config)
+    if config is not None and os.path.exists(os.path.abspath(config)):
+        app.config.from_pyfile(os.path.abspath(config))
     else:
         # try to update the config from the object
         app.config.from_object(config)
