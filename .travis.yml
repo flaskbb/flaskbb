@@ -7,9 +7,10 @@ python:
 install:
   - "pip install -r requirements-dev.txt"
   - "pip install coveralls"
+  - "pip install -e ."
 # command to run tests
 script:
-  - python manage.py compile_translations
+  - flaskbb translations compile
   - py.test --cov=flaskbb --cov-report=term-missing tests
 after_success:
   - coveralls

@@ -23,14 +23,14 @@ For example, on archlinux you can install it with
 
     $ sudo pacman -S python2-virtualenvwrapper
 
-or, if you own a Mac, you can simply install it with
+or, if you own a Mac, you can install it with
 ::
 
     $ sudo pip install virtualenvwrapper
 
 For more information checkout the  `virtualenvwrapper <http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation>`_ installation.
 
-After that you can create your virtualenv with
+After that, you can create your virtualenv with
 ::
 
     $ mkvirtualenv -a /path/to/flaskbb -p $(which python2) flaskbb
@@ -160,12 +160,13 @@ For a guided install, run
 
     $ make install
 
-or:
+or
+::
 
-    python manage.py install
+    flaskbb install
 
 During the installation process you are asked about your username,
-your email address and the password for your administrator user. Using the 
+your email address and the password for your administrator user. Using the
 `make install` command is recommended as it checks that the dependencies are also
 installed.
 
@@ -177,7 +178,7 @@ If the database models changed after a release, you have to run the ``upgrade``
 command
 ::
 
-    python manage.py db upgrade
+    flaskbb db upgrade
 
 
 Deploying

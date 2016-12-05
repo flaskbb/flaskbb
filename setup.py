@@ -9,21 +9,22 @@ And Easy to Setup
 -----------------
 
 .. code:: bash
-    $ python manage.py createall
+    $ pip install -e .
 
-    $ python manage.py runserver
+    $ flaskbb install
+
+    $ flaskbb runserver
      * Running on http://localhost:8080/
 
 
 Resources
 ---------
 
-* `website <http://flaskbb.org>`_
+* `website <https://flaskbb.org>`_
 * `source <https://github.com/sh4nks/flaskbb>`_
 * `issues <https://github.com/sh4nks/flaskbb/issues>`_
-
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import sys
 
@@ -51,11 +52,11 @@ setup(
     version='1.0.dev0',
     url='http://github.com/sh4nks/flaskbb/',
     license='BSD',
-    author='sh4nks',
-    author_email='sh4nks7@gmail.com',
-    description='A forum software written with flask',
+    author='Peter Justin',
+    author_email='peter.justin@outlook.com',
+    description='A classic Forum Software in Python using Flask.',
     long_description=__doc__,
-    packages=['flaskbb'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     platforms='any',
@@ -81,7 +82,6 @@ setup(
         'Flask-Migrate',
         'Flask-Plugins',
         'Flask-Redis',
-        'Flask-Script',
         'Flask-SQLAlchemy',
         'Flask-Themes2',
         'flask-whooshee',
@@ -109,6 +109,10 @@ setup(
         'Whoosh',
         'WTForms'
     ],
+    entry_points='''
+        [console_scripts]
+        flaskbb=flaskbb.cli:flaskbb
+    ''',
     test_suite='tests',
     tests_require=[
         'py',

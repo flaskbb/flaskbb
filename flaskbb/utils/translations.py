@@ -9,11 +9,15 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
+import subprocess
 
 import babel
+from flask import current_app
 
 from flask_babelplus import Domain, get_locale
 from flask_plugins import get_enabled_plugins
+
+from flaskbb.extensions import plugin_manager
 
 
 class FlaskBBDomain(Domain):
@@ -72,3 +76,93 @@ class FlaskBBDomain(Domain):
             cache[str(locale)] = translations
 
         return translations
+
+
+def update_translations(include_plugins=False):
+    """Updates all translations.
+
+    :param include_plugins: If set to `True` it will also update the
+                            translations for all plugins.
+    """
+
+    # update flaskbb translations
+    translations_folder = os.path.join(current_app.root_path, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", source_file, "."])
+    subprocess.call(["pybabel", "update", "-i", source_file,
+                     "-d", translations_folder])
+
+    if include_plugins:
+        # updates all plugin translations too
+        for plugin in plugin_manager.all_plugins:
+            update_plugin_translations(plugin)
+
+
+def add_translations(translation):
+    """Adds a new language to the translations."""
+
+    translations_folder = os.path.join(current_app.root_path, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", source_file, "."])
+    subprocess.call(["pybabel", "init", "-i", source_file,
+                     "-d", translations_folder, "-l", translation])
+
+
+def compile_translations(include_plugins=False):
+    """Compiles all translations.
+
+    :param include_plugins: If set to `True` it will also compile the
+                            translations for all plugins.
+    """
+
+    # compile flaskbb translations
+    translations_folder = os.path.join(current_app.root_path, "translations")
+    subprocess.call(["pybabel", "compile", "-d", translations_folder])
+
+    if include_plugins:
+        # compile all plugin translations
+        for plugin in plugin_manager.all_plugins:
+            compile_plugin_translations(plugin)
+
+
+def add_plugin_translations(plugin, translation):
+    """Adds a new language to the plugin translations. Expects the name
+    of the plugin and the translations name like "en".
+    """
+
+    plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", source_file,
+                     plugin_folder])
+    subprocess.call(["pybabel", "init", "-i", source_file,
+                     "-d", translations_folder, "-l", translation])
+
+
+def update_plugin_translations(plugin):
+    """Updates the plugin translations. Expects the name of the plugin."""
+
+    plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+    source_file = os.path.join(translations_folder, "messages.pot")
+
+    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
+                     "-k", "lazy_gettext", "-o", source_file,
+                     plugin_folder])
+    subprocess.call(["pybabel", "update", "-i", source_file,
+                     "-d", translations_folder])
+
+
+def compile_plugin_translations(plugin):
+    """Compile the plugin translations. Expects the name of the plugin."""
+
+    plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
+    translations_folder = os.path.join(plugin_folder, "translations")
+
+    subprocess.call(["pybabel", "compile", "-d", translations_folder])
