@@ -3,12 +3,11 @@
 Command Line Interface
 ======================
 
-Here you find the documentation about FlaskBB's Command Line Interface.
-The command line is provided by click.
+Here you can find the documentation about FlaskBB's Command Line Interface.
 
 To get help for a commands, just type ``flaskbb COMMAND --help``.
-If no command options or arguments are used it will print out all
-available commands
+If no command options or arguments are used it will display all available
+commands.
 
 .. sourcecode:: text
 
@@ -17,187 +16,326 @@ available commands
       This is the commandline interface for flaskbb.
 
     Options:
-      --help  Show this message and exit.
+      --version      Show the FlaskBB version.
+      --config TEXT  Specify the config to use in dotted module notation e.g.
+                     flaskbb.configs.default.DefaultConfig
+      --help         Show this message and exit.
 
     Commands:
-      db            Perform database migrations.
-      install       Interactively setup flaskbb.
-      plugins       Plugins command sub group.
-      populate      Creates the database with some test data.
-      run           Runs a development server.
-      setup         Runs a preconfigured setup for FlaskBB.
-      shell         Runs a shell in the app context.
-      start         Starts a production ready wsgi server.
-      themes        Themes command sub group.
-      translations  Translations command sub group.
-      upgrade       Updates the migrations and fixtures.
-      users         Create, update or delete users.
-
+      celery           Preconfigured wrapper around the 'celery' command.
+      db               Perform database migrations.
+      download-emojis  Downloads emojis from emoji-cheat-sheet.com.
+      install          Installs flaskbb.
+      plugins          Plugins command sub group.
+      populate         Creates the necessary tables and groups for FlaskBB.
+      reindex          Reindexes the search index.
+      run              Runs a development server.
+      shell            Runs a shell in the app context.
+      start            Starts a production ready wsgi server.
+      themes           Themes command sub group.
+      translations     Translations command sub group.
+      upgrade          Updates the migrations and fixtures.
+      urls             Show routes for the app.
+      users            Create, update or delete users.
 
 
 Commands
 --------
 
-You can find a complete overview, including the ones from the sub groups,
-below.
+Here you will find a detailed description of every command including all
+of their options and arguments.
 
+.. I am cheating here as i don't know how else to get rid of the warnings
 
-.. program:: flaskbb
+.. describe:: flaskbb install
 
+    Installs flaskbb. If no arguments are used, an interactive setup
+    will be run.
 
-.. option:: install
+    .. describe:: --welcome, -w
 
-        Installs flaskbb. If no arguments are used, an interactive setup
-        will be run.
+        Disables the generation of the welcome forum.
 
+    .. describe:: --force, -f
 
-.. option:: upgrade
+        Doesn't ask for confirmation if the database should be deleted or not.
 
-    Updates the migrations and fixtures to the latest version.
+    .. describe:: --username USERNAME, -u USERNAME
 
-    .. option:: --all, -a
+        The username of the user.
+
+    .. describe:: --email EMAIL, -e EMAIL
+
+        The email address of the user.
+
+    .. describe:: --password PASSWORD, -p PASSWORD
+
+        The password of the user.
+
+    .. describe:: --group GROUP, -g GROUP
+
+        The primary group of the user. The group ``GROUP`` has to be
+        one of ``admin``, ``super_mod``, ``mod`` or ``member``.
+
+.. describe:: flaskbb upgrade
+
+    Updates the migrations and fixtures.
+
+    .. describe:: --all, -a
 
         Upgrades migrations AND fixtures to the latest version.
 
-    .. option:: --fixture FIXTURE, -f FIXTURE
+    .. describe:: --fixture FIXTURE, -f FIXTURE
 
         The fixture which should be upgraded or installed.
         All fixtures have to be places inside flaskbb/fixtures/
 
-    .. option:: --force-fixture, -ff
+    .. describe:: --force-fixture, -ff
 
         Forcefully upgrades the fixtures. WARNING: This will also overwrite
         any settings.
 
+.. describe:: flaskbb populate
 
-.. option:: populate
+    Creates the necessary tables and groups for FlaskBB.
 
-        Creates the necessary tables and groups for FlaskBB.
+    .. describe:: --test-data, -t
 
-        .. option:: --test, -t
+        Adds some test data.
 
-            Adds some test data.
+    .. describe:: --bulk-data, -b
 
-        .. option:: --posts
+        Adds a lot of test data. Has to be used in combination with
+        ``--posts`` and ``--topics``.
 
-            Number of posts to create in each topic (default: 100).
+    .. describe:: --posts
 
-        .. option:: --topics
+        Number of posts to create in each topic (default: 100).
 
-            Number of topics to create (default: 100).
+    .. describe:: --topics
 
-        .. option:: --force, -f
+        Number of topics to create (default: 100).
 
-            Will delete the database before populating it.
+    .. describe:: --force, -f
 
+        Will delete the database without asking before populating it.
 
-.. option:: runserver
+    .. describe:: --initdb, -i
 
-        Starts the development server
+        Initializes the database before populating it.
 
+.. describe:: flaskbb runserver
 
-.. option:: start
+    Starts the development server
+
+.. describe:: flaskbb start
 
     Starts a production ready wsgi server.
-    TODO: Unsure about this command, would 'serve' or 'server' be better?
+    Other versions of starting FlaskBB are still supported!
 
-    .. option:: --server SERVER
+    .. describe:: --server SERVER, -s SERVER
 
-        Defaults to gunicorn. The following WSGI Servers are supported:
+        Defaults to ``gunicorn``. The following WSGI Servers are supported:
             - gunicorn (default)
-            - TODO
+            - gevent
 
+    .. describe:: --host HOST, -h HOST
 
-.. option:: shell
+        The interface to bind FlaskBB to. Defaults to ``127.0.0.1``.
+
+    .. describe:: --port PORT, -p PORT
+
+        The port to bind FlaskBB to. Defaults to ``8000``.
+
+    .. describe:: --workers WORKERS, -w WORKERS
+
+        The number of worker processes for handling requests.
+        Defaults to ``4``.
+
+    .. describe:: --daemon, -d
+
+        Starts gunicorn in daemon mode.
+
+    .. describe:: --config, -c
+
+        The configuration file to use for the FlaskBB WSGI Application.
+
+.. describe:: flaskbb celery CELERY_ARGS
+
+    Starts celery. This is just a preconfigured wrapper around the ``celery``
+    command. Additional arguments are directly passed to celery.
+
+    .. describe:: --help-celery
+
+        Shows the celery help message.
+
+.. describe:: flaskbb shell
 
     Creates a python shell with an app context.
 
+.. describe:: flaskbb urls
 
-.. option:: translations
+    Lists all available routes.
+
+    .. describe:: --route, -r
+
+        Order by route.
+
+    .. describe:: --endpoint, -e
+
+        Order by endpoint
+
+    .. describe:: --methods, m
+
+        Order by methods
+
+.. describe:: flaskbb reindex
+
+    Reindexes the search index.
+
+.. describe:: flaskbb translations
 
     Translations command sub group.
 
-    .. option:: add LANGUAGE_CODE
+    .. describe:: new LANGUAGE_CODE
 
         Adds a new language to FlaskBB's translations.
         The ``LANGUAGE_CODE`` is the short identifier for the language i.e.
         '``en``', '``de``', '``de_AT``', etc.
 
-        .. option:: -p, --plugin PLUGIN_NAME
+        .. describe:: --plugin PLUGIN_NAME, --p PLUGIN_NAME
 
             Adds a new language to a plugin.
 
-    .. option:: update
+    .. describe:: update
 
-        Updates all translations, including the ones from the plugins.
-        Use -p <PLUGIN_NAME> to only update the translation of a given
-        plugin.
+        Updates the translations.
 
-        .. option:: -p, --plugin PLUGIN_NAME
+        .. describe:: --all, -a
+
+            Updates all translations, including the ones from the plugins.
+
+        .. describe:: --plugin PLUGIN_NAME, --p PLUGIN_NAME
 
             Update the language of the given plugin.
 
-    .. option:: compile
+    .. describe:: compile
 
-        Compiles all translations, including the ones from the plugins.
+        Compiles the translations.
 
-        .. option:: -p, --plugin PLUGIN_NAME
+        .. describe:: --all, -a
+
+            Compiles all translations, including the ones from the plugins.
+
+        .. describe:: --plugin PLUGIN_NAME, --p PLUGIN_NAME
 
             Compiles only the given plugin translation.
 
-
-.. option:: plugins
+.. describe:: flaskbb plugins
 
     Plugins command sub group.
 
-    .. option:: create PLUGIN_NAME
+    .. describe:: new PLUGIN_IDENTIFIER
 
-        Creates a basic starter template for a new plugin.
+        Creates a new plugin based on the cookiecutter plugin template.
+        Defaults to this template:
+        https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
+        It will either accept a valid path on the filesystem
+        or a URL to a Git repository which contains the cookiecutter template.
 
-    .. option:: add PLUGIN_NAME
+    .. describe:: install PLUGIN_IDENTIFIER
 
-        Adds a new plugin.
+        Installs a plugin by using the plugin's identifier.
 
-    .. option:: remove PLUGIN_NAME
+    .. describe:: uninstall PLUGIN_IDENTIFIER
 
-        Removes a plugin.
+        Uninstalls a plugin by using the plugin's identifier.
 
+    .. describe:: remove PLUGIN_IDENTIFIER
 
-.. option:: themes
+        Removes a plugin from the filesystem by using the plugin's identifier.
+
+        describe:: --force, -f
+
+            Removes the plugin without asking for confirmation first.
+
+    .. describe:: list
+
+        Lists all installed plugins.
+
+.. describe:: flaskbb themes
 
     Themes command sub group.
 
-    .. option:: create THEME_NAME
+    .. describe:: new THEME_IDENTIFIER
 
-        Creates a basic starter template for a new theme.
+        Creates a new theme based on the cookiecutter theme
+        template. Defaults to this template:
+        https://github.com/sh4nks/cookiecutter-flaskbb-theme.
+        It will either accept a valid path on the filesystem
+        or a URL to a Git repository which contains the cookiecutter template.
 
-    .. option:: add THEME_NAME
+    .. describe:: remove THEME_IDENTIFIER
 
-        Adds a new theme.
+        Removes a theme from the filesystem by the theme's identifier.
 
-    .. option:: remove THEME_NAME
+    .. describe:: list
 
-        Removes a theme.
+        Lists all installed themes.
 
+.. describe:: flaskbb users
 
-.. option:: users
+    Creates a new user. If an option is missing, you will be interactivly
+    prompted to type it.
 
-    Creates a new user. Pass any arguments to omit the interactive mode.
+    .. describe:: new
 
-    .. option:: -g, --group GROUP
+        Creates a new user.
 
-        Uses ``GROUP`` as the primary group.
+        .. describe:: --username USERNAME, -u USERNAME
 
-    .. option:: -u, --username USERNAME
+            The username of the user.
 
-        Uses ``USERNAME`` as the name of the new user.
+        .. describe:: --email EMAIL, -e EMAIL
 
-    .. option:: -p, --password PASSWORD
+            The email address of the user.
 
-        Uses ``PASSWORD`` as password for the new user. But you have to ḱnow,
-        that when choosing this option, the password is most likely stored
-        in a history file (i.e. ``.bash_history``).
+        .. describe:: --password PASSWORD, -p PASSWORD
 
-    .. option:: -e, --email EMAIL
+            The password of the user.
 
-        Uses ``EMAIL`` as the email address for the new user.
+        .. describe:: --group GROUP, -g GROUP
+
+            The primary group of the user. The group ``GROUP`` has to be
+            one of ``admin``, ``super_mod``, ``mod`` or ``member``.
+
+    .. describe:: update
+
+        Updates an user.
+
+        .. describe:: --username USERNAME, -u USERNAME
+
+            The username of the user.
+
+        .. describe:: --email EMAIL, -e EMAIL
+
+            The email address of the user.
+
+        .. describe:: --password PASSWORD, -p PASSWORD
+
+            The password of the user.
+
+        .. describe:: --group GROUP, -g GROUP
+
+            The primary group of the user. The group ``GROUP`` has to be
+            one of ``admin``, ``super_mod``, ``mod`` or ``member``.
+
+    .. describe:: delete
+
+        .. describe:: --username USERNAME, -u USERNAME
+
+            The username of the user.
+
+        .. describe:: --force, -f
+
+            Removes the user without asking for confirmation first.
