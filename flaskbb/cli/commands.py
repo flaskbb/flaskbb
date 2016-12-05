@@ -162,6 +162,8 @@ def make_app(script_info):
                             "Using default config.".format(config_file),
                             fg="red")
                 config_file = None
+    else:
+        click.secho("[~] Using default config.", fg="yellow")
 
     return create_app(config_file)
 
