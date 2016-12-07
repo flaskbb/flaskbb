@@ -4,6 +4,7 @@ Installation
 -  `Basic Setup <#basic-setup>`_
 -  `Configuration <#configuration>`_
 -  `Deploying <#deploying>`_
+-  `Deploying to PythonAnywhere <#deploying-to-pythonanywhere>`_
 
 
 
@@ -328,3 +329,45 @@ adjust the paths in the ``alias`` es, as well as the socket adress in ``uwsgi_pa
 
 Like in the `uWSGI <#uwsgi>`_ chapter, don't forget to create a symlink to
 ``/etc/nginx/sites-enabled/``.
+
+
+Deploying to PythonAnywhere
+---------------------------
+
+`PythonAnywhere <https://www.pythonanywhere.com/>`_ is a platform-as-a-service, which basically means they have a bunch of servers pre-configured with Python, nginx and uWSGI.  You can run a low-traffic website with them for free, so it's an easy way to get quickly FlaskBB running publicly.
+
+Here's what to do:
+
+* Sign up for a PythonAnywhere account at `https://www.pythonanywhere.com/ <https://www.pythonanywhere.com/>`_.
+* On the "Consoles" tab, start a Bash console and install/configure FlaskBB like this:
+::
+
+    git clone https://github.com/sh4nks/flaskbb.git
+    cd flaskbb
+    pip3.5 install --user -r requirements.txt
+    python3.5 manage.py initdb
+
+* Click the PythonAnywhere logo to go back to the dashboard, then go to the "Web" tab, and click the "Add a new web app" button.
+* Just click "Next" on the first page.
+* On the next page, click "Flask"
+* On the next page, click "Python 3.5"
+* On the next page, just accept the default and click next
+* Wait while the website is created.
+* Click on the "Source code" link, and in the input that appears, replace the `mysite` at the end with `flaskbb`
+* Click on the "WSGI configuration file" filename, and wait for an editor to load.
+* Change the line that sets `project_home` to replace `mysite` with `flaskbb` again.
+* Change the line that says
+::
+
+    from flask_app import app as application
+ 
+...to say
+::
+
+    from manage import app as application
+         
+* Click the green "Save" button near the top right.
+* Go back to the "Web" tab.
+* Click the green "Reload..." button.
+* Click the link to visit the site -- you'll have a new FlaskBB install!
+
