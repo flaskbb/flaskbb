@@ -34,23 +34,27 @@ def plugins():
 
 
 @plugins.command("new")
-@click.argument("plugin_identifier", callback=check_cookiecutter)
+@click.argument("plugin_name", callback=check_cookiecutter)
 @click.option("--template", "-t", type=click.STRING,
               default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
               help="Path to a cookiecutter template or to a valid git repo.")
-def new_plugin(plugin_identifier, template):
+def new_plugin(plugin_name, template):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = os.path.join(current_app.root_path, "plugins", plugin_identifier)
-    click.secho("[+] Creating new plugin {}".format(plugin_identifier),
+    out_dir = os.path.join(current_app.root_path, "plugins")
+    click.secho("[+] Creating new plugin {}".format(plugin_name),
                 fg="cyan")
-    cookiecutter(template, output_dir=out_dir)
-    click.secho("[+] Done. Created in {}".format(out_dir),
+    try:
+        newdir=cookiecutter(template, output_dir=out_dir,extra_context={'plugin_name':plugin_name})
+        click.secho("[+] Done. Created in {}".format(newdir),
                 fg="green", bold=True)
+    except Exception as e:
+        click.secho("[-] Couldn't create plugin because of following "
+                    "exception: \n{}".format(e), fg="red")
 
 
 @plugins.command("install")
