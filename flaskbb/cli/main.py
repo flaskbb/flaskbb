@@ -97,8 +97,7 @@ def install(welcome, force, username, email, password, group):
             drop_database(db.engine.url)
         else:
             sys.exit(0)
-    if not database_exists(db.engine.url):
-        create_database(db.engine.url)
+    create_database(db.engine.url)
     upgrade_database()
 
     click.secho("[+] Creating default settings...", fg="cyan")
