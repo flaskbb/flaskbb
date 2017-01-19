@@ -27,15 +27,15 @@ else:           # pragma: no cover
     iteritems = lambda d: d.iteritems()
 
 
-def to_bytes(text):
+def to_bytes(text, encoding='utf-8'):
     """Transform string to bytes."""
     if isinstance(text, text_type):
-        text = text.encode('utf-8')
+        text = text.encode(encoding)
     return text
 
 
 def to_unicode(input_bytes, encoding='utf-8'):
     """Decodes input_bytes to text if needed."""
-    if not isinstance(input_bytes, string_types):
+    if not isinstance(input_bytes, text_type):
         input_bytes = input_bytes.decode(encoding)
     return input_bytes

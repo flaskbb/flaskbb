@@ -17,6 +17,11 @@ class CRUDMixin(object):
     def __repr__(self):
         return "<{}>".format(self.__class__.__name__)
 
+    @classmethod
+    def create(cls, **kwargs):
+        instance = cls(**kwargs)
+        return instance.save()
+
     def save(self):
         """Saves the object to the database."""
         db.session.add(self)

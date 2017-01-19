@@ -1,0 +1,9 @@
+include LICENSE AUTHORS CHANGES README.md celery_worker.py babel.cfg pytest.ini
+graft flaskbb
+graft tests
+graft migrations
+prune flaskbb/themes/*/node_modules
+prune flaskbb/themes/*/.sass-cache
+prune flaskbb/themes/*/src/*
+global-exclude __pycache__
+global-exclude *.py[co]
