@@ -61,13 +61,13 @@ def set_config(ctx, param, value):
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-@click.group(cls=FlaskGroup, create_app=make_app)
-@click.option("--version", expose_value=False, callback=get_version,
-              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
 @click.option("--config", expose_value=False, callback=set_config,
-              required=False, is_flag=False, is_eager=True,
+              required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use in dotted module notation "
                    "e.g. flaskbb.configs.default.DefaultConfig")
+@click.option("--version", expose_value=False, callback=get_version,
+              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
 def flaskbb():
     """This is the commandline interface for flaskbb."""
     pass
