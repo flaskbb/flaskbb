@@ -98,7 +98,10 @@ class Report(db.Model, CRUDMixin):
     zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
     reason = db.Column(db.Text)
 
-    post = db.relationship("Post", backref="report", lazy="joined")
+    post = db.relationship(
+        "Post", lazy="joined",
+        backref=db.backref('report', cascade='all, delete-orphan')
+    )
     reporter = db.relationship("User", lazy="joined",
                                foreign_keys=[reporter_id])
     zapper = db.relationship("User", lazy="joined", foreign_keys=[zapped_by])
@@ -339,14 +342,13 @@ class Topic(db.Model, CRUDMixin):
 
         # If the topic is unread try to get the first unread post
         if topic_is_unread(self, topicsread, user, forumsread):
-            # 
             query = Post.query.filter(Post.topic_id == self.id)
             if topicsread is not None:
                 query = query.filter(Post.date_created > topicsread.last_read)
             post = query.order_by(Post.id.asc()).first()
             if post is not None:
                 return post.url
-        
+
         return self.url
 
     # Methods

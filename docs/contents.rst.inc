@@ -5,10 +5,11 @@ Contents
    :maxdepth: 2
 
    installation
+   theming
+   cli
    plugins
    plugin_tutorial/index
    events
-   theming
    settings
    permissions
    models

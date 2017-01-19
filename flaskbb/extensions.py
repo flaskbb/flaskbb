@@ -21,7 +21,7 @@ from flask_migrate import Migrate
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
 from flask_babelplus import Babel
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flaskbb.exceptions import AuthorizationRequired
@@ -64,7 +64,7 @@ plugin_manager = PluginManager()
 babel = Babel()
 
 # CSRF
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 
 # Rate Limiting
 limiter = Limiter(auto_check=False, key_func=get_remote_address)

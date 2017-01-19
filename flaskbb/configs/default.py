@@ -182,3 +182,5 @@ class DefaultConfig(object):
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
+    # Plugin Folder
+    PLUGINS_FOLDER = os.path.join(_basedir, "flaskbb", "plugins")

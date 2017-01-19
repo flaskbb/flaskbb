@@ -4,46 +4,57 @@ Installation
 -  `Basic Setup <#basic-setup>`_
 -  `Configuration <#configuration>`_
 -  `Deploying <#deploying>`_
+-  `Deploying to PythonAnywhere <#deploying-to-pythonanywhere>`_
 
 
 
 Basic Setup
 -----------
 
+We recommend installing FlaskBB in an isolated Python environment. This can be
+achieved with `virtualenv`_. In our little guide we will use a wrapper around
+virtualenv - the `virtualenvwrapper`_. In addition to virtualenv, we will also
+use the package manager `pip`_ to install the dependencies for FlaskBB.
+
+
 Virtualenv Setup
 ~~~~~~~~~~~~~~~~
 
-Before you can start, you need to create a `virtualenv`.
-You can install the virtualenvwrapper with your package manager or via pip.
-Be sure that pip is installed. If you don't know how to install pip, have a
-look at their `documentation <http://www.pip-installer.org/en/latest/installing.html>`_.
+The easiest way to install `virtualenv`_ and
+`virtualenvwrapper`_ is, to use the package manager on your system (if you
+are running Linux) to install them.
 
-For example, on archlinux you can install it with
-::
+For example, on archlinux you can install them with::
 
     $ sudo pacman -S python2-virtualenvwrapper
 
-or, if you own a Mac, you can simply install it with
-::
+or, on macOS, you can install them with::
 
     $ sudo pip install virtualenvwrapper
 
-For more information checkout the  `virtualenvwrapper <http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation>`_ installation.
+It's sufficient to just install the virtualenvwrapper because it depends on
+virtualenv and the package manager will resolve all the dependncies for you.
 
-After that you can create your virtualenv with
-::
+After that, you can create your virtualenv with::
 
     $ mkvirtualenv -a /path/to/flaskbb -p $(which python2) flaskbb
 
-and you should be switched automatically to your newly created virtualenv.
+This will create a virtualenv named ``flaskbb`` using the python interpreter in
+version 2 and it will set your project directory to ``/path/to/flaskbb``.
+This comes handy when typing ``workon flaskbb`` as it will change your
+current directory automatically to ``/path/to/flaskbb``.
 To deactivate it you just have to type ``deactivate`` and if you want to work
-on it again, you need to type ``workon flaskbb``.
+on it again, just type ``workon flaskbb``.
+
+If you want to know more about those isolated python environments, checkout
+the `virtualenv`_ and `virtualenvwrapper`_ docs.
 
 
 Required Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-Now you can install the required dependencies.
+Now that you have set up your environment, you are ready to install the
+dependencies.
 ::
 
     $ pip install -r requirements.txt
@@ -57,16 +68,21 @@ Alternatively, you can use the `make` command to install the dependencies.
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We have one optional dependency, redis (the python package is installed automatically).
-If you want to use it, be sure that a redis-server is running. If you decide
-to use redis, the `online guests` and `online users` are being tracked by redis,
-else it will only track the `online users` via a simple SQL query.
-
-**On Archlinux**
+We have one optional dependency, redis (the python package is installed
+automatically).
+If you want to use it, make sure that a redis-server is running.
+Redis will be used as the default result and caching backend for
+celery (celery is a task queue which FlaskBB uses to send non blocking emails).
+The feature for tracking the `online guests` and `online users` do also
+require redis (although `online users` works without redis as well).
+To install redis, just use your distributions package manager. For Arch Linux
+this is `pacman` and for Debian/Ubuntu based systems this is `apt-get`.
 ::
 
-    # Install redis
+    # Installing redis using 'pacman':
     $ sudo pacman -S redis
+    # Installing redis using 'apt-get':
+    $ sudo apt-get install redis-server
 
     # Check if redis is already running.
     $ systemctl status redis
@@ -74,30 +90,32 @@ else it will only track the `online users` via a simple SQL query.
     # If not, start it.
     $ sudo systemctl start redis
 
-    # Optional: Start redis everytime you boot your machine
+    # Optional: Lets start redis everytime you boot your machine
     $ sudo systemctl enable redis
-
-**On Debian 7.0 (Wheezy)**
-::
-
-    # Install redis
-    $ sudo apt-get install redis-server
-
-    # Check if redis is already running.
-    $ service redis-server status
-
-    # If not, start it
-    $ sudo service redis-server start
-
-    # Optional: Start redis everytime you boot your machine
-    # I can't remember if this is done automatically..
-    $ sudo update-rc.d redis-server defaults
 
 
 Configuration
 -------------
 
-Before you can start, you need to configure `FlaskBB`.
+FlaskBB will no longer assume which config to use. By default, it will load
+a config with some sane defaults (i.e. debug off) but thats it.
+You can either pass the import string to a config object or
+the path to the config file, which is in turn a valid python file.
+
+A valid import string, for example, is::
+
+    flaskbb.configs.development.DevelopmentConfig
+
+and if you wish to use a configuration file, you are free to place it anywhere
+your app user has read access. Please note, that if you decide to use a
+relativ path, it will start looking for the file in the 'root' directory
+of FlaskBB (this is, where the README.md, LICENSE, etc. files are in).
+Absolut paths are also supported. Use whatever you like.
+::
+
+    flaskbb --config dev_config.cfg run
+    [+] Using config from: /path/to/flaskbb/dev_config.cfg
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 
 
 Development
@@ -109,21 +127,75 @@ For development, you need to copy ``flaskbb/configs/development.py.example`` to
 
     cp flaskbb/configs/development.py.example flaskbb/configs/development.py
 
-The reCAPTCHA keys should work fine on localhost.
+And you should be ready to go!
+
+You can either run::
+
+    make run
+
+or::
+
+    flaskbb --config flaskbb.configs.development.DevelopmentConfig run
+
+to start the development server using the development config.
 
 
 Production
 ~~~~~~~~~~
 
-If you plan, to use `FlaskBB` in a production environment (not recommended at
-the moment, because it's still in development), you need to copy
-``flaskbb/configs/production.py.example`` to ``flaskbb/configs/production.py``.
-::
+FlaskBB already sets some sane defaults, so you shouldn't have to change much.
+There are only a few things you have to do. Here we will use the provided
+`production.py.example` configuration file as a template.
+
+Let's copy the example config (production.py file is in .gitignore)::
 
     cp flaskbb/configs/production.py.example flaskbb/configs/production.py
 
-Now open ``flaskbb/configs/production.py`` with your favourite editor and adjust
-the config variables to your needs.
+and now you are ready to start adjusting the config.
+Open `production.py` with your favorite editor and search for the following
+configuration variables and change them accordingly to your needs:
+
+- ``SERVER_NAME = "example.org"``
+- ``PREFERRED_URL_SCHEME = "https"``
+- ``SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/flaskbb.sqlite'``
+- ``SECRET_KEY = "secret key"``
+- ``WTF_CSRF_SECRET_KEY = "reallyhardtoguess"``
+
+
+Redis
+~~~~~
+
+If you have decided to use redis as well, which we highly recommend, then
+the following services and features can be enabled and configured to use redis.
+
+Before you can start using redis, you have to enable and configure it.
+This is quite easy just set ``REDIS_ENABLE`` to ``True`` and adjust the
+``REDIS_URL`` if needed.::
+
+    REDIS_ENABLED = True
+    REDIS_URL = "redis://localhost:6379"  # or with a password: "redis://:password@localhost:6379"
+    REDIS_DATABASE = 0
+
+The other services are already configured to use the REDIS_URL configuration
+variable.
+
+**Celery**
+::
+
+    CELERY_BROKER_URL = REDIS_URL
+    CELERY_RESULT_BACKEND = REDIS_URL
+
+**Caching**
+::
+
+    CACHE_TYPE = "redis"
+    CACHE_REDIS_URL = REDIS_URL
+
+**Rate Limiting**
+::
+
+    RATELIMIT_ENABLED = True
+    RATELIMIT_STORAGE_URL = REDIS_URL
 
 
 Mail Examples
@@ -155,41 +227,35 @@ Both methods are included in the example configs.
 Installation
 ------------
 
-For a guided install, run
-::
+For a guided install, run::
 
     $ make install
 
-or:
+or::
 
-    python manage.py install
+    flaskbb install
 
 During the installation process you are asked about your username,
-your email address and the password for your administrator user. Using the 
-`make install` command is recommended as it checks that the dependencies are also
-installed.
+your email address and the password for your administrator user. Using the
+`make install` command is recommended as it checks that the dependencies
+are also installed.
 
 
 Upgrading
 ---------
 
 If the database models changed after a release, you have to run the ``upgrade``
-command
-::
+command::
 
-    python manage.py db upgrade
+    flaskbb db upgrade
 
 
 Deploying
 ---------
 
-I prefer to use supervisor, uWSGI and nginx to deploy my apps, but if you have
-figured out how to deploy it in another way, please let me know, so I
-(or you if you create a pull request) can add it to the documentation.
-
-**NOTE:** I have only used Debian to deploy it, if someone is using a other
-distribution, could you let me know if that works too? `Also, if you have better
-configurations for uWSGI, supervisor or nginx let me know that too.`
+This chapter will describe how to set up Supervisor + uWSGI + nginx for
+FlaskBB as well as document how to use the built-in WSGI server (gunicorn)
+that can be used in a productive environment.
 
 
 Supervisor
@@ -230,9 +296,7 @@ uWSGI
 
 To get started with uWSGI, you need to install it first.
 You'll also need the python plugin to serve python apps.
-This can be done with:
-
-::
+This can be done with::
 
     $ sudo apt-get install uwsgi uwsgi-plugin-python
 
@@ -278,6 +342,28 @@ Don't forget to create a symlink to ``/etc/uwsgi/apps-enabled``.
     ln -s /etc/uwsgi/apps-available/flaskbb /etc/uwsgi/apps-enabled/flaskbb
 
 
+gunicorn
+~~~~~~~~
+
+`Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX.`
+
+It's a pre-fork worker model ported from Ruby's Unicorn project.
+The Gunicorn server is broadly compatible with various web frameworks,
+simply implemented, light on server resources, and fairly speedy.
+
+This is probably the easiest way to run a FlaskBB instance.
+Just install gunicorn via pip inside your virtualenv::
+
+    pip install gunicorn
+
+FlaskBB has an built-in command to gunicorn::
+
+    flaskbb start
+
+To see a full list of options either type ``flaskbb start --help`` or
+visit the :ref:`cli <commandline>` docs.
+
+
 nginx
 ~~~~~
 
@@ -289,7 +375,7 @@ The nginx config is pretty straightforward. Again, this is how I use it for
 ``/etc/nginx/sites-available/flaskbb``.
 The only thing left is, that you need to adjust the ``server_name`` to your
 domain and the paths in ``access_log``, ``error_log``. Also, don't forget to
-adjust the paths in the ``alias`` es, as well as the socket adress in ``uwsgi_pass``.
+adjust the paths in the ``alias`` es, as well as the socket address in ``uwsgi_pass``.
 
 ::
 
@@ -324,6 +410,90 @@ adjust the paths in the ``alias`` es, as well as the socket adress in ``uwsgi_pa
         }
     }
 
+If you wish to use gunicorn instead of uwsgi just replace the ``location @flaskbb``
+with this::
+
+    location @flaskbb {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        #proxy_set_header SCRIPT_NAME /forums;  # This line will make flaskbb available on /forums;
+        proxy_redirect off;
+        proxy_buffering off;
+
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+Don't forget to adjust the ``proxy_pass`` address to your socket address.
+
 
 Like in the `uWSGI <#uwsgi>`_ chapter, don't forget to create a symlink to
 ``/etc/nginx/sites-enabled/``.
+
+
+User Contributed Deployment Guides
+----------------------------------
+
+We do not maintain these deployment guides. They have been submitted by users
+and we thought it is nice to include them in docs. If something is missing,
+or doesn't work - please open a new pull request on GitHub.
+
+
+Deploying to PythonAnywhere
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`PythonAnywhere <https://www.pythonanywhere.com/>`_ is a
+platform-as-a-service, which basically means they have a bunch of servers
+pre-configured with Python, nginx and uWSGI.
+You can run a low-traffic website with them for free,
+so it's an easy way to get quickly FlaskBB running publicly.
+
+Here's what to do:
+
+* Sign up for a PythonAnywhere account at
+  `https://www.pythonanywhere.com/ <https://www.pythonanywhere.com/>`_.
+* On the "Consoles" tab, start a Bash console and install/configure
+  FlaskBB like this
+
+::
+
+    git clone https://github.com/sh4nks/flaskbb.git
+    cd flaskbb
+    pip3.5 install --user -r requirements.txt
+    pip3.5 install --user -e .
+
+* Click the PythonAnywhere logo to go back to the dashboard,
+  then go to the "Web" tab, and click the "Add a new web app" button.
+* Just click "Next" on the first page.
+* On the next page, click "Flask"
+* On the next page, click "Python 3.5"
+* On the next page, just accept the default and click next
+* Wait while the website is created.
+* Click on the "Source code" link, and in the input that appears,
+  replace the `mysite` at the end with `flaskbb`
+* Click on the "WSGI configuration file" filename,
+  and wait for an editor to load.
+* Change the line that sets `project_home` to replace `mysite` with `flaskbb`
+  again.
+* Change the line that says
+
+::
+
+    from flask_app import app as application
+
+to say
+
+::
+
+    from flaskbb import create_app
+    application = create_app("/path/to/your/configuration/file")
+
+* Click the green "Save" button near the top right.
+* Go back to the "Web" tab.
+* Click the green "Reload..." button.
+* Click the link to visit the site -- you'll have a new FlaskBB install!
+
+
+.. _virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
+.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation
+.. _pip: http://www.pip-installer.org/en/latest/installing.html

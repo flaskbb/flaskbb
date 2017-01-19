@@ -157,25 +157,49 @@ def create_default_groups():
     return result
 
 
-def create_admin_user(username, password, email):
-    """Creates the administrator user.
-    Returns the created admin user.
+def create_user(username, password, email, groupname):
+    """Creates a user.
+    Returns the created user.
 
     :param username: The username of the user.
     :param password: The password of the user.
     :param email: The email address of the user.
+    :param groupname: The name of the group to which the user
+                      should belong to.
     """
-    admin_group = Group.query.filter_by(admin=True).first()
-    user = User()
+    if groupname == "member":
+        group = Group.get_member_group()
+    else:
+        group = Group.query.filter(getattr(Group, groupname) == True).first()
 
-    user.username = username
+    user = User.create(username=username, password=password, email=email,
+                       primary_group_id=group.id, activated=True)
+    return user
+
+
+def update_user(username, password, email, groupname):
+    """Update an existing user.
+    Returns the updated user.
+
+    :param username: The username of the user.
+    :param password: The password of the user.
+    :param email: The email address of the user.
+    :param groupname: The name of the group to which the user
+                      should belong to.
+    """
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        return None
+
+    if groupname == "member":
+        group = Group.get_member_group()
+    else:
+        group = Group.query.filter(getattr(Group, groupname) == True).first()
+
     user.password = password
     user.email = email
-    user.primary_group_id = admin_group.id
-    user.activated = True
-
-    user.save()
-    return user
+    user.primary_group_id = group.id
+    return user.save()
 
 
 def create_welcome_forum():
