@@ -17,7 +17,7 @@ import click
 from werkzeug.utils import import_string, ImportStringError
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import database_exists, drop_database
+from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 from flask_migrate import upgrade as upgrade_database
 
 from flaskbb import create_app
@@ -95,11 +95,10 @@ def install(welcome, force, username, email, password, group):
             "create a new one?", fg="magenta")
         ):
             drop_database(db.engine.url)
-            upgrade_database()
         else:
             sys.exit(0)
-    else:
-        upgrade_database()
+    create_database(db.engine.url)
+    upgrade_database()
 
     click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
