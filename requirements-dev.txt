@@ -4,4 +4,4 @@ coverage
 py
 pytest
 pytest-cov
-pytest-random
+pytest-random==0.02
