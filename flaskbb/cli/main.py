@@ -12,6 +12,7 @@ import sys
 import os
 import time
 import requests
+import binascii
 
 import click
 from werkzeug.utils import import_string, ImportStringError
@@ -403,3 +404,95 @@ def list_urls(order_by):
     for rule in rules:
         methods = ", ".join(rule.methods)
         click.echo(column_template.format(rule.rule, rule.endpoint, methods))
+
+
+@flaskbb.command("makeconfig")
+@click.option("--debug", "-d", default=False, is_flag=True,
+              help="Creates a development config with DEBUG set to True.")
+@click.option("--output", "-o", default=".",
+              help="The path where the config file will be saved at.")
+def generate_config(debug, output):
+    configvars = {"is_debug": debug}
+
+    click.secho("The name and port number of the server.\n"
+                "This is needed to correctly generate URLs when no request "
+                "context is available.", fg="cyan")
+    configvars["server_name"] = click.prompt(
+        click.style("Server Name", fg="magenta"), type=str,
+        default="forums.flaskbb.org")
+
+    click.secho("The URL Scheme is also needed in order to generate correct "
+                "URLs when no request context is available.\n"
+                "Choose either 'https' or 'http'.", fg="cyan")
+    configvars["url_scheme"] = click.prompt(
+        click.style("URL Scheme", fg="magenta"),
+        type=click.Choice(["https", "http"]), default="https")
+
+    click.secho("For Postgres use:\n"
+                "    postgresql://flaskbb@localhost:5432/flaskbb\n"
+                "For more options see the SQLAlchemy docs:\n"
+                "    http://docs.sqlalchemy.org/en/latest/core/engines.html",
+                fg="cyan")
+    configvars["database_url"] = click.prompt(
+        click.style("Database URI", fg="magenta"),
+        default="sqlite:///" + os.path.join(
+            os.path.dirname(current_app.root_path), "flaskbb.sqlite"))
+
+    click.secho("Redis will be used for things such as the task queue, "
+                "caching and rate limiting.", fg="cyan")
+    configvars["use_redis"] = click.confirm(
+        click.style("Would you like to use redis?", fg="magenta"),
+        default=True)
+
+    if configvars.get("use_redis", False):
+        configvars["redis_url"] = click.prompt(
+            click.style("Redis URI", fg="magenta"),
+            default="redis://localhost:6379")
+    else:
+        configvars["redis_url"] = ""
+
+    click.secho("To use 'localhost' make sure that you have sendmail or\n"
+                "anything similar installed. Gmail is also supprted.",
+                fg="cyan")
+    configvars["mail_server"] = click.prompt(
+        click.style("Mail Server", fg="magenta"),
+        default="localhost")
+    configvars["mail_port"] = click.prompt(
+        click.style("Mail Server SMTP Port", fg="magenta"),
+        default="25")
+    configvars["mail_use_ssl"] = click.confirm(
+        click.style("Use SSL for sending mails?", fg="magenta"),
+        default=False)
+    configvars["mail_use_tls"] = click.confirm(
+        click.style("Use TLS for sending mails?", fg="magenta"),
+        default=False)
+    configvars["mail_username"] = click.prompt(
+        click.style("Mail Username", fg="magenta"),
+        default="")
+    configvars["mail_password"] = click.prompt(
+        click.style("Mail Password", fg="magenta"),
+        default="")
+    configvars["mail_sender_name"] = click.prompt(
+        click.style("Mail Sender Name", fg="magenta"),
+        default="FlaskBB Mailer")
+    configvars["mail_sender_address"] = click.prompt(
+        click.style("Mail Sender Address", fg="magenta"),
+        default="noreply@yourdomain.org")
+    configvars["mail_admin_address"] = click.prompt(
+        click.style("Mail Admin Email", fg="magenta"),
+        default="admin@youremailaddress.org")
+
+    config_path = os.path.join(
+        os.path.dirname(current_app.root_path), "flaskbb.cfg"
+    )
+    configvars["config_path"] = click.prompt(
+        click.style("Output Path", fg="magenta"),
+        default=config_path)
+
+    click.secho("The configuration file has been saved to: {cfg}\n"
+                "You can use it like this: flaskbb --config {cfg} run\n"
+                "Feel free to further adjust it as needed."
+                .format(cfg=config_path), fg="green")
+
+    configvars["secret_key"] = binascii.hexlify(os.urandom(24)).decode()
+    configvars["csrf_secret_key"] = binascii.hexlify(os.urandom(24)).decode()
