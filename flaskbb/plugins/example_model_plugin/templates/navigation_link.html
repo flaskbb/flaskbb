@@ -1,0 +1,7 @@
+{% if flaskbb_config["PLUGIN_NAME_DISPLAY_IN_NAVIGATION"] %}
+<li {% if 'plugin_name.index' == request.endpoint %}class="active"{% endif %}>
+    <a href="{{ url_for('plugin_name.index') }}">
+        <i class="fa fa-home"></i> Plugin Name
+    </a>
+</li>
+{% endif %}

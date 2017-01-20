@@ -10,8 +10,35 @@
 """
 from flask import current_app
 from flask_plugins import Plugin
-
+from flask_migrate import upgrade,downgrade,migrate
+from flaskbb.extensions import db,migrate as mig
 from flaskbb.management.models import SettingsGroup
+from flask import g
+import contextlib
+import os,copy
+
+@contextlib.contextmanager
+def plugin_name_migrate(name):
+    g.plugin_name=name
+    yield
+    del g.plugin_name
+
+def db_for_plugin(plugin_name,db):
+    newdb=copy.copy(db)
+    def Table(*args,**kwargs):
+        newtable=db.Table(*args,**kwargs)
+        newtable._plugin=plugin_name
+        return newtable
+    newdb.Table=Table
+    return newdb
+
+@mig.configure
+def config_migrate(config):
+    plugins = current_app.extensions['plugin_manager'].all_plugins.values()
+    migration_dirs = [p.get_migration_version_dir() for p in plugins]
+    if config.get_main_option('version_table')=='plugins':
+        config.set_main_option('version_locations', ' '.join(migration_dirs))
+    return config
 
 
 class FlaskBBPlugin(Plugin):
@@ -20,6 +47,31 @@ class FlaskBBPlugin(Plugin):
     #: install additional things you must set it, else it won't install
     #: anything.
     settings_key = None
+
+    def resource_filename(self, *names):
+        return os.path.join(self.path, *names)
+
+    def get_migration_version_dir(self):
+        return self.resource_filename('migration_versions')
+
+    def upgrade_database(self, target='head'):
+        plugindir = current_app.extensions['plugin_manager'].plugin_folder
+        upgrade(directory=os.path.join(plugindir, 'migrations'), revision=self.settings_key + '@' + target)
+
+    def downgrade_database(self, target='base'):
+        plugindir = current_app.extensions['plugin_manager'].plugin_folder
+        downgrade(directory=os.path.join(plugindir, 'migrations'), revision=self.settings_key + '@' + target)
+
+    def migrate(self):
+        with plugin_name_migrate(self.__module__):
+            plugindir = current_app.extensions['plugin_manager'].plugin_folder
+            try:
+                migrate(directory=os.path.join(plugindir, 'migrations'),
+                        head=self.settings_key)
+            except Exception as e:  #presumably this is the initial migration?
+                migrate(directory=os.path.join(plugindir, 'migrations'),
+                        version_path=self.resource_filename('migration_versions'),
+                        branch_label=self.settings_key)
 
     @property
     def installable(self):

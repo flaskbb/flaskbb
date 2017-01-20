@@ -128,3 +128,29 @@ def list_plugins():
             click.secho("    - {} (version {})".format(
                 plugin.name, plugin.version), bold=True
             )
+
+
+@plugins.command("migrations")
+@click.argument("plugin_identifier")
+def migrate_plugin(plugin_identifier):
+    """Installs a new plugin."""
+    validate_plugin(plugin_identifier)
+    plugin = get_plugin_from_all(plugin_identifier)
+    click.secho("[+] Updating plugin migrations{}...".format(plugin.name), fg="cyan")
+    try:
+        plugin.migrate()
+    except Exception as e:
+        click.secho("[-] Couldn't generate migrations for plugin because of following "
+                    "exception: \n{}".format(e), fg="red")
+
+@plugins.command("upgrade")
+@click.argument("plugin_identifier")
+def upgrade_plugin(plugin_identifier):
+    """Uninstalls a plugin from FlaskBB."""
+    validate_plugin(plugin_identifier)
+    plugin = get_plugin_from_all(plugin_identifier)
+    click.secho("[+] Upgrading plugin {}...".format(plugin.name), fg="cyan")
+    try:
+        plugin.upgrade_database()
+    except AttributeError:
+        pass
