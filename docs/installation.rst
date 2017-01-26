@@ -46,12 +46,25 @@ current directory automatically to ``/path/to/flaskbb``.
 To deactivate it you just have to type ``deactivate`` and if you want to work
 on it again, just type ``workon flaskbb``.
 
+It is also possible to use ``virtualenv`` without the ``virtualenvwrapper``.
+For this you have to use the ``virtualenv`` command and pass the name
+of the virtualenv as an argument. In our example, the name of
+the virtualenv is ``.venv``.
+::
+
+    $ virtualenv .venv
+
+and finally activate it
+::
+
+    $ source .venv/bin/activate
+
 If you want to know more about those isolated python environments, checkout
 the `virtualenv`_ and `virtualenvwrapper`_ docs.
 
 
-Required Dependencies
-~~~~~~~~~~~~~~~~~~~~~
+Dependencies
+~~~~~~~~~~~~
 
 Now that you have set up your environment, you are ready to install the
 dependencies.
@@ -65,8 +78,15 @@ Alternatively, you can use the `make` command to install the dependencies.
     $ make dependencies
 
 
+The development process requires a few extra dependencies which can be
+installed with the provided ``requirements-dev.txt`` file.
+::
+
+    $ pip install -r requirements-dev.txt
+
+
 Optional Dependencies
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 We have one optional dependency, redis (the python package is installed
 automatically).
