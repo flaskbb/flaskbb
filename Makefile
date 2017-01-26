@@ -24,7 +24,6 @@ run:
 
 install:dependencies
 	clear
-	pip install -e .
 	flaskbb install
 
 docs:
