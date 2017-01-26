@@ -25,16 +25,7 @@ class TestingConfig(DefaultConfig):
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
 
-    # Recaptcha
-    # To get recaptcha, visit the link below:
-    # https://www.google.com/recaptcha/admin/create
-    # Those keys are only going to work on localhost!
-    RECAPTCHA_ENABLED = True
-    RECAPTCHA_USE_SSL = False
-    RECAPTCHA_PUBLIC_KEY = "6LcZB-0SAAAAAGIddBuSFU9aBpHKDa16p5gSqnxK"
-    RECAPTCHA_PRIVATE_KEY = "6LcZB-0SAAAAAPuPHhazscMJYa2mBe7MJSoWXrUu"
-    RECAPTCHA_OPTIONS = {"theme": "white"}
-
+    # Use the in-memory storage
     WHOOSHEE_MEMORY_STORAGE = True
 
     CELERY_ALWAYS_EAGER = True
