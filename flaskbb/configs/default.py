@@ -19,11 +19,11 @@ class DefaultConfig(object):
     # Get the app root path
     #            <_basedir>
     # ../../ -->  flaskbb/flaskbb/configs/base.py
-    _basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
-                            os.path.dirname(__file__)))))
+    basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
+                           os.path.dirname(__file__)))))
 
     # Python version
-    _version_str = '{0.major}{0.minor}'.format(sys.version_info)
+    py_version = '{0.major}{0.minor}'.format(sys.version_info)
 
     # Flask Settings
     # ------------------------------
@@ -61,7 +61,7 @@ class DefaultConfig(object):
     # For PostgresSQL:
     #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
     # For SQLite:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + _basedir + '/' + \
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + basedir + '/' + \
                               'flaskbb.sqlite'
 
     # This option will be removed as soon as Flask-SQLAlchemy removes it.
@@ -85,7 +85,7 @@ class DefaultConfig(object):
     # Full-Text-Search
     # ------------------------------
     # This will use the "whoosh_index" directory to store the search indexes
-    WHOOSHEE_DIR = os.path.join(_basedir, "whoosh_index", _version_str)
+    WHOOSHEE_DIR = os.path.join(basedir, "whoosh_index", py_version)
     # How long should whooshee try to acquire write lock? (defaults to 2)
     WHOOSHEE_WRITER_TIMEOUT = 2
     # Minimum number of characters for the search (defaults to 3)
@@ -172,7 +172,7 @@ class DefaultConfig(object):
     # Celery
     CELERY_BROKER_URL = 'redis://localhost:6379'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-    if not REDIS_ENABLED: CELERY_ALWAYS_EAGER=True
+    if not REDIS_ENABLED: CELERY_ALWAYS_EAGER = True
 
     # FlaskBB Settings
     # ------------------------------ #
@@ -183,4 +183,4 @@ class DefaultConfig(object):
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
     # Plugin Folder
-    PLUGINS_FOLDER = os.path.join(_basedir, "flaskbb", "plugins")
+    PLUGINS_FOLDER = os.path.join(basedir, "flaskbb", "plugins")
