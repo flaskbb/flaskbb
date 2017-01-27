@@ -133,7 +133,8 @@ def list_plugins():
 @plugins.command("migrations")
 @click.argument("plugin_identifier")
 def migrate_plugin(plugin_identifier):
-    """Installs a new plugin."""
+    """Generates migration files for a plugin.
+    Migration version files are stored in flaskbb/plugins/<plugin_dir>/migration_versions"""
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
     click.secho("[+] Updating plugin migrations{}...".format(plugin.name), fg="cyan")
@@ -146,7 +147,7 @@ def migrate_plugin(plugin_identifier):
 @plugins.command("upgrade")
 @click.argument("plugin_identifier")
 def upgrade_plugin(plugin_identifier):
-    """Uninstalls a plugin from FlaskBB."""
+    """Upgrades database to the latest version of a plugin's models"""
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
     click.secho("[+] Upgrading plugin {}...".format(plugin.name), fg="cyan")

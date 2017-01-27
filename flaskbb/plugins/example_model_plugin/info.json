@@ -1,9 +1,0 @@
-{
-    "identifier": "test_model_plugin",
-    "name": "Plugin Name",
-    "author": "Your Name",
-    "website": "http://flaskbb.org",
-    "license": "BSD License",
-    "description": "A description of the plugin",
-    "version": "0.1.0"
-}
