@@ -415,6 +415,7 @@ def list_urls(order_by):
 @click.option("--stdout", default=False, is_flag=True,
               help="This will ignore --output and print the config to stdout.")
 def generate_config(debug, output, stdout):
+    """Generates a FlaskBB configuration file."""
     config_dict = {"is_debug": debug}
 
     click.secho("The name and port number of the server.\n"
@@ -463,7 +464,8 @@ def generate_config(debug, output, stdout):
     config_dict["mail_server"] = click.prompt(
         click.style("Mail Server", fg="magenta"),
         default="localhost")
-    click.secho("The port on which the SMTP server is listening on.", fg="cyan")
+    click.secho("The port on which the SMTP server is listening on.",
+                fg="cyan")
     config_dict["mail_port"] = click.prompt(
         click.style("Mail Server SMTP Port", fg="magenta"),
         default="25")
@@ -483,7 +485,7 @@ def generate_config(debug, output, stdout):
         click.style("Mail Username", fg="magenta"),
         default="")
     click.secho("Not needed if using a local smtp server. For gmail you have "
-            "put in your gmail password here.", fg="cyan")
+                "put in your gmail password here.", fg="cyan")
     config_dict["mail_password"] = click.prompt(
         click.style("Mail Password", fg="magenta"),
         default="")
@@ -509,19 +511,29 @@ def generate_config(debug, output, stdout):
     config_template = config_env.get_template('config.cfg.template')
 
     if not stdout:
-        config_path = os.path.join(
+        config_dict["config_path"] = os.path.join(
             os.path.dirname(current_app.root_path), "flaskbb.cfg"
         )
         click.secho("The path where you want to save this configuration file.",
                     fg="cyan")
-        config_dict["config_path"] = click.prompt(
-            click.style("Output Path", fg="magenta"),
-            default=config_path)
+        while True:
+            if os.path.exists(config_dict["config_path"]) and click.confirm(
+                click.style("Config {} exists. Do you want to overwride it?"
+                            .format(config_dict["config_path"]), fg="magenta")
+            ):
+                break
 
-        if os.path.exists(config_dict["config_path"]) and click.confirm(
-            click.style("Config file already exists. "
-                        "Do you want to overwride it?")):
-            pass
+            config_dict["config_path"] = click.prompt(
+                click.style("Save to", fg="magenta"),
+                default=config_dict["config_path"])
+
+            if not os.path.exists(config_dict["config_path"]):
+                break
+
+        with open(config_dict["config_path"], 'w') as cfg_file:
+            cfg_file.write(
+                config_template.render(**config_dict).encode("utf-8")
+            )
 
         click.secho("The configuration file has been saved to: {cfg}"
                     .format(cfg=config_dict["config_path"]), fg="blue")
