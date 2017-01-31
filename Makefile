@@ -20,7 +20,7 @@ test:
 	py.test
 
 run:
-	flaskbb --config flaskbb.configs.development.DevelopmentConfig run
+	flaskbb --config ./flaskbb.cfg run
 
 install:dependencies
 	clear

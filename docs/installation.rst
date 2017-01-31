@@ -117,69 +117,77 @@ this is `pacman` and for Debian/Ubuntu based systems this is `apt-get`.
 Configuration
 -------------
 
-FlaskBB will no longer assume which config to use. By default, it will load
-a config with some sane defaults (i.e. debug off) but thats it.
-You can either pass the import string to a config object or
-the path to the config file, which is in turn a valid python file.
+FlaskBB comes with the ability to generate the configuration file for you.
+Just run::
 
-A valid import string, for example, is::
+    flaskbb makeconfig
 
-    flaskbb.configs.development.DevelopmentConfig
+and answer its questions. By default it will try to save the configuration
+file with the name ``flaskbb.cfg`` in FlaskBB's root folder.
 
-and if you wish to use a configuration file, you are free to place it anywhere
-your app user has read access. Please note, that if you decide to use a
-relativ path, it will start looking for the file in the 'root' directory
-of FlaskBB (this is, where the README.md, LICENSE, etc. files are in).
-Absolut paths are also supported. Use whatever you like.
-::
+You can also omit the questions, which will generate a **developemnt**
+configuration by passing the ``-d/--development`` option to it::
 
-    flaskbb --config dev_config.cfg run
-    [+] Using config from: /path/to/flaskbb/dev_config.cfg
+    flaskbb makeconfig -d
+
+In previous versions, FlaskBB tried to assume which configuration file to use,
+which it will no longer do. Now, by default, it will load a config with
+some sane defaults (i.e. debug off) but thats it. You can either pass an
+import string to a config object or the path to the (python) config file.
+
+For example, if you are using a generated config file it looks something
+like this::
+
+    flaskbb --config flaskbb.cfg run
+    [+] Using config from: /path/to/flaskbb/flaskbb.cfg
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+
+and this is how you do it by using an import string. Be sure that it is
+importable from within FlaskBB::
+
+    flaskbb --config flaskbb.configs.default.DefaultConfig run
 
 
 Development
 ~~~~~~~~~~~
 
-For development, you need to copy ``flaskbb/configs/development.py.example`` to
-``flaskbb/configs/development.py``.
-::
+To get started with development you have to generate a development
+configuration first. You can use the CLI for this,
+as explained in `Configuration <#configuration>`_::
 
-    cp flaskbb/configs/development.py.example flaskbb/configs/development.py
+    flaskbb makeconfig --development
 
-And you should be ready to go!
-
-You can either run::
+Now you can either use ``make`` to run the development server::
 
     make run
 
-or::
+or if you like to type a little bit more, the CLI::
 
-    flaskbb --config flaskbb.configs.development.DevelopmentConfig run
-
-to start the development server using the development config.
+    flaskbb --config flaskbb.cfg run
 
 
 Production
 ~~~~~~~~~~
 
 FlaskBB already sets some sane defaults, so you shouldn't have to change much.
-There are only a few things you have to do. Here we will use the provided
-`production.py.example` configuration file as a template.
+To make this whole process a little bit easier for you, we have created
+a little wizard which will ask you some questions and with the answers
+you provide it will generate a configuration for you. You can of course
+further adjust the generated configuration.
 
-Let's copy the example config (production.py file is in .gitignore)::
+The setup wizard can be started with::
 
-    cp flaskbb/configs/production.py.example flaskbb/configs/production.py
+    flaskbb makeconfig
 
-and now you are ready to start adjusting the config.
-Open `production.py` with your favorite editor and search for the following
-configuration variables and change them accordingly to your needs:
+
+These are the only settings you have to make sure to setup accordingly if
+you want to run FlaskBB in production:
 
 - ``SERVER_NAME = "example.org"``
 - ``PREFERRED_URL_SCHEME = "https"``
 - ``SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/flaskbb.sqlite'``
 - ``SECRET_KEY = "secret key"``
-- ``WTF_CSRF_SECRET_KEY = "reallyhardtoguess"``
+- ``WTF_CSRF_SECRET_KEY = "secret key"``
 
 
 Redis
@@ -190,13 +198,14 @@ the following services and features can be enabled and configured to use redis.
 
 Before you can start using redis, you have to enable and configure it.
 This is quite easy just set ``REDIS_ENABLE`` to ``True`` and adjust the
-``REDIS_URL`` if needed.::
+``REDIS_URL`` if needed.
+::
 
     REDIS_ENABLED = True
     REDIS_URL = "redis://localhost:6379"  # or with a password: "redis://:password@localhost:6379"
     REDIS_DATABASE = 0
 
-The other services are already configured to use the REDIS_URL configuration
+The other services are already configured to use the ``REDIS_URL`` configuration
 variable.
 
 **Celery**
@@ -257,7 +266,7 @@ or::
 
 During the installation process you are asked about your username,
 your email address and the password for your administrator user. Using the
-`make install` command is recommended as it checks that the dependencies
+``make install`` command is recommended as it checks that the dependencies
 are also installed.
 
 
