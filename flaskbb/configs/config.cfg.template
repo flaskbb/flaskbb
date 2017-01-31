@@ -1,3 +1,5 @@
+# This file has been automatically generated on {{ timestamp }}.
+# Feel free to adjust it as needed.
 import os
 import datetime
 from flaskbb.configs.default import DefaultConfig
@@ -29,7 +31,7 @@ PREFERRED_URL_SCHEME = "{{ url_scheme }}"
 # For PostgresSQL:
 #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
 # For SQLite:
-SQLALCHEMY_DATABASE_URI = "{{ database_url }}"
+SQLALCHEMY_DATABASE_URI = "{{ database_uri }}"
 
 # This option will be removed as soon as Flask-SQLAlchemy removes it.
 # At the moment it is just used to suppress the super annoying warning
@@ -92,14 +94,14 @@ WHOOSHEE_MIN_STRING_LEN = 3
 #   - Caching
 #   - Rate Limiting
 REDIS_ENABLED = {{ redis_enabled }}
-REDIS_URL = "{{ redis_url }}"
+REDIS_URL = "{{ redis_uri }}"
 REDIS_DATABASE = 0
 
 
 # Celery
 # ------------------------------
-CELERY_BROKER_URL = "{{ redis_url }}"
-CELERY_RESULT_BACKEND = "{{ redis_url }}"
+CELERY_BROKER_URL = "{{ redis_uri }}"
+CELERY_RESULT_BACKEND = "{{ redis_uri }}"
 
 
 # Rate Limiting
@@ -116,7 +118,7 @@ CELERY_RESULT_BACKEND = "{{ redis_url }}"
 # Using the redis storage requires the installation of the redis package,
 # which will be installed if you enable REDIS_ENABLE while memcached
 # relies on the pymemcache package.
-RATELIMIT_STORAGE_URL = "{% if redis_enabled %}{{ redis_url }}{% else %}memory://{% endif %}"
+RATELIMIT_STORAGE_URL = "{% if redis_enabled %}{{ redis_uri }}{% else %}memory://{% endif %}"
 
 
 # Caching
