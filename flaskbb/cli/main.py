@@ -27,7 +27,7 @@ from flask_migrate import upgrade as upgrade_database
 from flaskbb import create_app
 from flaskbb._compat import iteritems
 from flaskbb.extensions import db, whooshee, celery
-from flaskbb.cli.utils import (save_user_prompt, prompt_config_path,
+from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
                                write_config, get_version, FlaskBBCLIError,
                                EmailType)
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
@@ -110,7 +110,7 @@ def install(welcome, force, username, email, password, group):
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    save_user_prompt(username, email, password, group)
+    prompt_save_user(username, email, password, group)
 
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")

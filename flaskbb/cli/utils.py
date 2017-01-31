@@ -69,33 +69,6 @@ class EmailType(click.ParamType):
         return "email"
 
 
-def save_user_prompt(username, email, password, group, only_update=False):
-    if not username:
-        username = click.prompt(
-            click.style("Username", fg="magenta"), type=str,
-            default=os.environ.get("USER", "")
-        )
-    if not email:
-        email = click.prompt(
-            click.style("Email address", fg="magenta"), type=EmailType()
-        )
-    if not password:
-        password = click.prompt(
-            click.style("Password", fg="magenta"), hide_input=True,
-            confirmation_prompt=True
-        )
-    if not group:
-        group = click.prompt(
-            click.style("Group", fg="magenta"),
-            type=click.Choice(["admin", "super_mod", "mod", "member"]),
-            default="admin"
-        )
-
-    if only_update:
-        return update_user(username, password, email, group)
-    return create_user(username, password, email, group)
-
-
 def validate_plugin(plugin):
     """Checks if a plugin is installed.
     TODO: Figure out how to use this in a callback. Doesn't work because
@@ -136,6 +109,33 @@ def get_version(ctx, param, value):
         'python_version': sys.version.split("\n")[0]
     }, color=ctx.color)
     ctx.exit()
+
+
+def prompt_save_user(username, email, password, group, only_update=False):
+    if not username:
+        username = click.prompt(
+            click.style("Username", fg="magenta"), type=str,
+            default=os.environ.get("USER", "")
+        )
+    if not email:
+        email = click.prompt(
+            click.style("Email address", fg="magenta"), type=EmailType()
+        )
+    if not password:
+        password = click.prompt(
+            click.style("Password", fg="magenta"), hide_input=True,
+            confirmation_prompt=True
+        )
+    if not group:
+        group = click.prompt(
+            click.style("Group", fg="magenta"),
+            type=click.Choice(["admin", "super_mod", "mod", "member"]),
+            default="admin"
+        )
+
+    if only_update:
+        return update_user(username, password, email, group)
+    return create_user(username, password, email, group)
 
 
 def prompt_config_path(config_path):
