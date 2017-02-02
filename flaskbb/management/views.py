@@ -384,7 +384,7 @@ def unread_reports():
         order_by(Report.id.desc()).\
         paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
 
-    return render_template("management/unread_reports.html", reports=reports)
+    return render_template("management/reports.html", reports=reports)
 
 
 @management.route("/reports/<int:report_id>/markread", methods=["POST"])
@@ -441,6 +441,37 @@ def report_markread(report_id=None):
     db.session.commit()
 
     flash(_("All reports were marked as read."), "success")
+    return redirect(url_for("management.reports"))
+
+
+@management.route("/reports/<int:report_id>/delete", methods=["POST"])
+@management.route("/reports/delete", methods=["POST"])
+@allows.requires(IsAtleastModerator)
+def delete_report(report_id=None):
+    if request.is_xhr:
+        ids = request.get_json()["ids"]
+        data = []
+
+        for report in Report.query.filter(Report.id.in_(ids)).all():
+            if report.delete():
+                data.append({
+                    "id": report.id,
+                    "type": "delete",
+                    "reverse": False,
+                    "reverse_name": None,
+                    "reverse_url": None
+                })
+
+        return jsonify(
+            message="{} reports deleted.".format(len(data)),
+            category="success",
+            data=data,
+            status=200
+        )
+
+    report = Report.query.filter_by(id=report_id).first_or_404()
+    report.delete()
+    flash(_("Report deleted."), "success")
     return redirect(url_for("management.reports"))
 
 
