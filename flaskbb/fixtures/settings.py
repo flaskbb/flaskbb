@@ -83,6 +83,26 @@ fixture = (
                 'name':         "Enable Account Activation",
                 'description':  "Enable to let the user activate their account by sending a email with an activation link."
             }),
+            ('auth_username_min_length', {
+                'value':        3,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Username Minimum Length",
+                'description':  "The minimum length of the username. Changing this will only affect new registrations.",
+            }),
+            ('auth_username_max_length', {
+                'value':        20,
+                'value_type':   "integer",
+                'extra':        {'min': 0},
+                'name':         "Username Maximum Length",
+                'description':  "The Maximum length of the username. Changing this will only affect new registrations.",
+            }),
+            ('auth_username_blacklist', {
+                'value':        "me,administrator,moderator",
+                'value_type':   "string",
+                'name':         "Username Blacklist",
+                'description':  "A comma seperated list with forbidden usernames.",
+            }),
             ('auth_ratelimit_enabled', {
                 'value':        True,
                 'value_type':   "boolean",
