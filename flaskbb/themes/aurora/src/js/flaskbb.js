@@ -96,8 +96,8 @@ var send_data = function(endpoint_url, data) {
                     reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="'+ v.reverse_name +'"></span>';
                 }
                 form.find('button').html(reverse_html);
-            } else {
-                form.parents('.action-row').remove();
+            } else if(v.type == "delete") {
+                form.parents(".row").remove();
             }
 
         });
