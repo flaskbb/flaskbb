@@ -116,7 +116,7 @@ def view_topic(topic_id, slug=None):
 
     # fetch the posts in the topic
     posts = Post.query.\
-        join(User, Post.user_id == User.id).\
+        outerjoin(User, Post.user_id == User.id).\
         filter(Post.topic_id == topic.id).\
         add_entity(User).\
         order_by(Post.id.asc()).\
