@@ -34,9 +34,9 @@
   "devDependencies": {
     "autoprefixer": "^6.4.0",
     "imagemin-cli": "^3.0.0",
-    "node-sass": "^3.8.0",
-    "npm-run-all": "^3.0.0",
-    "onchange": "^2.5.0",
+    "node-sass": "^4.5.0",
+    "npm-run-all": "^4.0.1",
+    "onchange": "^3.2.1",
     "postcss-cli": "^2.5.2",
     "uglify-js": "^2.7.3"
   },
