@@ -410,7 +410,7 @@ def reply_post(topic_id, post_id):
     if not Permission(CanPostReply):
         flash(_("You do not have the permissions to post in this topic."),
               "danger")
-        return redirect(topic.forum.url)
+        return view_post(post.id)
 
     form = ReplyForm()
     if form.validate_on_submit():
@@ -420,8 +420,8 @@ def reply_post(topic_id, post_id):
                 form=form, preview=form.content.data
             )
         else:
-            form.save(current_user, topic)
-            return redirect(post.topic.url)
+            post = form.save(current_user, topic)
+            return view_post(post.id)
     else:
         form.content.data = format_quote(post.username, post.content)
 
@@ -436,7 +436,7 @@ def edit_post(post_id):
     if not Permission(CanEditPost):
         flash(_("You do not have the permissions to edit this post."),
               "danger")
-        return redirect(post.topic.url)
+        return view_post(post.id)
 
     if post.first_post:
         form = NewTopicForm()
@@ -458,19 +458,15 @@ def edit_post(post_id):
             if post.first_post:
                 post.topic.title = form.title.data
                 post.topic.save()
-            return redirect(post.topic.url)
+            return view_post(post.id)
     else:
         if post.first_post:
             form.title.data = post.topic.title
 
         form.content.data = post.content
 
-    return render_template(
-        "forum/new_post.html",
-        topic=post.topic,
-        form=form,
-        edit_mode=True
-    )
+    return render_template("forum/new_post.html", topic=post.topic, form=form,
+                           edit_mode=True)
 
 
 @forum.route("/post/<int:post_id>/delete", methods=["POST"])
