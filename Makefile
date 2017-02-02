@@ -3,6 +3,7 @@
 help:
 	@echo "  clean      remove unwanted stuff"
 	@echo "  install    install dependencies and flaskbb"
+	@echo "  devconfig  generates a development config"
 	@echo "  test       run the testsuite"
 	@echo "  run        run the development server with the development config"
 	@echo "  docs       build the documentation"
@@ -22,9 +23,12 @@ test:
 run:
 	flaskbb --config ./flaskbb.cfg run
 
+devconfig:
+	flaskbb makeconfig -d
+
 install:dependencies
 	clear
-	flaskbb install
+	flaskbb --config ./flaskbb.cfg install
 
 docs:
 	$(MAKE) -C docs html

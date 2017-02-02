@@ -435,7 +435,7 @@ def generate_config(development, output, force):
 
     default_conf = {
         "is_debug": True,
-        "server_name": "localhost",
+        "server_name": "localhost:5000",
         "url_scheme": "http",
         "database_uri": "sqlite:///" + os.path.join(
             os.path.dirname(current_app.root_path), "flaskbb.sqlite"),
