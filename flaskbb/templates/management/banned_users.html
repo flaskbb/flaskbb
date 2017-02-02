@@ -92,8 +92,8 @@
                         <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                            <button class="btn btn-icon" name="confirmDialog">
-                                <span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
+                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}">
+                                <span class="fa fa-flag text-success"></span>
                             </button>
                         </form>
                     {% endif %}
