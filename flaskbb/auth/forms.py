@@ -71,12 +71,15 @@ class RegisterForm(FlaskForm):
         # would through an out of context error if used with validators.Length
         min_length = flaskbb_config["AUTH_USERNAME_MIN_LENGTH"]
         max_length = flaskbb_config["AUTH_USERNAME_MAX_LENGTH"]
+        blacklist = [w.strip() for w in
+                     flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")]
+
         if len(field.data) < min_length or len(field.data) > max_length:
             raise ValidationError(_(
                 "Username must be between %(min)s and %(max)s characters long.",
                 min=min_length, max=max_length)
             )
-        if field.data.lower() in flaskbb_config["AUTH_USERNAME_BLACKLIST"]:
+        if field.data.lower() in blacklist:
             raise ValidationError(_(
                 "This is a system reserved name. Choose a different one.")
             )

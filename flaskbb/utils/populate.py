@@ -104,7 +104,6 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                 )
 
             group.save()
-        updated_settings[group] = []
 
         for settings in settingsgroup[1]["settings"]:
 
@@ -131,6 +130,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                     )
 
                 setting.save()
+                updated_settings[group] = []
                 updated_settings[group].append(setting)
     return updated_settings
 

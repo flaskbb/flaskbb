@@ -201,12 +201,12 @@ def upgrade(all_latest, fixture, force):
             raise FlaskBBCLIError("{} fixture is not available"
                                   .format(fixture), fg="red")
 
-        click.secho("[+] Updating fixtures...")
+        click.secho("[+] Updating fixtures...", fg="cyan")
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
         click.secho("[+] {} groups and {} settings updated.".format(
-            len(count.keys()), len(count.values()), fg="green")
+            len(count.keys()), len(count.values())), fg="green"
         )
 
 
