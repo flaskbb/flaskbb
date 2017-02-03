@@ -13,6 +13,7 @@
     <div class="panel-body">
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
+            {{ emit_event('before-registration-form') }}
             {{ horizontal_field(form.username)}}
             {{ horizontal_field(form.email)}}
             {{ horizontal_field(form.password)}}
@@ -25,6 +26,7 @@
             {{ horizontal_field(form.language) }}
             {{ horizontal_field(form.accept_tos)}}
             {{ horizontal_field(form.submit)}}
+            {{ emit_event('after-registration-form') }}
         </form>
     </div>
 </div>
