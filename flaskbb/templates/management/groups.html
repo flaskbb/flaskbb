@@ -60,8 +60,8 @@
                         </a>
                         <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-icon" name="confirmDialog">
-                                <span class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}"></span>
+                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}">
+                                <span class="fa fa-trash text-danger"></span>
                             </button>
                         </form>
                     </div>

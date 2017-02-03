@@ -12,18 +12,23 @@ import sys
 import os
 import time
 import requests
+import binascii
+from datetime import datetime
 
 import click
 from werkzeug.utils import import_string, ImportStringError
+from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import database_exists, drop_database
+from sqlalchemy_utils.functions import (database_exists, create_database,
+                                        drop_database)
 from flask_migrate import upgrade as upgrade_database
 
 from flaskbb import create_app
 from flaskbb._compat import iteritems
 from flaskbb.extensions import db, whooshee, celery
-from flaskbb.cli.utils import (get_version, save_user_prompt, FlaskBBCLIError,
+from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
+                               write_config, get_version, FlaskBBCLIError,
                                EmailType)
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_default_groups,
@@ -61,13 +66,13 @@ def set_config(ctx, param, value):
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-@click.group(cls=FlaskGroup, create_app=make_app)
-@click.option("--version", expose_value=False, callback=get_version,
-              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
 @click.option("--config", expose_value=False, callback=set_config,
-              required=False, is_flag=False, is_eager=True,
+              required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use in dotted module notation "
                    "e.g. flaskbb.configs.default.DefaultConfig")
+@click.option("--version", expose_value=False, callback=get_version,
+              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
 def flaskbb():
     """This is the commandline interface for flaskbb."""
     pass
@@ -95,18 +100,17 @@ def install(welcome, force, username, email, password, group):
             "create a new one?", fg="magenta")
         ):
             drop_database(db.engine.url)
-            upgrade_database()
         else:
             sys.exit(0)
-    else:
-        upgrade_database()
+    create_database(db.engine.url)
+    upgrade_database()
 
     click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    save_user_prompt(username, email, password, group)
+    prompt_save_user(username, email, password, group)
 
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
@@ -197,12 +201,12 @@ def upgrade(all_latest, fixture, force):
             raise FlaskBBCLIError("{} fixture is not available"
                                   .format(fixture), fg="red")
 
-        click.secho("[+] Updating fixtures...")
+        click.secho("[+] Updating fixtures...", fg="cyan")
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
         click.secho("[+] {} groups and {} settings updated.".format(
-            len(count.keys()), len(count.values()), fg="green")
+            len(count.keys()), len(count.values())), fg="green"
         )
 
 
@@ -404,3 +408,166 @@ def list_urls(order_by):
     for rule in rules:
         methods = ", ".join(rule.methods)
         click.echo(column_template.format(rule.rule, rule.endpoint, methods))
+
+
+@flaskbb.command("makeconfig")
+@click.option("--development", "-d", default=False, is_flag=True,
+              help="Creates a development config with DEBUG set to True.")
+@click.option("--output", "-o", required=False,
+              help="The path where the config file will be saved at. "
+                   "Defaults to the flaskbb's root folder.")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Overwrite any existing config file if one exists.")
+def generate_config(development, output, force):
+    """Generates a FlaskBB configuration file."""
+    config_env = Environment(
+        loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))
+    )
+    config_template = config_env.get_template('config.cfg.template')
+
+    if output:
+        config_path = os.path.abspath(output)
+    else:
+        config_path = os.path.dirname(current_app.root_path)
+
+    if os.path.exists(config_path) and not os.path.isfile(config_path):
+        config_path = os.path.join(config_path, "flaskbb.cfg")
+
+    default_conf = {
+        "is_debug": True,
+        "server_name": "localhost:5000",
+        "url_scheme": "http",
+        "database_uri": "sqlite:///" + os.path.join(
+            os.path.dirname(current_app.root_path), "flaskbb.sqlite"),
+        "redis_enabled": False,
+        "redis_uri": "redis://localhost:6379",
+        "mail_server": "localhost",
+        "mail_port": 25,
+        "mail_use_tls": False,
+        "mail_use_ssl": False,
+        "mail_username": "",
+        "mail_password": "",
+        "mail_sender_name": "FlaskBB Mailer",
+        "mail_sender_address": "noreply@yourdomain",
+        "mail_admin_address": "admin@yourdomain",
+        "secret_key": binascii.hexlify(os.urandom(24)).decode(),
+        "csrf_secret_key": binascii.hexlify(os.urandom(24)).decode(),
+        "timestamp": datetime.utcnow().strftime("%A, %d. %B %Y at %H:%M")
+    }
+
+    if not force:
+        config_path = prompt_config_path(config_path)
+
+    if force and os.path.exists(config_path):
+        click.secho("Overwriting existing config file: {}".format(config_path),
+                    fg="yellow")
+
+    if development:
+        write_config(default_conf, config_template, config_path)
+        sys.exit(0)
+
+    # SERVER_NAME
+    click.secho("The name and port number of the server.\n"
+                "This is needed to correctly generate URLs when no request "
+                "context is available.", fg="cyan")
+    default_conf["server_name"] = click.prompt(
+        click.style("Server Name", fg="magenta"), type=str,
+        default=default_conf.get("server_name"))
+
+    # PREFERRED_URL_SCHEME
+    click.secho("The URL Scheme is also needed in order to generate correct "
+                "URLs when no request context is available.\n"
+                "Choose either 'https' or 'http'.", fg="cyan")
+    default_conf["url_scheme"] = click.prompt(
+        click.style("URL Scheme", fg="magenta"),
+        type=click.Choice(["https", "http"]),
+        default=default_conf.get("url_scheme"))
+
+    # SQLALCHEMY_DATABASE_URI
+    click.secho("For Postgres use:\n"
+                "    postgresql://flaskbb@localhost:5432/flaskbb\n"
+                "For more options see the SQLAlchemy docs:\n"
+                "    http://docs.sqlalchemy.org/en/latest/core/engines.html",
+                fg="cyan")
+    default_conf["database_url"] = click.prompt(
+        click.style("Database URI", fg="magenta"),
+        default=default_conf.get("database_uri"))
+
+    # REDIS_ENABLED
+    click.secho("Redis will be used for things such as the task queue, "
+                "caching and rate limiting.", fg="cyan")
+    default_conf["redis_enabled"] = click.confirm(
+        click.style("Would you like to use redis?", fg="magenta"),
+        default=True)  # default_conf.get("redis_enabled") is False
+
+    # REDIS_URI
+    if default_conf.get("redis_enabled", False):
+        default_conf["redis_uri"] = click.prompt(
+            click.style("Redis URI", fg="magenta"),
+            default=default_conf.get("redis_uri"))
+    else:
+        default_conf["redis_uri"] = ""
+
+    # MAIL_SERVER
+    click.secho("To use 'localhost' make sure that you have sendmail or\n"
+                "something similar installed. Gmail is also supprted.",
+                fg="cyan")
+    default_conf["mail_server"] = click.prompt(
+        click.style("Mail Server", fg="magenta"),
+        default=default_conf.get("mail_server"))
+    # MAIL_PORT
+    click.secho("The port on which the SMTP server is listening on.",
+                fg="cyan")
+    default_conf["mail_port"] = click.prompt(
+        click.style("Mail Server SMTP Port", fg="magenta"),
+        default=default_conf.get("mail_port"))
+    # MAIL_USE_TLS
+    click.secho("If you are using a local SMTP server like sendmail this is "
+                "not needed. For external servers this is hopefully required.",
+                fg="cyan")
+    default_conf["mail_use_tls"] = click.confirm(
+        click.style("Use TLS for sending mails?", fg="magenta"),
+        default=default_conf.get("mail_use_tls"))
+    # MAIL_USE_SSL
+    click.secho("Same as above. TLS is the successor to SSL.", fg="cyan")
+    default_conf["mail_use_ssl"] = click.confirm(
+        click.style("Use SSL for sending mails?", fg="magenta"),
+        default=default_conf.get("mail_use_ssl"))
+    # MAIL_USERNAME
+    click.secho("Not needed if using a local smtp server. For gmail you have "
+                "put in your email address here.", fg="cyan")
+    default_conf["mail_username"] = click.prompt(
+        click.style("Mail Username", fg="magenta"),
+        default=default_conf.get("mail_username"))
+    # MAIL_PASSWORD
+    click.secho("Not needed if using a local smtp server. For gmail you have "
+                "put in your gmail password here.", fg="cyan")
+    default_conf["mail_password"] = click.prompt(
+        click.style("Mail Password", fg="magenta"),
+        default=default_conf.get("mail_password"))
+    # MAIL_DEFAULT_SENDER
+    click.secho("The name of the sender. You probably want to change it to "
+                "something like '<your_community> Mailer'.", fg="cyan")
+    default_conf["mail_sender_name"] = click.prompt(
+        click.style("Mail Sender Name", fg="magenta"),
+        default=default_conf.get("mail_sender_name"))
+    click.secho("On localhost you want to use a noreply address here. "
+                "Use your email address for gmail here.", fg="cyan")
+    default_conf["mail_sender_address"] = click.prompt(
+        click.style("Mail Sender Address", fg="magenta"),
+        default=default_conf.get("mail_sender_address"))
+    # ADMINS
+    click.secho("Logs and important system messages are sent to this address."
+                "Use your email address for gmail here.", fg="cyan")
+    default_conf["mail_admin_address"] = click.prompt(
+        click.style("Mail Admin Email", fg="magenta"),
+        default=default_conf.get("mail_admin_address"))
+
+    write_config(default_conf, config_template, config_path)
+
+    # Finished
+    click.secho("The configuration file has been saved to:\n{cfg}"
+                .format(cfg=config_path), fg="blue")
+    click.secho("Usage: flaskbb --config {cfg} run\n"
+                "Feel free to adjust it as needed."
+                .format(cfg=config_path), fg="green")

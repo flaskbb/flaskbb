@@ -15,7 +15,7 @@ import click
 from sqlalchemy.exc import IntegrityError
 
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import FlaskBBCLIError, EmailType, save_user_prompt
+from flaskbb.cli.utils import FlaskBBCLIError, EmailType, prompt_save_user
 from flaskbb.user.models import User
 
 
@@ -35,7 +35,7 @@ def users():
 def new_user(username, email, password, group):
     """Creates a new user. Omit any options to use the interactive mode."""
     try:
-        user = save_user_prompt(username, email, password, group)
+        user = prompt_save_user(username, email, password, group)
 
         click.secho("[+] User {} with Email {} in Group {} created.".format(
             user.username, user.email, user.primary_group.name), fg="cyan"
@@ -56,7 +56,7 @@ def new_user(username, email, password, group):
 def change_user(username, password, email, group):
     """Updates an user. Omit any options to use the interactive mode."""
 
-    user = save_user_prompt(username, password, email, group)
+    user = prompt_save_user(username, password, email, group)
     if user is None:
         raise FlaskBBCLIError("The user with username {} does not exist."
                               .format(username), fg="red")

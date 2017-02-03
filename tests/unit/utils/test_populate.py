@@ -41,6 +41,30 @@ def test_update_settings_from_fixture(database):
                                                  overwrite_setting=True)
     assert len(force_updated) == SettingsGroup.query.count()
 
+    updated_fixture = (
+        ('general', {
+            'name': "General Settings",
+            'description': "How many items per page are displayed.",
+            'settings': (
+                ('project_title', {
+                    'value': "FlaskBB",
+                    'value_type': "string",
+                    'name': "Project title",
+                    'description': "The title of the project.",
+                }),
+                ('test_fixture', {
+                    'description': 'This is a test fixture',
+                    'name': 'Test Fixture',
+                    'value': 'FlaskBBTest',
+                    'value_type': 'string'
+                })
+            )
+        }),
+    )
+
+    updated = update_settings_from_fixture(updated_fixture)
+    assert len(updated) == 1
+
 
 def test_create_user(default_groups):
     user = User.query.filter_by(username="admin").first()

@@ -221,7 +221,6 @@ class Setting(db.Model, CRUDMixin):
                 first_or_404()
             result = result.settings
         else:
-            print(Setting.query)
             result = cls.query.all()
 
         for setting in result:
