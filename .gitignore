@@ -60,7 +60,3 @@ flaskbb/plugins/*
 !flaskbb/plugins/__init__.py
 !flaskbb/plugins/portal/
 
-# production stuff
-logs/
-venv/
-pip-selfcheck.json
