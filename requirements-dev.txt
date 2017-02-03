@@ -3,5 +3,5 @@ cov-core
 coverage
 py
 pytest
-pytest-cov
+pytest-cov==2.4.0
 pytest-random
