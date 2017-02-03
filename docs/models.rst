@@ -1,7 +1,7 @@
 .. _models:
 
-Available Models
-================
+Models
+======
 
 FlaskBB uses SQLAlchemy as it's ORM. The models are split in three modules
 which are covered below.
