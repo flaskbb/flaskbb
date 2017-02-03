@@ -16,16 +16,17 @@ commands.
       This is the commandline interface for flaskbb.
 
     Options:
-      --version      Show the FlaskBB version.
-      --config TEXT  Specify the config to use in dotted module notation e.g.
-                     flaskbb.configs.default.DefaultConfig
-      --help         Show this message and exit.
+      --config CONFIG  Specify the config to use in dotted module notation e.g.
+                       flaskbb.configs.default.DefaultConfig
+      --version        Show the FlaskBB version.
+      --help           Show this message and exit.
 
     Commands:
       celery           Preconfigured wrapper around the 'celery' command.
       db               Perform database migrations.
       download-emojis  Downloads emojis from emoji-cheat-sheet.com.
       install          Installs flaskbb.
+      makeconfig       Generates a FlaskBB configuration file.
       plugins          Plugins command sub group.
       populate         Creates the necessary tables and groups for FlaskBB.
       reindex          Reindexes the search index.
@@ -185,9 +186,26 @@ of their options and arguments.
 
         Order by endpoint
 
-    .. describe:: --methods, m
+    .. describe:: --methods, -m
 
         Order by methods
+
+.. describe:: flaskbb makeconfig
+
+    Generates a FlaskBB configuration file.
+
+    .. describe:: --development, -d
+
+        Creates a development config with DEBUG set to True.
+
+    .. describe:: --output, -o
+
+        The path where the config file will be saved at.
+        Defaults to the flaskbb's root folder.
+
+    .. describe:: --force, -f
+
+        Overwrites any existing config file, if one exsits, WITHOUT asking.
 
 .. describe:: flaskbb reindex
 
