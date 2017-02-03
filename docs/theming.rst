@@ -6,6 +6,52 @@ Theming
 FlaskBB uses the `Flask-Themes2`_ extension for theming.
 
 
+Quickstart
+----------
+
+1. Create a new folder within the ``themes/`` folder and give it the name
+   of your theme.
+2. Copy the content of the ``aurora/`` folder into your folder theme's folder.
+3. Create **2** new folders called ``static/`` and ``templates/`` in your
+   themes folder.
+4. Copy ``layout.html`` from FlaskBB's ``templates/`` into your themes
+   ``templates/`` folder and modified to your liking. Feel free to copy
+   other templates over into your themes. Just make sure that they have the
+   same name and directory structure to overwrite them.
+5. Add some information about your theme using the ``info.json`` file.
+6. Edit the ``package.json`` to your needs.
+7. Happy theming!
+
+In the end your folder structure should look like this::
+
+    ── example_theme/
+        ├── node_modules
+        │   └── ...
+        ├── src
+        │   ├── img
+        │   │   └── ...
+        │   ├── js
+        │   │   └── ...
+        │   └── scss
+        │       └── ...
+        ├── static
+        │   ├── img
+        │   ├── css
+        │   ├── fonts
+        │   └── js
+        ├── templates
+        │   ├── ...
+        │   └── layout.html
+        ├── tools
+        │   ├── build_css
+        │   ├── build_fonts
+        │   └── build_js
+        ├── info.json
+        ├── LICENSE
+        ├── package.json
+        └── README.md
+
+
 Getting Started
 ---------------
 
@@ -234,52 +280,6 @@ you just have to run::
     npm run watch:all
 
 and upon changes it will automatically rebuild the files.
-
-
-TL;DR
------
-
-1. Create a new folder within the ``themes/`` folder and give it the name
-   of your theme.
-2. Copy the content of the ``aurora/`` folder into your folder theme's folder.
-3. Create **2** new folders called ``static/`` and ``templates/`` in your
-   themes folder.
-4. Copy ``layout.html`` from FlaskBB's ``templates/`` into your themes
-   ``templates/`` folder and modified to your liking. Feel free to copy
-   other templates over into your themes. Just make sure that they have the
-   same name and directory structure to overwrite them.
-5. Add some information about your theme using the ``info.json`` file.
-6. Edit the ``package.json`` to your needs.
-7. Happy theming!
-
-In the end your folder structure should look like this::
-
-    ── example_theme/
-        ├── node_modules
-        │   └── ...
-        ├── src
-        │   ├── img
-        │   │   └── ...
-        │   ├── js
-        │   │   └── ...
-        │   └── scss
-        │       └── ...
-        ├── static
-        │   ├── img
-        │   ├── css
-        │   ├── fonts
-        │   └── js
-        ├── templates
-        │   ├── ...
-        │   └── layout.html
-        ├── tools
-        │   ├── build_css
-        │   ├── build_fonts
-        │   └── build_js
-        ├── info.json
-        ├── LICENSE
-        ├── package.json
-        └── README.md
 
 
 .. _Jinja2: http://jinja.pocoo.org/
