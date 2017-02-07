@@ -130,6 +130,7 @@ class UserForm(FlaskForm):
     def save(self):
         data = self.data
         data.pop('submit', None)
+        data.pop('csrf_token', None)
         user = User(**data)
         return user.save()
 
@@ -260,6 +261,7 @@ class GroupForm(FlaskForm):
     def save(self):
         data = self.data
         data.pop('submit', None)
+        data.pop('csrf_token', None)
         group = Group(**data)
         return group.save()
 
@@ -363,8 +365,9 @@ class ForumForm(FlaskForm):
 
     def save(self):
         data = self.data
-        # remove the button
+        # delete submit and csrf_token from data
         data.pop('submit', None)
+        data.pop('csrf_token', None)
         forum = Forum(**data)
         return forum.save()
 
@@ -380,8 +383,9 @@ class EditForumForm(ForumForm):
 
     def save(self):
         data = self.data
-        # remove the button
+        # delete submit and csrf_token from data
         data.pop('submit', None)
+        data.pop('csrf_token', None)
         forum = Forum(**data)
         # flush SQLA info from created instance so that it can be merged
         make_transient(forum)
@@ -415,6 +419,8 @@ class CategoryForm(FlaskForm):
 
     def save(self):
         data = self.data
+        # delete submit and csrf_token from data
         data.pop('submit', None)
+        data.pop('csrf_token', None)
         category = Category(**data)
         return category.save()
