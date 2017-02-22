@@ -16,12 +16,14 @@ from wtforms.validators import (DataRequired, InputRequired, Email, EqualTo,
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
+from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.fields import RecaptchaField
 
 USERNAME_RE = r'^[\w.+-]+$'
-is_username = regexp(USERNAME_RE,
-                     message=_("You can only use letters, numbers or dashes."))
+is_valid_username = regexp(
+    USERNAME_RE, message=_("You can only use letters, numbers or dashes.")
+)
 
 
 class LoginForm(FlaskForm):
@@ -43,8 +45,8 @@ class LoginRecaptchaForm(LoginForm):
 
 class RegisterForm(FlaskForm):
     username = StringField(_("Username"), validators=[
-        DataRequired(message=_("A valid username is required.")),
-        is_username])
+        DataRequired(message=_("A valid username is required")),
+        is_valid_username])
 
     email = StringField(_("Email address"), validators=[
         DataRequired(message=_("A valid email address is required.")),
@@ -66,6 +68,21 @@ class RegisterForm(FlaskForm):
     submit = SubmitField(_("Register"))
 
     def validate_username(self, field):
+        # would through an out of context error if used with validators.Length
+        min_length = flaskbb_config["AUTH_USERNAME_MIN_LENGTH"]
+        max_length = flaskbb_config["AUTH_USERNAME_MAX_LENGTH"]
+        blacklist = [w.strip() for w in
+                     flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")]
+
+        if len(field.data) < min_length or len(field.data) > max_length:
+            raise ValidationError(_(
+                "Username must be between %(min)s and %(max)s characters long.",
+                min=min_length, max=max_length)
+            )
+        if field.data.lower() in blacklist:
+            raise ValidationError(_(
+                "This is a system reserved name. Choose a different one.")
+            )
         user = User.query.filter_by(username=field.data).first()
         if user:
             raise ValidationError(_("This username is already taken."))
@@ -126,7 +143,7 @@ class ResetPasswordForm(FlaskForm):
 class RequestActivationForm(FlaskForm):
     username = StringField(_("Username"), validators=[
         DataRequired(message=_("A valid username is required.")),
-        is_username])
+        is_valid_username])
 
     email = StringField(_("Email address"), validators=[
         DataRequired(message=_("A valid email address is required.")),

@@ -153,10 +153,12 @@ def configure_extensions(app):
 
     # Flask-Whooshee
     whooshee.init_app(app)
-    whooshee.register_whoosheer(PostWhoosheer)
-    whooshee.register_whoosheer(TopicWhoosheer)
-    whooshee.register_whoosheer(ForumWhoosheer)
-    whooshee.register_whoosheer(UserWhoosheer)
+    # not needed for unittests - and it will speed up testing A LOT
+    if not app.testing:
+        whooshee.register_whoosheer(PostWhoosheer)
+        whooshee.register_whoosheer(TopicWhoosheer)
+        whooshee.register_whoosheer(ForumWhoosheer)
+        whooshee.register_whoosheer(UserWhoosheer)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]

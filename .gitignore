@@ -44,6 +44,8 @@ __pycache__
 *.iml
 flaskbb/configs/production.py
 flaskbb/configs/development.py
+flaskbb/configs/*.cfg
+*.cfg
 .tox
 *.rdb
 .cache
@@ -57,5 +59,3 @@ node_modules
 
 # Ignore plugins
 flaskbb/plugins/*
-!flaskbb/plugins/__init__.py
-!flaskbb/plugins/portal/

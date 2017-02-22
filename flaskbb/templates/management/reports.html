@@ -18,8 +18,8 @@
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
-            {{ navlink('management.unread_reports', _("Show unread reports")) }}
-            {{ navlink('management.reports', _("Show all reports")) }}
+            {{ navlink('management.reports', _("Show all Reports")) }}
+            {{ navlink('management.unread_reports', _("Show unread Reports")) }}
         </ul>
     </div>
 </div>
@@ -28,37 +28,84 @@
 <div class="col-md-9 settings-col with-left-border">
     <div class="panel settings-panel">
         <div class="panel-heading settings-head">
-            <span class="fa fa-flag"></span> {% trans %}All Reports{% endtrans %}
+            <span class="fa fa-flag"></span> {% trans %}Reports{% endtrans %}
         </div>
         <div class="panel-body settings-body">
             <div class="settings-content">
                 <div class="settings-meta row">
-                    <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
+                    <div class="col-md-1 col-sm-1 col-xs-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
                     <div class="col-md-1 col-sm-2 col-xs-2 meta-item">{% trans %}Poster{% endtrans %}</div>
-                    <div class="col-md-3 col-sm-3 col-xs-3 meta-item">{% trans %}Topic{% endtrans %}</div>
-                    <div class="col-md-3 col-sm-4 col-xs-3 meta-item">{% trans %}Reason{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-xs-2 meta-item">{% trans %}Reporter{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-3 col-xs-3 meta-item">{% trans %}Topic{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-4 col-xs-3 meta-item">{% trans %}Reason{% endtrans %}</div>
+                    <div class="col-md-2 hidden-sm hidden-xs meta-item">{% trans %}Reporter{% endtrans %}</div>
                     <div class="col-md-2 hidden-sm hidden-xs meta-item">{% trans %}Reported{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                <span class="fa fa-fw fa-cog"></span> {% trans %}Actions{% endtrans %}
+                            </button>
+                            <ul class="dropdown-menu slidedown">
+                                <li>
+                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.report_markread') }}')">
+                                        <span class="fa fa-fw fa-flag-o text-primary"></span> {% trans %}Mark as Read{% endtrans %}
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.delete_report') }}')">
+                                        <span class="fa fa-fw fa-trash text-danger"></span> {% trans %}Delete selected reports{% endtrans %}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             {% for report in reports.items %}
                 <div class="row settings-row hover clearfix">
-                    <div class="col-md-1 col-sm-1 col-xs-1">{{ report.id }}</div>
+                    <div class="col-md-1 col-sm-1 col-xs-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ report.id }}" title="Select Report"/></div>
                     <div class="col-md-1 col-sm-2 col-xs-2"><a href="{{ report.post.user.url }}">{{ report.post.user.username }}</a></div>
-                    <div class="col-md-3 col-sm-3 col-xs-3"><a href="{{ report.post.url }}" target="_blank">{{ report.post.topic.title }}</a></div>
-                    <div class="col-md-3 col-sm-4 col-xs-3">{{ report.reason }}</div>
-                    <div class="col-md-2 col-sm-2 col-xs-2">{{ report.reporter.username }}</div>
+                    <div class="col-md-2 col-sm-3 col-xs-3"><a href="{{ report.post.url }}" target="_blank">{{ report.post.topic.title }}</a></div>
+                    <div class="col-md-2 col-sm-4 col-xs-3">{{ report.reason }}</div>
+                    <div class="col-md-2 hidden-sm hidden-xs">{{ report.reporter.username }}</div>
                     <div class="col-md-2 hidden-sm hidden-xs">{{ report.reported|time_since }}</div>
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        {% if not report.zapped %}
+                        <form class="inline-form" id="read-{{report.id}}" method="post" action="{{ url_for('management.report_markread', report_id=report.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Mark as Read{% endtrans %}">
+                                <span class="fa fa-flag-o text-primary"></span>
+                            </button>
+                        </form>
+                        {% endif %}
+                        <form class="inline-form" id="delete-{{report.id}}" method="post" action="{{ url_for('management.delete_report', report_id=report.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}">
+                                <span class="fa fa-trash text-danger"></span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             {% else %}
                 <div class="row settings-row clearfix">
-                    <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No unread reports.{% endtrans %}</div>
+                    <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No reports.{% endtrans %}</div>
                 </div>
             {% endfor %}
             </div>
             <div class="panel-footer settings-footer">
-                {{ render_pagination(reports, url_for('management.unread_reports')) }}
+                {{ render_pagination(reports, url_for(request.endpoint)) }}
             </div>
         </div>
     </div>
 </div>
+{% include theme('confirm_dialog.html') %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    var bulk_actions = new BulkActions();
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
 {% endblock %}

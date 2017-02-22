@@ -1,4 +1,4 @@
 from flaskbb import create_app
-from flaskbb.configs.production import ProductionConfig
 
-flaskbb = create_app(config=ProductionConfig())
+# will throw an error if the config doesn't exist
+flaskbb = create_app(config="flaskbb.cfg")
