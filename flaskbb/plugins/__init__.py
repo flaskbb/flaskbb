@@ -62,6 +62,7 @@ def config_migrate(config):
     migration_dirs = [p.get_migration_version_dir() for p in plugins]
     if config.get_main_option('version_table') == 'plugins':
         config.set_main_option('version_locations', ' '.join(migration_dirs))
+        print config.get_main_option('version_locations')
     return config
 
 
@@ -82,7 +83,7 @@ class FlaskBBPlugin(Plugin):
 
     def get_migration_version_dir(self):
         """Returns path to directory containing the migration version files"""
-        return self.resource_filename('migration_versions')
+        return self.__module__+':migration_versions'
 
     def upgrade_database(self, target='head'):
         """Updates database to a later version of plugin models.
@@ -106,7 +107,7 @@ class FlaskBBPlugin(Plugin):
                         head=self.settings_key)
             except Exception as e:  # presumably this is the initial migration?
                 migrate(directory=os.path.join(plugin_dir, '_migration_environment'),
-                        version_path=self.resource_filename('migration_versions'),
+                        version_path=os.path.join(self.path,'migration_versions'),
                         branch_label=self.settings_key)
 
     @property
