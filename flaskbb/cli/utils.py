@@ -170,7 +170,7 @@ def write_config(config, config_template, config_path):
     :param config_template: The config (jinja2-)template.
     :param config_path: The place to write the new config file.
     """
-    with open(config_path, 'w') as cfg_file:
+    with open(config_path, 'wb') as cfg_file:
         cfg_file.write(
             config_template.render(**config).encode("utf-8")
         )
