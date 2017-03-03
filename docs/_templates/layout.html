@@ -1,15 +1,15 @@
-{% extends 'alabaster/layout.html' %}
-
-{{ sidebar }}
+{% extends 'basic/layout.html' %}
 
 {%- block extrahead %}
   {{ super() }}
+  <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" />
   {% if theme_touch_icon %}
     <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" />
   {% endif %}
   {% if theme_canonical_url %}
     <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html"/>
   {% endif %}
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 {% endblock %}
 
 {# Disable base theme's top+bottom related navs; we have our own in sidebar #}
