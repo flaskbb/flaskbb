@@ -63,14 +63,11 @@ setup(
     install_requires=[
         'alembic',
         'amqp',
-        'anyjson',
         'Babel',
         'billiard',
         'blinker',
         'celery',
         'click',
-        'cov-core',
-        'coverage',
         'Flask',
         'flask-allows',
         'Flask-BabelPlus',
@@ -118,7 +115,8 @@ setup(
         'py',
         'pytest',
         'pytest-cov',
-        'pytest-random'
+        'cov-core',
+        'coverage'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
