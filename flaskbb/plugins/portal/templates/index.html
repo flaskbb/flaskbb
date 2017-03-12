@@ -123,7 +123,7 @@
               <a href="{{ url_for('user.profile', username=topic.user.username) }}">{{ topic.user.username }}</a>
             </div>
             <div class="portal-topic-updated">
-              {{ topic.date_created | time_since }}
+              {{ topic.last_updated | time_since }}
             </div>
           </div> <!-- /.topic -->
 
