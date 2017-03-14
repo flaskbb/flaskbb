@@ -45,7 +45,7 @@ def new_plugin(plugin_identifier, template):
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = os.path.join(current_app.root_path, "plugins")
+    out_dir = current_app.extensions['plugin_manager'].plugin_folder  #monkeypatched by test routine
     click.secho("[+] Creating new plugin...",
                 fg="cyan")
     cookiecutter(template, output_dir=out_dir)
@@ -155,3 +155,16 @@ def upgrade_plugin(plugin_identifier):
         plugin.upgrade_database()
     except AttributeError:
         pass
+
+@plugins.command("downgrade")
+@click.argument("plugin_identifier")
+def downgrade_plugin(plugin_identifier):
+    """Downgrades database to remove a plugin's models"""
+    validate_plugin(plugin_identifier)
+    plugin = get_plugin_from_all(plugin_identifier)
+    if click.confirm("Please confirm you want to remove this plugins data from the database"):
+        click.secho("[+] Downgrading plugin {}...".format(plugin.name), fg="cyan")
+        try:
+            plugin.downgrade_database()
+        except AttributeError:
+            pass
