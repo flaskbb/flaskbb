@@ -36,6 +36,10 @@ ul, ol {
   padding: 0;
 }
 
+code {
+  padding: 0;
+}
+
 /* -- sidebar --------------------------------------------------------------- */
 .page-sidebar {
   margin-top: 25px;
