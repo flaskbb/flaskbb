@@ -17,8 +17,7 @@ from flask import g
 from flask_migrate import upgrade, downgrade, migrate
 from flask_plugins import Plugin
 from flaskbb.extensions import db, migrate as mig
-from flaskbb.management.models import SettingsGroup
-
+from flaskbb.management.models import SettingsGroup,Setting
 
 @contextlib.contextmanager  # TODO: Add tests
 def plugin_name_migrate(name):
@@ -71,6 +70,7 @@ class FlaskBBPlugin(Plugin):
     #: install additional things you must set it, else it won't install
     #: anything.
     settings_key = None
+    requires_install=None
 
     def resource_filename(self, *names):
         "Returns an absolute filename for a plugin resource."
@@ -128,6 +128,14 @@ class FlaskBBPlugin(Plugin):
                 return True
             return False
         return False
+
+    def this_version_installed(self):
+        if self.uninstallable():
+            if Setting.as_dict(self.settings_key).get('version',None)==self.version:
+                return True
+            return False
+        return None
+
 
         # Some helpers
 
