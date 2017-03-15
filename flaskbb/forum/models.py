@@ -331,8 +331,8 @@ class Topic(db.Model, CRUDMixin):
 
         :param topicsread: The topicsread object for the topic
 
-        :param user: The user who should be checked if he has read the last post
-                    in the topic
+        :param user: The user who should be checked if he has read the
+                     last post in the topic
 
         :param forumsread: The forumsread object in which the topic is. If you
                         also want to check if the user has marked the forum as

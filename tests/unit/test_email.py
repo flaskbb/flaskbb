@@ -11,7 +11,8 @@ def test_send_reset_token_to_user(default_settings, user):
             send_reset_token(user)
 
             assert len(outbox) == 1
-            assert "/auth/reset-password" in outbox[0].body  # from /auth/reset-password/<token>
+            # from /auth/reset-password/<token>
+            assert "/auth/reset-password" in outbox[0].body
             assert "/auth/reset-password" in outbox[0].html
 
 
@@ -23,5 +24,6 @@ def test_send_activation_token_to_user(default_settings, user):
             send_activation_token(user)
 
             assert len(outbox) == 1
-            assert "/auth/activate" in outbox[0].body  # from /auth/activate/<token>
+            # from /auth/activate/<token>
+            assert "/auth/activate" in outbox[0].body
             assert "/auth/activate" in outbox[0].html

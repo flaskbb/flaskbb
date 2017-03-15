@@ -27,7 +27,9 @@ def test_category_delete(category):
 
 
 def test_category_delete_with_user(topic):
-    """Test the delete category method with recounting the users post counts."""
+    """Test the delete category method with recounting the users post
+    counts.
+    """
     user = topic.user
     forum = topic.forum
     category = topic.forum.category
@@ -550,7 +552,9 @@ def test_forumsread(topic, user):
     assert forumsread is not None
 
     forumsread.delete()
-    forumsread = ForumsRead.query.filter_by(forum_id=forumsread.forum_id).first()
+    forumsread = ForumsRead.query.\
+        filter_by(forum_id=forumsread.forum_id).\
+        first()
     assert forumsread is None
 
 
@@ -566,5 +570,7 @@ def test_topicsread(topic, user):
     assert topicsread is not None
 
     topicsread.delete()
-    topicsread = TopicsRead.query.filter_by(topic_id=topicsread.topic_id).first()
+    topicsread = TopicsRead.query.\
+        filter_by(topic_id=topicsread.topic_id).\
+        first()
     assert topicsread is None

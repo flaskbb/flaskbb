@@ -1,11 +1,14 @@
-import pytest
-from flaskbb.utils.populate import *
+from flaskbb.utils.populate import delete_settings_from_fixture, \
+    create_settings_from_fixture, update_settings_from_fixture, \
+    create_default_groups, create_test_data, insert_bulk_data, \
+    create_welcome_forum, create_user
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.fixtures.settings import fixture as settings_fixture
-from flaskbb.user.models import Group
+from flaskbb.user.models import Group, User
 from flaskbb.forum.models import Category, Topic, Post
+from flaskbb.management.models import Setting, SettingsGroup
 
-# 184-199, 218-268, 278-307
+
 def test_delete_settings_from_fixture(default_settings):
     groups_count = SettingsGroup.query.count()
     assert len(settings_fixture) == groups_count

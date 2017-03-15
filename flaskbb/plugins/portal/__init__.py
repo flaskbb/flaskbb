@@ -31,17 +31,18 @@ fixture = (
         "description": "Configure the portal",
         "settings": (
             ('plugin_portal_forum_ids', {
-                'value':        [1],
-                'value_type':   "selectmultiple",
-                'name':         "Forum IDs",
-                'description':  "The forum ids from which forums the posts should be displayed on the portal.",
+                'value': [1],
+                'value_type': "selectmultiple",
+                'name': "Forum IDs",
+                'description': ("The forum ids from which forums the posts "
+                                "should be displayed on the portal."),
                 'extra': {"choices": available_forums, "coerce": int}
             }),
             ('plugin_portal_recent_topics', {
-                'value':        10,
-                'value_type':   "integer",
-                'name':         "Number of Recent Topics",
-                'description':  "The number of topics in Recent Topics portlet.",
+                'value': 10,
+                'value_type': "integer",
+                'name': "Number of Recent Topics",
+                'description': "The number of topics in Recent Topics.",
                 'extra': {"min": 1},
             }),
         ),

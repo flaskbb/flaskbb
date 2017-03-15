@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-import datetime
+# -*- coding: utf-8 -*-
+import datetime as dt
 from flaskbb.utils.helpers import slugify, forum_is_unread, topic_is_unread, \
     crop_title, render_markup, is_online, format_date, format_quote, \
     get_image_info, check_image, time_utcnow
@@ -30,9 +30,9 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
     # but before we have to add an read entry in forumsread and topicsread
     topic.update_read(user, topic.forum, forumsread)
 
-    time_read = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+    time_read = dt.datetime.utcnow() - dt.timedelta(hours=1)
     forumsread.cleared = time_read  # lets cheat here a bit :P
-    forumsread.last_read = datetime.datetime.utcnow()
+    forumsread.last_read = dt.datetime.utcnow()
     forumsread.save()
     assert not forum_is_unread(forum, forumsread, user)
 
@@ -43,7 +43,7 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
     # there haven't been a post since TRACKER_LENGTH and thus the forum is read
     flaskbb_config["TRACKER_LENGTH"] = 1
     # this is cheating; don't do this.
-    forum.last_post_created = forum.last_post_created - datetime.timedelta(hours=48)
+    forum.last_post_created = forum.last_post_created - dt.timedelta(hours=48)
     forum.save()
     assert not forum_is_unread(forum, forumsread, user)
 
@@ -63,20 +63,22 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     assert topic_is_unread(topic, topicsread, user, forumsread)
 
     # TopicsRead is none and the forum has never been marked as read
-    assert topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
+    assert topic_is_unread(topic, topicsread=None, user=user,
+                           forumsread=forumsread)
 
     # lets mark the forum as read
     forumsread.cleared = time_utcnow()
     forumsread.last_read = time_utcnow()
     forumsread.save()
-    assert not topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
+    assert not topic_is_unread(topic, topicsread=None, user=user,
+                               forumsread=forumsread)
 
     # disabled tracker
     flaskbb_config["TRACKER_LENGTH"] = 0
     assert not topic_is_unread(topic, None, user, None)
 
     # post is older than tracker length
-    time_posted = time_utcnow() - datetime.timedelta(days=2)
+    time_posted = time_utcnow() - dt.timedelta(days=2)
     flaskbb_config["TRACKER_LENGTH"] = 1
     topic.last_post.date_created = time_posted
     topic.save()
@@ -101,13 +103,13 @@ def test_is_online(default_settings, user):
 
 
 def test_format_date():
-    date = datetime.date(2015, 2, 15)
-    time = datetime.datetime.combine(date, datetime.datetime.min.time())
+    date = dt.date(2015, 2, 15)
+    time = dt.datetime.combine(date, dt.datetime.min.time())
     assert format_date(time) == "2015-02-15"
 
 
 def test_format_quote(topic):
-    expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"
+    expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
     actual = format_quote(topic.first_post.username, topic.first_post.content)
     assert actual == expected_markdown
 
@@ -119,9 +121,9 @@ def test_get_image_info():
     png = "http://i.imgur.com/JXzKxNs.png"
 
     # Issue #207 Image - This works now
-    #issue_img = "http://b.reich.io/gtlbjc.jpg"
-    #issue_img = get_image_info(issue_img)
-    #assert issue_img["content_type"] == "JPEG"
+    # issue_img = "http://b.reich.io/gtlbjc.jpg"
+    # issue_img = get_image_info(issue_img)
+    # assert issue_img["content_type"] == "JPEG"
 
     jpg_img = get_image_info(jpg)
     assert jpg_img["content_type"] == "JPEG"
@@ -152,7 +154,7 @@ def test_check_image(default_settings):
     # random too big image
     img_size = "http://i.imgur.com/l3Vmp4m.gif"
     # random image wrong type
-    img_type = "https://d11xdyzr0div58.cloudfront.net/static/logos/archlinux-logo-black-scalable.f931920e6cdb.svg"
+    img_type = "https://d11xdyzr0div58.cloudfront.net/static/logos/archlinux-logo-black-scalable.f931920e6cdb.svg"  # noqa
 
     data = check_image(img_width)
     assert "wide" in data[0]

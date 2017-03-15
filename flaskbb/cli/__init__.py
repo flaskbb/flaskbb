@@ -15,8 +15,8 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flaskbb.cli.main import flaskbb
-from flaskbb.cli.plugins import plugins
-from flaskbb.cli.themes import themes
-from flaskbb.cli.translations import translations
-from flaskbb.cli.users import users
+from flaskbb.cli.main import flaskbb  # noqa
+from flaskbb.cli.plugins import plugins  # noqa
+from flaskbb.cli.themes import themes  # noqa
+from flaskbb.cli.translations import translations  # noqa
+from flaskbb.cli.users import users  # noqa

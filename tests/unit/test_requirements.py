@@ -62,7 +62,9 @@ def test_Moderator_in_Forum_CanEditLockedTopic(moderator_user, topic_locked):
     assert r.CanEditPost(moderator_user, request)
 
 
-def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(Fred, topic_locked, default_groups):
+def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(
+        Fred, topic_locked, default_groups):
+
     request = SimpleNamespace(view_args={'topic_id': topic_locked.id})
     Fred.primary_group = default_groups[2]
     assert not r.CanEditPost(Fred, request)

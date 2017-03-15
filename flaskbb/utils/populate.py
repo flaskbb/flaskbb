@@ -348,7 +348,7 @@ def insert_bulk_data(topic_count=10, post_count=100):
 
             # Uncomment the line underneath and the other line to reduce
             # performance but fixes the above mentioned problem.
-            #topic.last_post_id = last_post_id
+            # topic.last_post_id = last_post_id
 
             created_posts += 1
             posts.append(post)
@@ -356,7 +356,7 @@ def insert_bulk_data(topic_count=10, post_count=100):
         # uncomment this and delete the one below, also uncomment the
         # topic.last_post_id line above. This will greatly reduce the
         # performance.
-        #db.session.bulk_save_objects(posts)
+        # db.session.bulk_save_objects(posts)
     db.session.bulk_save_objects(posts)
 
     # and finally, lets update some stats

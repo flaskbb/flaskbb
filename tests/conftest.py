@@ -1,3 +1,3 @@
-from tests.fixtures.app import *
-from tests.fixtures.forum import *
-from tests.fixtures.user import *
+from tests.fixtures.app import *  # noqa
+from tests.fixtures.forum import *  # noqa
+from tests.fixtures.user import *  # noqa

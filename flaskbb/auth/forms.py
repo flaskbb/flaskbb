@@ -76,7 +76,8 @@ class RegisterForm(FlaskForm):
 
         if len(field.data) < min_length or len(field.data) > max_length:
             raise ValidationError(_(
-                "Username must be between %(min)s and %(max)s characters long.",
+                "Username must be between %(min)s and %(max)s "
+                "characters long.",
                 min=min_length, max=max_length)
             )
         if field.data.lower() in blacklist:

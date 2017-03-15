@@ -218,7 +218,7 @@ def download_emoji():
     """
     click.secho("[+] Downloading emojis...", fg="cyan")
     HOSTNAME = "https://api.github.com"
-    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"
+    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"  # noqa
     FULL_URL = "{}{}".format(HOSTNAME, REPO)
     DOWNLOAD_PATH = os.path.join(current_app.static_folder, "emoji")
     response = requests.get(FULL_URL)

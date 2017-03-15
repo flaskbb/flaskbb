@@ -12,4 +12,4 @@ def test_flaskbb_config(default_settings):
     assert flaskbb_config['PROJECT_TITLE'] == 'FlaskBBTest'
     # test __iter__
     test_dict = {}
-    assert type(flaskbb_config.__iter__()) == type(test_dict.__iter__())
+    assert type(flaskbb_config.__iter__()) == isinstance(test_dict.__iter__())

@@ -25,7 +25,7 @@ from flaskbb.utils.populate import create_user, update_user
 
 cookiecutter_available = False
 try:
-    from cookiecutter.main import cookiecutter
+    from cookiecutter.main import cookiecutter  # noqa
     cookiecutter_available = True
 except ImportError:
     pass
