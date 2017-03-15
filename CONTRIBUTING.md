@@ -25,6 +25,9 @@ Follow the [PEP8 style guide][pep8].
 
   [pep8]: https://www.python.org/dev/peps/pep-0008/
 
+You can check if your code follows the PEP8, either by running ``make lint``
+or by executing ``flake8`` directly.
+
 FlaskBB is depending on a few python packages for development. One of those is
 [py.test][pytest] which runs our testsuite. Just use the provided
 ``requirements-dev.txt`` file and you should be good to go.

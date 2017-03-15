@@ -6,3 +6,4 @@ pytest
 pytest-cov
 Sphinx
 alabaster
+flake8
