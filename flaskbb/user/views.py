@@ -35,7 +35,7 @@ def profile(username):
 def view_all_topics(username):
     page = request.args.get("page", 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    topics = user.all_topics(page)
+    topics = user.all_topics(page, current_user)
     return render_template("user/all_topics.html", user=user, topics=topics)
 
 
@@ -43,7 +43,7 @@ def view_all_topics(username):
 def view_all_posts(username):
     page = request.args.get("page", 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    posts = user.all_posts(page)
+    posts = user.all_posts(page, current_user)
     return render_template("user/all_posts.html", user=user, posts=posts)
 
 

@@ -17,7 +17,7 @@ from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
-from flaskbb.forum.models import (Post, Topic, topictracker, TopicsRead,
+from flaskbb.forum.models import (Post, Topic, Forum, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
 
@@ -269,20 +269,40 @@ class User(db.Model, UserMixin, CRUDMixin):
         self.save()
         return self
 
-    def all_topics(self, page):
-        """Returns a paginated result with all topics the user has created."""
-        return Topic.query.\
-            filter(Topic.user_id == self.id,
-                   Topic.id == Post.topic_id).\
-            order_by(Post.id.desc()).\
-            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+    def all_topics(self, page, viewer):
+        """Returns a paginated result with all topics the user has created.
 
-    def all_posts(self, page):
-        """Returns a paginated result with all posts the user has created."""
-        return Post.query.\
-            filter(Post.user_id == self.id).\
-            order_by(Post.id.desc()).\
+        :param page: The page which should be displayed.
+        :param viewer: The user who is viewing this user. It will return a
+                       list with topics that the *viewer* has access to and
+                       thus it will not display all topics from
+                       the requested user.
+        """
+        group_ids = [g.id for g in viewer.groups]
+        topics = Topic.query.\
+            filter(Topic.user_id == self.id,
+                   Forum.id == Topic.forum_id,
+                   Forum.groups.any(Group.id.in_(group_ids))).\
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+        return topics
+
+    def all_posts(self, page, viewer):
+        """Returns a paginated result with all posts the user has created.
+
+        :param page: The page which should be displayed.
+        :param viewer: The user who is viewing this user. It will return a
+                       list with posts that the *viewer* has access to and
+                       thus it will not display all posts from
+                       the requested user.
+        """
+        group_ids = [g.id for g in viewer.groups]
+        posts = Post.query.\
+            filter(Post.user_id == self.id,
+                   Post.topic_id == Topic.id,
+                   Topic.forum_id == Forum.id,
+                   Forum.groups.any(Group.id.in_(group_ids))).\
+            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+        return posts
 
     def track_topic(self, topic):
         """Tracks the specified topic.
