@@ -60,6 +60,11 @@ def overview():
     else:
         online_users = len(get_online_users())
 
+    unread_reports = Report.query.\
+        filter(Report.zapped == None).\
+        order_by(Report.id.desc()).\
+        count()
+
     celery_inspect = celery.control.inspect()
     try:
         celery_running = True if celery_inspect.ping() else False
@@ -68,28 +73,30 @@ def overview():
         # from redis is also bad because you can run celery with other
         # brokers as well.
         celery_running = False
+
     python_version = "{}.{}.{}".format(
         sys.version_info[0], sys.version_info[1], sys.version_info[2]
     )
 
     stats = {
         "current_app": current_app,
-        # user stats
+        "unread_reports": unread_reports,
+        # stats stats
         "all_users": User.query.count(),
         "banned_users": banned_users,
         "online_users": online_users,
         "all_groups": Group.query.count(),
-        # forum stats
         "report_count": Report.query.count(),
         "topic_count": Topic.query.count(),
         "post_count": Post.query.count(),
-        # misc stats
-        "plugins": get_all_plugins(),
+        # components
         "python_version": python_version,
         "celery_version": celery_version,
         "celery_running": celery_running,
         "flask_version": flask_version,
-        "flaskbb_version": flaskbb_version
+        "flaskbb_version": flaskbb_version,
+        # plugins
+        "plugins": get_all_plugins()
     }
 
     return render_template("management/overview.html", **stats)

@@ -20,11 +20,18 @@
                 <div class="stats">
                     <div class="row stats-row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
-                            <!-- TODO: (Later) Show new reports, updates, etc -->
+                            {# TODO: I have a feeling that this can be done so much nicer #}
                             {% if not celery_running %}
                             <div class="alert-message alert-message-danger">
                                 <h4>{% trans %}There is a problem.{% endtrans %}</h4>
-                                <p>{% trans config_path=current_app.config["CONFIG_PATH"] %}Celery is <strong>not</strong> running. You can start celery with this command <code>flaskbb --config {{ config_path }} celery worker</code>{% endtrans %}</p>
+                                <p>{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
+                                <p>{% trans %}You can start celery with this command:{% endtrans %}</p>
+                                <pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>
+                            </div>
+                            {% elif unread_reports > 0 %}
+                            <div class="alert-message alert-message-warning">
+                                <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
+                                <p>{% trans url=url_for('management.unread_reports') %}You have <a href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
                             </div>
                             {% else %}
                             <div class="alert-message alert-message-success">
