@@ -81,10 +81,13 @@ def configure_app(app, config):
 
     if isinstance(config, string_types) and \
             os.path.exists(os.path.abspath(config)):
-        app.config.from_pyfile(os.path.abspath(config))
+        config = os.path.abspath(config)
+        app.config.from_pyfile(config)
     else:
         # try to update the config from the object
         app.config.from_object(config)
+    # Add the location of the config to the config
+    app.config["CONFIG_PATH"] = config
 
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
