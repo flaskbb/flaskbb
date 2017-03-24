@@ -61,7 +61,13 @@ def overview():
         online_users = len(get_online_users())
 
     celery_inspect = celery.control.inspect()
-    celery_running = True if celery_inspect.ping() else False
+    try:
+        celery_running = True if celery_inspect.ping() else False
+    except Exception:
+        # catching Exception is bad, and just catching ConnectionError
+        # from redis is also bad because you can run celery with other
+        # brokers as well.
+        celery_running = False
     python_version = "{}.{}.{}".format(
         sys.version_info[0], sys.version_info[1], sys.version_info[2]
     )
@@ -741,7 +747,7 @@ def disable_plugin(plugin):
 @allows.requires(IsAdmin)
 def uninstall_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
-    if plugin.uninstallable:
+    if plugin.installed:
         plugin.uninstall()
         Setting.invalidate_cache()
 
@@ -756,7 +762,7 @@ def uninstall_plugin(plugin):
 @allows.requires(IsAdmin)
 def install_plugin(plugin):
     plugin = get_plugin_from_all(plugin)
-    if plugin.installable and not plugin.uninstallable:
+    if not plugin.installed:
         plugin.install()
         Setting.invalidate_cache()
 

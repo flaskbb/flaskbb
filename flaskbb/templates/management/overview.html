@@ -134,7 +134,7 @@
                             {% for plugin in plugins %}
                             <div class="row stats-item">
                                 <div class="key pull-left">
-                                {% if plugin.uninstallable %}
+                                {% if plugin.installed %}
                                     <a href="{{ url_for('management.settings', slug=plugin.settings_key) }}">{{ plugin.name }}</a>
                                 {% else %}
                                     <a href="{{ url_for('management.plugins') }}">{{ plugin.name }}</a>
