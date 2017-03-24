@@ -21,10 +21,17 @@
                     <div class="row stats-row">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <!-- TODO: (Later) Show new reports, updates, etc -->
+                            {% if not celery_running %}
+                            <div class="alert-message alert-message-danger">
+                                <h4>{% trans %}There is a problem.{% endtrans %}</h4>
+                                <p>{% trans config_path=current_app.config["CONFIG_PATH"] %}Celery is <strong>not</strong> running. You can start celery with this command <code>flaskbb --config {{ config_path }} celery worker</code>{% endtrans %}</p>
+                            </div>
+                            {% else %}
                             <div class="alert-message alert-message-success">
                                 <h4>{% trans %}Everything seems alright.{% endtrans %}</h4>
                                 <p>{% trans %}No new notifications.{% endtrans %}</p>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row stats-row">
@@ -103,6 +110,16 @@
                                 <div class="key pull-left">FlaskBB API</div><div class="value pull-right">v1</div>
                             </div>
                             -->
+                            <div class="row stats-item">
+                                <div class="key pull-left">Celery</div><div class="value pull-right">
+                                {% if celery_running %}
+                                    <span class="text-success"><strong>running</strong></span>
+                                {% else %}
+                                <span class="text-danger"><strong>not running</strong></span>
+                                {% endif %}
+                                {{ celery_version }}
+                                </div>
+                            </div>
                             <div class="row stats-item">
                                 <div class="key pull-left">Flask</div><div class="value pull-right">{{ flask_version }}</div>
                             </div>

@@ -10,6 +10,7 @@
 """
 import sys
 
+from celery import __version__ as celery_version
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
 from flask_login import current_user, login_fresh
@@ -24,7 +25,7 @@ from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
                                         CanBanUser, CanEditUser,
                                         IsAtleastSuperModerator)
-from flaskbb.extensions import db, allows
+from flaskbb.extensions import db, allows, celery
 from flaskbb.utils.helpers import (render_template, time_diff, time_utcnow,
                                    get_online_users)
 from flaskbb.user.models import Guest, User, Group
@@ -59,7 +60,14 @@ def overview():
     else:
         online_users = len(get_online_users())
 
+    celery_inspect = celery.control.inspect()
+    celery_running = True if celery_inspect.ping() else False
+    python_version = "{}.{}.{}".format(
+        sys.version_info[0], sys.version_info[1], sys.version_info[2]
+    )
+
     stats = {
+        "current_app": current_app,
         # user stats
         "all_users": User.query.count(),
         "banned_users": banned_users,
@@ -71,7 +79,9 @@ def overview():
         "post_count": Post.query.count(),
         # misc stats
         "plugins": get_all_plugins(),
-        "python_version": "%s.%s" % (sys.version_info[0], sys.version_info[1]),
+        "python_version": python_version,
+        "celery_version": celery_version,
+        "celery_running": celery_running,
         "flask_version": flask_version,
         "flaskbb_version": flaskbb_version
     }
