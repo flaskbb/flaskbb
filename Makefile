@@ -22,7 +22,7 @@ test:
 	py.test
 
 run:
-	flaskbb --config ./flaskbb.cfg run
+	flaskbb --config ./flaskbb.cfg run --debugger --reload
 
 devconfig:
 	flaskbb makeconfig -d
