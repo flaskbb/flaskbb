@@ -8,10 +8,18 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import warnings
 from flask import current_app
 from flask_plugins import Plugin
 
 from flaskbb.management.models import SettingsGroup
+
+
+class FlaskBBPluginDeprecationWarning(DeprecationWarning):
+    pass
+
+
+warnings.simplefilter("always", FlaskBBPluginDeprecationWarning)
 
 
 class FlaskBBPlugin(Plugin):
@@ -22,25 +30,40 @@ class FlaskBBPlugin(Plugin):
     settings_key = None
 
     @property
-    def installable(self):
-        """Is ``True`` if the Plugin can be installed."""
+    def has_settings(self):
+        """Is ``True`` if the Plugin **can** be installed."""
         if self.settings_key is not None:
             return True
         return False
 
     @property
-    def uninstallable(self):
-        """Is ``True`` if the Plugin can be uninstalled."""
-        if self.installable:
+    def installed(self):
+        is_installed = False
+        if self.has_settings:
             group = SettingsGroup.query.\
                 filter_by(key=self.settings_key).\
                 first()
-            if group and len(group.settings.all()) > 0:
-                return True
-            return False
-        return False
+            is_installed = group and len(group.settings.all()) > 0
+        return is_installed
 
-        # Some helpers
+    @property
+    def uninstallable(self):
+        """Is ``True`` if the Plugin **can** be uninstalled."""
+        warnings.warn(
+            "self.uninstallable is deprecated. Use self.installed instead.",
+            FlaskBBPluginDeprecationWarning
+        )
+        return self.installed
+
+    @property
+    def installable(self):
+        warnings.warn(
+            "self.installable is deprecated. Use self.has_settings instead.",
+            FlaskBBPluginDeprecationWarning
+        )
+        return self.has_settings
+
+    # Some helpers
     def register_blueprint(self, blueprint, **kwargs):
         """Registers a blueprint.
 
