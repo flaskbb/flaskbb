@@ -248,11 +248,15 @@ class Post(db.Model, CRUDMixin):
                     order_by(Post.id.desc()).limit(2).offset(0).\
                     all()
 
-                second_last_post = second_last_post[1]
+                # now lets update the second last post to the last post
+                last_post = second_last_post[1]
+                self.topic.forum.last_post_id = last_post.id
+                self.topic.forum.last_post_title = last_post.topic.title
+                self.topic.forum.last_post_user_id = last_post.user_id
+                self.topic.forum.last_post_username = last_post.username
+                self.topic.forum.last_post_created = last_post.date_created
 
-                self.topic.forum.last_post_id = second_last_post.id
-
-            # check if there is a second last post, else it is the first post
+            # check if there is a second last post in this topic
             if self.topic.second_last_post:
                 # Now the second last post will be the last post
                 self.topic.last_post_id = self.topic.second_last_post
