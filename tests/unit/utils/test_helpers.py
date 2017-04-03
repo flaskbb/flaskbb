@@ -154,7 +154,7 @@ def test_check_image(default_settings):
     # random too big image
     img_size = "http://i.imgur.com/l3Vmp4m.gif"
     # random image wrong type
-    img_type = "https://d11xdyzr0div58.cloudfront.net/static/logos/archlinux-logo-black-scalable.f931920e6cdb.svg"  # noqa
+    img_type = "https://flaskbb.org/static/imgs/flask.svg"
 
     data = check_image(img_width)
     assert "wide" in data[0]
