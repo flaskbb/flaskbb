@@ -45,8 +45,8 @@ def new_plugin(plugin_identifier, template):
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = current_app.extensions['plugin_manager'].plugin_folder  #monkeypatched by test routine
-    click.secho("[+] Creating new plugin...",
+    out_dir = os.path.join(current_app.root_path, "plugins", plugin_identifier)
+    click.secho("[+] Creating new plugin {}".format(plugin_identifier),
                 fg="cyan")
     cookiecutter(template, output_dir=out_dir)
     click.secho("[+] Done. Created in {}".format(out_dir),
@@ -128,52 +128,3 @@ def list_plugins():
             click.secho("    - {} (version {})".format(
                 plugin.name, plugin.version), bold=True
             )
-
-
-@plugins.command("migrate")
-@click.argument("plugin_identifier")
-@click.option("--message", "-m", help="The name of the migration.")
-def migrate_plugin(plugin_identifier, message=None):
-    """Generates migration files for a plugin.
-    Migration version files are stored in
-    ``flaskbb/plugins/<plugin_dir>/migration_versions``.
-    """
-    validate_plugin(plugin_identifier)
-    plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Updating plugin migrations {}...".format(plugin.name),
-                fg="cyan")
-    try:
-        plugin.migrate(message=message)
-    except Exception as e:
-        click.secho("[-] Couldn't generate migrations for plugin because of "
-                    "following exception: \n{}".format(e), fg="red")
-
-
-@plugins.command("upgrade")
-@click.argument("plugin_identifier")
-def upgrade_plugin(plugin_identifier):
-    """Upgrades database to the latest version of a plugin's models"""
-    validate_plugin(plugin_identifier)
-    plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Upgrading plugin {}...".format(plugin.name), fg="cyan")
-    try:
-        plugin.upgrade_database()
-    except AttributeError:
-        pass
-
-
-@plugins.command("downgrade")
-@click.argument("plugin_identifier")
-def downgrade_plugin(plugin_identifier):
-    """Downgrades database to remove a plugin's models"""
-    validate_plugin(plugin_identifier)
-    plugin = get_plugin_from_all(plugin_identifier)
-
-    if click.confirm("Please confirm if you want to remove this plugins data "
-                     "from the database."):
-        click.secho("[+] Downgrading plugin {}...".format(plugin.name),
-                    fg="cyan")
-        try:
-            plugin.downgrade_database()
-        except AttributeError:
-            pass
