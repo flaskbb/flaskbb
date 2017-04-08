@@ -1,8 +1,7 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool, ext as sa_ext
+from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
-from flaskbb.plugins import config_migrate
 import logging
 
 # this is the Alembic Config object, which provides
@@ -30,16 +29,18 @@ target_metadata = db.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-moduletables = {k.__table__.name: k.__module__ for k in db.Model._decl_class_registry.values() if
-                hasattr(k, '__table__')}
+moduletables = {k.__table__.name: k.__module__
+                for k in db.Model._decl_class_registry.values()
+                if hasattr(k, '__table__')}
+
 
 def include_object(obj, name, type_, reflected, compare_to):
-  try:
-    modname = moduletables.get(name) or getattr(obj,'_plugin',None)
+    modname = moduletables.get(name) or getattr(obj, '_plugin', None)
     if hasattr(g, 'plugin_tables'):
         return name in g.plugin_tables
     elif hasattr(g, 'plugin_name'):
-        if name == 'alembic_version': return False
+        if name == 'alembic_version':
+            return False
         if not modname:
             return False
         if modname and modname.startswith(g.plugin_name):
@@ -47,8 +48,7 @@ def include_object(obj, name, type_, reflected, compare_to):
         return False
     else:
         return False
-  except Exception as e:
-    print e
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -74,7 +74,6 @@ def run_migrations_online():
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
 
     # this callback is used to prevent an auto-migration from being generated

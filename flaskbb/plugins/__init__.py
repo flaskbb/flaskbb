@@ -9,40 +9,42 @@
     :license: BSD, see LICENSE for more details.
 """
 import contextlib
-
 import copy
 import os
+
 from flask import current_app
 from flask import g
 from flask_migrate import upgrade, downgrade, migrate
 from flask_plugins import Plugin
-from flaskbb.extensions import db, migrate as mig
-from flaskbb.management.models import SettingsGroup,Setting
+from flaskbb.extensions import db, migrate as migrate_ext
+from flaskbb.management.models import SettingsGroup, Setting
+
 
 @contextlib.contextmanager  # TODO: Add tests
 def plugin_name_migrate(name):
-    """Migrations in this with block will only apply to models from the named plugin"""
+    """Migrations in this with block will only apply to models
+    from the named plugin"""
     g.plugin_name = name
     yield
     del g.plugin_name
 
 
-def db_for_plugin(plugin_name,sqla_instance=None):
+def db_for_plugin(plugin_name, sqla_instance=None):
     """Labels models as belonging to this plugin.
-    sqla_instance is a valid Flask-SQLAlchemy instance, if None, then the default db is used
+    sqla_instance is a valid Flask-SQLAlchemy instance, if None,
+    then the default db is used
 
     Usage:
         from flaskbb.plugins import db_for_plugin
 
-        db=db_for_plugin(__name__)
+        db = db_for_plugin(__name__)
 
         mytable = db.Table(...)
 
         class MyModel(db.Model):
             ...
-
-        """
-    sqla_instance=sqla_instance or db
+    """
+    sqla_instance = sqla_instance or db
     new_db = copy.copy(sqla_instance)
 
     def Table(*args, **kwargs):
@@ -54,14 +56,14 @@ def db_for_plugin(plugin_name,sqla_instance=None):
     return new_db
 
 
-@mig.configure
+@migrate_ext.configure
 def config_migrate(config):
-    """Configuration callback for plugins environment"""
+    """Configuration callback for plugins environment."""
     plugins = current_app.extensions['plugin_manager'].all_plugins.values()
     migration_dirs = [p.get_migration_version_dir() for p in plugins]
     if config.get_main_option('version_table') == 'plugins':
         config.set_main_option('version_locations', ' '.join(migration_dirs))
-        print config.get_main_option('version_locations')
+        # current_app.logger.debug(config.get_main_option('version_locations'))
     return config
 
 
@@ -70,45 +72,60 @@ class FlaskBBPlugin(Plugin):
     #: install additional things you must set it, else it won't install
     #: anything.
     settings_key = None
-    requires_install=None
+    requires_install = None
 
     def resource_filename(self, *names):
-        "Returns an absolute filename for a plugin resource."
-        if len(names)==1 and '/' in names[0]:
-            names=names[0].split('/')
-        fname= os.path.join(self.path, *names)
-        if ' ' in fname and not '"' in fname and not "'" in fname:
-            fname='"%s"'%fname
+        """Returns an absolute filename for a plugin resource."""
+        if len(names) == 1 and '/' in names[0]:
+            names = names[0].split('/')
+        fname = os.path.join(self.path, *names)
+        if ' ' in fname and '"' not in fname and "'" not in fname:
+            fname = '"%s"' % fname
         return fname
 
     def get_migration_version_dir(self):
-        """Returns path to directory containing the migration version files"""
-        return self.__module__+':migration_versions'
+        """Returns the path to the directory which is containing the
+        migration version files
+        """
+        return self.__module__ + ':migration_versions'
 
     def upgrade_database(self, target='head'):
-        """Updates database to a later version of plugin models.
-        Default behaviour is to upgrade to latest version"""
+        """Updates the database to a later version of the plugin models.
+        Default behaviour is to upgrade to the latest version.
+        """
         plugin_dir = current_app.extensions['plugin_manager'].plugin_folder
-        upgrade(directory=os.path.join(plugin_dir, '_migration_environment'), revision=self.settings_key + '@' + target)
+        plugin_env = os.path.join(plugin_dir, '_migration_environment')
+        plugin_rev = "{}@{}".format(self.settings_key, target)
+        upgrade(directory=plugin_env, revision=plugin_rev)
 
     def downgrade_database(self, target='base'):
-        """Rolls back database to a previous version of plugin models.
-        Default behaviour is to remove models completely"""
+        """Rolls back the database to a previous version of plugin models.
+        Default behaviour is to remove the models completely.
+        """
         plugin_dir = current_app.extensions['plugin_manager'].plugin_folder
-        downgrade(directory=os.path.join(plugin_dir, '_migration_environment'), revision=self.settings_key + '@' + target)
+        plugin_env = os.path.join(plugin_dir, '_migration_environment')
+        plugin_rev = "{}@{}".format(self.settings_key, target)
+        downgrade(directory=plugin_env, revision=plugin_rev)
 
-    def migrate(self):
+    def migrate(self, message=None):
         """Generates new migration files for a plugin and stores them in
-        flaskbb/plugins/<plugin_folder>/migration_versions"""
+        flaskbb/plugins/<plugin_folder>/migration_versions
+
+        :param message: The message of the revision.
+        """
         with plugin_name_migrate(self.__module__):
             plugin_dir = current_app.extensions['plugin_manager'].plugin_folder
+            plugin_env = os.path.join(plugin_dir, '_migration_environment')
+            plugin_ver = os.path.join(self.path, 'migration_versions')
             try:
-                migrate(directory=os.path.join(plugin_dir, '_migration_environment'),
-                        head=self.settings_key)
+                migrate(directory=plugin_env, head=self.settings_key)
             except Exception as e:  # presumably this is the initial migration?
-                migrate(directory=os.path.join(plugin_dir, '_migration_environment'),
-                        version_path=os.path.join(self.path,'migration_versions'),
-                        branch_label=self.settings_key)
+                migrate(
+                    message=message,
+                    directory=plugin_env,
+                    version_path=plugin_ver,
+                    branch_label=self.settings_key
+                )
 
     @property
     def installable(self):
@@ -130,15 +147,17 @@ class FlaskBBPlugin(Plugin):
         return False
 
     def this_version_installed(self):
-        if self.uninstallable():
-            if Setting.as_dict(self.settings_key).get('version',None)==self.version:
+        installed_migration = Setting.\
+            as_dict(self.settings_key).\
+            get('version', None)
+
+        if self.uninstallable:
+            if installed_migration == self.version:
                 return True
             return False
         return None
 
-
-        # Some helpers
-
+    # Some helpers
     def register_blueprint(self, blueprint, **kwargs):
         """Registers a blueprint.
 

@@ -130,19 +130,24 @@ def list_plugins():
             )
 
 
-@plugins.command("migrations")
+@plugins.command("migrate")
 @click.argument("plugin_identifier")
-def migrate_plugin(plugin_identifier):
+@click.option("--message", "-m", help="The name of the migration.")
+def migrate_plugin(plugin_identifier, message=None):
     """Generates migration files for a plugin.
-    Migration version files are stored in flaskbb/plugins/<plugin_dir>/migration_versions"""
+    Migration version files are stored in
+    ``flaskbb/plugins/<plugin_dir>/migration_versions``.
+    """
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Updating plugin migrations{}...".format(plugin.name), fg="cyan")
+    click.secho("[+] Updating plugin migrations {}...".format(plugin.name),
+                fg="cyan")
     try:
-        plugin.migrate()
+        plugin.migrate(message=message)
     except Exception as e:
-        click.secho("[-] Couldn't generate migrations for plugin because of following "
-                    "exception: \n{}".format(e), fg="red")
+        click.secho("[-] Couldn't generate migrations for plugin because of "
+                    "following exception: \n{}".format(e), fg="red")
+
 
 @plugins.command("upgrade")
 @click.argument("plugin_identifier")
@@ -156,14 +161,18 @@ def upgrade_plugin(plugin_identifier):
     except AttributeError:
         pass
 
+
 @plugins.command("downgrade")
 @click.argument("plugin_identifier")
 def downgrade_plugin(plugin_identifier):
     """Downgrades database to remove a plugin's models"""
     validate_plugin(plugin_identifier)
     plugin = get_plugin_from_all(plugin_identifier)
-    if click.confirm("Please confirm you want to remove this plugins data from the database"):
-        click.secho("[+] Downgrading plugin {}...".format(plugin.name), fg="cyan")
+
+    if click.confirm("Please confirm if you want to remove this plugins data "
+                     "from the database."):
+        click.secho("[+] Downgrading plugin {}...".format(plugin.name),
+                    fg="cyan")
         try:
             plugin.downgrade_database()
         except AttributeError:
