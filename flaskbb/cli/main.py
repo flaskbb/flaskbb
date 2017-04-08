@@ -22,11 +22,11 @@ from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from sqlalchemy_utils.functions import (database_exists, create_database,
                                         drop_database)
-from flask_migrate import upgrade as upgrade_database
+from flask_alembic import alembic_click
 
 from flaskbb import create_app
 from flaskbb._compat import iteritems
-from flaskbb.extensions import db, whooshee, celery
+from flaskbb.extensions import db, whooshee, celery, alembic
 from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
                                write_config, get_version, FlaskBBCLIError,
                                EmailType)
@@ -95,6 +95,9 @@ def flaskbb():
     pass
 
 
+flaskbb.add_command(alembic_click, "db")
+
+
 @flaskbb.command()
 @click.option("--welcome", "-w", default=True, is_flag=True,
               help="Disable the welcome forum.")
@@ -120,7 +123,7 @@ def install(welcome, force, username, email, password, group):
         else:
             sys.exit(0)
     create_database(db.engine.url)
-    upgrade_database()
+    alembic.upgrade()
 
     click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
@@ -161,11 +164,11 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
 
         # do not initialize the db if -i is passed
         if not initdb:
-            upgrade_database()
+            alembic.upgrade()
 
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
-        upgrade_database()
+        alembic.upgrade()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")
@@ -206,7 +209,7 @@ def upgrade(all_latest, fixture, force):
     if all_latest:
         click.secho("[+] Upgrading migrations to the latest version...",
                     fg="cyan")
-        upgrade_database()
+        alembic.upgrade()
 
     if fixture or all_latest:
         try:

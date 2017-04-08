@@ -17,7 +17,7 @@ from flask_mail import Mail
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_redis import FlaskRedis
-from flask_migrate import Migrate
+from flask_alembic import Alembic
 from flask_themes2 import Themes
 from flask_plugins import PluginManager
 from flask_babelplus import Babel
@@ -52,7 +52,7 @@ redis_store = FlaskRedis()
 debugtoolbar = DebugToolbarExtension()
 
 # Migrations
-migrate = Migrate()
+alembic = Alembic()
 
 # Themes
 themes = Themes()

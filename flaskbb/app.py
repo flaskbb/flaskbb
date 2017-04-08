@@ -29,7 +29,7 @@ from flaskbb.forum.views import forum
 from flaskbb.user.models import User, Guest
 # extensions
 from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
-                                debugtoolbar, migrate, themes, plugin_manager,
+                                debugtoolbar, alembic, themes, plugin_manager,
                                 babel, csrf, allows, limiter, celery, whooshee)
 # various helpers
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
@@ -133,8 +133,8 @@ def configure_extensions(app):
     # Flask-SQLAlchemy
     db.init_app(app)
 
-    # Flask-Migrate
-    migrate.init_app(app, db)
+    # Flask-Alembic
+    alembic.init_app(app, command_name="db")
 
     # Flask-Mail
     mail.init_app(app)
