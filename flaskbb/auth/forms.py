@@ -84,12 +84,12 @@ class RegisterForm(FlaskForm):
             raise ValidationError(_(
                 "This is a system reserved name. Choose a different one.")
             )
-        user = User.query.filter_by(username=field.data).first()
+        user = User.query.filter_by(username=field.data.lower()).first()
         if user:
             raise ValidationError(_("This username is already taken."))
 
     def validate_email(self, field):
-        email = User.query.filter_by(email=field.data).first()
+        email = User.query.filter_by(email=field.data.lower()).first()
         if email:
             raise ValidationError(_("This email address is already taken."))
 

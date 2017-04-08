@@ -103,12 +103,14 @@ class UserForm(FlaskForm):
         if hasattr(self, "user"):
             user = User.query.filter(
                 db.and_(
-                    User.username.like(field.data),
+                    User.username.like(field.data.lower()),
                     db.not_(User.id == self.user.id)
                 )
             ).first()
         else:
-            user = User.query.filter(User.username.like(field.data)).first()
+            user = User.query.filter(
+                User.username.like(field.data.lower())
+            ).first()
 
         if user:
             raise ValidationError(_("This username is already taken."))
@@ -117,12 +119,14 @@ class UserForm(FlaskForm):
         if hasattr(self, "user"):
             user = User.query.filter(
                 db.and_(
-                    User.email.like(field.data),
+                    User.email.like(field.data.lower()),
                     db.not_(User.id == self.user.id)
                 )
             ).first()
         else:
-            user = User.query.filter(User.email.like(field.data)).first()
+            user = User.query.filter(
+                User.email.like(field.data.lower())
+            ).first()
 
         if user:
             raise ValidationError(_("This email address is already taken."))
@@ -218,12 +222,14 @@ class GroupForm(FlaskForm):
         if hasattr(self, "group"):
             group = Group.query.filter(
                 db.and_(
-                    Group.name.like(field.data),
+                    Group.name.like(field.data.lower()),
                     db.not_(Group.id == self.group.id)
                 )
             ).first()
         else:
-            group = Group.query.filter(Group.name.like(field.data)).first()
+            group = Group.query.filter(
+                Group.name.like(field.data.lower())
+            ).first()
 
         if group:
             raise ValidationError(_("This group name is already taken."))
