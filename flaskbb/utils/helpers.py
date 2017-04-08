@@ -12,6 +12,8 @@ import re
 import time
 import itertools
 import operator
+import os
+import glob
 from datetime import datetime, timedelta
 from pytz import UTC
 from PIL import ImageFile
@@ -491,3 +493,20 @@ def check_image(url):
         return error, False
 
     return error, True
+
+
+def get_alembic_branches():
+    """Returns a tuple with (branchname, plugin_dir) combinations.
+    The branchname is the name of plugin directory which should also be
+    the unique identifier of the plugin.
+    """
+    basedir = os.path.dirname(os.path.dirname(__file__))
+    plugin_migration_dirs = glob.glob(
+        "{}/*/migrations".format(os.path.join(basedir, "plugins"))
+    )
+    branches_dirs = [
+        tuple([os.path.basename(os.path.dirname(p)), p])
+        for p in plugin_migration_dirs
+    ]
+
+    return branches_dirs

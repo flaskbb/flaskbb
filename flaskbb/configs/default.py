@@ -12,6 +12,8 @@
 import os
 import sys
 import datetime
+import glob
+from flaskbb.utils.helpers import get_alembic_branches
 
 
 class DefaultConfig(object):
@@ -69,6 +71,11 @@ class DefaultConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
+
+    ALEMBIC = {
+        'script_location': os.path.join(basedir, "migrations"),
+        'version_locations': get_alembic_branches()
+    }
 
     # Security
     # ------------------------------
