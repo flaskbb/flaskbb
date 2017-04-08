@@ -56,7 +56,24 @@ def make_app(script_info):
                             fg="red")
                 config_file = None
     else:
-        click.secho("[~] Using default config.", fg="yellow")
+        # lets look for a config file in flaskbb's root folder
+        # TODO: are there any other places we should look for the config?
+        # Like somewhere in /etc/?
+
+        # this walks back to flaskbb/ from flaskbb/flaskbb/cli/main.py
+        # can't use current_app.root_path because it's not (yet) available
+        config_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(__file__))
+        )
+        config_file = os.path.join(config_dir, "flaskbb.cfg")
+        if os.path.exists(config_file):
+                click.secho("[+] Found config file 'flaskbb.cfg' in {}"
+                            .format(config_dir), fg="yellow")
+                click.secho("[+] Using config from: {}".format(config_file),
+                            fg="cyan")
+        else:
+            config_file = None
+            click.secho("[~] Using default config.", fg="yellow")
 
     return create_app(config_file)
 
@@ -523,7 +540,7 @@ def generate_config(development, output, force):
         default=default_conf.get("mail_port"))
     # MAIL_USE_TLS
     click.secho("If you are using a local SMTP server like sendmail this is "
-                "not needed. For external servers this is hopefully required.",
+                "not needed. For external servers it is required.",
                 fg="cyan")
     default_conf["mail_use_tls"] = click.confirm(
         click.style("Use TLS for sending mails?", fg="magenta"),
@@ -534,14 +551,14 @@ def generate_config(development, output, force):
         click.style("Use SSL for sending mails?", fg="magenta"),
         default=default_conf.get("mail_use_ssl"))
     # MAIL_USERNAME
-    click.secho("Not needed if using a local smtp server. For gmail you have "
-                "put in your email address here.", fg="cyan")
+    click.secho("Not needed if you are using a local smtp server.\nFor gmail "
+                "you have to put in your email address here.", fg="cyan")
     default_conf["mail_username"] = click.prompt(
         click.style("Mail Username", fg="magenta"),
         default=default_conf.get("mail_username"))
     # MAIL_PASSWORD
-    click.secho("Not needed if using a local smtp server. For gmail you have "
-                "put in your gmail password here.", fg="cyan")
+    click.secho("Not needed if you are using a local smtp server.\nFor gmail "
+                "you have to put in your gmail password here.", fg="cyan")
     default_conf["mail_password"] = click.prompt(
         click.style("Mail Password", fg="magenta"),
         default=default_conf.get("mail_password"))
@@ -566,8 +583,8 @@ def generate_config(development, output, force):
     write_config(default_conf, config_template, config_path)
 
     # Finished
-    click.secho("The configuration file has been saved to:\n{cfg}"
-                .format(cfg=config_path), fg="blue")
-    click.secho("Usage: flaskbb --config {cfg} run\n"
+    click.secho("The configuration file has been saved to:\n{cfg}\n"
                 "Feel free to adjust it as needed."
+                .format(cfg=config_path), fg="blue", bold=True)
+    click.secho("Usage: \nflaskbb --config {cfg} run"
                 .format(cfg=config_path), fg="green")
