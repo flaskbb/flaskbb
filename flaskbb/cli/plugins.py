@@ -34,23 +34,40 @@ def plugins():
 
 
 @plugins.command("new")
-@click.argument("plugin_identifier", callback=check_cookiecutter)
+@click.option("--full_name", help="Your Name")
+@click.option("--email", help="Your email address (eq. you@example.com)")
+@click.option("--plugin_name", help="Plugin Name")
+@click.option("--plugin_identifier", help="Identifier for the plugin eg plugin_name")
+@click.option("--plugin_classname", help="Plugin class name eg PluginName")
+@click.option("--description", help="A description of the plugin")
+@click.option("--website", help="Website address")
+@click.option("--version", help="Version name")
 @click.option("--template", "-t", type=click.STRING,
               default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
               help="Path to a cookiecutter template or to a valid git repo.")
-def new_plugin(plugin_identifier, template):
+def new_plugin(template, **cookie_context):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = os.path.join(current_app.root_path, "plugins", plugin_identifier)
-    click.secho("[+] Creating new plugin {}".format(plugin_identifier),
+    check_cookiecutter(None,None,'plugin')
+    out_dir = os.path.join(current_app.root_path, "plugins")
+    cookie_context = {k: v for k, v in cookie_context.items() if v}
+    if cookie_context.get('plugin_name'):
+        cookie_context.setdefault('plugin_identifier', cookie_context['plugin_name'].lower().replace(' ', ''))
+        cookie_context.setdefault('plugin_classname', cookie_context['plugin_name'].title().replace(' ', ''))
+
+    click.secho("[+] Creating new plugin...",
                 fg="cyan")
-    cookiecutter(template, output_dir=out_dir)
-    click.secho("[+] Done. Created in {}".format(out_dir),
+    try:
+        newdir=cookiecutter(template, output_dir=out_dir,extra_context=cookie_context)
+        click.secho("[+] Done. Created in {}".format(newdir),
                 fg="green", bold=True)
+    except Exception as e:
+        click.secho("[-] Couldn't create plugin because of following "
+                    "exception: \n{}".format(e), fg="red")
 
 
 @plugins.command("install")
