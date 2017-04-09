@@ -45,7 +45,7 @@ def new_plugin(plugin_identifier, template):
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = os.path.join(current_app.root_path, "plugins", plugin_identifier)
+    out_dir = os.path.join(current_app.root_path, "plugins")
     click.secho("[+] Creating new plugin {}".format(plugin_identifier),
                 fg="cyan")
     cookiecutter(template, output_dir=out_dir)
