@@ -32,10 +32,41 @@ For example, the structure of a plugin could look like this
     |   |-- style.css
     |-- templates
         |-- myplugin.html
-
+    |-- migrations
+        |-- 59f7c49b6289_init.py
 
 Management
 ----------
+
+Database
+~~~~~~~~
+
+Upgrading, downgrading and generating database revisions is all handled
+via alembic. We make use of a alembic feature called 'branch_labels'.
+Each plugin's identifier will be used as a branch_label if used with alembic.
+Lets say, that identifier of your plugin is ``portal_plugin``, then you have
+to use the following commands for generaring, upgrading and downgrading
+your plugins database migrations:
+
+* (Auto-)Generating revisions
+    ``flaskbb db revision --branch portal_plugin "<YOUR_MESSAGE>"``
+
+    Replace <YOUR_MESSAGE> with something like "initial migration" if it's
+    the first migration or with just a few words that will describe the
+    changes of the revision.
+
+* Applying revisions
+    ``flaskbb db upgrade portal_plugin@head``
+
+    If you want to upgrade to specific revision, replace ``head`` with the
+    revision id.
+
+* Downgrading revisions
+    ``flaskbb db downgrade portal_plugin@-1``
+
+    If you just want to revert the latest revision, just use ``-1``.
+    To downgrade all database migrations, use ``base``.
+
 
 Deactivating
 ~~~~~~~~~~~~
@@ -65,7 +96,7 @@ server.
 Example Plugin
 --------------
 
-A really simple Plugin could look like this:
+A simple Plugin could look like this:
 
 .. sourcecode:: python
 
@@ -158,9 +189,9 @@ Plugin Class
 
   .. autoattribute:: settings_key
 
-  .. autoattribute:: installable
+  .. autoattribute:: has_settings
 
-  .. autoattribute:: uninstallable
+  .. autoattribute:: installed
 
   .. automethod:: setup
 
@@ -169,11 +200,3 @@ Plugin Class
   .. automethod:: uninstall
 
   .. automethod:: register_blueprint
-
-  .. automethod:: create_table
-
-  .. automethod:: drop_table
-
-  .. automethod:: create_all_tables
-
-  .. automethod:: drop_all_tables
