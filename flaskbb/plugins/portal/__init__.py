@@ -17,13 +17,13 @@ from flaskbb.forum.models import Forum
 
 from .views import portal, inject_portal_link
 
-__version__ = "0.1"
 __plugin__ = "PortalPlugin"
 
 
 def available_forums():
     forums = Forum.query.order_by(Forum.id.asc()).all()
     return [(forum.id, forum.title) for forum in forums]
+
 
 fixture = (
     ('plugin_portal', {
@@ -51,17 +51,6 @@ fixture = (
 
 
 class PortalPlugin(FlaskBBPlugin):
-
-    name = "Portal Plugin"
-
-    description = ("This Plugin provides a simple portal for FlaskBB.")
-
-    author = "sh4nks"
-
-    license = "BSD"
-
-    version = __version__
-
     settings_key = 'plugin_portal'
 
     def setup(self):
