@@ -1,3 +1,4 @@
+import pytest
 from flask_login import login_user
 
 from flaskbb.message import views
@@ -70,3 +71,15 @@ def test_message_sent(application, default_settings, user):
         login_user(user)
         resp = views.sent()
         assert 'No conversations found' in resp
+
+
+def test_message_view_raw(
+        application, conversation_msgs,
+        default_settings, user):
+    with application.test_request_context():
+        login_user(user)
+        resp = views.raw_message(conversation_msgs.last_message.id)
+        assert conversation_msgs.last_message.message in resp
+
+        # FIXME needs to test line 188 for which we need to log in a
+        # different user
