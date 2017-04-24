@@ -35,7 +35,8 @@ from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
                                    forum_is_unread, topic_is_unread,
-                                   render_template, render_markup)
+                                   render_template, render_markup,
+                                   app_config_from_env)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
@@ -91,6 +92,10 @@ def configure_app(app, config):
 
     # try to update the config via the environment variable
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
+
+    # Parse the env for FLASKBB_ prefixed env variables and set
+    # them on the config object
+    app_config_from_env(app, prefix="FLASKBB_")
 
 
 def configure_celery_app(app, celery):

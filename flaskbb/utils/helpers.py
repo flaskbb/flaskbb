@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import ast
 import re
 import time
 import itertools
@@ -27,7 +28,7 @@ from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template
 from flask_login import current_user
 
-from flaskbb._compat import range_method, text_type
+from flaskbb._compat import range_method, text_type, iteritems
 from flaskbb.extensions import redis_store
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
@@ -510,3 +511,26 @@ def get_alembic_branches():
     ]
 
     return branches_dirs
+
+
+def app_config_from_env(app, prefix="FLASKBB_"):
+    """Retrieves the configuration variables from the environment.
+    Set your environment variables like this::
+
+        export FLASKBB_SECRET_KEY="your-secret-key"
+
+    and based on the prefix, it will set the actual config variable
+    on the ``app.config`` object.
+
+    :param app: The application object.
+    :param prefix: The prefix of the environment variables.
+    """
+    for key, value in iteritems(os.environ):
+        if key.startswith(prefix):
+            key = key[len(prefix):]
+            try:
+                value = ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                pass
+            app.config[key] = value
+    return app
