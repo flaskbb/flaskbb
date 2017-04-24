@@ -534,3 +534,57 @@ def app_config_from_env(app, prefix="FLASKBB_"):
                 pass
             app.config[key] = value
     return app
+
+
+class ReverseProxyPathFix(object):
+    """Wrap the application in this middleware and configure the
+    front-end server to add these headers, to let you quietly bind
+    this to a URL other than / and to an HTTP scheme that is
+    different than what is used locally.
+    http://flask.pocoo.org/snippets/35/
+
+    In wsgi.py::
+
+        from flaskbb.utils.helpers import ReverseProxyPathFix
+        flaskbb = create_app(config="flaskbb.cfg")
+        flaskbb.wsgi_app = ReverseProxyPathFix(flaskbb.wsgi_app)
+
+    and in nginx::
+
+        location /forums {
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Scheme $scheme;
+            proxy_set_header X-Script-Name /forums;  # this part here
+        }
+
+    :param app: the WSGI application
+    :param force_https: Force HTTPS on all routes. Defaults to ``False``.
+    """
+
+    def __init__(self, app, force_https=False):
+        self.app = app
+        self.force_https = force_https
+
+    def __call__(self, environ, start_response):
+        script_name = environ.get('HTTP_X_SCRIPT_NAME', '')
+        if script_name:
+            environ['SCRIPT_NAME'] = script_name
+            path_info = environ.get('PATH_INFO', '')
+            if path_info and path_info.startswith(script_name):
+                environ['PATH_INFO'] = path_info[len(script_name):]
+        server = environ.get('HTTP_X_FORWARDED_SERVER_CUSTOM',
+                             environ.get('HTTP_X_FORWARDED_SERVER', ''))
+        if server:
+            environ['HTTP_HOST'] = server
+
+        scheme = environ.get('HTTP_X_SCHEME', '')
+
+        if scheme:
+            environ['wsgi.url_scheme'] = scheme
+
+        if self.force_https:
+            environ['wsgi.url_scheme'] = 'https'
+
+        return self.app(environ, start_response)
