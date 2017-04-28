@@ -39,6 +39,7 @@ class FlaskBBDomain(Domain):
             self.plugin_translations = [
                 os.path.join(plugin.path, "translations")
                 for plugin in get_enabled_plugins()
+                if os.path.exists(os.path.join(plugin.path, "translations"))
             ]
 
     def get_translations(self):
@@ -84,8 +85,6 @@ def update_translations(include_plugins=False):
     :param include_plugins: If set to `True` it will also update the
                             translations for all plugins.
     """
-
-    # update flaskbb translations
     translations_folder = os.path.join(current_app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
@@ -95,14 +94,16 @@ def update_translations(include_plugins=False):
                      "-d", translations_folder])
 
     if include_plugins:
-        # updates all plugin translations too
         for plugin in plugin_manager.all_plugins:
             update_plugin_translations(plugin)
 
 
 def add_translations(translation):
-    """Adds a new language to the translations."""
+    """Adds a new language to the translations.
 
+    :param translation: The short name of the translation
+                        like ``en`` or ``de_AT``.
+    """
     translations_folder = os.path.join(current_app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
@@ -118,22 +119,21 @@ def compile_translations(include_plugins=False):
     :param include_plugins: If set to `True` it will also compile the
                             translations for all plugins.
     """
-
-    # compile flaskbb translations
     translations_folder = os.path.join(current_app.root_path, "translations")
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
 
     if include_plugins:
-        # compile all plugin translations
         for plugin in plugin_manager.all_plugins:
             compile_plugin_translations(plugin)
 
 
 def add_plugin_translations(plugin, translation):
-    """Adds a new language to the plugin translations. Expects the name
-    of the plugin and the translations name like "en".
-    """
+    """Adds a new language to the plugin translations.
 
+    :param plugin: The plugins identifier.
+    :param translation: The short name of the translation
+                        like ``en`` or ``de_AT``.
+    """
     plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
@@ -146,11 +146,17 @@ def add_plugin_translations(plugin, translation):
 
 
 def update_plugin_translations(plugin):
-    """Updates the plugin translations. Expects the name of the plugin."""
+    """Updates the plugin translations.
+    Returns ``False`` if no translations for this plugin exists.
 
+    :param plugin: The plugins identifier
+    """
     plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
+
+    if not os.path.exists(source_file):
+        return False
 
     subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
                      "-k", "lazy_gettext", "-o", source_file,
@@ -160,9 +166,15 @@ def update_plugin_translations(plugin):
 
 
 def compile_plugin_translations(plugin):
-    """Compile the plugin translations. Expects the name of the plugin."""
+    """Compile the plugin translations.
+    Returns ``False`` if no translations for this plugin exists.
 
+    :param plugin: The plugins identifier
+    """
     plugin_folder = os.path.join(current_app.config["PLUGINS_FOLDER"], plugin)
     translations_folder = os.path.join(plugin_folder, "translations")
+
+    if not os.path.exists(translations_folder):
+        return False
 
     subprocess.call(["pybabel", "compile", "-d", translations_folder])
