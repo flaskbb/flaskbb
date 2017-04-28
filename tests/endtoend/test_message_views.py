@@ -1,4 +1,5 @@
 import pytest
+from werkzeug import exceptions
 from flask_login import login_user
 
 from flaskbb.message import views
@@ -15,7 +16,6 @@ def test_message_inbox(application, default_settings, conversation_msgs, user):
     with application.test_request_context():
         login_user(user)
         resp = views.inbox()
-        print resp
         assert 'From <a href="/user/test_normal">test_normal</a>' in resp
 
 
@@ -75,11 +75,13 @@ def test_message_sent(application, default_settings, user):
 
 def test_message_view_raw(
         application, conversation_msgs,
-        default_settings, user):
+        default_settings, user, moderator_user):
     with application.test_request_context():
         login_user(user)
         resp = views.raw_message(conversation_msgs.last_message.id)
         assert conversation_msgs.last_message.message in resp
 
-        # FIXME needs to test line 188 for which we need to log in a
-        # different user
+        # same view should raise a 404 for a different user
+        login_user(moderator_user)
+        with pytest.raises(exceptions.NotFound):
+            resp = views.raw_message(conversation_msgs.last_message.id)
