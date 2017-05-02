@@ -76,6 +76,9 @@ class DefaultConfig(object):
         'script_location': os.path.join(basedir, "migrations"),
         'version_locations': get_alembic_branches()
     }
+    ALEMBIC_CONTEXT = {
+        'render_as_batch': True
+    }
 
     # Security
     # ------------------------------
