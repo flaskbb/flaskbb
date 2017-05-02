@@ -7,12 +7,12 @@ Create Date: 2015-03-22 21:57:57.444251
 """
 
 # revision identifiers, used by Alembic.
-revision = '514ca0a3282c'
-down_revision = '8ad96e49dc6'
-
 from alembic import op
 import sqlalchemy as sa
 import sqlalchemy_utils
+
+revision = '514ca0a3282c'
+down_revision = '8ad96e49dc6'
 
 
 def upgrade():
