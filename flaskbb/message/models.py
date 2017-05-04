@@ -20,14 +20,17 @@ class Conversation(db.Model, CRUDMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                             nullable=True)
+    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                           nullable=True)
     shared_id = db.Column(UUIDType, nullable=False)
-    subject = db.Column(db.String(255))
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    trash = db.Column(db.Boolean, nullable=False, default=False)
-    draft = db.Column(db.Boolean, nullable=False, default=False)
-    unread = db.Column(db.Boolean, nullable=False, default=True)
+    subject = db.Column(db.String(255), nullable=True)
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                             nullable=False)
+    trash = db.Column(db.Boolean, default=False, nullable=False)
+    draft = db.Column(db.Boolean, default=False, nullable=False)
+    unread = db.Column(db.Boolean, default=False, nullable=False)
 
     messages = db.relationship(
         "Message", lazy="joined", backref="conversation",
@@ -85,7 +88,8 @@ class Message(db.Model, CRUDMixin):
     # the user who wrote the message
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                             nullable=False)
 
     user = db.relationship("User", lazy="joined")
 

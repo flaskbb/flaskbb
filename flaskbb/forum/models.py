@@ -34,27 +34,18 @@ topictracker = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
               nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id',
-                            use_alter=True, name="fk_tracker_topic_id"),
+              db.ForeignKey('topics.id', use_alter=True,
+                            name="fk_tracker_topic_id"),
               nullable=False))
 
 
-# m2m table for group-forum permission mapping
 forumgroups = db.Table(
     'forumgroups',
-    db.Column(
-        'group_id',
-        db.Integer(),
-        db.ForeignKey('groups.id'),
-        nullable=False
-    ),
-    db.Column(
-        'forum_id',
-        db.Integer(),
-        db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
-        nullable=False
-    )
-)
+    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id'),
+              nullable=False),
+    db.Column('forum_id', db.Integer(),
+              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+              nullable=False))
 
 
 class TopicsRead(db.Model, CRUDMixin):
@@ -70,7 +61,8 @@ class TopicsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_tr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                          nullable=False)
 
 
 class ForumsRead(db.Model, CRUDMixin):
@@ -82,21 +74,27 @@ class ForumsRead(db.Model, CRUDMixin):
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
-    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    cleared = db.Column(UTCDateTime(timezone=True))
+    last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                          nullable=False)
+    cleared = db.Column(UTCDateTime(timezone=True), nullable=True)
 
 
 class Report(db.Model, CRUDMixin):
     __tablename__ = "reports"
 
+    # TODO: Store in addition to the info below topic title and username
+    # as well. So that in case a user or post gets deleted, we can
+    # still view the report
+
     id = db.Column(db.Integer, primary_key=True)
     reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                            nullable=False)
-    reported = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=False)
-    zapped = db.Column(UTCDateTime(timezone=True))
-    zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"))
-    reason = db.Column(db.Text)
+                            nullable=True)
+    reported = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                         nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=True)
+    zapped = db.Column(UTCDateTime(timezone=True), nullable=True)
+    zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    reason = db.Column(db.Text, nullable=True)
 
     post = db.relationship(
         "Post", lazy="joined",
@@ -140,13 +138,15 @@ class Post(db.Model, CRUDMixin):
                          db.ForeignKey("topics.id",
                                        use_alter=True,
                                        name="fk_post_topic_id",
-                                       ondelete="CASCADE"))
+                                       ondelete="CASCADE"),
+                         nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    date_modified = db.Column(UTCDateTime(timezone=True))
-    modified_by = db.Column(db.String(200))
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                             nullable=False)
+    date_modified = db.Column(UTCDateTime(timezone=True), nullable=True)
+    modified_by = db.Column(db.String(200), nullable=True)
 
     # Properties
     @property
@@ -287,23 +287,27 @@ class Topic(db.Model, CRUDMixin):
                                        name="fk_topic_forum_id"),
                          nullable=False)
     title = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    locked = db.Column(db.Boolean, default=False)
-    important = db.Column(db.Boolean, default=False)
-    views = db.Column(db.Integer, default=0)
-    post_count = db.Column(db.Integer, default=0)
+    date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                             nullable=False)
+    last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                             nullable=False)
+    locked = db.Column(db.Boolean, default=False, nullable=False)
+    important = db.Column(db.Boolean, default=False, nullable=False)
+    views = db.Column(db.Integer, default=0, nullable=False)
+    post_count = db.Column(db.Integer, default=0, nullable=False)
 
     # One-to-one (uselist=False) relationship between first_post and topic
-    first_post_id = db.Column(db.Integer, db.ForeignKey("posts.id",
-                                                        ondelete="CASCADE"))
+    first_post_id = db.Column(db.Integer,
+                              db.ForeignKey("posts.id", ondelete="CASCADE"),
+                              nullable=True)
     first_post = db.relationship("Post", backref="first_post", uselist=False,
                                  foreign_keys=[first_post_id])
 
     # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"),
+                             nullable=True)
 
     last_post = db.relationship("Post", backref="last_post", uselist=False,
                                 foreign_keys=[last_post_id])
@@ -330,20 +334,17 @@ class Topic(db.Model, CRUDMixin):
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     def first_unread(self, topicsread, user, forumsread=None):
-        """Returns the url to the first unread post if any else to the topic
-        itself.
+        """Returns the url to the first unread post. If no unread posts exist
+        it will return the url to the topic.
 
         :param topicsread: The topicsread object for the topic
-
         :param user: The user who should be checked if he has read the
                      last post in the topic
-
         :param forumsread: The forumsread object in which the topic is. If you
                         also want to check if the user has marked the forum as
                         read, than you will also need to pass an forumsread
                         object.
         """
-
         # If the topic is unread try to get the first unread post
         if topic_is_unread(self, topicsread, user, forumsread):
             query = Post.query.filter(Post.topic_id == self.id)
@@ -526,8 +527,7 @@ class Topic(db.Model, CRUDMixin):
         self.username = user.username
 
         # Set the last_updated time. Needed for the readstracker
-        created = time_utcnow()
-        self.date_created = self.last_updated = created
+        self.date_created = self.last_updated = time_utcnow()
 
         # Insert and commit the topic
         db.session.add(self)
@@ -536,8 +536,8 @@ class Topic(db.Model, CRUDMixin):
         # Create the topic post
         post.save(user, self)
 
-        # Update the first post id
-        self.first_post_id = post.id
+        # Update the first and last post id
+        self.last_post_id = self.first_post_id = post.id
 
         # Update the topic count
         forum.topic_count += 1
@@ -611,26 +611,29 @@ class Forum(db.Model, CRUDMixin):
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
                             nullable=False)
     title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text)
+    description = db.Column(db.Text, nullable=True)
     position = db.Column(db.Integer, default=1, nullable=False)
     locked = db.Column(db.Boolean, default=False, nullable=False)
     show_moderators = db.Column(db.Boolean, default=False, nullable=False)
-    external = db.Column(db.String(200))
+    external = db.Column(db.String(200), nullable=True)
 
     post_count = db.Column(db.Integer, default=0, nullable=False)
     topic_count = db.Column(db.Integer, default=0, nullable=False)
 
     # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"))
+    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"),
+                             nullable=True)
     last_post = db.relationship("Post", backref="last_post_forum",
                                 uselist=False, foreign_keys=[last_post_id])
 
-    # Not nice, but needed to improve the performance
-    last_post_title = db.Column(db.String(255))
-    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    last_post_username = db.Column(db.String(255))
+    # Not nice, but needed to improve the performance; can be set to NULL
+    # if the forum has no posts
+    last_post_title = db.Column(db.String(255), nullable=True)
+    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                                  nullable=True)
+    last_post_username = db.Column(db.String(255), nullable=True)
     last_post_created = db.Column(UTCDateTime(timezone=True),
-                                  default=time_utcnow)
+                                  default=time_utcnow, nullable=True)
 
     # One-to-many
     topics = db.relationship(
@@ -912,7 +915,7 @@ class Category(db.Model, CRUDMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text)
+    description = db.Column(db.Text, nullable=True)
     position = db.Column(db.Integer, default=1, nullable=False)
 
     # One-to-many

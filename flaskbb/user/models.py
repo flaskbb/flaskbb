@@ -24,8 +24,11 @@ from flaskbb.message.models import Conversation
 
 groups_users = db.Table(
     'groups_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id')))
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'),
+              nullable=False),
+    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'),
+              nullable=False)
+)
 
 
 class Group(db.Model, CRUDMixin):
@@ -33,7 +36,7 @@ class Group(db.Model, CRUDMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
-    description = db.Column(db.Text)
+    description = db.Column(db.Text, nullable=True)
 
     # Group types
     admin = db.Column(db.Boolean, default=False, nullable=False)
@@ -86,22 +89,24 @@ class User(db.Model, UserMixin, CRUDMixin):
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
     _password = db.Column('password', db.String(120), nullable=False)
-    date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow)
-    birthday = db.Column(db.DateTime)
-    gender = db.Column(db.String(10))
-    website = db.Column(db.String(200))
-    location = db.Column(db.String(100))
-    signature = db.Column(db.Text)
-    avatar = db.Column(db.String(200))
-    notes = db.Column(db.Text)
+    date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                            nullable=False)
+    lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                         nullable=True)
+    birthday = db.Column(db.DateTime, nullable=True)
+    gender = db.Column(db.String(10), nullable=True)
+    website = db.Column(db.String(200), nullable=True)
+    location = db.Column(db.String(100), nullable=True)
+    signature = db.Column(db.Text, nullable=True)
+    avatar = db.Column(db.String(200), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
 
-    last_failed_login = db.Column(UTCDateTime(timezone=True))
-    login_attempts = db.Column(db.Integer, default=0)
-    activated = db.Column(db.Boolean, default=False)
+    last_failed_login = db.Column(UTCDateTime(timezone=True), nullable=True)
+    login_attempts = db.Column(db.Integer, default=0, nullable=False)
+    activated = db.Column(db.Boolean, default=False, nullable=False)
 
-    theme = db.Column(db.String(15))
-    language = db.Column(db.String(15), default="en")
+    theme = db.Column(db.String(15), nullable=True)
+    language = db.Column(db.String(15), default="en", nullable=True)
 
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     topics = db.relationship("Topic", backref="user", lazy="dynamic")
