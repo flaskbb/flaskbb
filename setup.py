@@ -49,7 +49,7 @@ class PyTestCommand(TestCommand):
 
 setup(
     name='FlaskBB',
-    version='1.0.dev0',
+    version='1.0',
     url='http://github.com/sh4nks/flaskbb/',
     license='BSD',
     author='Peter Justin',
