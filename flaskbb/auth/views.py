@@ -222,7 +222,7 @@ def reset_password(token):
 
 
 @auth.route("/activate", methods=["GET", "POST"])
-def request_activation_token(token=None):
+def request_activation_token():
     """Requests a new account activation token."""
     if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
         flash(_("This account is already activated."), "info")
@@ -239,13 +239,15 @@ def request_activation_token(token=None):
     return render_template("auth/request_account_activation.html", form=form)
 
 
-@auth.route("/activate/<token>", methods=["GET", "POST"])
+@auth.route("/activate/confirm", methods=["GET", "POST"])
+@auth.route("/activate/confirm/<token>", methods=["GET", "POST"])
 def activate_account(token=None):
     """Handles the account activation process."""
     if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
         flash(_("This account is already activated."), "info")
         return redirect(url_for('forum.index'))
 
+    expired = invalid = user = None
     form = None
     if token is not None:
         expired, invalid, user = get_token_status(token, "activate_account")
@@ -257,7 +259,7 @@ def activate_account(token=None):
 
     if invalid:
         flash(_("Your account activation token is invalid."), "danger")
-        return redirect(url_for("auth.request_email_confirmation"))
+        return redirect(url_for("auth.request_activation_token"))
 
     if expired:
         flash(_("Your account activation token is expired."), "danger")
