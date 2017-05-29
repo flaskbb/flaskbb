@@ -49,7 +49,9 @@ def inbox():
 
 
 @message.route("/<int:conversation_id>/view", methods=["GET", "POST"])
+@login_required
 def view_conversation(conversation_id):
+    # if the user is not linked with the conversation it will abort with 404
     conversation = Conversation.query.filter_by(
         id=conversation_id,
         user_id=current_user.id
