@@ -1,6 +1,6 @@
 -r requirements.txt
 cov-core
-coverage
+coverage==4.2
 py
 pytest
 pytest-cov
