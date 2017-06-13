@@ -158,7 +158,7 @@ class RequestActivationForm(FlaskForm):
         if not self.user.username == self.username.data:
             raise ValidationError(_("User does not exist."))
 
-        if self.user.activated is not None:
+        if self.user.activated is True:
             raise ValidationError(_("User is already active."))
 
 
