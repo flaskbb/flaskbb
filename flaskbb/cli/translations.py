@@ -43,7 +43,7 @@ def new_translation(lang, plugin):
 
 
 @translations.command("update")
-@click.option("is_all", "--all", "-a", default=True, is_flag=True,
+@click.option("is_all", "--all", "-a", default=False, is_flag=True,
               help="Updates the plugin translations as well.")
 @click.option("--plugin", "-p", type=click.STRING,
               help="Updates the language of the given plugin.")
@@ -60,7 +60,7 @@ def update_translation(is_all, plugin):
 
 
 @translations.command("compile")
-@click.option("is_all", "--all", "-a", default=True, is_flag=True,
+@click.option("is_all", "--all", "-a", default=False, is_flag=True,
               help="Compiles the plugin translations as well.")
 @click.option("--plugin", "-p", type=click.STRING,
               help="Compiles the translations for a given plugin.")
