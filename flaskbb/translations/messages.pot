@@ -1,236 +1,257 @@
 # Translations template for PROJECT.
-# Copyright (C) 2016 ORGANIZATION
+# Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-06-09 11:35+0200\n"
+"POT-Creation-Date: 2017-06-28 20:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.2.0\n"
+"Generated-By: Babel 2.4.0\n"
 
-#: flaskbb/email.py:26
+#: flaskbb/email.py:27
 msgid "Password Recovery Confirmation"
 msgstr ""
 
-#: flaskbb/email.py:48 flaskbb/templates/auth/account_activation.html:1
+#: flaskbb/email.py:50 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
 msgstr ""
 
-#: flaskbb/auth/forms.py:24 flaskbb/management/forms.py:32
+#: flaskbb/auth/forms.py:25 flaskbb/management/forms.py:31
 msgid "You can only use letters, numbers or dashes."
 msgstr ""
 
-#: flaskbb/auth/forms.py:28
+#: flaskbb/auth/forms.py:30
 msgid "Username or Email address"
 msgstr ""
 
-#: flaskbb/auth/forms.py:29
+#: flaskbb/auth/forms.py:31
 msgid "Please enter your username or email address."
 msgstr ""
 
-#: flaskbb/auth/forms.py:32 flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:86
-#: flaskbb/auth/forms.py:109 flaskbb/user/forms.py:64
+#: flaskbb/auth/forms.py:34 flaskbb/auth/forms.py:55 flaskbb/auth/forms.py:107
+#: flaskbb/auth/forms.py:130 flaskbb/user/forms.py:63
 msgid "Password"
 msgstr ""
 
-#: flaskbb/auth/forms.py:33 flaskbb/auth/forms.py:87 flaskbb/user/forms.py:65
+#: flaskbb/auth/forms.py:35 flaskbb/auth/forms.py:108 flaskbb/user/forms.py:64
 msgid "Please enter your password."
-msgstr ""
-
-#: flaskbb/auth/forms.py:35 flaskbb/auth/forms.py:57 flaskbb/auth/forms.py:97
-msgid "Captcha"
 msgstr ""
 
 #: flaskbb/auth/forms.py:37
 msgid "Remember me"
 msgstr ""
 
-#: flaskbb/auth/forms.py:39 flaskbb/templates/layout.html:134
-#: flaskbb/templates/navigation.html:60 flaskbb/templates/auth/login.html:1
-#: flaskbb/templates/auth/login.html:10
+#: flaskbb/auth/forms.py:39 flaskbb/templates/auth/login.html:1
+#: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:141
 msgid "Login"
 msgstr ""
 
-#: flaskbb/auth/forms.py:43 flaskbb/auth/forms.py:124
-#: flaskbb/management/forms.py:52 flaskbb/templates/forum/memberlist.html:43
+#: flaskbb/auth/forms.py:43 flaskbb/auth/forms.py:61 flaskbb/auth/forms.py:118
+msgid "Captcha"
+msgstr ""
+
+#: flaskbb/auth/forms.py:47 flaskbb/auth/forms.py:145
+#: flaskbb/management/forms.py:51 flaskbb/templates/forum/memberlist.html:45
 #: flaskbb/templates/forum/search_result.html:104
 #: flaskbb/templates/management/banned_users.html:62
 #: flaskbb/templates/management/users.html:62
 msgid "Username"
 msgstr ""
 
-#: flaskbb/auth/forms.py:44 flaskbb/auth/forms.py:125
-#: flaskbb/message/forms.py:23
-msgid "A valid username is required."
+#: flaskbb/auth/forms.py:48
+msgid "A valid username is required"
 msgstr ""
 
-#: flaskbb/auth/forms.py:47 flaskbb/auth/forms.py:93 flaskbb/auth/forms.py:105
-#: flaskbb/auth/forms.py:128 flaskbb/management/forms.py:56
+#: flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:114 flaskbb/auth/forms.py:126
+#: flaskbb/auth/forms.py:149 flaskbb/management/forms.py:55
 msgid "Email address"
 msgstr ""
 
-#: flaskbb/auth/forms.py:48 flaskbb/auth/forms.py:94 flaskbb/auth/forms.py:106
-#: flaskbb/auth/forms.py:129 flaskbb/management/forms.py:57
-#: flaskbb/user/forms.py:37
+#: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:115 flaskbb/auth/forms.py:127
+#: flaskbb/auth/forms.py:150 flaskbb/management/forms.py:56
+#: flaskbb/user/forms.py:36
 msgid "A valid email address is required."
 msgstr ""
 
-#: flaskbb/auth/forms.py:49 flaskbb/auth/forms.py:130
-#: flaskbb/management/forms.py:58 flaskbb/user/forms.py:38
-#: flaskbb/user/forms.py:43 flaskbb/user/forms.py:46
+#: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:151
+#: flaskbb/management/forms.py:57 flaskbb/user/forms.py:37
+#: flaskbb/user/forms.py:42 flaskbb/user/forms.py:45
 msgid "Invalid email address."
 msgstr ""
 
-#: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:111
+#: flaskbb/auth/forms.py:57 flaskbb/auth/forms.py:132
 msgid "Passwords must match."
 msgstr ""
 
-#: flaskbb/auth/forms.py:55 flaskbb/auth/forms.py:113
+#: flaskbb/auth/forms.py:59 flaskbb/auth/forms.py:134
 msgid "Confirm password"
 msgstr ""
 
-#: flaskbb/auth/forms.py:59 flaskbb/user/forms.py:29
+#: flaskbb/auth/forms.py:63 flaskbb/user/forms.py:28
 msgid "Language"
 msgstr ""
 
-#: flaskbb/auth/forms.py:61
+#: flaskbb/auth/forms.py:65
 msgid "I accept the Terms of Service"
 msgstr ""
 
-#: flaskbb/auth/forms.py:63 flaskbb/templates/layout.html:139
-#: flaskbb/templates/navigation.html:66 flaskbb/templates/auth/register.html:1
-#: flaskbb/templates/auth/register.html:10
+#: flaskbb/auth/forms.py:66
+msgid "Please accept the TOS."
+msgstr ""
+
+#: flaskbb/auth/forms.py:68 flaskbb/templates/auth/register.html:1
+#: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:146
 msgid "Register"
 msgstr ""
 
-#: flaskbb/auth/forms.py:68 flaskbb/management/forms.py:116
+#: flaskbb/auth/forms.py:78
+#, python-format
+msgid "Username must be between %(min)s and %(max)s characters long."
+msgstr ""
+
+#: flaskbb/auth/forms.py:84
+msgid "This is a system reserved name. Choose a different one."
+msgstr ""
+
+#: flaskbb/auth/forms.py:89 flaskbb/management/forms.py:116
 msgid "This username is already taken."
 msgstr ""
 
-#: flaskbb/auth/forms.py:73 flaskbb/management/forms.py:130
-#: flaskbb/user/forms.py:60
+#: flaskbb/auth/forms.py:94 flaskbb/management/forms.py:132
+#: flaskbb/user/forms.py:59
 msgid "This email address is already taken."
 msgstr ""
 
-#: flaskbb/auth/forms.py:89 flaskbb/templates/auth/reauth.html:1
+#: flaskbb/auth/forms.py:110 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:10
 msgid "Refresh Login"
 msgstr ""
 
-#: flaskbb/auth/forms.py:99
+#: flaskbb/auth/forms.py:120
 msgid "Request Password"
 msgstr ""
 
-#: flaskbb/auth/forms.py:115
+#: flaskbb/auth/forms.py:136
 msgid "Reset password"
 msgstr ""
 
-#: flaskbb/auth/forms.py:120
+#: flaskbb/auth/forms.py:141
 msgid "Wrong email address."
 msgstr ""
 
-#: flaskbb/auth/forms.py:132
+#: flaskbb/auth/forms.py:146 flaskbb/management/forms.py:52
+#: flaskbb/message/forms.py:23
+msgid "A valid username is required."
+msgstr ""
+
+#: flaskbb/auth/forms.py:153
 msgid "Send Confirmation Mail"
 msgstr ""
 
-#: flaskbb/auth/forms.py:138
+#: flaskbb/auth/forms.py:159
 msgid "User does not exist."
 msgstr ""
 
-#: flaskbb/auth/forms.py:141
+#: flaskbb/auth/forms.py:162
 msgid "User is already active."
 msgstr ""
 
-#: flaskbb/auth/forms.py:145
+#: flaskbb/auth/forms.py:166
 msgid "Email confirmation token"
 msgstr ""
 
-#: flaskbb/auth/forms.py:146
+#: flaskbb/auth/forms.py:167
 msgid "Please enter the token that we have sent to you."
 msgstr ""
 
-#: flaskbb/auth/forms.py:150
+#: flaskbb/auth/forms.py:171
 msgid "Confirm Email"
 msgstr ""
 
-#: flaskbb/auth/views.py:95
+#: flaskbb/auth/views.py:97
+msgid ""
+"In order to use your account you have to activate it through the link we "
+"have sent to your email address."
+msgstr ""
+
+#: flaskbb/auth/views.py:102
 msgid "Wrong username or password."
 msgstr ""
 
-#: flaskbb/auth/views.py:111
+#: flaskbb/auth/views.py:118
 msgid "Reauthenticated."
 msgstr ""
 
-#: flaskbb/auth/views.py:114
+#: flaskbb/auth/views.py:121
 msgid "Wrong password."
 msgstr ""
 
-#: flaskbb/auth/views.py:125
+#: flaskbb/auth/views.py:132
 msgid "Logged out"
 msgstr ""
 
-#: flaskbb/auth/views.py:136
+#: flaskbb/auth/views.py:143
 msgid "The registration has been disabled."
 msgstr ""
 
-#: flaskbb/auth/views.py:150
+#: flaskbb/auth/views.py:164
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
 msgstr ""
 
-#: flaskbb/auth/views.py:154
+#: flaskbb/auth/views.py:168
 msgid "Thanks for registering."
 msgstr ""
 
-#: flaskbb/auth/views.py:173
+#: flaskbb/auth/views.py:187
 msgid "Email sent! Please check your inbox."
 msgstr ""
 
-#: flaskbb/auth/views.py:176
+#: flaskbb/auth/views.py:190
 msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
 
-#: flaskbb/auth/views.py:193
+#: flaskbb/auth/views.py:207
 msgid "Your password token is invalid."
 msgstr ""
 
-#: flaskbb/auth/views.py:197
+#: flaskbb/auth/views.py:211
 msgid "Your password token is expired."
 msgstr ""
 
-#: flaskbb/auth/views.py:203
+#: flaskbb/auth/views.py:217
 msgid "Your password has been updated."
 msgstr ""
 
-#: flaskbb/auth/views.py:214 flaskbb/auth/views.py:232
+#: flaskbb/auth/views.py:228 flaskbb/auth/views.py:247
 msgid "This account is already activated."
 msgstr ""
 
-#: flaskbb/auth/views.py:221
+#: flaskbb/auth/views.py:235
 msgid "A new account activation token has been sent to your email address."
 msgstr ""
 
-#: flaskbb/auth/views.py:245
+#: flaskbb/auth/views.py:261
 msgid "Your account activation token is invalid."
 msgstr ""
 
-#: flaskbb/auth/views.py:249
+#: flaskbb/auth/views.py:265
 msgid "Your account activation token is expired."
 msgstr ""
 
-#: flaskbb/auth/views.py:260
+#: flaskbb/auth/views.py:276
 msgid "Your account has been activated."
 msgstr ""
 
@@ -274,7 +295,6 @@ msgid "Post Topic"
 msgstr ""
 
 #: flaskbb/forum/forms.py:73 flaskbb/templates/management/reports.html:39
-#: flaskbb/templates/management/unread_reports.html:39
 msgid "Reason"
 msgstr ""
 
@@ -287,14 +307,13 @@ msgid "Report post"
 msgstr ""
 
 #: flaskbb/forum/forms.py:85 flaskbb/forum/forms.py:89
-#: flaskbb/forum/forms.py:104 flaskbb/templates/layout.html:75
-#: flaskbb/templates/navigation.html:21
-#: flaskbb/templates/forum/memberlist.html:26
+#: flaskbb/forum/forms.py:104 flaskbb/templates/forum/memberlist.html:29
 #: flaskbb/templates/forum/search_form.html:1
 #: flaskbb/templates/forum/search_form.html:10
 #: flaskbb/templates/forum/search_form.html:15
 #: flaskbb/templates/forum/search_result.html:1
 #: flaskbb/templates/forum/search_result.html:10
+#: flaskbb/templates/layout.html:77
 #: flaskbb/templates/management/banned_users.html:39
 #: flaskbb/templates/management/users.html:39
 msgid "Search"
@@ -313,36 +332,34 @@ msgstr ""
 #: flaskbb/templates/forum/search_result.html:134
 #: flaskbb/templates/forum/topictracker.html:31
 #: flaskbb/templates/management/reports.html:38
-#: flaskbb/templates/management/unread_reports.html:38
 msgid "Topic"
 msgstr ""
 
-#: flaskbb/forum/forms.py:102 flaskbb/templates/layout.html:73
-#: flaskbb/templates/navigation.html:19 flaskbb/templates/forum/category.html:9
+#: flaskbb/forum/forms.py:102 flaskbb/templates/forum/category.html:9
 #: flaskbb/templates/forum/category_layout.html:8
 #: flaskbb/templates/forum/edit_forum.html:13
 #: flaskbb/templates/forum/forum.html:10
-#: flaskbb/templates/forum/memberlist.html:9
+#: flaskbb/templates/forum/memberlist.html:12
 #: flaskbb/templates/forum/new_post.html:11
 #: flaskbb/templates/forum/new_topic.html:11
 #: flaskbb/templates/forum/search_form.html:9
 #: flaskbb/templates/forum/search_result.html:9
 #: flaskbb/templates/forum/search_result.html:213
 #: flaskbb/templates/forum/topic.html:10
-#: flaskbb/templates/forum/topic_horizontal.html:14
+#: flaskbb/templates/forum/topic_horizontal.html:10
 #: flaskbb/templates/forum/topictracker.html:14
+#: flaskbb/templates/layout.html:75
 #: flaskbb/templates/management/banned_users.html:8
 #: flaskbb/templates/management/category_form.html:8
 #: flaskbb/templates/management/forum_form.html:8
 #: flaskbb/templates/management/forums.html:7
-#: flaskbb/templates/management/forums.html:62
+#: flaskbb/templates/management/forums.html:61
 #: flaskbb/templates/management/group_form.html:8
 #: flaskbb/templates/management/groups.html:7
 #: flaskbb/templates/management/overview.html:7
 #: flaskbb/templates/management/plugins.html:7
 #: flaskbb/templates/management/reports.html:8
 #: flaskbb/templates/management/settings.html:7
-#: flaskbb/templates/management/unread_reports.html:8
 #: flaskbb/templates/management/user_form.html:8
 #: flaskbb/templates/management/users.html:8
 #: flaskbb/templates/message/message_layout.html:6
@@ -354,603 +371,608 @@ msgid "Forum"
 msgstr ""
 
 #: flaskbb/forum/forms.py:102 flaskbb/templates/forum/search_result.html:99
-#: flaskbb/templates/management/management_layout.html:13
+#: flaskbb/templates/management/management_layout.html:21
 #: flaskbb/templates/management/users.html:1
 #: flaskbb/templates/management/users.html:34
 msgid "Users"
 msgstr ""
 
-#: flaskbb/forum/views.py:167
+#: flaskbb/forum/views.py:170
 msgid "You do not have the permissions to create a new topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:195 flaskbb/utils/helpers.py:109
+#: flaskbb/forum/views.py:198 flaskbb/utils/helpers.py:112
 msgid "You do not have the permissions to delete this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:212
+#: flaskbb/forum/views.py:215
 msgid "You do not have the permissions to lock this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:228
+#: flaskbb/forum/views.py:231
 msgid "You do not have the permissions to unlock this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:244
+#: flaskbb/forum/views.py:247
 msgid "You do not have the permissions to highlight this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:261
+#: flaskbb/forum/views.py:264
 msgid "You do not have the permissions to trivialize this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:284
+#: flaskbb/forum/views.py:287
 msgid "You do not have the permissions to moderate this forum."
 msgstr ""
 
-#: flaskbb/forum/views.py:306
+#: flaskbb/forum/views.py:309
 msgid "In order to perform this action you have to select at least one topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:315
+#: flaskbb/forum/views.py:318
 #, python-format
 msgid "%(count)s topics locked."
 msgstr ""
 
-#: flaskbb/forum/views.py:321
+#: flaskbb/forum/views.py:324
 #, python-format
 msgid "%(count)s topics unlocked."
 msgstr ""
 
-#: flaskbb/forum/views.py:328
+#: flaskbb/forum/views.py:331
 #, python-format
 msgid "%(count)s topics highlighted."
 msgstr ""
 
-#: flaskbb/forum/views.py:334
+#: flaskbb/forum/views.py:337
 #, python-format
 msgid "%(count)s topics trivialized."
 msgstr ""
 
-#: flaskbb/forum/views.py:341
+#: flaskbb/forum/views.py:344
 #, python-format
 msgid "%(count)s topics deleted."
 msgstr ""
 
-#: flaskbb/forum/views.py:349
+#: flaskbb/forum/views.py:352
 msgid "Please choose a new forum for the topics."
 msgstr ""
 
-#: flaskbb/forum/views.py:361
+#: flaskbb/forum/views.py:364
 msgid "You do not have the permissions to move this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:381 flaskbb/forum/views.py:408
+#: flaskbb/forum/views.py:384 flaskbb/forum/views.py:411
 msgid "You do not have the permissions to post in this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:434
+#: flaskbb/forum/views.py:437
 msgid "You do not have the permissions to edit this post."
 msgstr ""
 
-#: flaskbb/forum/views.py:465
+#: flaskbb/forum/views.py:480
 msgid "You do not have the permissions to delete this post."
 msgstr ""
 
-#: flaskbb/forum/views.py:489
+#: flaskbb/forum/views.py:504
 msgid "Thanks for reporting."
 msgstr ""
 
-#: flaskbb/forum/views.py:525
+#: flaskbb/forum/views.py:540
 #, python-format
 msgid "Forum %(forum)s marked as read."
 msgstr ""
 
-#: flaskbb/forum/views.py:547
+#: flaskbb/forum/views.py:562
 msgid "All forums marked as read."
 msgstr ""
 
-#: flaskbb/management/forms.py:53
-msgid "Please enter a username."
+#: flaskbb/forum/views.py:632
+#, python-format
+msgid "%(topic_count)s topics untracked."
 msgstr ""
 
-#: flaskbb/management/forms.py:63 flaskbb/user/forms.py:82
+#: flaskbb/management/forms.py:62 flaskbb/user/forms.py:81
 msgid "Birthday"
 msgstr ""
 
-#: flaskbb/management/forms.py:67 flaskbb/user/forms.py:86
+#: flaskbb/management/forms.py:65 flaskbb/user/forms.py:84
 msgid "Gender"
 msgstr ""
 
-#: flaskbb/management/forms.py:69 flaskbb/user/forms.py:88
+#: flaskbb/management/forms.py:67 flaskbb/user/forms.py:86
 msgid "Male"
 msgstr ""
 
-#: flaskbb/management/forms.py:70 flaskbb/user/forms.py:89
+#: flaskbb/management/forms.py:68 flaskbb/user/forms.py:87
 msgid "Female"
 msgstr ""
 
-#: flaskbb/management/forms.py:72 flaskbb/user/forms.py:91
+#: flaskbb/management/forms.py:70 flaskbb/user/forms.py:89
 msgid "Location"
 msgstr ""
 
-#: flaskbb/management/forms.py:75 flaskbb/templates/forum/search_result.html:48
+#: flaskbb/management/forms.py:73 flaskbb/templates/forum/search_result.html:48
 #: flaskbb/templates/forum/topic.html:52
-#: flaskbb/templates/forum/topic_horizontal.html:63
-#: flaskbb/templates/message/conversation.html:47
-#: flaskbb/templates/message/conversation.html:101 flaskbb/user/forms.py:94
+#: flaskbb/templates/forum/topic_horizontal.html:59
+#: flaskbb/templates/message/conversation.html:43
+#: flaskbb/templates/message/conversation.html:97 flaskbb/user/forms.py:92
 msgid "Website"
 msgstr ""
 
-#: flaskbb/management/forms.py:78 flaskbb/user/forms.py:97
+#: flaskbb/management/forms.py:76 flaskbb/user/forms.py:95
 msgid "Avatar"
 msgstr ""
 
-#: flaskbb/management/forms.py:81
+#: flaskbb/management/forms.py:79
 msgid "Forum signature"
 msgstr ""
 
-#: flaskbb/management/forms.py:84 flaskbb/user/forms.py:103
+#: flaskbb/management/forms.py:82 flaskbb/user/forms.py:101
 msgid "Notes"
 msgstr ""
 
-#: flaskbb/management/forms.py:87
+#: flaskbb/management/forms.py:85
 msgid "Is active?"
 msgstr ""
 
-#: flaskbb/management/forms.py:91
+#: flaskbb/management/forms.py:89
 msgid "Primary group"
 msgstr ""
 
-#: flaskbb/management/forms.py:96
+#: flaskbb/management/forms.py:94
 msgid "Secondary groups"
 msgstr ""
 
-#: flaskbb/management/forms.py:102 flaskbb/management/forms.py:216
-#: flaskbb/management/forms.py:336 flaskbb/management/forms.py:416
-#: flaskbb/templates/management/settings.html:59 flaskbb/user/forms.py:32
-#: flaskbb/user/forms.py:48 flaskbb/user/forms.py:74 flaskbb/user/forms.py:106
+#: flaskbb/management/forms.py:100 flaskbb/management/forms.py:219
+#: flaskbb/management/forms.py:342 flaskbb/management/forms.py:424
+#: flaskbb/templates/management/settings.html:59 flaskbb/user/forms.py:31
+#: flaskbb/user/forms.py:47 flaskbb/user/forms.py:73 flaskbb/user/forms.py:104
 msgid "Save"
 msgstr ""
 
-#: flaskbb/management/forms.py:151
+#: flaskbb/management/forms.py:154
 msgid "Group name"
 msgstr ""
 
-#: flaskbb/management/forms.py:152
+#: flaskbb/management/forms.py:155
 msgid "Please enter a name for the group."
 msgstr ""
 
-#: flaskbb/management/forms.py:154 flaskbb/management/forms.py:287
-#: flaskbb/management/forms.py:404 flaskbb/templates/management/groups.html:35
+#: flaskbb/management/forms.py:157 flaskbb/management/forms.py:293
+#: flaskbb/management/forms.py:412 flaskbb/templates/management/groups.html:35
 msgid "Description"
 msgstr ""
 
-#: flaskbb/management/forms.py:158
+#: flaskbb/management/forms.py:161
 msgid "Is 'Admin' group?"
 msgstr ""
 
-#: flaskbb/management/forms.py:159
+#: flaskbb/management/forms.py:162
 msgid "With this option the group has access to the admin panel."
 msgstr ""
 
-#: flaskbb/management/forms.py:163
+#: flaskbb/management/forms.py:166
 msgid "Is 'Super Moderator' group?"
 msgstr ""
 
-#: flaskbb/management/forms.py:164
+#: flaskbb/management/forms.py:167
 msgid ""
 "Check this, if the users in this group are allowed to moderate every "
 "forum."
 msgstr ""
 
-#: flaskbb/management/forms.py:168
+#: flaskbb/management/forms.py:171
 msgid "Is 'Moderator' group?"
 msgstr ""
 
-#: flaskbb/management/forms.py:169
+#: flaskbb/management/forms.py:172
 msgid ""
 "Check this, if the users in this group are allowed to moderate specified "
 "forums."
 msgstr ""
 
-#: flaskbb/management/forms.py:173
+#: flaskbb/management/forms.py:176
 msgid "Is 'Banned' group?"
 msgstr ""
 
-#: flaskbb/management/forms.py:174
+#: flaskbb/management/forms.py:177
 msgid "Only one group of type 'Banned' is allowed."
 msgstr ""
 
-#: flaskbb/management/forms.py:177
+#: flaskbb/management/forms.py:180
 msgid "Is 'Guest' group?"
 msgstr ""
 
-#: flaskbb/management/forms.py:178
+#: flaskbb/management/forms.py:181
 msgid "Only one group of type 'Guest' is allowed."
 msgstr ""
 
-#: flaskbb/management/forms.py:181
+#: flaskbb/management/forms.py:184
 msgid "Can edit posts"
 msgstr ""
 
-#: flaskbb/management/forms.py:182
+#: flaskbb/management/forms.py:185
 msgid "Check this, if the users in this group can edit posts."
 msgstr ""
 
-#: flaskbb/management/forms.py:185
+#: flaskbb/management/forms.py:188
 msgid "Can delete posts"
 msgstr ""
 
-#: flaskbb/management/forms.py:186
+#: flaskbb/management/forms.py:189
 msgid "Check this, if the users in this group can delete posts."
 msgstr ""
 
-#: flaskbb/management/forms.py:190
+#: flaskbb/management/forms.py:193
 msgid "Can delete topics"
 msgstr ""
 
-#: flaskbb/management/forms.py:191
+#: flaskbb/management/forms.py:194
 msgid "Check this, if the users in this group can delete topics."
 msgstr ""
 
-#: flaskbb/management/forms.py:195
+#: flaskbb/management/forms.py:198
 msgid "Can create topics"
 msgstr ""
 
-#: flaskbb/management/forms.py:196
+#: flaskbb/management/forms.py:199
 msgid "Check this, if the users in this group can create topics."
 msgstr ""
 
-#: flaskbb/management/forms.py:200
+#: flaskbb/management/forms.py:203
 msgid "Can post replies"
 msgstr ""
 
-#: flaskbb/management/forms.py:201
+#: flaskbb/management/forms.py:204
 msgid "Check this, if the users in this group can post replies."
 msgstr ""
 
-#: flaskbb/management/forms.py:206
+#: flaskbb/management/forms.py:209
 msgid "Moderators can edit user profiles"
 msgstr ""
 
-#: flaskbb/management/forms.py:207
+#: flaskbb/management/forms.py:210
 msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
 
-#: flaskbb/management/forms.py:212
+#: flaskbb/management/forms.py:215
 msgid "Moderators can ban users"
 msgstr ""
 
-#: flaskbb/management/forms.py:213
+#: flaskbb/management/forms.py:216
 msgid "Allow moderators to ban other users."
 msgstr ""
 
-#: flaskbb/management/forms.py:230
+#: flaskbb/management/forms.py:235
 msgid "This group name is already taken."
 msgstr ""
 
-#: flaskbb/management/forms.py:244
+#: flaskbb/management/forms.py:249
 msgid "There is already a group of type 'Banned'."
 msgstr ""
 
-#: flaskbb/management/forms.py:259
+#: flaskbb/management/forms.py:264
 msgid "There is already a group of type 'Guest'."
 msgstr ""
 
-#: flaskbb/management/forms.py:282
+#: flaskbb/management/forms.py:288
 msgid "Forum title"
 msgstr ""
 
-#: flaskbb/management/forms.py:283
+#: flaskbb/management/forms.py:289
 msgid "Please enter a forum title."
 msgstr ""
 
-#: flaskbb/management/forms.py:289 flaskbb/management/forms.py:406
+#: flaskbb/management/forms.py:295 flaskbb/management/forms.py:414
 msgid "You can format your description with Markdown."
 msgstr ""
 
-#: flaskbb/management/forms.py:293 flaskbb/management/forms.py:410
+#: flaskbb/management/forms.py:299 flaskbb/management/forms.py:418
 msgid "Position"
 msgstr ""
 
-#: flaskbb/management/forms.py:295
+#: flaskbb/management/forms.py:301
 msgid "Please enter a position for theforum."
 msgstr ""
 
-#: flaskbb/management/forms.py:300
+#: flaskbb/management/forms.py:306
 msgid "Category"
 msgstr ""
 
-#: flaskbb/management/forms.py:304
+#: flaskbb/management/forms.py:310
 msgid "The category that contains this forum."
 msgstr ""
 
-#: flaskbb/management/forms.py:308
+#: flaskbb/management/forms.py:314
 msgid "External link"
 msgstr ""
 
-#: flaskbb/management/forms.py:310
+#: flaskbb/management/forms.py:316
 msgid "A link to a website i.e. 'http://flaskbb.org'."
 msgstr ""
 
-#: flaskbb/management/forms.py:314
+#: flaskbb/management/forms.py:320
 #: flaskbb/templates/forum/category_layout.html:80
 #: flaskbb/templates/forum/search_result.html:283
-#: flaskbb/templates/management/forums.html:135
+#: flaskbb/templates/management/forums.html:136
 msgid "Moderators"
 msgstr ""
 
-#: flaskbb/management/forms.py:315
+#: flaskbb/management/forms.py:321
 msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
 
-#: flaskbb/management/forms.py:320
+#: flaskbb/management/forms.py:326
 msgid "Show moderators"
 msgstr ""
 
-#: flaskbb/management/forms.py:321
+#: flaskbb/management/forms.py:327
 msgid "Do you want to show the moderators on the index page?"
 msgstr ""
 
-#: flaskbb/management/forms.py:325
+#: flaskbb/management/forms.py:331
 msgid "Locked?"
 msgstr ""
 
-#: flaskbb/management/forms.py:326
+#: flaskbb/management/forms.py:332
 msgid "Disable new posts and topics in this forum."
 msgstr ""
 
-#: flaskbb/management/forms.py:330
+#: flaskbb/management/forms.py:336
 msgid "Group access"
 msgstr ""
 
-#: flaskbb/management/forms.py:333
+#: flaskbb/management/forms.py:339
 msgid "Select the groups that can access this forum."
 msgstr ""
 
-#: flaskbb/management/forms.py:341
+#: flaskbb/management/forms.py:347
 msgid "You cannot convert a forum that contains topics into an external link."
 msgstr ""
 
-#: flaskbb/management/forms.py:347
+#: flaskbb/management/forms.py:353
 msgid "You also need to specify some moderators."
 msgstr ""
 
-#: flaskbb/management/forms.py:359
+#: flaskbb/management/forms.py:365
 #, python-format
 msgid "%(user)s is not in a moderators group."
 msgstr ""
 
-#: flaskbb/management/forms.py:400
+#: flaskbb/management/forms.py:408
 msgid "Category title"
 msgstr ""
 
-#: flaskbb/management/forms.py:401
+#: flaskbb/management/forms.py:409
 msgid "Please enter a category title."
 msgstr ""
 
-#: flaskbb/management/forms.py:412
+#: flaskbb/management/forms.py:420
 msgid "Please enter a position for the category."
 msgstr ""
 
-#: flaskbb/management/views.py:111
+#: flaskbb/management/views.py:134
 msgid "Settings saved."
 msgstr ""
 
-#: flaskbb/management/views.py:150
+#: flaskbb/management/views.py:173
 msgid "You are not allowed to edit this user."
 msgstr ""
 
-#: flaskbb/management/views.py:184
+#: flaskbb/management/views.py:207
 msgid "User updated."
 msgstr ""
 
-#: flaskbb/management/views.py:188
+#: flaskbb/management/views.py:211
 msgid "Edit User"
 msgstr ""
 
-#: flaskbb/management/views.py:223
+#: flaskbb/management/views.py:246
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: flaskbb/management/views.py:227
+#: flaskbb/management/views.py:250
 msgid "User deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:237
+#: flaskbb/management/views.py:260
 msgid "User added."
 msgstr ""
 
-#: flaskbb/management/views.py:241
+#: flaskbb/management/views.py:264
 #: flaskbb/templates/management/banned_users.html:24
 #: flaskbb/templates/management/user_form.html:24
 #: flaskbb/templates/management/users.html:24
 msgid "Add User"
 msgstr ""
 
-#: flaskbb/management/views.py:271
+#: flaskbb/management/views.py:294
 msgid "You do not have the permissions to ban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:295
-#: flaskbb/templates/management/banned_users.html:96
+#: flaskbb/management/views.py:318
+#: flaskbb/templates/management/banned_users.html:95
 #: flaskbb/templates/management/users.html:122
 msgid "Unban"
 msgstr ""
 
-#: flaskbb/management/views.py:313
+#: flaskbb/management/views.py:336
 msgid "A moderator cannot ban an admin user."
 msgstr ""
 
-#: flaskbb/management/views.py:317
+#: flaskbb/management/views.py:340
 msgid "User is now banned."
 msgstr ""
 
-#: flaskbb/management/views.py:319
+#: flaskbb/management/views.py:342
 msgid "Could not ban user."
 msgstr ""
 
-#: flaskbb/management/views.py:329
+#: flaskbb/management/views.py:352
 msgid "You do not have the permissions to unban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:344 flaskbb/templates/management/users.html:112
+#: flaskbb/management/views.py:367 flaskbb/templates/management/users.html:111
 msgid "Ban"
 msgstr ""
 
-#: flaskbb/management/views.py:359
+#: flaskbb/management/views.py:382
 msgid "User is now unbanned."
 msgstr ""
 
-#: flaskbb/management/views.py:361
+#: flaskbb/management/views.py:384
 msgid "Could not unban user."
 msgstr ""
 
-#: flaskbb/management/views.py:422
+#: flaskbb/management/views.py:445
 #, python-format
 msgid "Report %(id)s is already marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:429
+#: flaskbb/management/views.py:452
 #, python-format
 msgid "Report %(id)s marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:443
+#: flaskbb/management/views.py:466
 msgid "All reports were marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:474
+#: flaskbb/management/views.py:497
+msgid "Report deleted."
+msgstr ""
+
+#: flaskbb/management/views.py:528
 msgid "Group updated."
 msgstr ""
 
-#: flaskbb/management/views.py:478
+#: flaskbb/management/views.py:532
 msgid "Edit Group"
 msgstr ""
 
-#: flaskbb/management/views.py:506
+#: flaskbb/management/views.py:560
 msgid "You cannot delete one of the standard groups."
 msgstr ""
 
-#: flaskbb/management/views.py:514
+#: flaskbb/management/views.py:568
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr ""
 
-#: flaskbb/management/views.py:520
+#: flaskbb/management/views.py:574
 msgid "Group deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:523
+#: flaskbb/management/views.py:577
 msgid "No group chosen."
 msgstr ""
 
-#: flaskbb/management/views.py:533
+#: flaskbb/management/views.py:587
 msgid "Group added."
 msgstr ""
 
-#: flaskbb/management/views.py:537
+#: flaskbb/management/views.py:591
 #: flaskbb/templates/management/group_form.html:21
 #: flaskbb/templates/management/groups.html:20
 msgid "Add Group"
 msgstr ""
 
-#: flaskbb/management/views.py:556
+#: flaskbb/management/views.py:610
 msgid "Forum updated."
 msgstr ""
 
-#: flaskbb/management/views.py:567 flaskbb/templates/management/forums.html:154
+#: flaskbb/management/views.py:621 flaskbb/templates/management/forums.html:155
 msgid "Edit Forum"
 msgstr ""
 
-#: flaskbb/management/views.py:580
+#: flaskbb/management/views.py:634
 msgid "Forum deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:592
+#: flaskbb/management/views.py:646
 msgid "Forum added."
 msgstr ""
 
-#: flaskbb/management/views.py:601
+#: flaskbb/management/views.py:655
 #: flaskbb/templates/management/category_form.html:21
 #: flaskbb/templates/management/forum_form.html:21
 #: flaskbb/templates/management/forums.html:20
-#: flaskbb/templates/management/forums.html:44
+#: flaskbb/templates/management/forums.html:43
 msgid "Add Forum"
 msgstr ""
 
-#: flaskbb/management/views.py:611
+#: flaskbb/management/views.py:665
 msgid "Category added."
 msgstr ""
 
-#: flaskbb/management/views.py:615
+#: flaskbb/management/views.py:669
 #: flaskbb/templates/management/category_form.html:22
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 msgid "Add Category"
 msgstr ""
 
-#: flaskbb/management/views.py:627
+#: flaskbb/management/views.py:681
 msgid "Category updated."
 msgstr ""
 
-#: flaskbb/management/views.py:631 flaskbb/templates/management/forums.html:47
+#: flaskbb/management/views.py:685 flaskbb/templates/management/forums.html:46
 msgid "Edit Category"
 msgstr ""
 
-#: flaskbb/management/views.py:644
+#: flaskbb/management/views.py:698
 msgid "Category with all associated forums deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:662
+#: flaskbb/management/views.py:716
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
 msgstr ""
 
-#: flaskbb/management/views.py:668
+#: flaskbb/management/views.py:722
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
 msgstr ""
 
-#: flaskbb/management/views.py:671
+#: flaskbb/management/views.py:725
 msgid ""
 "It seems that FlaskBB does not have enough filesystem permissions. Try "
 "removing the 'DISABLED' file by yourself instead."
 msgstr ""
 
-#: flaskbb/management/views.py:684
+#: flaskbb/management/views.py:738
 #, python-format
 msgid "Plugin %(plugin)s not found."
 msgstr ""
 
-#: flaskbb/management/views.py:689
+#: flaskbb/management/views.py:743
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
 msgstr ""
 
-#: flaskbb/management/views.py:692
+#: flaskbb/management/views.py:746
 msgid ""
 "It seems that FlaskBB does not have enough filesystem permissions. Try "
 "creating the 'DISABLED' file by yourself instead."
 msgstr ""
 
-#: flaskbb/management/views.py:707
+#: flaskbb/management/views.py:761
 msgid "Plugin has been uninstalled."
 msgstr ""
 
-#: flaskbb/management/views.py:709
+#: flaskbb/management/views.py:763
 msgid "Cannot uninstall plugin."
 msgstr ""
 
-#: flaskbb/management/views.py:722
+#: flaskbb/management/views.py:776
 msgid "Plugin has been installed."
 msgstr ""
 
-#: flaskbb/management/views.py:724
+#: flaskbb/management/views.py:778
 msgid "Cannot install plugin."
 msgstr ""
 
@@ -969,8 +991,8 @@ msgstr ""
 #: flaskbb/message/forms.py:28 flaskbb/message/forms.py:59
 #: flaskbb/templates/forum/search_result.html:43
 #: flaskbb/templates/forum/topic.html:47
-#: flaskbb/templates/forum/topic_horizontal.html:58
-#: flaskbb/templates/message/conversation.html:97
+#: flaskbb/templates/forum/topic_horizontal.html:54
+#: flaskbb/templates/message/conversation.html:93
 #: flaskbb/templates/user/profile_layout.html:47
 msgid "Message"
 msgstr ""
@@ -999,64 +1021,81 @@ msgstr ""
 msgid "Send Message"
 msgstr ""
 
-#: flaskbb/message/views.py:71 flaskbb/message/views.py:127
+#: flaskbb/message/views.py:73 flaskbb/message/views.py:130
 msgid ""
 "You cannot send any messages anymore because you have reached your "
 "message limit."
 msgstr ""
 
-#: flaskbb/message/views.py:144 flaskbb/message/views.py:216
+#: flaskbb/message/views.py:147 flaskbb/message/views.py:219
 msgid "Message saved."
 msgstr ""
 
-#: flaskbb/message/views.py:169 flaskbb/message/views.py:234
+#: flaskbb/message/views.py:172 flaskbb/message/views.py:237
 msgid "Message sent."
 msgstr ""
 
-#: flaskbb/message/views.py:175
+#: flaskbb/message/views.py:178
 msgid "Compose Message"
 msgstr ""
 
-#: flaskbb/message/views.py:202
+#: flaskbb/message/views.py:205
 msgid "You cannot edit a sent message."
 msgstr ""
 
-#: flaskbb/message/views.py:242
+#: flaskbb/message/views.py:245
 msgid "Edit Message"
 msgstr ""
 
-#: flaskbb/templates/layout.html:74 flaskbb/templates/navigation.html:20
+#: flaskbb/templates/confirm_dialog.html:6
+msgid "Are you sure?"
+msgstr ""
+
+#: flaskbb/templates/confirm_dialog.html:9
+msgid ""
+"Are you sure that you want to perform this action? This action is "
+"irreversible."
+msgstr ""
+
+#: flaskbb/templates/confirm_dialog.html:12
+msgid "Cancel"
+msgstr ""
+
+#: flaskbb/templates/confirm_dialog.html:13
+msgid "Yes"
+msgstr ""
+
 #: flaskbb/templates/forum/memberlist.html:1
-#: flaskbb/templates/forum/memberlist.html:10
-#: flaskbb/templates/forum/memberlist.html:36
+#: flaskbb/templates/forum/memberlist.html:13
+#: flaskbb/templates/forum/memberlist.html:39 flaskbb/templates/layout.html:76
 msgid "Memberlist"
 msgstr ""
 
-#: flaskbb/templates/layout.html:87 flaskbb/templates/layout.html:103
+#: flaskbb/templates/layout.html:89 flaskbb/templates/layout.html:110
 #: flaskbb/templates/message/inbox.html:1
 #: flaskbb/templates/message/message_layout.html:18
 msgid "Inbox"
 msgstr ""
 
-#: flaskbb/templates/layout.html:104 flaskbb/templates/navigation.html:54
+#: flaskbb/templates/layout.html:111
 #: flaskbb/templates/message/message_layout.html:16
 msgid "New Message"
 msgstr ""
 
-#: flaskbb/templates/layout.html:116 flaskbb/templates/navigation.html:35
 #: flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:15
 #: flaskbb/templates/forum/topictracker.html:26
+#: flaskbb/templates/layout.html:123
 msgid "Topic Tracker"
 msgstr ""
 
-#: flaskbb/templates/layout.html:119 flaskbb/templates/navigation.html:38
-#: flaskbb/templates/management/management_layout.html:17
+#: flaskbb/templates/layout.html:126
+#: flaskbb/templates/management/management_layout.html:15
 #: flaskbb/templates/user/settings_layout.html:8
 msgid "Settings"
 msgstr ""
 
-#: flaskbb/templates/layout.html:121 flaskbb/templates/navigation.html:40
+#: flaskbb/templates/layout.html:128
 #: flaskbb/templates/management/banned_users.html:9
 #: flaskbb/templates/management/category_form.html:9
 #: flaskbb/templates/management/forum_form.html:9
@@ -1067,28 +1106,23 @@ msgstr ""
 #: flaskbb/templates/management/plugins.html:8
 #: flaskbb/templates/management/reports.html:9
 #: flaskbb/templates/management/settings.html:8
-#: flaskbb/templates/management/unread_reports.html:9
 #: flaskbb/templates/management/user_form.html:9
 #: flaskbb/templates/management/users.html:9
 msgid "Management"
 msgstr ""
 
-#: flaskbb/templates/layout.html:125 flaskbb/templates/navigation.html:44
+#: flaskbb/templates/layout.html:132
 msgid "Logout"
 msgstr ""
 
-#: flaskbb/templates/layout.html:141 flaskbb/templates/navigation.html:67
 #: flaskbb/templates/auth/reset_password.html:1
 #: flaskbb/templates/auth/reset_password.html:10
+#: flaskbb/templates/layout.html:148
 msgid "Reset Password"
 msgstr ""
 
-#: flaskbb/templates/macros.html:325
+#: flaskbb/templates/macros.html:327
 msgid "Pages"
-msgstr ""
-
-#: flaskbb/templates/navigation.html:53
-msgid "Private Messages"
 msgstr ""
 
 #: flaskbb/templates/auth/forgot_password.html:1
@@ -1191,7 +1225,7 @@ msgstr ""
 #: flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/forum/search_result.html:129
 #: flaskbb/templates/forum/search_result.html:214
-#: flaskbb/templates/management/overview.html:85
+#: flaskbb/templates/management/overview.html:99
 #: flaskbb/templates/user/all_posts.html:28
 #: flaskbb/templates/user/all_topics.html:8
 #: flaskbb/templates/user/all_topics.html:28
@@ -1202,20 +1236,20 @@ msgstr ""
 #: flaskbb/templates/forum/category_layout.html:10
 #: flaskbb/templates/forum/edit_forum.html:32
 #: flaskbb/templates/forum/forum.html:50
-#: flaskbb/templates/forum/memberlist.html:50
+#: flaskbb/templates/forum/memberlist.html:52
 #: flaskbb/templates/forum/search_result.html:16
 #: flaskbb/templates/forum/search_result.html:40
 #: flaskbb/templates/forum/search_result.html:105
 #: flaskbb/templates/forum/search_result.html:135
 #: flaskbb/templates/forum/search_result.html:215
 #: flaskbb/templates/forum/topic.html:44
-#: flaskbb/templates/forum/topic_horizontal.html:55
+#: flaskbb/templates/forum/topic_horizontal.html:51
 #: flaskbb/templates/forum/topictracker.html:32
 #: flaskbb/templates/management/banned_users.html:63
-#: flaskbb/templates/management/overview.html:88
+#: flaskbb/templates/management/overview.html:102
 #: flaskbb/templates/management/users.html:63
-#: flaskbb/templates/message/conversation.html:44
-#: flaskbb/templates/message/conversation.html:95
+#: flaskbb/templates/message/conversation.html:40
+#: flaskbb/templates/message/conversation.html:91
 #: flaskbb/templates/user/all_posts.html:8
 #: flaskbb/templates/user/all_posts.html:34
 #: flaskbb/templates/user/all_topics.html:34
@@ -1234,7 +1268,7 @@ msgstr ""
 
 #: flaskbb/templates/forum/category_layout.html:27
 #: flaskbb/templates/forum/search_result.html:232
-#: flaskbb/templates/management/forums.html:80
+#: flaskbb/templates/management/forums.html:79
 msgid "Link to"
 msgstr ""
 
@@ -1247,7 +1281,7 @@ msgstr ""
 #: flaskbb/templates/forum/search_result.html:317
 #: flaskbb/templates/forum/topictracker.html:68
 #: flaskbb/templates/forum/topictracker.html:91
-#: flaskbb/templates/management/plugins.html:42
+#: flaskbb/templates/management/plugins.html:51
 msgid "by"
 msgstr ""
 
@@ -1290,8 +1324,9 @@ msgid "Trivialize"
 msgstr ""
 
 #: flaskbb/templates/forum/edit_forum.html:145
-#: flaskbb/templates/management/groups.html:64
-#: flaskbb/templates/management/users.html:132
+#: flaskbb/templates/management/groups.html:63
+#: flaskbb/templates/management/reports.html:82
+#: flaskbb/templates/management/users.html:131
 msgid "Delete"
 msgstr ""
 
@@ -1304,8 +1339,8 @@ msgid "Move"
 msgstr ""
 
 #: flaskbb/templates/forum/forum.html:25
-#: flaskbb/templates/management/unread_reports.html:50
-#: flaskbb/templates/management/unread_reports.html:69
+#: flaskbb/templates/management/reports.html:50
+#: flaskbb/templates/management/reports.html:74
 msgid "Mark as Read"
 msgstr ""
 
@@ -1361,14 +1396,14 @@ msgstr ""
 msgid "Guests online"
 msgstr ""
 
-#: flaskbb/templates/forum/memberlist.html:46
+#: flaskbb/templates/forum/memberlist.html:48
 #: flaskbb/templates/forum/search_result.html:106
 #: flaskbb/templates/management/banned_users.html:64
 #: flaskbb/templates/management/users.html:64
 msgid "Date registered"
 msgstr ""
 
-#: flaskbb/templates/forum/memberlist.html:48
+#: flaskbb/templates/forum/memberlist.html:50
 #: flaskbb/templates/forum/search_result.html:107
 #: flaskbb/templates/management/banned_users.html:65
 #: flaskbb/templates/management/users.html:65
@@ -1376,13 +1411,18 @@ msgid "Group"
 msgstr ""
 
 #: flaskbb/templates/forum/new_post.html:1
-#: flaskbb/templates/forum/new_post.html:14
-#: flaskbb/templates/forum/new_post.html:21
+#: flaskbb/templates/forum/new_post.html:18
+#: flaskbb/templates/forum/new_post.html:30
 msgid "New Post"
 msgstr ""
 
+#: flaskbb/templates/forum/new_post.html:16
+#: flaskbb/templates/forum/new_post.html:28
+msgid "Edit Post"
+msgstr ""
+
 #: flaskbb/templates/forum/online_users.html:1
-#: flaskbb/templates/forum/online_users.html:15
+#: flaskbb/templates/forum/online_users.html:13
 msgid "Online Users"
 msgstr ""
 
@@ -1401,15 +1441,15 @@ msgstr ""
 
 #: flaskbb/templates/forum/search_result.html:39
 #: flaskbb/templates/forum/topic.html:43
-#: flaskbb/templates/forum/topic_horizontal.html:54
-#: flaskbb/templates/message/conversation.html:43
-#: flaskbb/templates/message/conversation.html:94
+#: flaskbb/templates/forum/topic_horizontal.html:50
+#: flaskbb/templates/message/conversation.html:39
+#: flaskbb/templates/message/conversation.html:90
 msgid "Joined"
 msgstr ""
 
 #: flaskbb/templates/forum/search_result.html:54
 #: flaskbb/templates/forum/topic.html:58
-#: flaskbb/templates/message/conversation.html:106
+#: flaskbb/templates/message/conversation.html:102
 msgid "Guest"
 msgstr ""
 
@@ -1492,14 +1532,9 @@ msgstr ""
 
 #: flaskbb/templates/management/banned_users.html:70
 #: flaskbb/templates/management/groups.html:39
-#: flaskbb/templates/management/unread_reports.html:45
+#: flaskbb/templates/management/reports.html:45
 #: flaskbb/templates/management/users.html:69
 msgid "Actions"
-msgstr ""
-
-#: flaskbb/templates/management/banned_users.html:74
-#: flaskbb/templates/management/users.html:79
-msgid "Are you sure you want to unban these Users?"
 msgstr ""
 
 #: flaskbb/templates/management/banned_users.html:75
@@ -1510,25 +1545,25 @@ msgstr ""
 #: flaskbb/templates/management/category_form.html:20
 #: flaskbb/templates/management/forum_form.html:20
 #: flaskbb/templates/management/forums.html:19
-#: flaskbb/templates/management/forums.html:30
+#: flaskbb/templates/management/forums.html:29
 msgid "Manage Forums"
 msgstr ""
 
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/forums.html:9
-#: flaskbb/templates/management/management_layout.html:19
+#: flaskbb/templates/management/management_layout.html:16
 msgid "Forums"
 msgstr ""
 
-#: flaskbb/templates/management/forums.html:52
+#: flaskbb/templates/management/forums.html:51
 msgid "Delete Category"
 msgstr ""
 
-#: flaskbb/templates/management/forums.html:63
+#: flaskbb/templates/management/forums.html:62
 msgid "Topics / Posts"
 msgstr ""
 
-#: flaskbb/templates/management/forums.html:100
+#: flaskbb/templates/management/forums.html:99
 msgid "Edit Link"
 msgstr ""
 
@@ -1536,7 +1571,7 @@ msgstr ""
 msgid "Delete Link"
 msgstr ""
 
-#: flaskbb/templates/management/forums.html:159
+#: flaskbb/templates/management/forums.html:161
 msgid "Delete Forum"
 msgstr ""
 
@@ -1550,16 +1585,12 @@ msgstr ""
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:28
 #: flaskbb/templates/management/management_layout.html:18
-#: flaskbb/templates/management/overview.html:82
+#: flaskbb/templates/management/overview.html:96
 msgid "Groups"
 msgstr ""
 
 #: flaskbb/templates/management/groups.html:34
 msgid "Group Name"
-msgstr ""
-
-#: flaskbb/templates/management/groups.html:43
-msgid "Are you sure you want to delete these Groups?"
 msgstr ""
 
 #: flaskbb/templates/management/groups.html:44
@@ -1584,57 +1615,79 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: flaskbb/templates/management/management_layout.html:14
-#: flaskbb/templates/management/overview.html:91
-#: flaskbb/templates/management/reports.html:1
-#: flaskbb/templates/management/reports.html:10
-msgid "Reports"
-msgstr ""
-
-#: flaskbb/templates/management/management_layout.html:20
-#: flaskbb/templates/management/overview.html:115
+#: flaskbb/templates/management/management_layout.html:17
+#: flaskbb/templates/management/overview.html:139
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:25
-msgid "Everything seems alright."
+#: flaskbb/templates/management/management_layout.html:22
+#: flaskbb/templates/management/overview.html:105
+#: flaskbb/templates/management/reports.html:1
+#: flaskbb/templates/management/reports.html:10
+#: flaskbb/templates/management/reports.html:31
+msgid "Reports"
 msgstr ""
 
 #: flaskbb/templates/management/overview.html:26
-msgid "No new notifications."
+msgid "There is a problem."
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:27
+msgid "Celery is <strong>not</strong> running."
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:28
+msgid "You can start celery with this command:"
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:33
+msgid "There is something that wants your attention."
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:34
+#, python-format
+msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
 msgstr ""
 
 #: flaskbb/templates/management/overview.html:38
+msgid "Everything seems alright."
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:39
+msgid "No new notifications."
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:52
 msgid "users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:50
+#: flaskbb/templates/management/overview.html:64
 msgid "posts"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:62
+#: flaskbb/templates/management/overview.html:76
 msgid "topics"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:70
+#: flaskbb/templates/management/overview.html:84
 msgid "Statistics"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:73
+#: flaskbb/templates/management/overview.html:87
 msgid "Registered users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:76
+#: flaskbb/templates/management/overview.html:90
 msgid "Online users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:79
+#: flaskbb/templates/management/overview.html:93
 msgid "Banned users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:96
+#: flaskbb/templates/management/overview.html:110
 msgid "Components"
 msgstr ""
 
@@ -1654,87 +1707,63 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:40
+#: flaskbb/templates/management/plugins.html:49
 msgid "Version"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:48
+#: flaskbb/templates/management/plugins.html:57
 msgid "Enable"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:53
+#: flaskbb/templates/management/plugins.html:62
 msgid "Disable"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:60
+#: flaskbb/templates/management/plugins.html:69
 msgid "Install"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:66
+#: flaskbb/templates/management/plugins.html:75
 msgid "Uninstall"
 msgstr ""
 
 #: flaskbb/templates/management/reports.html:21
-#: flaskbb/templates/management/unread_reports.html:21
-msgid "Show unread reports"
+msgid "Show all Reports"
 msgstr ""
 
 #: flaskbb/templates/management/reports.html:22
-#: flaskbb/templates/management/unread_reports.html:22
-msgid "Show all reports"
-msgstr ""
-
-#: flaskbb/templates/management/reports.html:31
-msgid "All Reports"
+msgid "Show unread Reports"
 msgstr ""
 
 #: flaskbb/templates/management/reports.html:37
-#: flaskbb/templates/management/unread_reports.html:37
 msgid "Poster"
 msgstr ""
 
 #: flaskbb/templates/management/reports.html:40
-#: flaskbb/templates/management/unread_reports.html:40
 msgid "Reporter"
 msgstr ""
 
 #: flaskbb/templates/management/reports.html:41
-#: flaskbb/templates/management/unread_reports.html:41
 msgid "Reported"
 msgstr ""
 
-#: flaskbb/templates/management/reports.html:54
-#: flaskbb/templates/management/unread_reports.html:76
-msgid "No unread reports."
+#: flaskbb/templates/management/reports.html:55
+msgid "Delete selected reports"
 msgstr ""
 
-#: flaskbb/templates/management/unread_reports.html:1
-#: flaskbb/templates/management/unread_reports.html:10
-#: flaskbb/templates/management/unread_reports.html:31
-msgid "Unread Reports"
-msgstr ""
-
-#: flaskbb/templates/management/unread_reports.html:49
-msgid "Are you sure you want to mark these Reports as read?"
-msgstr ""
-
-#: flaskbb/templates/management/users.html:73
-msgid "Are you sure you want to ban these Users?"
+#: flaskbb/templates/management/reports.html:90
+msgid "No reports."
 msgstr ""
 
 #: flaskbb/templates/management/users.html:74
 msgid "Ban selected Users"
 msgstr ""
 
-#: flaskbb/templates/management/users.html:85
-msgid "Are you sure you want to delete these Users?"
-msgstr ""
-
 #: flaskbb/templates/management/users.html:86
 msgid "Delete selected Users"
 msgstr ""
 
-#: flaskbb/templates/message/conversation.html:105
+#: flaskbb/templates/message/conversation.html:101
 msgid "Deleted"
 msgstr ""
 
@@ -1816,43 +1845,43 @@ msgstr ""
 msgid "Account Settings"
 msgstr ""
 
-#: flaskbb/user/forms.py:30
+#: flaskbb/user/forms.py:29
 msgid "Theme"
 msgstr ""
 
-#: flaskbb/user/forms.py:36
+#: flaskbb/user/forms.py:35
 msgid "Old email address"
 msgstr ""
 
-#: flaskbb/user/forms.py:40
+#: flaskbb/user/forms.py:39
 msgid "New email address"
 msgstr ""
 
-#: flaskbb/user/forms.py:42
+#: flaskbb/user/forms.py:41
 msgid "Email addresses must match."
 msgstr ""
 
-#: flaskbb/user/forms.py:45
+#: flaskbb/user/forms.py:44
 msgid "Confirm email address"
 msgstr ""
 
-#: flaskbb/user/forms.py:67
+#: flaskbb/user/forms.py:66
 msgid "New password"
 msgstr ""
 
-#: flaskbb/user/forms.py:69
+#: flaskbb/user/forms.py:68
 msgid "New passwords must match."
 msgstr ""
 
-#: flaskbb/user/forms.py:72
+#: flaskbb/user/forms.py:71
 msgid "Confirm new password"
 msgstr ""
 
-#: flaskbb/user/forms.py:78
+#: flaskbb/user/forms.py:77
 msgid "Old password is wrong."
 msgstr ""
 
-#: flaskbb/user/forms.py:100
+#: flaskbb/user/forms.py:98
 msgid "Forum Signature"
 msgstr ""
 
@@ -1872,7 +1901,7 @@ msgstr ""
 msgid "User details updated."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:92
+#: flaskbb/utils/helpers.py:95
 msgid "You do not have the permissions to execute this action."
 msgstr ""
 
