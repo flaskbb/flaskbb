@@ -9,9 +9,11 @@ Version 1.0.1
 
 Unreleased
 
-* Fix account activation via form input
-
-
+* Fixes a bug that prevented users to activate their accounts via the form
+  input.
+* Fixes a translations bug that wouldn't take the territory code into account
+  when choosing a language (#299).
+* Various translations updated.
 
 Version 1.0
 -----------
