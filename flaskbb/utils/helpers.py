@@ -23,13 +23,14 @@ import requests
 import unidecode
 from flask import session, url_for, flash, redirect, request
 from jinja2 import Markup
+from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask_babelplus import lazy_gettext as _
-from flask_themes2 import render_theme_template
+from flask_themes2 import render_theme_template, get_themes_list
 from flask_login import current_user
 
 from flaskbb._compat import range_method, text_type, iteritems
-from flaskbb.extensions import redis_store
+from flaskbb.extensions import redis_store, babel
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
 from flask_allows import Permission
@@ -511,6 +512,31 @@ def get_alembic_branches():
     ]
 
     return branches_dirs
+
+
+def get_available_themes():
+    """Returns a list that contains all available themes. The items in the
+    list are tuples where the first item of the tuple is the identifier and
+    the second one the name of the theme.
+    For example::
+
+        [('aurora_mod', 'Aurora Mod')]
+    """
+    return [(theme.identifier, theme.name) for theme in get_themes_list()]
+
+
+def get_available_languages():
+    """Returns a list that contains all available languages. The items in the
+    list are tuples where the first item of the tuple is the locale
+    identifier (i.e. de_AT) and the second one the display name of the locale.
+    For example::
+
+        [('de_AT', 'Deutsch (Österreich)')]
+    """
+    return [
+        (get_locale_identifier((l.language, l.territory)), l.display_name)
+        for l in babel.list_translations()
+    ]
 
 
 def app_config_from_env(app, prefix="FLASKBB_"):

@@ -8,22 +8,14 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flask_themes2 import get_themes_list
-
-from flaskbb.extensions import babel
-
-
-def available_themes():
-    return [(theme.identifier, theme.name) for theme in get_themes_list()]
+# import .. as .. to make it backwards compatible
+from flaskbb.utils.helpers import \
+    get_available_languages as available_languages, \
+    get_available_themes as available_themes
 
 
 def available_avatar_types():
     return [("PNG", "PNG"), ("JPEG", "JPG"), ("GIF", "GIF")]
-
-
-def available_languages():
-    return [(locale.language, locale.display_name)
-            for locale in babel.list_translations()]
 
 
 fixture = (

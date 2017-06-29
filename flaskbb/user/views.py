@@ -11,11 +11,10 @@
 """
 from flask import Blueprint, flash, request
 from flask_login import login_required, current_user
-from flask_themes2 import get_themes_list
 from flask_babelplus import gettext as _
 
-from flaskbb.extensions import babel
-from flaskbb.utils.helpers import render_template
+from flaskbb.utils.helpers import (render_template, get_available_languages,
+                                   get_available_themes)
 from flaskbb.user.models import User
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
                                 ChangeUserDetailsForm, GeneralSettingsForm)
@@ -52,11 +51,8 @@ def view_all_posts(username):
 def settings():
     form = GeneralSettingsForm()
 
-    form.theme.choices = [(theme.identifier, theme.name)
-                          for theme in get_themes_list()]
-
-    form.language.choices = [(locale.language, locale.display_name)
-                             for locale in babel.list_translations()]
+    form.theme.choices = get_available_themes()
+    form.language.choices = get_available_languages()
 
     if form.validate_on_submit():
         current_user.theme = form.theme.data

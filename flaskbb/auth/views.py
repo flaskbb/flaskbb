@@ -18,7 +18,7 @@ from flask_babelplus import gettext as _
 
 from flaskbb.extensions import limiter
 from flaskbb.utils.helpers import (render_template, redirect_or_next,
-                                   format_timedelta)
+                                   format_timedelta, get_available_languages)
 from flaskbb.email import send_reset_token, send_activation_token
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.auth.forms import (LoginForm, LoginRecaptchaForm, ReauthForm,
@@ -26,7 +26,6 @@ from flaskbb.auth.forms import (LoginForm, LoginRecaptchaForm, ReauthForm,
                                 RegisterForm, AccountActivationForm,
                                 RequestActivationForm)
 from flaskbb.user.models import User
-from flaskbb.fixtures.settings import available_languages
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
 
@@ -145,7 +144,7 @@ def register():
 
     form = RegisterForm(request.form)
 
-    form.language.choices = available_languages()
+    form.language.choices = get_available_languages()
     form.language.default = flaskbb_config['DEFAULT_LANGUAGE']
     form.process(request.form)  # needed because a default is overriden
 
