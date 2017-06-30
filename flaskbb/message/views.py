@@ -30,17 +30,18 @@ message = Blueprint("message", __name__)
 def inbox():
     page = request.args.get('page', 1, type=int)
 
-    conversations = Conversation.query.\
+    conversations = Conversation.query. \
         filter(
             Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == False,
-            Conversation.trash == False
+            Conversation.trash == False,
+            db.not_(Conversation.from_user_id == current_user.id)
         ).\
-        order_by(Message.date_created.desc()).\
+        order_by(Message.date_created.desc()). \
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-    message_count = Conversation.query.\
+    message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
 
