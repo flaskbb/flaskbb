@@ -28,6 +28,8 @@ class Conversation(db.Model, CRUDMixin):
     subject = db.Column(db.String(255), nullable=True)
     date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                              nullable=False)
+    date_modified = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
+                              nullable=False)
     trash = db.Column(db.Boolean, default=False, nullable=False)
     draft = db.Column(db.Boolean, default=False, nullable=False)
     unread = db.Column(db.Boolean, default=False, nullable=False)
@@ -73,6 +75,7 @@ class Conversation(db.Model, CRUDMixin):
             message.save(self)
             return self
 
+        self.date_modified = time_utcnow()
         db.session.add(self)
         db.session.commit()
         return self
@@ -101,6 +104,7 @@ class Message(db.Model, CRUDMixin):
         """
         if conversation is not None:
             self.conversation_id = conversation.id
+            conversation.date_modified = time_utcnow()
             self.date_created = time_utcnow()
 
         db.session.add(self)
