@@ -30,17 +30,18 @@ message = Blueprint("message", __name__)
 def inbox():
     page = request.args.get('page', 1, type=int)
 
+    # the inbox will display both, the recieved and the sent messages
     conversations = Conversation.query. \
         filter(
-            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == False,
             Conversation.trash == False,
-            db.not_(Conversation.from_user_id == current_user.id)
         ).\
-        order_by(Message.date_created.desc()). \
+        order_by(Conversation.date_modified.desc()). \
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
+    # we can't simply do conversations.total because it would ignore
+    # drafted and trashed messages
     message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
@@ -66,7 +67,7 @@ def view_conversation(conversation_id):
     form = MessageForm()
     if form.validate_on_submit():
 
-        message_count = Conversation.query.\
+        message_count = Conversation.query. \
             filter(Conversation.user_id == current_user.id).\
             count()
 
@@ -88,7 +89,7 @@ def view_conversation(conversation_id):
 
         # save the message in the recievers conversation
         old_conv = conversation
-        conversation = Conversation.query.\
+        conversation = Conversation.query. \
             filter(
                 Conversation.user_id == to_user_id,
                 Conversation.shared_id == conversation.shared_id
@@ -123,7 +124,7 @@ def new_conversation():
     form = ConversationForm()
     to_user = request.args.get("to_user")
 
-    message_count = Conversation.query.\
+    message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
 
@@ -290,18 +291,17 @@ def delete_conversation(conversation_id):
 def sent():
     page = request.args.get('page', 1, type=int)
 
-    conversations = Conversation.query.\
+    conversations = Conversation.query. \
         filter(
-            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == False,
             Conversation.trash == False,
             db.not_(Conversation.to_user_id == current_user.id)
         ).\
-        order_by(Message.date_created.desc()).\
+        order_by(Conversation.date_modified.desc()). \
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-    message_count = Conversation.query.\
+    message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
 
@@ -314,17 +314,16 @@ def sent():
 def drafts():
     page = request.args.get('page', 1, type=int)
 
-    conversations = Conversation.query.\
+    conversations = Conversation.query. \
         filter(
-            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.draft == True,
             Conversation.trash == False
         ).\
-        order_by(Message.date_created.desc()).\
+        order_by(Conversation.date_modified.desc()). \
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-    message_count = Conversation.query.\
+    message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
 
@@ -337,16 +336,15 @@ def drafts():
 def trash():
     page = request.args.get('page', 1, type=int)
 
-    conversations = Conversation.query.\
+    conversations = Conversation.query. \
         filter(
-            Conversation.id == Message.conversation_id,
             Conversation.user_id == current_user.id,
             Conversation.trash == True,
         ).\
-        order_by(Message.date_created.desc()).\
+        order_by(Conversation.date_modified.desc()). \
         paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-    message_count = Conversation.query.\
+    message_count = Conversation.query. \
         filter(Conversation.user_id == current_user.id).\
         count()
 
