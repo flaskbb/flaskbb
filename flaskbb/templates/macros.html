@@ -405,7 +405,10 @@
 {%- endmacro -%}
 
 
-{# Generates a topic url with an anchor to the post #}
+{#
+Generates a topic url with an anchor to the post
+XXX: Rename to generate_anchor_url to make it universally useful
+#}
 {%- macro generate_post_url(topic, post, page) -%}
     {%- if page > 1 -%}
         {{ topic.url }}?page={{ page }}#pid{{ post.id }}
@@ -415,11 +418,14 @@
 {%- endmacro -%}
 
 
-{# Generates the post id for the topic. Each topic starts with the post id 1 #}
-{%- macro generate_post_id(posts, page, per_page) -%}
-    {%- if posts.page == 1 -%}
+{#
+Generates the pagination object id in a list.
+For example, on id should continue with 11 on page 2 if per_page is set to 10
+#}
+{%- macro generate_obj_id(obj, page, per_page) -%}
+    {%- if obj.page == 1 -%}
         {{ page }}
     {%- else -%}
-        {{ page + (posts.page - 1) * per_page }}
+        {{ page + (obj.page - 1) * per_page }}
     {%- endif -%}
 {%- endmacro -%}

@@ -1,3 +1,4 @@
+{% from "macros.html" import generate_obj_id %}
 <div class="panel conversation-panel">
     <div class="panel-heading conversation-head">
         <div class="row">
@@ -7,7 +8,7 @@
                 </div>
 
                 <div class="pull-right">
-                    <span class="label label-info">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
+                    <span class="label label-info" title="The amount of all conversations" data-toggle="tooltip" data-placement="top">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
                 </div>
             </div>
         </div>
@@ -34,6 +35,9 @@
                             {{ conversation.subject }}
                         {% endif %}
                     </a>
+                    <div class="pull-right">
+                        <strong><small>#{{ generate_obj_id(conversations, loop.index, flaskbb_config["TOPICS_PER_PAGE"]) }}</small></strong>
+                    </div>
                 </div>
                 <!-- meta info (date, user) -->
                 <div class="conversation-meta">
