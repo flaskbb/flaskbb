@@ -122,9 +122,9 @@ class Report(db.Model, CRUDMixin):
             return self
 
         if post and user:
-            self.reporter_id = user.id
+            self.reporter = user
             self.reported = time_utcnow()
-            self.post_id = post.id
+            self.post = post
 
         db.session.add(self)
         db.session.commit()
@@ -168,6 +168,8 @@ class Post(db.Model, CRUDMixin):
             self.content = content
 
         if user:
+            # setting user here -- even with setting the user id explicitly
+            # breaks the bulk insert for some reason
             self.user_id = user.id
             self.username = user.username
 
@@ -367,6 +369,9 @@ class Topic(db.Model, CRUDMixin):
             self.title = title
 
         if user:
+            # setting the user here, even with setting the id, breaks the bulk insert
+            # stuff as they use the session.bulk_save_objects which does not trigger
+            # relationships
             self.user_id = user.id
             self.username = user.username
 
@@ -492,7 +497,7 @@ class Topic(db.Model, CRUDMixin):
         old_forum = self.forum
         self.forum.post_count -= self.post_count
         self.forum.topic_count -= 1
-        self.forum_id = new_forum.id
+        self.forum = new_forum
 
         new_forum.post_count += self.post_count
         new_forum.topic_count += 1
@@ -556,20 +561,20 @@ class Topic(db.Model, CRUDMixin):
             order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
 
         # do we want to delete the topic with the last post in the forum?
-        if topic and topic[0].id == self.id:
+        if topic and topic[0] == self:
             try:
                 # Now the second last post will be the last post
-                self.forum.last_post_id = topic[1].last_post_id
+                self.forum.last_post = topic[1].last_post
                 self.forum.last_post_title = topic[1].title
-                self.forum.last_post_user_id = topic[1].user_id
+                self.forum.last_post_user = topic[1].user
                 self.forum.last_post_username = topic[1].username
                 self.forum.last_post_created = topic[1].last_updated
             # Catch an IndexError when you delete the last topic in the forum
             # There is no second last post
             except IndexError:
-                self.forum.last_post_id = None
+                self.forum.last_post = None
                 self.forum.last_post_title = None
-                self.forum.last_post_user_id = None
+                self.forum.last_post_user = None
                 self.forum.last_post_username = None
                 self.forum.last_post_created = None
 
@@ -758,7 +763,7 @@ class Forum(db.Model, CRUDMixin):
                               ForumsRead.user_id == user.id)).\
             filter(Topic.forum_id == self.id,
                    Topic.last_updated > read_cutoff,
-                   db.or_(TopicsRead.last_read == None,
+                   db.or_(TopicsRead.last_read == None,  # noqa: E711
                           TopicsRead.last_read < Topic.last_updated)).\
             count()
 
