@@ -623,11 +623,18 @@ class Forum(db.Model, CRUDMixin):
     last_post = db.relationship("Post", backref="last_post_forum",
                                 uselist=False, foreign_keys=[last_post_id])
 
+    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                                  nullable=True)
+
+    last_post_user = db.relationship(
+        "User",
+        uselist=False,
+        foreign_keys=[last_post_user_id]
+    )
+
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
     last_post_title = db.Column(db.String(255), nullable=True)
-    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                                  nullable=True)
     last_post_username = db.Column(db.String(255), nullable=True)
     last_post_created = db.Column(UTCDateTime(timezone=True),
                                   default=time_utcnow, nullable=True)
