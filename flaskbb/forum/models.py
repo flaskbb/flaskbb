@@ -197,24 +197,18 @@ class Post(db.Model, CRUDMixin):
         # Adding a new post
         if user and topic:
             created = time_utcnow()
-            self.user_id = user.id
+            self.user = user
             self.username = user.username
-            self.topic_id = topic.id
+            self.topic = topic
             self.date_created = created
 
             topic.last_updated = created
-
-            # This needs to be done before the last_post_id gets updated.
-            db.session.add(self)
-            db.session.commit()
-
-            # Now lets update the last post id
-            topic.last_post_id = self.id
+            topic.last_post = self
 
             # Update the last post info for the forum
-            topic.forum.last_post_id = self.id
+            topic.forum.last_post = self
+            topic.forum.last_post_user = self.user
             topic.forum.last_post_title = topic.title
-            topic.forum.last_post_user_id = user.id
             topic.forum.last_post_username = user.username
             topic.forum.last_post_created = created
 
