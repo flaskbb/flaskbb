@@ -227,15 +227,15 @@ class Post(db.Model, CRUDMixin):
     def delete(self):
         """Deletes a post and returns self."""
         # This will delete the whole topic
-        if self.topic.first_post_id == self.id:
+        if self.topic.first_post == self:
             self.topic.delete()
             return self
 
         # Delete the last post
-        if self.topic.last_post_id == self.id:
+        if self.topic.last_post == self:
 
             # update the last post in the forum
-            if self.topic.last_post_id == self.topic.forum.last_post_id:
+            if self.topic.last_post == self.topic.forum.last_post:
                 # We need the second last post in the forum here,
                 # because the last post will be deleted
                 second_last_post = Post.query.\
@@ -246,7 +246,7 @@ class Post(db.Model, CRUDMixin):
 
                 # now lets update the second last post to the last post
                 last_post = second_last_post[1]
-                self.topic.forum.last_post_id = last_post.id
+                self.topic.forum.last_post = last_post
                 self.topic.forum.last_post_title = last_post.topic.title
                 self.topic.forum.last_post_user_id = last_post.user_id
                 self.topic.forum.last_post_username = last_post.username
@@ -260,7 +260,7 @@ class Post(db.Model, CRUDMixin):
             # there is no second last post, now the last post is also the
             # first post
             else:
-                self.topic.last_post_id = self.topic.first_post_id
+                self.topic.last_post = self.topic.first_post
 
             post = Post.query.get(self.topic.last_post_id)
             self.topic.last_updated = post.date_created
@@ -522,8 +522,8 @@ class Topic(db.Model, CRUDMixin):
             return self
 
         # Set the forum and user id
-        self.forum_id = forum.id
-        self.user_id = user.id
+        self.forum = forum
+        self.user = user
         self.username = user.username
 
         # Set the last_updated time. Needed for the readstracker
@@ -537,7 +537,7 @@ class Topic(db.Model, CRUDMixin):
         post.save(user, self)
 
         # Update the first and last post id
-        self.last_post_id = self.first_post_id = post.id
+        self.last_post = self.first_post = post
 
         # Update the topic count
         forum.topic_count += 1
