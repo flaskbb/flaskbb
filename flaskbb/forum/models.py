@@ -496,7 +496,7 @@ class Topic(db.Model, CRUDMixin):
         """
 
         # if the target forum is the current forum, abort
-        if self.forum_id == new_forum.id:
+        if self.forum == new_forum:
             return False
 
         old_forum = self.forum
