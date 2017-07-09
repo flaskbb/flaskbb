@@ -53,14 +53,17 @@ class TopicsRead(db.Model, CRUDMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
+    user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     topic_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
                                        name="fk_tr_topic_id"),
                          primary_key=True)
+    topic = db.relationship('Topic', uselist=False, foreign_keys=[topic_id])
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_tr_forum_id"),
                          primary_key=True)
+    forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                           nullable=False)
 
@@ -70,10 +73,12 @@ class ForumsRead(db.Model, CRUDMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
+    user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
+    forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                           nullable=False)
     cleared = db.Column(UTCDateTime(timezone=True), nullable=True)
