@@ -465,9 +465,9 @@ class Topic(db.Model, CRUDMixin):
         # the TopicsRead model.
         elif not topicsread:
             topicsread = TopicsRead()
-            topicsread.user_id = user.id
-            topicsread.topic_id = self.id
-            topicsread.forum_id = self.forum_id
+            topicsread.user = user
+            topicsread.topic = self
+            topicsread.forum = self.forum
             topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
@@ -715,8 +715,8 @@ class Forum(db.Model, CRUDMixin):
         if last_post is not None:
 
             # a new last post was found in the forum
-            if not last_post.id == self.last_post_id:
-                self.last_post_id = last_post.id
+            if last_post != self.last_post:
+                self.last_post = last_post
                 self.last_post_title = last_post.topic.title
                 self.last_post_user_id = last_post.user_id
                 self.last_post_username = last_post.username
