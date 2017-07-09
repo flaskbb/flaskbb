@@ -550,8 +550,8 @@ def markread(forum_id=None, slug=None):
     forumsread_list = []
     for forum_instance in forums:
         forumsread = ForumsRead()
-        forumsread.user_id = real(current_user).id
-        forumsread.forum_id = forum_instance.id
+        forumsread.user = real(current_user)
+        forumsread.forum = forum_instance
         forumsread.last_read = time_utcnow()
         forumsread.cleared = time_utcnow()
         forumsread_list.append(forumsread)
