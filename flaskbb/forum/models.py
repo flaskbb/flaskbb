@@ -708,7 +708,8 @@ class Forum(db.Model, CRUDMixin):
             filter(Post.topic_id == Topic.id,
                    Topic.forum_id == self.id).\
             order_by(Post.date_created.desc()).\
-            first()
+            limit(1)\
+            .first()
 
         # Last post is none when there are no topics in the forum
         if last_post is not None:
