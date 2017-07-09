@@ -255,7 +255,7 @@ class Post(db.Model, CRUDMixin):
                 last_post = second_last_post[1]
                 self.topic.forum.last_post = last_post
                 self.topic.forum.last_post_title = last_post.topic.title
-                self.topic.forum.last_post_user_id = last_post.user_id
+                self.topic.forum.last_post_user = last_post.user
                 self.topic.forum.last_post_username = last_post.username
                 self.topic.forum.last_post_created = last_post.date_created
 
