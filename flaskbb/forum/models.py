@@ -724,9 +724,9 @@ class Forum(db.Model, CRUDMixin):
 
         # No post found..
         else:
-            self.last_post_id = None
+            self.last_post = None
             self.last_post_title = None
-            self.last_post_user_id = None
+            self.last_post_user = None
             self.last_post_username = None
             self.last_post_created = None
 
@@ -789,8 +789,8 @@ class Forum(db.Model, CRUDMixin):
 
             # No ForumRead Entry existing - creating one.
             forumsread = ForumsRead()
-            forumsread.user_id = user.id
-            forumsread.forum_id = self.id
+            forumsread.user = user
+            forumsread.forum = self
             forumsread.last_read = time_utcnow()
             forumsread.save()
             return True
