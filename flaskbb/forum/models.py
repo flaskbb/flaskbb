@@ -276,7 +276,6 @@ class Post(db.Model, CRUDMixin):
         self.user.post_count -= 1
         self.topic.post_count -= 1
         self.topic.forum.post_count -= 1
-        db.session.commit()
 
         db.session.delete(self)
         db.session.commit()
@@ -583,9 +582,6 @@ class Topic(db.Model, CRUDMixin):
                 self.forum.last_post_username = None
                 self.forum.last_post_created = None
 
-            # Commit the changes
-            db.session.commit()
-
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
 
@@ -593,13 +589,11 @@ class Topic(db.Model, CRUDMixin):
 
         # Delete the topic
         db.session.delete(self)
-        db.session.commit()
 
         # Update the post counts
         if users:
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
 
         forum.topic_count = Topic.query.\
             filter_by(forum_id=self.forum_id).\
