@@ -266,6 +266,9 @@ class Post(db.Model, CRUDMixin):
             else:
                 self.topic.last_post_id = self.topic.first_post_id
 
+            post = Post.query.get(self.topic.last_post_id)
+            self.topic.last_updated = post.date_created
+
         # Update the post counts
         self.user.post_count -= 1
         self.topic.post_count -= 1
