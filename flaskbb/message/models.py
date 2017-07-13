@@ -103,7 +103,7 @@ class Message(db.Model, CRUDMixin):
                              belongs to.
         """
         if conversation is not None:
-            self.conversation_id = conversation.id
+            self.conversation = conversation
             conversation.date_modified = time_utcnow()
             self.date_created = time_utcnow()
 

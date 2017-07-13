@@ -197,7 +197,7 @@ def update_user(username, password, email, groupname):
 
     user.password = password
     user.email = email
-    user.primary_group_id = group.id
+    user.primary_group = group
     return user.save()
 
 

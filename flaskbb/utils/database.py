@@ -9,8 +9,18 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
-
 from flaskbb.extensions import db
+
+
+def make_comparable(cls):
+    def __eq__(self, other):
+        return isinstance(other, cls) and self.id == other.id
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    cls.__eq__ = __eq__
+    return cls
 
 
 class CRUDMixin(object):

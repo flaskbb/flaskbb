@@ -16,7 +16,7 @@ from flaskbb.extensions import db, cache
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.database import CRUDMixin, UTCDateTime
+from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.forum.models import (Post, Topic, Forum, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
@@ -31,6 +31,7 @@ groups_users = db.Table(
 )
 
 
+@make_comparable
 class Group(db.Model, CRUDMixin):
     __tablename__ = "groups"
 
@@ -413,7 +414,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                 Group.banned == True
             ).first()
 
-            self.primary_group_id = banned_group.id
+            self.primary_group = banned_group
             self.save()
             self.invalidate_cache()
             return True
@@ -430,7 +431,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                 Group.banned == False
             ).first()
 
-            self.primary_group_id = member_group.id
+            self.primary_group = member_group
             self.save()
             self.invalidate_cache()
             return True
@@ -452,7 +453,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
             for group in groups:
                 # Do not add the primary group to the secondary groups
-                if group.id == self.primary_group_id:
+                if group == self.primary_group:
                     continue
                 self.add_to_group(group)
 

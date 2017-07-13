@@ -16,7 +16,7 @@ from sqlalchemy.orm import aliased
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
                                    get_forums, time_utcnow, topic_is_unread)
-from flaskbb.utils.database import CRUDMixin, UTCDateTime
+from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -53,14 +53,17 @@ class TopicsRead(db.Model, CRUDMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
+    user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     topic_id = db.Column(db.Integer,
                          db.ForeignKey("topics.id", use_alter=True,
                                        name="fk_tr_topic_id"),
                          primary_key=True)
+    topic = db.relationship('Topic', uselist=False, foreign_keys=[topic_id])
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_tr_forum_id"),
                          primary_key=True)
+    forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                           nullable=False)
 
@@ -70,15 +73,18 @@ class ForumsRead(db.Model, CRUDMixin):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
+    user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     forum_id = db.Column(db.Integer,
                          db.ForeignKey("forums.id", use_alter=True,
                                        name="fk_fr_forum_id"),
                          primary_key=True)
+    forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                           nullable=False)
     cleared = db.Column(UTCDateTime(timezone=True), nullable=True)
 
 
+@make_comparable
 class Report(db.Model, CRUDMixin):
     __tablename__ = "reports"
 
@@ -121,15 +127,16 @@ class Report(db.Model, CRUDMixin):
             return self
 
         if post and user:
-            self.reporter_id = user.id
+            self.reporter = user
             self.reported = time_utcnow()
-            self.post_id = post.id
+            self.post = post
 
         db.session.add(self)
         db.session.commit()
         return self
 
 
+@make_comparable
 class Post(db.Model, CRUDMixin):
     __tablename__ = "posts"
 
@@ -166,6 +173,8 @@ class Post(db.Model, CRUDMixin):
             self.content = content
 
         if user:
+            # setting user here -- even with setting the user id explicitly
+            # breaks the bulk insert for some reason
             self.user_id = user.id
             self.username = user.username
 
@@ -197,24 +206,18 @@ class Post(db.Model, CRUDMixin):
         # Adding a new post
         if user and topic:
             created = time_utcnow()
-            self.user_id = user.id
+            self.user = user
             self.username = user.username
-            self.topic_id = topic.id
+            self.topic = topic
             self.date_created = created
 
             topic.last_updated = created
-
-            # This needs to be done before the last_post_id gets updated.
-            db.session.add(self)
-            db.session.commit()
-
-            # Now lets update the last post id
-            topic.last_post_id = self.id
+            topic.last_post = self
 
             # Update the last post info for the forum
-            topic.forum.last_post_id = self.id
+            topic.forum.last_post = self
+            topic.forum.last_post_user = self.user
             topic.forum.last_post_title = topic.title
-            topic.forum.last_post_user_id = user.id
             topic.forum.last_post_username = user.username
             topic.forum.last_post_created = created
 
@@ -231,15 +234,15 @@ class Post(db.Model, CRUDMixin):
     def delete(self):
         """Deletes a post and returns self."""
         # This will delete the whole topic
-        if self.topic.first_post_id == self.id:
+        if self.topic.first_post == self:
             self.topic.delete()
             return self
 
         # Delete the last post
-        if self.topic.last_post_id == self.id:
+        if self.topic.last_post == self:
 
             # update the last post in the forum
-            if self.topic.last_post_id == self.topic.forum.last_post_id:
+            if self.topic.last_post == self.topic.forum.last_post:
                 # We need the second last post in the forum here,
                 # because the last post will be deleted
                 second_last_post = Post.query.\
@@ -250,9 +253,9 @@ class Post(db.Model, CRUDMixin):
 
                 # now lets update the second last post to the last post
                 last_post = second_last_post[1]
-                self.topic.forum.last_post_id = last_post.id
+                self.topic.forum.last_post = last_post
                 self.topic.forum.last_post_title = last_post.topic.title
-                self.topic.forum.last_post_user_id = last_post.user_id
+                self.topic.forum.last_post_user = last_post.user
                 self.topic.forum.last_post_username = last_post.username
                 self.topic.forum.last_post_created = last_post.date_created
 
@@ -264,22 +267,21 @@ class Post(db.Model, CRUDMixin):
             # there is no second last post, now the last post is also the
             # first post
             else:
-                self.topic.last_post_id = self.topic.first_post_id
+                self.topic.last_post = self.topic.first_post
 
-            post = Post.query.get(self.topic.last_post_id)
-            self.topic.last_updated = post.date_created
+            self.topic.last_updated = self.topic.last_post.date_created
 
         # Update the post counts
         self.user.post_count -= 1
         self.topic.post_count -= 1
         self.topic.forum.post_count -= 1
-        db.session.commit()
 
         db.session.delete(self)
         db.session.commit()
         return self
 
 
+@make_comparable
 class Topic(db.Model, CRUDMixin):
     __tablename__ = "topics"
 
@@ -370,6 +372,9 @@ class Topic(db.Model, CRUDMixin):
             self.title = title
 
         if user:
+            # setting the user here, even with setting the id, breaks the bulk insert
+            # stuff as they use the session.bulk_save_objects which does not trigger
+            # relationships
             self.user_id = user.id
             self.username = user.username
 
@@ -458,9 +463,9 @@ class Topic(db.Model, CRUDMixin):
         # the TopicsRead model.
         elif not topicsread:
             topicsread = TopicsRead()
-            topicsread.user_id = user.id
-            topicsread.topic_id = self.id
-            topicsread.forum_id = self.forum_id
+            topicsread.user = user
+            topicsread.topic = self
+            topicsread.forum = self.forum
             topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
@@ -489,13 +494,13 @@ class Topic(db.Model, CRUDMixin):
         """
 
         # if the target forum is the current forum, abort
-        if self.forum_id == new_forum.id:
+        if self.forum == new_forum:
             return False
 
         old_forum = self.forum
         self.forum.post_count -= self.post_count
         self.forum.topic_count -= 1
-        self.forum_id = new_forum.id
+        self.forum = new_forum
 
         new_forum.post_count += self.post_count
         new_forum.topic_count += 1
@@ -525,8 +530,8 @@ class Topic(db.Model, CRUDMixin):
             return self
 
         # Set the forum and user id
-        self.forum_id = forum.id
-        self.user_id = user.id
+        self.forum = forum
+        self.user = user
         self.username = user.username
 
         # Set the last_updated time. Needed for the readstracker
@@ -540,7 +545,7 @@ class Topic(db.Model, CRUDMixin):
         post.save(user, self)
 
         # Update the first and last post id
-        self.last_post_id = self.first_post_id = post.id
+        self.last_post = self.first_post = post
 
         # Update the topic count
         forum.topic_count += 1
@@ -559,25 +564,22 @@ class Topic(db.Model, CRUDMixin):
             order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
 
         # do we want to delete the topic with the last post in the forum?
-        if topic and topic[0].id == self.id:
+        if topic and topic[0] == self:
             try:
                 # Now the second last post will be the last post
-                self.forum.last_post_id = topic[1].last_post_id
+                self.forum.last_post = topic[1].last_post
                 self.forum.last_post_title = topic[1].title
-                self.forum.last_post_user_id = topic[1].user_id
+                self.forum.last_post_user = topic[1].user
                 self.forum.last_post_username = topic[1].username
                 self.forum.last_post_created = topic[1].last_updated
             # Catch an IndexError when you delete the last topic in the forum
             # There is no second last post
             except IndexError:
-                self.forum.last_post_id = None
+                self.forum.last_post = None
                 self.forum.last_post_title = None
-                self.forum.last_post_user_id = None
+                self.forum.last_post_user = None
                 self.forum.last_post_username = None
                 self.forum.last_post_created = None
-
-            # Commit the changes
-            db.session.commit()
 
         # These things needs to be stored in a variable before they are deleted
         forum = self.forum
@@ -586,13 +588,11 @@ class Topic(db.Model, CRUDMixin):
 
         # Delete the topic
         db.session.delete(self)
-        db.session.commit()
 
         # Update the post counts
         if users:
             for user in users:
                 user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
 
         forum.topic_count = Topic.query.\
             filter_by(forum_id=self.forum_id).\
@@ -607,6 +607,7 @@ class Topic(db.Model, CRUDMixin):
         return self
 
 
+@make_comparable
 class Forum(db.Model, CRUDMixin):
     __tablename__ = "forums"
 
@@ -629,11 +630,18 @@ class Forum(db.Model, CRUDMixin):
     last_post = db.relationship("Post", backref="last_post_forum",
                                 uselist=False, foreign_keys=[last_post_id])
 
+    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                                  nullable=True)
+
+    last_post_user = db.relationship(
+        "User",
+        uselist=False,
+        foreign_keys=[last_post_user_id]
+    )
+
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
     last_post_title = db.Column(db.String(255), nullable=True)
-    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                                  nullable=True)
     last_post_username = db.Column(db.String(255), nullable=True)
     last_post_created = db.Column(UTCDateTime(timezone=True),
                                   default=time_utcnow, nullable=True)
@@ -693,14 +701,15 @@ class Forum(db.Model, CRUDMixin):
             filter(Post.topic_id == Topic.id,
                    Topic.forum_id == self.id).\
             order_by(Post.date_created.desc()).\
-            first()
+            limit(1)\
+            .first()
 
         # Last post is none when there are no topics in the forum
         if last_post is not None:
 
             # a new last post was found in the forum
-            if not last_post.id == self.last_post_id:
-                self.last_post_id = last_post.id
+            if last_post != self.last_post:
+                self.last_post = last_post
                 self.last_post_title = last_post.topic.title
                 self.last_post_user_id = last_post.user_id
                 self.last_post_username = last_post.username
@@ -708,9 +717,9 @@ class Forum(db.Model, CRUDMixin):
 
         # No post found..
         else:
-            self.last_post_id = None
+            self.last_post = None
             self.last_post_title = None
-            self.last_post_user_id = None
+            self.last_post_user = None
             self.last_post_username = None
             self.last_post_created = None
 
@@ -753,7 +762,7 @@ class Forum(db.Model, CRUDMixin):
                               ForumsRead.user_id == user.id)).\
             filter(Topic.forum_id == self.id,
                    Topic.last_updated > read_cutoff,
-                   db.or_(TopicsRead.last_read == None,
+                   db.or_(TopicsRead.last_read == None,  # noqa: E711
                           TopicsRead.last_read < Topic.last_updated)).\
             count()
 
@@ -773,8 +782,8 @@ class Forum(db.Model, CRUDMixin):
 
             # No ForumRead Entry existing - creating one.
             forumsread = ForumsRead()
-            forumsread.user_id = user.id
-            forumsread.forum_id = self.id
+            forumsread.user = user
+            forumsread.forum = self
             forumsread.last_read = time_utcnow()
             forumsread.save()
             return True
@@ -913,6 +922,7 @@ class Forum(db.Model, CRUDMixin):
         return topics
 
 
+@make_comparable
 class Category(db.Model, CRUDMixin):
     __tablename__ = "categories"
 

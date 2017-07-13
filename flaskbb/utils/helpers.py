@@ -29,6 +29,8 @@ from flask_babelplus import lazy_gettext as _
 from flask_themes2 import render_theme_template, get_themes_list
 from flask_login import current_user
 
+from werkzeug.local import LocalProxy
+
 from flaskbb._compat import range_method, text_type, iteritems
 from flaskbb.extensions import redis_store, babel
 from flaskbb.utils.settings import flaskbb_config
@@ -614,3 +616,12 @@ class ReverseProxyPathFix(object):
             environ['wsgi.url_scheme'] = 'https'
 
         return self.app(environ, start_response)
+
+
+def real(obj):
+    """
+    Unwraps a werkzeug.local.LocalProxy object if given one, else returns the object
+    """
+    if isinstance(obj, LocalProxy):
+        return obj._get_current_object()
+    return obj
