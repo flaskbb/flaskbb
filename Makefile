@@ -1,4 +1,4 @@
-.PHONY: clean install help test lint run dependencies docs
+.PHONY: clean install help test lint run dependencies docs ctags
 
 help:
 	@echo "  clean      remove unwanted stuff"
@@ -8,6 +8,7 @@ help:
 	@echo "  lint       check the source for style errors"
 	@echo "  run        run the development server with the development config"
 	@echo "  docs       build the documentation"
+	@echo "  ctags	    creates a ctags file of Flaskbb's main files"
 
 dependencies:requirements.txt
 	pip install -r requirements.txt
@@ -39,3 +40,14 @@ lint:check
 
 check:
 	@type flake8 >/dev/null 2>&1 || echo "Flake8 is not installed. You can install it with 'pip install flake8'."
+
+ctags:
+	ctags \
+	--verbose -R -f tags \
+	--exclude=.tx \
+	--exclude=.git \
+	--exclude=tests \
+	--exclude=whoosh_index \
+	--exclude=docs \
+	--exclude=FlaskBB.egg-info \
+	.
