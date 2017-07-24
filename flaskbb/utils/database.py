@@ -19,7 +19,12 @@ def make_comparable(cls):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash((cls, self.id))
+
     cls.__eq__ = __eq__
+    cls.__ne__ = __ne__
+    cls.__hash__ = __hash__
     return cls
 
 
