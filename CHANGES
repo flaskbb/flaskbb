@@ -13,6 +13,8 @@ Unreleased
   input.
 * Fixes a translations bug that wouldn't take the territory code into account
   when choosing a language (#299).
+* Fixes a bug which would not show all conversations in the conversations view.
+* Fixes a bug that made a forum section inaccessible when the ``last_post_id`` of a topic was set to None.
 * Various translations updated.
 
 Version 1.0
