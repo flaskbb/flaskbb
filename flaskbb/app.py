@@ -15,6 +15,7 @@ from functools import partial
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError
 from flask import Flask, request
 from flask_login import current_user
 
@@ -28,9 +29,10 @@ from flaskbb.forum.views import forum
 # models
 from flaskbb.user.models import User, Guest
 # extensions
-from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
-                                debugtoolbar, alembic, themes, plugin_manager,
-                                babel, csrf, allows, limiter, celery, whooshee)
+from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
+                                db, debugtoolbar, limiter, login_manager, mail,
+                                plugin_manager, redis_store, themes, whooshee)
+
 # various helpers
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
@@ -50,6 +52,11 @@ from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
+from flaskbb.plugins.models import PluginRegistry
+from flaskbb.plugins import spec
+
+from pluggy import PluginManager
+
 
 def create_app(config=None):
     """Creates the app.
@@ -61,16 +68,17 @@ def create_app(config=None):
                    later overwrite it from the ENVVAR.
     """
     app = Flask("flaskbb")
-
     configure_app(app, config)
     configure_celery_app(app, celery)
-    configure_blueprints(app)
     configure_extensions(app)
+    load_plugins(app)
+    configure_blueprints(app)
     configure_template_filters(app)
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
     configure_logging(app)
+    app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
     return app
 
@@ -96,6 +104,7 @@ def configure_app(app, config):
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object
     app_config_from_env(app, prefix="FLASKBB_")
+    app.pluggy = PluginManager('flaskbb', implprefix='flaskbb_')
 
 
 def configure_celery_app(app, celery):
@@ -124,6 +133,8 @@ def configure_blueprints(app):
     app.register_blueprint(
         message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
     )
+
+    app.pluggy.hook.flaskbb_load_blueprints(app=app)
 
 
 def configure_extensions(app):
@@ -239,6 +250,8 @@ def configure_template_filters(app):
 
     app.jinja_env.filters.update(filters)
 
+    app.pluggy.hook.flaskbb_jinja_directives(app=app)
+
 
 def configure_context_processors(app):
     """Configures the context processors."""
@@ -273,6 +286,8 @@ def configure_before_handlers(app):
             else:
                 mark_online(request.remote_addr, guest=True)
 
+    app.pluggy.hook.flaskbb_request_processors(app=app)
+
 
 def configure_errorhandlers(app):
     """Configures the error handlers."""
@@ -288,6 +303,8 @@ def configure_errorhandlers(app):
     @app.errorhandler(500)
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
+
+    app.pluggy.hook.flaskbb_errorhandlers(app=app)
 
 
 def configure_logging(app):
@@ -349,3 +366,28 @@ def configure_logging(app):
                                  parameters, context, executemany):
             total = time.time() - conn.info['query_start_time'].pop(-1)
             app.logger.debug("Total Time: %f", total)
+
+
+def load_plugins(app):
+    app.pluggy.add_hookspecs(spec)
+    try:
+        with app.app_context():
+            plugins = PluginRegistry.query.all()
+
+    except OperationalError:
+        return
+
+    for plugin in plugins:
+        if not plugin.enabled:
+            app.pluggy.set_blocked(plugin.name)
+
+    app.pluggy.load_setuptools_entrypoints('flaskbb_plugin')
+    app.pluggy.hook.flaskbb_extensions(app=app)
+
+    loaded_names = set([p[0] for p in app.pluggy.list_name_plugin()])
+    registered_names = set([p.name for p in plugins])
+    unregistered = [PluginRegistry(name=name) for name in loaded_names - registered_names]
+
+    with app.app_context():
+        db.session.add_all(unregistered)
+        db.session.commit()
