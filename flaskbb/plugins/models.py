@@ -44,4 +44,4 @@ class PluginRegistry(db.Model):
     )
 
     def __repr__(self):
-        return '<FlaskBBPlugin name={} enabled={}>'.format(self.name, self.id)
+        return '<FlaskBBPlugin name={} enabled={}>'.format(self.name, self.enabled)
