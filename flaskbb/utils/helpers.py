@@ -18,10 +18,11 @@ import glob
 from datetime import datetime, timedelta
 from pytz import UTC
 from PIL import ImageFile
+from functools import wraps
 
 import requests
 import unidecode
-from flask import session, url_for, flash, redirect, request
+from flask import session, url_for, flash, redirect, request, g
 from jinja2 import Markup
 from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
@@ -625,3 +626,47 @@ def real(obj):
     if isinstance(obj, LocalProxy):
         return obj._get_current_object()
     return obj
+
+
+def anonymous_required(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if current_user is not None and current_user.is_authenticated:
+            return redirect_or_next(url_for('forum.index'))
+        return f(*a, **k)
+
+    return wrapper
+
+
+def enforce_recaptcha(limiter):
+    current_limit = getattr(g, 'view_rate_limit', None)
+    login_recaptcha = False
+    if current_limit is not None:
+        window_stats = limiter.limiter.get_window_stats(*current_limit)
+        stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
+        login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
+    return login_recaptcha
+
+
+def registration_enabled(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if not flaskbb_config["REGISTRATION_ENABLED"]:
+            flash(_("The registration has been disabled."), "info")
+            return redirect_or_next(url_for("forum.index"))
+        return f(*a, **k)
+
+    return wrapper
+
+
+def requires_unactivated(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
+            flash(_("This account is already activated."), "info")
+            return redirect(url_for('forum.index'))
+        return f(*a, **k)
+    return wrapper

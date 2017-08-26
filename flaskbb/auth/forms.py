@@ -37,6 +37,7 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField(_("Remember me"), default=False)
 
     submit = SubmitField(_("Login"))
+    recaptcha = HiddenField(_("Captcha"))
 
 
 class LoginRecaptchaForm(LoginForm):
