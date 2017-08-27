@@ -27,8 +27,9 @@ from flaskbb.extensions import limiter
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    format_timedelta, get_available_languages,
-                                   redirect_or_next, registration_enabled,
-                                   render_template, requires_unactivated)
+                                   redirect_or_next, register_view,
+                                   registration_enabled, render_template,
+                                   requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
 
@@ -317,17 +318,27 @@ class ActivateAccount(MethodView):
         return render_template("auth/account_activation.html", form=form)
 
 
-auth.add_url_rule("/login", view_func=Login.as_view('login'))
-auth.add_url_rule("/reauth", view_func=Reauth.as_view('reauth'))
-auth.add_url_rule("/register", view_func=Register.as_view('register'))
-auth.add_url_rule("/reset-password", view_func=ForgotPassword.as_view('forgot_password'))
-auth.add_url_rule("/reset-password/<token>", view_func=ResetPassword.as_view('reset_password'))
-auth.add_url_rule(
-    "/activate", view_func=RequestActivationToken.as_view('request_activation_token')
+register_view(auth, routes=["/login"], view_func=Login.as_view('login'))
+register_view(auth, routes=["/reauth"], view_func=Reauth.as_view('reauth'))
+register_view(auth, routes=["/register"], view_func=Register.as_view('register'))
+register_view(
+    auth,
+    routes=["/reset-password"],
+    view_func=ForgotPassword.as_view('forgot_password')
+)
+register_view(
+    auth,
+    routes=["/reset-password/<token>"],
+    view_func=ResetPassword.as_view('reset_password')
+)
+register_view(
+    auth,
+    routes=["/activate"],
+    view_func=RequestActivationToken.as_view('request_activation_token')
 )
 
-# need to register this one specially because Flask complains otherwise
-_activate = ActivateAccount.as_view('activate_account')
-auth.add_url_rule("/activate/confirm", view_func=_activate)
-auth.add_url_rule("/activate/confirm/<token>", view_func=_activate)
-del _activate
+register_view(
+    auth,
+    routes=["/activate/confirm", "/activate/confirm/<token>"],
+    view_func=ActivateAccount.as_view('activate_account')
+)
