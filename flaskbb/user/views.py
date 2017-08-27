@@ -10,11 +10,13 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import Blueprint, flash, request
+from flask.views import MethodView
 from flask_login import login_required, current_user
 from flask_babelplus import gettext as _
 
-from flaskbb.utils.helpers import (render_template, get_available_languages,
-                                   get_available_themes)
+from flaskbb.utils.helpers import (get_available_languages,
+                                   get_available_themes, register_view,
+                                   render_template)
 from flaskbb.user.models import User
 from flaskbb.user.forms import (ChangePasswordForm, ChangeEmailForm,
                                 ChangeUserDetailsForm, GeneralSettingsForm)
@@ -46,60 +48,99 @@ def view_all_posts(username):
     return render_template("user/all_posts.html", user=user, posts=posts)
 
 
-@user.route("/settings/general", methods=["POST", "GET"])
-@login_required
-def settings():
-    form = GeneralSettingsForm()
+class UserSettings(MethodView):
+    decorators = [login_required]
+    form = GeneralSettingsForm
 
-    form.theme.choices = get_available_themes()
-    form.language.choices = get_available_languages()
+    def get(self):
+        form = self.form()
 
-    if form.validate_on_submit():
-        current_user.theme = form.theme.data
-        current_user.language = form.language.data
-        current_user.save()
-
-        flash(_("Settings updated."), "success")
-    else:
+        form.theme.choices = get_available_themes()
+        form.language.choices = get_available_languages()
         form.theme.data = current_user.theme
         form.language.data = current_user.language
 
-    return render_template("user/general_settings.html", form=form)
+        return render_template("user/general_settings.html", form=form)
+
+    def post(self):
+        form = self.form()
+
+        form.theme.choices = get_available_themes()
+        form.language.choices = get_available_languages()
+
+        if form.validate_on_submit():
+            current_user.theme = form.theme.data
+            current_user.language = form.language.data
+            current_user.save()
+
+            flash(_("Settings updated."), "success")
+        else:
+            form.theme.data = current_user.theme
+            form.language.data = current_user.language
+
+        return render_template("user/general_settings.html", form=form)
 
 
-@user.route("/settings/password", methods=["POST", "GET"])
-@login_required
-def change_password():
-    form = ChangePasswordForm()
-    if form.validate_on_submit():
-        current_user.password = form.new_password.data
-        current_user.save()
+class ChangePassword(MethodView):
+    decorators = [login_required]
+    form = ChangePasswordForm
 
-        flash(_("Password updated."), "success")
-    return render_template("user/change_password.html", form=form)
+    def get(self):
+        return render_template("user/change_password.html", form=self.form())
 
+    def post(self):
+        form = self.form()
+        if form.validate_on_submit():
+            current_user.password = form.new_password.data
+            current_user.save()
 
-@user.route("/settings/email", methods=["POST", "GET"])
-@login_required
-def change_email():
-    form = ChangeEmailForm(current_user)
-    if form.validate_on_submit():
-        current_user.email = form.new_email.data
-        current_user.save()
-
-        flash(_("Email address updated."), "success")
-    return render_template("user/change_email.html", form=form)
+            flash(_("Password updated."), "success")
+        return render_template("user/change_password.html", form=form)
 
 
-@user.route("/settings/user-details", methods=["POST", "GET"])
-@login_required
-def change_user_details():
-    form = ChangeUserDetailsForm(obj=current_user)
+class ChangeEmail(MethodView):
+    decorators = [login_required]
+    form = ChangeEmailForm
 
-    if form.validate_on_submit():
-        form.populate_obj(current_user)
-        current_user.save()
+    def get(self):
+        return render_template("user/change_email.html", form=self.form(current_user))
 
-        flash(_("User details updated."), "success")
+    def post(self):
+        form = self.form(current_user)
+        if form.validate_on_submit():
+            current_user.email = form.new_email.data
+            current_user.save()
 
-    return render_template("user/change_user_details.html", form=form)
+            flash(_("Email address updated."), "success")
+        return render_template("user/change_email.html", form=form)
+
+
+class ChangeUserDetails(MethodView):
+    decorators = [login_required]
+    form = ChangeUserDetailsForm
+
+    def get(self):
+        return render_template("user/change_user_details.html", form=self.form(obh=current_user))
+
+    def post(self):
+        form = self.form(obj=current_user)
+
+        if form.validate_on_submit():
+            form.populate_obj(current_user)
+            current_user.save()
+
+            flash(_("User details updated."), "success")
+
+        return render_template("user/change_user_details.html", form=form)
+
+
+register_view(user, routes=['/settings/general'], view_func=UserSettings.as_view('settings'))
+register_view(
+    user, routes=['/settings/password'], view_func=ChangePassword.as_view('change_password')
+)
+register_view(user, routes=['/settings/email'], view_func=ChangeEmail.as_view('change_email'))
+register_view(
+    user,
+    routes=["/settings/user-details"],
+    view_func=ChangeUserDetails.as_view('change_user_details')
+)
