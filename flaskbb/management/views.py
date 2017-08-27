@@ -13,6 +13,7 @@ import sys
 from celery import __version__ as celery_version
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
+from flask.views import MethodView
 from flask_login import current_user, login_fresh
 from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelplus import gettext as _
@@ -26,8 +27,8 @@ from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
                                         CanBanUser, CanEditUser,
                                         IsAtleastSuperModerator)
 from flaskbb.extensions import db, allows, celery
-from flaskbb.utils.helpers import (render_template, time_diff, time_utcnow,
-                                   get_online_users)
+from flaskbb.utils.helpers import (get_online_users, register_view,
+                                   render_template, time_diff, time_utcnow)
 from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
@@ -102,115 +103,7 @@ def overview():
     return render_template("management/overview.html", **stats)
 
 
-@management.route("/settings", methods=["GET", "POST"])
-@management.route("/settings/<path:slug>", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def settings(slug=None):
-    slug = slug if slug else "general"
-
-    # get the currently active group
-    active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-    # get all groups - used to build the navigation
-    all_groups = SettingsGroup.query.all()
-
-    SettingsForm = Setting.get_form(active_group)
-
-    old_settings = Setting.get_settings(active_group)
-    new_settings = {}
-
-    form = SettingsForm()
-
-    if form.validate_on_submit():
-        for key, values in iteritems(old_settings):
-            try:
-                # check if the value has changed
-                if values['value'] == form[key].data:
-                    continue
-                else:
-                    new_settings[key] = form[key].data
-            except KeyError:
-                pass
-        Setting.update(settings=new_settings, app=current_app)
-        flash(_("Settings saved."), "success")
-    else:
-        for key, values in iteritems(old_settings):
-            try:
-                form[key].data = values['value']
-            except (KeyError, ValueError):
-                pass
-
-    return render_template("management/settings.html", form=form,
-                           all_groups=all_groups, active_group=active_group)
-
-
 # Users
-@management.route("/users", methods=['GET', 'POST'])
-@allows.requires(IsAtleastModerator)
-def users():
-    page = request.args.get("page", 1, type=int)
-    search_form = UserSearchForm()
-
-    if search_form.validate():
-        users = search_form.get_results().\
-            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-        return render_template("management/users.html", users=users,
-                               search_form=search_form)
-
-    users = User.query. \
-        order_by(User.id.asc()).\
-        paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-
-    return render_template("management/users.html", users=users,
-                           search_form=search_form)
-
-
-@management.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAtleastModerator)
-def edit_user(user_id):
-    user = User.query.filter_by(id=user_id).first_or_404()
-
-    if not Permission(CanEditUser, identity=current_user):
-        flash(_("You are not allowed to edit this user."), "danger")
-        return redirect(url_for("management.users"))
-
-    member_group = db.and_(*[db.not_(getattr(Group, p)) for p in
-                             ['admin', 'mod', 'super_mod', 'banned', 'guest']])
-
-    filt = db.or_(
-        Group.id.in_(g.id for g in current_user.groups), member_group
-    )
-
-    if Permission(IsAtleastSuperModerator, identity=current_user):
-        filt = db.or_(filt, Group.mod)
-
-    if Permission(IsAdmin, identity=current_user):
-        filt = db.or_(filt, Group.admin, Group.super_mod)
-
-    if Permission(CanBanUser, identity=current_user):
-        filt = db.or_(filt, Group.banned)
-
-    group_query = Group.query.filter(filt)
-
-    form = EditUserForm(user)
-    form.primary_group.query = group_query
-    form.secondary_groups.query = group_query
-    if form.validate_on_submit():
-        form.populate_obj(user)
-        user.primary_group_id = form.primary_group.data.id
-
-        # Don't override the password
-        if form.password.data:
-            user.password = form.password.data
-
-        user.save(groups=form.secondary_groups.data)
-
-        flash(_("User updated."), "success")
-        return redirect(url_for("management.edit_user", user_id=user.id))
-
-    return render_template("management/user_form.html", form=form,
-                           title=_("Edit User"))
-
-
 @management.route("/users/delete", methods=["POST"])
 @management.route("/users/<int:user_id>/delete", methods=["POST"])
 @allows.requires(IsAdmin)
@@ -249,41 +142,6 @@ def delete_user(user_id=None):
     user.delete()
     flash(_("User deleted."), "success")
     return redirect(url_for("management.users"))
-
-
-@management.route("/users/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def add_user():
-    form = AddUserForm()
-    if form.validate_on_submit():
-        form.save()
-        flash(_("User added."), "success")
-        return redirect(url_for("management.users"))
-
-    return render_template("management/user_form.html", form=form,
-                           title=_("Add User"))
-
-
-@management.route("/users/banned", methods=["GET", "POST"])
-@allows.requires(IsAtleastModerator)
-def banned_users():
-    page = request.args.get("page", 1, type=int)
-    search_form = UserSearchForm()
-
-    users = User.query.filter(
-        Group.banned == True,
-        Group.id == User.primary_group_id
-    ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-
-    if search_form.validate():
-        users = search_form.get_results().\
-            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-
-        return render_template("management/banned_users.html", users=users,
-                               search_form=search_form)
-
-    return render_template("management/banned_users.html", users=users,
-                           search_form=search_form)
 
 
 @management.route("/users/ban", methods=["POST"])
@@ -511,27 +369,6 @@ def groups():
     return render_template("management/groups.html", groups=groups)
 
 
-@management.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def edit_group(group_id):
-    group = Group.query.filter_by(id=group_id).first_or_404()
-
-    form = EditGroupForm(group)
-
-    if form.validate_on_submit():
-        form.populate_obj(group)
-        group.save()
-
-        if group.guest:
-            Guest.invalidate_cache()
-
-        flash(_("Group updated."), "success")
-        return redirect(url_for("management.groups", group_id=group.id))
-
-    return render_template("management/group_form.html", form=form,
-                           title=_("Edit Group"))
-
-
 @management.route("/groups/<int:group_id>/delete", methods=["POST"])
 @management.route("/groups/delete", methods=["POST"])
 @allows.requires(IsAdmin)
@@ -578,47 +415,12 @@ def delete_group(group_id=None):
     return redirect(url_for("management.groups"))
 
 
-@management.route("/groups/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def add_group():
-    form = AddGroupForm()
-    if form.validate_on_submit():
-        form.save()
-        flash(_("Group added."), "success")
-        return redirect(url_for("management.groups"))
-
-    return render_template("management/group_form.html", form=form,
-                           title=_("Add Group"))
-
-
 # Forums and Categories
 @management.route("/forums")
 @allows.requires(IsAdmin)
 def forums():
     categories = Category.query.order_by(Category.position.asc()).all()
     return render_template("management/forums.html", categories=categories)
-
-
-@management.route("/forums/<int:forum_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def edit_forum(forum_id):
-    forum = Forum.query.filter_by(id=forum_id).first_or_404()
-
-    form = EditForumForm(forum)
-    if form.validate_on_submit():
-        form.save()
-        flash(_("Forum updated."), "success")
-        return redirect(url_for("management.edit_forum", forum_id=forum.id))
-    else:
-        if forum.moderators:
-            form.moderators.data = ",".join([
-                user.username for user in forum.moderators
-            ])
-        else:
-            form.moderators.data = None
-
-    return render_template("management/forum_form.html", form=form,
-                           title=_("Edit Forum"))
 
 
 @management.route("/forums/<int:forum_id>/delete", methods=["POST"])
@@ -633,56 +435,6 @@ def delete_forum(forum_id):
 
     flash(_("Forum deleted."), "success")
     return redirect(url_for("management.forums"))
-
-
-@management.route("/forums/add", methods=["GET", "POST"])
-@management.route("/forums/<int:category_id>/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def add_forum(category_id=None):
-    form = AddForumForm()
-
-    if form.validate_on_submit():
-        form.save()
-        flash(_("Forum added."), "success")
-        return redirect(url_for("management.forums"))
-    else:
-        form.groups.data = Group.query.order_by(Group.id.asc()).all()
-        if category_id:
-            category = Category.query.filter_by(id=category_id).first()
-            form.category.data = category
-
-    return render_template("management/forum_form.html", form=form,
-                           title=_("Add Forum"))
-
-
-@management.route("/category/add", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def add_category():
-    form = CategoryForm()
-
-    if form.validate_on_submit():
-        form.save()
-        flash(_("Category added."), "success")
-        return redirect(url_for("management.forums"))
-
-    return render_template("management/category_form.html", form=form,
-                           title=_("Add Category"))
-
-
-@management.route("/category/<int:category_id>/edit", methods=["GET", "POST"])
-@allows.requires(IsAdmin)
-def edit_category(category_id):
-    category = Category.query.filter_by(id=category_id).first_or_404()
-
-    form = CategoryForm(obj=category)
-
-    if form.validate_on_submit():
-        form.populate_obj(category)
-        flash(_("Category updated."), "success")
-        category.save()
-
-    return render_template("management/category_form.html", form=form,
-                           title=_("Edit Category"))
 
 
 @management.route("/category/<int:category_id>/delete", methods=["POST"])
@@ -778,3 +530,419 @@ def install_plugin(plugin):
         flash(_("Cannot install plugin."), "danger")
 
     return redirect(url_for("management.plugins"))
+
+
+class ManagementSettings(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+
+    def get(self, slug=None):
+        slug = slug if slug else 'general'
+
+        # get the currently active group
+        active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
+        # get all groups - used to build the navigation
+        all_groups = SettingsGroup.query.all()
+
+        SettingsForm = Setting.get_form(active_group)
+
+        old_settings = Setting.get_settings(active_group)
+
+        form = SettingsForm()
+        for key, values in iteritems(old_settings):
+            try:
+                form[key].data = values['value']
+            except (KeyError, ValueError):
+                pass
+
+        return render_template(
+            'management/settings.html',
+            form=form,
+            all_groups=all_groups,
+            active_group=active_group
+        )
+
+    def post(self, slug=None):
+        slug = slug if slug else 'general'
+
+        # get the currently active group
+        active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
+        # get all groups - used to build the navigation
+        all_groups = SettingsGroup.query.all()
+
+        SettingsForm = Setting.get_form(active_group)
+
+        old_settings = Setting.get_settings(active_group)
+        new_settings = {}
+
+        form = SettingsForm()
+
+        if form.validate_on_submit():
+            for key, values in iteritems(old_settings):
+                try:
+                    # check if the value has changed
+                    if values['value'] == form[key].data:
+                        continue
+                    else:
+                        new_settings[key] = form[key].data
+                except KeyError:
+                    pass
+            Setting.update(settings=new_settings, app=current_app)
+            flash(_('Settings saved.'), 'success')
+        else:
+            for key, values in iteritems(old_settings):
+                try:
+                    form[key].data = values['value']
+                except (KeyError, ValueError):
+                    pass
+
+        return render_template(
+            'management/settings.html',
+            form=form,
+            all_groups=all_groups,
+            active_group=active_group
+        )
+
+
+class ManageUsers(MethodView):
+    decorators = [allows.requires(IsAtleastModerator)]
+    form = UserSearchForm
+
+    def get(self):
+        page = request.args.get('page', 1, type=int)
+        form = self.form()
+
+        users = User.query.order_by(User.id.asc()).paginate(
+            page, flaskbb_config['USERS_PER_PAGE'], False
+        )
+
+        return render_template('management/users.html', users=users, form=form)
+
+    def post(self):
+        page = request.args.get('page', 1, type=int)
+        form = self.form()
+
+        if form.validate():
+            users = form.get_results().\
+                paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+            return render_template('management/users.html', users=users, form=form)
+
+        users = User.query.order_by(User.id.asc()).paginate(
+            page, flaskbb_config['USERS_PER_PAGE'], False
+        )
+
+        return render_template('management/users.html', users=users, form=form)
+
+
+class EditUser(MethodView):
+    decorators = [allows.requires(IsAtleastModerator & CanEditUser)]
+    form = EditUserForm
+
+    def get(self, user_id):
+        user = User.query.filter_by(id=user_id).first_or_404()
+        form = self.form(user)
+        member_group = db.and_(
+            * [
+                db.not_(getattr(Group, p))
+                for p in ['admin', 'mod', 'super_mod', 'banned', 'guest']
+            ]
+        )
+
+        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
+
+        if Permission(IsAtleastSuperModerator, identity=current_user):
+            filt = db.or_(filt, Group.mod)
+
+        if Permission(IsAdmin, identity=current_user):
+            filt = db.or_(filt, Group.admin, Group.super_mod)
+
+        if Permission(CanBanUser, identity=current_user):
+            filt = db.or_(filt, Group.banned)
+
+        group_query = Group.query.filter(filt)
+
+        form.primary_group.query = group_query
+        form.secondary_groups.query = group_query
+
+        return render_template('management/user_form.html', form=form, title=_('Edit User'))
+
+    def post(self, user_id):
+        user = User.query.filter_by(id=user_id).first_or_404()
+
+        member_group = db.and_(
+            * [
+                db.not_(getattr(Group, p))
+                for p in ['admin', 'mod', 'super_mod', 'banned', 'guest']
+            ]
+        )
+
+        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
+
+        if Permission(IsAtleastSuperModerator, identity=current_user):
+            filt = db.or_(filt, Group.mod)
+
+        if Permission(IsAdmin, identity=current_user):
+            filt = db.or_(filt, Group.admin, Group.super_mod)
+
+        if Permission(CanBanUser, identity=current_user):
+            filt = db.or_(filt, Group.banned)
+
+        group_query = Group.query.filter(filt)
+
+        form = EditUserForm(user)
+        form.primary_group.query = group_query
+        form.secondary_groups.query = group_query
+        if form.validate_on_submit():
+            form.populate_obj(user)
+            user.primary_group_id = form.primary_group.data.id
+
+            # Don't override the password
+            if form.password.data:
+                user.password = form.password.data
+
+            user.save(groups=form.secondary_groups.data)
+
+            flash(_('User updated.'), 'success')
+            return redirect(url_for('management.edit_user', user_id=user.id))
+
+        return render_template('management/user_form.html', form=form, title=_('Edit User'))
+
+
+class AddUser(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = AddUserForm
+
+    def get(self):
+        return render_template('management/user_form.html', form=self.form(), title=_('Add User'))
+
+    def post(self):
+        form = self.form()
+        if form.validate_on_submit():
+            form.save()
+            flash(_('User added.'), 'success')
+            return redirect(url_for('management.users'))
+
+        return render_template('management/user_form.html', form=form, title=_('Add User'))
+
+
+class BannedUsers(MethodView):
+    decorators = [allows.requires(IsAtleastModerator)]
+    form = UserSearchForm
+
+    def get(self):
+        page = request.args.get('page', 1, type=int)
+        search_form = self.form()
+
+        users = User.query.filter(Group.banned == True, Group.id == User.primary_group_id
+                                  ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+
+        return render_template(
+            'management/banned_users.html', users=users, search_form=search_form
+        )
+
+    def post(self):
+        page = request.args.get('page', 1, type=int)
+        search_form = self.form()
+
+        users = User.query.filter(Group.banned == True, Group.id == User.primary_group_id
+                                  ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+
+        if search_form.validate():
+            users = search_form.get_results().\
+                paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+
+            return render_template(
+                'management/banned_users.html', users=users, search_form=search_form
+            )
+
+        return render_template(
+            'management/banned_users.html', users=users, search_form=search_form
+        )
+
+
+class AddGroup(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = AddGroupForm
+
+    def get(self):
+        return render_template(
+            'management/group_form.html', form=self.form(), title=_('Add Group')
+        )
+
+    def post(self):
+        form = AddGroupForm()
+        if form.validate_on_submit():
+            form.save()
+            flash(_('Group added.'), 'success')
+            return redirect(url_for('management.groups'))
+
+        return render_template('management/group_form.html', form=form, title=_('Add Group'))
+
+
+class EditGroup(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = EditGroupForm
+
+    def get(self, group_id):
+        group = Group.query.filter_by(id=group_id).first_or_404()
+        form = self.form(group)
+        return render_template('management/group_form.html', form=form, title=_('Edit Group'))
+
+    def post(self, group_id):
+        group = Group.query.filter_by(id=group_id).first_or_404()
+        form = EditGroupForm(group)
+
+        if form.validate_on_submit():
+            form.populate_obj(group)
+            group.save()
+
+            if group.guest:
+                Guest.invalidate_cache()
+
+            flash(_('Group updated.'), 'success')
+            return redirect(url_for('management.groups', group_id=group.id))
+
+        return render_template('management/group_form.html', form=form, title=_('Edit Group'))
+
+
+class EditForum(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = EditForumForm
+
+    def get(self, forum_id):
+        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+
+        form = self.form(forum)
+
+        if forum.moderators:
+            form.moderators.data = ','.join([user.username for user in forum.moderators])
+        else:
+            form.moderators.data = None
+
+        return render_template('management/forum_form.html', form=form, title=_('Edit Forum'))
+
+    def post(self, forum_id):
+        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+
+        form = self.form(forum)
+        if form.validate_on_submit():
+            form.save()
+            flash(_('Forum updated.'), 'success')
+            return redirect(url_for('management.edit_forum', forum_id=forum.id))
+        else:
+            if forum.moderators:
+                form.moderators.data = ','.join([user.username for user in forum.moderators])
+            else:
+                form.moderators.data = None
+
+        return render_template('management/forum_form.html', form=form, title=_('Edit Forum'))
+
+
+class AddForum(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = AddForumForm
+
+    def get(self, category_id=None):
+        form = self.form()
+
+        form.groups.data = Group.query.order_by(Group.id.asc()).all()
+
+        if category_id:
+            category = Category.query.filter_by(id=category_id).first()
+            form.category.data = category
+
+        return render_template('management/forum_form.html', form=form, title=_('Add Forum'))
+
+    def post(self, category_id=None):
+        form = self.form()
+
+        if form.validate_on_submit():
+            form.save()
+            flash(_('Forum added.'), 'success')
+            return redirect(url_for('management.forums'))
+        else:
+            form.groups.data = Group.query.order_by(Group.id.asc()).all()
+            if category_id:
+                category = Category.query.filter_by(id=category_id).first()
+                form.category.data = category
+
+        return render_template('management/forum_form.html', form=form, title=_('Add Forum'))
+
+
+class AddCategory(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = CategoryForm
+
+    def get(self):
+        return render_template(
+            'management/category_form.html', form=self.form(), title=_('Add Category')
+        )
+
+    def post(self):
+        form = self.form()
+
+        if form.validate_on_submit():
+            form.save()
+            flash(_('Category added.'), 'success')
+            return redirect(url_for('management.forums'))
+
+        return render_template('management/category_form.html', form=form, title=_('Add Category'))
+
+
+class EditCategory(MethodView):
+    decorators = [allows.requires(IsAdmin)]
+    form = CategoryForm
+
+    def get(self, category_id):
+        category = Category.query.filter_by(id=category_id).first_or_404()
+
+        form = self.form(obj=category)
+
+        return render_template(
+            'management/category_form.html', form=form, title=_('Edit Category')
+        )
+
+    def post(self, category_id):
+        category = Category.query.filter_by(id=category_id).first_or_404()
+
+        form = self.form(obj=category)
+
+        if form.validate_on_submit():
+            form.populate_obj(category)
+            flash(_('Category updated.'), 'success')
+            category.save()
+
+        return render_template(
+            'management/category_form.html', form=form, title=_('Edit Category')
+        )
+
+
+register_view(
+    management,
+    routes=['/settings', '/settings/<path:slug>'],
+    view_func=ManagementSettings.as_view('settings')
+)
+register_view(management, routes=['/users'], view_func=ManageUsers.as_view('users'))
+register_view(
+    management, routes=['/users/<int:user_id>/edit'], view_func=EditUser.as_view('edit_user')
+)
+register_view(management, routes=['/users/add'], view_func=AddUser.as_view('add_user'))
+register_view(management, routes=['/users/banned'], view_func=BannedUsers.as_view('banned_users'))
+register_view(management, routes=['/groups/add'], view_func=AddGroup.as_view('add_groups'))
+register_view(
+    management, routes=['/groups/<int:group_id>/edit'], view_func=EditGroup.as_view('edit_group')
+)
+register_view(
+    management, routes=['/forums/<int:forum_id>/edit'], view_func=EditForum.as_view('edit_forum')
+)
+
+register_view(
+    management,
+    routes=['/forums/add', '/forums/<int:category_id>/add'],
+    view_func=AddForum.as_view('add_forum')
+)
+register_view(management, routes=['/category/add'], view_func=AddCategory.as_view('add_category'))
+register_view(
+    management,
+    routes=['/category/<int:category_id>/edit'],
+    view_func=EditCategory.as_view('edit_category')
+)
