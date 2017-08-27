@@ -24,7 +24,8 @@ def test_message_view_conversation(
         conversation_msgs, user):
     with application.test_request_context():
         login_user(user)
-        resp = views.view_conversation(conversation_msgs.id)
+        view = views.ViewConversation()
+        resp = view.get(conversation_msgs.id)
         assert conversation_msgs.first_message.message in resp
 
 
