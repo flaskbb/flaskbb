@@ -74,14 +74,13 @@ def login_rate_limit_message():
 limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 
 
-@auth.route("/logout")
-@limiter.exempt
-@login_required
-def logout():
-    """Logs the user out."""
-    logout_user()
-    flash(_("Logged out"), "success")
-    return redirect(url_for("forum.index"))
+class Logout(MethodView):
+    decorators = [limiter.exempt, login_required]
+
+    def get(self):
+        logout_user()
+        flash(_("Logged out"), "success")
+        return redirect(url_for("forum.index"))
 
 
 class Login(MethodView):
@@ -318,27 +317,24 @@ class ActivateAccount(MethodView):
         return render_template("auth/account_activation.html", form=form)
 
 
-register_view(auth, routes=["/login"], view_func=Login.as_view('login'))
-register_view(auth, routes=["/reauth"], view_func=Reauth.as_view('reauth'))
-register_view(auth, routes=["/register"], view_func=Register.as_view('register'))
+register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
+register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
+register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
+register_view(auth, routes=['/register'], view_func=Register.as_view('register'))
 register_view(
-    auth,
-    routes=["/reset-password"],
-    view_func=ForgotPassword.as_view('forgot_password')
+    auth, routes=['/reset-password'], view_func=ForgotPassword.as_view('forgot_password')
+)
+register_view(
+    auth, routes=['/reset-password/<token>'], view_func=ResetPassword.as_view('reset_password')
 )
 register_view(
     auth,
-    routes=["/reset-password/<token>"],
-    view_func=ResetPassword.as_view('reset_password')
-)
-register_view(
-    auth,
-    routes=["/activate"],
+    routes=['/activate'],
     view_func=RequestActivationToken.as_view('request_activation_token')
 )
 
 register_view(
     auth,
-    routes=["/activate/confirm", "/activate/confirm/<token>"],
+    routes=['/activate/confirm', '/activate/confirm/<token>'],
     view_func=ActivateAccount.as_view('activate_account')
 )
