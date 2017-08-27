@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+'''
     flaskbb.forum.views
     ~~~~~~~~~~~~~~~~~~~
 
@@ -8,305 +8,122 @@
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
-"""
+'''
 import math
-from sqlalchemy import asc, desc
-from flask import (Blueprint, redirect, url_for, current_app, request, flash,
-                   abort)
-from flask.views import MethodView
-from flask_login import login_required, current_user
-from flask_babelplus import gettext as _
-from flask_allows import Permission, And
 
-from flaskbb.extensions import db, allows
-from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.helpers import (get_online_users, time_diff, time_utcnow,
-                                   format_quote, render_template,
-                                   do_topic_action, real, register_view)
+from flask import (Blueprint, abort, current_app, flash, redirect, request,
+                   url_for)
+from flask.views import MethodView
+from flask_allows import And, Permission
+from flask_babelplus import gettext as _
+from flask_login import current_user, login_required
+from sqlalchemy import asc, desc
+
+from flaskbb.extensions import allows, db
+from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
+                                 ReportForm, SearchPageForm, UserSearchForm)
+from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
+                                  TopicsRead)
+from flaskbb.user.models import User
+from flaskbb.utils.helpers import (do_topic_action, format_quote,
+                                   get_online_users, real, register_view,
+                                   render_template, time_diff, time_utcnow)
 from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
                                         CanDeletePost, CanDeleteTopic,
                                         CanEditPost, CanPostReply,
                                         CanPostTopic,
                                         IsAtleastModeratorInForum)
-from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
-                                  TopicsRead)
-from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
-                                 ReportForm, SearchPageForm, UserSearchForm)
-from flaskbb.user.models import User
-
-forum = Blueprint("forum", __name__)
-
-
-@forum.route("/")
-def index():
-    categories = Category.get_all(user=real(current_user))
-
-    # Fetch a few stats about the forum
-    user_count = User.query.count()
-    topic_count = Topic.query.count()
-    post_count = Post.query.count()
-    newest_user = User.query.order_by(User.id.desc()).first()
-
-    # Check if we use redis or not
-    if not current_app.config["REDIS_ENABLED"]:
-        online_users = User.query.filter(User.lastseen >= time_diff()).count()
-
-        # Because we do not have server side sessions, we cannot check if there
-        # are online guests
-        online_guests = None
-    else:
-        online_users = len(get_online_users())
-        online_guests = len(get_online_users(guest=True))
-
-    return render_template("forum/index.html",
-                           categories=categories,
-                           user_count=user_count,
-                           topic_count=topic_count,
-                           post_count=post_count,
-                           newest_user=newest_user,
-                           online_users=online_users,
-                           online_guests=online_guests)
-
-
-@forum.route("/category/<int:category_id>")
-@forum.route("/category/<int:category_id>-<slug>")
-def view_category(category_id, slug=None):
-    category, forums = Category.\
-        get_forums(category_id=category_id, user=real(current_user))
-
-    return render_template("forum/category.html", forums=forums,
-                           category=category)
-
-
-@forum.route("/forum/<int:forum_id>")
-@forum.route("/forum/<int:forum_id>-<slug>")
-@allows.requires(CanAccessForum())
-def view_forum(forum_id, slug=None):
-    page = request.args.get('page', 1, type=int)
-
-    forum_instance, forumsread = Forum.get_forum(
-        forum_id=forum_id, user=real(current_user)
-    )
-
-    if forum_instance.external:
-        return redirect(forum_instance.external)
-
-    topics = Forum.get_topics(
-        forum_id=forum_instance.id, user=real(current_user), page=page,
-        per_page=flaskbb_config["TOPICS_PER_PAGE"]
-    )
-
-    return render_template(
-        "forum/forum.html", forum=forum_instance,
-        topics=topics, forumsread=forumsread,
-    )
-
-
-@forum.route("/post/<int:post_id>")
-def view_post(post_id):
-    """Redirects to a post in a topic."""
-    post = Post.query.filter_by(id=post_id).first_or_404()
-    post_in_topic = Post.query.\
-        filter(Post.topic_id == post.topic_id,
-               Post.id <= post_id).\
-        order_by(Post.id.asc()).\
-        count()
-    page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
-
-    return redirect(post.topic.url + "?page=%d#pid%s" % (page, post.id))
-
-
-@forum.route("/topic/<int:topic_id>/delete", methods=["POST"])
-@forum.route("/topic/<int:topic_id>-<slug>/delete", methods=["POST"])
-@login_required
-def delete_topic(topic_id=None, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    if not Permission(CanDeleteTopic):
-        flash(_("You do not have the permissions to delete this topic."),
-              "danger")
-        return redirect(topic.forum.url)
-
-    involved_users = User.query.filter(Post.topic_id == topic.id,
-                                       User.id == Post.user_id).all()
-    topic.delete(users=involved_users)
-    return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
+from flaskbb.utils.settings import flaskbb_config
 
+forum = Blueprint('forum', __name__)
 
-@forum.route("/topic/<int:topic_id>/lock", methods=["POST"])
-@forum.route("/topic/<int:topic_id>-<slug>/lock", methods=["POST"])
-@login_required
-def lock_topic(topic_id=None, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
-        flash(_("You do not have the permissions to lock this topic."),
-              "danger")
-        return redirect(topic.url)
-
-    topic.locked = True
-    topic.save()
-    return redirect(topic.url)
-
-
-@forum.route("/topic/<int:topic_id>/unlock", methods=["POST"])
-@forum.route("/topic/<int:topic_id>-<slug>/unlock", methods=["POST"])
-@login_required
-def unlock_topic(topic_id=None, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
-        flash(_("You do not have the permissions to unlock this topic."),
-              "danger")
-        return redirect(topic.url)
 
-    topic.locked = False
-    topic.save()
-    return redirect(topic.url)
+class ForumIndex(MethodView):
 
+    def get(self):
+        categories = Category.get_all(user=real(current_user))
 
-@forum.route("/topic/<int:topic_id>/highlight", methods=["POST"])
-@forum.route("/topic/<int:topic_id>-<slug>/highlight", methods=["POST"])
-@login_required
-def highlight_topic(topic_id=None, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
-        flash(_("You do not have the permissions to highlight this topic."),
-              "danger")
-        return redirect(topic.url)
-
-    topic.important = True
-    topic.save()
-    return redirect(topic.url)
+        # Fetch a few stats about the forum
+        user_count = User.query.count()
+        topic_count = Topic.query.count()
+        post_count = Post.query.count()
+        newest_user = User.query.order_by(User.id.desc()).first()
 
+        # Check if we use redis or not
+        if not current_app.config['REDIS_ENABLED']:
+            online_users = User.query.filter(User.lastseen >= time_diff()).count()
 
-@forum.route("/topic/<int:topic_id>/trivialize", methods=["POST"])
-@forum.route("/topic/<int:topic_id>-<slug>/trivialize", methods=["POST"])
-@login_required
-def trivialize_topic(topic_id=None, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-    # Unlock is basically the same as lock
-    if not Permission(IsAtleastModeratorInForum(forum=topic.forum)):
-        flash(_("You do not have the permissions to trivialize this topic."),
-              "danger")
-        return redirect(topic.url)
-
-    topic.important = False
-    topic.save()
-    return redirect(topic.url)
-
-
-@forum.route("/post/<int:post_id>/delete", methods=["POST"])
-@login_required
-def delete_post(post_id):
-    post = Post.query.filter_by(id=post_id).first_or_404()
-
-    # TODO: Bulk delete
-
-    if not Permission(CanDeletePost):
-        flash(_("You do not have the permissions to delete this post."),
-              "danger")
-        return redirect(post.topic.url)
-
-    first_post = post.first_post
-    topic_url = post.topic.url
-    forum_url = post.topic.forum.url
-
-    post.delete()
-
-    # If the post was the first post in the topic, redirect to the forums
-    if first_post:
-        return redirect(forum_url)
-    return redirect(topic_url)
-
-
-@forum.route("/post/<int:post_id>/raw", methods=["POST", "GET"])
-@login_required
-def raw_post(post_id):
-    post = Post.query.filter_by(id=post_id).first_or_404()
-    return format_quote(username=post.username, content=post.content)
-
-
-@forum.route("/<int:forum_id>/markread", methods=["POST"])
-@forum.route("/<int:forum_id>-<slug>/markread", methods=["POST"])
-@login_required
-def markread(forum_id=None, slug=None):
-    # Mark a single forum as read
-    if forum_id:
-        forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
-        forumsread = ForumsRead.query.filter_by(
-            user_id=real(current_user).id, forum_id=forum_instance.id
-        ).first()
-        TopicsRead.query.filter_by(user_id=real(current_user).id,
-                                   forum_id=forum_instance.id).delete()
-
-        if not forumsread:
-            forumsread = ForumsRead()
-            forumsread.user = real(current_user)
-            forumsread.forum = forum_instance
-
-        forumsread.last_read = time_utcnow()
-        forumsread.cleared = time_utcnow()
-
-        db.session.add(forumsread)
-        db.session.commit()
-
-        flash(_("Forum %(forum)s marked as read.", forum=forum_instance.title),
-              "success")
-
-        return redirect(forum_instance.url)
-
-    # Mark all forums as read
-    ForumsRead.query.filter_by(user_id=real(current_user).id).delete()
-    TopicsRead.query.filter_by(user_id=real(current_user).id).delete()
-
-    forums = Forum.query.all()
-    forumsread_list = []
-    for forum_instance in forums:
-        forumsread = ForumsRead()
-        forumsread.user = real(current_user)
-        forumsread.forum = forum_instance
-        forumsread.last_read = time_utcnow()
-        forumsread.cleared = time_utcnow()
-        forumsread_list.append(forumsread)
-
-    db.session.add_all(forumsread_list)
-    db.session.commit()
-
-    flash(_("All forums marked as read."), "success")
-
-    return redirect(url_for("forum.index"))
-
-
-@forum.route("/who-is-online")
-def who_is_online():
-    if current_app.config['REDIS_ENABLED']:
-        online_users = get_online_users()
-    else:
-        online_users = User.query.filter(User.lastseen >= time_diff()).all()
-    return render_template("forum/online_users.html",
-                           online_users=online_users)
-
-@forum.route("/topictracker/<int:topic_id>/add", methods=["POST"])
-@forum.route("/topictracker/<int:topic_id>-<slug>/add", methods=["POST"])
-@login_required
-def track_topic(topic_id, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-    real(current_user).track_topic(topic)
-    real(current_user).save()
-    return redirect(topic.url)
-
-
-@forum.route("/topictracker/<int:topic_id>/delete", methods=["POST"])
-@forum.route("/topictracker/<int:topic_id>-<slug>/delete", methods=["POST"])
-@login_required
-def untrack_topic(topic_id, slug=None):
-    topic = Topic.query.filter_by(id=topic_id).first_or_404()
-    real(current_user).untrack_topic(topic)
-    real(current_user).save()
-    return redirect(topic.url)
+            # Because we do not have server side sessions, we cannot check if there
+            # are online guests
+            online_guests = None
+        else:
+            online_users = len(get_online_users())
+            online_guests = len(get_online_users(guest=True))
+
+        return render_template(
+            'forum/index.html',
+            categories=categories,
+            user_count=user_count,
+            topic_count=topic_count,
+            post_count=post_count,
+            newest_user=newest_user,
+            online_users=online_users,
+            online_guests=online_guests
+        )
+
+
+class ViewCategory(MethodView):
+
+    def get(self, category_id, slug=None):
+        category, forums = Category.get_forums(category_id=category_id, user=real(current_user))
+
+        return render_template('forum/category.html', forums=forums, category=category)
+
+
+class ViewForum(MethodView):
+    decorators = [allows.requires(CanAccessForum())]
+
+    def get(self, forum_id, slug=None):
+        page = request.args.get('page', 1, type=int)
+
+        forum_instance, forumsread = Forum.get_forum(forum_id=forum_id, user=real(current_user))
+
+        if forum_instance.external:
+            return redirect(forum_instance.external)
+
+        topics = Forum.get_topics(
+            forum_id=forum_instance.id,
+            user=real(current_user),
+            page=page,
+            per_page=flaskbb_config['TOPICS_PER_PAGE']
+        )
+
+        return render_template(
+            'forum/forum.html',
+            forum=forum_instance,
+            topics=topics,
+            forumsread=forumsread,
+        )
+
+
+class ViewPost(MethodView):
+
+    def get(self, post_id):
+        '''Redirects to a post in a topic.'''
+        post = Post.query.filter_byforumy(id=post_id).first_or_404()
+        post_in_topic = Post.query.filter(Post.topic_id == post.topic_id,
+                                          Post.id <= post_id).order_by(Post.id.asc()).count()
+        page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
+
+        return redirect(
+            url_for(
+                'forum.view_topic',
+                topic_id=post.topic.id,
+                slug=post.topic.slug,
+                page=page,
+                _anchor='pid{}'.format(post.id)
+            )
+        )
 
 
 class ViewTopic(MethodView):
@@ -519,7 +336,7 @@ class NewPost(MethodView):
                 )
             else:
                 post = form.save(real(current_user), topic)
-                return view_post(post.id)
+                return redirect(url_for('forum.view_post', post_id=post.id))
 
         return render_template('forum/new_post.html', topic=topic, form=form)
 
@@ -538,12 +355,11 @@ class ReplyPost(MethodView):
         if form.validate_on_submit():
             if 'preview' in request.form:
                 return render_template(
-                    'forum/new_post.html', topic=topic,
-                    form=form, preview=form.content.data
+                    'forum/new_post.html', topic=topic, form=form, preview=form.content.data
                 )
             else:
                 post = form.save(real(current_user), topic)
-                return view_post(post.id)
+                return redirect(url_for('forum.view_post', post_id=post.id))
         else:
             form.content.data = format_quote(post.username, post.content)
 
@@ -694,15 +510,167 @@ class Search(MethodView):
         return render_template('forum/search_form.html', form=form)
 
 
+class DeleteTopic(MethodView):
+    decorators = [allows.requires(CanDeleteTopic), login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        involved_users = User.query.filter(Post.topic_id == topic.id,
+                                           User.id == Post.user_id).all()
+        topic.delete(users=involved_users)
+        return redirect(url_for('forum.view_forum', forum_id=topic.forum_id))
+
+
+class LockTopic(MethodView):
+    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        topic.locked = True
+        topic.save()
+        return redirect(topic.url)
+
+
+class UnlockTopic(MethodView):
+    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+
+    def post(self, topic_id, topic_slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        topic.locked = False
+        topic.save()
+        return redirect(topic.url)
+
+
+class HighlightTopic(MethodView):
+    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+
+    def post(self, topic_id, topic_slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        topic.important = True
+        topic.save()
+        return redirect(topic.url)
+
+
+class TrivializeTopic(MethodView):
+    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+
+    def post(topic_id=None, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        topic.important = False
+        topic.save()
+        return redirect(topic.url)
+
+
+class DeletePost(MethodView):
+    decorators = [allows.requires(CanDeletePost), login_required]
+
+    def post(self, post_id):
+        post = Post.query.filter_by(id=post_id).first_or_404()
+        first_post = post.first_post
+        topic_url = post.topic.url
+        forum_url = post.topic.forum.url
+
+        post.delete()
+
+        # If the post was the first post in the topic, redirect to the forums
+        if first_post:
+            return redirect(forum_url)
+        return redirect(topic_url)
+
+
+class RawPost(MethodView):
+    decorators = [login_required]
+
+    def get(self, post_id):
+        post = Post.query.filter_by(id=post_id).first_or_404()
+        return format_quote(username=post.username, content=post.content)
+
+
+class MarkRead(MethodView):
+    decorators = [login_required]
+
+    def post(self, forum_id=None, slug=None):
+        # Mark a single forum as read
+        if forum_id is not None:
+            forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
+            forumsread = ForumsRead.query.filter_by(
+                user_id=real(current_user).id, forum_id=forum_instance.id
+            ).first()
+            TopicsRead.query.filter_by(
+                user_id=real(current_user).id, forum_id=forum_instance.id
+            ).delete()
+
+            if not forumsread:
+                forumsread = ForumsRead()
+                forumsread.user = real(current_user)
+                forumsread.forum = forum_instance
+
+            forumsread.last_read = time_utcnow()
+            forumsread.cleared = time_utcnow()
+
+            db.session.add(forumsread)
+            db.session.commit()
+
+            flash(_('Forum %(forum)s marked as read.', forum=forum_instance.title), 'success')
+
+            return redirect(forum_instance.url)
+
+        # Mark all forums as read
+        ForumsRead.query.filter_by(user_id=real(current_user).id).delete()
+        TopicsRead.query.filter_by(user_id=real(current_user).id).delete()
+
+        forums = Forum.query.all()
+        forumsread_list = []
+        for forum_instance in forums:
+            forumsread = ForumsRead()
+            forumsread.user = real(current_user)
+            forumsread.forum = forum_instance
+            forumsread.last_read = time_utcnow()
+            forumsread.cleared = time_utcnow()
+            forumsread_list.append(forumsread)
+
+        db.session.add_all(forumsread_list)
+        db.session.commit()
+
+        flash(_('All forums marked as read.'), 'success')
+
+        return redirect(url_for('forum.index'))
+
+
+class WhoIsOnline(MethodView):
+
+    def get(self):
+        if current_app.config['REDIS_ENABLED']:
+            online_users = get_online_users()
+        else:
+            online_users = User.query.filter(User.lastseen >= time_diff()).all()
+        return render_template('forum/online_users.html', online_users=online_users)
+
+
+class TrackTopic(MethodView):
+    decorators = [login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        real(current_user).track_topic(topic)
+        real(current_user).save()
+        return redirect(topic.url)
+
+
+class UntrackTopic(MethodView):
+    decorators = [login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        real(current_user).untrack_topic(topic)
+        real(current_user).save()
+        return redirect(topic.url)
+
+
 register_view(
     forum,
-    routes=['/topic/<int:topic_id>', '/topic/<int:topic_id>-<slug>'],
-    view_func=ViewTopic.as_view('view_topic')
-)
-register_view(
-    forum,
-    routes=['/<int:forum_id>/topic/new', '/<int:forum_id>-<slug>/topic/new'],
-    view_func=NewTopic.as_view('new_topic')
+    routes=['/category/<int:category_id>', '/category/<int:category_id>-<slug>'],
+    view_func=ViewCategory.as_view('view_category')
 )
 register_view(
     forum,
@@ -711,18 +679,80 @@ register_view(
 )
 register_view(
     forum,
-    routes=['/topic/<int:topic_id>/post/new', '/topic/<int:topic_id>-<slug>/post/new'],
-    view_func=NewPost.as_view('new_post')
+    routes=['/forum/<int:forum_id>', '/forum/<int:forum_id>-<slug>'],
+    view_func=ViewForum.as_view('view_forum')
+)
+register_view(
+    forum,
+    routes=['/<int:forum_id>/markread', '/<int:forum_id>-<slug>/markread'],
+    view_func=MarkRead.as_view('markread')
+)
+register_view(
+    forum,
+    routes=['/<int:forum_id>/topic/new', '/<int:forum_id>-<slug>/topic/new'],
+    view_func=NewTopic.as_view('new_topic')
+)
+register_view(forum, routes=['/memberlist'], view_func=MemberList.as_view('memberlist'))
+register_view(
+    forum, routes=['/post/<int:post_id>/delete'], view_func=DeletePost.as_view('delete_post')
+)
+register_view(forum, routes=['/post/<int:post_id>/edit'], view_func=EditPost.as_view('edit_post'))
+register_view(forum, routes=['/post/<int:post_id>/raw'], view_func=RawPost.as_view('raw_post'))
+register_view(
+    forum, routes=['/post/<int:post_id>/report'], view_func=ReportView.as_view('report_view')
+)
+register_view(forum, routes=['/post/<int:post_id>'], view_func=ViewPost.as_view('view_post'))
+register_view(forum, routes=['/search'], view_func=Search.as_view('search'))
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>/delete', '/topic/<int:topic_id>-<slug>/delete'],
+    view_func=DeleteTopic.as_view('delete_topic')
+)
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>/highlight', '/topic/<int:topic_id>-<slug>/highlight'],
+    view_func=HighlightTopic.as_view('highlight_topic')
+)
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>/lock', '/topic/<int:topic_id>-<slug>/lock'],
+    view_func=LockTopic.as_view('lock_topic')
 )
 register_view(
     forum,
     routes=['/topic/<int:topic_id>/post/<int:post_id>/reply'],
     view_func=ReplyPost.as_view('reply_post')
 )
-register_view(forum, routes=['/post/<int:post_id>/edit'], view_func=EditPost.as_view('edit_post'))
 register_view(
-    forum, routes=['/post/<int:post_id>/report'], view_func=ReportView.as_view('report_view')
+    forum,
+    routes=['/topic/<int:topic_id>/post/new', '/topic/<int:topic_id>-<slug>/post/new'],
+    view_func=NewPost.as_view('new_post')
 )
-register_view(forum, routes=['/memberlist'], view_func=MemberList.as_view('memberlist'))
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>', '/topic/<int:topic_id>-<slug>'],
+    view_func=ViewTopic.as_view('view_topic')
+)
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>/trivialize', '/topic/<int:topic_id>-<slug>/trivialize'],
+    view_func=TrivializeTopic.as_view('trivialize_topic')
+)
+register_view(
+    forum,
+    routes=['/topic/<int:topic_id>/unlock', '/topic/<int:topic_id>-<slug>/unlock'],
+    view_func=UnlockTopic.as_view('unlock_topic')
+)
+register_view(
+    forum,
+    routes=['/topictracker/<int:topic_id>/add', '/topictracker/<int:topic_id>-<slug>/add'],
+    view_func=TrackTopic.as_view('track_topic')
+)
+register_view(
+    forum,
+    routes=['/topictracker/<int:topic_id>/delete', '/topictracker/<int:topic_id>-<slug>/delete'],
+    view_func=UntrackTopic.as_view('untrack_topic')
+)
 register_view(forum, routes=['/topictracker'], view_func=TopicTracker.as_view('topictracker'))
-register_view(forum, routes=['/search'], view_func=Search.as_view('search'))
+register_view(forum, routes=['/'], view_func=ForumIndex.as_view('index'))
+register_view(forum, routes=['/who-is-online'], view_func=WhoIsOnline.as_view('who_is_online'))
