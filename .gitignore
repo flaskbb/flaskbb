@@ -13,6 +13,11 @@
 *.tgz
 *.tar.gz
 
+# custom ignore
+######################
+/venv
+历史.txt
+
 # Logs and databases #
 ######################
 *.log
