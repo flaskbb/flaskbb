@@ -110,7 +110,7 @@ class ViewPost(MethodView):
 
     def get(self, post_id):
         '''Redirects to a post in a topic.'''
-        post = Post.query.filter_byforumy(id=post_id).first_or_404()
+        post = Post.query.filter_by(id=post_id).first_or_404()
         post_in_topic = Post.query.filter(Post.topic_id == post.topic_id,
                                           Post.id <= post_id).order_by(Post.id.asc()).count()
         page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
@@ -175,12 +175,12 @@ class ViewTopic(MethodView):
 
         elif form.validate_on_submit():
             post = form.save(real(current_user), topic)
-            return redirect('forum.view_post', post_id=post.id)
+            return redirect(url_for('forum.view_post', post_id=post.id))
 
         else:
             for e in form.errors.get('content', []):
                 flash(e, 'danger')
-            return redirect('forum.view_topic', topic_id=topic_id, slug=slug)
+            return redirect(url_for('forum.view_topic', topic_id=topic_id, slug=slug))
 
     def form(self):
         if Permission(CanPostReply):
@@ -438,7 +438,7 @@ class MemberList(MethodView):
         users = User.query.order_by(order_func(sort_obj)).paginate(
             page, flaskbb_config['USERS_PER_PAGE'], False
         )
-        return render_template('forum/memberlist.html', users=users, form=self.form())
+        return render_template('forum/memberlist.html', users=users, search_form=self.form())
 
     def post(self):
         page = request.args.get('page', 1, type=int)
@@ -460,12 +460,12 @@ class MemberList(MethodView):
         form = self.form()
         if form.validate():
             users = form.get_results().paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-            return render_template('forum/memberlist.html', users=users, form=form)
+            return render_template('forum/memberlist.html', users=users, search_form=form)
 
         users = User.query.order_by(order_func(sort_obj)).paginate(
             page, flaskbb_config['USERS_PER_PAGE'], False
         )
-        return render_template('forum/memberlist.html', users=users, form=form)
+        return render_template('forum/memberlist.html', users=users, search_form=form)
 
 
 class TopicTracker(MethodView):
@@ -534,7 +534,7 @@ class LockTopic(MethodView):
 class UnlockTopic(MethodView):
     decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
 
-    def post(self, topic_id, topic_slug=None):
+    def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         topic.locked = False
         topic.save()
@@ -544,7 +544,7 @@ class UnlockTopic(MethodView):
 class HighlightTopic(MethodView):
     decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
 
-    def post(self, topic_id, topic_slug=None):
+    def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         topic.important = True
         topic.save()
@@ -699,7 +699,7 @@ register_view(
 register_view(forum, routes=['/post/<int:post_id>/edit'], view_func=EditPost.as_view('edit_post'))
 register_view(forum, routes=['/post/<int:post_id>/raw'], view_func=RawPost.as_view('raw_post'))
 register_view(
-    forum, routes=['/post/<int:post_id>/report'], view_func=ReportView.as_view('report_view')
+    forum, routes=['/post/<int:post_id>/report'], view_func=ReportView.as_view('report_post')
 )
 register_view(forum, routes=['/post/<int:post_id>'], view_func=ViewPost.as_view('view_post'))
 register_view(forum, routes=['/search'], view_func=Search.as_view('search'))
