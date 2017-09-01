@@ -53,20 +53,17 @@ class Inbox(MethodView):
         page = request.args.get('page', 1, type=int)
 
         # the inbox will display both, the recieved and the sent messages
-        conversations = Conversation.query. \
-            filter(
-                Conversation.user_id == current_user.id,
-                Conversation.draft == False,
-                Conversation.trash == False,
-            ).\
-            order_by(Conversation.date_modified.desc()). \
-            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+        conversations = Conversation.query.filter(
+            Conversation.user_id == current_user.id,
+            Conversation.draft == False,
+            Conversation.trash == False,
+        ).order_by(Conversation.date_modified.desc()).paginate(
+            page, flaskbb_config['TOPICS_PER_PAGE'], False
+        )
 
         # we can't simply do conversations.total because it would ignore
         # drafted and trashed messages
-        message_count = Conversation.query. \
-            filter(Conversation.user_id == current_user.id).\
-            count()
+        message_count = Conversation.query.filter(Conversation.user_id == current_user.id).count()
 
         return render_template(
             "message/inbox.html", conversations=conversations, message_count=message_count
@@ -395,12 +392,12 @@ class TrashedMessages(MethodView):
         )
 
 
-register_view(message, routes=['/drafts'], DraftMessages.as_view('drafts'))
+register_view(message, routes=['/drafts'], view_func=DraftMessages.as_view('drafts'))
 register_view(message, routes=['/', '/inbox'], view_func=Inbox.as_view('inbox'))
 register_view(
     message,
-    routes=['/int:conversation_id>/delete'],
-    DeleteConversation.as_view('delete_conversation')
+    routes=['/<int:conversation_id>/delete'],
+    view_func=DeleteConversation.as_view('delete_conversation')
 )
 register_view(
     message,
@@ -408,18 +405,23 @@ register_view(
     view_func=EditConversation.as_view('edit_conversation')
 )
 register_view(
-    message, routes=['/<int:conversation_id>/move'], MoveConversation.as_view('move_conversation')
+    message,
+    routes=['/<int:conversation_id>/move'],
+    view_func=MoveConversation.as_view('move_conversation')
 )
 register_view(
-    message.routes=['/<int:conversation_id>/restore'],
-    RestoreConversation.as_view('restore_conversation')
+    message,
+    routes=['/<int:conversation_id>/restore'],
+    view_func=RestoreConversation.as_view('restore_conversation')
 )
 register_view(
     message,
     routes=["/<int:conversation_id>/view"],
     view_func=ViewConversation.as_view('view_conversation')
 )
-register_view(message, routes=['/message/<int:message_id>/raw'], RawMessage.as_view('raw_message'))
+register_view(
+    message, routes=['/message/<int:message_id>/raw'], view_func=RawMessage.as_view('raw_message')
+)
 register_view(message, routes=["/new"], view_func=NewConversation.as_view('new_conversation'))
-register_view(message, routes=['/sent'], SentMessages.as_view('sent'))
-register_view(message, routes=['/trash'], TrashedMessages.as_view('trash'))
+register_view(message, routes=['/sent'], view_func=SentMessages.as_view('sent'))
+register_view(message, routes=['/trash'], view_func=TrashedMessages.as_view('trash'))
