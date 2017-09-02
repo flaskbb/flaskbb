@@ -31,7 +31,7 @@ from flask_login import current_user
 
 from werkzeug.local import LocalProxy
 
-from flaskbb._compat import range_method, text_type, iteritems
+from flaskbb._compat import range_method, text_type, iteritems, to_unicode, to_bytes
 from flaskbb.extensions import redis_store, babel
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
@@ -296,6 +296,7 @@ def mark_online(user_id, guest=False):  # pragma: no cover
 
     Ref: http://flask.pocoo.org/snippets/71/
     """
+    user_id = to_bytes(user_id)
     now = int(time.time())
     expires = now + (flaskbb_config['ONLINE_LAST_MINUTES'] * 60) + 10
     if guest:
@@ -320,10 +321,13 @@ def get_online_users(guest=False):  # pragma: no cover
     current = int(time.time()) // 60
     minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
-        return redis_store.sunion(['online-guests/%d' % (current - x)
+        users = redis_store.sunion(['online-guests/%d' % (current - x)
                                    for x in minutes])
-    return redis_store.sunion(['online-users/%d' % (current - x)
-                               for x in minutes])
+    else:
+        users = redis_store.sunion(['online-users/%d' % (current - x)
+                                   for x in minutes])
+
+    return [to_unicode(u) for u in users]
 
 
 def crop_title(title, length=None, suffix="..."):
