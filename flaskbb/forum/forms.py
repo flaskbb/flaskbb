@@ -83,7 +83,7 @@ class ReportForm(FlaskForm):
 
 class UserSearchForm(FlaskForm):
     search_query = StringField(_("Search"), validators=[
-        Optional(), Length(min=3, max=50)
+        DataRequired(), Length(min=3, max=50)
     ])
 
     submit = SubmitField(_("Search"))
