@@ -131,7 +131,7 @@ class ManageUsers(MethodView):
             page, flaskbb_config['USERS_PER_PAGE'], False
         )
 
-        return render_template('management/users.html', users=users, form=form)
+        return render_template('management/users.html', users=users, search_form=form)
 
     def post(self):
         page = request.args.get('page', 1, type=int)
@@ -140,13 +140,13 @@ class ManageUsers(MethodView):
         if form.validate():
             users = form.get_results().\
                 paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
-            return render_template('management/users.html', users=users, form=form)
+            return render_template('management/users.html', users=users, search_form=form)
 
         users = User.query.order_by(User.id.asc()).paginate(
             page, flaskbb_config['USERS_PER_PAGE'], False
         )
 
-        return render_template('management/users.html', users=users, form=form)
+        return render_template('management/users.html', users=users, search_form=form)
 
 
 class EditUser(MethodView):
@@ -355,6 +355,18 @@ class BanUser(MethodView):
                 data=data,
                 status=200
             )
+
+        user = User.query.filter_by(id=user_id).first_or_404()
+        # Do not allow moderators to ban admins
+        if Permission(IsAdmin, identity=user) and Permission(Not(IsAdmin), identity=current_user):
+            flash(_("A moderator cannot ban an admin user."), "danger")
+            return redirect(url_for("management.overview"))
+
+        if not current_user.id == user.id and user.ban():
+            flash(_("User is now banned."), "success")
+        else:
+            flash(_("Could not ban user."), "danger")
+        return redirect(url_for("management.banned_users"))
 
 
 class UnbanUser(MethodView):
@@ -954,11 +966,11 @@ register_view(
     management, routes=['/forums/<int:forum_id>/edit'], view_func=EditForum.as_view('edit_forum')
 )
 register_view(management, routes=['forums'], view_func=Forums.as_view('forums'))
-register_view(management, routes=['/groups/add'], view_func=AddGroup.as_view('add_groups'))
+register_view(management, routes=['/groups/add'], view_func=AddGroup.as_view('add_group'))
 register_view(
     management,
     routes=['/groups/<int:group_id>/delete', '/groups/delete'],
-    view_func=DeleteGroup.as_view('delete-group')
+    view_func=DeleteGroup.as_view('delete_group')
 )
 register_view(
     management, routes=['/groups/<int:group_id>/edit'], view_func=EditGroup.as_view('edit_group')
@@ -1009,7 +1021,7 @@ register_view(management, routes=['/users/banned'], view_func=BannedUsers.as_vie
 register_view(
     management,
     routes=['/users/ban', '/users/<int:user_id>/ban'],
-    view_func=BanUser.as_view('/ban_user')
+    view_func=BanUser.as_view('ban_user')
 )
 register_view(
     management,
