@@ -57,7 +57,7 @@ class UserForm(FlaskForm):
         Email(message=_("Invalid email address."))])
 
     password = PasswordField("Password", validators=[
-        Optional()])
+        DataRequired()])
 
     birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
         Optional()])
@@ -144,6 +144,8 @@ class AddUserForm(UserForm):
 
 
 class EditUserForm(UserForm):
+    password = PasswordField("Password", validators=[Optional()])
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs['obj'] = self.user
