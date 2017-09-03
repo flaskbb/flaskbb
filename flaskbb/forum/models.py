@@ -10,13 +10,14 @@
 """
 from datetime import timedelta
 
-from flask import url_for, abort
+from flask import abort, url_for
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
-from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
-                                   get_forums, time_utcnow, topic_is_unread)
-from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
+from flaskbb.utils.database import (CRUDMixin, HideableCRUDMixin, UTCDateTime,
+                                    make_comparable)
+from flaskbb.utils.helpers import (get_categories_and_forums, get_forums,
+                                   slugify, time_utcnow, topic_is_unread)
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -137,7 +138,7 @@ class Report(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Post(db.Model, CRUDMixin):
+class Post(HideableCRUDMixin, db.Model):
     __tablename__ = "posts"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -282,7 +283,7 @@ class Post(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Topic(db.Model, CRUDMixin):
+class Topic(HideableCRUDMixin, db.Model):
     __tablename__ = "topics"
 
     id = db.Column(db.Integer, primary_key=True)
