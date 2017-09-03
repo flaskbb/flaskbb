@@ -9,10 +9,13 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
+from flask_sqlalchemy import BaseQuery
+
 from flaskbb.extensions import db
 
 
 def make_comparable(cls):
+
     def __eq__(self, other):
         return isinstance(other, cls) and self.id == other.id
 
@@ -29,6 +32,7 @@ def make_comparable(cls):
 
 
 class CRUDMixin(object):
+
     def __repr__(self):
         return "<{}>".format(self.__class__.__name__)
 
@@ -70,3 +74,54 @@ class UTCDateTime(db.TypeDecorator):
 
         # other dialects are already non-naive
         return value
+
+
+class HideableQuery(BaseQuery):
+
+    def __new__(cls, *args, **kwargs):
+        inst = super(HideableQuery, cls).__new__(cls)
+        with_hidden = kwargs.pop('_with_hidden', False)
+        if args or kwargs:
+            super(HideableQuery, inst).__init__(*args, **kwargs)
+            return inst.filter_by(hidden=False) if not with_hidden else inst
+        return inst
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def with_hidden(self):
+        return self.__class__(
+            db.class_mapper(self._mapper_zero().class_), session=db.session(), _with_hidden=True
+        )
+
+    def _get(self, *args, **kwargs):
+        return super(HideableQuery, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        include_hidden = kwargs.pop('include_hidden', False)
+        obj = self.with_hidden()._get(*args, **kwargs)
+        return obj if obj is not None and (include_hidden or not obj.hidden) else None
+
+
+class HideableMixin(object):
+    hidden = db.Column(db.Boolean, default=False)
+    hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
+    query_class = HideableQuery
+
+    def hide(self, *args, **kwargs):
+        from flaskbb.utils.helpers import time_utcnow
+
+        self.hidden = True
+        self.hidden_at = time_utcnow()
+        db.session.commit()
+        return self
+
+    def unhide(self, *args, **kwargs):
+        self.hidden = False
+        self.hidden_at = None
+        db.session.commit()
+        return self
+
+
+class HideableCRUDMixin(HideableMixin, CRUDMixin):
+    pass
