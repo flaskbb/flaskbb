@@ -113,13 +113,11 @@ class HideableMixin(object):
 
         self.hidden = True
         self.hidden_at = time_utcnow()
-        db.session.commit()
         return self
 
     def unhide(self, *args, **kwargs):
         self.hidden = False
         self.hidden_at = None
-        db.session.commit()
         return self
 
 
