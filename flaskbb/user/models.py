@@ -56,6 +56,7 @@ class Group(db.Model, CRUDMixin):
     deletetopic = db.Column(db.Boolean, default=False, nullable=False)
     posttopic = db.Column(db.Boolean, default=True, nullable=False)
     postreply = db.Column(db.Boolean, default=True, nullable=False)
+    viewhidden = db.Column(db.Boolean, default=False, nullable=False)
 
     # Methods
     def __repr__(self):

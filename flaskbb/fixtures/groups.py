@@ -27,6 +27,7 @@ fixture = OrderedDict((
         'postreply': True,
         'mod_edituser': True,
         'mod_banuser': True,
+        'viewhidden': True,
     }),
     ('Super Moderator', {
         'description': 'The Super Moderator Group',
@@ -42,6 +43,7 @@ fixture = OrderedDict((
         'postreply': True,
         'mod_edituser': True,
         'mod_banuser': True,
+        'viewhidden': True,
     }),
     ('Moderator', {
         'description': 'The Moderator Group',
@@ -57,6 +59,7 @@ fixture = OrderedDict((
         'postreply': True,
         'mod_edituser': True,
         'mod_banuser': True,
+        'viewhidden': True
     }),
     ('Member', {
         'description': 'The Member Group',
@@ -72,6 +75,7 @@ fixture = OrderedDict((
         'postreply': True,
         'mod_edituser': False,
         'mod_banuser': False,
+        'viewhidden': False,
     }),
     ('Banned', {
         'description': 'The Banned Group',
@@ -87,6 +91,7 @@ fixture = OrderedDict((
         'postreply': False,
         'mod_edituser': False,
         'mod_banuser': False,
+        'viewhidden': False,
     }),
     ('Guest', {
         'description': 'The Guest Group',
@@ -102,5 +107,6 @@ fixture = OrderedDict((
         'postreply': False,
         'mod_edituser': False,
         'mod_banuser': False,
+        'viewhidden': False
     })
 ))
