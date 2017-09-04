@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import pytz
+from flask_login import current_user
 from flask_sqlalchemy import BaseQuery
 
 from flaskbb.extensions import db
@@ -80,14 +81,14 @@ class HideableQuery(BaseQuery):
 
     def __new__(cls, *args, **kwargs):
         inst = super(HideableQuery, cls).__new__(cls)
-        with_hidden = kwargs.pop('_with_hidden', False)
+        with_hidden = kwargs.pop(
+            '_with_hidden', False
+        ) or (current_user and current_user.permissions.get('viewhidden', False))
         if args or kwargs:
             super(HideableQuery, inst).__init__(*args, **kwargs)
             entity = inst._mapper_zero().class_
-            return inst.filter(db.or_(
-                entity.hidden == False,
-                entity.hidden == None
-            )) if not with_hidden else inst
+            return inst.filter(db.or_(entity.hidden == False, entity.hidden == None)
+                               ) if not with_hidden else inst
         return inst
 
     def __init__(self, *args, **kwargs):
