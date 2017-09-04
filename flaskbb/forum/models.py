@@ -239,7 +239,35 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.delete()
             return self
 
-        # Delete the last post
+        self._deal_with_last_post()
+        self._update_counts()
+
+        db.session.delete(self)
+        db.session.commit()
+        return self
+
+    def hide(self):
+        if self.topic.first_post == self:
+            self.topic.hide()
+            return self
+
+        self._deal_with_last_post()
+        self._update_counts()
+        super(Post, self).hide()
+        db.session.commit()
+        return self
+
+    def unhide(self):
+        if self.topic.first_post == self:
+            self.topic.unhide()
+            return self
+
+        self._restore_topic_to_forum()
+        super(Post, self).unhide()
+        db.session.commit()
+        return self
+
+    def _deal_with_last_post(self):
         if self.topic.last_post == self:
 
             # update the last post in the forum
@@ -272,14 +300,34 @@ class Post(HideableCRUDMixin, db.Model):
 
             self.topic.last_updated = self.topic.last_post.date_created
 
+    def _update_counts(self):
         # Update the post counts
         self.user.post_count -= 1
         self.topic.post_count -= 1
         self.topic.forum.post_count -= 1
 
-        db.session.delete(self)
-        db.session.commit()
-        return self
+    def _restore_post_to_topic(self):
+        self.user.post_count += 1
+        self.topic.post_count += 1
+        self.topic.forum.post_count += 1
+
+        last_unhidden_post = Post.query.filter(
+            Post.topic_id == self.topic_id,
+            Post.id != self.id
+        ).limit(1).first()
+
+        # should never be None, but deal with it anyways to be safe
+        if last_unhidden_post and self.date_created > last_unhidden_post.date_created:
+            self.topic.last_post = self
+            self.second_last_post = last_unhidden_post
+
+            # if we're the newest in the topic again, we might be the newest in the forum again
+            if self.date_created > self.topic.forum.last_post.date_created:
+                self.topic.forum.last_post = self
+                self.topic.forum.last_post_title = self.topic.title
+                self.topic.forum.last_post_user = self.user
+                self.topic.forum.last_post_username = self.username
+                self.topic.forum.last_post_created = self.date_created
 
 
 @make_comparable
