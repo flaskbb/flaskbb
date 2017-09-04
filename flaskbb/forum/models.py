@@ -246,23 +246,29 @@ class Post(HideableCRUDMixin, db.Model):
         db.session.commit()
         return self
 
-    def hide(self):
+    def hide(self, user):
+        if self.hidden:
+            return
+
         if self.topic.first_post == self:
-            self.topic.hide()
+            self.topic.hide(user)
             return self
 
         self._deal_with_last_post()
         self._update_counts()
-        super(Post, self).hide()
+        super(Post, self).hide(user)
         db.session.commit()
         return self
 
     def unhide(self):
+        if not self.hidden:
+            return
+
         if self.topic.first_post == self:
             self.topic.unhide()
             return self
 
-        self._restore_topic_to_forum()
+        self._restore_post_to_topic()
         super(Post, self).unhide()
         db.session.commit()
         return self
@@ -301,16 +307,37 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.last_updated = self.topic.last_post.date_created
 
     def _update_counts(self):
+        if self.hidden:
+            clauses = [Post.hidden != True, Post.id != self.id]
+        else:
+            clauses = [db.or_(Post.hidden != True, Post.id == self.id)]
+
+        user_post_clauses = clauses + [
+            Post.user_id == self.user.id,
+            Topic.id == Post.topic_id,
+            Topic.hidden != True,
+        ]
+
         # Update the post counts
-        self.user.post_count -= 1
-        self.topic.post_count -= 1
-        self.topic.forum.post_count -= 1
+        self.user.post_count = Post.query.filter(*user_post_clauses).count()
+
+        if self.topic.hidden:
+            self.topic.post_count = 0
+        else:
+            topic_post_clauses = clauses + [
+                Post.topic_id == self.topic.id,
+            ]
+            self.topic.post_count = Post.query.filter(*topic_post_clauses).count()
+
+        forum_post_clauses = clauses + [
+            Post.topic_id == Topic.id,
+            Topic.forum_id == self.topic.forum.id,
+            Topic.hidden != True,
+        ]
+
+        self.topic.forum.post_count = Post.query.filter(*forum_post_clauses).count()
 
     def _restore_post_to_topic(self):
-        self.user.post_count += 1
-        self.topic.post_count += 1
-        self.topic.forum.post_count += 1
-
         last_unhidden_post = Post.query.filter(
             Post.topic_id == self.topic_id,
             Post.id != self.id
@@ -322,7 +349,14 @@ class Post(HideableCRUDMixin, db.Model):
             self.second_last_post = last_unhidden_post
 
             # if we're the newest in the topic again, we might be the newest in the forum again
-            if self.date_created > self.topic.forum.last_post.date_created:
+            # only set if our parent topic isn't hidden
+            if (
+                not self.topic.hidden and
+                (
+                    not self.topic.forum.last_post or
+                    self.date_created > self.topic.forum.last_post.date_created
+                )
+            ):
                 self.topic.forum.last_post = self
                 self.topic.forum.last_post_title = self.topic.title
                 self.topic.forum.last_post_user = self.user
@@ -610,24 +644,32 @@ class Topic(HideableCRUDMixin, db.Model):
         forum = self.forum
         db.session.delete(self)
         self._fix_user_post_counts(users or self.involved_users().all())
-        self._fix_forum_counts(forum)
+        self._fix_post_counts(forum)
         db.session.commit()
         return self
 
-    def hide(self, users=None):
+    def hide(self, user, users=None):
         """Soft deletes a topic from a forum
         """
+        if self.hidden:
+            return
+
         self._remove_topic_from_forum()
-        super(Topic, self).hide()
+        super(Topic, self).hide(user)
+        self._handle_first_post()
         self._fix_user_post_counts(users or self.involved_users().all())
-        self._fix_forum_counts(self.forum)
+        self._fix_post_counts(self.forum)
         db.session.commit()
         return self
 
     def unhide(self, users=None):
         """Restores a hidden topic to a forum
         """
+        if not self.hidden:
+            return
+
         super(Topic, self).unhide()
+        self._handle_first_post()
         self._restore_topic_to_forum()
         self._fix_user_post_counts(users or self.involved_users().all())
         self.forum.recalculate()
@@ -642,7 +684,7 @@ class Topic(HideableCRUDMixin, db.Model):
             Topic.last_post_id.desc()
         ).limit(2).offset(0).all()
 
-        # do we want to delete the topic with the last post in the forum?
+        # do we want to replace the topic with the last post in the forum?
         if len(topics) > 1 and topics[0] == self:
             # Now the second last post will be the last post
             self.forum.last_post = topics[1].last_post
@@ -666,19 +708,34 @@ class Topic(HideableCRUDMixin, db.Model):
                 user.post_count = Post.query.filter(
                     Post.user_id == user.id,
                     Topic.id == Post.topic_id,
-                    Topic.hidden == False
+                    Topic.hidden != True,
+                    Post.hidden != True
                 ).count()
 
-    def _fix_forum_counts(self, forum):
-        forum.topic_count = Topic.query.filter_by(
-            forum_id=self.forum_id
-        ).count()
+    def _fix_post_counts(self, forum):
+        clauses = [
+            Topic.forum_id == forum.id
+        ]
+        if self.hidden:
+            clauses.extend([
+                Topic.id != self.id,
+                Topic.hidden != True,
+            ])
+        else:
+            clauses.append(db.or_(Topic.id == self.id, Topic.hidden != True))
 
-        forum.post_count = Post.query.filter(
+        forum.topic_count = Topic.query.filter(*clauses).count()
+
+        post_count = clauses + [
             Post.topic_id == Topic.id,
-            Topic.forum_id == self.forum_id,
-            Topic.hidden == False
-        ).count()
+        ]
+
+        if self.hidden:
+            post_count.append(Post.hidden != True)
+        else:
+            post_count.append(db.or_(Post.hidden != True, Post.id == self.first_post.id))
+
+        forum.post_count = Post.query.distinct().filter(*post_count).count()
 
     def _restore_topic_to_forum(self):
         if self.forum.last_post is None or self.forum.last_post_created < self.last_updated:
@@ -688,14 +745,19 @@ class Topic(HideableCRUDMixin, db.Model):
             self.forum.last_post_username = self.username
             self.forum.last_post_created = self.last_updated
 
+    def _handle_first_post(self):
+        # have to do this specially because otherwise we start recurisve calls
+        self.first_post.hidden = self.hidden
+        self.first_post.hidden_by = self.hidden_by
+        self.first_post.hidden_at = self.hidden_at
+
     def involved_users(self):
         """
         Returns a query of all users involved in the topic
         """
         # todo: Find circular import and break it
         from flaskbb.user.models import User
-        return User.query.filter(Post.topic_id == self.id, User.id == Post.user_id)
-
+        return User.query.distinct().filter(Post.topic_id == self.id, User.id == Post.user_id)
 
 
 @make_comparable

@@ -111,8 +111,8 @@ class User(db.Model, UserMixin, CRUDMixin):
     theme = db.Column(db.String(15), nullable=True)
     language = db.Column(db.String(15), default="en", nullable=True)
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic")
+    posts = db.relationship("Post", backref="user", lazy="dynamic", primaryjoin="User.id == Post.user_id")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic", primaryjoin="User.id == Topic.user_id")
 
     post_count = db.Column(db.Integer, default=0)
 

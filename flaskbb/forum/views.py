@@ -275,22 +275,24 @@ def trivialize_topic(topic_id=None, slug=None):
 @login_required
 def hide_topic(topic_id, slug=None):
     topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
-    if not Permission(Has('makehidden') & IsAtleastModeratorInForum(forum=topic.forum)):
+    if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have permission to hide this topic"),
                 "danger")
         return redirect(topic.url)
-    topic.hide()
+    topic.hide(user=current_user)
     topic.save()
-    return redirect(url_for('forum.view_forum', forum_id=topic.forum.id, slug=topic.forum.slug))
+
+    if Permission(Has('viewhidden')):
+        return redirect(topic.url)
+    return redirect(topic.forum.url)
 
 
 @forum.route("/topic/<int:topic_id>/unhide", methods=["POST"])
 @forum.route("/topic/<int:topic_id>-<slug>/unhide", methods=["POST"])
 @login_required
-@allows.requires(Has('viewhidden'))
 def unhide_topic(topic_id, slug=None):
-    topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
-    if not Permission(Has('makehidden') & IsAtleastModeratorInForum(forum=topic.forum)):
+    topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=topic.forum)):
         flash(_("You do not have permission to unhide this topic"),
                 "danger")
         return redirect(topic.url)
@@ -546,6 +548,55 @@ def report_post(post_id):
         flash(_("Thanks for reporting."), "success")
 
     return render_template("forum/report_post.html", form=form)
+
+
+@forum.route("/post/<int:post_id>/hide", methods=["POST"])
+@login_required
+def hide_post(post_id):
+    post = Post.query.filter(Post.id == post_id).first_or_404()
+
+    if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=post.topic.forum)):
+        flash(_("You do not have permission to hide this post"),
+                "danger")
+        return redirect(post.topic.url)
+
+    if post.hidden:
+        flash(_("Post is already hidden"), "warning")
+        return redirect(post.topic.url)
+
+    first_post = post.first_post
+
+    post.hide(current_user)
+    post.save()
+
+    if first_post:
+        flash(_("Topic hidden"), "success")
+    else:
+        flash(_("Post hidden"), "success")
+
+    if post.first_post and not Permission(Has("viewhidden")):
+        return redirect(post.topic.forum.url)
+    return redirect(post.topic.url)
+
+
+@forum.route("/post/<int:post_id>/unhide", methods=["POST"])
+@login_required
+def unhide_post(post_id):
+    post = Post.query.filter(Post.id == post_id).first_or_404()
+
+    if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=post.topic.forum)):
+        flash(_("You do not have permission to unhide this post"),
+                "danger")
+        return redirect(post.topic.url)
+
+    if not post.hidden:
+        flash(_("Post is already unhidden"), "warning")
+        redirect(post.topic.url)
+
+    post.unhide()
+    post.save()
+    flash(_("Post unhidden"), "success")
+    return redirect(post.topic.url)
 
 
 @forum.route("/post/<int:post_id>/raw", methods=["POST", "GET"])

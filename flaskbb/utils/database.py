@@ -11,7 +11,7 @@
 import pytz
 from flask_login import current_user
 from flask_sqlalchemy import BaseQuery
-
+from sqlalchemy.ext.declarative import declared_attr
 from flaskbb.extensions import db
 
 
@@ -87,8 +87,7 @@ class HideableQuery(BaseQuery):
         if args or kwargs:
             super(HideableQuery, inst).__init__(*args, **kwargs)
             entity = inst._mapper_zero().class_
-            return inst.filter(db.or_(entity.hidden == False, entity.hidden == None)
-                               ) if not with_hidden else inst
+            return inst.filter(entity.hidden != True) if not with_hidden else inst
         return inst
 
     def __init__(self, *args, **kwargs):
@@ -109,18 +108,37 @@ class HideableQuery(BaseQuery):
 
 
 class HideableMixin(object):
-    hidden = db.Column(db.Boolean, default=False)
-    hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
     query_class = HideableQuery
 
-    def hide(self, *args, **kwargs):
+    hidden = db.Column(db.Boolean, default=False, nullable=True)
+    hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
+
+    @declared_attr
+    def hidden_by_id(cls):
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('users.id', name='fk_{}_hidden_by'.format(cls.__name__)),
+            nullable=True
+        )
+
+    @declared_attr
+    def hidden_by(cls):
+        return db.relationship(
+            'User',
+            uselist=False,
+            foreign_keys=[cls.hidden_by_id],
+        )
+
+    def hide(self, user, *args, **kwargs):
         from flaskbb.utils.helpers import time_utcnow
 
+        self.hidden_by = user
         self.hidden = True
         self.hidden_at = time_utcnow()
         return self
 
     def unhide(self, *args, **kwargs):
+        self.hidden_by = None
         self.hidden = False
         self.hidden_at = None
         return self

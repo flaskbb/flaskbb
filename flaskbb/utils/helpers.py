@@ -127,7 +127,7 @@ def do_topic_action(topics, user, action, reverse):
             if topic.hidden:
                 continue
             modified_topics += 1
-            topic.hide()
+            topic.hide(user)
 
     elif action == 'unhide':
         if not Permission(Has('makehidden')):
@@ -240,7 +240,7 @@ def forum_is_unread(forum, forumsread, user):
         return False
 
     # check if the last post is newer than the tracker length
-    if forum.last_post_created < read_cutoff:
+    if not forum.last_post or forum.last_post_created < read_cutoff:
         return False
 
     # If the user hasn't visited a topic in the forum - therefore,
