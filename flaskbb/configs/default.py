@@ -194,3 +194,6 @@ class DefaultConfig(object):
     ADMIN_URL_PREFIX = "/admin"
     # Plugin Folder
     PLUGINS_FOLDER = os.path.join(basedir, "flaskbb", "plugins")
+
+    # Logging Config Path
+    LOG_CONF_FILE = None

@@ -10,6 +10,7 @@
 """
 import os
 import logging
+import logging.config
 import time
 from functools import partial
 
@@ -336,6 +337,9 @@ def configure_logging(app):
         mail_handler.setLevel(logging.ERROR)
         mail_handler.setFormatter(formatter)
         app.logger.addHandler(mail_handler)
+
+    if app.config.get('LOG_CONF_FILE'):
+        logging.config.fileConfig(app.config['LOG_CONF_FILE'], disable_existing_loggers=False)
 
     if app.config["SQLALCHEMY_ECHO"]:
         # Ref: http://stackoverflow.com/a/8428546

@@ -154,6 +154,7 @@ ADMINS = ["{{ mail_admin_address }}"]
 # If SEND_LOGS is set to True, the admins (see the mail configuration) will
 # recieve the error logs per email.
 SEND_LOGS = False
+LOG_CONF_FILE = {{ log_config_path }}
 
 
 # FlaskBB Settings
