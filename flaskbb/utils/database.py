@@ -83,7 +83,11 @@ class HideableQuery(BaseQuery):
         with_hidden = kwargs.pop('_with_hidden', False)
         if args or kwargs:
             super(HideableQuery, inst).__init__(*args, **kwargs)
-            return inst.filter_by(hidden=False) if not with_hidden else inst
+            entity = inst._mapper_zero().class_
+            return inst.filter(db.or_(
+                entity.hidden == False,
+                entity.hidden == None
+            )) if not with_hidden else inst
         return inst
 
     def __init__(self, *args, **kwargs):
