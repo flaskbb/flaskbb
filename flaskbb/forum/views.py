@@ -279,9 +279,7 @@ def hide_topic(topic_id, slug=None):
         flash(_("You do not have permission to hide this topic"),
                 "danger")
         return redirect(topic.url)
-    involved_users = User.query.filter(Post.topic_id == topic.id,
-                                       User.id == Post.user_id).all()
-    topic.hide(involved_users)
+    topic.hide()
     topic.save()
     return redirect(url_for('forum.view_forum', forum_id=topic.forum.id, slug=topic.forum.slug))
 
@@ -296,9 +294,7 @@ def unhide_topic(topic_id, slug=None):
         flash(_("You do not have permission to unhide this topic"),
                 "danger")
         return redirect(topic.url)
-    involved_users = User.query.filter(Post.topic_id == topic.id,
-                                       User.id == Post.user_id).all()
-    topic.unhide(involved_users)
+    topic.unhide()
     topic.save()
     return redirect(topic.url)
 
@@ -399,6 +395,19 @@ def manage_forum(forum_id, slug=None):
                 return redirect(mod_forum_url)
 
             new_forum.move_topics_to(tmp_topics)
+            return redirect(mod_forum_url)
+
+        # hiding/unhiding
+        elif "hide" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=real(current_user),
+                                      action="hide", reverse=False)
+            flash(_("%(count)s topics hidden.", count=changed), "success")
+            return redirect(mod_forum_url)
+
+        elif "unhide" in request.form:
+            changed = do_topic_action(topics=tmp_topics, user=real(current_user),
+                                      action="unhide", reverse=False)
+            flash(_("%(count)s topics unhidden.", count=changed), "success")
             return redirect(mod_forum_url)
 
     return render_template(
