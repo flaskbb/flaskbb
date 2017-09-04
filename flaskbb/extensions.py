@@ -19,7 +19,6 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_redis import FlaskRedis
 from flask_alembic import Alembic
 from flask_themes2 import Themes
-from flask_plugins import PluginManager
 from flask_babelplus import Babel
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
@@ -56,9 +55,6 @@ alembic = Alembic()
 
 # Themes
 themes = Themes()
-
-# PluginManager
-plugin_manager = PluginManager()
 
 # Babel
 babel = Babel()

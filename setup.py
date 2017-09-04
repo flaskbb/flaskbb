@@ -77,7 +77,6 @@ setup(
         'Flask-Limiter',
         'Flask-Login',
         'Flask-Mail',
-        'Flask-Plugins',
         'Flask-Redis',
         'Flask-SQLAlchemy',
         'Flask-Themes2',

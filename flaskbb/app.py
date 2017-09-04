@@ -31,7 +31,7 @@ from flaskbb.user.models import User, Guest
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, debugtoolbar, limiter, login_manager, mail,
-                                plugin_manager, redis_store, themes, whooshee)
+                                redis_store, themes, whooshee)
 
 # various helpers
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
@@ -142,9 +142,6 @@ def configure_extensions(app):
 
     # Flask-WTF CSRF
     csrf.init_app(app)
-
-    # Flask-Plugins
-    plugin_manager.init_app(app)
 
     # Flask-SQLAlchemy
     db.init_app(app)
@@ -381,13 +378,19 @@ def load_plugins(app):
         if not plugin.enabled:
             app.pluggy.set_blocked(plugin.name)
 
-    app.pluggy.load_setuptools_entrypoints('flaskbb_plugin')
+    app.pluggy.load_setuptools_entrypoints('flaskbb_plugins')
     app.pluggy.hook.flaskbb_extensions(app=app)
 
     loaded_names = set([p[0] for p in app.pluggy.list_name_plugin()])
     registered_names = set([p.name for p in plugins])
-    unregistered = [PluginRegistry(name=name) for name in loaded_names - registered_names]
+    unregistered = [
+        PluginRegistry(name=name) for name in loaded_names - registered_names
+    ]
 
     with app.app_context():
         db.session.add_all(unregistered)
         db.session.commit()
+
+    app.logger.debug(
+        "Enabled Plugins: {}".format(app.pluggy.list_name_plugin())
+    )

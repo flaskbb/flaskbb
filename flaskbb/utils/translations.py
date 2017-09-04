@@ -15,9 +15,6 @@ import babel
 from flask import current_app
 
 from flask_babelplus import Domain, get_locale
-from flask_plugins import get_enabled_plugins
-
-from flaskbb.extensions import plugin_manager
 
 
 class FlaskBBDomain(Domain):
@@ -38,7 +35,7 @@ class FlaskBBDomain(Domain):
         with self.app.app_context():
             self.plugin_translations = [
                 os.path.join(plugin.path, "translations")
-                for plugin in get_enabled_plugins()
+                for plugin in self.app.pluggy.get_plugins()
                 if os.path.exists(os.path.join(plugin.path, "translations"))
             ]
 
@@ -94,7 +91,7 @@ def update_translations(include_plugins=False):
                      "-d", translations_folder])
 
     if include_plugins:
-        for plugin in plugin_manager.all_plugins:
+        for plugin in current_app.pluggy.get_plugins():
             update_plugin_translations(plugin)
 
 

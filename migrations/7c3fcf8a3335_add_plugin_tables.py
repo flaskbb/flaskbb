@@ -1,7 +1,7 @@
 """Add plugin tables
 
 Revision ID: 7c3fcf8a3335
-Revises: 
+Revises:
 Create Date: 2017-08-12 12:41:04.725309
 
 """
@@ -25,14 +25,19 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+
     op.create_table('plugin_store',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.Unicode(length=255), nullable=False),
-    sa.Column('value', sa.Unicode(length=255), nullable=True),
+    sa.Column('key', sa.Unicode(length=255), nullable=False),
+    sa.Column('value', sa.PickleType(), nullable=True),
+    sa.Column('value_type', sa.Unicode(length=20), nullable=False),
+    sa.Column('extra', sa.PickleType(), nullable=False),
     sa.Column('plugin_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.Unicode(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['plugin_id'], ['plugin_registry.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name', 'plugin_id', name='plugin_kv_uniq')
+    sa.UniqueConstraint('key', 'plugin_id', name='plugin_kv_uniq')
     )
     # ### end Alembic commands ###
 

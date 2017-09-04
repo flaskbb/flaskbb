@@ -14,7 +14,6 @@ from celery import __version__ as celery_version
 from flask import (Blueprint, current_app, request, redirect, url_for, flash,
                    jsonify, __version__ as flask_version)
 from flask_login import current_user, login_fresh
-from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
 from flask_babelplus import gettext as _
 from flask_allows import Permission, Not
 
@@ -28,6 +27,7 @@ from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
 from flaskbb.extensions import db, allows, celery
 from flaskbb.utils.helpers import (render_template, time_diff, time_utcnow,
                                    get_online_users)
+from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
 from flaskbb.management.models import Setting, SettingsGroup
@@ -96,7 +96,7 @@ def overview():
         "flask_version": flask_version,
         "flaskbb_version": flaskbb_version,
         # plugins
-        "plugins": get_all_plugins()
+        "plugins": []
     }
 
     return render_template("management/overview.html", **stats)
@@ -703,78 +703,93 @@ def delete_category(category_id):
 @management.route("/plugins")
 @allows.requires(IsAdmin)
 def plugins():
-    plugins = get_all_plugins()
+    from flaskbb.utils.helpers import parse_pkginfo
+    plugins_distinfo = current_app.pluggy.list_plugin_distinfo()
+
+    plugins = {}
+    # XXX: Mapping from PKG-INFO to something more readable?
+    for plugin in plugins_distinfo:
+        name = current_app.pluggy.get_name(plugin[0])
+        plugins[name] = parse_pkginfo(plugin[1].key)
+
     return render_template("management/plugins.html", plugins=plugins)
 
 
-@management.route("/plugins/<path:plugin>/enable", methods=["POST"])
+@management.route("/plugins/<path:pluginname>/settings")
 @allows.requires(IsAdmin)
-def enable_plugin(plugin):
-    plugin = get_plugin_from_all(plugin)
+def plugin_settings():
+    plugins = current_app.pluggy.get_plugins()
+    return render_template("management/plugins.html", plugins=plugins)
+
+
+@management.route("/plugins/<path:pluginname>/enable", methods=["POST"])
+@allows.requires(IsAdmin)
+def enable_plugin(pluginname):
+    plugin_module = current_app.pluggy.get_plugin(pluginname)
+    if plugin_module is None:
+        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "error")
+        return redirect(url_for("management.plugins"))
+
+    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
 
     if plugin.enabled:
         flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name),
               "info")
         return redirect(url_for("management.plugins"))
 
-    try:
-        plugin.enable()
-        flash(_("Plugin %(plugin)s enabled. Please restart FlaskBB now.",
-                plugin=plugin.name), "success")
-    except OSError:
-        flash(_("It seems that FlaskBB does not have enough filesystem "
-                "permissions. Try removing the 'DISABLED' file by "
-                "yourself instead."), "danger")
+    plugin.enabled = True
+    plugin.save()
 
+    flash(_("Plugin %(plugin)s enabled. Please restart FlaskBB now.",
+            plugin=plugin.name), "success")
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:plugin>/disable", methods=["POST"])
+@management.route("/plugins/<path:pluginname>/disable", methods=["POST"])
 @allows.requires(IsAdmin)
-def disable_plugin(plugin):
-    try:
-        plugin = get_plugin(plugin)
-    except KeyError:
-        flash(_("Plugin %(plugin)s not found.", plugin=plugin.name), "danger")
+def disable_plugin(pluginname):
+    plugin_module = current_app.pluggy.get_plugin(pluginname)
+    if plugin_module is None:
+        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
+        return redirect(url_for("management.plugins"))
+    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
+
+    if not plugin.enabled:
+        flash(_("Plugin %(plugin)s is already disabled.", plugin=plugin.name),
+              "info")
         return redirect(url_for("management.plugins"))
 
-    try:
-        plugin.disable()
-        flash(_("Plugin %(plugin)s disabled. Please restart FlaskBB now.",
-                plugin=plugin.name), "success")
-    except OSError:
-        flash(_("It seems that FlaskBB does not have enough filesystem "
-                "permissions. Try creating the 'DISABLED' file by "
-                "yourself instead."), "danger")
+    plugin.enabled = False
+    plugin.save()
+    flash(_("Plugin %(plugin)s disabled. Please restart FlaskBB now.",
+            plugin=plugin.name), "success")
 
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:plugin>/uninstall", methods=["POST"])
+@management.route("/plugins/<path:pluginname>/uninstall", methods=["POST"])
 @allows.requires(IsAdmin)
-def uninstall_plugin(plugin):
-    plugin = get_plugin_from_all(plugin)
-    if plugin.installed:
-        plugin.uninstall()
-        Setting.invalidate_cache()
+def uninstall_plugin(pluginname):
+    plugin_module = current_app.pluggy.get_plugin(pluginname)
+    if plugin_module is None:
+        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
+        return redirect(url_for("management.plugins"))
+    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
 
-        flash(_("Plugin has been uninstalled."), "success")
-    else:
-        flash(_("Cannot uninstall plugin."), "danger")
-
+    plugin.delete()
+    flash(_("Plugin has been uninstalled."), "success")
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:plugin>/install", methods=["POST"])
+@management.route("/plugins/<path:pluginname>/install", methods=["POST"])
 @allows.requires(IsAdmin)
-def install_plugin(plugin):
-    plugin = get_plugin_from_all(plugin)
-    if not plugin.installed:
-        plugin.install()
-        Setting.invalidate_cache()
+def install_plugin(pluginname):
+    plugin_module = current_app.pluggy.get_plugin(pluginname)
+    if plugin_module is None:
+        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
+        return redirect(url_for("management.plugins"))
+    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
 
-        flash(_("Plugin has been installed."), "success")
-    else:
-        flash(_("Cannot install plugin."), "danger")
-
+    plugin.add_settings(plugin_module.SETTINGS)
+    flash(_("Plugin has been installed."), "success")
     return redirect(url_for("management.plugins"))
