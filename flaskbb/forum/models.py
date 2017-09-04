@@ -559,53 +559,95 @@ class Topic(HideableCRUDMixin, db.Model):
 
         :param users: A list with user objects
         """
+        forum = self.forum
+        db.session.delete(self)
+        self._fix_user_post_counts(users or self.involved_users().all())
+        self._fix_forum_counts(forum)
+        db.session.commit()
+        return self
+
+    def hide(self, users=None):
+        """Soft deletes a topic from a forum
+        """
+        self._remove_topic_from_forum()
+        super(Topic, self).hide()
+        self._fix_user_post_counts(users or self.involved_users().all())
+        self._fix_forum_counts(self.forum)
+        db.session.commit()
+        return self
+
+    def unhide(self, users=None):
+        """Restores a hidden topic to a forum
+        """
+        super(Topic, self).unhide()
+        self._restore_topic_to_forum()
+        self._fix_user_post_counts(users or self.involved_users().all())
+        self.forum.recalculate()
+        db.session.commit()
+        return self
+
+    def _remove_topic_from_forum(self):
         # Grab the second last topic in the forum + parents/childs
-        topic = Topic.query.\
-            filter_by(forum_id=self.forum_id).\
-            order_by(Topic.last_post_id.desc()).limit(2).offset(0).all()
+        topics = Topic.query.filter(
+            Topic.forum_id == self.forum_id
+        ).order_by(
+            Topic.last_post_id.desc()
+        ).limit(2).offset(0).all()
 
         # do we want to delete the topic with the last post in the forum?
-        if topic and topic[0] == self:
-            try:
-                # Now the second last post will be the last post
-                self.forum.last_post = topic[1].last_post
-                self.forum.last_post_title = topic[1].title
-                self.forum.last_post_user = topic[1].user
-                self.forum.last_post_username = topic[1].username
-                self.forum.last_post_created = topic[1].last_updated
-            # Catch an IndexError when you delete the last topic in the forum
-            # There is no second last post
-            except IndexError:
-                self.forum.last_post = None
-                self.forum.last_post_title = None
-                self.forum.last_post_user = None
-                self.forum.last_post_username = None
-                self.forum.last_post_created = None
-
-        # These things needs to be stored in a variable before they are deleted
-        forum = self.forum
+        if len(topics) > 1 and topics[0] == self:
+            # Now the second last post will be the last post
+            self.forum.last_post = topics[1].last_post
+            self.forum.last_post_title = topics[1].title
+            self.forum.last_post_user = topics[1].user
+            self.forum.last_post_username = topics[1].username
+            self.forum.last_post_created = topics[1].last_updated
+        else:
+            self.forum.last_post = None
+            self.forum.last_post_title = None
+            self.forum.last_post_user = None
+            self.forum.last_post_username = None
+            self.forum.last_post_created = None
 
         TopicsRead.query.filter_by(topic_id=self.id).delete()
 
-        # Delete the topic
-        db.session.delete(self)
-
+    def _fix_user_post_counts(self, users=None):
         # Update the post counts
         if users:
             for user in users:
-                user.post_count = Post.query.filter_by(user_id=user.id).count()
+                user.post_count = Post.query.filter(
+                    Post.user_id == user.id,
+                    Topic.id == Post.topic_id,
+                    Topic.hidden == False
+                ).count()
 
-        forum.topic_count = Topic.query.\
-            filter_by(forum_id=self.forum_id).\
-            count()
+    def _fix_forum_counts(self, forum):
+        forum.topic_count = Topic.query.filter_by(
+            forum_id=self.forum_id
+        ).count()
 
-        forum.post_count = Post.query.\
-            filter(Post.topic_id == Topic.id,
-                   Topic.forum_id == self.forum_id).\
-            count()
+        forum.post_count = Post.query.filter(
+            Post.topic_id == Topic.id,
+            Topic.forum_id == self.forum_id,
+            Topic.hidden == False
+        ).count()
 
-        db.session.commit()
-        return self
+    def _restore_topic_to_forum(self):
+        if self.forum.last_post is None or self.forum.last_post_created < self.last_updated:
+            self.forum.last_post = self.last_post
+            self.forum.last_post_title = self.title
+            self.forum.last_post_user = self.user
+            self.forum.last_post_username = self.username
+            self.forum.last_post_created = self.last_updated
+
+    def involved_users(self):
+        """
+        Returns a query of all users involved in the topic
+        """
+        # todo: Find circular import and break it
+        from flaskbb.user.models import User
+        return User.query.filter(Post.topic_id == self.id, User.id == Post.user_id)
+
 
 
 @make_comparable

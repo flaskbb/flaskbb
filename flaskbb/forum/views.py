@@ -25,7 +25,7 @@ from flaskbb.utils.helpers import (get_online_users, time_diff, time_utcnow,
 from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
                                         CanDeletePost, CanDeleteTopic,
                                         CanEditPost, CanPostReply,
-                                        CanPostTopic,
+                                        CanPostTopic, Has,
                                         IsAtleastModeratorInForum)
 from flaskbb.forum.models import (Category, Forum, Topic, Post, ForumsRead,
                                   TopicsRead)
@@ -266,6 +266,39 @@ def trivialize_topic(topic_id=None, slug=None):
         return redirect(topic.url)
 
     topic.important = False
+    topic.save()
+    return redirect(topic.url)
+
+
+@forum.route("/topic/<int:topic_id>/hide", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/hide", methods=["POST"])
+@login_required
+def hide_topic(topic_id, slug=None):
+    topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
+    if not Permission(Has('makehidden') & IsAtleastModeratorInForum(forum=topic.forum)):
+        flash(_("You do not have permission to hide this topic"),
+                "danger")
+        return redirect(topic.url)
+    involved_users = User.query.filter(Post.topic_id == topic.id,
+                                       User.id == Post.user_id).all()
+    topic.hide(involved_users)
+    topic.save()
+    return redirect(url_for('forum.view_forum', forum_id=topic.forum.id, slug=topic.forum.slug))
+
+
+@forum.route("/topic/<int:topic_id>/unhide", methods=["POST"])
+@forum.route("/topic/<int:topic_id>-<slug>/unhide", methods=["POST"])
+@login_required
+@allows.requires(Has('viewhidden'))
+def unhide_topic(topic_id, slug=None):
+    topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
+    if not Permission(Has('makehidden') & IsAtleastModeratorInForum(forum=topic.forum)):
+        flash(_("You do not have permission to unhide this topic"),
+                "danger")
+        return redirect(topic.url)
+    involved_users = User.query.filter(Post.topic_id == topic.id,
+                                       User.id == Post.user_id).all()
+    topic.unhide(involved_users)
     topic.save()
     return redirect(topic.url)
 
