@@ -517,9 +517,9 @@ def test_post_delete(topic):
     post_last.delete()
 
     # That was a bit trickier..
-    assert topic.post_count == 1
-    assert topic.forum.post_count == 1
-    assert topic.user.post_count == 1
+    assert topic.post_count == 2
+    assert topic.forum.post_count == 2
+    assert topic.user.post_count == 2
     assert topic.first_post_id == topic.last_post_id
 
     assert topic.forum.last_post_id == topic.last_post_id
