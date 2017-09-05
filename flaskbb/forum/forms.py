@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask_wtf import FlaskForm
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
                      BooleanField, SubmitField)
@@ -16,6 +17,9 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
 from flaskbb.user.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class QuickreplyForm(FlaskForm):

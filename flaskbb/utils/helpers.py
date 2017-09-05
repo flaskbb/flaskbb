@@ -15,6 +15,7 @@ import itertools
 import operator
 import os
 import glob
+import logging
 from datetime import datetime, timedelta
 from pytz import UTC
 from PIL import ImageFile
@@ -37,6 +38,9 @@ from flaskbb.extensions import redis_store, babel
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.markup import markdown
 from flask_allows import Permission
+
+
+logger = logging.getLogger(__name__)
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 

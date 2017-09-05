@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, TextAreaField, SelectField,
@@ -20,6 +21,9 @@ from flaskbb.user.models import User
 from flaskbb.extensions import db
 from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
+
+
+logger = logging.getLogger(__name__)
 
 
 class GeneralSettingsForm(FlaskForm):

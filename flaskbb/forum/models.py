@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import timedelta
+import logging
 
 from flask import url_for, abort
 from sqlalchemy.orm import aliased
@@ -18,6 +19,9 @@ from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
                                    get_forums, time_utcnow, topic_is_unread)
 from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.utils.settings import flaskbb_config
+
+
+logger = logging.getLogger(__name__)
 
 
 moderators = db.Table(

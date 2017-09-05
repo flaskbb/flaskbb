@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, ValidationError, SubmitField
@@ -16,6 +17,9 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.user.models import User
 from flaskbb.message.models import Conversation, Message
+
+
+logger = logging.getLogger(__name__)
 
 
 class ConversationForm(FlaskForm):

@@ -11,6 +11,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime
+import logging
 try:
     import urllib2 as http
 except ImportError:
@@ -25,6 +26,10 @@ from wtforms.widgets.core import Select, HTMLString, html_params
 
 from flaskbb._compat import to_bytes, to_unicode
 from flaskbb.utils.settings import flaskbb_config
+
+
+logger = logging.getLogger(__name__)
+
 
 JSONEncoder = json.JSONEncoder
 

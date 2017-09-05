@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
@@ -15,6 +16,9 @@ from flask_wtf import FlaskForm
 from flaskbb._compat import text_type, iteritems
 from flaskbb.extensions import db, cache
 from flaskbb.utils.database import CRUDMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class SettingsGroup(db.Model, CRUDMixin):

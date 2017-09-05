@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, BooleanField, HiddenField,
                      SubmitField, SelectField)
@@ -19,6 +20,10 @@ from flaskbb.user.models import User
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.fields import RecaptchaField
+
+
+logger = logging.getLogger(__name__)
+
 
 USERNAME_RE = r'^[\w.+-]+$'
 is_valid_username = regexp(

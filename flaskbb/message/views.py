@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import uuid
 from functools import wraps
 
@@ -23,6 +24,9 @@ from flaskbb.user.models import User
 from flaskbb.utils.helpers import (format_quote, register_view,
                                    render_template, time_utcnow)
 from flaskbb.utils.settings import flaskbb_config
+
+
+logger = logging.getLogger(__name__)
 
 message = Blueprint("message", __name__)
 

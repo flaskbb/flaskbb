@@ -8,8 +8,12 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import pytz
 from flaskbb.extensions import db
+
+
+logger = logging.getLogger(__name__)
 
 
 def make_comparable(cls):

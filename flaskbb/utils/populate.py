@@ -9,10 +9,14 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+import logging
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
 from flaskbb.extensions import db
+
+
+logger = logging.getLogger(__name__)
 
 
 def delete_settings_from_fixture(fixture):

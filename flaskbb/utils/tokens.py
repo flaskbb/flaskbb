@@ -9,11 +9,15 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask import current_app
 from itsdangerous import (TimedJSONWebSignatureSerializer, SignatureExpired,
                           BadSignature)
 
 from flaskbb.user.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 def make_token(user, operation, expire=3600):

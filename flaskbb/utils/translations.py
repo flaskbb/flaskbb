@@ -8,6 +8,7 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import os
 import subprocess
 
@@ -18,6 +19,9 @@ from flask_babelplus import Domain, get_locale
 from flask_plugins import get_enabled_plugins
 
 from flaskbb.extensions import plugin_manager
+
+
+logger = logging.getLogger(__name__)
 
 
 class FlaskBBDomain(Domain):

@@ -52,6 +52,9 @@ from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 
 
+logger = logging.getLogger(__name__)
+
+
 def create_app(config=None):
     """Creates the app.
 

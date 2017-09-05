@@ -8,6 +8,7 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import os
 import re
 
@@ -17,6 +18,9 @@ import mistune
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
+
+
+logger = logging.getLogger(__name__)
 
 
 _re_emoji = re.compile(r':([a-z0-9\+\-_]+):', re.I)
