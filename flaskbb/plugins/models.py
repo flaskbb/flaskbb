@@ -15,6 +15,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
+from flaskbb.utils.forms import generate_settings_form
 
 
 class PluginStore(CRUDMixin, db.Model):
@@ -33,7 +34,9 @@ class PluginStore(CRUDMixin, db.Model):
     name = db.Column(db.Unicode(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
 
-    __table_args__ = (UniqueConstraint('key', 'plugin_id', name='plugin_kv_uniq'), )
+    __table_args__ = (
+        UniqueConstraint('key', 'plugin_id', name='plugin_kv_uniq'),
+    )
 
     def __repr__(self):
         return '<PluginSetting plugin={} key={} value={}>'.format(
@@ -54,6 +57,9 @@ class PluginRegistry(CRUDMixin, db.Model):
     settings = association_proxy(
         'values', 'value', creator=lambda k, v: PluginStore(key=k, value=v)
     )
+
+    def get_settings_form(self):
+        return generate_settings_form(self.values.values())()
 
     def add_settings(self, settings):
         plugin_settings = []
