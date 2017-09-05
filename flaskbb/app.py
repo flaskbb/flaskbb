@@ -53,9 +53,8 @@ from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 
 from flaskbb.plugins.models import PluginRegistry
+from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins import spec
-
-from pluggy import PluginManager
 
 
 def create_app(config=None):
@@ -104,7 +103,7 @@ def configure_app(app, config):
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object
     app_config_from_env(app, prefix="FLASKBB_")
-    app.pluggy = PluginManager('flaskbb', implprefix='flaskbb_')
+    app.pluggy = FlaskBBPluginManager('flaskbb', implprefix='flaskbb_')
 
 
 def configure_celery_app(app, celery):

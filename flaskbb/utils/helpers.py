@@ -629,12 +629,12 @@ def real(obj):
     return obj
 
 
-def parse_pkginfo(plugin_dist_name):
-    raw_metadata = get_distribution(plugin_dist_name).get_metadata('PKG-INFO')
+def parse_pkg_metadata(dist_name):
+    raw_metadata = get_distribution(dist_name).get_metadata('PKG-INFO')
     metadata = {}
 
     # lets use the Parser from email to parse our metadata :)
     for key, value in message_from_string(raw_metadata).items():
-        metadata[key] = value
+        metadata[key.replace('-', '_').lower()] = value
 
     return metadata
