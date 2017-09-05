@@ -27,40 +27,40 @@
                         <div class="col-md-4 col-sm-4 col-xs-4 meta-item">{% trans %}Manage{% endtrans %}</div>
                     </div>
                 </div>
-                {% for pluginname, plugininfo in plugins.items() %}
+                {% for plugin_name, plugin_info in plugins.items() %}
                 <div class="row settings-row hover with-border-bottom">
                     <div class="col-md-4 col-sm-4 col-xs-4">
-                    {% if plugininfo['Home-page'] %}
-                      <a href="{{ plugininfo['Home-page'] }}">{{ pluginname.title() }}</a>
+                    {% if plugin_info.get('home_page') %}
+                      <a href="{{ plugin_info.get('home_page') }}">{{ plugin_name.title() }}</a>
                     {% else %}
-                      {{ pluginname.title() }}
+                      {{ plugin_name.title() }}
                     {% endif %}
                     </div>
                     <div class="col-md-4 col-sm-4 col-xs-4">
-                        <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugininfo['Version'] }}</div>
-                        <div class="plugin-description">{{ plugininfo['Description'] }}</div>
-                        <div class="plugin-author">{% trans %}by{% endtrans %} {{ plugininfo['Author'] }}</div>
+                        <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugin_info.get('version') }}</div>
+                        <div class="plugin-description">{{ plugin_info.get('summary') }}</div>
+                        <div class="plugin-author">{% trans %}by{% endtrans %} {{ plugin_info.get('author') }}</div>
                     </div>
                     <div class="col-md-4 col-sm-4 col-xs-4">
-                        <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', pluginname=pluginname) }}">
+                        <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', name=plugin_name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-success">{% trans %}Enable{% endtrans %}</button>
                         </form>
-                        <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', pluginname=pluginname) }}">
+                        <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', name=plugin_name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-warning">{% trans %}Disable{% endtrans %}</button>
                         </form>
 
-                        <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', pluginname=pluginname) }}">
+                        <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', name=plugin_name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-info">{% trans %}Install{% endtrans %}</button>
                         </form>
 
-                        <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', pluginname=pluginname) }}">
+                        <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', name=plugin_name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-danger">{% trans %}Uninstall{% endtrans %}</button>
                         </form>
-                        <a class="btn btn-info" href="{{ url_for('management.plugin_settings', pluginname=pluginname) }}">Settings</a>
+                        <a class="btn btn-info" href="{{ url_for('management.settings', plugin=plugin_name) }}">Settings</a>
                     </div>
                     </div>
                 </div>

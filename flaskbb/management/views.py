@@ -26,7 +26,7 @@ from flaskbb.utils.requirements import (IsAtleastModerator, IsAdmin,
                                         IsAtleastSuperModerator)
 from flaskbb.extensions import db, allows, celery
 from flaskbb.utils.helpers import (render_template, time_diff, time_utcnow,
-                                   get_online_users)
+                                   get_online_users, validate_plugin)
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.user.models import Guest, User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category, Report
@@ -104,43 +104,58 @@ def overview():
 
 @management.route("/settings", methods=["GET", "POST"])
 @management.route("/settings/<path:slug>", methods=["GET", "POST"])
+@management.route("/settings/plugin/<path:plugin>", methods=["GET", "POST"])
 @allows.requires(IsAdmin)
-def settings(slug=None):
-    slug = slug if slug else "general"
+def settings(slug=None, plugin=None):
+    slug = slug if slug and not plugin else "general"
 
-    # get the currently active group
-    active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-    # get all groups - used to build the navigation
+    active_settings = {}
+    active_group, active_plugin = None, None
+    if plugin is not None:
+        active_plugin = PluginRegistry.query.filter_by(name=plugin).first_or_404()
+        active_settings['key'] = active_plugin.name
+        active_settings['title'] = active_plugin.name.title()
+        form = active_plugin.get_settings_form()
+        old_settings = active_plugin.settings
+
+    elif slug is not None:
+        active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
+        active_settings['key'] = active_group.key
+        active_settings['title'] = active_group.name
+        form = Setting.get_form(active_group)()
+        old_settings = Setting.get_settings(active_group)
+    # get all groups and plugins - used to build the navigation
     all_groups = SettingsGroup.query.all()
+    all_plugins = PluginRegistry.query.all()
 
-    SettingsForm = Setting.get_form(active_group)
-
-    old_settings = Setting.get_settings(active_group)
     new_settings = {}
-
-    form = SettingsForm()
-
     if form.validate_on_submit():
-        for key, values in iteritems(old_settings):
+        for key, value in iteritems(old_settings):
             try:
                 # check if the value has changed
-                if values['value'] == form[key].data:
+                if value == form[key].data:
                     continue
                 else:
                     new_settings[key] = form[key].data
             except KeyError:
                 pass
-        Setting.update(settings=new_settings, app=current_app)
+        if active_group is not None:
+            Setting.update(settings=new_settings, app=current_app)
+        else:
+            active_plugin.settings.update(new_settings)
+            active_plugin.save()
         flash(_("Settings saved."), "success")
     else:
-        for key, values in iteritems(old_settings):
+        for key, value in iteritems(old_settings):
             try:
-                form[key].data = values['value']
+                form[key].data = value
             except (KeyError, ValueError):
                 pass
 
     return render_template("management/settings.html", form=form,
-                           all_groups=all_groups, active_group=active_group)
+                           all_groups=all_groups, all_plugins=all_plugins,
+                           active_settings=active_settings,
+                           active_group=active_group)
 
 
 # Users
@@ -703,34 +718,16 @@ def delete_category(category_id):
 @management.route("/plugins")
 @allows.requires(IsAdmin)
 def plugins():
-    from flaskbb.utils.helpers import parse_pkginfo
-    plugins_distinfo = current_app.pluggy.list_plugin_distinfo()
-
-    plugins = {}
-    # XXX: Mapping from PKG-INFO to something more readable?
-    for plugin in plugins_distinfo:
-        name = current_app.pluggy.get_name(plugin[0])
-        plugins[name] = parse_pkginfo(plugin[1].key)
-
+    plugins = current_app.pluggy.list_plugin_metadata()
+    print(plugins)
     return render_template("management/plugins.html", plugins=plugins)
 
 
-@management.route("/plugins/<path:pluginname>/settings")
+@management.route("/plugins/<path:name>/enable", methods=["POST"])
 @allows.requires(IsAdmin)
-def plugin_settings():
-    plugins = current_app.pluggy.get_plugins()
-    return render_template("management/plugins.html", plugins=plugins)
-
-
-@management.route("/plugins/<path:pluginname>/enable", methods=["POST"])
-@allows.requires(IsAdmin)
-def enable_plugin(pluginname):
-    plugin_module = current_app.pluggy.get_plugin(pluginname)
-    if plugin_module is None:
-        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "error")
-        return redirect(url_for("management.plugins"))
-
-    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
+def enable_plugin(name):
+    validate_plugin(name)
+    plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
     if plugin.enabled:
         flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name),
@@ -745,14 +742,11 @@ def enable_plugin(pluginname):
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:pluginname>/disable", methods=["POST"])
+@management.route("/plugins/<path:name>/disable", methods=["POST"])
 @allows.requires(IsAdmin)
-def disable_plugin(pluginname):
-    plugin_module = current_app.pluggy.get_plugin(pluginname)
-    if plugin_module is None:
-        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
-        return redirect(url_for("management.plugins"))
-    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
+def disable_plugin(name):
+    validate_plugin(name)
+    plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
     if not plugin.enabled:
         flash(_("Plugin %(plugin)s is already disabled.", plugin=plugin.name),
@@ -767,28 +761,22 @@ def disable_plugin(pluginname):
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:pluginname>/uninstall", methods=["POST"])
+@management.route("/plugins/<path:name>/uninstall", methods=["POST"])
 @allows.requires(IsAdmin)
-def uninstall_plugin(pluginname):
-    plugin_module = current_app.pluggy.get_plugin(pluginname)
-    if plugin_module is None:
-        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
-        return redirect(url_for("management.plugins"))
-    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
+def uninstall_plugin(name):
+    validate_plugin(name)
+    plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
     plugin.delete()
     flash(_("Plugin has been uninstalled."), "success")
     return redirect(url_for("management.plugins"))
 
 
-@management.route("/plugins/<path:pluginname>/install", methods=["POST"])
+@management.route("/plugins/<path:name>/install", methods=["POST"])
 @allows.requires(IsAdmin)
-def install_plugin(pluginname):
-    plugin_module = current_app.pluggy.get_plugin(pluginname)
-    if plugin_module is None:
-        flash(_("Plugin %(plugin)s not found.", plugin=pluginname), "danger")
-        return redirect(url_for("management.plugins"))
-    plugin = PluginRegistry.query.filter_by(name=pluginname).first_or_404()
+def install_plugin(name):
+    plugin_module = validate_plugin(name)
+    plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
     plugin.add_settings(plugin_module.SETTINGS)
     flash(_("Plugin has been installed."), "success")

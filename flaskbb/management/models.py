@@ -98,13 +98,7 @@ class Setting(db.Model, CRUDMixin):
 
         settings = {}
         for setting in result:
-            settings[setting.key] = {
-                'name': setting.name,
-                'description': setting.description,
-                'value': setting.value,
-                'value_type': setting.value_type,
-                'extra': setting.extra
-            }
+            settings[setting.key] = setting.value
 
         return settings
 

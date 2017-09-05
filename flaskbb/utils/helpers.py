@@ -23,7 +23,7 @@ from PIL import ImageFile
 
 import requests
 import unidecode
-from flask import session, url_for, flash, redirect, request
+from flask import current_app, session, url_for, flash, redirect, request
 from jinja2 import Markup
 from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
@@ -638,3 +638,14 @@ def parse_pkg_metadata(dist_name):
         metadata[key.replace('-', '_').lower()] = value
 
     return metadata
+
+
+def validate_plugin(name):  # better name?
+    """Tries to look up the plugin by name. Upon failure it will flash
+    a message and abort. Returns the plugin module on success.
+    """
+    plugin_module = current_app.pluggy.get_plugin(name)
+    if plugin_module is None:
+        flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
+        return redirect(url_for("management.plugins"))
+    return plugin_module

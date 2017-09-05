@@ -1,4 +1,4 @@
-{% set page_title = active_group.name %}
+{% set page_title = active_settings.get('title') %}
 
 {% extends theme("management/management_layout.html") %}
 
@@ -6,7 +6,7 @@
 <ol class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
     <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{{ active_group.name }}</li>
+    <li class="active">{{ active_settings.get('title') }}</li>
 </ol>
 {% endblock %}
 
@@ -17,11 +17,20 @@
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
+        <li class="nav-header">FlaskBB Settings</li>
         {% for group in all_groups %}
-            {% if group.key == active_group.key %}
+            {% if group.key == active_settings.get('key') %}
                 <li class="active"><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
             {% else %}
                 <li><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+        <li class="nav-header">Plugin Settings</li>
+        {% for plugin in all_plugins %}
+            {% if plugin.name == active_settings.get('key') %}
+                <li class="active"><a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a></li>
+            {% else %}
+                <li><a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a></li>
             {% endif %}
         {% endfor %}
         </ul>
@@ -31,7 +40,7 @@
 <div class="col-md-9 settings-col with-left-border">
     <div class="panel settings-panel">
         <div class="panel-heading settings-head">
-            <span class="fa fa-cogs"></span> {{ active_group.name }}
+            <span class="fa fa-cogs"></span> {{ active_settings.get('title') }}
         </div>
         <div class="panel-body settings-body">
             <div class="settings-content">
