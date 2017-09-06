@@ -1,0 +1,38 @@
+# Chinese (Simplified, China) translations for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-08-30 20:01+0800\n"
+"PO-Revision-Date: 2017-08-30 20:01+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+
+#: flaskbb/plugins/portal/views.py:26
+msgid ""
+"Please install the plugin first to configure the forums which should be "
+"displayed"
+msgstr "在配置论坛之前请首先安装要使用的插件."
+
+#: flaskbb/plugins/portal/templates/index.html:87
+msgid "News"
+msgstr "最新信息"
+
+#: flaskbb/plugins/portal/templates/index.html:113
+msgid "Recent Topics"
+msgstr "论坛新帖"
+
+#: flaskbb/plugins/portal/templates/index.html:136
+msgid "Statistics"
+msgstr "统计"
+
