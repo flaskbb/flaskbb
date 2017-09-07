@@ -19,10 +19,11 @@ use the package manager `pip`_ to install the dependencies for FlaskBB.
 
 Virtualenv Setup
 ~~~~~~~~~~~~~~~~
-
-The easiest way to install `virtualenv`_ and
+**Linux:** The easiest way to install `virtualenv`_ and
 `virtualenvwrapper`_ is, to use the package manager on your system (if you
 are running Linux) to install them.
+
+**Windows:** Take a look at the `flask`_ documentation (then skip ahead to dependancies).
 
 For example, on archlinux you can install them with::
 
@@ -255,6 +256,8 @@ Both methods are included in the example configs.
 
 Installation
 ------------
+
+**Sqlite users:** create a DB file in your project source.
 
 For a guided install, run::
 
@@ -526,3 +529,4 @@ to say
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation
 .. _pip: http://www.pip-installer.org/en/latest/installing.html
+.. _flask: http://flask.pocoo.org/docs/0.12/installation/ 
