@@ -27,6 +27,7 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 # models
 from flaskbb.user.models import User, Guest
+from flaskbb.permissions.models import Permission    # needed for migrations
 # extensions
 from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
                                 debugtoolbar, alembic, themes, plugin_manager,

@@ -16,7 +16,7 @@ from flaskbb.extensions import db, cache
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
+from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable, HasPermissions
 from flaskbb.forum.models import (Post, Topic, Forum, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
@@ -32,7 +32,7 @@ groups_users = db.Table(
 
 
 @make_comparable
-class Group(db.Model, CRUDMixin):
+class Group(HasPermissions, db.Model, CRUDMixin):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -83,7 +83,7 @@ class Group(db.Model, CRUDMixin):
                                 cls.banned == False).first()
 
 
-class User(db.Model, UserMixin, CRUDMixin):
+class User(HasPermissions, db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)

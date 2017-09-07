@@ -16,7 +16,7 @@ from sqlalchemy.orm import aliased
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import (slugify, get_categories_and_forums,
                                    get_forums, time_utcnow, topic_is_unread)
-from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
+from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable, HasPermissions
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -608,7 +608,7 @@ class Topic(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Forum(db.Model, CRUDMixin):
+class Forum(HasPermissions, db.Model, CRUDMixin):
     __tablename__ = "forums"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -923,7 +923,7 @@ class Forum(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Category(db.Model, CRUDMixin):
+class Category(HasPermissions, db.Model, CRUDMixin):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
