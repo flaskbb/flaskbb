@@ -13,6 +13,7 @@ import os
 import time
 import requests
 import binascii
+import traceback
 from datetime import datetime
 
 import click
@@ -37,8 +38,35 @@ from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
 from flaskbb.utils.translations import compile_translations
 
 
+
+class FlaskBBGroup(FlaskGroup):
+    def __init__(self, *args, **kwargs):
+        super(FlaskBBGroup, self).__init__(*args, **kwargs)
+        self._loaded_flaskbb_plugins = False
+
+    def _load_flaskbb_plugins(self, ctx):
+        if self._loaded_flaskbb_plugins:
+            return
+
+        try:
+            app = ctx.ensure_object(ScriptInfo).load_app()
+            app.pluggy.hook.flaskbb_cli(cli=self, app=app)
+            self._loaded_flaskbb_plugins = True
+        except Exception as exc:
+            click.echo(click.style("Error while loading CLI Plugins", fg='red'))
+            click.echo(click.style(traceback.format_exc(), fg='red'))
+
+    def get_command(self, ctx, name):
+        self._load_flaskbb_plugins(ctx)
+        return super(FlaskBBGroup, self).get_command(ctx, name)
+
+    def list_commands(self, ctx):
+        self._load_flaskbb_plugins(ctx)
+        return super(FlaskBBGroup, self).list_commands(ctx)
+
+
 def make_app(script_info):
-    config_file = getattr(script_info, "config_file")
+    config_file = getattr(script_info, "config_file", None)
     if config_file is not None:
         # check if config file exists
         if os.path.exists(os.path.abspath(config_file)):
@@ -83,7 +111,7 @@ def set_config(ctx, param, value):
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-@click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
+@click.group(cls=FlaskBBGroup, create_app=make_app, add_version_option=False)
 @click.option("--config", expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use in dotted module notation "

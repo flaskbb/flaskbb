@@ -21,7 +21,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         for ep in iter_entry_points(entrypoint_name):
             # is the plugin registered or blocked?
             if self.get_plugin(ep.name) or self.is_blocked(ep.name):
-                self._disabled_plugins.append(ep.name, ep.dist)
+                self._disabled_plugins.append((ep.name, ep.dist))
                 continue
             try:
                 plugin = ep.load()

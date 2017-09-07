@@ -391,5 +391,8 @@ def load_plugins(app):
         db.session.commit()
 
     app.logger.debug(
-        "Enabled Plugins: {}".format(app.pluggy.list_name_plugin())
+        "Plugins Found: {}".format(app.pluggy.list_name_plugin())
+    )
+    app.logger.debug(
+        "Disabled Plugins: {}".format(app.pluggy.list_disabled_plugins())
     )
