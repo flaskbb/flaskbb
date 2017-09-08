@@ -124,7 +124,7 @@ Production / I Just Want to Try It
 FlaskBB already sets some sane defaults, so you shouldn't have to change much.
 To make this whole process a little bit easier for you, we have created
 a little wizard which will ask you some questions and with the answers
-you provide i.t will generate a configuration for you. You can of course
+you provide it will generate a configuration for you. You can of course
 further adjust the generated configuration.
 
 The setup wizard can be started with::
@@ -141,9 +141,9 @@ you want to run FlaskBB in production:
 - ``SECRET_KEY = "secret key"``
 - ``WTF_CSRF_SECRET_KEY = "secret key"``
 
-By default it will try to save the configuration file with the name flaskbb.cfg in FlaskBB’s root folder.
+By default it will try to save the configuration file with the name flaskbb.cfg in FlaskBBâ€™s root folder.
 
-Finally to get going – fire up FlaskBB!
+Finally to get going â€“ fire up FlaskBB!
 
     flaskbb --config flaskbb.cfg run
     [+] Using config from: /path/to/flaskbb/flaskbb.cfg
@@ -170,7 +170,7 @@ or if you like to type a little bit more, the CLI::
 
     flaskbb --config flaskbb.cfg run
 
-You can either pass an import string to the path to the (python) config file you’ve just created, or a default config object. (Most users will follow the example above, which uses the generated file).
+You can either pass an import string to the path to the (python) config file youâ€™ve just created, or a default config object. (Most users will follow the example above, which uses the generated file).
 This is how you do it by using an import string. Be sure that it is importable from within FlaskBB:
 
     flaskbb --config flaskbb.configs.default.DefaultConfig run
