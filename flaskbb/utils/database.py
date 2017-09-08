@@ -90,23 +90,26 @@ class PermissionBase(object):
 
     @declared_attr
     def permission(cls):
-        return db.relationship('Permission', uselist=False)
+        return db.relationship('Permission', uselist=False, lazy='joined')
 
 
 class HasPermissions(object):
+
     @declared_attr
     def permissions_(cls):
         perms_name = "{}Permission".format(cls.__name__)
         table_name = "{}_permissions".format(cls.__tablename__)
-        parent_id = db.Column(
-            db.ForeignKey("{}.id".format(cls.__tablename__)), nullable=False
-        )
+        parent_id = db.Column(db.ForeignKey("{}.id".format(cls.__tablename__)), nullable=False)
+
+        def repr(self):
+            return "<{}Permission {} value={}>".format(
+                cls.__name__, self.permission.name, self.value
+            )
 
         cls.Permission = type(
             perms_name, (PermissionBase, db.Model),
-            {
-                'parent_id': parent_id,
-                '__tablename__': table_name
-            }
+            {'parent_id': parent_id,
+             '__tablename__': table_name,
+             '__repr__': repr}
         )
-        return db.relationship(cls.Permission, backref='parent')
+        return db.relationship(cls.Permission, backref='parent', lazy="joined")

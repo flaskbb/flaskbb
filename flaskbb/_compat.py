@@ -16,6 +16,7 @@ if not PY2:     # pragma: no cover
     iterkeys = lambda d: iter(d.keys())
     itervalues = lambda d: iter(d.values())
     iteritems = lambda d: iter(d.items())
+    from collections.abc import Mapping
 else:           # pragma: no cover
     text_type = unicode
     string_types = (str, unicode)
@@ -25,6 +26,7 @@ else:           # pragma: no cover
     iterkeys = lambda d: d.iterkeys()
     itervalues = lambda d: d.itervalues()
     iteritems = lambda d: d.iteritems()
+    from collections import Mapping
 
 
 def to_bytes(text, encoding='utf-8'):

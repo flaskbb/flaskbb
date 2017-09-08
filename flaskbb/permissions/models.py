@@ -20,3 +20,6 @@ class Permission(db.Model):
     name = db.Column(db.Unicode(25), nullable=False, unique=True)
     description = db.Column(db.UnicodeText, nullable=True)
     default = db.Column(db.Boolean, default=False, nullable=False)
+
+    def __repr__(self):
+        return "<Permission {} default={}>".format(self.name, self.default)

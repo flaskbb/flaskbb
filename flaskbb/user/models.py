@@ -134,6 +134,17 @@ class User(HasPermissions, db.Model, UserMixin, CRUDMixin):
                         backref=db.backref("topicstracked", lazy="dynamic"),
                         lazy="dynamic")
 
+    @property
+    def level(self):
+        if 'admin' in self.permissions:
+            return 'admin'
+        elif 'super_mod' in self.permissions:
+            return 'super_mod'
+        elif 'mod' in self.permissions:
+            return 'mod'
+        else:
+            return 'user'
+
     # Properties
     @property
     def is_active(self):
@@ -363,7 +374,6 @@ class User(HasPermissions, db.Model, UserMixin, CRUDMixin):
         return self.secondary_groups.filter(
             groups_users.c.group_id == group.id).count() > 0
 
-    @cache.memoize()
     def get_groups(self):
         """Returns all the groups the user is in."""
         return [self.primary_group] + list(self.secondary_groups)
@@ -489,6 +499,10 @@ class User(HasPermissions, db.Model, UserMixin, CRUDMixin):
 
 class Guest(AnonymousUserMixin):
     @property
+    def level(self):
+        return 'guest'
+
+    @property
     def permissions(self):
         return self.get_permissions()
 
@@ -496,7 +510,6 @@ class Guest(AnonymousUserMixin):
     def groups(self):
         return self.get_groups()
 
-    @cache.memoize()
     def get_groups(self):
         return Group.query.filter(Group.guest == True).all()
 
