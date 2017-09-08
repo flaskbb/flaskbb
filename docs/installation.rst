@@ -23,7 +23,7 @@ Virtualenv Setup
 `virtualenvwrapper`_ is, to use the package manager on your system (if you
 are running Linux) to install them.
 
-**Windows:** Take a look at the `flask`_ documentation (then skip ahead to dependancies).
+**Windows:** Take a look at the `flask`_ documentation (then skip ahead to dependencies).
 
 For example, on archlinux you can install them with::
 
@@ -34,7 +34,7 @@ or, on macOS, you can install them with::
     $ sudo pip install virtualenvwrapper
 
 It's sufficient to just install the virtualenvwrapper because it depends on
-virtualenv and the package manager will resolve all the dependncies for you.
+virtualenv and the package manager will resolve all the dependencies for you.
 
 After that, you can create your virtualenv with::
 
