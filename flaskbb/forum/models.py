@@ -15,7 +15,7 @@ from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
 from flaskbb.utils.database import (CRUDMixin, HideableCRUDMixin, UTCDateTime,
-                                    make_comparable)
+                                    make_comparable, HideableQuery)
 from flaskbb.utils.helpers import (get_categories_and_forums, get_forums,
                                    slugify, time_utcnow, topic_is_unread)
 from flaskbb.utils.settings import flaskbb_config
@@ -212,20 +212,21 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic = topic
             self.date_created = created
 
-            topic.last_updated = created
-            topic.last_post = self
+            if not topic.hidden:
+                topic.last_updated = created
+                topic.last_post = self
 
-            # Update the last post info for the forum
-            topic.forum.last_post = self
-            topic.forum.last_post_user = self.user
-            topic.forum.last_post_title = topic.title
-            topic.forum.last_post_username = user.username
-            topic.forum.last_post_created = created
+                # Update the last post info for the forum
+                topic.forum.last_post = self
+                topic.forum.last_post_user = self.user
+                topic.forum.last_post_title = topic.title
+                topic.forum.last_post_username = user.username
+                topic.forum.last_post_created = created
 
-            # Update the post counts
-            user.post_count += 1
-            topic.post_count += 1
-            topic.forum.post_count += 1
+                # Update the post counts
+                user.post_count += 1
+                topic.post_count += 1
+                topic.forum.post_count += 1
 
             # And commit it!
             db.session.add(topic)
@@ -254,9 +255,9 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.hide(user)
             return self
 
+        super(Post, self).hide(user)
         self._deal_with_last_post()
         self._update_counts()
-        super(Post, self).hide(user)
         db.session.commit()
         return self
 
@@ -270,6 +271,7 @@ class Post(HideableCRUDMixin, db.Model):
 
         self._restore_post_to_topic()
         super(Post, self).unhide()
+        self._update_counts()
         db.session.commit()
         return self
 
@@ -280,19 +282,28 @@ class Post(HideableCRUDMixin, db.Model):
             if self.topic.last_post == self.topic.forum.last_post:
                 # We need the second last post in the forum here,
                 # because the last post will be deleted
-                second_last_post = Post.query.\
-                    filter(Post.topic_id == Topic.id,
-                           Topic.forum_id == self.topic.forum.id).\
-                    order_by(Post.id.desc()).limit(2).offset(0).\
-                    all()
+                second_last_post = Post.query.filter(
+                    Post.topic_id == Topic.id,
+                    Topic.forum_id == self.topic.forum.id,
+                    Post.hidden != True,
+                    Post.id != self.id
+                ).order_by(
+                    Post.id.desc()
+                ).limit(1).first()
 
-                # now lets update the second last post to the last post
-                last_post = second_last_post[1]
-                self.topic.forum.last_post = last_post
-                self.topic.forum.last_post_title = last_post.topic.title
-                self.topic.forum.last_post_user = last_post.user
-                self.topic.forum.last_post_username = last_post.username
-                self.topic.forum.last_post_created = last_post.date_created
+                if second_last_post:
+                    # now lets update the second last post to the last post
+                    self.topic.forum.last_post = second_last_post
+                    self.topic.forum.last_post_title = second_last_post.topic.title
+                    self.topic.forum.last_post_user = second_last_post.user
+                    self.topic.forum.last_post_username = second_last_post.username
+                    self.topic.forum.last_post_created = second_last_post.date_created
+                else:
+                    self.topic.forum.last_post = None
+                    self.topic.forum.last_post_title = None
+                    self.topic.forum.last_post_user = None
+                    self.topic.forum.last_post_username = None
+                    self.topic.forum.last_post_created = None
 
             # check if there is a second last post in this topic
             if self.topic.second_last_post:
@@ -340,7 +351,8 @@ class Post(HideableCRUDMixin, db.Model):
     def _restore_post_to_topic(self):
         last_unhidden_post = Post.query.filter(
             Post.topic_id == self.topic_id,
-            Post.id != self.id
+            Post.id != self.id,
+            Post.hidden != True,
         ).limit(1).first()
 
         # should never be None, but deal with it anyways to be safe
@@ -952,11 +964,13 @@ class Forum(db.Model, CRUDMixin):
         :param last_post: If set to ``True`` it will also try to update
                           the last post columns in the forum.
         """
-        topic_count = Topic.query.filter_by(forum_id=self.id).count()
-        post_count = Post.query.\
-            filter(Post.topic_id == Topic.id,
-                   Topic.forum_id == self.id).\
-            count()
+        topic_count = Topic.query.filter(Forum.id == self.id, Topic.hidden != True).count()
+        post_count = Post.query.filter(
+            Post.topic_id == Topic.id,
+            Topic.forum_id == self.id,
+            Post.hidden != True,
+            Topic.hidden != True
+        ).count()
         self.topic_count = topic_count
         self.post_count = post_count
 
