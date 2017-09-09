@@ -94,7 +94,7 @@
 
                             {% if topic.hidden %}
                             <div class="topic-author">
-                                {% trans %}Hidden on{% endtrans %} {{ topic.hidden_at|format_date('%b %d %Y') }} {% trans %}by{% endtrans %} {{ topic.hidden_by.username }}
+                                {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
                             </div>
                             {% endif %}
                         </div>

@@ -17,7 +17,7 @@
     {% if topic.hidden %}
     <div class="alert alert-warning">
         <span class="fa fa-user-secret"></span>
-        {% trans %}This is topic is hidden{% endtrans %} ({{ topic.hidden_at|format_date('%b %d %Y') }} {% trans %} by {% endtrans %} {{ topic.hidden_by.username }})
+        {{ gettext("This topic is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
     </div>
     {% endif %}
 
@@ -93,7 +93,7 @@
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
-                                {% trans %}This is post is hidden{% endtrans %} ({{ post.hidden_at|format_date('%b %d %Y') }} {% trans %} by {% endtrans %} {{ post.hidden_by.username }})
+                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
                             </div>
                             {% endif %}
                         {{ post.content|markup }}
