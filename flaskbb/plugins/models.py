@@ -10,7 +10,6 @@
     :license: BSD, see LICENSE for more details.
 """
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from flaskbb.extensions import db
@@ -51,9 +50,6 @@ class PluginRegistry(CRUDMixin, db.Model):
         collection_class=attribute_mapped_collection('key'),
         cascade='all, delete-orphan',
         backref='plugin'
-    )
-    settings = association_proxy(
-        'values', 'value', creator=lambda k, v: PluginStore(key=k, value=v)
     )
 
     def get_settings_form(self):
