@@ -517,9 +517,9 @@ def test_post_delete(topic):
     post_last.delete()
 
     # That was a bit trickier..
-    assert topic.post_count == 1
-    assert topic.forum.post_count == 1
-    assert topic.user.post_count == 1
+    assert topic.post_count == 2
+    assert topic.forum.post_count == 2
+    assert topic.user.post_count == 2
     assert topic.first_post_id == topic.last_post_id
 
     assert topic.forum.last_post_id == topic.last_post_id
@@ -574,3 +574,66 @@ def test_topicsread(topic, user):
         filter_by(topic_id=topicsread.topic_id).\
         first()
     assert topicsread is None
+
+
+def test_hiding_post_updates_counts(forum, topic, user):
+    new_post = Post(content='spam')
+    new_post.save(user=user, topic=topic)
+    new_post.hide(user)
+    assert user.post_count == 1
+    assert topic.post_count == 1
+    assert forum.post_count == 1
+    assert topic.last_post != new_post
+    assert forum.last_post != new_post
+    assert new_post.hidden_by == user
+    new_post.unhide()
+    assert topic.post_count == 2
+    assert user.post_count == 2
+    assert forum.post_count == 2
+    assert topic.last_post == new_post
+    assert forum.last_post == new_post
+    assert new_post.hidden_by is None
+
+
+def test_hiding_topic_updates_counts(forum, topic, user):
+    assert forum.post_count == 1
+    topic.hide(user)
+    assert forum.post_count == 0
+    assert topic.hidden_by == user
+    assert forum.last_post is None
+    topic.unhide()
+    assert forum.post_count == 1
+    assert topic.hidden_by is None
+    assert forum.last_post == topic.last_post
+
+
+def test_hiding_first_post_hides_topic(forum, topic, user):
+    assert forum.post_count == 1
+    topic.first_post.hide(user)
+    assert forum.post_count == 0
+    assert topic.hidden_by == user
+    assert forum.last_post is None
+    topic.first_post.unhide()
+    assert forum.post_count == 1
+    assert topic.hidden_by is None
+    assert forum.last_post == topic.last_post
+
+
+def test_retrieving_hidden_posts(topic, user):
+    new_post = Post(content='stuff')
+    new_post.save(user, topic)
+    new_post.hide(user)
+
+    assert Post.query.get(new_post.id) is None
+    assert Post.query.get(new_post.id, include_hidden=True) == new_post
+    assert Post.query.filter(Post.id == new_post.id).first() is None
+    assert Post.query.with_hidden().filter(Post.id == new_post.id).first() == new_post
+
+
+def test_retrieving_hidden_topics(topic, user):
+    topic.hide(user)
+
+    assert Topic.query.get(topic.id) is None
+    assert Topic.query.get(topic.id, include_hidden=True) == topic
+    assert Topic.query.filter(Topic.id == topic.id).first() is None
+    assert Topic.query.with_hidden().filter(Topic.id == topic.id).first() == topic
