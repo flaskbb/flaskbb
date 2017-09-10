@@ -241,7 +241,7 @@ def forum_is_unread(forum, forumsread, user):
         return False
 
     # check if the last post is newer than the tracker length
-    if not forum.last_post or forum.last_post_created < read_cutoff:
+    if forum.last_post_id is None or forum.last_post_created < read_cutoff:
         return False
 
     # If the user hasn't visited a topic in the forum - therefore,

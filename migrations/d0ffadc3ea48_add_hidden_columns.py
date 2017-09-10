@@ -12,8 +12,8 @@ import flaskbb
 
 # revision identifiers, used by Alembic.
 revision = 'd0ffadc3ea48'
-down_revision = None
-branch_labels = ('default',)
+down_revision = '881dd22cab94'
+branch_labels = ()
 depends_on = None
 
 
