@@ -964,7 +964,7 @@ class Forum(db.Model, CRUDMixin):
         :param last_post: If set to ``True`` it will also try to update
                           the last post columns in the forum.
         """
-        topic_count = Topic.query.filter(Forum.id == self.id, Topic.hidden != True).count()
+        topic_count = Topic.query.filter(Topic.forum_id == self.id, Topic.hidden != True).count()
         post_count = Post.query.filter(
             Post.topic_id == Topic.id,
             Topic.forum_id == self.id,
