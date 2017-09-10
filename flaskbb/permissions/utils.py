@@ -11,16 +11,15 @@
 
 from itertools import chain, groupby
 
-from werkzeug.datastructures import ImmutableDict
-
 from flaskbb._compat import Mapping
-
+from werkzeug.datastructures import ImmutableDict
 
 # Use: This can be created once at request start up
 # and then consulted when needed, doing the heavy lifting
 # only when asked and then caching the result so it doesn't
 # have to do it again as merge_permissions is potentially
 # expensive to call as it does a *lot* of iteration
+
 
 # Preferably, this would be on some thread local object
 # so it can be intelligently cached rather than potentially
@@ -46,12 +45,14 @@ class PermissionManager(Mapping):
         return self._combined
 
     def _combine_permissions(self):
-        return ImmutableDict(merge_permissions(
-            all_permission=self._all_permissions,
-            user=self._user,
-            category=self._category,
-            forum=self._forum
-        ))
+        return ImmutableDict(
+            merge_permissions(
+                all_permission=self._all_permissions,
+                user=self._user,
+                category=self._category,
+                forum=self._forum
+            )
+        )
 
     def __getitem__(self, name):
         try:

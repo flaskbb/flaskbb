@@ -27,7 +27,7 @@ from flaskbb.management.views import management
 from flaskbb.forum.views import forum
 # models
 from flaskbb.user.models import User, Guest
-from flaskbb.permissions.models import Permission    # needed for migrations
+from flaskbb.permissions.locals import current_permissions
 # extensions
 from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
                                 debugtoolbar, alembic, themes, plugin_manager,
@@ -250,7 +250,7 @@ def configure_context_processors(app):
         templates.
         """
 
-        return dict(flaskbb_config=flaskbb_config)
+        return dict(flaskbb_config=flaskbb_config, current_permissions=current_permissions)
 
 
 def configure_before_handlers(app):
