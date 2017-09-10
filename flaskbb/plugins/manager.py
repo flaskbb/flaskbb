@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.plugins.manager
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    Plugin Manager for FlaskBB
+
+    :copyright: 2017, the FlaskBB Team
+    :license: BSD, see LICENSE for more details
+"""
+from pkg_resources import (DistributionNotFound, VersionConflict,
+                           iter_entry_points)
+
 import pluggy
 from flaskbb.utils.helpers import parse_pkg_metadata
 
@@ -8,28 +21,31 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     """
 
     def __init__(self, project_name, implprefix=None):
-        super(FlaskBBPluginManager, self).__init__(project_name=project_name,
-                                                   implprefix=implprefix)
+        super(FlaskBBPluginManager, self).__init__(
+            project_name=project_name, implprefix=implprefix
+        )
         self._plugin_metadata = {}
         self._disabled_plugins = []
 
     def load_setuptools_entrypoints(self, entrypoint_name):
         """Load modules from querying the specified setuptools entrypoint name.
         Return the number of loaded plugins. """
-        from pkg_resources import (iter_entry_points, DistributionNotFound,
-                                   VersionConflict)
         for ep in iter_entry_points(entrypoint_name):
-            # is the plugin registered or blocked?
-            if self.get_plugin(ep.name) or self.is_blocked(ep.name):
+            if self.get_plugin(ep.name):
+                continue
+
+            if self.is_blocked(ep.name):
                 self._disabled_plugins.append((ep.name, ep.dist))
                 continue
+
             try:
                 plugin = ep.load()
             except DistributionNotFound:
                 continue
             except VersionConflict as e:
                 raise pluggy.PluginValidationError(
-                    "Plugin %r could not be loaded: %s!" % (ep.name, e))
+                    "Plugin %r could not be loaded: %s!" % (ep.name, e)
+                )
             self.register(plugin, name=ep.name)
             self._plugin_distinfo.append((plugin, ep.dist))
             self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
