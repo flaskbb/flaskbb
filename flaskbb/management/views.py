@@ -102,8 +102,7 @@ class ManagementSettings(MethodView):
                                active_settings=active_settings,
                                active_group=active_group)
 
-
-    def post(self, slug=None):
+    def post(self, slug=None, plugin=None):
         slug = slug if slug and not plugin else "general"
 
         active_settings = {}
@@ -875,7 +874,7 @@ class ManagementOverview(MethodView):
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
-            "plugins": get_all_plugins()
+            "plugins": []
         }
 
         return render_template("management/overview.html", **stats)
@@ -895,7 +894,7 @@ class EnablePlugin(MethodView):
 
     def post(self, name):
         validate_plugin(name)
-        plugin = PluginRegistry.query.filter(Plugin.name == name).first_or_404()
+        plugin = PluginRegistry.query.filter(PluginRegistry.name == name).first_or_404()
 
         if plugin.enabled:
             flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
