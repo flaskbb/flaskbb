@@ -15,7 +15,7 @@ from functools import partial
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from flask import Flask, request
 from flask_login import current_user
 
@@ -370,7 +370,7 @@ def load_plugins(app):
         with app.app_context():
             plugins = PluginRegistry.query.all()
 
-    except OperationalError:
+    except (OperationalError, ProgrammingError):
         return
 
     for plugin in plugins:

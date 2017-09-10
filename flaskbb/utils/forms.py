@@ -12,6 +12,15 @@ from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
 from flaskbb._compat import text_type
+from enum import Enum
+
+class SettingsValueTypes(Enum):
+    string = 0
+    integer = 1
+    float = 3
+    boolean = 4
+    select = 5
+    selectmultiple = 6
 
 
 def generate_settings_form(settings):
@@ -24,9 +33,9 @@ def generate_settings_form(settings):
     for setting in settings:
         field_validators = []
 
-        if setting.value_type in ("integer", "float"):
+        if setting.value_type in {SettingsValueTypes.integer, SettingsValueTypes.float}:
             validator_class = validators.NumberRange
-        elif setting.value_type == "string":
+        elif setting.value_type == SettingsValueTypes.string:
             validator_class = validators.Length
 
         # generate the validators
@@ -44,14 +53,14 @@ def generate_settings_form(settings):
 
         # Generate the fields based on value_type
         # IntegerField
-        if setting.value_type == "integer":
+        if setting.value_type == SettingsValueTypes.integer:
             setattr(
                 SettingsForm, setting.key,
                 IntegerField(setting.name, validators=field_validators,
                              description=setting.description)
             )
         # FloatField
-        elif setting.value_type == "float":
+        elif setting.value_type == SettingsValueTypes.float:
             setattr(
                 SettingsForm, setting.key,
                 FloatField(setting.name, validators=field_validators,
@@ -59,7 +68,7 @@ def generate_settings_form(settings):
             )
 
         # TextField
-        elif setting.value_type == "string":
+        elif setting.value_type == SettingsValueTypes.string:
             setattr(
                 SettingsForm, setting.key,
                 TextField(setting.name, validators=field_validators,
@@ -67,7 +76,7 @@ def generate_settings_form(settings):
             )
 
         # SelectMultipleField
-        elif setting.value_type == "selectmultiple":
+        elif setting.value_type == SettingsValueTypes.selectmultiple:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
@@ -85,7 +94,7 @@ def generate_settings_form(settings):
             )
 
         # SelectField
-        elif setting.value_type == "select":
+        elif setting.value_type == SettingsValueTypes.select:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
@@ -102,7 +111,7 @@ def generate_settings_form(settings):
             )
 
         # BooleanField
-        elif setting.value_type == "boolean":
+        elif setting.value_type == SettingsValueTypes.boolean:
             setattr(
                 SettingsForm, setting.key,
                 BooleanField(setting.name, description=setting.description)

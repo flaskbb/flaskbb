@@ -15,16 +15,14 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
-from flaskbb.utils.forms import generate_settings_form
-
+from flaskbb.utils.forms import generate_settings_form, SettingsValueTypes
 
 class PluginStore(CRUDMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.Unicode(255), nullable=False)
     value = db.Column(db.PickleType, nullable=False)
-    # Enum?
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.Unicode(20), nullable=False)
+    value_type = db.Column(db.Enum(SettingsValueTypes), nullable=False)
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
     extra = db.Column(db.PickleType, nullable=True)
