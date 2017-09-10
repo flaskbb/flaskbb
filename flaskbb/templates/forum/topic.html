@@ -93,7 +93,7 @@
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
-                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
+                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at, '%b %d %Y'))}}
                             </div>
                             {% endif %}
                         {{ post.content|markup }}
