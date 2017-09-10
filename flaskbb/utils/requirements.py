@@ -7,11 +7,11 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
-from flask_allows import Requirement, Or, And
+from flask_allows import And, Or, Requirement
 
 from flaskbb.exceptions import FlaskBBError
-from flaskbb.forum.models import Post, Topic, Forum
-from flaskbb.user.models import Group
+from flaskbb.forum.locals import current_forum, current_post, current_topic
+from flaskbb.forum.models import Forum, Post, Topic
 
 
 class Has(Requirement):
@@ -57,15 +57,9 @@ class IsModeratorInForum(IsAuthed):
         return Forum.query.get(self.forum_id)
 
     def _get_forum_from_request(self, request):
-        view_args = request.view_args
-        if 'post_id' in view_args:
-            return Post.query.get(view_args['post_id']).topic.forum
-        elif 'topic_id' in view_args:
-            return Topic.query.get(view_args['topic_id']).forum
-        elif 'forum_id' in view_args:
-            return Forum.query.get(view_args['forum_id'])
-        else:
-            raise FlaskBBError
+        if not current_forum:
+            raise FlaskBBError('Could not load forum data')
+        return current_forum
 
 
 class IsSameUser(IsAuthed):
@@ -82,11 +76,10 @@ class IsSameUser(IsAuthed):
         return self._get_user_id_from_post(request)
 
     def _get_user_id_from_post(self, request):
-        view_args = request.view_args
-        if 'post_id' in view_args:
-            return Post.query.get(view_args['post_id']).user_id
-        elif 'topic_id' in view_args:
-            return Topic.query.get(view_args['topic_id']).user_id
+        if current_post:
+            return current_post.user_id
+        elif current_topic:
+            return current_topic.user_id
         else:
             raise FlaskBBError
 
@@ -125,22 +118,8 @@ class TopicNotLocked(Requirement):
             return self._get_topic_from_request(request)
 
     def _get_topic_from_request(self, request):
-        view_args = request.view_args
-        if 'post_id' in view_args:
-            return (
-                Topic.query.join(Post, Post.topic_id == Topic.id)
-                .join(Forum, Forum.id == Topic.forum_id)
-                .filter(Post.id == view_args['post_id'])
-                .with_entities(Topic.locked, Forum.locked)
-                .first()
-            )
-        elif 'topic_id' in view_args:
-            return (
-                Topic.query.join(Forum, Forum.id == Topic.forum_id)
-                .filter(Topic.id == view_args['topic_id'])
-                .with_entities(Topic.locked, Forum.locked)
-                .first()
-            )
+        if current_topic:
+            return current_topic.locked, current_forum.locked
         else:
             raise FlaskBBError("How did you get this to happen?")
 
@@ -166,58 +145,31 @@ class ForumNotLocked(Requirement):
             return self._get_forum_from_request(request)
 
     def _get_forum_from_request(self, request):
-        view_args = request.view_args
-
-        # These queries look big and nasty, but they really aren't that bad
-        # Basically, find the forum this post or topic belongs to
-        # with_entities returns a KeyedTuple with only the locked status
-
-        if 'post_id' in view_args:
-            return (
-                Forum.query.join(Topic, Topic.forum_id == Forum.id)
-                .join(Post, Post.topic_id == Topic.id)
-                .filter(Post.id == view_args['post_id'])
-                .with_entities(Forum.locked)
-                .first()
-            )
-
-        elif 'topic_id' in view_args:
-            return (
-                Forum.query.join(Topic, Topic.forum_id == Forum.id)
-                .filter(Topic.id == view_args['topic_id'])
-                .with_entities(Forum.locked)
-                .first()
-            )
-
-        elif 'forum_id' in view_args:
-            return Forum.query.get(view_args['forum_id'])
+        if current_forum:
+            return current_forum.locked
+        raise FlaskBBError
 
 
 class CanAccessForum(Requirement):
     def fulfill(self, user, request):
-        forum_id = request.view_args['forum_id']
-        group_ids = [g.id for g in user.groups]
+        if not current_forum:
+            raise FlaskBBError('Could not load forum data')
 
-        return Forum.query.filter(
-            Forum.id == forum_id,
-            Forum.groups.any(Group.id.in_(group_ids))
-        ).count()
+        return set([g.id for g in current_forum.groups]) & set([g.id for g in user.groups])
 
 
 class CanAccessTopic(Requirement):
     def fulfill(self, user, request):
-        topic_id = request.view_args['topic_id']
-        group_ids = [g.id for g in user.groups]
+        if not current_forum:
+            raise FlaskBBError('Could not load topic data')
 
-        return Forum.query.join(Topic, Topic.forum_id == Forum.id).filter(
-            Topic.id == topic_id,
-            Forum.groups.any(Group.id.in_(group_ids))
-        ).count()
+        return set([g.id for g in current_forum.groups]) & set([g.id for g in user.groups])
 
 
 def IsAtleastModeratorInForum(forum_id=None, forum=None):
     return Or(IsAtleastSuperModerator, IsModeratorInForum(forum_id=forum_id,
                                                           forum=forum))
+
 
 IsMod = And(IsAuthed(), Has('mod'))
 IsSuperMod = And(IsAuthed(), Has('super_mod'))

@@ -9,35 +9,36 @@
     :license: BSD, see LICENSE for more details.
 """
 import ast
-import re
-import time
+import glob
 import itertools
 import operator
 import os
-import glob
+import re
+import time
 from datetime import datetime, timedelta
-from pkg_resources import get_distribution
 from email import message_from_string
-from pytz import UTC
-from PIL import ImageFile
+from functools import wraps
+
+from pkg_resources import get_distribution
 
 import requests
 import unidecode
-from flask import current_app, session, url_for, flash, redirect, request
-from jinja2 import Markup
 from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
-from flask_babelplus import lazy_gettext as _
-from flask_themes2 import render_theme_template, get_themes_list
-from flask_login import current_user
-
-from werkzeug.local import LocalProxy
-
-from flaskbb._compat import range_method, text_type, iteritems
-from flaskbb.extensions import redis_store, babel
-from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.markup import markdown
+from flask import current_app, flash, g, redirect, request, session, url_for
 from flask_allows import Permission
+from flask_babelplus import lazy_gettext as _
+from flask_login import current_user
+from flask_themes2 import get_themes_list, render_theme_template
+from flaskbb._compat import (iteritems, range_method, text_type, to_bytes,
+                             to_unicode)
+from flaskbb.extensions import babel, redis_store
+from flaskbb.utils.markup import markdown
+from flaskbb.utils.settings import flaskbb_config
+from jinja2 import Markup
+from PIL import ImageFile
+from pytz import UTC
+from werkzeug.local import LocalProxy
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -298,6 +299,7 @@ def mark_online(user_id, guest=False):  # pragma: no cover
 
     Ref: http://flask.pocoo.org/snippets/71/
     """
+    user_id = to_bytes(user_id)
     now = int(time.time())
     expires = now + (flaskbb_config['ONLINE_LAST_MINUTES'] * 60) + 10
     if guest:
@@ -322,10 +324,13 @@ def get_online_users(guest=False):  # pragma: no cover
     current = int(time.time()) // 60
     minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
-        return redis_store.sunion(['online-guests/%d' % (current - x)
+        users = redis_store.sunion(['online-guests/%d' % (current - x)
                                    for x in minutes])
-    return redis_store.sunion(['online-users/%d' % (current - x)
-                               for x in minutes])
+    else:
+        users = redis_store.sunion(['online-users/%d' % (current - x)
+                                   for x in minutes])
+
+    return [to_unicode(u) for u in users]
 
 
 def crop_title(title, length=None, suffix="..."):
@@ -649,3 +654,52 @@ def validate_plugin(name):  # better name?
         flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
         return redirect(url_for("management.plugins"))
     return plugin_module
+
+
+def anonymous_required(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if current_user is not None and current_user.is_authenticated:
+            return redirect_or_next(url_for('forum.index'))
+        return f(*a, **k)
+
+    return wrapper
+
+
+def enforce_recaptcha(limiter):
+    current_limit = getattr(g, 'view_rate_limit', None)
+    login_recaptcha = False
+    if current_limit is not None:
+        window_stats = limiter.limiter.get_window_stats(*current_limit)
+        stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
+        login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
+    return login_recaptcha
+
+
+def registration_enabled(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if not flaskbb_config["REGISTRATION_ENABLED"]:
+            flash(_("The registration has been disabled."), "info")
+            return redirect_or_next(url_for("forum.index"))
+        return f(*a, **k)
+
+    return wrapper
+
+
+def requires_unactivated(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if current_user.is_active or not flaskbb_config["ACTIVATE_ACCOUNT"]:
+            flash(_("This account is already activated."), "info")
+            return redirect(url_for('forum.index'))
+        return f(*a, **k)
+    return wrapper
+
+
+def register_view(bp_or_app, routes, view_func, *args, **kwargs):
+    for route in routes:
+        bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)

@@ -537,7 +537,7 @@ def generate_config(development, output, force):
                 "For more options see the SQLAlchemy docs:\n"
                 "    http://docs.sqlalchemy.org/en/latest/core/engines.html",
                 fg="cyan")
-    default_conf["database_url"] = click.prompt(
+    default_conf["database_uri"] = click.prompt(
         click.style("Database URI", fg="magenta"),
         default=default_conf.get("database_uri"))
 

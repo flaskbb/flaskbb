@@ -10,7 +10,8 @@ help:
 	@echo "  docs       build the documentation"
 
 dependencies:requirements.txt
-	pip install -r requirements.txt
+	@echo "Installing dependencies..."
+	@pip install -r requirements.txt 1>/dev/null
 
 clean:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -24,11 +25,11 @@ test:
 run:
 	flaskbb run --debugger --reload
 
-devconfig:
+devconfig:dependencies
 	flaskbb makeconfig -d
 
 install:dependencies
-	clear
+	@[ -f ./flaskbb.cfg ] || (echo "flaskbb.cfg not found. You can generate a configuration file with 'flaskbb makeconfig'."; exit 1)
 	flaskbb --config ./flaskbb.cfg install
 
 docs:
