@@ -19,10 +19,11 @@ use the package manager `pip`_ to install the dependencies for FlaskBB.
 
 Virtualenv Setup
 ~~~~~~~~~~~~~~~~
-
-The easiest way to install `virtualenv`_ and
+**Linux:** The easiest way to install `virtualenv`_ and
 `virtualenvwrapper`_ is, to use the package manager on your system (if you
 are running Linux) to install them.
+
+**Windows:** Take a look at the `flask`_ documentation (then skip ahead to dependencies).
 
 For example, on archlinux you can install them with::
 
@@ -33,7 +34,7 @@ or, on macOS, you can install them with::
     $ sudo pip install virtualenvwrapper
 
 It's sufficient to just install the virtualenvwrapper because it depends on
-virtualenv and the package manager will resolve all the dependncies for you.
+virtualenv and the package manager will resolve all the dependencies for you.
 
 After that, you can create your virtualenv with::
 
@@ -117,56 +118,7 @@ this is `pacman` and for Debian/Ubuntu based systems this is `apt-get`.
 Configuration
 -------------
 
-FlaskBB comes with the ability to generate the configuration file for you.
-Just run::
-
-    flaskbb makeconfig
-
-and answer its questions. By default it will try to save the configuration
-file with the name ``flaskbb.cfg`` in FlaskBB's root folder.
-
-You can also omit the questions, which will generate a **developemnt**
-configuration by passing the ``-d/--development`` option to it::
-
-    flaskbb makeconfig -d
-
-In previous versions, FlaskBB tried to assume which configuration file to use,
-which it will no longer do. Now, by default, it will load a config with
-some sane defaults (i.e. debug off) but thats it. You can either pass an
-import string to a config object or the path to the (python) config file.
-
-For example, if you are using a generated config file it looks something
-like this::
-
-    flaskbb --config flaskbb.cfg run
-    [+] Using config from: /path/to/flaskbb/flaskbb.cfg
-     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-
-and this is how you do it by using an import string. Be sure that it is
-importable from within FlaskBB::
-
-    flaskbb --config flaskbb.configs.default.DefaultConfig run
-
-
-Development
-~~~~~~~~~~~
-
-To get started with development you have to generate a development
-configuration first. You can use the CLI for this,
-as explained in `Configuration <#configuration>`_::
-
-    flaskbb makeconfig --development
-
-Now you can either use ``make`` to run the development server::
-
-    make run
-
-or if you like to type a little bit more, the CLI::
-
-    flaskbb --config flaskbb.cfg run
-
-
-Production
+Production / I Just Want to Try It
 ~~~~~~~~~~
 
 FlaskBB already sets some sane defaults, so you shouldn't have to change much.
@@ -189,6 +141,39 @@ you want to run FlaskBB in production:
 - ``SECRET_KEY = "secret key"``
 - ``WTF_CSRF_SECRET_KEY = "secret key"``
 
+By default it will try to save the configuration file with the name flaskbb.cfg in FlaskBB’s root folder.
+
+Finally to get going – fire up FlaskBB!
+
+    flaskbb --config flaskbb.cfg run
+    [+] Using config from: /path/to/flaskbb/flaskbb.cfg
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+
+Development
+~~~~~~~~~~~
+
+To get started with development you have to generate a development
+configuration first. You can use the CLI for this,
+as explained in `Configuration <#configuration>`_::
+
+    flaskbb makeconfig -d
+
+or
+
+    flaskbb makeconfig --development
+
+Now you can either use ``make`` to run the development server::
+
+    make run
+
+or if you like to type a little bit more, the CLI::
+
+    flaskbb --config flaskbb.cfg run
+
+You can either pass an import string to the path to the (python) config file you’ve just created, or a default config object. (Most users will follow the example above, which uses the generated file).
+This is how you do it by using an import string. Be sure that it is importable from within FlaskBB:
+
+    flaskbb --config flaskbb.configs.default.DefaultConfig run
 
 Redis
 ~~~~~
@@ -255,6 +240,8 @@ Both methods are included in the example configs.
 
 Installation
 ------------
+
+**Sqlite users:** create a DB file in your project source.
 
 For a guided install, run::
 
@@ -526,3 +513,4 @@ to say
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation
 .. _pip: http://www.pip-installer.org/en/latest/installing.html
+.. _flask: http://flask.pocoo.org/docs/0.12/installation/ 
