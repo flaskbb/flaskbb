@@ -82,7 +82,7 @@ class ManagementSettings(MethodView):
 
         # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.all()
+        all_plugins = PluginRegistry.query.filter(PluginRegistry.values != None).all()
         form = populate_settings_form(form, old_settings)
 
         return render_template("management/settings.html", form=form,
