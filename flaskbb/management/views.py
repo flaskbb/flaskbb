@@ -36,6 +36,7 @@ from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator,
                                         IsAtleastSuperModerator)
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
 
 management = Blueprint("management", __name__)
 
@@ -51,107 +52,62 @@ def check_fresh_login():
 class ManagementSettings(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def get(self, slug=None, plugin=None):
-        slug = slug if slug and not plugin else "general"
-
-        active_settings = {}
-        active_group, active_plugin = None, None
+    def _determine_active_settings(self, slug, plugin):
+        """Determines which settings are active.
+        Returns a tuple in following order:
+            ``form``, ``old_settings``, ``plugin_obj``, ``active_nav``
+        """
+        # Any ideas how to do this better?
+        slug = slug if slug else 'general'
+        active_nav = {}  # used to build the navigation
+        plugin_obj = None
         if plugin is not None:
-            active_plugin = PluginRegistry.query.filter_by(name=plugin).first_or_404()
-            active_settings['key'] = active_plugin.name
-            active_settings['title'] = active_plugin.name.title()
-            form = active_plugin.get_settings_form()
-            old_settings = active_plugin.settings
+            plugin_obj = PluginRegistry.query.filter_by(name=plugin).first_or_404()
+            active_nav.update({'key': plugin_obj.name,
+                               'title': plugin_obj.name.title()})
+            form = plugin_obj.get_settings_form()
+            old_settings = plugin_obj.settings
 
         elif slug is not None:
-            active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-            active_settings['key'] = active_group.key
-            active_settings['title'] = active_group.name
-            form = Setting.get_form(active_group)()
-            old_settings = Setting.get_settings(active_group)
+            group_obj = SettingsGroup.query.filter_by(key=slug).first_or_404()
+            active_nav.update({'key': group_obj.key, 'title': group_obj.name})
+            form = Setting.get_form(group_obj)()
+            old_settings = Setting.get_settings(group_obj)
+
+        return form, old_settings, plugin_obj, active_nav
+
+    def get(self, slug=None, plugin=None):
+        form, old_settings, plugin_obj, active_nav = \
+            self._determine_active_settings(slug, plugin)
+
         # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
         all_plugins = PluginRegistry.query.all()
-
-        new_settings = {}
-        if form.validate_on_submit():
-            for key, value in iteritems(old_settings):
-                try:
-                    # check if the value has changed
-                    if value == form[key].data:
-                        continue
-                    else:
-                        new_settings[key] = form[key].data
-                except KeyError:
-                    pass
-            if active_group is not None:
-                Setting.update(settings=new_settings, app=current_app)
-            else:
-                active_plugin.settings.update(new_settings)
-                active_plugin.save()
-            flash(_("Settings saved."), "success")
-        else:
-            for key, value in iteritems(old_settings):
-                try:
-                    form[key].data = value
-                except (KeyError, ValueError):
-                    pass
+        form = populate_settings_form(form, old_settings)
 
         return render_template("management/settings.html", form=form,
                                all_groups=all_groups, all_plugins=all_plugins,
-                               active_settings=active_settings,
-                               active_group=active_group)
+                               active_nav=active_nav)
 
     def post(self, slug=None, plugin=None):
-        slug = slug if slug and not plugin else "general"
-
-        active_settings = {}
-        active_group, active_plugin = None, None
-        if plugin is not None:
-            active_plugin = PluginRegistry.query.filter_by(name=plugin).first_or_404()
-            active_settings['key'] = active_plugin.name
-            active_settings['title'] = active_plugin.name.title()
-            form = active_plugin.get_settings_form()
-            old_settings = active_plugin.settings
-
-        elif slug is not None:
-            active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-            active_settings['key'] = active_group.key
-            active_settings['title'] = active_group.name
-            form = Setting.get_form(active_group)()
-            old_settings = Setting.get_settings(active_group)
-        # get all groups and plugins - used to build the navigation
+        form, old_settings, plugin_obj, active_nav = \
+            self._determine_active_settings(slug, plugin)
         all_groups = SettingsGroup.query.all()
         all_plugins = PluginRegistry.query.all()
 
-        new_settings = {}
         if form.validate_on_submit():
-            for key, value in iteritems(old_settings):
-                try:
-                    # check if the value has changed
-                    if value == form[key].data:
-                        continue
-                    else:
-                        new_settings[key] = form[key].data
-                except KeyError:
-                    pass
-            if active_group is not None:
-                Setting.update(settings=new_settings, app=current_app)
+            new_settings = populate_settings_dict(form, old_settings)
+
+            if plugin_obj is not None:
+                plugin_obj.update_settings(new_settings)
             else:
-                active_plugin.settings.update(new_settings)
-                active_plugin.save()
+                Setting.update(settings=new_settings, app=current_app)
+
             flash(_("Settings saved."), "success")
-        else:
-            for key, value in iteritems(old_settings):
-                try:
-                    form[key].data = value
-                except (KeyError, ValueError):
-                    pass
 
         return render_template("management/settings.html", form=form,
                                all_groups=all_groups, all_plugins=all_plugins,
-                               active_settings=active_settings,
-                               active_group=active_group)
+                               active_nav=active_nav)
 
 
 class ManageUsers(MethodView):

@@ -11,8 +11,9 @@
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
-from flaskbb._compat import text_type
+from flaskbb._compat import text_type, iteritems
 from enum import Enum
+
 
 class SettingsValueTypes(Enum):
     string = 0
@@ -21,6 +22,31 @@ class SettingsValueTypes(Enum):
     boolean = 4
     select = 5
     selectmultiple = 6
+
+
+def populate_settings_dict(form, settings):
+    new_settings = {}
+    for key, value in iteritems(settings):
+        try:
+            # check if the value has changed
+            if value == form[key].data:
+                continue
+            else:
+                new_settings[key] = form[key].data
+        except KeyError:
+            pass
+
+    return new_settings
+
+
+def populate_settings_form(form, settings):
+    for key, value in iteritems(settings):
+        try:
+            form[key].data = value
+        except (KeyError, ValueError):
+            pass
+
+    return form
 
 
 def generate_settings_form(settings):
