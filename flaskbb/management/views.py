@@ -507,10 +507,8 @@ class DeleteGroup(MethodView):
         if group_id is not None:
             if group_id <= 5:  # there are 5 standard groups
                 flash(
-                    _(
-                        "You cannot delete the standard groups. "
-                        "Try renaming it instead.", "danger"
-                    )
+                    _("You cannot delete the standard groups. Try renaming it instead."),
+                    "danger"
                 )
                 return redirect(url_for("management.groups"))
 
