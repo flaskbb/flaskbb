@@ -189,7 +189,6 @@ class ViewTopic(MethodView):
 
 
 class NewTopic(MethodView):
-    decorators = [login_required]
     form = NewTopicForm
 
     def get(self, forum_id, slug=None):
