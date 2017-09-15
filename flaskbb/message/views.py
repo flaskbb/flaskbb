@@ -87,7 +87,7 @@ class ViewConversation(MethodView):
         form = self.form()
         return render_template("message/conversation.html", conversation=conversation, form=form)
 
-    @requires_message_box_space
+    #@requires_message_box_space
     def post(self, conversation_id):
         conversation = Conversation.query.filter_by(
             id=conversation_id, user_id=current_user.id
@@ -302,7 +302,7 @@ class RestoreConversation(MethodView):
 
         conversation.trash = False
         conversation.save()
-        return redirect(url_for("message.inbox"))
+        return redirect(url_for("message.trash"))
 
 
 class DeleteConversation(MethodView):
@@ -314,7 +314,7 @@ class DeleteConversation(MethodView):
         ).first_or_404()
 
         conversation.delete()
-        return redirect(url_for("message.inbox"))
+        return redirect(url_for("message.trash"))
 
 
 class SentMessages(MethodView):
