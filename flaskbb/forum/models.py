@@ -207,8 +207,11 @@ class Post(HideableCRUDMixin, db.Model):
         # Adding a new post
         if user and topic:
             created = time_utcnow()
-            self.user = user
-            self.username = user.username
+            if isinstance(user, db.Model):
+                self.user = user
+                self.username = user.username
+            else:
+                self.username = ""
             self.topic = topic
             self.date_created = created
 
@@ -220,11 +223,15 @@ class Post(HideableCRUDMixin, db.Model):
                 topic.forum.last_post = self
                 topic.forum.last_post_user = self.user
                 topic.forum.last_post_title = topic.title
-                topic.forum.last_post_username = user.username
+                if isinstance(user, db.Model):
+                    topic.forum.last_post_username = user.username
+                else:
+                    topic.forum.last_post_username = ""
                 topic.forum.last_post_created = created
 
                 # Update the post counts
-                user.post_count += 1
+                if isinstance(user, db.Model):
+                    user.post_count += 1
                 topic.post_count += 1
                 topic.forum.post_count += 1
 
