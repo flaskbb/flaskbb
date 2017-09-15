@@ -210,7 +210,7 @@ class Post(HideableCRUDMixin, db.Model):
             if isinstance(user, db.Model):
                 self.user = user
                 self.username = user.username
-            else:
+            else: # needed to prevent database integrity error (username must not be NULL)
                 self.username = ""
             self.topic = topic
             self.date_created = created
@@ -633,8 +633,11 @@ class Topic(HideableCRUDMixin, db.Model):
 
         # Set the forum and user id
         self.forum = forum
-        self.user = user
-        self.username = user.username
+        if isinstance(user, db.Model):
+            self.user = user
+            self.username = user.username
+        else: # needed to prevent database integrity error (username must not be NULL)
+            self.username = ""
 
         # Set the last_updated time. Needed for the readstracker
         self.date_created = self.last_updated = time_utcnow()
