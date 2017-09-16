@@ -225,8 +225,8 @@ def upgrade(all_latest, fixture, force):
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
-        click.secho("[+] {} groups and {} settings updated.".format(
-            len(count.keys()), len(count.values())), fg="green"
+        click.secho("[+] {settings} settings in {groups} setting groups updated.".format(
+            groups=len(count), settings=sum([len(settings) for settings in count.values()])), fg="green"
         )
 
 
