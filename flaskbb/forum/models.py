@@ -207,7 +207,7 @@ class Post(HideableCRUDMixin, db.Model):
         # Adding a new post
         if user and topic:
             created = time_utcnow()
-            if isinstance(user, db.Model):
+            if user.is_authenticated:
                 self.user = user
                 self.username = user.username
             else:
@@ -225,14 +225,14 @@ class Post(HideableCRUDMixin, db.Model):
                 topic.forum.last_post = self
                 topic.forum.last_post_user = self.user
                 topic.forum.last_post_title = topic.title
-                if isinstance(user, db.Model):
+                if user.is_authenticated:
                     topic.forum.last_post_username = user.username
                 else:
                     topic.forum.last_post_username = ""
                 topic.forum.last_post_created = created
 
                 # Update the post counts
-                if isinstance(user, db.Model):
+                if user.is_authenticated:
                     user.post_count += 1
                 topic.post_count += 1
                 topic.forum.post_count += 1
@@ -635,7 +635,7 @@ class Topic(HideableCRUDMixin, db.Model):
 
         # Set the forum and user id
         self.forum = forum
-        if isinstance(user, db.Model):
+        if user.is_authenticated:
             self.user = user
             self.username = user.username
         else:

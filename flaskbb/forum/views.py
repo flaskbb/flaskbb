@@ -189,13 +189,13 @@ class ViewTopic(MethodView):
 
 
 class NewTopic(MethodView):
+    decorators = [allows.requires(CanPostTopic)]
     form = NewTopicForm
 
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         return render_template('forum/new_topic.html', forum=forum_instance, form=self.form())
 
-    @allows.requires(CanPostTopic)
     def post(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         form = self.form()
