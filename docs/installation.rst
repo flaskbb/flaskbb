@@ -144,10 +144,12 @@ you want to run FlaskBB in production:
 By default it will try to save the configuration file with the name flaskbb.cfg in FlaskBB’s root folder.
 
 Finally to get going – fire up FlaskBB!
+::
 
     flaskbb --config flaskbb.cfg run
+    
     [+] Using config from: /path/to/flaskbb/flaskbb.cfg
-     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 
 Development
 ~~~~~~~~~~~
