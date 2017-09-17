@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+import collections
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
@@ -85,7 +86,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                               setting if it already exists.
                               Defaults to ``False``.
     """
-    updated_settings = {}
+    updated_settings = collections.defaultdict(list)
 
     for settingsgroup in fixture:
 
@@ -130,10 +131,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                     )
 
                 setting.save()
-                try:
-                    updated_settings[group].append(setting)
-                except KeyError:
-                    updated_settings[group] = [setting]
+                updated_settings[group].append(setting)
     return updated_settings
 
 
