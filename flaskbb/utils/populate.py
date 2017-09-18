@@ -110,8 +110,17 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
 
             setting = Setting.query.filter_by(key=settings[0]).first()
 
-            if (setting is not None and overwrite_setting) or setting is None:
+            if setting is not None:
+                setting_is_different = (
+                    setting.value != settings[1]["value"]
+                    or setting.value_type != settings[1]["value_type"]
+                    or setting.name != settings[1]["name"]
+                    or setting.description != settings[1]["description"]
+                    or setting.extra != settings[1].get("extra", "")
+                    or setting.settingsgroup != group.key
+                )
 
+            if (setting is not None and overwrite_setting and setting_is_different) or setting is None:
                 if setting is not None:
                     setting.value = settings[1]["value"]
                     setting.value_type = settings[1]["value_type"]
