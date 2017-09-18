@@ -127,7 +127,7 @@ def test_update_settings_from_fixture(database):
             'settings': (
                 # change value
                 ('monty_python', {
-                    'value': "And now for something completely different…",
+                    'value': "And now for something completely different...",
                     'value_type': "string",
                     'name': "Monty Python",
                     'description': "A random quote from Monty Python.",
@@ -165,7 +165,7 @@ def test_update_settings_from_fixture(database):
             'settings': (
                 # change value
                 ('monty_python_reborn', {
-                    'value': "And now for something completely different…",
+                    'value': "And now for something completely different...",
                     'value_type': "string",
                     'name': "Monty Python",
                     'description': "A random quote from Monty Python.",
