@@ -12,9 +12,11 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
+from flaskbb._compat import itervalues
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import generate_settings_form, SettingsValueTypes
+
 
 class PluginStore(CRUDMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,10 +54,35 @@ class PluginRegistry(CRUDMixin, db.Model):
         backref='plugin'
     )
 
+    @property
+    def settings(self):
+        return {kv.key: kv.value for kv in itervalues(self.values)}
+
     def get_settings_form(self):
+        """Generates a settings form based on the settings."""
         return generate_settings_form(self.values.values())()
 
+    def update_settings(self, settings):
+        """Updates the given settings of the plugin.
+
+        :param settings: A dictionary containing setting items.
+        """
+        pluginstore = PluginStore.query.filter(
+            PluginStore.key.in_(settings.keys())
+        ).all()
+
+        setting_list = []
+        for pluginsetting in pluginstore:
+            pluginsetting.value = settings[pluginsetting.key]
+            setting_list.append(pluginsetting)
+        db.session.add_all(setting_list)
+        db.session.commit()
+
     def add_settings(self, settings):
+        """Adds the given settings to the plugin.
+
+        :param settings: A dictionary containing setting items.
+        """
         plugin_settings = []
         for key in settings:
             pluginstore = PluginStore()
