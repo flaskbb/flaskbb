@@ -20,7 +20,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_plugins import PluginManager
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import BaseQuery, SQLAlchemy
 from flask_themes2 import Themes
