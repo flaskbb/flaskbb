@@ -258,7 +258,7 @@ def configure_context_processors(app):
         templates.
         """
 
-        return dict(flaskbb_config=flaskbb_config)
+        return dict(flaskbb_config=flaskbb_config, format_date=format_date)
 
 
 def configure_before_handlers(app):

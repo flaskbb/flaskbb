@@ -481,12 +481,16 @@ def generate_config(development, output, force):
     if os.path.exists(config_path) and not os.path.isfile(config_path):
         config_path = os.path.join(config_path, "flaskbb.cfg")
 
+    # An override to handle database location paths on Windows environments
+    database_path = "sqlite:///" + os.path.join(os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
+    if os.name == 'nt':
+        database_path = database_path.replace("\\", r"\\")
+
     default_conf = {
         "is_debug": True,
         "server_name": "localhost:5000",
         "url_scheme": "http",
-        "database_uri": "sqlite:///" + os.path.join(
-            os.path.dirname(current_app.root_path), "flaskbb.sqlite"),
+        "database_uri": database_path,
         "redis_enabled": False,
         "redis_uri": "redis://localhost:6379",
         "mail_server": "localhost",

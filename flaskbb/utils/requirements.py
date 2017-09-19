@@ -146,7 +146,7 @@ class ForumNotLocked(Requirement):
 
     def _get_forum_from_request(self, request):
         if current_forum:
-            return current_forum.locked
+            return current_forum
         raise FlaskBBError
 
 

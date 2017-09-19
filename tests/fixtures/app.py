@@ -20,6 +20,12 @@ def application():
     ctx.pop()
 
 
+@pytest.yield_fixture()
+def request_context(application):
+    with application.test_request_context():
+        yield
+
+
 @pytest.fixture()
 def default_groups(database):
     """Creates the default groups"""

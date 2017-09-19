@@ -60,6 +60,8 @@
                         <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
                         {% if topic.locked %}
                             <span class="fa fa-lock fa-fw topic-locked"></span>
+                        {% elif topic.hidden %}
+                            <span class="fa fa-user-secret"></span>
                         {% elif topic.important %}
                             {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
                                 <span class="fa fa-star fa-fw topic-starred-unread"></span>
@@ -89,6 +91,12 @@
                                 {{ topic.username }}
                                 {% endif %}
                             </div>
+
+                            {% if topic.hidden %}
+                            <div class="topic-author">
+                                {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

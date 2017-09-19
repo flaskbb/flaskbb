@@ -68,6 +68,25 @@
                     </li>
                     {% endif %}
                 {% endif %}
+                {% if current_user | can_moderate(topic.forum) and current_user.permissions.get('makehidden', False) %}
+                <li>
+                    {% if topic.hidden %}
+                    <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id, slug=topic.slug) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">
+                            <span class="fa fa-user fa-fw"></span> {% trans %}Unhide Topic{% endtrans %}
+                        </button>
+                    </form>
+                    {% else %}
+                    <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id, slug=topic.slug) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-link">
+                            <span class="fa fa-user-secret fa-fw"></span> {% trans %}Hide Topic{% endtrans %}
+                        </button>
+                    </form>
+                    {% endif %}
+                </li>
+                {% endif %}
                 </ul>
             </div>
             <!-- end Moderation buttons -->
