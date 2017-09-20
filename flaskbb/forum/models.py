@@ -15,7 +15,7 @@ from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
 from flaskbb.utils.database import (CRUDMixin, HideableCRUDMixin, UTCDateTime,
-                                    make_comparable, HideableQuery)
+                                    make_comparable)
 from flaskbb.utils.helpers import (get_categories_and_forums, get_forums,
                                    slugify, time_utcnow, topic_is_unread)
 from flaskbb.utils.settings import flaskbb_config
@@ -697,13 +697,14 @@ class Topic(HideableCRUDMixin, db.Model):
         ).limit(2).offset(0).all()
 
         # do we want to replace the topic with the last post in the forum?
-        if len(topics) > 1 and topics[0] == self:
-            # Now the second last post will be the last post
-            self.forum.last_post = topics[1].last_post
-            self.forum.last_post_title = topics[1].title
-            self.forum.last_post_user = topics[1].user
-            self.forum.last_post_username = topics[1].username
-            self.forum.last_post_created = topics[1].last_updated
+        if len(topics) > 1:
+            if topics[0] == self:
+                # Now the second last post will be the last post
+                self.forum.last_post = topics[1].last_post
+                self.forum.last_post_title = topics[1].title
+                self.forum.last_post_user = topics[1].user
+                self.forum.last_post_username = topics[1].username
+                self.forum.last_post_created = topics[1].last_updated
         else:
             self.forum.last_post = None
             self.forum.last_post_title = None
