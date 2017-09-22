@@ -691,7 +691,8 @@ class Topic(HideableCRUDMixin, db.Model):
     def _remove_topic_from_forum(self):
         # Grab the second last topic in the forum + parents/childs
         topics = Topic.query.filter(
-            Topic.forum_id == self.forum_id
+            Topic.forum_id == self.forum_id,
+            Topic.hidden != True
         ).order_by(
             Topic.last_post_id.desc()
         ).limit(2).offset(0).all()
