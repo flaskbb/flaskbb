@@ -107,9 +107,7 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
-@click.option("--group", "-g", help="The group of the user.",
-              type=click.Choice(["admin", "super_mod", "mod", "member"]))
-def install(welcome, force, username, email, password, group):
+def install(welcome, force, username, email, password):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -130,7 +128,7 @@ def install(welcome, force, username, email, password, group):
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    prompt_save_user(username, email, password, group)
+    prompt_save_user(username, email, password, "admin")
 
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
