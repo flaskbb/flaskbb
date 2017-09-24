@@ -93,11 +93,11 @@ def do_topic_action(topics, user, action, reverse):
                     For example, to unlock a topic, ``reverse`` should be
                     set to ``True``.
     """
-    from flaskbb.utils.requirements import (IsAtleastModeratorInForum,
-                                            CanDeleteTopic)
+    if not topics:
+        return False
 
-    from flaskbb.user.models import User
-    from flaskbb.forum.models import Post
+    from flaskbb.utils.requirements import (IsAtleastModeratorInForum,
+                                            CanDeleteTopic, Has)
 
     if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
         flash(_("You do not have the permissions to execute this "
@@ -105,8 +105,7 @@ def do_topic_action(topics, user, action, reverse):
         return False
 
     modified_topics = 0
-    if action != "delete":
-
+    if action not in {'delete', 'hide', 'unhide'}:
         for topic in topics:
             if getattr(topic, action) and not reverse:
                 continue
@@ -114,17 +113,37 @@ def do_topic_action(topics, user, action, reverse):
             setattr(topic, action, not reverse)
             modified_topics += 1
             topic.save()
-    elif action == "delete":
-        for topic in topics:
-            if not Permission(CanDeleteTopic):
-                flash(_("You do not have the permissions to delete this "
-                        "topic."), "danger")
-                return False
 
-            involved_users = User.query.filter(Post.topic_id == topic.id,
-                                               User.id == Post.user_id).all()
+    elif action == "delete":
+        if not Permission(CanDeleteTopic):
+            flash(_("You do not have the permissions to delete these topics."), "danger")
+            return False
+
+        for topic in topics:
             modified_topics += 1
-            topic.delete(involved_users)
+            topic.delete()
+
+    elif action == 'hide':
+        if not Permission(Has('makehidden')):
+            flash(_("You do not have the permissions to hide these topics."), "danger")
+            return False
+
+        for topic in topics:
+            if topic.hidden:
+                continue
+            modified_topics += 1
+            topic.hide(user)
+
+    elif action == 'unhide':
+        if not Permission(Has('makehidden')):
+            flash(_("You do not have the permissions to unhide these topics."), "danger")
+            return False
+
+        for topic in topics:
+            if not topic.hidden:
+                continue
+            modified_topics += 1
+            topic.unhide()
 
     return modified_topics
 
@@ -226,7 +245,7 @@ def forum_is_unread(forum, forumsread, user):
         return False
 
     # check if the last post is newer than the tracker length
-    if forum.last_post_created < read_cutoff:
+    if forum.last_post_id is None or forum.last_post_created < read_cutoff:
         return False
 
     # If the user hasn't visited a topic in the forum - therefore,

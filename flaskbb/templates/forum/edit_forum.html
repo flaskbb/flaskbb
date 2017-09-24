@@ -145,6 +145,17 @@
                             <span class="fa fa-trash-o fa-fw"></span> {% trans %}Delete{% endtrans %}
                         </button>
 
+                        {% if current_user.permissions.get('makehidden') %}
+                        <div class="btn-group" role="group">
+                            <button name="hide" class="btn btn-info">
+                                <span class="fa fa-user-secret fa-fw"></span> {% trans %}Hide{% endtrans %}
+                            </button>
+                            <button name="unhide" class="btn btn-info">
+                                <span class="fa fa-user fa-fw"></span> {% trans %}Unhide{% endtrans %}
+                            </button>
+                        </div>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

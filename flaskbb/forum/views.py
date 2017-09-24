@@ -32,7 +32,7 @@ from flaskbb.utils.helpers import (do_topic_action, format_quote,
 from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
                                         CanDeletePost, CanDeleteTopic,
                                         CanEditPost, CanPostReply,
-                                        CanPostTopic,
+                                        CanPostTopic, Has,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
 
@@ -317,6 +317,22 @@ class ManageForum(MethodView):
                 return redirect(mod_forum_url)
 
             new_forum.move_topics_to(tmp_topics)
+
+        # hiding/unhiding
+        elif "hide" in request.form:
+            changed = do_topic_action(
+                topics=tmp_topics, user=real(current_user), action="hide", reverse=False
+            )
+            flash(_("%(count)s topics hidden.", count=changed), "success")
+            return redirect(mod_forum_url)
+
+        elif "unhide" in request.form:
+            changed = do_topic_action(
+                topics=tmp_topics, user=real(current_user), action="unhide", reverse=False
+            )
+            flash(_("%(count)s topics unhidden.", count=changed), "success")
+            return redirect(mod_forum_url)
+
         else:
             flash(_('Unknown action requested'), 'danger')
             return redirect(mod_forum_url)
@@ -671,6 +687,84 @@ class UntrackTopic(MethodView):
         return redirect(topic.url)
 
 
+class HideTopic(MethodView):
+    decorators = [login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
+        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=topic.forum)):
+            flash(_("You do not have permission to hide this topic"), "danger")
+            return redirect(topic.url)
+        topic.hide(user=current_user)
+        topic.save()
+
+        if Permission(Has('viewhidden')):
+            return redirect(topic.url)
+        return redirect(topic.forum.url)
+
+
+class UnhideTopic(MethodView):
+    decorators = [login_required]
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=topic.forum)):
+            flash(_("You do not have permission to unhide this topic"), "danger")
+            return redirect(topic.url)
+        topic.unhide()
+        topic.save()
+        return redirect(topic.url)
+
+
+class HidePost(MethodView):
+    decorators = [login_required]
+
+    def post(self, post_id):
+        post = Post.query.filter(Post.id == post_id).first_or_404()
+
+        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=post.topic.forum)):
+            flash(_("You do not have permission to hide this post"), "danger")
+            return redirect(post.topic.url)
+
+        if post.hidden:
+            flash(_("Post is already hidden"), "warning")
+            return redirect(post.topic.url)
+
+        first_post = post.first_post
+
+        post.hide(current_user)
+        post.save()
+
+        if first_post:
+            flash(_("Topic hidden"), "success")
+        else:
+            flash(_("Post hidden"), "success")
+
+        if post.first_post and not Permission(Has("viewhidden")):
+            return redirect(post.topic.forum.url)
+        return redirect(post.topic.url)
+
+
+class UnhidePost(MethodView):
+    decorators = [login_required]
+
+    def post(self, post_id):
+        post = Post.query.filter(Post.id == post_id).first_or_404()
+
+        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(forum=post.topic.forum)):
+            flash(_("You do not have permission to unhide this post"), "danger")
+            return redirect(post.topic.url)
+
+        if not post.hidden:
+            flash(_("Post is already unhidden"), "warning")
+            redirect(post.topic.url)
+
+        post.unhide()
+        post.save()
+        flash(_("Post unhidden"), "success")
+        return redirect(post.topic.url)
+
+
 register_view(
     forum,
     routes=['/category/<int:category_id>', '/category/<int:category_id>-<slug>'],
@@ -760,3 +854,17 @@ register_view(
 register_view(forum, routes=['/topictracker'], view_func=TopicTracker.as_view('topictracker'))
 register_view(forum, routes=['/'], view_func=ForumIndex.as_view('index'))
 register_view(forum, routes=['/who-is-online'], view_func=WhoIsOnline.as_view('who_is_online'))
+register_view(
+    forum,
+    routes=["/topic/<int:topic_id>/hide", "/topic/<int:topic_id>-<slug>/hide"],
+    view_func=HideTopic.as_view('hide_topic')
+)
+register_view(
+    forum,
+    routes=["/topic/<int:topic_id>/unhide", "/topic/<int:topic_id>-<slug>/unhide"],
+    view_func=UnhideTopic.as_view('unhide_topic')
+)
+register_view(forum, routes=["/post/<int:post_id>/hide"], view_func=HidePost.as_view('hide_post'))
+register_view(
+    forum, routes=["/post/<int:post_id>/unhide"], view_func=UnhidePost.as_view('unhide_post')
+)

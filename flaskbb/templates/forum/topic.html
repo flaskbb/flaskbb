@@ -14,6 +14,13 @@
     </ol>
 
     {% include theme('forum/topic_controls.html') %}
+    {% if topic.hidden %}
+    <div class="alert alert-warning">
+        <span class="fa fa-user-secret"></span>
+        {{ gettext("This topic is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
+    </div>
+    {% endif %}
+
 
     <div class="panel topic-panel">
         <div class="panel-heading topic-head">
@@ -83,6 +90,12 @@
                     </div>
 
                         <div class="post-content clearfix" id="pid{{ post.id }}">
+                            {% if post.hidden %}
+                            <div class="alert alert-warning">
+                                <span class="fa fa-user-secret"></span>
+                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at, '%b %d %Y'))}}
+                            </div>
+                            {% endif %}
                         {{ post.content|markup }}
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
@@ -131,6 +144,34 @@
                             {% if current_user.is_authenticated %}
                             <!-- Report post -->
                                 <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="Report this post"></a>
+                            {% endif %}
+
+                            {% if current_user.permissions.get('makehidden') %}
+                                {% if post.first_post %}
+                                    {% if topic.hidden %}
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=post.topic.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="Unhide this topic"></button>
+                                    </form>
+                                    {% else %}
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=post.topic.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="Hide this topic"></button>
+                                    </form>
+                                    {% endif %}
+                                {% else %}
+                                    {% if post.hidden %}
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="Unhide this post"></button>
+                                    </form>
+                                    {% else %}
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="Hide this post"></button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
 
                             </div> <!-- end post-menu -->

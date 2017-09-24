@@ -222,6 +222,17 @@ class GroupForm(FlaskForm):
         description=_("Allow moderators to ban other users.")
     )
 
+    viewhidden = BooleanField(
+        _("Can view hidden posts and topics"),
+        description=_("Allows a user to view hidden posts and topics"),
+    )
+
+    makehidden = BooleanField(
+        _("Can hide posts and topics"),
+        description=_("Allows a user to hide posts and topics"),
+    )
+
+
     submit = SubmitField(_("Save"))
 
     def validate_name(self, field):

@@ -60,6 +60,8 @@ class Group(db.Model, CRUDMixin):
     deletetopic = db.Column(db.Boolean, default=False, nullable=False)
     posttopic = db.Column(db.Boolean, default=True, nullable=False)
     postreply = db.Column(db.Boolean, default=True, nullable=False)
+    viewhidden = db.Column(db.Boolean, default=False, nullable=False)
+    makehidden = db.Column(db.Boolean, default=False, nullable=False)
 
     # Methods
     def __repr__(self):
@@ -113,8 +115,8 @@ class User(db.Model, UserMixin, CRUDMixin):
     theme = db.Column(db.String(15), nullable=True)
     language = db.Column(db.String(15), default="en", nullable=True)
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic")
+    posts = db.relationship("Post", backref="user", lazy="dynamic", primaryjoin="User.id == Post.user_id")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic", primaryjoin="User.id == Topic.user_id")
 
     post_count = db.Column(db.Integer, default=0)
 
