@@ -29,9 +29,9 @@ from flaskbb.management.forms import (AddForumForm, AddGroupForm, AddUserForm,
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.user.models import Group, Guest, User
+from flaskbb.plugins.utils import validate_plugin
 from flaskbb.utils.helpers import (get_online_users, register_view,
-                                   render_template, time_diff, time_utcnow,
-                                   validate_plugin)
+                                   render_template, time_diff, time_utcnow)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator,
                                         IsAtleastSuperModerator)
@@ -840,8 +840,7 @@ class PluginsView(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
     def get(self):
-        plugins = current_app.pluggy.list_plugin_metadata()
-        print(plugins)
+        plugins = PluginRegistry.query.all()
         return render_template("management/plugins.html", plugins=plugins)
 
 
@@ -880,6 +879,7 @@ class DisablePlugin(MethodView):
         plugin.save()
         flash(_("Plugin %(plugin)s disabled. Please restart FlaskBB now.",
                 plugin=plugin.name), "success")
+        return redirect(url_for("management.plugins"))
 
 
 class UninstallPlugin(MethodView):
@@ -891,7 +891,6 @@ class UninstallPlugin(MethodView):
 
         plugin.delete()
         flash(_("Plugin has been uninstalled."), "success")
-        return redirect(url_for("management.plugins"))
         return redirect(url_for("management.plugins"))
 
 

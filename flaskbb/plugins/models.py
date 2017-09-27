@@ -9,6 +9,7 @@
     :copyright: (c) 2017 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
@@ -57,6 +58,23 @@ class PluginRegistry(CRUDMixin, db.Model):
     @property
     def settings(self):
         return {kv.key: kv.value for kv in itervalues(self.values)}
+
+    @property
+    def info(self):
+        return current_app.pluggy.list_plugin_metadata().get(self.name, {})
+
+    @property
+    def is_installable(self):
+        """Returns True if the plugin has settings that can be installed."""
+        plugin_module = current_app.pluggy.get_plugin(self.name)
+        return True if plugin_module.SETTINGS else False
+
+    @property
+    def is_installed(self):
+        """Returns True if the plugin is installed."""
+        if self.settings:
+            return True
+        return False
 
     def get_settings_form(self):
         """Generates a settings form based on the settings."""
