@@ -664,17 +664,6 @@ def parse_pkg_metadata(dist_name):
     return metadata
 
 
-def validate_plugin(name):  # better name?
-    """Tries to look up the plugin by name. Upon failure it will flash
-    a message and abort. Returns the plugin module on success.
-    """
-    plugin_module = current_app.pluggy.get_plugin(name)
-    if plugin_module is None:
-        flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
-        return redirect(url_for("management.plugins"))
-    return plugin_module
-
-
 def anonymous_required(f):
 
     @wraps(f)
