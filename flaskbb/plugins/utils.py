@@ -12,6 +12,10 @@
 from flask import current_app, flash, redirect, url_for
 from flask_babelplus import gettext as _
 
+from flaskbb.extensions import db
+from flaskbb.plugins.models import PluginRegistry
+
+
 def validate_plugin(name):
     """Tries to look up the plugin by name. Upon failure it will flash
     a message and abort. Returns the plugin module on success.
@@ -21,3 +25,26 @@ def validate_plugin(name):
         flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
         return redirect(url_for("management.plugins"))
     return plugin_module
+
+
+def remove_zombie_plugins_from_db():
+    """Removes 'zombie' plugins from the db. A zombie plugin is a plugin
+    which exists in the database but isn't installed in the env anymore.
+    Returns the names of the deleted plugins.
+    """
+    d_fs_plugins = [p[0] for p in current_app.pluggy.list_disabled_plugins()]
+    d_db_plugins = [p.name for p in PluginRegistry.query.filter_by(enabled=False).all()]
+
+    plugin_names = [p.name for p in PluginRegistry.query.all()]
+
+    remove_me = []
+    for p in plugin_names:
+        if p in d_db_plugins and p not in d_fs_plugins:
+            remove_me.append(p)
+
+    if len(remove_me) > 0:
+        PluginRegistry.query.filter(
+            PluginRegistry.name.in_(remove_me)
+        ).delete(synchronize_session='fetch')
+        db.session.commit()
+    return remove_me

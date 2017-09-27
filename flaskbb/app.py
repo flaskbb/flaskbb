@@ -54,6 +54,7 @@ from flaskbb.utils.settings import flaskbb_config
 
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.manager import FlaskBBPluginManager
+from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 from flaskbb.plugins import spec
 
 
@@ -385,14 +386,17 @@ def load_plugins(app):
     unregistered = [
         PluginRegistry(name=name) for name in loaded_names - registered_names
     ]
-
     with app.app_context():
         db.session.add_all(unregistered)
         db.session.commit()
+        removed = remove_zombie_plugins_from_db()
 
     app.logger.debug(
         "Plugins Found: {}".format(app.pluggy.list_name_plugin())
     )
     app.logger.debug(
         "Disabled Plugins: {}".format(app.pluggy.list_disabled_plugins())
+    )
+    app.logger.debug(
+        "Removed Plugins: {}".format(removed)
     )
