@@ -29,12 +29,15 @@ def upgrade():
         'plugin_store',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('key', sa.Unicode(length=255), nullable=False),
-        sa.Column('value', sa.PickleType(), nullable=True),
-        sa.Column('value_type', sa.Unicode(length=20), nullable=False),
-        sa.Column('extra', sa.PickleType(), nullable=False),
+        sa.Column('value', sa.PickleType(), nullable=False),
+        sa.Column('value_type', sa.Enum(
+            'string', 'integer', 'float', 'boolean', 'select', 'selectmultiple',
+            name='settingsvaluetypes'), nullable=False
+        ),
+        sa.Column('extra', sa.PickleType(), nullable=True),
         sa.Column('plugin_id', sa.Integer(), nullable=True),
         sa.Column('name', sa.Unicode(length=255), nullable=False),
-        sa.Column('description', sa.Text(), nullable=False),
+        sa.Column('description', sa.Text(), nullable=True),
         sa.ForeignKeyConstraint(
             ['plugin_id'],
             ['plugin_registry.id'],
