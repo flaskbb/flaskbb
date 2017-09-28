@@ -888,8 +888,8 @@ class UninstallPlugin(MethodView):
     def post(self, name):
         validate_plugin(name)
         plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
-
-        plugin.delete()
+        PluginStore.query.filter_by(plugin_id=plugin.id).delete()
+        db.session.commit()
         flash(_("Plugin has been uninstalled."), "success")
         return redirect(url_for("management.plugins"))
 
