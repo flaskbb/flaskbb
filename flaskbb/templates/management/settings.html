@@ -25,6 +25,7 @@
                 <li><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
             {% endif %}
         {% endfor %}
+        {% if all_plugins %}
         <li class="nav-header">Plugin Settings</li>
         {% for plugin in all_plugins %}
             {% if plugin.name == active_nav.get('key') %}
@@ -33,6 +34,7 @@
                 <li><a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a></li>
             {% endif %}
         {% endfor %}
+        {% endif %}
         </ul>
     </div>
 </div><!--/.col-md-3 -->

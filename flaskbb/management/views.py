@@ -830,7 +830,7 @@ class ManagementOverview(MethodView):
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
-            "plugins": []
+            "plugins": PluginRegistry.query.all()
         }
 
         return render_template("management/overview.html", **stats)
@@ -849,7 +849,7 @@ class EnablePlugin(MethodView):
 
     def post(self, name):
         validate_plugin(name)
-        plugin = PluginRegistry.query.filter(PluginRegistry.name == name).first_or_404()
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
         if plugin.enabled:
             flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
@@ -906,7 +906,12 @@ class InstallPlugin(MethodView):
         return redirect(url_for("management.plugins"))
 
 
-register_view(management, routes=['/category/add'], view_func=AddCategory.as_view('add_category'))
+# Categories
+register_view(
+    management,
+    routes=['/category/add'],
+    view_func=AddCategory.as_view('add_category')
+)
 register_view(
     management,
     routes=["/category/<int:category_id>/delete"],
@@ -917,6 +922,8 @@ register_view(
     routes=['/category/<int:category_id>/edit'],
     view_func=EditCategory.as_view('edit_category')
 )
+
+# Forums
 register_view(
     management,
     routes=['/forums/add', '/forums/<int:category_id>/add'],
@@ -928,19 +935,39 @@ register_view(
     view_func=DeleteForum.as_view('delete_forum')
 )
 register_view(
-    management, routes=['/forums/<int:forum_id>/edit'], view_func=EditForum.as_view('edit_forum')
+    management,
+    routes=['/forums/<int:forum_id>/edit'],
+    view_func=EditForum.as_view('edit_forum')
 )
-register_view(management, routes=['forums'], view_func=Forums.as_view('forums'))
-register_view(management, routes=['/groups/add'], view_func=AddGroup.as_view('add_group'))
+register_view(
+    management,
+    routes=['forums'],
+    view_func=Forums.as_view('forums')
+)
+
+# Groups
+register_view(
+    management,
+    routes=['/groups/add'],
+    view_func=AddGroup.as_view('add_group')
+)
 register_view(
     management,
     routes=['/groups/<int:group_id>/delete', '/groups/delete'],
     view_func=DeleteGroup.as_view('delete_group')
 )
 register_view(
-    management, routes=['/groups/<int:group_id>/edit'], view_func=EditGroup.as_view('edit_group')
+    management,
+    routes=['/groups/<int:group_id>/edit'],
+    view_func=EditGroup.as_view('edit_group')
 )
-register_view(management, routes=['/groups'], view_func=Groups.as_view('groups'))
+register_view(
+    management,
+    routes=['/groups'],
+    view_func=Groups.as_view('groups')
+)
+
+# Plugins
 register_view(
     management,
     routes=['/plugins/<path:name>/disable'],
@@ -961,7 +988,13 @@ register_view(
     routes=['/plugins/<path:name>/uninstall'],
     view_func=UninstallPlugin.as_view('uninstall_plugin')
 )
-register_view(management, routes=['/plugins'], view_func=PluginsView.as_view('plugins'))
+register_view(
+    management,
+    routes=['/plugins'],
+    view_func=PluginsView.as_view('plugins')
+)
+
+# Reports
 register_view(
     management,
     routes=['/reports/<int:report_id>/delete', '/reports/delete'],
@@ -973,16 +1006,34 @@ register_view(
     view_func=MarkReportRead.as_view('report_markread')
 )
 register_view(
-    management, routes=['/reports/unread'], view_func=UnreadReports.as_view('unread_reports')
+    management,
+    routes=['/reports/unread'],
+    view_func=UnreadReports.as_view('unread_reports')
 )
-register_view(management, routes=['/reports'], view_func=Reports.as_view('reports'))
+register_view(
+    management,
+    routes=['/reports'],
+    view_func=Reports.as_view('reports')
+)
+
+# Settings
 register_view(
     management,
     routes=['/settings', '/settings/<path:slug>', '/settings/plugin/<path:plugin>'],
     view_func=ManagementSettings.as_view('settings')
 )
-register_view(management, routes=['/users/add'], view_func=AddUser.as_view('add_user'))
-register_view(management, routes=['/users/banned'], view_func=BannedUsers.as_view('banned_users'))
+
+# Users
+register_view(
+    management,
+    routes=['/users/add'],
+    view_func=AddUser.as_view('add_user')
+)
+register_view(
+    management,
+    routes=['/users/banned'],
+    view_func=BannedUsers.as_view('banned_users')
+)
 register_view(
     management,
     routes=['/users/ban', '/users/<int:user_id>/ban'],
@@ -994,12 +1045,22 @@ register_view(
     view_func=DeleteUser.as_view('delete_user')
 )
 register_view(
-    management, routes=['/users/<int:user_id>/edit'], view_func=EditUser.as_view('edit_user')
+    management,
+    routes=['/users/<int:user_id>/edit'],
+    view_func=EditUser.as_view('edit_user')
 )
 register_view(
     management,
     routes=['/users/unban', '/users/<int:user_id>/unban'],
     view_func=UnbanUser.as_view('unban_user')
 )
-register_view(management, routes=['/users'], view_func=ManageUsers.as_view('users'))
-register_view(management, routes=['/'], view_func=ManagementOverview.as_view('overview'))
+register_view(
+    management,
+    routes=['/users'],
+    view_func=ManageUsers.as_view('users')
+)
+register_view(
+    management,
+    routes=['/'],
+    view_func=ManagementOverview.as_view('overview')
+)
