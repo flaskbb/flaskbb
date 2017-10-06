@@ -9,10 +9,13 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+
+from sqlalchemy_utils.functions import create_database
+
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-from flaskbb.extensions import db
+from flaskbb.extensions import alembic, db
 
 
 def delete_settings_from_fixture(fixture):
@@ -365,3 +368,14 @@ def insert_bulk_data(topic_count=10, post_count=100):
     user2.recalculate()
 
     return created_topics, created_posts
+
+
+def create_latest_db():
+    """Creates the database including the schema using SQLAlchemy's
+    db.create_all method instead of going through all the database revisions.
+    The revision will be set to 'head' which indicates the latest alembic
+    revision.
+    """
+    create_database(db.engine.url)
+    db.create_all()
+    alembic.stamp()
