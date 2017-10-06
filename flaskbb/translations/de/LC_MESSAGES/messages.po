@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Peter Justin <peter@peterjustin.me>, 2015
+# Toshiki Wulf <webmedia@toshiki.de>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-06-28 20:50+0200\n"
-"PO-Revision-Date: 2017-06-28 18:03+0000\n"
-"Last-Translator: Peter Justin <peter@peterjustin.me>\n"
+"PO-Revision-Date: 2017-09-23 20:40+0000\n"
+"Last-Translator: Toshiki Wulf <webmedia@toshiki.de>\n"
 "Language-Team: German (http://www.transifex.com/flaskbb/flaskbb/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +27,7 @@ msgstr ""
 #: flaskbb/email.py:50 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
-msgstr ""
+msgstr "Konto aktivieren"
 
 #: flaskbb/auth/forms.py:25 flaskbb/management/forms.py:31
 msgid "You can only use letters, numbers or dashes."
@@ -34,11 +35,11 @@ msgstr "Es sind nur Buchstaben, Zahlen und Unterstriche erlaubt."
 
 #: flaskbb/auth/forms.py:30
 msgid "Username or Email address"
-msgstr ""
+msgstr "Benutzername oder E-Mail-Adresse"
 
 #: flaskbb/auth/forms.py:31
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "Bitte Benutzernamen oder E-Mail-Adresse eingeben."
 
 #: flaskbb/auth/forms.py:34 flaskbb/auth/forms.py:55 flaskbb/auth/forms.py:107
 #: flaskbb/auth/forms.py:130 flaskbb/user/forms.py:63
@@ -47,11 +48,11 @@ msgstr "Passwort"
 
 #: flaskbb/auth/forms.py:35 flaskbb/auth/forms.py:108 flaskbb/user/forms.py:64
 msgid "Please enter your password."
-msgstr ""
+msgstr "Bitte Passwort eingeben."
 
 #: flaskbb/auth/forms.py:37
 msgid "Remember me"
-msgstr ""
+msgstr "Eingeloggt bleiben"
 
 #: flaskbb/auth/forms.py:39 flaskbb/templates/auth/login.html:1
 #: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:141
@@ -72,25 +73,25 @@ msgstr "Benutzername"
 
 #: flaskbb/auth/forms.py:48
 msgid "A valid username is required"
-msgstr ""
+msgstr "Bitte einen gültigen Benutzernamen angeben"
 
 #: flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:114
 #: flaskbb/auth/forms.py:126 flaskbb/auth/forms.py:149
 #: flaskbb/management/forms.py:55
 msgid "Email address"
-msgstr ""
+msgstr "E-Mail-Adresse"
 
 #: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:115
 #: flaskbb/auth/forms.py:127 flaskbb/auth/forms.py:150
 #: flaskbb/management/forms.py:56 flaskbb/user/forms.py:36
 msgid "A valid email address is required."
-msgstr ""
+msgstr "Bitte gültige E-Mail-Adresse eingeben"
 
 #: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:151
 #: flaskbb/management/forms.py:57 flaskbb/user/forms.py:37
 #: flaskbb/user/forms.py:42 flaskbb/user/forms.py:45
 msgid "Invalid email address."
-msgstr ""
+msgstr "E-Mail-Adresse ungültig"
 
 #: flaskbb/auth/forms.py:57 flaskbb/auth/forms.py:132
 msgid "Passwords must match."
@@ -98,7 +99,7 @@ msgstr "Passwörter müssen übereinstimmen."
 
 #: flaskbb/auth/forms.py:59 flaskbb/auth/forms.py:134
 msgid "Confirm password"
-msgstr ""
+msgstr "Passwort bestätigen"
 
 #: flaskbb/auth/forms.py:63 flaskbb/user/forms.py:28
 msgid "Language"
@@ -110,7 +111,7 @@ msgstr "Ich aktzeptiere die Nutzungsbediengungen."
 
 #: flaskbb/auth/forms.py:66
 msgid "Please accept the TOS."
-msgstr ""
+msgstr "Bitte Nutzungsbedingungen akzeptieren"
 
 #: flaskbb/auth/forms.py:68 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:146
@@ -120,7 +121,7 @@ msgstr "Registrieren"
 #: flaskbb/auth/forms.py:78
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long."
-msgstr ""
+msgstr "Der Benutzername muss zwischen %(min)s und %(max)s Zeichen lang sein."
 
 #: flaskbb/auth/forms.py:84
 msgid "This is a system reserved name. Choose a different one."
@@ -128,12 +129,12 @@ msgstr ""
 
 #: flaskbb/auth/forms.py:89 flaskbb/management/forms.py:116
 msgid "This username is already taken."
-msgstr ""
+msgstr "Dieser Benutzername ist bereits vergeben."
 
 #: flaskbb/auth/forms.py:94 flaskbb/management/forms.py:132
 #: flaskbb/user/forms.py:59
 msgid "This email address is already taken."
-msgstr ""
+msgstr "Diese E-Mail-Adresse ist bereits einem anderen Benutzer zugeordnet."
 
 #: flaskbb/auth/forms.py:110 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:10
@@ -146,7 +147,7 @@ msgstr "Passwort anfordern"
 
 #: flaskbb/auth/forms.py:136
 msgid "Reset password"
-msgstr ""
+msgstr "Passwort zurücksetzen"
 
 #: flaskbb/auth/forms.py:141
 msgid "Wrong email address."
@@ -155,37 +156,37 @@ msgstr ""
 #: flaskbb/auth/forms.py:146 flaskbb/management/forms.py:52
 #: flaskbb/message/forms.py:23
 msgid "A valid username is required."
-msgstr ""
+msgstr "Bitte einen gültigen Benutzernamen angeben"
 
 #: flaskbb/auth/forms.py:153
 msgid "Send Confirmation Mail"
-msgstr ""
+msgstr "Bestätigungs-E-Mail senden"
 
 #: flaskbb/auth/forms.py:159
 msgid "User does not exist."
-msgstr ""
+msgstr "Benutzer existiert nicht"
 
 #: flaskbb/auth/forms.py:162
 msgid "User is already active."
-msgstr ""
+msgstr "Benutzer bereits aktiv"
 
 #: flaskbb/auth/forms.py:166
 msgid "Email confirmation token"
-msgstr ""
+msgstr "Bestätigungscode"
 
 #: flaskbb/auth/forms.py:167
 msgid "Please enter the token that we have sent to you."
-msgstr ""
+msgstr "Bitte den per E-Mail versendeten Bestätigungscode eingeben."
 
 #: flaskbb/auth/forms.py:171
 msgid "Confirm Email"
-msgstr ""
+msgstr "E-Mail-Adresse bestätigen"
 
 #: flaskbb/auth/views.py:97
 msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
-msgstr ""
+msgstr "Das Benutzerkonto muss zuerst mit Hilfe des per E-Mail versendeten Links bestätigt werden."
 
 #: flaskbb/auth/views.py:102
 msgid "Wrong username or password."

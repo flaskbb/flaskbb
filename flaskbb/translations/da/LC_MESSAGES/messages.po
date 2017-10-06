@@ -4,13 +4,14 @@
 # 
 # Translators:
 # krestenjacobsen <kresten@logiskhave.dk>, 2015
+# krestenjacobsen <kresten@logiskhave.dk>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-06-28 20:50+0200\n"
-"PO-Revision-Date: 2017-06-28 18:03+0000\n"
-"Last-Translator: Peter Justin <peter@peterjustin.me>\n"
+"PO-Revision-Date: 2017-09-22 17:08+0000\n"
+"Last-Translator: sh4nks\n"
 "Language-Team: Danish (http://www.transifex.com/flaskbb/flaskbb/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
