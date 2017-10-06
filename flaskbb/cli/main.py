@@ -20,8 +20,7 @@ from werkzeug.utils import import_string, ImportStringError
 from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import (database_exists, create_database,
-                                        drop_database)
+from sqlalchemy_utils.functions import database_exists, drop_database
 from flask_alembic import alembic_click
 
 from flaskbb import create_app
@@ -33,7 +32,8 @@ from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_default_groups,
                                     create_default_settings, insert_bulk_data,
-                                    update_settings_from_fixture)
+                                    update_settings_from_fixture,
+                                    create_latest_db)
 from flaskbb.utils.translations import compile_translations
 
 
@@ -120,8 +120,9 @@ def install(welcome, force, username, email, password):
             drop_database(db.engine.url)
         else:
             sys.exit(0)
-    create_database(db.engine.url)
-    alembic.upgrade()
+
+    # creating database from scratch and 'stamping it'
+    create_latest_db()
 
     click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
@@ -162,11 +163,11 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
 
         # do not initialize the db if -i is passed
         if not initdb:
-            alembic.upgrade()
+            create_latest_db()
 
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
-        alembic.upgrade()
+        create_latest_db()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")
