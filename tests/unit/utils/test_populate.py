@@ -1,5 +1,6 @@
 import pytest
 from sqlalchemy.exc import OperationalError
+from sqlalchemy_utils.functions import create_database, drop_database
 
 from flaskbb.extensions import alembic, db
 from flaskbb.utils.populate import delete_settings_from_fixture, \
@@ -246,5 +247,10 @@ def test_migrations_upgrade():
     with pytest.raises(OperationalError):
         User.query.all()
 
+    # ensure that the database is created
+    create_database(db.engine.url)
+
     alembic.upgrade()
     assert len(User.query.all()) == 0
+
+    drop_database(db.engine.url)
