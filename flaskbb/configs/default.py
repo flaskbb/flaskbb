@@ -12,8 +12,6 @@
 import os
 import sys
 import datetime
-import glob
-from flaskbb.utils.helpers import get_alembic_branches
 
 
 class DefaultConfig(object):
@@ -74,7 +72,7 @@ class DefaultConfig(object):
 
     ALEMBIC = {
         'script_location': os.path.join(basedir, "migrations"),
-        'version_locations': get_alembic_branches()
+        'version_locations': ''
     }
     ALEMBIC_CONTEXT = {
         'render_as_batch': True

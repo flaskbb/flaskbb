@@ -26,6 +26,15 @@ def flaskbb_load_translations():
     """
     Hook for registering translation folders.
     """
+
+
+@spec
+def flaskbb_load_migrations():
+    """
+    Hook for registering additional migrations
+    """
+
+
 @spec
 def flaskbb_load_blueprints(app):
     """

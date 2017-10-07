@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import ast
-import glob
 import itertools
 import operator
 import os
@@ -25,7 +24,7 @@ import requests
 import unidecode
 from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
-from flask import current_app, flash, g, redirect, request, session, url_for
+from flask import flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
@@ -525,18 +524,14 @@ def check_image(url):
     return error, True
 
 
-def get_alembic_branches():
+def get_alembic_locations(plugin_dirs):
     """Returns a tuple with (branchname, plugin_dir) combinations.
     The branchname is the name of plugin directory which should also be
     the unique identifier of the plugin.
     """
-    basedir = os.path.dirname(os.path.dirname(__file__))
-    plugin_migration_dirs = glob.glob(
-        "{}/*/migrations".format(os.path.join(basedir, "plugins"))
-    )
     branches_dirs = [
         tuple([os.path.basename(os.path.dirname(p)), p])
-        for p in plugin_migration_dirs
+        for p in plugin_dirs
     ]
 
     return branches_dirs

@@ -38,7 +38,7 @@ from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
                                    forum_is_unread, topic_is_unread,
                                    render_template, render_markup,
-                                   app_config_from_env)
+                                   app_config_from_env, get_alembic_locations)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
@@ -77,8 +77,10 @@ def create_app(config=None):
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
+    configure_migrations(app)
     configure_translations(app)
     configure_logging(app)
+
     app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
     return app
@@ -291,6 +293,15 @@ def configure_errorhandlers(app):
         return render_template("errors/server_error.html"), 500
 
     app.pluggy.hook.flaskbb_errorhandlers(app=app)
+
+
+def configure_migrations(app):
+    """Configure migrations."""
+    plugin_dirs = app.pluggy.hook.flaskbb_load_migrations()
+    version_locations = get_alembic_locations(plugin_dirs)
+
+    app.config['ALEMBIC']['version_locations'] = version_locations
+    app.logger.info(app.config['ALEMBIC'])
 
 
 def configure_translations(app):
