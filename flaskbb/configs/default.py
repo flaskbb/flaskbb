@@ -190,5 +190,8 @@ class DefaultConfig(object):
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
-    # Plugin Folder
-    PLUGINS_FOLDER = os.path.join(basedir, "flaskbb", "plugins")
+    # Remove dead plugins - useful if you want to migrate your instance
+    # somewhere else and forgot to reinstall the plugins.
+    # If set to `False` it will NOT remove plugins that are NOT installed on
+    # the filesystem (virtualenv, site-packages).
+    REMOVE_DEAD_PLUGINS = True

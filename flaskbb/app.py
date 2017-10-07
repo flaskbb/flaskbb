@@ -406,7 +406,9 @@ def load_plugins(app):
     with app.app_context():
         db.session.add_all(unregistered)
         db.session.commit()
-        removed = remove_zombie_plugins_from_db()
+
+        if app.config["REMOVE_DEAD_PLUGINS"]:
+            removed = remove_zombie_plugins_from_db()
 
     app.logger.debug(
         "Plugins Found: {}".format(app.pluggy.list_name_plugin())
