@@ -55,6 +55,10 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Returns the metadata for a given name."""
         return self._plugin_metadata.get(name)
 
+    def list_name(self):
+        """Returns only the enabled plugin names."""
+        return list(self._name2plugin.keys())
+
     def list_plugin_metadata(self):
         """Returns the metadata for all plugins"""
         return self._plugin_metadata

@@ -77,6 +77,7 @@ def create_app(config=None):
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
+    configure_translations(app)
     configure_logging(app)
     app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
@@ -196,18 +197,6 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-    # Flask-BabelEx
-    babel.init_app(app=app, default_domain=FlaskBBDomain(app))
-
-    @babel.localeselector
-    def get_locale():
-        # if a user is logged in, use the locale from the user settings
-        if current_user and \
-                current_user.is_authenticated and current_user.language:
-            return current_user.language
-        # otherwise we will just fallback to the default language
-        return flaskbb_config["DEFAULT_LANGUAGE"]
-
     # Flask-Allows
     allows.init_app(app)
     allows.identity_loader(lambda: current_user)
@@ -302,6 +291,23 @@ def configure_errorhandlers(app):
         return render_template("errors/server_error.html"), 500
 
     app.pluggy.hook.flaskbb_errorhandlers(app=app)
+
+
+def configure_translations(app):
+    """Configure translations."""
+
+    # we have to initialize the extension after we have loaded the plugins
+    # because we of the 'flaskbb_load_translations' hook
+    babel.init_app(app=app, default_domain=FlaskBBDomain(app))
+
+    @babel.localeselector
+    def get_locale():
+        # if a user is logged in, use the locale from the user settings
+        if current_user and \
+                current_user.is_authenticated and current_user.language:
+            return current_user.language
+        # otherwise we will just fallback to the default language
+        return flaskbb_config["DEFAULT_LANGUAGE"]
 
 
 def configure_logging(app):

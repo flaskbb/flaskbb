@@ -74,7 +74,7 @@ def validate_plugin(plugin):
           the appcontext can't be found and using with_appcontext doesn't
           help either.
     """
-    if plugin not in current_app.pluggy.get_plugins():
+    if plugin not in current_app.pluggy.list_name():
         raise FlaskBBCLIError("Plugin {} not found.".format(plugin), fg="red")
     return True
 
