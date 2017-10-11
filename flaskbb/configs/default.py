@@ -194,4 +194,4 @@ class DefaultConfig(object):
     # somewhere else and forgot to reinstall the plugins.
     # If set to `False` it will NOT remove plugins that are NOT installed on
     # the filesystem (virtualenv, site-packages).
-    REMOVE_DEAD_PLUGINS = True
+    REMOVE_DEAD_PLUGINS = False
