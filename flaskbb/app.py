@@ -301,7 +301,6 @@ def configure_migrations(app):
     version_locations = get_alembic_locations(plugin_dirs)
 
     app.config['ALEMBIC']['version_locations'] = version_locations
-    app.logger.info(app.config['ALEMBIC'])
 
 
 def configure_translations(app):
@@ -407,6 +406,7 @@ def load_plugins(app):
         db.session.add_all(unregistered)
         db.session.commit()
 
+        removed = 0
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
 
