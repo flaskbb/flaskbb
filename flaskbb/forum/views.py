@@ -312,7 +312,12 @@ class ManageForum(MethodView):
                 flash(_('You do not have the permissions to move this topic.'), 'danger')
                 return redirect(mod_forum_url)
 
-            new_forum.move_topics_to(tmp_topics)
+            if new_forum.move_topics_to(tmp_topics):
+                flash(_('Topics moved.'), 'success')
+            else:
+                flash(_('Failed to move topics.'), 'danger')
+
+            return redirect(mod_forum_url)
 
         # hiding/unhiding
         elif "hide" in request.form:

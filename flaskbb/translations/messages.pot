@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-10-06 19:44+0200\n"
+"POT-Creation-Date: 2017-10-12 19:32-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,71 +411,79 @@ msgstr ""
 msgid "You do not have the permissions to move this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:322
+#: flaskbb/forum/views.py:316
+msgid "Topics moved."
+msgstr ""
+
+#: flaskbb/forum/views.py:318
+msgid "Failed to move topics."
+msgstr ""
+
+#: flaskbb/forum/views.py:327
 #, python-format
 msgid "%(count)s topics hidden."
 msgstr ""
 
-#: flaskbb/forum/views.py:329
+#: flaskbb/forum/views.py:334
 #, python-format
 msgid "%(count)s topics unhidden."
 msgstr ""
 
-#: flaskbb/forum/views.py:333
+#: flaskbb/forum/views.py:338
 msgid "Unknown action requested"
 msgstr ""
 
-#: flaskbb/forum/views.py:429
+#: flaskbb/forum/views.py:434
 msgid "Thanks for reporting."
 msgstr ""
 
-#: flaskbb/forum/views.py:510
+#: flaskbb/forum/views.py:515
 #, python-format
 msgid "%(topic_count)s topics untracked."
 msgstr ""
 
-#: flaskbb/forum/views.py:630
+#: flaskbb/forum/views.py:635
 #, python-format
 msgid "Forum %(forum)s marked as read."
 msgstr ""
 
-#: flaskbb/forum/views.py:651
+#: flaskbb/forum/views.py:656
 msgid "All forums marked as read."
 msgstr ""
 
-#: flaskbb/forum/views.py:692
+#: flaskbb/forum/views.py:697
 msgid "You do not have permission to hide this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:708
+#: flaskbb/forum/views.py:713
 msgid "You do not have permission to unhide this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:722
+#: flaskbb/forum/views.py:727
 msgid "You do not have permission to hide this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:726
+#: flaskbb/forum/views.py:731
 msgid "Post is already hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:735
+#: flaskbb/forum/views.py:740
 msgid "Topic hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:737
+#: flaskbb/forum/views.py:742
 msgid "Post hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:751
+#: flaskbb/forum/views.py:756
 msgid "You do not have permission to unhide this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:755
+#: flaskbb/forum/views.py:760
 msgid "Post is already unhidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:760
+#: flaskbb/forum/views.py:765
 msgid "Post unhidden"
 msgstr ""
 
