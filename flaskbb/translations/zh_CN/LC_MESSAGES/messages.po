@@ -415,7 +415,14 @@ msgstr "请为主题选择一个论坛."
 msgid "You do not have the permissions to move this topic."
 msgstr "您没有权限移动该主题。"
 
-#: flaskbb/forum/views.py:322
+#: flaskbb/forum/views.py:316
+msgid "Topics moved."
+msgstr ""
+
+#: flaskbb/forum/views.py:318
+msgid "Failed to move topics."
+msgstr ""
+
 #, python-format
 msgid "%(count)s topics hidden."
 msgstr ""

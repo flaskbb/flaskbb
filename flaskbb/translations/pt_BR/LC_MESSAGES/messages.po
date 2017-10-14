@@ -415,7 +415,14 @@ msgstr "Por favor escolha um novo fórum para os tópicos."
 msgid "You do not have the permissions to move this topic."
 msgstr "Você não tem permissões para mover esse tópico."
 
-#: flaskbb/forum/views.py:322
+#: flaskbb/forum/views.py:316
+msgid "Topics moved."
+msgstr ""
+
+#: flaskbb/forum/views.py:318
+msgid "Failed to move topics."
+msgstr ""
+
 #, python-format
 msgid "%(count)s topics hidden."
 msgstr ""
