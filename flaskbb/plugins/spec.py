@@ -76,3 +76,8 @@ def flaskbb_cli(cli):
     """
     Hook for registering CLI commands
     """
+
+
+@spec
+def flaskbb_tpl_before_navigation():
+    """Hook for registering additional navigation items."""

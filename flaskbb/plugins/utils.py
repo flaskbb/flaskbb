@@ -10,10 +10,31 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import current_app, flash, redirect, url_for
+from jinja2 import Markup
 from flask_babelplus import gettext as _
 
 from flaskbb.extensions import db
+from flaskbb.utils.datastructures import TemplateEventResult
 from flaskbb.plugins.models import PluginRegistry
+
+
+def template_hook(name, silent=True, **kwargs):
+    """Calls the given template hook.
+
+    :param name: The name of the hook.
+    :param silent: If set to ``False``, it will raise an exception if a hook
+                   doesn't exist. Defauls to ``True``.
+    :param kwargs: Additional kwargs that should be passed to the hook.
+    """
+    try:
+        hook = getattr(current_app.pluggy.hook, name)
+        result = hook(**kwargs)
+    except AttributeError:  # raised if hook doesn't exist
+        if silent:
+            return ""
+        raise
+
+    return Markup(TemplateEventResult(result))
 
 
 def validate_plugin(name):

@@ -54,7 +54,7 @@ from flaskbb.utils.settings import flaskbb_config
 
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.manager import FlaskBBPluginManager
-from flaskbb.plugins.utils import remove_zombie_plugins_from_db
+from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
 from flaskbb.plugins import spec
 
 
@@ -237,6 +237,8 @@ def configure_template_filters(app):
     filters['delete_topic'] = TplCanDeleteTopic(request)
 
     app.jinja_env.filters.update(filters)
+
+    app.jinja_env.globals["run_hook"] = template_hook
 
     app.pluggy.hook.flaskbb_jinja_directives(app=app)
 
