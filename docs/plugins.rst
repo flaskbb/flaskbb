@@ -71,14 +71,9 @@ your plugins database migrations:
 Deactivating
 ~~~~~~~~~~~~
 
-The only way to disable a plugin without removing it is, to add a ``DISABLED``
-file in the plugin's root folder. You need to reload your application in order
-to have the plugin fully disabled. A disabled plugin could look like this::
+You can either deactivate the plugin via the Admin Panel or by running::
 
-    my_plugin
-    |-- DISABLED    # Just add a empty file named "DISABLED" to disable a plugin
-    |-- info.json
-    |-- __init__.py
+    flaskbb plugins disable <plugin_name>
 
 .. important:: Restart the server.
 
@@ -89,8 +84,12 @@ to have the plugin fully disabled. A disabled plugin could look like this::
 Activating
 ~~~~~~~~~~
 
-Simply remove the ``DISABLED`` file in the plugin directory and restart the
-server.
+All plugins are activated by default. To activate a deactivated plugin you
+either have to activate it via the Admin Panel again or by running the
+activation command::
+
+    flaskbb plugins enable <plugin_name>
+
 
 
 Example Plugin
@@ -138,8 +137,11 @@ section below.
 Metadata
 ~~~~~~~~
 
-In order to get a working plugin, following metadata should be defined
-in a ``info.json`` file.
+A proper plugin should have at least put the following metadata into
+the ``setup.py`` file.
+
+https://docs.python.org/3.6/distutils/setupscript.html#additional-meta-data
+https://github.com/pypa/sampleproject/blob/master/setup.py
 
 ``identifier`` : **required**
     The plugin's identifier. It should be a Python identifier (starts with a
@@ -176,27 +178,9 @@ in a ``info.json`` file.
     whether or not to show this, though.
 
 
-Events
-------
+Hooks
+-----
 
-A full list with events can be found here :doc:`events`.
-
-
-Plugin Class
-------------
-
-.. autoclass:: FlaskBBPlugin
-
-  .. autoattribute:: settings_key
-
-  .. autoattribute:: has_settings
-
-  .. autoattribute:: installed
-
-  .. automethod:: setup
-
-  .. automethod:: install
-
-  .. automethod:: uninstall
-
-  .. automethod:: register_blueprint
+FlaskBB uses so called 'Hooks' ...
+Under the hood we use `pluggy`...
+A full list of hooks can be found here :doc:`hooks`.
