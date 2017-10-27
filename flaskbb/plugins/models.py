@@ -57,10 +57,12 @@ class PluginRegistry(CRUDMixin, db.Model):
 
     @property
     def settings(self):
+        """Returns a dict with contains all the settings in a plugin."""
         return {kv.key: kv.value for kv in itervalues(self.values)}
 
     @property
     def info(self):
+        """Returns some information about the plugin."""
         return current_app.pluggy.list_plugin_metadata().get(self.name, {})
 
     @property

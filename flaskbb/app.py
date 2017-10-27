@@ -411,13 +411,4 @@ def load_plugins(app):
         removed = 0
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
-
-    app.logger.debug(
-        "Plugins Found: {}".format(app.pluggy.list_name_plugin())
-    )
-    app.logger.debug(
-        "Disabled Plugins: {}".format(app.pluggy.list_disabled_plugins())
-    )
-    app.logger.debug(
-        "Removed Plugins: {}".format(removed)
-    )
+            app.logger.info("Removed Plugins: {}".format(removed))

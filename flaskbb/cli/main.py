@@ -38,7 +38,6 @@ from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
 from flaskbb.utils.translations import compile_translations
 
 
-
 class FlaskBBGroup(FlaskGroup):
     def __init__(self, *args, **kwargs):
         super(FlaskBBGroup, self).__init__(*args, **kwargs)
@@ -53,7 +52,8 @@ class FlaskBBGroup(FlaskGroup):
             app.pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception as exc:
-            click.echo(click.style("Error while loading CLI Plugins", fg='red'))
+            click.echo(click.style("Error while loading CLI Plugins",
+                                   fg='red'))
             click.echo(click.style(traceback.format_exc(), fg='red'))
 
     def get_command(self, ctx, name):

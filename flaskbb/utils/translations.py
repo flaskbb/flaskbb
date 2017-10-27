@@ -26,7 +26,6 @@ class FlaskBBDomain(Domain):
         with self.app.app_context():
             self.plugin_translations = \
                 self.app.pluggy.hook.flaskbb_load_translations()
-            print(self.plugin_translations)
 
     def get_translations(self):
         """Returns the correct gettext translations that should be used for
