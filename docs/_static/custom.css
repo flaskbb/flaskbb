@@ -8,7 +8,7 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  padding-top: 50px;
+  /*padding-top: 50px; */ /* uncomment if navbar should be fixed */
 }
 
 body,
