@@ -10,7 +10,7 @@
     <div class="panel-body page-body">
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
-            {{ emit_event('before-update-user-details') }}
+            {{ run_hook('flaskbb_tpl_before_user_details_form') }}
             {{ horizontal_select_field(form.birthday, select_class="form-control", surrounded_div="col-sm-4") }}
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
@@ -18,7 +18,7 @@
             {{ horizontal_field(form.avatar) }}
             {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
             {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
-            {{ emit_event('after-update-user-details') }}
+            {{ run_hook('flaskbb_tpl_after_user_details_form') }}
             {{ horizontal_field(form.submit) }}
 
             {% include theme('editor_help.html') %}

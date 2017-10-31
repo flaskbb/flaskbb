@@ -100,8 +100,8 @@ def flaskbb_tpl_after_registration_form():
 
 
 @spec
-def flaskbb_tpl_before_update_user_details():
-    """This event is emitted in the Change User Details form **before** an
+def flaskbb_tpl_before_user_details_form():
+    """This hook is emitted in the Change User Details form **before** an
     input field is rendered.
 
     in :file:`templates/user/change_user_details.html`.
@@ -109,7 +109,7 @@ def flaskbb_tpl_before_update_user_details():
 
 
 @spec
-def flaskbb_tpl_after_update_user_details():
+def flaskbb_tpl_after_user_details_form():
     """This hook is emitted in the Change User Details form **after** the last
     input field has been rendered but before the submit field.
 
