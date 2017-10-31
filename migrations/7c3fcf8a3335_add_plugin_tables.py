@@ -32,7 +32,7 @@ def upgrade():
         sa.Column('value', sa.PickleType(), nullable=False),
         sa.Column('value_type', sa.Enum(
             'string', 'integer', 'float', 'boolean', 'select', 'selectmultiple',
-            name='settingsvaluetypes'), nullable=False
+            name='settingvaluetype'), nullable=False
         ),
         sa.Column('extra', sa.PickleType(), nullable=True),
         sa.Column('plugin_id', sa.Integer(), nullable=True),

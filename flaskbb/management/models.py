@@ -11,7 +11,7 @@
 from flaskbb._compat import iteritems
 from flaskbb.extensions import db, cache
 from flaskbb.utils.database import CRUDMixin
-from flaskbb.utils.forms import generate_settings_form, SettingsValueTypes
+from flaskbb.utils.forms import generate_settings_form, SettingValueType
 
 
 class SettingsGroup(db.Model, CRUDMixin):
@@ -45,7 +45,7 @@ class Setting(db.Model, CRUDMixin):
     description = db.Column(db.Text, nullable=False)
 
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.Enum(SettingsValueTypes), nullable=False)
+    value_type = db.Column(db.Enum(SettingValueType), nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices

@@ -15,7 +15,7 @@ from flaskbb._compat import text_type, iteritems
 from enum import Enum
 
 
-class SettingsValueTypes(Enum):
+class SettingValueType(Enum):
     string = 0
     integer = 1
     float = 3
@@ -59,9 +59,10 @@ def generate_settings_form(settings):
     for setting in settings:
         field_validators = []
 
-        if setting.value_type in {SettingsValueTypes.integer, SettingsValueTypes.float}:
+        if setting.value_type in {SettingValueType.integer,
+                                  SettingValueType.float}:
             validator_class = validators.NumberRange
-        elif setting.value_type == SettingsValueTypes.string:
+        elif setting.value_type == SettingValueType.string:
             validator_class = validators.Length
 
         # generate the validators
@@ -79,14 +80,14 @@ def generate_settings_form(settings):
 
         # Generate the fields based on value_type
         # IntegerField
-        if setting.value_type == SettingsValueTypes.integer:
+        if setting.value_type == SettingValueType.integer:
             setattr(
                 SettingsForm, setting.key,
                 IntegerField(setting.name, validators=field_validators,
                              description=setting.description)
             )
         # FloatField
-        elif setting.value_type == SettingsValueTypes.float:
+        elif setting.value_type == SettingValueType.float:
             setattr(
                 SettingsForm, setting.key,
                 FloatField(setting.name, validators=field_validators,
@@ -94,7 +95,7 @@ def generate_settings_form(settings):
             )
 
         # TextField
-        elif setting.value_type == SettingsValueTypes.string:
+        elif setting.value_type == SettingValueType.string:
             setattr(
                 SettingsForm, setting.key,
                 TextField(setting.name, validators=field_validators,
@@ -102,7 +103,7 @@ def generate_settings_form(settings):
             )
 
         # SelectMultipleField
-        elif setting.value_type == SettingsValueTypes.selectmultiple:
+        elif setting.value_type == SettingValueType.selectmultiple:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
@@ -120,7 +121,7 @@ def generate_settings_form(settings):
             )
 
         # SelectField
-        elif setting.value_type == SettingsValueTypes.select:
+        elif setting.value_type == SettingValueType.select:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
@@ -137,7 +138,7 @@ def generate_settings_form(settings):
             )
 
         # BooleanField
-        elif setting.value_type == SettingsValueTypes.boolean:
+        elif setting.value_type == SettingValueType.boolean:
             setattr(
                 SettingsForm, setting.key,
                 BooleanField(setting.name, description=setting.description)
