@@ -373,6 +373,7 @@ intersphinx_mapping = {
     'werkzeug': ('http://werkzeug.pocoo.org/docs/latest/', None),
     'click': ('http://click.pocoo.org/', None),
     'jinja': ('http://jinja.pocoo.org/docs/latest', None),
+    'wtforms': ('https://wtforms.readthedocs.io/en/latest', None),
 }
 
 autodoc_member_order = 'bysource'
