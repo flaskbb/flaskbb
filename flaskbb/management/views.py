@@ -19,7 +19,6 @@ from flask_allows import Not, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
 from flaskbb import __version__ as flaskbb_version
-from flaskbb._compat import iteritems
 from flaskbb.extensions import allows, celery, db
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Category, Forum, Post, Report, Topic
