@@ -36,6 +36,8 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
             if self.is_blocked(ep.name):
                 self._disabled_plugins.append((ep.name, ep.dist))
+                self._plugin_metadata[ep.name] = \
+                    parse_pkg_metadata(ep.dist.key)
                 continue
 
             try:
