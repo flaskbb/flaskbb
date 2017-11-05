@@ -11,7 +11,7 @@
 from __future__ import unicode_literals
 import collections
 
-from sqlalchemy_utils.functions import create_database
+from sqlalchemy_utils.functions import create_database, database_exists
 
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
@@ -385,6 +385,8 @@ def create_latest_db():
     The revision will be set to 'head' which indicates the latest alembic
     revision.
     """
-    create_database(db.engine.url)
+    if not database_exists(db.engine.url):
+        create_database(db.engine.url)
+
     db.create_all()
     alembic.stamp()

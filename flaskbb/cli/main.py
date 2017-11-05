@@ -20,7 +20,7 @@ from werkzeug.utils import import_string, ImportStringError
 from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import database_exists, drop_database
+from sqlalchemy_utils.functions import database_exists
 from flask_alembic import alembic_click
 
 from flaskbb import create_app
@@ -107,6 +107,7 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
+@with_appcontext
 def install(welcome, force, username, email, password):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
@@ -117,7 +118,7 @@ def install(welcome, force, username, email, password):
             "Existing database found. Do you want to delete the old one and "
             "create a new one?", fg="magenta")
         ):
-            drop_database(db.engine.url)
+            db.drop_all()
         else:
             sys.exit(0)
 
@@ -159,7 +160,7 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
-        drop_database(db.engine.url)
+        db.drop_all()
 
         # do not initialize the db if -i is passed
         if not initdb:
