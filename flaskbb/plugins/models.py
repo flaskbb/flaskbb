@@ -43,6 +43,17 @@ class PluginStore(CRUDMixin, db.Model):
             self.plugin.name, self.key, self.value
         )
 
+    @classmethod
+    def get_or_create(cls, plugin_id, key):
+        """Returns the PluginStore object or an empty one.
+        The created object still needs to be added to the database session
+        """
+        obj = cls.query.filter_by(plugin_id=plugin_id, key=key).first()
+
+        if obj is not None:
+            return obj
+        return PluginStore()
+
 
 class PluginRegistry(CRUDMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -88,6 +99,7 @@ class PluginRegistry(CRUDMixin, db.Model):
         :param settings: A dictionary containing setting items.
         """
         pluginstore = PluginStore.query.filter(
+            PluginStore.plugin_id == self.id,
             PluginStore.key.in_(settings.keys())
         ).all()
 
@@ -98,21 +110,28 @@ class PluginRegistry(CRUDMixin, db.Model):
         db.session.add_all(setting_list)
         db.session.commit()
 
-    def add_settings(self, settings):
+    def add_settings(self, settings, force=False):
         """Adds the given settings to the plugin.
 
         :param settings: A dictionary containing setting items.
+        :param force: Forcefully overwrite existing settings.
         """
         plugin_settings = []
         for key in settings:
-            pluginstore = PluginStore()
+            if force:
+                with db.session.no_autoflush:
+                    pluginstore = PluginStore.get_or_create(self.id, key)
+            else:
+                # otherwise we assume that no such setting exist
+                pluginstore = PluginStore()
+
             pluginstore.key = key
+            pluginstore.plugin = self
             pluginstore.value = settings[key]['value']
             pluginstore.value_type = settings[key]['value_type']
             pluginstore.extra = settings[key]['extra']
             pluginstore.name = settings[key]['name']
             pluginstore.description = settings[key]['description']
-            pluginstore.plugin = self
             plugin_settings.append(pluginstore)
 
         db.session.add_all(plugin_settings)
