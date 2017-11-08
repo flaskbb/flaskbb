@@ -31,14 +31,18 @@ def upgrade():
                nullable=False)
 
     # See https://github.com/sh4nks/flaskbb/issues/309
-    if connection.engine.dialect.name != "mysql":
-        with op.batch_alter_table('groups_users', schema=None) as batch_op:
-            batch_op.alter_column('group_id',
-                   existing_type=sa.INTEGER(),
-                   nullable=False)
-            batch_op.alter_column('user_id',
-                   existing_type=sa.INTEGER(),
-                   nullable=False)
+    if connection.engine.dialect.name == "mysql":
+        op.execute('SET FOREIGN_KEY_CHECKS=0;')
+    with op.batch_alter_table('groups_users', schema=None) as batch_op:
+        batch_op.alter_column('group_id',
+               existing_type=sa.INTEGER(),
+               nullable=False)
+        batch_op.alter_column('user_id',
+               existing_type=sa.INTEGER(),
+               nullable=False)
+    # activate them again
+    if connection.engine.dialect.name == "mysql":
+        op.execute('SET FOREIGN_KEY_CHECKS=1;')
 
     with op.batch_alter_table('messages', schema=None) as batch_op:
         batch_op.alter_column('date_created',
@@ -161,14 +165,17 @@ def downgrade():
                existing_type=flaskbb.utils.database.UTCDateTime(timezone=True),
                nullable=True)
 
-    if connection.engine.dialect.name != "mysql":
-        with op.batch_alter_table('groups_users', schema=None) as batch_op:
-            batch_op.alter_column('user_id',
-                   existing_type=sa.INTEGER(),
-                   nullable=True)
-            batch_op.alter_column('group_id',
-                   existing_type=sa.INTEGER(),
-                   nullable=True)
+    if connection.engine.dialect.name == "mysql":
+        op.execute('SET FOREIGN_KEY_CHECKS=0;')
+    with op.batch_alter_table('groups_users', schema=None) as batch_op:
+        batch_op.alter_column('user_id',
+               existing_type=sa.INTEGER(),
+               nullable=True)
+        batch_op.alter_column('group_id',
+               existing_type=sa.INTEGER(),
+               nullable=True)
+    if connection.engine.dialect.name == "mysql":
+        op.execute('SET FOREIGN_KEY_CHECKS=1;')
 
     with op.batch_alter_table('forumsread', schema=None) as batch_op:
         batch_op.alter_column('last_read',
