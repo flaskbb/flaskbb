@@ -14,6 +14,14 @@ from flaskbb.forum.models import Category, Topic, Post
 from flaskbb.management.models import Setting, SettingsGroup
 
 
+def _individual_settings(update_result):
+    """Helper that returns the number of settings that were updated."""
+    return sum(
+        len(settings_in_a_group)
+        for settings_in_a_group in update_result.values()
+    )
+
+
 def test_delete_settings_from_fixture(default_settings):
     groups_count = SettingsGroup.query.count()
     assert len(settings_fixture) == groups_count
@@ -36,159 +44,60 @@ def test_create_settings_from_fixture(database):
 
 
 def test_update_settings_from_fixture(database):
-    def individual_settings(update_result):
-        """helper that returns the number of settings that were updated"""
-        return sum(len(settings_in_a_group) for settings_in_a_group in update_result.values())
-
     settings_fixture_group_count = len(settings_fixture)
     settings_fixture_setting_count = sum(
-        len(settings_fixture[k][1]['settings']) for k in range(len(settings_fixture))
+        len(settings_fixture[k][1]['settings'])
+        for k in range(len(settings_fixture))
     )
-
 
     assert not SettingsGroup.query.count()
     assert not Setting.query.count()
 
-    # No force-overwrite - the fixtures will be created because they do not exist.
-    updated_1 = update_settings_from_fixture(settings_fixture)
-    assert settings_fixture_group_count == len(updated_1)
+    # No force-overwrite - the fixtures will be created because they
+    # do not exist.
+    updated = update_settings_from_fixture(settings_fixture)
+    assert settings_fixture_group_count == len(updated)
     assert settings_fixture_group_count == SettingsGroup.query.count()
-    assert settings_fixture_setting_count == individual_settings(updated_1)
+    assert settings_fixture_setting_count == _individual_settings(updated)
     assert settings_fixture_setting_count == Setting.query.count()
 
-    # force-overwrite - nothing changed so nothing should happen here
-    force_updated_1 = update_settings_from_fixture(settings_fixture,
-                                                   overwrite_group=True,
-                                                   overwrite_setting=True)
 
-    assert len(force_updated_1) == 0
-    assert individual_settings(force_updated_1) == 0
-    assert settings_fixture_group_count == SettingsGroup.query.count()
-    assert settings_fixture_setting_count == Setting.query.count()
-
-    fixture_to_update_with = (
-        # a group where we change a lot
-        ('general', {
-            'name': "General Settings",
-            'description': "This description is wrong.",
-            'settings': (
-                # change value
-                ('project_title', {
-                    'value': "FlaskBB is cool!",
-                    'value_type': "string",
-                    'name': "Project title",
-                    'description': "The title of the project.",
-                }),
-                # change name
-                ('project_subtitle', {
-                    'value':        "A lightweight forum software in Flask",
-                    'value_type':   "string",
-                    'name':         "Subtitle of the project",
-                    'description':  "A short description of the project.",
-                }),
-                # change options (extra)
-                ('posts_per_page', {
-                    'value':        10,
-                    'value_type':   "integer",
-                    'extra':        {'min': 1},
-                    'name':         "Posts per page",
-                    'description':  "Number of posts displayed per page.",
-                }),
-                # change description
-                ('topics_per_page', {
-                    'value':        10,
-                    'value_type':   "integer",
-                    'extra':        {'min': 5},
-                    'name':         "Topics per page",
-                    'description':  "The number of topics to be displayed per page.",
-                }),
-                # add
-                ('test_fixture', {
-                    'description': 'This is a test fixture',
-                    'name': 'Test Fixture',
-                    'value': 'FlaskBBTest',
-                    'value_type': 'string'
-                }),
-            )
-        }),
-        # a group where we change nothing
-        ('auth', {
-            'name': 'Authentication Settings',
-            'description': 'Configurations for the Login and Register process!',
-            # the same as in flaskbb/settings/fixtures/settings.py
-            'settings': (
-                ('registration_enabled', {
-                    'value':        True,
-                    'value_type':   "boolean",
-                    'name':         "Enable Registration",
-                    'description':  "Enable or disable the registration",
-                }),
-            )
-        }),
-        # a wholly new group
-        ('testgroup', {
-            'name': "Important settings",
-            'description': "Some settings without which the world would not work.",
-            'settings': (
-                # change value
-                ('monty_python', {
-                    'value': "And now for something completely different...",
-                    'value_type': "string",
-                    'name': "Monty Python",
-                    'description': "A random quote from Monty Python.",
-                }),
-            )
-        })
-    )
-
+def test_update_settings_from_fixture_overwrite(database, default_settings,
+                                                updated_fixture):
     # should add groups: testgroup
     # should add testgroup/monty_python, general/test_fixture
-    updated_2 = update_settings_from_fixture(fixture_to_update_with)
-    assert len(updated_2) == 2
-    assert individual_settings(updated_2) == 2
-    assert settings_fixture_group_count + 1 == SettingsGroup.query.count()
-    assert settings_fixture_setting_count + 2 == Setting.query.count()
+    pre_update_group_count = SettingsGroup.query.count()
+    pre_update_setting_count = Setting.query.count()
+    updated = update_settings_from_fixture(updated_fixture)
+    assert len(updated) == 2
+    assert _individual_settings(updated) == 2
+    assert pre_update_group_count + 1 == SettingsGroup.query.count()
+    assert pre_update_setting_count + 2 == Setting.query.count()
 
-    fixture_to_update_with[2][1]['settings'][0][1]['description'] = "Something meaningless."
+
+def test_update_settings_from_fixture_force(database, default_settings,
+                                            updated_fixture):
+    # force-overwrite - nothing changed so nothing should happen here
+    pre_update_group_count = SettingsGroup.query.count()
+    pre_update_setting_count = Setting.query.count()
+    force_updated = update_settings_from_fixture(settings_fixture,
+                                                 overwrite_group=True,
+                                                 overwrite_setting=True)
+
+    assert len(force_updated) == 0
+    assert _individual_settings(force_updated) == 0
+    assert pre_update_group_count == SettingsGroup.query.count()
+    assert pre_update_setting_count == Setting.query.count()
 
     # should update groups: general
-    # should update settings: 4 in general, 1 in testgroup
-    force_updated_2 = update_settings_from_fixture(fixture_to_update_with,
+    # should update settings: 2 in general, 1 in testgroup
+    force_updated_1 = update_settings_from_fixture(updated_fixture,
                                                    overwrite_group=True,
                                                    overwrite_setting=True)
-    assert len(force_updated_2) == 2
-    assert individual_settings(force_updated_2) == 5
-    assert settings_fixture_group_count + 1 == SettingsGroup.query.count()
-    assert settings_fixture_setting_count + 2 == Setting.query.count()
-
-    modified_settings_fixture = [item for item in settings_fixture]
-    modified_settings_fixture.append(
-        # another wholly new group
-        ('testgroup2', {
-            'name': "Important settings",
-            'description': "Some settings without which the world would not work.",
-            'settings': (
-                # change value
-                ('monty_python_reborn', {
-                    'value': "And now for something completely different...",
-                    'value_type': "string",
-                    'name': "Monty Python",
-                    'description': "A random quote from Monty Python.",
-                }),
-            )
-        })
-    )
-
-    # should revert 4 in general
-    # should add testgroup2 and one subitem
-    force_updated_3 = update_settings_from_fixture(modified_settings_fixture,
-                                                   overwrite_group=True,
-                                                   overwrite_setting=True)
-
-    assert len(force_updated_3) == 2
-    assert individual_settings(force_updated_3) == 5
-    assert settings_fixture_group_count + 2 == SettingsGroup.query.count()
-    assert settings_fixture_setting_count + 3 == Setting.query.count()
+    assert len(force_updated_1) == 2
+    assert _individual_settings(force_updated_1) == 3
+    assert pre_update_group_count + 1 == SettingsGroup.query.count()
+    assert pre_update_setting_count + 2 == Setting.query.count()
 
 
 def test_create_user(default_groups):
