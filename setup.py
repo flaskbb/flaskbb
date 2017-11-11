@@ -83,6 +83,7 @@ setup(
         'Flask-Themes2',
         'flask-whooshee',
         'Flask-WTF',
+        'flaskbb-plugin-portal',
         'itsdangerous',
         'Jinja2',
         'kombu',

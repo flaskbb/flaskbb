@@ -21,6 +21,7 @@ Flask-SQLAlchemy==2.2
 Flask-Themes2==0.1.4
 flask-whooshee==0.4.1
 Flask-WTF==0.14.2
+flaskbb-plugin-portal==1.0.3
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==4.0.2
