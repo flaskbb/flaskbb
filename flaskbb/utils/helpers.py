@@ -649,7 +649,11 @@ def real(obj):
 
 
 def parse_pkg_metadata(dist_name):
-    raw_metadata = get_distribution(dist_name).get_metadata('PKG-INFO')
+    try:
+        raw_metadata = get_distribution(dist_name).get_metadata('METADATA')
+    except FileNotFoundError:
+        raw_metadata = get_distribution(dist_name).get_metadata('PKG-INFO')
+
     metadata = {}
 
     # lets use the Parser from email to parse our metadata :)
