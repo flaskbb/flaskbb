@@ -900,6 +900,11 @@ class InstallPlugin(MethodView):
         plugin_module = validate_plugin(name)
         plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
+        if not plugin.enabled:
+            flash(_("Can't install plugin. Enable '%(plugin)s' plugin first.",
+                    plugin=plugin.name), "danger")
+            return redirect(url_for("management.plugins"))
+
         plugin.add_settings(plugin_module.SETTINGS)
         flash(_("Plugin has been installed."), "success")
         return redirect(url_for("management.plugins"))
