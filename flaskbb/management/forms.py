@@ -300,6 +300,19 @@ class GroupForm(FlaskForm):
                     )
                     result = False
 
+        checked = []
+        for field in group_fields:
+            if field.data and field.data in checked:
+                if len(checked) > 1:
+                    field.errors.append(
+                        "A group can't have multiple group types."
+                    )
+                    result = False
+            else:
+                checked.append(field.data)
+
+        return result
+
     def save(self):
         data = self.data
         data.pop('submit', None)
