@@ -228,7 +228,6 @@ class GroupForm(FlaskForm):
         description=_("Allows a user to hide posts and topics"),
     )
 
-
     submit = SubmitField(_("Save"))
 
     def validate_name(self, field):
@@ -276,6 +275,30 @@ class GroupForm(FlaskForm):
         if field.data and group > 0:
             raise ValidationError(_("There is already a group of type "
                                     "'Guest'."))
+
+    def validate(self):
+        if not super(GroupForm, self).validate():
+            return False
+
+        result = True
+        permission_fields = (
+            self.editpost, self.deletepost, self.deletetopic,
+            self.posttopic, self.postreply, self.mod_edituser,
+            self.mod_banuser, self.viewhidden, self.makehidden
+        )
+        group_fields = [
+            self.admin, self.super_mod, self.mod, self.banned, self.guest
+        ]
+        # we do not allow to modify any guest permissions
+        if self.guest.data:
+            for field in permission_fields:
+                if field.data:
+                    # if done in 'validate_guest' it would display this
+                    # warning on the fields
+                    field.errors.append(
+                        _("Can't assign any permissions to this group.")
+                    )
+                    result = False
 
     def save(self):
         data = self.data
