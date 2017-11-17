@@ -209,8 +209,13 @@ class Post(HideableCRUDMixin, db.Model):
         # Adding a new post
         if user and topic:
             created = time_utcnow()
-            self.user = user
-            self.username = user.username
+            if user.is_authenticated:
+                self.user = user
+                self.username = user.username
+            else:
+                # treat guest users separately
+                # "" because username must not be NULL (database constaint)
+                self.username = ""
             self.topic = topic
             self.date_created = created
 
@@ -222,11 +227,15 @@ class Post(HideableCRUDMixin, db.Model):
                 topic.forum.last_post = self
                 topic.forum.last_post_user = self.user
                 topic.forum.last_post_title = topic.title
-                topic.forum.last_post_username = user.username
+                if user.is_authenticated:
+                    topic.forum.last_post_username = user.username
+                else:
+                    topic.forum.last_post_username = ""
                 topic.forum.last_post_created = created
 
                 # Update the post counts
-                user.post_count += 1
+                if user.is_authenticated:
+                    user.post_count += 1
                 topic.post_count += 1
                 topic.forum.post_count += 1
 
@@ -628,8 +637,13 @@ class Topic(HideableCRUDMixin, db.Model):
 
         # Set the forum and user id
         self.forum = forum
-        self.user = user
-        self.username = user.username
+        if user.is_authenticated:
+            self.user = user
+            self.username = user.username
+        else:
+            # treat guest users separately
+            # needed to prevent database integrity error (username must not be NULL)
+            self.username = ""
 
         # Set the last_updated time. Needed for the readstracker
         self.date_created = self.last_updated = time_utcnow()
