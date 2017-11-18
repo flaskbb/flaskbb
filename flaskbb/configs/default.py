@@ -226,9 +226,6 @@ class DefaultConfig(object):
     ADMIN_URL_PREFIX = "/admin"
 
 
-    # Plugin Folder
-    PLUGINS_FOLDER = os.path.join(basedir, "flaskbb", "plugins")
-
     # Remove dead plugins - useful if you want to migrate your instance
     # somewhere else and forgot to reinstall the plugins.
     # If set to `False` it will NOT remove plugins that are NOT installed on
