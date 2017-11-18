@@ -1,4 +1,5 @@
 import pytest
+from flaskbb.utils.forms import SettingValueType
 
 
 @pytest.fixture
@@ -12,7 +13,7 @@ def updated_fixture():
                 # change value
                 ('project_title', {
                     'value': "FlaskBB is cool!",
-                    'value_type': "string",
+                    'value_type': SettingValueType.string,
                     'name': "Project title",
                     'description': "The title of the project.",
                 }),
@@ -21,7 +22,7 @@ def updated_fixture():
                     'description': 'This is a test fixture',
                     'name': 'Test Fixture',
                     'value': 'FlaskBBTest',
-                    'value_type': 'string'
+                    'value_type': SettingValueType.string
                 }),
             )
         }),
@@ -33,7 +34,7 @@ def updated_fixture():
             'settings': (
                 ('registration_enabled', {
                     'value': True,
-                    'value_type': "boolean",
+                    'value_type': SettingValueType.boolean,
                     'name': "Enable Registration",
                     'description': "Enable or disable the registration",
                 }),
@@ -47,7 +48,7 @@ def updated_fixture():
                 # change value
                 ('monty_python', {
                     'value': "And now for something completely different...",
-                    'value_type': "string",
+                    'value_type': SettingValueType.string,
                     'name': "Monty Python",
                     'description': "A random quote from Monty Python.",
                 }),
