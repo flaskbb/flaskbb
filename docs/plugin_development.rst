@@ -183,9 +183,10 @@ Each hook specification has a corresponding hook implementation. By default,
 all hooks that are prefix with ``flaskbb_`` will be marked as a standard
 hook implementation. It is possible to modify the behavior of hooks.
 For example, default hooks are called in LIFO registered order.
-A hookimpl can influence its call-time invocation position using special
-attributes. If marked with a "tryfirst" or "trylast" option it will be executed
-first or last respectively in the hook call loop::
+Although, registration order might not be deterministic. A hookimpl
+can influence its call-time invocation position using special attributes. If
+marked with a "tryfirst" or "trylast" option it will be executed first or last
+respectively in the hook call loop::
 
     hookimpl = HookimplMarker('flaskbb')
 
