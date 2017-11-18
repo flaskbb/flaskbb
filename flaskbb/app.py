@@ -328,31 +328,60 @@ def configure_translations(app):
 
 def configure_logging(app):
     """Configures logging."""
+    if app.config.get('USE_DEFAULT_LOGGING'):
+        configure_default_logging(app)
 
-    logs_folder = os.path.join(app.root_path, os.pardir, "logs")
+    if app.config.get('LOG_CONF_FILE'):
+        logging.config.fileConfig(
+            app.config['LOG_CONF_FILE'], disable_existing_loggers=False
+        )
+
+    if app.config["SQLALCHEMY_ECHO"]:
+        # Ref: http://stackoverflow.com/a/8428546
+        @event.listens_for(Engine, "before_cursor_execute")
+        def before_cursor_execute(
+                conn, cursor, statement, parameters, context, executemany
+        ):
+            conn.info.setdefault('query_start_time', []).append(time.time())
+
+        @event.listens_for(Engine, "after_cursor_execute")
+        def after_cursor_execute(
+                conn, cursor, statement, parameters, context, executemany
+        ):
+            total = time.time() - conn.info['query_start_time'].pop(-1)
+            app.logger.debug("Total Time: %f", total)
+
+
+def configure_default_logging(app):
     from logging.handlers import SMTPHandler
+
+    logs_folder = app.config.get('LOG_PATH')
+
+    if logs_folder is None:
+        logs_folder = os.path.join(app.root_path, os.pardir, "logs")
+
+    default_log_format = '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+
     formatter = logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s '
-        '[in %(pathname)s:%(lineno)d]')
+        app.config.get('LOG_FORMAT') or default_log_format
+    )
 
     info_log = os.path.join(logs_folder, app.config['INFO_LOG'])
 
     info_file_handler = logging.handlers.RotatingFileHandler(
-        info_log,
-        maxBytes=100000,
-        backupCount=10
+        info_log, maxBytes=100000, backupCount=10
     )
 
-    info_file_handler.setLevel(logging.INFO)
+    log_level = app.config.get('LOG_LEVEL') or logging.INFO
+
+    info_file_handler.setLevel(log_level)
     info_file_handler.setFormatter(formatter)
     app.logger.addHandler(info_file_handler)
 
     error_log = os.path.join(logs_folder, app.config['ERROR_LOG'])
 
     error_file_handler = logging.handlers.RotatingFileHandler(
-        error_log,
-        maxBytes=100000,
-        backupCount=10
+        error_log, maxBytes=100000, backupCount=10
     )
 
     error_file_handler.setLevel(logging.ERROR)
@@ -360,34 +389,19 @@ def configure_logging(app):
     app.logger.addHandler(error_file_handler)
 
     if app.config["SEND_LOGS"]:
-        mail_handler = \
-            SMTPHandler(
-                app.config['MAIL_SERVER'],
-                app.config['MAIL_DEFAULT_SENDER'],
-                app.config['ADMINS'],
-                'application error, no admins specified',
-                (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
-            )
+        configure_mail_logs(app)
 
-        mail_handler.setLevel(logging.ERROR)
-        mail_handler.setFormatter(formatter)
-        app.logger.addHandler(mail_handler)
 
-    if app.config.get('LOG_CONF_FILE'):
-        logging.config.fileConfig(app.config['LOG_CONF_FILE'], disable_existing_loggers=False)
+def configure_mail_logs(app):
+    mail_handler = SMTPHandler(
+        app.config['MAIL_SERVER'], app.config['MAIL_DEFAULT_SENDER'],
+        app.config['ADMINS'], 'application error, no admins specified',
+        (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+    )
 
-    if app.config["SQLALCHEMY_ECHO"]:
-        # Ref: http://stackoverflow.com/a/8428546
-        @event.listens_for(Engine, "before_cursor_execute")
-        def before_cursor_execute(conn, cursor, statement,
-                                  parameters, context, executemany):
-            conn.info.setdefault('query_start_time', []).append(time.time())
-
-        @event.listens_for(Engine, "after_cursor_execute")
-        def after_cursor_execute(conn, cursor, statement,
-                                 parameters, context, executemany):
-            total = time.time() - conn.info['query_start_time'].pop(-1)
-            app.logger.debug("Total Time: %f", total)
+    mail_handler.setLevel(logging.ERROR)
+    mail_handler.setFormatter(formatter)
+    app.logger.addHandler(mail_handler)
 
 
 def load_plugins(app):
