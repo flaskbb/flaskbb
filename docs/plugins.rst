@@ -5,198 +5,140 @@ Plugins
 
 .. module:: flaskbb.plugins
 
-FlaskBB provides an easy way to extend the functionality of your forum
-via so called `Plugins`. Plugins do not modify the `core` of FlaskBB, so
-you can easily activate and deactivate them anytime. This part of the
-documentation only covers the basic things for creating plugins. If you are
-looking for a tutorial you need to go to this section of the documentation:
-:doc:`plugin_tutorial/index`.
+FlaskBB provides a full featured plugin system. This system allows you to
+easily extend or modify FlaskBB without touching any FlaskBB code. Under the
+hood it uses the `pluggy plugin system`_ which does most of the heavy lifting
+for us. A list of available plugins can be found at the `GitHub Wiki`_. A
+proper index for FlaskBB Plugins and Themes still have to be built.
 
+If you are interested in creating new plugins, checkout out the
+:doc:`Developing new Plugins </plugin_development>` page.
 
-Structure
----------
+.. _`pluggy plugin system`: https://pluggy.readthedocs.io/en/latest/
+.. _`GitHub Wiki`: https://github.com/sh4nks/flaskbb/wiki
 
-A plugin has it's own folder where all the plugin specific files are living.
-For example, the structure of a plugin could look like this
-
-.. sourcecode:: text
-
-    my_plugin
-    |-- info.json                Contains the Plugin's metadata
-    |-- license.txt              The full license text of your plugin
-    |-- __init__.py              The plugin's main class is located here
-    |-- views.py
-    |-- models.py
-    |-- forms.py
-    |-- static
-    |   |-- style.css
-    |-- templates
-        |-- myplugin.html
-    |-- migrations
-        |-- 59f7c49b6289_init.py
 
 Management
 ----------
 
-Database
+Before plugins can be used in FlaskBB, they have to be downloaded, installed
+and activated.
+Plugins can be very minimalistic with nothing to install at all (just enabling
+and disabling) to be very complex where you have to `run migrations <./plugins.html#database>`_ and add
+some `additional settings <./plugins.html#install>`_.
+
+Download
 ~~~~~~~~
 
-Upgrading, downgrading and generating database revisions is all handled
-via alembic. We make use of a alembic feature called 'branch_labels'.
-Each plugin's identifier will be used as a branch_label if used with alembic.
-Lets say, that identifier of your plugin is ``portal_plugin``, then you have
-to use the following commands for generaring, upgrading and downgrading
-your plugins database migrations:
+Downloading a Plugin is as easy as::
 
-* (Auto-)Generating revisions
-    ``flaskbb db revision --branch portal_plugin "<YOUR_MESSAGE>"``
+    $ pip install flaskbb-plugin-MYPLUGIN
 
-    Replace <YOUR_MESSAGE> with something like "initial migration" if it's
-    the first migration or with just a few words that will describe the
-    changes of the revision.
+if the plugin has been uploaded to PyPI. If you haven't uploaded your plugin
+to PyPI or are in the middle of developing one, you can just::
 
-* Applying revisions
-    ``flaskbb db upgrade portal_plugin@head``
+    $ pip install -e .
 
-    If you want to upgrade to specific revision, replace ``head`` with the
-    revision id.
+in your plugin's package directory to install it.
 
-* Downgrading revisions
-    ``flaskbb db downgrade portal_plugin@-1``
+Remove
+~~~~~~
 
-    If you just want to revert the latest revision, just use ``-1``.
-    To downgrade all database migrations, use ``base``.
+Removing a plugin is a little bit more tricky. By default, FlaskBB does not
+remove the settings of a plugin by itself because this could lead to some
+unwanted dataloss.
+
+`Disable`_ and `Uninstall`_ the plugin first before continuing.
+
+After taking care of this and you are confident that you won't need the
+plugin anymore you can finally remove it::
+
+    $ pip uninstall flaskbb-plugin-MYPLUGIN
+
+There is a setting in FlaskBB which lets you control the deletion of settings
+of a plugin. If ``REMOVE_DEAD_PLUGINS`` is set to ``True``, all not available
+plugins (not available on the filesystem) are constantly removed. Only change
+this if you know what you are doing.
+
+Install
+~~~~~~~
+
+In our context, by installing a plugin, we mean, to install the settings
+and apply the migrations. Personal Note: I can't think of a better name and
+I am open for suggestions.
+
+The plugin can be installed via the Admin Panel (in tab 'Plugins') or by
+running::
+
+    flaskbb plugins install <plugin_name>
 
 
-Deactivating
-~~~~~~~~~~~~
+Make sure to to apply the migrations of the plugin as well (**if any**, check the plugins docs)::
 
-The only way to disable a plugin without removing it is, to add a ``DISABLED``
-file in the plugin's root folder. You need to reload your application in order
-to have the plugin fully disabled. A disabled plugin could look like this::
+    flaskbb db upgrade <plugin_name>@head
 
-    my_plugin
-    |-- DISABLED    # Just add a empty file named "DISABLED" to disable a plugin
-    |-- info.json
-    |-- __init__.py
+Uninstall
+~~~~~~~~~
+
+Removing a plugin involves two steps. The first one is to check if the plugin
+has applied any migrations on FlaskBB and if so you can
+undo them via::
+
+    $ flaskbb db downgrade <plugin_name>@base
+
+The second step is to wipe the settings from FlaskBB which can be done in the
+Admin Panel or by running::
+
+    $ flaskbb plugins uninstall <plugin_name>
+
+Disable
+~~~~~~~
+
+Disabling a plugin has the benefit of keeping all the data of the plugin but
+not using the functionality it provides. A plugin can either be deactivated
+via the Admin Panel or by running::
+
+    flaskbb plugins disable <plugin_name>
 
 .. important:: Restart the server.
 
     You must restart the wsgi/in-built server in order to make the changes
     effect your forum.
 
+Enable
+~~~~~~
 
-Activating
-~~~~~~~~~~
+All plugins are activated by default. To activate a deactivated plugin you
+either have to activate it via the Admin Panel again or by running the
+activation command::
 
-Simply remove the ``DISABLED`` file in the plugin directory and restart the
-server.
-
-
-Example Plugin
---------------
-
-A simple Plugin could look like this:
-
-.. sourcecode:: python
-
-    from flask import flash
-    from flask.ext.plugins import connect_event
-
-    from flaskbb.plugins import FlaskBBPlugin
+    flaskbb plugins enable <plugin_name>
 
 
-    # This is the name of your Plugin class which implements FlaskBBPlugin.
-    # The exact name is needed in order to be recognized as a plugin.
-    __plugin__ "HelloWorldPlugin"
+Database
+--------
 
+Upgrading, downgrading and generating database revisions is all handled
+via alembic. We make use of alembic's branching feature to manage seperate
+migrations for the plugins. Each plugin will have it's own branch in alembic
+where migrations can be managed. Following commands are used for generaring,
+upgrading and downgrading your plugins database migrations:
 
-    def flash_index():
-        """Flashes a message when visiting the index page."""
+* (Auto-)Generating revisions
+    ``flaskbb db revision --branch <plugin_name> "<YOUR_MESSAGE>"``
 
-        flash("This is just a demonstration plugin", "success")
+    Replace <YOUR_MESSAGE> with something like "initial migration" if it's
+    the first migration or with just a few words that will describe the
+    changes of the revision.
 
+* Applying revisions
+    ``flaskbb db upgrade <plugin_name>@head``
 
-    class HelloWorldPlugin(FlaskBBPlugin):
-        def setup(self):
-            connect_event(before-forum-index-rendered, flash_index)
+    If you want to upgrade to specific revision, replace ``head`` with the
+    revision id.
 
-        def install(self):
-            # there is nothing to install
-            pass
+* Downgrading revisions
+    ``flaskbb db downgrade <plugin_name>@-1``
 
-        def uninstall(self):
-            # and nothing to uninstall
-            pass
-
-
-Your plugins also needs a ``info.json`` file, where it stores some meta data
-about the plugin. For more information see the `Metadata <#metadata>`_
-section below.
-
-
-Metadata
-~~~~~~~~
-
-In order to get a working plugin, following metadata should be defined
-in a ``info.json`` file.
-
-``identifier`` : **required**
-    The plugin's identifier. It should be a Python identifier (starts with a
-    letter or underscore, the rest can be letters, underscores, or numbers)
-    and should match the name of the plugin's folder.
-
-``name`` : **required**
-    A human-readable name for the plugin.
-
-``author`` : **required**
-    The name of the plugin's author, that is, you. It does not have to include
-    an e-mail address, and should be displayed verbatim.
-
-``description``
-    A description of the plugin in a few sentences. If you can write multiple
-    languages, you can include additional fields in the form
-    ``description_lc``, where ``lc`` is a two-letter language code like ``es``
-    or ``de``. They should contain the description, but in the indicated
-    language.
-
-``website``
-    The URL of the plugin's Web site. This can be a Web site specifically for
-    this plugin, Web site for a collection of plugins that includes this plugin,
-    or just the author's Web site.
-
-``license``
-    A simple phrase indicating your plugin's license, like ``GPL``,
-    ``MIT/X11``, ``Public Domain``, or ``Creative Commons BY-SA 3.0``. You
-    can put the full license's text in the ``license.txt`` file.
-
-``version``
-    This is simply to make it easier to distinguish between what version
-    of your plugin people are using. It's up to the theme/layout to decide
-    whether or not to show this, though.
-
-
-Events
-------
-
-A full list with events can be found here :doc:`events`.
-
-
-Plugin Class
-------------
-
-.. autoclass:: FlaskBBPlugin
-
-  .. autoattribute:: settings_key
-
-  .. autoattribute:: has_settings
-
-  .. autoattribute:: installed
-
-  .. automethod:: setup
-
-  .. automethod:: install
-
-  .. automethod:: uninstall
-
-  .. automethod:: register_blueprint
+    If you just want to revert the latest revision, just use ``-1``.
+    To downgrade all database migrations, use ``base``.

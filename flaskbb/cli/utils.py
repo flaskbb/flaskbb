@@ -15,11 +15,10 @@ import re
 
 import click
 
-from flask import __version__ as flask_version
+from flask import current_app, __version__ as flask_version
 from flask_themes2 import get_theme
 
 from flaskbb import __version__
-from flaskbb.extensions import plugin_manager
 from flaskbb.utils.populate import create_user, update_user
 
 
@@ -75,7 +74,9 @@ def validate_plugin(plugin):
           the appcontext can't be found and using with_appcontext doesn't
           help either.
     """
-    if plugin not in plugin_manager.all_plugins.keys():
+    # list_name holds all plugin names, also the disabled ones (they won't do
+    # anything as they are set as 'blocked' on pluggy)
+    if plugin not in current_app.pluggy.list_name():
         raise FlaskBBCLIError("Plugin {} not found.".format(plugin), fg="red")
     return True
 

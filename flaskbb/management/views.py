@@ -18,10 +18,7 @@ from flask.views import MethodView
 from flask_allows import Not, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
-from flask_plugins import get_all_plugins, get_plugin, get_plugin_from_all
-
 from flaskbb import __version__ as flaskbb_version
-from flaskbb._compat import iteritems
 from flaskbb.extensions import allows, celery, db
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Category, Forum, Post, Report, Topic
@@ -29,13 +26,16 @@ from flaskbb.management.forms import (AddForumForm, AddGroupForm, AddUserForm,
                                       CategoryForm, EditForumForm,
                                       EditGroupForm, EditUserForm)
 from flaskbb.management.models import Setting, SettingsGroup
+from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.user.models import Group, Guest, User
+from flaskbb.plugins.utils import validate_plugin
 from flaskbb.utils.helpers import (get_online_users, register_view,
                                    render_template, time_diff, time_utcnow)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator,
                                         IsAtleastSuperModerator)
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
 
 management = Blueprint("management", __name__)
 
@@ -51,72 +51,62 @@ def check_fresh_login():
 class ManagementSettings(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def get(self, slug=None):
+    def _determine_active_settings(self, slug, plugin):
+        """Determines which settings are active.
+        Returns a tuple in following order:
+            ``form``, ``old_settings``, ``plugin_obj``, ``active_nav``
+        """
+        # Any ideas how to do this better?
         slug = slug if slug else 'general'
+        active_nav = {}  # used to build the navigation
+        plugin_obj = None
+        if plugin is not None:
+            plugin_obj = PluginRegistry.query.filter_by(name=plugin).first_or_404()
+            active_nav.update({'key': plugin_obj.name,
+                               'title': plugin_obj.name.title()})
+            form = plugin_obj.get_settings_form()
+            old_settings = plugin_obj.settings
 
-        # get the currently active group
-        active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-        # get all groups - used to build the navigation
+        elif slug is not None:
+            group_obj = SettingsGroup.query.filter_by(key=slug).first_or_404()
+            active_nav.update({'key': group_obj.key, 'title': group_obj.name})
+            form = Setting.get_form(group_obj)()
+            old_settings = Setting.get_settings(group_obj)
+
+        return form, old_settings, plugin_obj, active_nav
+
+    def get(self, slug=None, plugin=None):
+        form, old_settings, plugin_obj, active_nav = \
+            self._determine_active_settings(slug, plugin)
+
+        # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
+        all_plugins = PluginRegistry.query.filter(PluginRegistry.values != None).all()
+        form = populate_settings_form(form, old_settings)
 
-        SettingsForm = Setting.get_form(active_group)
+        return render_template("management/settings.html", form=form,
+                               all_groups=all_groups, all_plugins=all_plugins,
+                               active_nav=active_nav)
 
-        old_settings = Setting.get_settings(active_group)
-
-        form = SettingsForm()
-        for key, values in iteritems(old_settings):
-            try:
-                form[key].data = values['value']
-            except (KeyError, ValueError):
-                pass
-
-        return render_template(
-            'management/settings.html',
-            form=form,
-            all_groups=all_groups,
-            active_group=active_group
-        )
-
-    def post(self, slug=None):
-        slug = slug if slug else 'general'
-
-        # get the currently active group
-        active_group = SettingsGroup.query.filter_by(key=slug).first_or_404()
-        # get all groups - used to build the navigation
+    def post(self, slug=None, plugin=None):
+        form, old_settings, plugin_obj, active_nav = \
+            self._determine_active_settings(slug, plugin)
         all_groups = SettingsGroup.query.all()
-
-        SettingsForm = Setting.get_form(active_group)
-
-        old_settings = Setting.get_settings(active_group)
-        new_settings = {}
-
-        form = SettingsForm()
+        all_plugins = PluginRegistry.query.all()
 
         if form.validate_on_submit():
-            for key, values in iteritems(old_settings):
-                try:
-                    # check if the value has changed
-                    if values['value'] == form[key].data:
-                        continue
-                    else:
-                        new_settings[key] = form[key].data
-                except KeyError:
-                    pass
-            Setting.update(settings=new_settings, app=current_app)
-            flash(_('Settings saved.'), 'success')
-        else:
-            for key, values in iteritems(old_settings):
-                try:
-                    form[key].data = values['value']
-                except (KeyError, ValueError):
-                    pass
+            new_settings = populate_settings_dict(form, old_settings)
 
-        return render_template(
-            'management/settings.html',
-            form=form,
-            all_groups=all_groups,
-            active_group=active_group
-        )
+            if plugin_obj is not None:
+                plugin_obj.update_settings(new_settings)
+            else:
+                Setting.update(settings=new_settings, app=current_app)
+
+            flash(_("Settings saved."), "success")
+
+        return render_template("management/settings.html", form=form,
+                               all_groups=all_groups, all_plugins=all_plugins,
+                               active_nav=active_nav)
 
 
 class ManageUsers(MethodView):
@@ -839,7 +829,7 @@ class ManagementOverview(MethodView):
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
-            "plugins": get_all_plugins()
+            "plugins": PluginRegistry.query.all()
         }
 
         return render_template("management/overview.html", **stats)
@@ -849,99 +839,83 @@ class PluginsView(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
     def get(self):
-        plugins = get_all_plugins()
+        plugins = PluginRegistry.query.all()
         return render_template("management/plugins.html", plugins=plugins)
 
 
 class EnablePlugin(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def post(self, plugin):
-        plugin = get_plugin_from_all(plugin)
+    def post(self, name):
+        validate_plugin(name)
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
         if plugin.enabled:
             flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
             return redirect(url_for("management.plugins"))
 
-        try:
-            plugin.enable()
-            flash(
-                _("Plugin %(plugin)s enabled. Please restart FlaskBB now.", plugin=plugin.name),
-                "success"
-            )
-        except OSError:
-            flash(
-                _(
-                    "It seems that FlaskBB does not have enough filesystem "
-                    "permissions. Try removing the 'DISABLED' file by "
-                    "yourself instead."
-                ), "danger"
-            )
+        plugin.enabled = True
+        plugin.save()
 
+        flash(_("Plugin %(plugin)s enabled. Please restart FlaskBB now.",
+                plugin=plugin.name), "success")
         return redirect(url_for("management.plugins"))
 
 
 class DisablePlugin(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def post(self, plugin):
-        try:
-            plugin = get_plugin(plugin)
-        except KeyError:
-            flash(_("Plugin %(plugin)s not found.", plugin=plugin.name), "danger")
+    def post(self, name):
+        validate_plugin(name)
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+
+        if not plugin.enabled:
+            flash(_("Plugin %(plugin)s is already disabled.", plugin=plugin.name),
+                  "info")
             return redirect(url_for("management.plugins"))
 
-        try:
-            plugin.disable()
-            flash(
-                _("Plugin %(plugin)s disabled. Please restart FlaskBB now.", plugin=plugin.name),
-                "success"
-            )
-        except OSError:
-            flash(
-                _(
-                    "It seems that FlaskBB does not have enough filesystem "
-                    "permissions. Try creating the 'DISABLED' file by "
-                    "yourself instead."
-                ), "danger"
-            )
-
+        plugin.enabled = False
+        plugin.save()
+        flash(_("Plugin %(plugin)s disabled. Please restart FlaskBB now.",
+                plugin=plugin.name), "success")
         return redirect(url_for("management.plugins"))
 
 
 class UninstallPlugin(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def post(self, plugin):
-        plugin = get_plugin_from_all(plugin)
-        if plugin.installed:
-            plugin.uninstall()
-            Setting.invalidate_cache()
-
-            flash(_("Plugin has been uninstalled."), "success")
-        else:
-            flash(_("Cannot uninstall plugin."), "danger")
-
+    def post(self, name):
+        validate_plugin(name)
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+        PluginStore.query.filter_by(plugin_id=plugin.id).delete()
+        db.session.commit()
+        flash(_("Plugin has been uninstalled."), "success")
         return redirect(url_for("management.plugins"))
 
 
 class InstallPlugin(MethodView):
     decorators = [allows.requires(IsAdmin)]
 
-    def post(self, plugin):
-        plugin = get_plugin_from_all(plugin)
-        if not plugin.installed:
-            plugin.install()
-            Setting.invalidate_cache()
+    def post(self, name):
+        plugin_module = validate_plugin(name)
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
 
-            flash(_("Plugin has been installed."), "success")
-        else:
-            flash(_("Cannot install plugin."), "danger")
+        if not plugin.enabled:
+            flash(_("Can't install plugin. Enable '%(plugin)s' plugin first.",
+                    plugin=plugin.name), "danger")
+            return redirect(url_for("management.plugins"))
 
+        plugin.add_settings(plugin_module.SETTINGS)
+        flash(_("Plugin has been installed."), "success")
         return redirect(url_for("management.plugins"))
 
 
-register_view(management, routes=['/category/add'], view_func=AddCategory.as_view('add_category'))
+# Categories
+register_view(
+    management,
+    routes=['/category/add'],
+    view_func=AddCategory.as_view('add_category')
+)
 register_view(
     management,
     routes=["/category/<int:category_id>/delete"],
@@ -952,6 +926,8 @@ register_view(
     routes=['/category/<int:category_id>/edit'],
     view_func=EditCategory.as_view('edit_category')
 )
+
+# Forums
 register_view(
     management,
     routes=['/forums/add', '/forums/<int:category_id>/add'],
@@ -963,40 +939,66 @@ register_view(
     view_func=DeleteForum.as_view('delete_forum')
 )
 register_view(
-    management, routes=['/forums/<int:forum_id>/edit'], view_func=EditForum.as_view('edit_forum')
+    management,
+    routes=['/forums/<int:forum_id>/edit'],
+    view_func=EditForum.as_view('edit_forum')
 )
-register_view(management, routes=['forums'], view_func=Forums.as_view('forums'))
-register_view(management, routes=['/groups/add'], view_func=AddGroup.as_view('add_group'))
+register_view(
+    management,
+    routes=['forums'],
+    view_func=Forums.as_view('forums')
+)
+
+# Groups
+register_view(
+    management,
+    routes=['/groups/add'],
+    view_func=AddGroup.as_view('add_group')
+)
 register_view(
     management,
     routes=['/groups/<int:group_id>/delete', '/groups/delete'],
     view_func=DeleteGroup.as_view('delete_group')
 )
 register_view(
-    management, routes=['/groups/<int:group_id>/edit'], view_func=EditGroup.as_view('edit_group')
+    management,
+    routes=['/groups/<int:group_id>/edit'],
+    view_func=EditGroup.as_view('edit_group')
 )
-register_view(management, routes=['/groups'], view_func=Groups.as_view('groups'))
 register_view(
     management,
-    routes=['/plugins/<path:plugin>/disable'],
+    routes=['/groups'],
+    view_func=Groups.as_view('groups')
+)
+
+# Plugins
+register_view(
+    management,
+    routes=['/plugins/<path:name>/disable'],
     view_func=DisablePlugin.as_view('disable_plugin')
 )
 register_view(
     management,
-    routes=['/plugins/<path:plugin>/enable'],
+    routes=['/plugins/<path:name>/enable'],
     view_func=EnablePlugin.as_view('enable_plugin')
 )
 register_view(
     management,
-    routes=['/plugins/<path:plugin>/install'],
+    routes=['/plugins/<path:name>/install'],
     view_func=InstallPlugin.as_view('install_plugin')
 )
 register_view(
     management,
-    routes=['/plugins/<path:plugin>/uninstall'],
+    routes=['/plugins/<path:name>/uninstall'],
     view_func=UninstallPlugin.as_view('uninstall_plugin')
 )
-register_view(management, routes=['/plugins'], view_func=PluginsView.as_view('plugins'))
+register_view(
+    management,
+    routes=['/plugins'],
+    view_func=PluginsView.as_view('plugins')
+)
+
+# Reports
 register_view(
     management,
     routes=['/reports/<int:report_id>/delete', '/reports/delete'],
@@ -1008,16 +1010,34 @@ register_view(
     view_func=MarkReportRead.as_view('report_markread')
 )
 register_view(
-    management, routes=['/reports/unread'], view_func=UnreadReports.as_view('unread_reports')
+    management,
+    routes=['/reports/unread'],
+    view_func=UnreadReports.as_view('unread_reports')
 )
-register_view(management, routes=['/reports'], view_func=Reports.as_view('reports'))
 register_view(
     management,
-    routes=['/settings', '/settings/<path:slug>'],
+    routes=['/reports'],
+    view_func=Reports.as_view('reports')
+)
+
+# Settings
+register_view(
+    management,
+    routes=['/settings', '/settings/<path:slug>', '/settings/plugin/<path:plugin>'],
     view_func=ManagementSettings.as_view('settings')
 )
-register_view(management, routes=['/users/add'], view_func=AddUser.as_view('add_user'))
-register_view(management, routes=['/users/banned'], view_func=BannedUsers.as_view('banned_users'))
+
+# Users
+register_view(
+    management,
+    routes=['/users/add'],
+    view_func=AddUser.as_view('add_user')
+)
+register_view(
+    management,
+    routes=['/users/banned'],
+    view_func=BannedUsers.as_view('banned_users')
+)
 register_view(
     management,
     routes=['/users/ban', '/users/<int:user_id>/ban'],
@@ -1029,12 +1049,22 @@ register_view(
     view_func=DeleteUser.as_view('delete_user')
 )
 register_view(
-    management, routes=['/users/<int:user_id>/edit'], view_func=EditUser.as_view('edit_user')
+    management,
+    routes=['/users/<int:user_id>/edit'],
+    view_func=EditUser.as_view('edit_user')
 )
 register_view(
     management,
     routes=['/users/unban', '/users/<int:user_id>/unban'],
     view_func=UnbanUser.as_view('unban_user')
 )
-register_view(management, routes=['/users'], view_func=ManageUsers.as_view('users'))
-register_view(management, routes=['/'], view_func=ManagementOverview.as_view('overview'))
+register_view(
+    management,
+    routes=['/users'],
+    view_func=ManageUsers.as_view('users')
+)
+register_view(
+    management,
+    routes=['/'],
+    view_func=ManagementOverview.as_view('overview')
+)

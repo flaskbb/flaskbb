@@ -5,6 +5,7 @@ billiard==3.5.0.2
 blinker==1.4
 celery==4.0.2
 click==6.7
+enum34==1.1.6
 Flask==0.12.1
 Flask-Alembic==2.0.1
 flask-allows==0.2.0
@@ -14,13 +15,13 @@ Flask-DebugToolbar==0.10.1
 Flask-Limiter==0.9.3
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
-Flask-Plugins==1.6.1
 Flask-Redis==0.3.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.2
 Flask-Themes2==0.1.4
 flask-whooshee==0.4.1
 Flask-WTF==0.14.2
+flaskbb-plugin-portal==1.0.3
 itsdangerous==0.24
 Jinja2==2.9.6
 kombu==4.0.2
@@ -30,6 +31,7 @@ MarkupSafe==1.0
 mistune==0.7.4
 olefile==0.44
 Pillow==4.0.0
+pluggy==0.5.1
 Pygments==2.2.0
 python-editor==1.0.3
 pytz==2017.2

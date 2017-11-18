@@ -9,122 +9,153 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
-import os
-import shutil
 
 import click
 from flask import current_app
-from flask_plugins import (get_all_plugins, get_enabled_plugins,
-                           get_plugin_from_all)
+from flask.cli import with_appcontext
 
+from flaskbb.extensions import db
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import check_cookiecutter, validate_plugin
-from flaskbb.extensions import plugin_manager
-
-try:
-    from cookiecutter.main import cookiecutter
-except ImportError:
-    pass
+from flaskbb.cli.utils import validate_plugin, check_cookiecutter
+from flaskbb.plugins.models import PluginRegistry, PluginStore
+from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
 
 @flaskbb.group()
 def plugins():
-    """Plugins command sub group."""
+    """Plugins command sub group. If you want to run migrations or do some
+    i18n stuff checkout the corresponding command sub groups."""
     pass
 
 
+@plugins.command("list")
+@with_appcontext
+def list_plugins():
+    """Lists all installed plugins."""
+    enabled_plugins = current_app.pluggy.list_plugin_distinfo()
+    if len(enabled_plugins) > 0:
+        click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
+        for plugin in enabled_plugins:
+            p_mod = plugin[0]
+            p_dist = plugin[1]
+            click.secho("\t- {}\t({}), version {}".format(
+                current_app.pluggy.get_name(p_mod).title(), p_dist.key,
+                p_dist.version), bold=True
+            )
+
+    disabled_plugins = current_app.pluggy.list_disabled_plugins()
+    if len(disabled_plugins) > 0:
+        click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
+        for plugin in disabled_plugins:
+            p_mod = plugin[0]
+            p_dist = plugin[1]
+            click.secho("\t- {}\t({}), version {}".format(
+                p_mod.title(), p_dist.key,
+                p_dist.version), bold=True
+            )
+
+
+@plugins.command("enable")
+@click.argument("plugin_name")
+@with_appcontext
+def enable_plugin(plugin_name):
+    """Enables a plugin."""
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+
+    if plugin.enabled:
+        click.secho("Plugin '{}' is already enabled.".format(plugin.name))
+
+    plugin.enabled = True
+    plugin.save()
+    click.secho("[+] Plugin '{}' enabled.".format(plugin.name), fg="green")
+
+
+@plugins.command("disable")
+@click.argument("plugin_name")
+@with_appcontext
+def disable_plugin(plugin_name):
+    """Disables a plugin."""
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+
+    if not plugin.enabled:
+        click.secho("Plugin '{}' is already disabled.".format(plugin.name))
+
+    plugin.enabled = False
+    plugin.save()
+    click.secho("[+] Plugin '{}' disabled.".format(plugin.name), fg="green")
+
+
+@plugins.command("install")
+@click.argument("plugin_name")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Overwrites existing settings")
+def install(plugin_name, force):
+    """Installs a plugin (no migrations)."""
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+
+    if not plugin.enabled:
+        click.secho("[+] Can't install disabled plugin. "
+                    "Enable '{}' Plugin first.".format(plugin.name), fg="red")
+        sys.exit(0)
+
+    if plugin.is_installable:
+        plugin_module = current_app.pluggy.get_plugin(plugin.name)
+        plugin.add_settings(plugin_module.SETTINGS, force)
+        click.secho("[+] Plugin has been installed.", fg="green")
+    else:
+        click.secho("[+] Nothing to install.", fg="green")
+
+
+@plugins.command("uninstall")
+@click.argument("plugin_name")
+def uninstall(plugin_name):
+    """Uninstalls a plugin (no migrations)."""
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+
+    if plugin.is_installed:
+        PluginStore.query.filter_by(plugin_id=plugin.id).delete()
+        db.session.commit()
+        click.secho("[+] Plugin has been uninstalled.", fg="green")
+    else:
+        click.secho("[+] Nothing to uninstall.", fg="green")
+
+
+@plugins.command("cleanup")
+@with_appcontext
+def cleanup():
+    """Removes zombie plugins from FlaskBB.
+
+    A zombie plugin is a plugin
+    which exists in the database but isn't installed in the env anymore.
+    """
+    deleted_plugins = remove_zombie_plugins_from_db()
+    if len(deleted_plugins) > 0:
+        click.secho("[+] Removed following zombie plugins from FlaskBB: ",
+                    fg="green", nl=False)
+        click.secho("{}".format(", ".join(deleted_plugins)))
+    else:
+        click.secho("[+] No zombie plugins found.", fg="green")
+
+
 @plugins.command("new")
-@click.argument("plugin_identifier", callback=check_cookiecutter)
+@click.argument("plugin_name", callback=check_cookiecutter)
 @click.option("--template", "-t", type=click.STRING,
               default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
               help="Path to a cookiecutter template or to a valid git repo.")
-def new_plugin(plugin_identifier, template):
+@click.option("--out-dir", "-o", type=click.STRING,
+              help="The location for the new FlaskBB plugin.")
+def new_plugin(plugin_name, template, out_dir):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    out_dir = os.path.join(current_app.root_path, "plugins")
-    click.secho("[+] Creating new plugin {}".format(plugin_identifier),
-                fg="cyan")
+    from cookiecutter.main import cookiecutter  # noqa
     cookiecutter(template, output_dir=out_dir)
-    click.secho("[+] Done. Created in {}".format(out_dir),
+    click.secho("[+] Created new plugin {} in {}".format(plugin_name, out_dir),
                 fg="green", bold=True)
-
-
-@plugins.command("install")
-@click.argument("plugin_identifier")
-def install_plugin(plugin_identifier):
-    """Installs a new plugin."""
-    validate_plugin(plugin_identifier)
-    plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Installing plugin {}...".format(plugin.name), fg="cyan")
-    try:
-        plugin_manager.install_plugins([plugin])
-    except Exception as e:
-        click.secho("[-] Couldn't install plugin because of following "
-                    "exception: \n{}".format(e), fg="red")
-
-
-@plugins.command("uninstall")
-@click.argument("plugin_identifier")
-def uninstall_plugin(plugin_identifier):
-    """Uninstalls a plugin from FlaskBB."""
-    validate_plugin(plugin_identifier)
-    plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Uninstalling plugin {}...".format(plugin.name), fg="cyan")
-    try:
-        plugin_manager.uninstall_plugins([plugin])
-    except AttributeError:
-        pass
-
-
-@plugins.command("remove")
-@click.argument("plugin_identifier")
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Removes the plugin without asking for confirmation.")
-def remove_plugin(plugin_identifier, force):
-    """Removes a plugin from the filesystem."""
-    validate_plugin(plugin_identifier)
-    if not force and not \
-            click.confirm(click.style("Are you sure?", fg="magenta")):
-        sys.exit(0)
-
-    plugin = get_plugin_from_all(plugin_identifier)
-    click.secho("[+] Uninstalling plugin {}...".format(plugin.name), fg="cyan")
-    try:
-        plugin_manager.uninstall_plugins([plugin])
-    except Exception as e:
-        click.secho("[-] Couldn't uninstall plugin because of following "
-                    "exception: \n{}".format(e), fg="red")
-        if not click.confirm(click.style(
-            "Do you want to continue anyway?", fg="magenta")
-        ):
-            sys.exit(0)
-
-    click.secho("[+] Removing plugin from filesystem...", fg="cyan")
-    shutil.rmtree(plugin.path, ignore_errors=False, onerror=None)
-
-
-@plugins.command("list")
-def list_plugins():
-    """Lists all installed plugins."""
-    click.secho("[+] Listing all installed plugins...", fg="cyan")
-
-    # This is subject to change as I am not happy with the current
-    # plugin system
-    enabled_plugins = get_enabled_plugins()
-    disabled_plugins = set(get_all_plugins()) - set(enabled_plugins)
-    if len(enabled_plugins) > 0:
-        click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
-        for plugin in enabled_plugins:
-            click.secho("    - {} (version {})".format(
-                plugin.name, plugin.version), bold=True
-            )
-    if len(disabled_plugins) > 0:
-        click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
-        for plugin in disabled_plugins:
-            click.secho("    - {} (version {})".format(
-                plugin.name, plugin.version), bold=True
-            )

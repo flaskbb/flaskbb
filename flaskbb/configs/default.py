@@ -12,8 +12,6 @@
 import os
 import sys
 import datetime
-import glob
-from flaskbb.utils.helpers import get_alembic_branches
 
 
 class DefaultConfig(object):
@@ -74,7 +72,7 @@ class DefaultConfig(object):
 
     ALEMBIC = {
         'script_location': os.path.join(basedir, "migrations"),
-        'version_locations': get_alembic_branches(),
+        'version_locations': '',
         'file_template': '%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s'
     }
     ALEMBIC_CONTEXT = {
@@ -193,5 +191,8 @@ class DefaultConfig(object):
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
-    # Plugin Folder
-    PLUGINS_FOLDER = os.path.join(basedir, "flaskbb", "plugins")
+    # Remove dead plugins - useful if you want to migrate your instance
+    # somewhere else and forgot to reinstall the plugins.
+    # If set to `False` it will NOT remove plugins that are NOT installed on
+    # the filesystem (virtualenv, site-packages).
+    REMOVE_DEAD_PLUGINS = False

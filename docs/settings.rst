@@ -16,10 +16,25 @@ The available fields are shown below.
     `Settings Model <models.html#flaskbb.management.models.Setting>`__.
 
 
-.. module:: flaskbb.management.models
+.. autoclass:: flaskbb.utils.forms.SettingValueType
+    :members:
+    :undoc-members:
 
 
-.. autoclass:: Setting
+    ======================================== =========================================== =====================================
+    Value Type                               Rendered As                                 Parsed & Saved as
+    ======================================== =========================================== =====================================
+    :attr:`~SettingValueType.string`         :class:`wtforms.fields.StringField`         :class:`str`
+    :attr:`~SettingValueType.integer`        :class:`wtforms.fields.IntegerField`        :class:`int`
+    :attr:`~SettingValueType.float`          :class:`wtforms.fields.FloatField`          :class:`float`
+    :attr:`~SettingValueType.boolean`        :class:`wtforms.fields.BooleanField`        :class:`bool`
+    :attr:`~SettingValueType.select`         :class:`wtforms.fields.SelectField`         :class:`list`
+    :attr:`~SettingValueType.selectmultiple` :class:`wtforms.fields.SelectMultipleField` :class:`list`
+    ======================================== =========================================== =====================================
+
+    TODO
+
+.. autoclass:: flaskbb.management.models
     :noindex:
 
     .. attribute:: key

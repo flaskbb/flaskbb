@@ -15,6 +15,7 @@ from functools import partial
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from flask import Flask, request
 from flask_login import current_user
 
@@ -28,15 +29,16 @@ from flaskbb.forum.views import forum
 # models
 from flaskbb.user.models import User, Guest
 # extensions
-from flaskbb.extensions import (db, login_manager, mail, cache, redis_store,
-                                debugtoolbar, alembic, themes, plugin_manager,
-                                babel, csrf, allows, limiter, celery, whooshee)
+from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
+                                db, debugtoolbar, limiter, login_manager, mail,
+                                redis_store, themes, whooshee)
+
 # various helpers
 from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
                                    forum_is_unread, topic_is_unread,
                                    render_template, render_markup,
-                                   app_config_from_env)
+                                   app_config_from_env, get_alembic_locations)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
@@ -50,6 +52,11 @@ from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 
+from flaskbb.plugins.models import PluginRegistry
+from flaskbb.plugins.manager import FlaskBBPluginManager
+from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+from flaskbb.plugins import spec
+
 
 def create_app(config=None):
     """Creates the app.
@@ -61,16 +68,20 @@ def create_app(config=None):
                    later overwrite it from the ENVVAR.
     """
     app = Flask("flaskbb")
-
     configure_app(app, config)
     configure_celery_app(app, celery)
-    configure_blueprints(app)
     configure_extensions(app)
+    load_plugins(app)
+    configure_blueprints(app)
     configure_template_filters(app)
     configure_context_processors(app)
     configure_before_handlers(app)
     configure_errorhandlers(app)
+    configure_migrations(app)
+    configure_translations(app)
     configure_logging(app)
+
+    app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
     return app
 
@@ -96,6 +107,7 @@ def configure_app(app, config):
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object
     app_config_from_env(app, prefix="FLASKBB_")
+    app.pluggy = FlaskBBPluginManager('flaskbb', implprefix='flaskbb_')
 
 
 def configure_celery_app(app, celery):
@@ -125,15 +137,14 @@ def configure_blueprints(app):
         message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
     )
 
+    app.pluggy.hook.flaskbb_load_blueprints(app=app)
+
 
 def configure_extensions(app):
     """Configures the extensions."""
 
     # Flask-WTF CSRF
     csrf.init_app(app)
-
-    # Flask-Plugins
-    plugin_manager.init_app(app)
 
     # Flask-SQLAlchemy
     db.init_app(app)
@@ -188,18 +199,6 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-    # Flask-BabelEx
-    babel.init_app(app=app, default_domain=FlaskBBDomain(app))
-
-    @babel.localeselector
-    def get_locale():
-        # if a user is logged in, use the locale from the user settings
-        if current_user and \
-                current_user.is_authenticated and current_user.language:
-            return current_user.language
-        # otherwise we will just fallback to the default language
-        return flaskbb_config["DEFAULT_LANGUAGE"]
-
     # Flask-Allows
     allows.init_app(app)
     allows.identity_loader(lambda: current_user)
@@ -239,6 +238,10 @@ def configure_template_filters(app):
 
     app.jinja_env.filters.update(filters)
 
+    app.jinja_env.globals["run_hook"] = template_hook
+
+    app.pluggy.hook.flaskbb_jinja_directives(app=app)
+
 
 def configure_context_processors(app):
     """Configures the context processors."""
@@ -273,6 +276,8 @@ def configure_before_handlers(app):
             else:
                 mark_online(request.remote_addr, guest=True)
 
+    app.pluggy.hook.flaskbb_request_processors(app=app)
+
 
 def configure_errorhandlers(app):
     """Configures the error handlers."""
@@ -288,6 +293,33 @@ def configure_errorhandlers(app):
     @app.errorhandler(500)
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
+
+    app.pluggy.hook.flaskbb_errorhandlers(app=app)
+
+
+def configure_migrations(app):
+    """Configure migrations."""
+    plugin_dirs = app.pluggy.hook.flaskbb_load_migrations()
+    version_locations = get_alembic_locations(plugin_dirs)
+
+    app.config['ALEMBIC']['version_locations'] = version_locations
+
+
+def configure_translations(app):
+    """Configure translations."""
+
+    # we have to initialize the extension after we have loaded the plugins
+    # because we of the 'flaskbb_load_translations' hook
+    babel.init_app(app=app, default_domain=FlaskBBDomain(app))
+
+    @babel.localeselector
+    def get_locale():
+        # if a user is logged in, use the locale from the user settings
+        if current_user and \
+                current_user.is_authenticated and current_user.language:
+            return current_user.language
+        # otherwise we will just fallback to the default language
+        return flaskbb_config["DEFAULT_LANGUAGE"]
 
 
 def configure_logging(app):
@@ -349,3 +381,34 @@ def configure_logging(app):
                                  parameters, context, executemany):
             total = time.time() - conn.info['query_start_time'].pop(-1)
             app.logger.debug("Total Time: %f", total)
+
+
+def load_plugins(app):
+    app.pluggy.add_hookspecs(spec)
+    try:
+        with app.app_context():
+            plugins = PluginRegistry.query.all()
+
+    except (OperationalError, ProgrammingError):
+        return
+
+    for plugin in plugins:
+        if not plugin.enabled:
+            app.pluggy.set_blocked(plugin.name)
+
+    app.pluggy.load_setuptools_entrypoints('flaskbb_plugins')
+    app.pluggy.hook.flaskbb_extensions(app=app)
+
+    loaded_names = set([p[0] for p in app.pluggy.list_name_plugin()])
+    registered_names = set([p.name for p in plugins])
+    unregistered = [
+        PluginRegistry(name=name) for name in loaded_names - registered_names
+    ]
+    with app.app_context():
+        db.session.add_all(unregistered)
+        db.session.commit()
+
+        removed = 0
+        if app.config["REMOVE_DEAD_PLUGINS"]:
+            removed = remove_zombie_plugins_from_db()
+            app.logger.info("Removed Plugins: {}".format(removed))

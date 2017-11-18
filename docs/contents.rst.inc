@@ -8,7 +8,9 @@ Contents
    cli
    theming
    plugins
-   events
+   plugin_development
+   hooks
+   settings
    api
 
 
