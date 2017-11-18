@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 revision = '8ad96e49dc6'
 down_revision = None
-branch_labels = ('flaskbb',)
+branch_labels = ('default',)
 
 
 def upgrade():

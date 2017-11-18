@@ -96,7 +96,7 @@ class ChangeUserDetails(MethodView):
     form = ChangeUserDetailsForm
 
     def get(self):
-        return render_template("user/change_user_details.html", form=self.form(obh=current_user))
+        return render_template("user/change_user_details.html", form=self.form(obj=current_user))
 
     def post(self):
         form = self.form(obj=current_user)

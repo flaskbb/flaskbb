@@ -72,7 +72,8 @@ class DefaultConfig(object):
 
     ALEMBIC = {
         'script_location': os.path.join(basedir, "migrations"),
-        'version_locations': ''
+        'version_locations': '',
+        'file_template': '%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s'
     }
     ALEMBIC_CONTEXT = {
         'render_as_batch': True

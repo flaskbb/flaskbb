@@ -182,6 +182,12 @@
         {% block javascript %}
         <!-- jquery and bootstrap and flaskbb.js -->
         <script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
+        <!-- Enable tooltips in all templates -->
+        <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        </script>
         {% endblock %}
 
         {# for extra scripts in other templates. #}

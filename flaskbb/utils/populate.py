@@ -9,10 +9,14 @@
     :license: BSD, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+import collections
+
+from sqlalchemy_utils.functions import create_database, database_exists
+
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post, Topic, Forum, Category
-from flaskbb.extensions import db
+from flaskbb.extensions import alembic, db
 
 
 def delete_settings_from_fixture(fixture):
@@ -85,7 +89,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                               setting if it already exists.
                               Defaults to ``False``.
     """
-    updated_settings = {}
+    updated_settings = collections.defaultdict(list)
 
     for settingsgroup in fixture:
 
@@ -109,8 +113,17 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
 
             setting = Setting.query.filter_by(key=settings[0]).first()
 
-            if (setting is not None and overwrite_setting) or setting is None:
+            if setting is not None:
+                setting_is_different = (
+                    setting.value != settings[1]["value"]
+                    or setting.value_type != settings[1]["value_type"]
+                    or setting.name != settings[1]["name"]
+                    or setting.description != settings[1]["description"]
+                    or setting.extra != settings[1].get("extra", "")
+                    or setting.settingsgroup != group.key
+                )
 
+            if (setting is not None and overwrite_setting and setting_is_different) or setting is None:
                 if setting is not None:
                     setting.value = settings[1]["value"]
                     setting.value_type = settings[1]["value_type"]
@@ -130,7 +143,6 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                     )
 
                 setting.save()
-                updated_settings[group] = []
                 updated_settings[group].append(setting)
     return updated_settings
 
@@ -365,3 +377,16 @@ def insert_bulk_data(topic_count=10, post_count=100):
     user2.recalculate()
 
     return created_topics, created_posts
+
+
+def create_latest_db():
+    """Creates the database including the schema using SQLAlchemy's
+    db.create_all method instead of going through all the database revisions.
+    The revision will be set to 'head' which indicates the latest alembic
+    revision.
+    """
+    if not database_exists(db.engine.url):
+        create_database(db.engine.url)
+
+    db.create_all()
+    alembic.stamp()

@@ -32,7 +32,7 @@ class Setting(db.Model, CRUDMixin):
 
     key = db.Column(db.String(255), primary_key=True)
     value = db.Column(db.PickleType, nullable=False)
-    settingsgroup = db.Column(db.String,
+    settingsgroup = db.Column(db.String(255),
                               db.ForeignKey('settingsgroup.key',
                                             use_alter=True,
                                             name="fk_settingsgroup"),
