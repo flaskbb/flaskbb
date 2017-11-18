@@ -30,7 +30,8 @@ moderators = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+              db.ForeignKey('forums.id', use_alter=True,
+                            name="fk_mods_forum_id"),
               nullable=False))
 
 
@@ -49,7 +50,8 @@ forumgroups = db.Table(
     db.Column('group_id', db.Integer(), db.ForeignKey('groups.id'),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, name="fk_forum_id"),
+              db.ForeignKey('forums.id', use_alter=True,
+                            name="fk_fg_forum_id"),
               nullable=False))
 
 

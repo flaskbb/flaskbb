@@ -20,8 +20,7 @@ from werkzeug.utils import import_string, ImportStringError
 from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import (database_exists, create_database,
-                                        drop_database)
+from sqlalchemy_utils.functions import database_exists
 from flask_alembic import alembic_click
 
 from flaskbb import create_app
@@ -33,7 +32,8 @@ from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
 from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_default_groups,
                                     create_default_settings, insert_bulk_data,
-                                    update_settings_from_fixture)
+                                    update_settings_from_fixture,
+                                    create_latest_db)
 from flaskbb.utils.translations import compile_translations
 
 
@@ -107,9 +107,8 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
-@click.option("--group", "-g", help="The group of the user.",
-              type=click.Choice(["admin", "super_mod", "mod", "member"]))
-def install(welcome, force, username, email, password, group):
+@with_appcontext
+def install(welcome, force, username, email, password):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -119,18 +118,19 @@ def install(welcome, force, username, email, password, group):
             "Existing database found. Do you want to delete the old one and "
             "create a new one?", fg="magenta")
         ):
-            drop_database(db.engine.url)
+            db.drop_all()
         else:
             sys.exit(0)
-    create_database(db.engine.url)
-    alembic.upgrade()
+
+    # creating database from scratch and 'stamping it'
+    create_latest_db()
 
     click.secho("[+] Creating default settings...", fg="cyan")
     create_default_groups()
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    prompt_save_user(username, email, password, group)
+    prompt_save_user(username, email, password, "admin")
 
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
@@ -160,15 +160,15 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
-        drop_database(db.engine.url)
+        db.drop_all()
 
         # do not initialize the db if -i is passed
         if not initdb:
-            alembic.upgrade()
+            create_latest_db()
 
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
-        alembic.upgrade()
+        create_latest_db()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")
@@ -225,8 +225,8 @@ def upgrade(all_latest, fixture, force):
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
-        click.secho("[+] {} groups and {} settings updated.".format(
-            len(count.keys()), len(count.values())), fg="green"
+        click.secho("[+] {settings} settings in {groups} setting groups updated.".format(
+            groups=len(count), settings=sum(len(settings) for settings in count.values())), fg="green"
         )
 
 
