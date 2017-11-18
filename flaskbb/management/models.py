@@ -9,14 +9,14 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
-from wtforms import (TextField, IntegerField, FloatField, BooleanField,
-                     SelectField, SelectMultipleField, validators)
+
 from flask_wtf import FlaskForm
-
-from flaskbb._compat import text_type, iteritems
-from flaskbb.extensions import db, cache
+from flaskbb._compat import iteritems, text_type
+from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
-
+from flaskbb.utils.forms import SettingValueType, generate_settings_form
+from wtforms import (BooleanField, FloatField, IntegerField, SelectField,
+                     SelectMultipleField, TextField, validators)
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class Setting(db.Model, CRUDMixin):
     description = db.Column(db.Text, nullable=False)
 
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.String(20), nullable=False)
+    value_type = db.Column(db.Enum(SettingValueType), nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
@@ -65,99 +65,7 @@ class Setting(db.Model, CRUDMixin):
         :param group: The settingsgroup name. It is used to get the settings
                       which are in the specified group.
         """
-
-        class SettingsForm(FlaskForm):
-            pass
-
-        # now parse the settings in this group
-        for setting in group.settings:
-            field_validators = []
-
-            if setting.value_type in ("integer", "float"):
-                validator_class = validators.NumberRange
-            elif setting.value_type == "string":
-                validator_class = validators.Length
-
-            # generate the validators
-            if "min" in setting.extra:
-                # Min number validator
-                field_validators.append(
-                    validator_class(min=setting.extra["min"])
-                )
-
-            if "max" in setting.extra:
-                # Max number validator
-                field_validators.append(
-                    validator_class(max=setting.extra["max"])
-                )
-
-            # Generate the fields based on value_type
-            # IntegerField
-            if setting.value_type == "integer":
-                setattr(
-                    SettingsForm, setting.key,
-                    IntegerField(setting.name, validators=field_validators,
-                                 description=setting.description)
-                )
-            # FloatField
-            elif setting.value_type == "float":
-                setattr(
-                    SettingsForm, setting.key,
-                    FloatField(setting.name, validators=field_validators,
-                               description=setting.description)
-                )
-
-            # TextField
-            elif setting.value_type == "string":
-                setattr(
-                    SettingsForm, setting.key,
-                    TextField(setting.name, validators=field_validators,
-                              description=setting.description)
-                )
-
-            # SelectMultipleField
-            elif setting.value_type == "selectmultiple":
-                # if no coerce is found, it will fallback to unicode
-                if "coerce" in setting.extra:
-                    coerce_to = setting.extra['coerce']
-                else:
-                    coerce_to = text_type
-
-                setattr(
-                    SettingsForm, setting.key,
-                    SelectMultipleField(
-                        setting.name,
-                        choices=setting.extra['choices'](),
-                        coerce=coerce_to,
-                        description=setting.description
-                    )
-                )
-
-            # SelectField
-            elif setting.value_type == "select":
-                # if no coerce is found, it will fallback to unicode
-                if "coerce" in setting.extra:
-                    coerce_to = setting.extra['coerce']
-                else:
-                    coerce_to = text_type
-
-                setattr(
-                    SettingsForm, setting.key,
-                    SelectField(
-                        setting.name,
-                        coerce=coerce_to,
-                        choices=setting.extra['choices'](),
-                        description=setting.description)
-                )
-
-            # BooleanField
-            elif setting.value_type == "boolean":
-                setattr(
-                    SettingsForm, setting.key,
-                    BooleanField(setting.name, description=setting.description)
-                )
-
-        return SettingsForm
+        return generate_settings_form(settings=group.settings)
 
     @classmethod
     def get_all(cls):
@@ -197,13 +105,7 @@ class Setting(db.Model, CRUDMixin):
 
         settings = {}
         for setting in result:
-            settings[setting.key] = {
-                'name': setting.name,
-                'description': setting.description,
-                'value': setting.value,
-                'value_type': setting.value_type,
-                'extra': setting.extra
-            }
+            settings[setting.key] = setting.value
 
         return settings
 

@@ -142,17 +142,17 @@
                             <div class="row stats-item">
                                 <div class="key pull-left">
                                 {% if plugin.installed %}
-                                    <a href="{{ url_for('management.settings', slug=plugin.settings_key) }}">{{ plugin.name }}</a>
+                                    <a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
                                 {% else %}
-                                    <a href="{{ url_for('management.plugins') }}">{{ plugin.name }}</a>
+                                    <a href="{{ url_for('management.plugins') }}">{{ plugin.name.title() }}</a>
                                 {% endif %}
                                 </div>
                                 <div class="value pull-right">
                                     {% if not plugin.enabled %}
                                         <span class="text-danger">not enabled</span>
-                                    {% elif plugin.enabled and plugin.installed %}
+                                    {% elif plugin.enabled and plugin.is_installed %}
                                         <span class="text-success">enabled &amp; installed</span>
-                                    {% elif plugin.enabled and not plugin.installed %}
+                                    {% elif plugin.enabled and not plugin.is_installed %}
                                         <span class="text-warning">not installed</span>
                                     {% endif %}
                                     {{ plugin.version }}

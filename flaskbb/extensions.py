@@ -20,17 +20,15 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_plugins import PluginManager
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import BaseQuery, SQLAlchemy
 from flask_themes2 import Themes
 from flask_whooshee import (DELETE_KWD, INSERT_KWD, UPDATE_KWD, Whooshee,
                             WhoosheeQuery)
 from flask_wtf.csrf import CSRFProtect
+from flaskbb.exceptions import AuthorizationRequired
 from sqlalchemy import event
 from sqlalchemy.orm import Query as SQLAQuery
-
-from flaskbb.exceptions import AuthorizationRequired
 
 
 class FlaskBBWhooshee(Whooshee):
@@ -100,9 +98,6 @@ alembic = Alembic()
 
 # Themes
 themes = Themes()
-
-# PluginManager
-plugin_manager = PluginManager()
 
 # Babel
 babel = Babel()
