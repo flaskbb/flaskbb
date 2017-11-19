@@ -92,6 +92,7 @@ setup(
         'MarkupSafe',
         'mistune',
         'Pillow',
+        'pluggy',
         'Pygments',
         'python-editor',
         'pytz',
