@@ -8,11 +8,15 @@
     :copyright: 2017, the FlaskBB Team
     :license: BSD, see LICENSE for more details
 """
+import logging
+
 from pkg_resources import (DistributionNotFound, VersionConflict,
                            iter_entry_points)
 
 import pluggy
 from flaskbb.utils.helpers import parse_pkg_metadata
+
+logger = logging.getLogger(__name__)
 
 
 class FlaskBBPluginManager(pluggy.PluginManager):
@@ -30,6 +34,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     def load_setuptools_entrypoints(self, entrypoint_name):
         """Load modules from querying the specified setuptools entrypoint name.
         Return the number of loaded plugins. """
+        logger.info("Loading plugins under entrypoint {}".format(entrypoint_name))
         for ep in iter_entry_points(entrypoint_name):
             if self.get_plugin(ep.name):
                 continue
@@ -43,6 +48,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             try:
                 plugin = ep.load()
             except DistributionNotFound:
+                logger.warn("Could not load plugin {}. Passing.".format(ep.name))
                 continue
             except VersionConflict as e:
                 raise pluggy.PluginValidationError(
@@ -51,6 +57,11 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             self.register(plugin, name=ep.name)
             self._plugin_distinfo.append((plugin, ep.dist))
             self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
+            logger.info("Loaded plugin: {}".format(ep.name))
+        logger.info("Loaded {} plugins for entrypoint {}".format(
+            len(self._plugin_distinfo),
+            entrypoint_name
+        ))
         return len(self._plugin_distinfo)
 
     def get_metadata(self, name):
