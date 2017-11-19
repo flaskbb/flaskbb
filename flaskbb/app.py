@@ -73,6 +73,7 @@ def create_app(config=None):
     """
     app = Flask("flaskbb")
     configure_app(app, config)
+    configure_logging(app)
     configure_celery_app(app, celery)
     configure_extensions(app)
     load_plugins(app)
@@ -83,7 +84,6 @@ def create_app(config=None):
     configure_errorhandlers(app)
     configure_migrations(app)
     configure_translations(app)
-    configure_logging(app)
 
     app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
