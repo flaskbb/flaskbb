@@ -9,7 +9,9 @@
     :license: BSD, see LICENSE for more details.
 """
 import ast
+import glob
 import itertools
+import logging
 import operator
 import os
 import re
@@ -38,6 +40,8 @@ from jinja2 import Markup
 from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
+
+logger = logging.getLogger(__name__)
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 

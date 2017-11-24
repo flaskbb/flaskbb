@@ -8,10 +8,17 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from flaskbb._compat import iteritems
-from flaskbb.extensions import db, cache
+import logging
+
+from flask_wtf import FlaskForm
+from flaskbb._compat import iteritems, text_type
+from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
-from flaskbb.utils.forms import generate_settings_form, SettingValueType
+from flaskbb.utils.forms import SettingValueType, generate_settings_form
+from wtforms import (BooleanField, FloatField, IntegerField, SelectField,
+                     SelectMultipleField, TextField, validators)
+
+logger = logging.getLogger(__name__)
 
 
 class SettingsGroup(db.Model, CRUDMixin):

@@ -10,4 +10,8 @@
     :license: BSD, see LICENSE for more details.
 """
 __version__ = '1.0'  # noqa
+import logging
+
+logger = logging.getLogger(__name__)
+
 from flaskbb.app import create_app  # noqa

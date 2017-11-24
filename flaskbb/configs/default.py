@@ -47,14 +47,47 @@ class DefaultConfig(object):
     # This only affects the url generation with 'url_for'.
     PREFERRED_URL_SCHEME = "http"
 
+    # Logging Settings
+    # ------------------------------
+    # This config section will deal with the logging settings
+    # for FlaskBB, adjust as needed.
+
+    # Logging Config Path
+    # see https://docs.python.org/library/logging.config.html#logging.config.fileConfig
+    # for more details. Should either be None or a path to a file
+    # If this is set to a path, consider setting USE_DEFAULT_LOGGING to False
+    # otherwise there may be interactions between the log configuration file
+    # and the default logging setting.
+    #
+    # If set to a file path, this should be an absolute file path
+    LOG_CONF_FILE = None
+
+    # When set to True this will enable the default
+    # FlaskBB logging configuration which uses the settings
+    # below to determine logging
+    USE_DEFAULT_LOGGING = True
+
+    # Log format FlaskBB will use
+    LOG_FORMAT = '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+
+    # Log level FlaskBB will use
+    LOG_LEVEL = "INFO"
+
     # If SEND_LOGS is set to True, the admins (see the mail configuration) will
     # recieve the error logs per email.
     SEND_LOGS = False
 
-    # The filename for the info and error logs. The logfiles are stored at
-    # flaskbb/logs
+    # Path to store the INFO and ERROR logs
+    # If None this defaults to flaskbb/logs
+    #
+    # If set to a file path, this should be an absolute path
+    LOG_PATH = None
+
+    # The filename for the info and error logs. The logfiles are stored
+    # at the path specified in LOG_PATH
     INFO_LOG = "info.log"
     ERROR_LOG = "error.log"
+
 
     # Database
     # ------------------------------
@@ -191,6 +224,8 @@ class DefaultConfig(object):
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
+
+
     # Remove dead plugins - useful if you want to migrate your instance
     # somewhere else and forgot to reinstall the plugins.
     # If set to `False` it will NOT remove plugins that are NOT installed on

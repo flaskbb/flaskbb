@@ -9,12 +9,16 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import whoosh
 from flask_whooshee import AbstractWhoosheer
 
 from flaskbb._compat import text_type
 from flaskbb.forum.models import Forum, Topic, Post
 from flaskbb.user.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class PostWhoosheer(AbstractWhoosheer):

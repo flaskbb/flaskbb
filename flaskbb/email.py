@@ -8,12 +8,16 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask import render_template
 from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail, celery
 from flaskbb.utils.tokens import make_token
+
+
+logger = logging.getLogger(__name__)
 
 
 @celery.task

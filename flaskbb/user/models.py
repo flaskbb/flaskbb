@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for
 from flask_login import UserMixin, AnonymousUserMixin
@@ -20,6 +21,9 @@ from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.forum.models import (Post, Topic, Forum, topictracker, TopicsRead,
                                   ForumsRead)
 from flaskbb.message.models import Conversation
+
+
+logger = logging.getLogger(__name__)
 
 
 groups_users = db.Table(

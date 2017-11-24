@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import sys
 
 from celery import __version__ as celery_version
@@ -36,6 +37,9 @@ from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastSuperModerator)
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
+
+logger = logging.getLogger(__name__)
+
 
 management = Blueprint("management", __name__)
 

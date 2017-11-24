@@ -8,11 +8,15 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from sqlalchemy_utils import UUIDType
 
 from flaskbb.extensions import db
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.database import CRUDMixin, UTCDateTime
+
+
+logger = logging.getLogger(__name__)
 
 
 class Conversation(db.Model, CRUDMixin):

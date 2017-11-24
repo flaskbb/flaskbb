@@ -9,6 +9,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask import Blueprint, flash, request
 from flask.views import MethodView
 from flask_babelplus import gettext as _
@@ -20,6 +21,9 @@ from flaskbb.user.models import User
 from flaskbb.utils.helpers import (get_available_languages,
                                    get_available_themes, register_view,
                                    render_template)
+
+logger = logging.getLogger(__name__)
+
 
 user = Blueprint("user", __name__)
 

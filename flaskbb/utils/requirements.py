@@ -7,11 +7,15 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
+import logging
+
 from flask_allows import And, Or, Requirement
 
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.locals import current_forum, current_post, current_topic
 from flaskbb.forum.models import Forum, Post, Topic
+
+logger = logging.getLogger(__name__)
 
 
 class Has(Requirement):

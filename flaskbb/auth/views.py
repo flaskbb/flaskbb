@@ -10,6 +10,7 @@
     :license: BSD, see LICENSE for more details.
 """
 from datetime import datetime
+import logging
 
 from flask import Blueprint, flash, g, redirect, request, url_for
 from flask.views import MethodView
@@ -32,6 +33,10 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
+
+
+logger = logging.getLogger(__name__)
+
 
 auth = Blueprint("auth", __name__)
 

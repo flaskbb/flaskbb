@@ -9,6 +9,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 '''
+import logging
 import math
 
 from flask import (Blueprint, abort, current_app, flash, redirect, request,
@@ -35,7 +36,10 @@ from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
 
-forum = Blueprint('forum', __name__)
+logger = logging.getLogger(__name__)
+
+
+forum = Blueprint("forum", __name__)
 
 
 class ForumIndex(MethodView):

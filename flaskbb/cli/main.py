@@ -504,7 +504,8 @@ def generate_config(development, output, force):
         "mail_admin_address": "admin@yourdomain",
         "secret_key": binascii.hexlify(os.urandom(24)).decode(),
         "csrf_secret_key": binascii.hexlify(os.urandom(24)).decode(),
-        "timestamp": datetime.utcnow().strftime("%A, %d. %B %Y at %H:%M")
+        "timestamp": datetime.utcnow().strftime("%A, %d. %B %Y at %H:%M"),
+        "log_config_path": "",
     }
 
     if not force:
@@ -614,6 +615,14 @@ def generate_config(development, output, force):
     default_conf["mail_admin_address"] = click.prompt(
         click.style("Mail Admin Email", fg="magenta"),
         default=default_conf.get("mail_admin_address"))
+
+    click.secho("Optional filepath to load a logging configuration file from. "
+                "See the Python logging documentation for more detail.\n"
+                "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",
+                fg="cyan")
+    default_conf["log_config_path"] =click.prompt(
+        click.style("Logging Config Path", fg="magenta"),
+        default=default_conf.get("log_config_path"))
 
     write_config(default_conf, config_template, config_path)
 

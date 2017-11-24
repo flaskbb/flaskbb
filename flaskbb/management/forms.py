@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, PasswordField,
                      SelectField, StringField, SubmitField, TextAreaField)
@@ -24,6 +25,9 @@ from flaskbb.forum.models import Forum, Category
 from flaskbb.user.models import User, Group
 from flaskbb.utils.requirements import IsAtleastModerator
 from flask_allows import Permission
+
+
+logger = logging.getLogger(__name__)
 
 
 USERNAME_RE = r'^[\w.+-]+$'

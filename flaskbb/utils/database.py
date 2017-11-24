@@ -8,11 +8,15 @@
     :copyright: (c) 2015 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 import pytz
 from flask_login import current_user
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy.ext.declarative import declared_attr
 from flaskbb.extensions import db
+
+
+logger = logging.getLogger(__name__)
 
 
 def make_comparable(cls):
