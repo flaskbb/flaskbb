@@ -10,15 +10,15 @@
     :license: BSD, see LICENSE for more details.
 """
 from flask import current_app, flash, redirect, url_for
-from jinja2 import Markup
+from jinja2 import Markup,contextfunction
 from flask_babelplus import gettext as _
 
 from flaskbb.extensions import db
 from flaskbb.utils.datastructures import TemplateEventResult
 from flaskbb.plugins.models import PluginRegistry
 
-
-def template_hook(name, silent=True, **kwargs):
+@contextfunction
+def template_hook(ctx,name, silent=True, **kwargs):
     """Calls the given template hook.
 
     :param name: The name of the hook.
@@ -26,6 +26,7 @@ def template_hook(name, silent=True, **kwargs):
                    doesn't exist. Defauls to ``True``.
     :param kwargs: Additional kwargs that should be passed to the hook.
     """
+    kwargs['context']=ctx
     try:
         hook = getattr(current_app.pluggy.hook, name)
         result = hook(**kwargs)
