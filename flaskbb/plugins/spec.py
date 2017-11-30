@@ -66,7 +66,7 @@ def flaskbb_cli(cli):
 # Template Hooks
 
 @spec
-def flaskbb_tpl_before_navigation():
+def flaskbb_tpl_before_navigation(context):
     """Hook for registering additional navigation items.
 
     in :file:`templates/layout.html`.
@@ -74,7 +74,7 @@ def flaskbb_tpl_before_navigation():
 
 
 @spec
-def flaskbb_tpl_after_navigation():
+def flaskbb_tpl_after_navigation(context):
     """Hook for registering additional navigation items.
 
     in :file:`templates/layout.html`.
@@ -82,7 +82,7 @@ def flaskbb_tpl_after_navigation():
 
 
 @spec
-def flaskbb_tpl_before_registration_form():
+def flaskbb_tpl_before_registration_form(context):
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
 
@@ -91,7 +91,7 @@ def flaskbb_tpl_before_registration_form():
 
 
 @spec
-def flaskbb_tpl_after_registration_form():
+def flaskbb_tpl_after_registration_form(context):
     """This hook is emitted in the Registration form **after** the last
     input field but before the submit field.
 
@@ -100,7 +100,7 @@ def flaskbb_tpl_after_registration_form():
 
 
 @spec
-def flaskbb_tpl_before_user_details_form():
+def flaskbb_tpl_before_user_details_form(context):
     """This hook is emitted in the Change User Details form **before** an
     input field is rendered.
 
@@ -109,7 +109,7 @@ def flaskbb_tpl_before_user_details_form():
 
 
 @spec
-def flaskbb_tpl_after_user_details_form():
+def flaskbb_tpl_after_user_details_form(context):
     """This hook is emitted in the Change User Details form **after** the last
     input field has been rendered but before the submit field.
 
