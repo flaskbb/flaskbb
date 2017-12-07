@@ -115,3 +115,32 @@ def flaskbb_tpl_after_user_details_form():
 
     in :file:`templates/user/change_user_details.html`.
     """
+
+@spec
+def flaskbb_tpl_profile_settings_menu():
+    """This hook is emitted on the user settings page in order to populate the
+    side bar menu. Implementations of this hook should return a list of tuples
+    that are view name and display text. The display text will be provided to
+    the translation service so it is unnecessary to supply translated text.
+
+    A plugin can declare a new block by setting the view to None. If this is
+    done, consider marking the hook implementation with `trylast=True` to
+    avoid capturing plugins that do not create new blocks.
+
+    For example:
+
+        @impl(trylast=True)
+        def flaskbb_tpl_profile_settings_menu():
+            return [
+                (None, 'Account Settings'),
+                ('user.settings', 'General Settings'),
+                ('user.change_user_details', 'Change User Details'),
+                ('user.change_email', 'Change E-Mail Address'),
+                ('user.change_password', 'Change Password')
+            ]
+
+    Hookwrappers for this spec should not be registered as FlaskBB
+    supplies its own hookwrapper to flatten all the lists into a single list.
+
+    in :file:`templates/user/settings_layout.html`
+    """

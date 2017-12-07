@@ -12,11 +12,13 @@
     <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
-                <li class="sidenav-header">{% trans %}Account Settings{% endtrans %}</li>
-                {{ navlink('user.settings', _('General Settings')) }}
-                {{ navlink('user.change_user_details', _('Change User Details')) }}
-                {{ navlink('user.change_email', _('Change E-Mail Address')) }}
-                {{ navlink('user.change_password', _('Change Password')) }}
+                {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False) %}
+                        {% if view == None %}
+                        <li class="sidenav-header">{% trans header=text %}{{ text }}{% endtrans %}</li>
+                        {% else %}
+                        {{ navlink(view, _(text)) }}
+                        {% endif %}
+                {% endfor %}
             </ul>
         </div>
     </div><!--/.col-sm-3 -->
