@@ -24,6 +24,9 @@ def template_hook(name, silent=True, is_markup=True, **kwargs):
     :param name: The name of the hook.
     :param silent: If set to ``False``, it will raise an exception if a hook
                    doesn't exist. Defauls to ``True``.
+    :param is_markup: Determines if the hook should return a Markup object or not.
+                      Setting to False returns a TemplateEventResult object. The
+                      default is True.
     :param kwargs: Additional kwargs that should be passed to the hook.
     """
     try:
