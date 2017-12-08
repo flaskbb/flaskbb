@@ -436,6 +436,8 @@ def load_plugins(app):
     registered_names = set([p.name for p in plugins])
     unregistered = [
         PluginRegistry(name=name) for name in loaded_names - registered_names
+        # ignore internal FlaskBB modules
+        if not name.startswith('flaskbb.') and name != 'flaskbb'
     ]
     with app.app_context():
         db.session.add_all(unregistered)
