@@ -11,6 +11,7 @@
 import os
 import logging
 import logging.config
+import sys
 import time
 from functools import partial
 
@@ -406,6 +407,17 @@ def configure_mail_logs(app):
 
 def load_plugins(app):
     app.pluggy.add_hookspecs(spec)
+
+    # have to find all the flaskbb modules that are loaded this way
+    # otherwise sys.modules might change while we're iterating it
+    # because of imports and that makes Python very unhappy
+    flaskbb_modules = [
+        module for name, module in sys.modules.items()
+        if name.startswith('flaskbb')
+    ]
+    for module in flaskbb_modules:
+        app.pluggy.register(module)
+
     try:
         with app.app_context():
             plugins = PluginRegistry.query.all()
@@ -424,6 +436,8 @@ def load_plugins(app):
     registered_names = set([p.name for p in plugins])
     unregistered = [
         PluginRegistry(name=name) for name in loaded_names - registered_names
+        # ignore internal FlaskBB modules
+        if not name.startswith('flaskbb.') and name != 'flaskbb'
     ]
     with app.app_context():
         db.session.add_all(unregistered)

@@ -31,7 +31,7 @@ MarkupSafe==1.0
 mistune==0.7.4
 olefile==0.44
 Pillow==4.0.0
-pluggy==0.5.1
+pluggy==0.6
 Pygments==2.2.0
 python-editor==1.0.3
 pytz==2017.2
