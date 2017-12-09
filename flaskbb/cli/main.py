@@ -17,6 +17,7 @@ import traceback
 from datetime import datetime
 
 import click
+from celery.bin.celery import CeleryCommand
 from werkzeug.utils import import_string, ImportStringError
 from jinja2 import Environment, FileSystemLoader
 from flask import current_app
@@ -109,8 +110,9 @@ def set_config(ctx, param, value):
 @click.group(cls=FlaskBBGroup, create_app=make_app, add_version_option=False)
 @click.option("--config", expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
-              help="Specify the config to use in dotted module notation "
-                   "e.g. flaskbb.configs.default.DefaultConfig")
+              help="Specify the config to use either in dotted module "
+                   "notation e.g. 'flaskbb.configs.default.DefaultConfig' "
+                   "or by using a path like '/path/to/flaskbb.cfg'")
 @click.option("--version", expose_value=False, callback=get_version,
               is_flag=True, is_eager=True, help="Show the FlaskBB version.")
 def flaskbb():
@@ -289,28 +291,16 @@ def download_emoji():
                 fg="green")
 
 
-@flaskbb.command("celery", context_settings=dict(ignore_unknown_options=True,))
-@click.argument('celery_args', nargs=-1, type=click.UNPROCESSED)
-@click.option("show_help", "--help", "-h", is_flag=True,
-              help="Shows this message and exits")
-@click.option("show_celery_help", "--help-celery", is_flag=True,
-              help="Shows the celery help message")
+@flaskbb.command("celery", add_help_option=False,
+                 context_settings={"ignore_unknown_options": True,
+                                   "allow_extra_args": True})
 @click.pass_context
 @with_appcontext
-def start_celery(ctx, show_help, show_celery_help, celery_args):
-    """Preconfigured wrapper around the 'celery' command.
-    Additional CELERY_ARGS arguments are passed to celery."""
-    if show_help:
-        click.echo(ctx.get_help())
-        sys.exit(0)
-
-    if show_celery_help:
-        click.echo(celery.start(argv=["--help"]))
-        sys.exit(0)
-
-    default_args = ['celery']
-    default_args = default_args + list(celery_args)
-    celery.start(argv=default_args)
+def start_celery(ctx):
+    """Preconfigured wrapper around the 'celery' command."""
+    CeleryCommand(celery).execute_from_commandline(
+        ["flaskbb celery"] + ctx.args
+    )
 
 
 @flaskbb.command()
