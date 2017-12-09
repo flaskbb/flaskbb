@@ -354,8 +354,6 @@ def configure_logging(app):
 
 
 def configure_default_logging(app):
-    from logging.handlers import SMTPHandler
-
     logs_folder = app.config.get('LOG_PATH')
 
     if logs_folder is None:
@@ -390,10 +388,11 @@ def configure_default_logging(app):
     app.logger.addHandler(error_file_handler)
 
     if app.config["SEND_LOGS"]:
-        configure_mail_logs(app)
+        configure_mail_logs(app, formatter)
 
 
-def configure_mail_logs(app):
+def configure_mail_logs(app, formatter):
+    from logging.handlers import SMTPHandler
     mail_handler = SMTPHandler(
         app.config['MAIL_SERVER'], app.config['MAIL_DEFAULT_SENDER'],
         app.config['ADMINS'], 'application error, no admins specified',
