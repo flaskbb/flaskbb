@@ -67,21 +67,17 @@ class FlaskBBGroup(FlaskGroup):
 
 def make_app(script_info):
     config_file = getattr(script_info, "config_file", None)
+
     if config_file is not None:
-        # check if config file exists
-        if os.path.exists(os.path.abspath(config_file)):
-            click.secho("[+] Using config from: {}".format(
-                        os.path.abspath(config_file)), fg="cyan")
-        # config file doesn't exist, maybe it's a module
-        else:
+        # check if config is a file or a module that has to be imported
+        if not os.path.exists(os.path.abspath(config_file)):
             try:
                 import_string(config_file)
-                click.secho("[+] Using config from: {}".format(config_file),
-                            fg="cyan")
             except ImportStringError:
-                click.secho("[~] Config '{}' doesn't exist. "
-                            "Using default config.".format(config_file),
-                            fg="red")
+                click.secho(
+                    "[~] Can't import config from '{}'. Falling back to "
+                    "to default config.".format(config_file), fg="yellow"
+                )
                 config_file = None
     else:
         # lets look for a config file in flaskbb's root folder
@@ -94,14 +90,13 @@ def make_app(script_info):
             os.path.dirname(os.path.dirname(__file__))
         )
         config_file = os.path.join(config_dir, "flaskbb.cfg")
-        if os.path.exists(config_file):
-                click.secho("[+] Found config file 'flaskbb.cfg' in {}"
-                            .format(config_dir), fg="yellow")
-                click.secho("[+] Using config from: {}".format(config_file),
-                            fg="cyan")
-        else:
+
+        if not os.path.exists(config_file):
+            click.secho(
+                "[~] Can't load config from '{}'. Falling back to default "
+                "config".format(config_file), fg="yellow"
+            )
             config_file = None
-            click.secho("[~] Using default config.", fg="yellow")
 
     return create_app(config_file)
 
