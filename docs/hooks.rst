@@ -69,3 +69,4 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_after_registration_form
 .. autofunction:: flaskbb_tpl_before_user_details_form
 .. autofunction:: flaskbb_tpl_after_user_details_form
+.. autofunction:: flaskbb_tpl_profile_settings_menu
