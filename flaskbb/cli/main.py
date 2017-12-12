@@ -38,6 +38,12 @@ from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_latest_db)
 from flaskbb.utils.translations import compile_translations
 
+import logging
+import click_log
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
+
 
 class FlaskBBGroup(FlaskGroup):
     def __init__(self, *args, **kwargs):
@@ -53,9 +59,10 @@ class FlaskBBGroup(FlaskGroup):
             app.pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception as exc:
-            click.echo(click.style("Error while loading CLI Plugins",
-                                   fg='red'))
-            click.echo(click.style(traceback.format_exc(), fg='red'))
+            logger.error(
+                "Error while loading CLI Plugins",
+                exc_info=traceback.format_exc()
+            )
 
     def get_command(self, ctx, name):
         self._load_flaskbb_plugins(ctx)
@@ -75,16 +82,13 @@ def make_app(script_info):
             try:
                 import_string(config_file)
             except ImportStringError:
-                click.secho(
-                    "[~] Can't import config from '{}'. Falling back to "
-                    "to default config.".format(config_file), fg="yellow"
-                )
+                logger.warning("Can't import config from '{}'. Falling back "
+                               "to default config.".format(config_file))
                 config_file = None
-    else:
-        # lets look for a config file in flaskbb's root folder
-        # TODO: are there any other places we should look for the config?
-        # Like somewhere in /etc/?
+        else:
+            logger.debug("Using config from: {}".format(config_file))
 
+    else:
         # this walks back to flaskbb/ from flaskbb/flaskbb/cli/main.py
         # can't use current_app.root_path because it's not (yet) available
         config_dir = os.path.dirname(
@@ -93,12 +97,15 @@ def make_app(script_info):
         config_file = os.path.join(config_dir, "flaskbb.cfg")
 
         if not os.path.exists(config_file):
-            click.secho(
-                "[~] Can't load config from '{}'. Falling back to default "
-                "config".format(config_file), fg="yellow"
+            logger.warning(
+                "No config file specified. Falling back to default "
+                "config".format(config_file)
             )
             config_file = None
-
+        else:
+            logger.debug(
+                "Found config file 'flaskbb.cfg' in {}.".format(config_dir)
+            )
     return create_app(config_file)
 
 
@@ -115,6 +122,7 @@ def set_config(ctx, param, value):
                    "or by using a path like '/path/to/flaskbb.cfg'")
 @click.option("--version", expose_value=False, callback=get_version,
               is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click_log.simple_verbosity_option(logger)
 def flaskbb():
     """This is the commandline interface for flaskbb."""
     pass
@@ -605,7 +613,7 @@ def generate_config(development, output, force):
                 "See the Python logging documentation for more detail.\n"
                 "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",
                 fg="cyan")
-    default_conf["log_config_path"] =click.prompt(
+    default_conf["log_config_path"] = click.prompt(
         click.style("Logging Config Path", fg="magenta"),
         default=default_conf.get("log_config_path"))
 
