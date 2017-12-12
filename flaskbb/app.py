@@ -424,7 +424,9 @@ def load_plugins(app):
         with app.app_context():
             plugins = PluginRegistry.query.all()
 
-    except (OperationalError, ProgrammingError):
+    except (OperationalError, ProgrammingError) as exc:
+        logger.debug("Database is not setup correctly or has not been "
+                     "setup yet.", exc_info=exc)
         return
 
     for plugin in plugins:
@@ -448,4 +450,4 @@ def load_plugins(app):
         removed = 0
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
-            app.logger.info("Removed Plugins: {}".format(removed))
+            logger.info("Removed Plugins: {}".format(removed))
