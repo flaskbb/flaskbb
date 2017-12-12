@@ -4,18 +4,34 @@ Changelog
 Here you can see the full list of changes between each release.
 
 
-Version 1.0.1
+Version 2.0.0
 -------------
 
 Unreleased
 
+* Migrated from Flask-Plugins to Pluggy as plugin system for plugins.
+  Plugins are now loaded via entry points and thus have to be installed
+  into the same environment as FlaskBB. During this migration we also moved
+  the [portal plugin](https://github.com/sh4nks/flaskbb-plugins) into its own
+  python package which can be installed via
+  ``pip install flaskbb-plugin-portal``. (PR #311)
+* Adds the functionality to "soft delete" posts and topics. (PR #325)
+* Improve logging. (PR #327)
+* Prefixes migrations with a timestamp which will sort them by creation date. (PR #353)
+* Transform views into Class-based Views. (PR #324)
+* Drop the tables instead of dropping the database when uninstalling FlaskBB. (PR #364)
+* Create the database using SQLAlchemy's ``db.create_all`` and stamp it as
+  'latest' instead of going through all migrations.
 * Fixes a bug that prevented users to activate their accounts via the form
   input.
 * Fixes a translations bug that wouldn't take the territory code into account
   when choosing a language (#299).
 * Fixes a bug which would not show all conversations in the conversations view.
-* Fixes a bug that made a forum section inaccessible when the ``last_post_id`` of a topic was set to None.
+* Fixes a bug that made a forum section inaccessible when the ``last_post_id``
+  of a topic was set to None.
 * Various translations updated.
+* Multiple permission fixes and various other fixes.
+
 
 Version 1.0
 -----------
