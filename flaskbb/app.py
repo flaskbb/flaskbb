@@ -74,7 +74,6 @@ def create_app(config=None):
     """
     app = Flask("flaskbb")
     configure_app(app, config)
-    configure_logging(app)
     configure_celery_app(app, celery)
     configure_extensions(app)
     load_plugins(app)
@@ -112,6 +111,10 @@ def configure_app(app, config):
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object
     app_config_from_env(app, prefix="FLASKBB_")
+
+    # Setting up logging as early as possible
+    configure_logging(app)
+
     app.pluggy = FlaskBBPluginManager('flaskbb', implprefix='flaskbb_')
 
 
