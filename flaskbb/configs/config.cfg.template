@@ -166,7 +166,7 @@ ADMINS = ["{{ mail_admin_address }}"]
 # and the default logging setting.
 #
 # If set to a file path, this should be an absolute file path
-LOG_CONF_FILE = {{ log_config_path }}
+LOG_CONF_FILE = {{ log_config_path or None }}
 
 # When set to True this will enable the default
 # FlaskBB logging configuration which uses the settings
