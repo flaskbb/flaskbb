@@ -579,7 +579,7 @@ class HighlightTopic(MethodView):
 class TrivializeTopic(MethodView):
     decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
 
-    def post(topic_id=None, slug=None):
+    def post(self, topic_id=None, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         topic.important = False
         topic.save()
