@@ -31,10 +31,34 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         self._plugin_metadata = {}
         self._disabled_plugins = []
 
+        self._internal_name2plugin = {}
+
+    def mark_as_internal_plugin(self, plugin):
+        """Marks a plugin as an internal FlaskBB plugin.
+        Returns the name of the plugin or None.
+
+        :param plugin: The plugin object to mark as internal
+                       FlaskBB plugin.
+        :param force: If set to ``True`` it will overwrite plugins which
+                      are already marked as internal.
+        """
+        name = self.get_name(plugin)
+        if name not in self._name2plugin:
+            return None
+
+        # already marked as internal
+        if name in self._internal_name2plugin:
+            self._name2plugin.pop(name)
+            return name
+
+        self._internal_name2plugin[name] = self._name2plugin.pop(name)
+        return name
+
     def load_setuptools_entrypoints(self, entrypoint_name):
         """Load modules from querying the specified setuptools entrypoint name.
         Return the number of loaded plugins. """
-        logger.info("Loading plugins under entrypoint {}".format(entrypoint_name))
+        logger.info("Loading plugins under entrypoint {}"
+                    .format(entrypoint_name))
         for ep in iter_entry_points(entrypoint_name):
             if self.get_plugin(ep.name):
                 continue
@@ -48,7 +72,8 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             try:
                 plugin = ep.load()
             except DistributionNotFound:
-                logger.warn("Could not load plugin {}. Passing.".format(ep.name))
+                logger.warn("Could not load plugin {}. Passing."
+                            .format(ep.name))
                 continue
             except VersionConflict as e:
                 raise pluggy.PluginValidationError(

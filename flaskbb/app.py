@@ -419,6 +419,7 @@ def load_plugins(app):
     ]
     for module in flaskbb_modules:
         app.pluggy.register(module)
+        app.pluggy.mark_as_internal_plugin(module)
 
     try:
         with app.app_context():
