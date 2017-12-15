@@ -41,6 +41,7 @@ class FlaskBBDomain(Domain):
         locale = get_locale()
         # now load and add the plugin translations
         for plugin in self.plugin_translations:
+            logger.debug("Loading plugin translation from: {}".format(plugin))
             plugin_translation = babel.support.Translations.load(
                 dirname=plugin,
                 locales=locale,
