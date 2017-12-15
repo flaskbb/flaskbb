@@ -68,6 +68,7 @@ setup(
         'blinker',
         'celery',
         'click',
+        'click-log',
         'enum34',
         'Flask',
         'Flask-Alembic',
