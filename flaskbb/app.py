@@ -21,7 +21,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from flask import Flask, request
 from flask_login import current_user
 
-from flaskbb._compat import string_types
+from flaskbb._compat import string_types, iteritems
 # views
 from flaskbb.user.views import user
 from flaskbb.message.views import message
@@ -413,10 +413,12 @@ def load_plugins(app):
     # have to find all the flaskbb modules that are loaded this way
     # otherwise sys.modules might change while we're iterating it
     # because of imports and that makes Python very unhappy
-    flaskbb_modules = [
-        module for name, module in sys.modules.items()
+    # Converting it to a set is neccessary because we are not interested
+    # in duplicated plugins or invalid ones ('None' - appears on py2)
+    flaskbb_modules = set(
+        module for name, module in iteritems(sys.modules)
         if name.startswith('flaskbb')
-    ]
+    )
     for module in flaskbb_modules:
         app.pluggy.register(module)
         app.pluggy.mark_as_internal_plugin(module)
