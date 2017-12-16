@@ -357,45 +357,21 @@ def configure_logging(app):
 
 
 def configure_default_logging(app):
-    logs_folder = app.config.get('LOG_PATH')
+    # TODO: Remove this once Flask 0.13 is released
+    app.config["LOGGER_NAME"] = "flask.app"
 
-    if logs_folder is None:
-        logs_folder = os.path.join(app.root_path, os.pardir, "logs")
-
-    default_log_format = '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-
-    formatter = logging.Formatter(
-        app.config.get('LOG_FORMAT') or default_log_format
-    )
-
-    info_log = os.path.join(logs_folder, app.config['INFO_LOG'])
-
-    info_file_handler = logging.handlers.RotatingFileHandler(
-        info_log, maxBytes=100000, backupCount=10
-    )
-
-    log_level = app.config.get('LOG_LEVEL') or logging.INFO
-
-    info_file_handler.setLevel(log_level)
-    info_file_handler.setFormatter(formatter)
-    app.logger.addHandler(info_file_handler)
-
-    error_log = os.path.join(logs_folder, app.config['ERROR_LOG'])
-
-    error_file_handler = logging.handlers.RotatingFileHandler(
-        error_log, maxBytes=100000, backupCount=10
-    )
-
-    error_file_handler.setLevel(logging.ERROR)
-    error_file_handler.setFormatter(formatter)
-    app.logger.addHandler(error_file_handler)
+    # Load default logging config
+    logging.config.dictConfig(app.config["LOG_DEFAULT_CONF"])
 
     if app.config["SEND_LOGS"]:
-        configure_mail_logs(app, formatter)
+        configure_mail_logs(app)
 
 
 def configure_mail_logs(app, formatter):
     from logging.handlers import SMTPHandler
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
+    )
     mail_handler = SMTPHandler(
         app.config['MAIL_SERVER'], app.config['MAIL_DEFAULT_SENDER'],
         app.config['ADMINS'], 'application error, no admins specified',
