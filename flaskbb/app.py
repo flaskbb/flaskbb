@@ -413,15 +413,14 @@ def load_plugins(app):
     # have to find all the flaskbb modules that are loaded this way
     # otherwise sys.modules might change while we're iterating it
     # because of imports and that makes Python very unhappy
-    # Converting it to a set is neccessary because we are not interested
-    # in duplicated plugins or invalid ones ('None' - appears on py2)
+    # we are not interested in duplicated plugins or invalid ones
+    # ('None' - appears on py2) and thus using a set
     flaskbb_modules = set(
         module for name, module in iteritems(sys.modules)
         if name.startswith('flaskbb')
     )
     for module in flaskbb_modules:
-        app.pluggy.register(module)
-        app.pluggy.mark_as_internal_plugin(module)
+        app.pluggy.register(module, internal=True)
 
     try:
         with app.app_context():

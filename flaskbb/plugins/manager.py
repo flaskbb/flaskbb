@@ -31,28 +31,64 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         self._plugin_metadata = {}
         self._disabled_plugins = []
 
+        # we maintain a seperate dict for flaskbb.* internal plugins
         self._internal_name2plugin = {}
 
-    def mark_as_internal_plugin(self, plugin):
-        """Marks a plugin as an internal FlaskBB plugin.
-        Returns the name of the plugin or None.
-
-        :param plugin: The plugin object to mark as internal
-                       FlaskBB plugin.
-        :param force: If set to ``True`` it will overwrite plugins which
-                      are already marked as internal.
+    def register(self, plugin, name=None, internal=False):
+        """Register a plugin and return its canonical name or None
+        if the name is blocked from registering.
+        Raise a ValueError if the plugin is already registered.
         """
-        name = self.get_name(plugin)
-        if name not in self._name2plugin:
-            return None
-
-        # already marked as internal
-        if name in self._internal_name2plugin:
-            self._name2plugin.pop(name)
+        # internal plugins are stored in self._plugin2hookcallers
+        name = super(FlaskBBPluginManager, self).register(plugin, name)
+        if not internal:
             return name
 
         self._internal_name2plugin[name] = self._name2plugin.pop(name)
         return name
+
+    def unregister(self, plugin=None, name=None):
+        """Unregister a plugin object and all its contained hook implementations
+        from internal data structures.
+        """
+        plugin = super(FlaskBBPluginManager, self).unregister(
+            plugin=plugin, name=name
+        )
+
+        name = self.get_name(plugin)
+        if self._internal_name2plugin.get(name):
+            del self._internal_name2plugin[name]
+
+        return plugin
+
+    def set_blocked(self, name):
+        """Block registrations of the given name, unregister if already
+        registered.
+        """
+        super(FlaskBBPluginManager, self).set_blocked(name)
+        self._internal_name2plugin[name] = None
+
+    def is_blocked(self, name):
+        """Return True if the name blockss registering plugins of that name."""
+        blocked = super(FlaskBBPluginManager, self).is_blocked(name)
+
+        return blocked or name in self._internal_name2plugin and \
+            self._internal_name2plugin[name] is None
+
+    def get_plugin(self, name):
+        """Return a plugin or None for the given name. """
+        plugin = super(FlaskBBPluginManager, self).get_plugin(name)
+        return self._internal_name2plugin.get(name, plugin)
+
+    def get_name(self, plugin):
+        """Return name for registered plugin or None if not registered."""
+        name = super(FlaskBBPluginManager, self).get_name(plugin)
+        if name:
+            return name
+
+        for name, val in self._internal_name2plugin.items():
+            if plugin == val:
+                return name
 
     def load_setuptools_entrypoints(self, entrypoint_name):
         """Load modules from querying the specified setuptools entrypoint name.
@@ -96,6 +132,10 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     def list_name(self):
         """Returns only the enabled plugin names."""
         return list(self._name2plugin.keys())
+
+    def list_internal_name_plugin(self):
+        """Returns a list of internal name/plugin pairs."""
+        return self._internal_name2plugin.items()
 
     def list_plugin_metadata(self):
         """Returns the metadata for all plugins"""
