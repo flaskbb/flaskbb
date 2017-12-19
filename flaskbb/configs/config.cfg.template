@@ -172,7 +172,7 @@ LOG_CONF_FILE = {{ log_config_path or None }}
 # If None this defaults to flaskbb/logs
 #
 # If set to a file path, this should be an absolute path
-LOG_PATH = os.path.join(basedir, 'logs')
+LOG_PATH = os.path.join(DefaultConfig.basedir, 'logs')
 
 # The default logging configuration that will be used when
 # USE_DEFAULT_LOGGING is set to True
