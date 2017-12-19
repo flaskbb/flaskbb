@@ -154,7 +154,7 @@ fixture = (
                 'value_type':   SettingValueType.integer,
                 'extra':        {"min": 0},
                 'name':         "Private Message Quota",
-                'description':  "The amount of messages a user can have."
+                'description':  "The amount of messages a user can have. 0 to disable private messages."
             }),
             ('online_last_minutes', {
                 'value':        15,

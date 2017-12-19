@@ -30,6 +30,17 @@ logger = logging.getLogger(__name__)
 
 message = Blueprint("message", __name__)
 
+def requires_private_messages_enabled(f):
+
+    @wraps(f)
+    def wrapper(*a, **k):
+        if not flaskbb_config['MESSAGE_QUOTA']:
+            flash(_("Private messages are disabled for this board."), "danger")
+            return redirect(url_for("forum.index"))
+        return f(*a, **k)
+
+    return wrapper
+
 
 def requires_message_box_space(f):
 
@@ -51,7 +62,7 @@ def requires_message_box_space(f):
 
 
 class Inbox(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def get(self):
         page = request.args.get('page', 1, type=int)
@@ -75,7 +86,7 @@ class Inbox(MethodView):
 
 
 class ViewConversation(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
     form = MessageForm
 
     def get(self, conversation_id):
@@ -137,7 +148,7 @@ class ViewConversation(MethodView):
 
 
 class NewConversation(MethodView):
-    decorators = [requires_message_box_space, login_required]
+    decorators = [requires_message_box_space, requires_private_messages_enabled, login_required]
     form = ConversationForm
 
     def get(self):
@@ -197,7 +208,7 @@ class NewConversation(MethodView):
 
 
 class EditConversation(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
     form = ConversationForm
 
     def get(self, conversation_id):
@@ -267,7 +278,7 @@ class EditConversation(MethodView):
 
 
 class RawMessage(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def get(self, message_id):
 
@@ -283,7 +294,7 @@ class RawMessage(MethodView):
 
 
 class MoveConversation(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def post(self, conversation_id):
         conversation = Conversation.query.filter_by(
@@ -297,7 +308,7 @@ class MoveConversation(MethodView):
 
 
 class RestoreConversation(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def post(self, conversation_id):
         conversation = Conversation.query.filter_by(
@@ -310,7 +321,7 @@ class RestoreConversation(MethodView):
 
 
 class DeleteConversation(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def post(self, conversation_id):
         conversation = Conversation.query.filter_by(
@@ -322,7 +333,7 @@ class DeleteConversation(MethodView):
 
 
 class SentMessages(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def get(self):
 
@@ -348,7 +359,7 @@ class SentMessages(MethodView):
 
 
 class DraftMessages(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def get(self):
 
@@ -373,7 +384,7 @@ class DraftMessages(MethodView):
 
 
 class TrashedMessages(MethodView):
-    decorators = [login_required]
+    decorators = [requires_private_messages_enabled, login_required]
 
     def get(self):
 

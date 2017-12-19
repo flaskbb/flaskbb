@@ -82,6 +82,7 @@
                         <ul class="nav navbar-nav navbar-right">
 
                             {% if current_user and current_user.is_authenticated %}
+                            {% if flaskbb_config["MESSAGE_QUOTA"] > 0 %}
                             <!-- Inbox -->
                             <li class="dropdown {{ is_active('message.inbox') }}">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -110,6 +111,7 @@
                                     <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
                                 </ul>
                             </li>
+                            {% endif %}
 
                             <!-- User Menu -->
                             <li>
