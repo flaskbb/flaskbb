@@ -246,10 +246,11 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.delete()
             return self
 
+        db.session.delete(self)
+
         self._deal_with_last_post()
         self._update_counts()
 
-        db.session.delete(self)
         db.session.commit()
         return self
 
@@ -312,7 +313,7 @@ class Post(HideableCRUDMixin, db.Model):
                     self.topic.forum.last_post_created = None
 
             # check if there is a second last post in this topic
-            if self.topic.second_last_post:
+            if self.topic.second_last_post is not None:
                 # Now the second last post will be the last post
                 self.topic.last_post_id = self.topic.second_last_post
 
@@ -426,8 +427,11 @@ class Topic(HideableCRUDMixin, db.Model):
     # Properties
     @property
     def second_last_post(self):
-        """Returns the second last post."""
-        return self.posts[-2].id
+        """Returns the second last post or None."""
+        try:
+            return self.posts[-2].id
+        except IndexError:
+            return None
 
     @property
     def slug(self):

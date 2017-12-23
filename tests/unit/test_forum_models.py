@@ -500,10 +500,12 @@ def test_post_delete(topic):
     """
     post_middle = Post(content="Test Content Middle")
     post_middle.save(topic=topic, user=topic.user)
+    assert topic.post_count == 2  # post_middle + first_post
 
     post_last = Post(content="Test Content Last")
     post_last.save(topic=topic, user=topic.user)
 
+    # first post + post_middle + post_last
     assert topic.post_count == 3
     assert topic.forum.post_count == 3
     assert topic.user.post_count == 3
@@ -513,13 +515,14 @@ def test_post_delete(topic):
     # Check the last posts
     assert topic.last_post == post_last
     assert topic.forum.last_post == post_last
+    assert topic.post_count == 2
 
     post_last.delete()
 
-    # That was a bit trickier..
-    assert topic.post_count == 2
-    assert topic.forum.post_count == 2
-    assert topic.user.post_count == 2
+    # only the first_post remains
+    assert topic.post_count == 1
+    assert topic.forum.post_count == 1
+    assert topic.user.post_count == 1
     assert topic.first_post_id == topic.last_post_id
 
     assert topic.forum.last_post_id == topic.last_post_id
