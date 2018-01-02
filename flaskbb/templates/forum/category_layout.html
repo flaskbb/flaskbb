@@ -57,7 +57,7 @@
                         {% if forum.locked %}
                             <span class="fa fa-lock fa-fw forum-locked"></span>
                         {% elif forum|forum_is_unread(forumsread, current_user) %}
-                            <span class="fa fa-comments fa-fwforum-unread"></span>
+                            <span class="fa fa-comments fa-fw forum-unread"></span>
                         {% else %}
                             <span class="fa fa-comments-o fa-fw forum-read"></span>
                         {% endif %}
