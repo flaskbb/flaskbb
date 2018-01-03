@@ -36,6 +36,7 @@ class UserSettings(MethodView):
         form = self.form()
 
         form.theme.choices = get_available_themes()
+        form.theme.choices.insert(0,('', 'Default'))
         form.language.choices = get_available_languages()
         form.theme.data = current_user.theme
         form.language.data = current_user.language
@@ -46,6 +47,7 @@ class UserSettings(MethodView):
         form = self.form()
 
         form.theme.choices = get_available_themes()
+        form.theme.choices.insert(0,('', 'Default'))
         form.language.choices = get_available_languages()
 
         if form.validate_on_submit():
