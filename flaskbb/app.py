@@ -133,10 +133,10 @@ def configure_app(app, config):
     # Setting up logging as early as possible
     configure_logging(app)
 
-    if isinstance(config, string_types):
-        config_name = config
-    else:
+    if not isinstance(config, string_types) and config is not None:
         config_name = "{}.{}".format(config.__module__, config.__name__)
+    else:
+        config_name = config
 
     logger.info("Using config from: {}".format(config_name))
 
