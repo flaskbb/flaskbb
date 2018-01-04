@@ -14,11 +14,13 @@ import time
 import requests
 import binascii
 import traceback
+import logging
 from datetime import datetime
 
 import click
+import click_log
 from celery.bin.celery import CeleryCommand
-from werkzeug.utils import import_string, ImportStringError
+from werkzeug.utils import import_string
 from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
@@ -38,8 +40,6 @@ from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
                                     create_latest_db)
 from flaskbb.utils.translations import compile_translations
 
-import logging
-import click_log
 
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
@@ -75,38 +75,8 @@ class FlaskBBGroup(FlaskGroup):
 
 def make_app(script_info):
     config_file = getattr(script_info, "config_file", None)
-
-    if config_file is not None:
-        # check if config is a file or a module that has to be imported
-        if not os.path.exists(os.path.abspath(config_file)):
-            try:
-                import_string(config_file)
-            except ImportStringError:
-                logger.warning("Can't import config from '{}'. Falling back "
-                               "to default config.".format(config_file))
-                config_file = None
-        else:
-            logger.debug("Using config from: {}".format(config_file))
-
-    else:
-        # this walks back to flaskbb/ from flaskbb/flaskbb/cli/main.py
-        # can't use current_app.root_path because it's not (yet) available
-        config_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(__file__))
-        )
-        config_file = os.path.join(config_dir, "flaskbb.cfg")
-
-        if not os.path.exists(config_file):
-            logger.warning(
-                "No config file specified. Falling back to default "
-                "config".format(config_file)
-            )
-            config_file = None
-        else:
-            logger.debug(
-                "Found config file 'flaskbb.cfg' in {}.".format(config_dir)
-            )
-    return create_app(config_file)
+    instance_path = getattr(script_info, "instance_path", None)
+    return create_app(config_file, instance_path)
 
 
 def set_config(ctx, param, value):
@@ -114,18 +84,34 @@ def set_config(ctx, param, value):
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-@click.group(cls=FlaskBBGroup, create_app=make_app, add_version_option=False)
+def set_instance(ctx, param, value):
+    """This will pass the instance path on the script info which can then
+    be used in 'make_app'."""
+    ctx.ensure_object(ScriptInfo).instance_path = value
+
+
+@click.group(cls=FlaskBBGroup, create_app=make_app, add_version_option=False,
+             invoke_without_command=True)
 @click.option("--config", expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use either in dotted module "
                    "notation e.g. 'flaskbb.configs.default.DefaultConfig' "
                    "or by using a path like '/path/to/flaskbb.cfg'")
+@click.option("--instance", expose_value=False, callback=set_instance,
+              required=False, is_flag=False, is_eager=True, metavar="PATH",
+              help="Specify the instance path to use. By default the folder "
+                   "'instance' next to the package or module is assumed to "
+                   "be the instance path.")
 @click.option("--version", expose_value=False, callback=get_version,
               is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click.pass_context
 @click_log.simple_verbosity_option(logger)
-def flaskbb():
+def flaskbb(ctx):
     """This is the commandline interface for flaskbb."""
-    pass
+    if ctx.invoked_subcommand is None:
+        # show the help text instead of an error
+        # when just '--config' option has been provided
+        click.echo(ctx.get_help())
 
 
 flaskbb.add_command(alembic_click, "db")

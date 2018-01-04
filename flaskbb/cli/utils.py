@@ -46,7 +46,7 @@ class FlaskBBCLIError(click.ClickException):
     def show(self, file=None):
         if file is None:
             file = click._compat.get_text_stderr()
-        click.secho("[-] Error: %s" % self.format_message(), file=file,
+        click.secho("error: %s" % self.format_message(), file=file,
                     **self.styles)
 
 
