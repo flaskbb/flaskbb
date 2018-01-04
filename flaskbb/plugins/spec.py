@@ -127,7 +127,7 @@ def flaskbb_tpl_profile_settings_menu():
     done, consider marking the hook implementation with `trylast=True` to
     avoid capturing plugins that do not create new blocks.
 
-    For example:
+    For example::
 
         @impl(trylast=True)
         def flaskbb_tpl_profile_settings_menu():
