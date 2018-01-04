@@ -607,11 +607,11 @@ def get_flaskbb_config(app, config_file):
             return config_file
 
         # config is a file
-        if (
-            os.path.exists(os.path.join(app.instance_path, config_file)) or
-            os.path.exists(os.path.abspath(config_file))
-        ):
-            return config_file
+        if os.path.exists(os.path.join(app.instance_path, config_file)):
+            return os.path.join(app.instance_path, config_file)
+
+        if os.path.exists(os.path.abspath(config_file)):
+            return os.path.join(os.path.abspath(config_file))
 
         # conifg is an importable string
         try:
