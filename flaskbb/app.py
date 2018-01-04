@@ -40,7 +40,8 @@ from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
                                    crop_title, is_online, mark_online,
                                    forum_is_unread, topic_is_unread,
                                    render_template, render_markup,
-                                   app_config_from_env, get_alembic_locations)
+                                   app_config_from_env, get_flaskbb_config,
+                                   get_alembic_locations)
 from flaskbb.utils.translations import FlaskBBDomain
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
@@ -63,16 +64,31 @@ from flaskbb.plugins import spec
 logger = logging.getLogger(__name__)
 
 
-def create_app(config=None):
+def create_app(config=None, instance_path=None):
     """Creates the app.
 
+    :param instance_path: An alternative instance path for the application.
+                          By default the folder ``'instance'`` next to the
+                          package or module is assumed to be the instance
+                          path.
+                          See :ref:`Instance Folders <flask:instance-folders>`.
     :param config: The configuration file or object.
                    The environment variable is weightet as the heaviest.
                    For example, if the config is specified via an file
                    and a ENVVAR, it will load the config via the file and
                    later overwrite it from the ENVVAR.
     """
-    app = Flask("flaskbb")
+
+    app = Flask(
+        "flaskbb",
+        instance_path=instance_path,
+        instance_relative_config=True
+    )
+
+    # instance folders are not automatically created by flask
+    if not os.path.exists(app.instance_path):
+        os.makedirs(app.instance_path)
+
     configure_app(app, config)
     configure_celery_app(app, celery)
     configure_extensions(app)
@@ -94,18 +110,20 @@ def configure_app(app, config):
     """Configures FlaskBB."""
     # Use the default config and override it afterwards
     app.config.from_object('flaskbb.configs.default.DefaultConfig')
-
-    if isinstance(config, string_types) and \
-            os.path.exists(os.path.abspath(config)):
-        config = os.path.abspath(config)
+    config = get_flaskbb_config(app, config)
+    # Path
+    if isinstance(config, string_types):
         app.config.from_pyfile(config)
+    # Module
     else:
         # try to update the config from the object
         app.config.from_object(config)
+
     # Add the location of the config to the config
     app.config["CONFIG_PATH"] = config
 
-    # try to update the config via the environment variable
+    # Environment
+    # Get config file from envvar
     app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
 
     # Parse the env for FLASKBB_ prefixed env variables and set
@@ -114,6 +132,13 @@ def configure_app(app, config):
 
     # Setting up logging as early as possible
     configure_logging(app)
+
+    if isinstance(config, string_types):
+        config_name = config
+    else:
+        config_name = "{}.{}".format(config.__module__, config.__name__)
+
+    logger.info("Using config from: {}".format(config_name))
 
     app.pluggy = FlaskBBPluginManager('flaskbb', implprefix='flaskbb_')
 
@@ -259,7 +284,6 @@ def configure_context_processors(app):
         """Injects the ``flaskbb_config`` config variable into the
         templates.
         """
-
         return dict(flaskbb_config=flaskbb_config, format_date=format_date)
 
 
@@ -270,7 +294,6 @@ def configure_before_handlers(app):
     def update_lastseen():
         """Updates `lastseen` before every reguest if the user is
         authenticated."""
-
         if current_user.is_authenticated:
             current_user.lastseen = time_utcnow()
             db.session.add(current_user)

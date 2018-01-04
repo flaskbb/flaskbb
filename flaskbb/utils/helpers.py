@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for more details.
 """
 import ast
-import glob
 import itertools
 import logging
 import operator
@@ -26,13 +25,14 @@ import requests
 import unidecode
 from babel.core import get_locale_identifier
 from babel.dates import format_timedelta as babel_format_timedelta
+from werkzeug.utils import import_string, ImportStringError
 from flask import flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
-from flaskbb._compat import (iteritems, range_method, text_type, to_bytes,
-                             to_unicode)
+from flaskbb._compat import (iteritems, range_method, text_type, string_types,
+                             to_bytes, to_unicode)
 from flaskbb.extensions import babel, redis_store
 from flaskbb.utils.markup import markdown
 from flaskbb.utils.settings import flaskbb_config
@@ -347,10 +347,10 @@ def get_online_users(guest=False):  # pragma: no cover
     minutes = range_method(flaskbb_config['ONLINE_LAST_MINUTES'])
     if guest:
         users = redis_store.sunion(['online-guests/%d' % (current - x)
-                                   for x in minutes])
+                                    for x in minutes])
     else:
         users = redis_store.sunion(['online-users/%d' % (current - x)
-                                   for x in minutes])
+                                    for x in minutes])
 
     return [to_unicode(u) for u in users]
 
@@ -587,6 +587,54 @@ def app_config_from_env(app, prefix="FLASKBB_"):
                 pass
             app.config[key] = value
     return app
+
+
+def get_flaskbb_config(app, config_file):
+    """Returns ``None`` or the config which is either the path to a config file
+    or an object. They can be used by ``app.config.from_pyfile`` or
+    by ``app.config.from_object``.
+
+    :param app: The app instance.
+    :param config_file: A string which is either a module that can be
+                        imported, a path to a config file or an object.
+                        If the provided config_file can't be found, it will
+                        search for a 'flaskbb.cfg' file in the instance
+                        directory and in the project's root directory.
+    """
+    if config_file is not None:
+        # config is an object
+        if not isinstance(config_file, string_types):
+            return config_file
+
+        # config is a file
+        if (
+            os.path.exists(os.path.join(app.instance_path, config_file)) or
+            os.path.exists(os.path.abspath(config_file))
+        ):
+            return config_file
+
+        # conifg is an importable string
+        try:
+            return import_string(config_file)
+        except ImportStringError:
+            return None
+    else:
+        # this would be so much nicer and cleaner if we wouldn't
+        # support the root/project dir.
+        # this walks back to flaskbb/ from flaskbb/flaskbb/cli/main.py
+        project_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(__file__))
+        )
+        project_config = os.path.join(project_dir, "flaskbb.cfg")
+
+        # instance config doesn't exist
+        instance_config = os.path.join(app.instance_path, "flaskbb.cfg")
+        if os.path.exists(instance_config):
+            return instance_config
+
+        # config in root directory doesn't exist
+        if os.path.exists(project_config):
+            return project_config
 
 
 class ReverseProxyPathFix(object):
