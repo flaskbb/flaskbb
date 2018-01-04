@@ -20,3 +20,4 @@ from flaskbb.cli.plugins import plugins  # noqa
 from flaskbb.cli.themes import themes  # noqa
 from flaskbb.cli.translations import translations  # noqa
 from flaskbb.cli.users import users  # noqa
+from flaskbb.cli.server import server  # noqa

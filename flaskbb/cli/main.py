@@ -28,7 +28,6 @@ from sqlalchemy_utils.functions import database_exists
 from flask_alembic import alembic_click
 
 from flaskbb import create_app
-from flaskbb._compat import iteritems
 from flaskbb.extensions import db, whooshee, celery, alembic
 from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
                                write_config, get_version, FlaskBBCLIError,
@@ -295,69 +294,6 @@ def start_celery(ctx):
     CeleryCommand(celery).execute_from_commandline(
         ["flaskbb celery"] + ctx.args
     )
-
-
-@flaskbb.command()
-@click.option("--server", "-s", default="gunicorn",
-              type=click.Choice(["gunicorn", "gevent"]),
-              help="The WSGI Server to run FlaskBB on.")
-@click.option("--host", "-h", default="127.0.0.1",
-              help="The interface to bind FlaskBB to.")
-@click.option("--port", "-p", default="8000", type=int,
-              help="The port to bind FlaskBB to.")
-@click.option("--workers", "-w", default=4,
-              help="The number of worker processes for handling requests.")
-@click.option("--daemon", "-d", default=False, is_flag=True,
-              help="Starts gunicorn as daemon.")
-@click.option("--config", "-c",
-              help="The configuration file to use for FlaskBB.")
-def start(server, host, port, workers, config, daemon):
-    """Starts a production ready wsgi server.
-    TODO: Figure out a way how to forward additional args to gunicorn
-          without causing any errors.
-    """
-    if server == "gunicorn":
-        try:
-            from gunicorn.app.base import Application
-
-            class FlaskBBApplication(Application):
-                def __init__(self, app, options=None):
-                    self.options = options or {}
-                    self.application = app
-                    super(FlaskBBApplication, self).__init__()
-
-                def load_config(self):
-                    config = dict([
-                        (key, value) for key, value in iteritems(self.options)
-                        if key in self.cfg.settings and value is not None
-                    ])
-                    for key, value in iteritems(config):
-                        self.cfg.set(key.lower(), value)
-
-                def load(self):
-                    return self.application
-
-            options = {
-                "bind": "{}:{}".format(host, port),
-                "workers": workers,
-                "daemon": daemon,
-            }
-            FlaskBBApplication(create_app(config=config), options).run()
-        except ImportError:
-            raise FlaskBBCLIError("Cannot import gunicorn. "
-                                  "Make sure it is installed.", fg="red")
-
-    elif server == "gevent":
-        try:
-            from gevent import __version__
-            from gevent.pywsgi import WSGIServer
-            click.secho("* Starting gevent {}".format(__version__))
-            click.secho("* Listening on http://{}:{}/".format(host, port))
-            http_server = WSGIServer((host, port), create_app(config=config))
-            http_server.serve_forever()
-        except ImportError:
-            raise FlaskBBCLIError("Cannot import gevent. "
-                                  "Make sure it is installed.", fg="red")
 
 
 @flaskbb.command("shell", short_help="Runs a shell in the app context.")
