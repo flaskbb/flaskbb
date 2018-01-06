@@ -949,7 +949,7 @@ register_view(
 )
 register_view(
     management,
-    routes=['forums'],
+    routes=['/forums'],
     view_func=Forums.as_view('forums')
 )
 
