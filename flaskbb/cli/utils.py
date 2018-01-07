@@ -22,13 +22,6 @@ from flaskbb import __version__
 from flaskbb.utils.populate import create_user, update_user
 
 
-cookiecutter_available = False
-try:
-    from cookiecutter.main import cookiecutter  # noqa
-    cookiecutter_available = True
-except ImportError:
-    pass
-
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
 
@@ -89,14 +82,20 @@ def validate_theme(theme):
         raise FlaskBBCLIError("Theme {} not found.".format(theme), fg="red")
 
 
-def check_cookiecutter(ctx, param, value):
+def get_cookiecutter():
+    cookiecutter_available = False
+    try:
+        from cookiecutter.main import cookiecutter  # noqa
+        cookiecutter_available = True
+    except ImportError:
+        pass
+
     if not cookiecutter_available:
         raise FlaskBBCLIError(
-            "Can't create {} because cookiecutter is not installed. "
-            "You can install it with 'pip install cookiecutter'.".
-            format(value), fg="red"
+            "Can't continue because cookiecutter is not installed. "
+            "You can install it with 'pip install cookiecutter'.", fg="red"
         )
-    return value
+    return cookiecutter
 
 
 def get_version(ctx, param, value):

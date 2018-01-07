@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import sys
+import os
 
 import click
 from flask import current_app
@@ -16,7 +17,7 @@ from flask.cli import with_appcontext
 
 from flaskbb.extensions import db
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import validate_plugin, check_cookiecutter
+from flaskbb.cli.utils import validate_plugin, get_cookiecutter
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
@@ -142,20 +143,26 @@ def cleanup():
 
 
 @plugins.command("new")
-@click.argument("plugin_name", callback=check_cookiecutter)
 @click.option("--template", "-t", type=click.STRING,
               default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
               help="Path to a cookiecutter template or to a valid git repo.")
-@click.option("--out-dir", "-o", type=click.STRING,
+@click.option("--out-dir", "-o", type=click.Path(), default=None,
               help="The location for the new FlaskBB plugin.")
-def new_plugin(plugin_name, template, out_dir):
+@click.option("--force", "-f", is_flag=True, default=False,
+              help="Overwrite the contents of output directory if it exists")
+def new_plugin(template, out_dir, force):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    from cookiecutter.main import cookiecutter  # noqa
-    cookiecutter(template, output_dir=out_dir)
-    click.secho("[+] Created new plugin {} in {}".format(plugin_name, out_dir),
+    cookiecutter = get_cookiecutter()
+
+    if out_dir is None:
+        out_dir = click.prompt("Saving plugin in",
+                               default=os.path.abspath("."))
+
+    r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
+    click.secho("[+] Created new plugin in {}".format(r),
                 fg="green", bold=True)

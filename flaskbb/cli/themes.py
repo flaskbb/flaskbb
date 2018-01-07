@@ -17,7 +17,7 @@ from flask import current_app
 from flask_themes2 import get_themes_list, get_theme
 
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import check_cookiecutter, validate_theme
+from flaskbb.cli.utils import get_cookiecutter, validate_theme
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -48,23 +48,30 @@ def list_themes():
 
 
 @themes.command("new")
-@click.argument("theme_identifier", callback=check_cookiecutter)
 @click.option("--template", "-t", type=click.STRING,
               default="https://github.com/sh4nks/cookiecutter-flaskbb-theme",
               help="Path to a cookiecutter template or to a valid git repo.")
-def new_theme(theme_identifier, template):
+@click.option("--out-dir", "-o", type=click.Path(), default=None,
+              help="The location for the new FlaskBB theme.")
+@click.option("--force", "-f", is_flag=True, default=False,
+              help="Overwrite the contents of output directory if it exists")
+def new_theme(template, out_dir, force):
     """Creates a new theme based on the cookiecutter theme
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-theme.
     It will either accept a valid path on the filesystem
     or a URL to a Git repository which contains the cookiecutter template.
     """
-    from cookiecutter.main import cookiecutter
-    out_dir = os.path.join(current_app.root_path, "themes")
-    click.secho("[+] Creating new theme {}".format(theme_identifier),
-                fg="cyan")
-    cookiecutter(template, output_dir=out_dir)
-    click.secho("[+] Done. Created in {}".format(out_dir),
+    cookiecutter = get_cookiecutter()
+
+    if out_dir is None:
+        out_dir = click.prompt(
+            "Saving theme in",
+            default=os.path.join(current_app.root_path, "themes")
+        )
+
+    r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
+    click.secho("[+] Created new theme in {}".format(r),
                 fg="green", bold=True)
 
 
