@@ -118,7 +118,7 @@ this is `pacman` and for Debian/Ubuntu based systems this is `apt-get`.
 Configuration
 -------------
 
-Production / I Just Want to Try It
+Production
 ~~~~~~~~~~
 
 FlaskBB already sets some sane defaults, so you shouldn't have to change much.
@@ -147,7 +147,7 @@ Finally to get going – fire up FlaskBB!
 ::
 
     flaskbb --config flaskbb.cfg run
-    
+
     [+] Using config from: /path/to/flaskbb/flaskbb.cfg
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 
@@ -515,4 +515,4 @@ to say
 .. _virtualenv: https://virtualenv.pypa.io/en/latest/installation.html
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/install.html#basic-installation
 .. _pip: http://www.pip-installer.org/en/latest/installing.html
-.. _flask: http://flask.pocoo.org/docs/0.12/installation/ 
+.. _flask: http://flask.pocoo.org/docs/0.12/installation/
