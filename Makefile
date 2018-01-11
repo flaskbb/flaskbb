@@ -1,4 +1,4 @@
-.PHONY: clean install help test lint run dependencies docs
+.PHONY: clean install help test lint isort run dependencies docs
 
 help:
 	@echo "  clean      remove unwanted stuff"
@@ -6,6 +6,7 @@ help:
 	@echo "  devconfig  generates a development config"
 	@echo "  test       run the testsuite"
 	@echo "  lint       check the source for style errors"
+	@echo "  isort      sort the python imports"
 	@echo "  run        run the development server with the development config"
 	@echo "  docs       build the documentation"
 
@@ -35,8 +36,14 @@ install:dependencies
 docs:
 	$(MAKE) -C docs html
 
-lint:check
+lint:check-flake8
 	flake8
 
-check:
+check-flake8:
 	@type flake8 >/dev/null 2>&1 || echo "Flake8 is not installed. You can install it with 'pip install flake8'."
+
+isort:check-isort
+	isort --order-by-type -rc -up
+
+check-isort:
+	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
