@@ -448,9 +448,13 @@ def load_plugins(app):
             removed = remove_zombie_plugins_from_db()
             logger.info("Removed Plugins: {}".format(removed))
 
+    # we need a copy of it because of
+    # RuntimeError: dictionary changed size during iteration
     tasks = celery.tasks.copy()
-    disabled_plugins = [p.__package__ for p in app.pluggy.get_disabled_plugins()]
-
-    for task in tasks:
-        if task.split(".")[0] in disabled_plugins:
-            celery.tasks.unregister(task)
+    disabled_plugins = [
+        p.__package__ for p in app.pluggy.get_disabled_plugins()
+    ]
+    for task_name, task in iteritems(tasks):
+        if task.__module__.split(".")[0] in disabled_plugins:
+            logger.debug("Unregistering task: '{}'".format(task))
+            celery.tasks.unregister(task_name)
