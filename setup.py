@@ -24,9 +24,13 @@ Resources
 * `source <https://github.com/sh4nks/flaskbb>`_
 * `issues <https://github.com/sh4nks/flaskbb/issues>`_
 """
-from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
+import ast
+import os
+import re
 import sys
+
+from setuptools import find_packages, setup
+from setuptools.command.test import test as TestCommand
 
 
 class PyTestCommand(TestCommand):
@@ -42,15 +46,39 @@ class PyTestCommand(TestCommand):
         self.test_suite = True
 
     def run_tests(self):
-        import pytest
+        import pytest  # noqa
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
 
+def read(*parts):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with open(os.path.join(here, *parts), 'r') as fp:
+        return fp.read()
+
+
+def find_version(*file_paths):
+    version_match = re.search(r'__version__\s+=\s+(.*)',
+                              read(*file_paths)).group(1)
+    if version_match:
+        return str(ast.literal_eval(version_match))
+    raise RuntimeError("Unable to find version string.")
+
+
+def get_requirements(e=None):
+    rf = "requirements.txt" if e is None else 'requirements-{}.txt'.format(e)
+    r = read(rf)
+    return [x.strip() for x in r.split('\n')
+            if not x.startswith('#') and not x.startswith("-e")]
+
+
+install_requires = get_requirements()
+
+
 setup(
     name='FlaskBB',
-    version='1.0',
-    url='http://github.com/sh4nks/flaskbb/',
+    version=find_version("flaskbb", "__init__.py"),
+    url='https://github.com/sh4nks/flaskbb/',
     license='BSD',
     author='Peter Justin',
     author_email='peter.justin@outlook.com',
@@ -60,55 +88,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'alembic',
-        'amqp',
-        'Babel',
-        'billiard',
-        'blinker',
-        'celery',
-        'click',
-        'click-log',
-        'enum34',
-        'Flask',
-        'Flask-Alembic',
-        'flask-allows',
-        'Flask-BabelPlus',
-        'Flask-Caching',
-        'Flask-DebugToolbar',
-        'Flask-Limiter',
-        'Flask-Login',
-        'Flask-Mail',
-        'Flask-Redis',
-        'Flask-SQLAlchemy',
-        'Flask-Themes2',
-        'flask-whooshee',
-        'Flask-WTF',
-        'flaskbb-plugin-portal',
-        'itsdangerous',
-        'Jinja2',
-        'kombu',
-        'limits',
-        'Mako',
-        'MarkupSafe',
-        'mistune',
-        'Pillow',
-        'pluggy',
-        'Pygments',
-        'python-editor',
-        'pytz',
-        'redis',
-        'requests',
-        'simplejson',
-        'six',
-        'speaklater',
-        'SQLAlchemy',
-        'SQLAlchemy-Utils',
-        'Unidecode',
-        'Werkzeug',
-        'Whoosh',
-        'WTForms'
-    ],
+    install_requires=install_requires,
     entry_points='''
         [console_scripts]
         flaskbb=flaskbb.cli:flaskbb
