@@ -1,4 +1,4 @@
-.PHONY: clean install help test lint isort run dependencies docs
+.PHONY: clean install help test lint isort run dependencies docs wheel upload
 
 help:
 	@echo "  clean      remove unwanted stuff"
@@ -8,6 +8,8 @@ help:
 	@echo "  lint       check the source for style errors"
 	@echo "  isort      sort the python imports"
 	@echo "  run        run the development server with the development config"
+	@echo "  wheel      creates a wheel package of flaskbb"
+	@echo "  upload     uploads a new version of FlaskBB to PyPI"
 	@echo "  docs       build the documentation"
 
 dependencies:requirements.txt
@@ -47,3 +49,9 @@ isort:check-isort
 
 check-isort:
 	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
+
+wheel:
+	python setup.py bdist_wheel
+
+upload:wheel
+	twine upload dist/*
