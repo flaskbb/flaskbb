@@ -1,71 +1,112 @@
-# Packages #
-############
-# it's better to unpack these files and commit the raw source
-# git has its own built in compression methods
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
-*.tgz
-*.tar.gz
+# Created by https://www.gitignore.io/api/vim,python
 
-# Logs and databases #
-######################
-*.log
-*.sql
-*.sqlite
-whoosh_index
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# OS generated files #
-######################
-.DS_Store*
-ehthumbs.db
-Icon?
-Thumbs.db
+# C extensions
+*.so
 
-# Project Related #
-###################
-.project
-.geanyprj
-.vscode
-.pydevproject
-.idea
-__pycache__
-*.nja
-*.pyc
-*.db
-.venv
-*.sublime-workspace
-*.sublime-project
-*.egg-info
-*.iml
-flaskbb/configs/production.py
-flaskbb/configs/development.py
-flaskbb/configs/*.cfg
-*.cfg
-.tox
-*.rdb
-.cache
-*.mo
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
 .coverage
-flaskbb/static/emoji/*
-.sass-cache
-bower_components
-node_modules
-.directory
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-# Created by https://www.gitignore.io/api/vim
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule.*
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
 
 ### Vim ###
 # swap
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
+.sw[a-p]
+.*.sw[a-p]
 # session
 Session.vim
 # temporary
@@ -74,6 +115,27 @@ Session.vim
 # auto-generated tag files
 tags
 
-# End of https://www.gitignore.io/api/vim
+# End of https://www.gitignore.io/api/vim,python
 
-htmlcov/
+
+### Project Related ###
+.project
+.geanyprj
+.vscode
+.pydevproject
+.idea
+*.nja
+*.sublime-workspace
+*.sublime-project
+*.iml
+.directory
+
+*.cfg
+*.rdb
+*.db
+*.sqlite
+flaskbb/static/emoji/*
+whoosh_index
+.sass-cache
+bower_components
+node_modules
