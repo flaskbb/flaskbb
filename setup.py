@@ -2,18 +2,24 @@
 FlaskBB
 =======
 
-FlaskBB is a forum software written in Python using the microframework Flask.
+FlaskBB is a Forum Software written in Python using the micro framework Flask.
 
 
-And Easy to Setup
------------------
+Quickstart
+----------
 
 .. code:: bash
+    # Install the FlaskBB package and it's dependencies
     $ pip install -e .
 
+    # Generate a configuration
+    $ flaskbb makeconfig
+
+    # Install FlaskBB
     $ flaskbb install
 
-    $ flaskbb runserver
+    # Run the development server
+    $ flaskbb run
      * Running on http://localhost:8080/
 
 
@@ -104,7 +110,8 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
-        'Intended Audience :: Developers, Users',
+        'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
