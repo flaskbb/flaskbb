@@ -55,6 +55,12 @@ def flaskbb_jinja_directives(app):
 def flaskbb_additional_setup(app, pluggy):
     """Hook for any additional setup a plugin wants to do after all other
     application setup has finished.
+
+    For example, you could apply a WSGI middleware::
+
+        @impl
+        def flaskbb_additional_setup(app):
+            app.wsgi_app = ProxyFix(app.wsgi_app)
     """
 
 
@@ -116,6 +122,7 @@ def flaskbb_tpl_after_user_details_form():
     in :file:`templates/user/change_user_details.html`.
     """
 
+
 @spec
 def flaskbb_tpl_profile_settings_menu():
     """This hook is emitted on the user settings page in order to populate the
@@ -143,4 +150,31 @@ def flaskbb_tpl_profile_settings_menu():
     supplies its own hookwrapper to flatten all the lists into a single list.
 
     in :file:`templates/user/settings_layout.html`
+    """
+
+
+@spec
+def flaskbb_tpl_admin_settings_menu(user):
+    """This hook is emitted in the admin panel and used to add additional
+    navigation links to the admin menu.
+
+    Implementations of this hook should return a list of tuples
+    that are view name, display text and optionally an icon.
+    The display text will be provided to the translation service so it
+    is unnecessary to supply translated text.
+
+    For example::
+
+        @impl(hookwrapper=True, tryfirst=True)
+        def flaskbb_tpl_admin_settings_menu():
+            # only add this item if the user is an admin
+            if Permission(IsAdmin, identity=current_user):
+                return [
+                    ("myplugin.foobar", "Foobar", "fa fa-foobar")
+                ]
+
+    Hookwrappers for this spec should not be registered as FlaskBB
+    supplies its own hookwrapper to flatten all the lists into a single list.
+
+    in :file:`templates/management/management_layout.html`
     """
