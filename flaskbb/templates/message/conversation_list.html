@@ -8,7 +8,7 @@
                 </div>
 
                 <div class="pull-right">
-                    <span class="label label-info" title="The amount of all conversations" data-toggle="tooltip" data-placement="top">{{ message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
+                    <span class="label label-info" title="The amount of all conversations" data-toggle="tooltip" data-placement="top">{{ current_user.message_count }}/{{ flaskbb_config["MESSAGE_QUOTA"] }}</span>
                 </div>
             </div>
         </div>

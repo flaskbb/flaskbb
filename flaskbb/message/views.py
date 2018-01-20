@@ -31,21 +31,30 @@ logger = logging.getLogger(__name__)
 message = Blueprint("message", __name__)
 
 
-def requires_message_box_space(f):
+def check_message_box_space(redirect_to=None):
+    """Checks the message quota has been exceeded. If thats the case
+    it flashes a message and redirects back to some endpoint.
 
+    :param redirect_to: The endpoint to redirect to. If set to ``None`` it
+                        will redirect to the ``message.inbox`` endpoint.
+    """
+    if current_user.message_count >= flaskbb_config["MESSAGE_QUOTA"]:
+        flash(
+            _(
+                "You cannot send any messages anymore because you have "
+                "reached your message limit."
+            ), "danger"
+        )
+        return redirect(redirect_to or url_for("message.inbox"))
+
+
+def require_message_box_space(f):
+    """Decorator for :func:`check_message_box_space`."""
+    # not sure how this can be done without explicitly providing a decorator
+    # for this
     @wraps(f)
     def wrapper(*a, **k):
-        message_count = Conversation.query.filter(Conversation.user_id == current_user.id).count()
-
-        if message_count >= flaskbb_config["MESSAGE_QUOTA"]:
-            flash(
-                _(
-                    "You cannot send any messages anymore because you have "
-                    "reached your message limit."
-                ), "danger"
-            )
-            return redirect(url_for("message.inbox"))
-        return f(*a, **k)
+        return check_message_box_space() or f(*a, **k)
 
     return wrapper
 
@@ -55,7 +64,6 @@ class Inbox(MethodView):
 
     def get(self):
         page = request.args.get('page', 1, type=int)
-
         # the inbox will display both, the recieved and the sent messages
         conversations = Conversation.query.filter(
             Conversation.user_id == current_user.id,
@@ -65,13 +73,8 @@ class Inbox(MethodView):
             page, flaskbb_config['TOPICS_PER_PAGE'], False
         )
 
-        # we can't simply do conversations.total because it would ignore
-        # drafted and trashed messages
-        message_count = Conversation.query.filter(Conversation.user_id == current_user.id).count()
-
-        return render_template(
-            "message/inbox.html", conversations=conversations, message_count=message_count
-        )
+        return render_template("message/inbox.html",
+                               conversations=conversations)
 
 
 class ViewConversation(MethodView):
@@ -89,9 +92,10 @@ class ViewConversation(MethodView):
             conversation.save()
 
         form = self.form()
-        return render_template("message/conversation.html", conversation=conversation, form=form)
+        return render_template("message/conversation.html",
+                               conversation=conversation, form=form)
 
-    @requires_message_box_space
+    @require_message_box_space
     def post(self, conversation_id):
         conversation = Conversation.query.filter_by(
             id=conversation_id, user_id=current_user.id
@@ -137,7 +141,7 @@ class ViewConversation(MethodView):
 
 
 class NewConversation(MethodView):
-    decorators = [requires_message_box_space, login_required]
+    decorators = [login_required]
     form = ConversationForm
 
     def get(self):
@@ -165,6 +169,8 @@ class NewConversation(MethodView):
             return redirect(url_for("message.drafts"))
 
         if "send_message" in request.form and form.validate():
+            check_message_box_space()
+
             to_user = User.query.filter_by(username=form.to_user.data).first()
 
             # this is the shared id between conversations because the messages
@@ -240,6 +246,8 @@ class EditConversation(MethodView):
                 return redirect(url_for("message.drafts"))
 
             if "send_message" in request.form and form.validate():
+                check_message_box_space()
+
                 to_user = User.query.filter_by(username=form.to_user.data).first()
                 # Save the message in the recievers inbox
                 form.save(
@@ -306,7 +314,7 @@ class RestoreConversation(MethodView):
 
         conversation.trash = False
         conversation.save()
-        return redirect(url_for("message.inbox"))
+        return redirect(url_for("message.trash"))
 
 
 class DeleteConversation(MethodView):
@@ -318,7 +326,7 @@ class DeleteConversation(MethodView):
         ).first_or_404()
 
         conversation.delete()
-        return redirect(url_for("message.inbox"))
+        return redirect(url_for("message.trash"))
 
 
 class SentMessages(MethodView):
@@ -338,12 +346,8 @@ class SentMessages(MethodView):
             order_by(Conversation.date_modified.desc()). \
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-        message_count = Conversation.query. \
-            filter(Conversation.user_id == current_user.id).\
-            count()
-
         return render_template(
-            "message/sent.html", conversations=conversations, message_count=message_count
+            "message/sent.html", conversations=conversations
         )
 
 
@@ -363,12 +367,8 @@ class DraftMessages(MethodView):
             order_by(Conversation.date_modified.desc()). \
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-        message_count = Conversation.query. \
-            filter(Conversation.user_id == current_user.id).\
-            count()
-
         return render_template(
-            "message/drafts.html", conversations=conversations, message_count=message_count
+            "message/drafts.html", conversations=conversations
         )
 
 
@@ -387,12 +387,8 @@ class TrashedMessages(MethodView):
             order_by(Conversation.date_modified.desc()). \
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
 
-        message_count = Conversation.query. \
-            filter(Conversation.user_id == current_user.id).\
-            count()
-
         return render_template(
-            "message/trash.html", conversations=conversations, message_count=message_count
+            "message/trash.html", conversations=conversations
         )
 
 
