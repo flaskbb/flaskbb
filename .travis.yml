@@ -5,6 +5,10 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+before_install:
+  - mkdir -p $HOME/bin
+  - curl -fsSL https://testspace-client.s3.amazonaws.com/testspace-linux.tgz | tar -zxvf- -C $HOME/bin
+  - testspace config url $TS_ORG.testspace.com
 # command to install dependencies
 install:
   - "pip install -r requirements-dev.txt"
@@ -13,6 +17,8 @@ install:
 # command to run tests
 script:
   - flaskbb translations compile
-  - py.test --cov=flaskbb --cov-report=term-missing tests
+  - py.test --cov=flaskbb --cov-report=term-missing --junit-xml=testresults.xml tests
+after_script:
+  - testspace [Python-${TRAVIS_PYTHON_VERSION}]testresults.xml{tests}
 after_success:
   - coveralls
