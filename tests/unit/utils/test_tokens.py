@@ -4,7 +4,7 @@ from flaskbb.utils.tokens import make_token, get_token_status
 
 
 def test_make_token(user):
-    token = make_token(user, "test")
+    token = make_token(user.id, "test")
     s = TimedJSONWebSignatureSerializer(current_app.config['SECRET_KEY'])
     unpacked_token = s.loads(token)
     assert user.id == unpacked_token["id"]
@@ -12,7 +12,7 @@ def test_make_token(user):
 
 
 def test_valid_token_status(user):
-    token = make_token(user, "valid_test")
+    token = make_token(user.id, "valid_test")
     expired, invalid, token_user = get_token_status(token, "valid_test")
 
     assert not expired
@@ -21,7 +21,7 @@ def test_valid_token_status(user):
 
 
 def test_token_status_with_data(user):
-    token = make_token(user, "test_data")
+    token = make_token(user.id, "test_data")
     expired, invalid, token_user, data = \
         get_token_status(token, "test_data", return_data=True)
     assert user.id == data["id"]
@@ -29,7 +29,7 @@ def test_token_status_with_data(user):
 
 
 def test_token_operation(user):
-    token = make_token(user, "operation_test")
+    token = make_token(user.id, "operation_test")
     expired, invalid, token_user = get_token_status(token, "invalid_op")
     assert invalid
     assert not expired
@@ -48,7 +48,7 @@ def test_invalid_token_status(user):
 
 
 def test_expired_token_status(user):
-    token = make_token(user, "expired_test", -1)
+    token = make_token(user.id, "expired_test", -1)
     expired, invalid, token_user = get_token_status(token, "expired_test")
     assert expired
     assert not invalid

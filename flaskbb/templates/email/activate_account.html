@@ -1,6 +1,6 @@
 {% set link = url_for('auth.activate_account', token=token, _external=True) %}
 
-<p>{% trans user=user.username %}Dear {{ user }},{% endtrans %}</p>
+<p>{% trans %}Dear {{ username }},{% endtrans %}</p>
 
 <p>{% trans %}Click the link below to activate your account:{% endtrans %}</p>
 

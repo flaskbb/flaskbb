@@ -21,46 +21,50 @@ logger = logging.getLogger(__name__)
 
 
 @celery.task
-def send_reset_token(user):
+def send_reset_token(user_id, username, email):
     """Sends the reset token to the user's email address.
 
-    :param user: The user object to whom the email should be sent.
+    :param user_id: The user id. Used to generate the reset token.
+    :param username: The username to whom the email should be sent.
+    :param email:  The email address of the user
     """
-    token = make_token(user=user, operation="reset_password")
+    token = make_token(user_id=user_id, operation="reset_password")
     send_email(
         subject=_("Password Recovery Confirmation"),
-        recipients=[user.email],
+        recipients=[email],
         text_body=render_template(
             "email/reset_password.txt",
-            user=user,
+            username=username,
             token=token
         ),
         html_body=render_template(
             "email/reset_password.html",
-            user=user,
+            username=username,
             token=token
         )
     )
 
 
 @celery.task
-def send_activation_token(user):
+def send_activation_token(user_id, username, email):
     """Sends the activation token to the user's email address.
 
-    :param user: The user object to whom the email should be sent.
+    :param user_id: The user id. Used to generate the reset token.
+    :param username: The username to whom the email should be sent.
+    :param email:  The email address of the user
     """
-    token = make_token(user=user, operation="activate_account")
+    token = make_token(user_id=user_id, operation="activate_account")
     send_email(
         subject=_("Account Activation"),
-        recipients=[user.email],
+        recipients=[email],
         text_body=render_template(
             "email/activate_account.txt",
-            user=user,
+            username=username,
             token=token
         ),
         html_body=render_template(
             "email/activate_account.html",
-            user=user,
+            username=username,
             token=token
         )
     )
