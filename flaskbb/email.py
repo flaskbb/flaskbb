@@ -26,6 +26,7 @@ def send_reset_token(user):
 
     :param user: The user object to whom the email should be sent.
     """
+    user = User.query.filter_by(username=user).first()
     token = make_token(user=user, operation="reset_password")
     send_email(
         subject=_("Password Recovery Confirmation"),

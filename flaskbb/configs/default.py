@@ -265,7 +265,6 @@ class DefaultConfig(object):
     # Celery
     CELERY_BROKER_URL = 'redis://localhost:6379'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-    if not REDIS_ENABLED: CELERY_ALWAYS_EAGER = True
 
     # FlaskBB Settings
     # ------------------------------ #
