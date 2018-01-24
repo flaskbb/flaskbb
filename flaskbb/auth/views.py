@@ -167,7 +167,7 @@ class Register(MethodView):
                 # for the newly created user is fresh.
                 # PS: `db.session.merge(user)` did not work for me.
                 user = User.query.filter_by(email=user.email).first()
-                send_activation_token.delay(user)
+                send_activation_token.delay(user.username)
                 flash(
                     _("An account activation email has been sent to %(email)s", email=user.email),
                     "success"
