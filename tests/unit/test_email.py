@@ -8,7 +8,7 @@ def test_send_reset_token_to_user(default_settings, user):
 
     with current_app.test_request_context():
         with mail.record_messages() as outbox:
-            send_reset_token(user)
+            send_reset_token(user.username)
 
             assert len(outbox) == 1
             # from /auth/reset-password/<token>
@@ -21,7 +21,7 @@ def test_send_activation_token_to_user(default_settings, user):
 
     with current_app.test_request_context():
         with mail.record_messages() as outbox:
-            send_activation_token(user)
+            send_activation_token(user.username)
 
             assert len(outbox) == 1
             # from /auth/activate/<token>
