@@ -15,6 +15,7 @@ from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail, celery
 from flaskbb.utils.tokens import make_token
+from flaskbb.user.models import User
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ def send_reset_token(user):
 
     :param user: The user object to whom the email should be sent.
     """
+    user = User.query.filter_by(username=user).first()
     token = make_token(user=user, operation="reset_password")
     send_email(
         subject=_("Password Recovery Confirmation"),
@@ -49,6 +51,7 @@ def send_activation_token(user):
 
     :param user: The user object to whom the email should be sent.
     """
+    user = User.query.filter_by(username=user).first()
     token = make_token(user=user, operation="activate_account")
     send_email(
         subject=_("Account Activation"),

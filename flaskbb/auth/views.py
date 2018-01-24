@@ -167,7 +167,7 @@ class Register(MethodView):
                 # for the newly created user is fresh.
                 # PS: `db.session.merge(user)` did not work for me.
                 user = User.query.filter_by(email=user.email).first()
-                send_activation_token.delay(user)
+                send_activation_token.delay(user.username)
                 flash(
                     _("An account activation email has been sent to %(email)s", email=user.email),
                     "success"
@@ -194,7 +194,7 @@ class ForgotPassword(MethodView):
             user = User.query.filter_by(email=form.email.data).first()
 
             if user:
-                send_reset_token.delay(user)
+                send_reset_token.delay(user.username)
                 flash(_("Email sent! Please check your inbox."), "info")
                 return redirect(url_for("auth.forgot_password"))
             else:
@@ -250,7 +250,7 @@ class RequestActivationToken(MethodView):
         form = self.form()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            send_activation_token.delay(user)
+            send_activation_token.delay(user.username)
             flash(
                 _("A new account activation token has been sent to "
                   "your email address."), "success"
