@@ -117,7 +117,7 @@ class ViewPost(MethodView):
         post = Post.query.filter_by(id=post_id).first_or_404()
         post_in_topic = Post.query.filter(Post.topic_id == post.topic_id,
                                           Post.id <= post_id).order_by(Post.id.asc()).count()
-        page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
+        page = int(math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE'])))
 
         return redirect(
             url_for(
