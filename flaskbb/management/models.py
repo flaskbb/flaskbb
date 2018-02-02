@@ -37,8 +37,7 @@ class Setting(db.Model, CRUDMixin):
     value = db.Column(db.PickleType, nullable=False)
     settingsgroup = db.Column(db.String(255),
                               db.ForeignKey('settingsgroup.key',
-                                            use_alter=True, ondelete="CASCADE",
-                                            name="fk_settingsgroup"),
+                                            ondelete="CASCADE"),
                               nullable=False)
 
     # The name (displayed in the form)

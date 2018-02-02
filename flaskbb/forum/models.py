@@ -31,8 +31,7 @@ moderators = db.Table(
               db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, ondelete="CASCADE",
-                            name="fk_mods_forum_id"),
+              db.ForeignKey('forums.id', ondelete="CASCADE"),
               nullable=False))
 
 
@@ -42,8 +41,7 @@ topictracker = db.Table(
               db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id', use_alter=True, ondelete="CASCADE",
-                            name="fk_tracker_topic_id"),
+              db.ForeignKey('topics.id', ondelete="CASCADE"),
               nullable=False))
 
 
@@ -53,8 +51,7 @@ forumgroups = db.Table(
               db.ForeignKey('groups.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True, ondelete="CASCADE",
-                            name="fk_fg_forum_id"),
+              db.ForeignKey('forums.id', ondelete="CASCADE"),
               nullable=False))
 
 
@@ -66,15 +63,11 @@ class TopicsRead(db.Model, CRUDMixin):
                         primary_key=True)
     user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     topic_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_tr_topic_id",
-                                       ondelete="CASCADE"),
+                         db.ForeignKey("topics.id", ondelete="CASCADE"),
                          primary_key=True)
     topic = db.relationship('Topic', uselist=False, foreign_keys=[topic_id])
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id", use_alter=True,
-                                       name="fk_tr_forum_id",
-                                       ondelete="CASCADE"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          primary_key=True)
     forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -89,9 +82,7 @@ class ForumsRead(db.Model, CRUDMixin):
                         primary_key=True)
     user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id", use_alter=True,
-                                       name="fk_fr_forum_id",
-                                       ondelete="CASCADE"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          primary_key=True)
     forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -157,10 +148,7 @@ class Post(HideableCRUDMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id",
-                                       use_alter=True,
-                                       name="fk_post_topic_id",
-                                       ondelete="CASCADE"),
+                         db.ForeignKey("topics.id", ondelete="CASCADE"),
                          nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
@@ -397,9 +385,7 @@ class Topic(HideableCRUDMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id",
-                                       use_alter=True, ondelete="CASCADE",
-                                       name="fk_topic_forum_id"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          nullable=False)
     title = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
