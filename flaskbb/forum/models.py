@@ -148,7 +148,8 @@ class Post(HideableCRUDMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id", ondelete="CASCADE"),
+                         db.ForeignKey("topics.id", ondelete="CASCADE",
+                                       use_alter=True),
                          nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
@@ -416,7 +417,8 @@ class Topic(HideableCRUDMixin, db.Model):
     # One-to-many
     posts = db.relationship("Post", backref="topic", lazy="dynamic",
                             primaryjoin="Post.topic_id == Topic.id",
-                            cascade="all, delete-orphan", post_update=True)
+                            cascade="all, delete-orphan",
+                            post_update=True)
 
     # Properties
     @property
@@ -812,11 +814,8 @@ class Forum(db.Model, CRUDMixin):
                                                 ondelete="SET NULL"),
                                   nullable=True)
 
-    last_post_user = db.relationship(
-        "User",
-        uselist=False,
-        foreign_keys=[last_post_user_id]
-    )
+    last_post_user = db.relationship("User", uselist=False,
+                                     foreign_keys=[last_post_user_id])
 
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
@@ -826,11 +825,8 @@ class Forum(db.Model, CRUDMixin):
                                   default=time_utcnow, nullable=True)
 
     # One-to-many
-    topics = db.relationship(
-        "Topic",
-        backref="forum",
-        lazy="dynamic"
-    )
+    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
+                             cascade="all, delete-orphan")
 
     # Many-to-many
     moderators = db.relationship(
@@ -1110,7 +1106,8 @@ class Category(db.Model, CRUDMixin):
     # One-to-many
     forums = db.relationship("Forum", backref="category", lazy="dynamic",
                              primaryjoin='Forum.category_id == Category.id',
-                             order_by='asc(Forum.position)')
+                             order_by='asc(Forum.position)',
+                             cascade="all, delete-orphan")
 
     # Properties
     @property

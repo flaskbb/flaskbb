@@ -43,7 +43,7 @@ class Conversation(db.Model, CRUDMixin):
     messages = db.relationship(
         "Message", lazy="joined", backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
-        order_by="asc(Message.id)"
+        order_by="asc(Message.id)", cascade="all, delete-orphan"
     )
 
     # this is actually the users message box

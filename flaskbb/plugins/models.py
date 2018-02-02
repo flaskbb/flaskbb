@@ -64,7 +64,8 @@ class PluginRegistry(CRUDMixin, db.Model):
     values = db.relationship(
         'PluginStore',
         collection_class=attribute_mapped_collection('key'),
-        backref='plugin'
+        backref='plugin',
+        cascade="all, delete-orphan",
     )
 
     @property

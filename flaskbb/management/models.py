@@ -24,7 +24,8 @@ class SettingsGroup(db.Model, CRUDMixin):
     key = db.Column(db.String(255), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    settings = db.relationship("Setting", lazy="dynamic", backref="group")
+    settings = db.relationship("Setting", lazy="dynamic", backref="group",
+                               cascade="all, delete-orphan")
 
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.key)
