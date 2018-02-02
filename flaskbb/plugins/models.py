@@ -28,7 +28,9 @@ class PluginStore(CRUDMixin, db.Model):
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
     extra = db.Column(db.PickleType, nullable=True)
-    plugin_id = db.Column(db.Integer, db.ForeignKey('plugin_registry.id'))
+    plugin_id = db.Column(db.Integer,
+                          db.ForeignKey("plugin_registry.id",
+                                        ondelete="CASCADE"))
 
     # Display stuff
     name = db.Column(db.Unicode(255), nullable=False)
@@ -62,7 +64,6 @@ class PluginRegistry(CRUDMixin, db.Model):
     values = db.relationship(
         'PluginStore',
         collection_class=attribute_mapped_collection('key'),
-        cascade='all, delete-orphan',
         backref='plugin'
     )
 

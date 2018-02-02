@@ -28,9 +28,11 @@ logger = logging.getLogger(__name__)
 
 groups_users = db.Table(
     'groups_users',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'),
+    db.Column('user_id', db.Integer,
+              db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
-    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'),
+    db.Column('group_id', db.Integer,
+              db.ForeignKey('groups.id', ondelete="CASCADE"),
               nullable=False)
 )
 
@@ -115,8 +117,10 @@ class User(db.Model, UserMixin, CRUDMixin):
     theme = db.Column(db.String(15), nullable=True)
     language = db.Column(db.String(15), default="en", nullable=True)
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic", primaryjoin="User.id == Post.user_id")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic", primaryjoin="User.id == Topic.user_id")
+    posts = db.relationship("Post", backref="user", lazy="dynamic",
+                            primaryjoin="User.id == Post.user_id")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic",
+                             primaryjoin="User.id == Topic.user_id")
 
     post_count = db.Column(db.Integer, default=0)
 
@@ -193,7 +197,6 @@ class User(db.Model, UserMixin, CRUDMixin):
             Conversation.user_id == self.id,
             Conversation.id == Message.conversation_id
         ).count()
-
 
     @property
     def days_registered(self):
@@ -480,22 +483,15 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def delete(self):
         """Deletes the User."""
-        # This isn't done automatically...
-        Conversation.query.filter_by(user_id=self.id).delete()
-        ForumsRead.query.filter_by(user_id=self.id).delete()
-        TopicsRead.query.filter_by(user_id=self.id).delete()
 
         # This should actually be handeld by the dbms.. but dunno why it doesnt
         # work here
-        from flaskbb.forum.models import Forum
-
-        last_post_forums = Forum.query.\
-            filter_by(last_post_user_id=self.id).all()
-
-        for forum in last_post_forums:
-            forum.last_post_user_id = None
-            forum.save()
-
+        #from flaskbb.forum.models import Forum
+        #last_post_forums = Forum.query.\
+        #    filter_by(last_post_user_id=self.id).all()
+        #for forum in last_post_forums:
+        #    forum.last_post_user_id = None
+        #    forum.save()
         db.session.delete(self)
         db.session.commit()
 
