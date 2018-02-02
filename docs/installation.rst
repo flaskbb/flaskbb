@@ -243,7 +243,13 @@ Both methods are included in the example configs.
 Installation
 ------------
 
-**Sqlite users:** create a DB file in your project source.
+**MySQL users:** Make sure that you create the database using the
+``utf8mb4`` charset::
+
+    CREATE DATABASE flaskbb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+See `this <https://dba.stackexchange.com/a/152383>`_ SO answer for more
+information.
 
 For a guided install, run::
 
