@@ -27,7 +27,7 @@ from flask_whooshee import (DELETE_KWD, INSERT_KWD, UPDATE_KWD, Whooshee,
                             WhoosheeQuery)
 from flask_wtf.csrf import CSRFProtect
 from flaskbb.exceptions import AuthorizationRequired
-from sqlalchemy import event
+from sqlalchemy import MetaData, event
 from sqlalchemy.orm import Query as SQLAQuery
 
 
@@ -73,7 +73,15 @@ class FlaskBBWhooshee(Whooshee):
 allows = Allows(throws=AuthorizationRequired)
 
 # Database
-db = SQLAlchemy()
+metadata = MetaData(
+    naming_convention={
+        "ix": 'ix_%(column_0_label)s',
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+    }
+)
+db = SQLAlchemy(metadata=metadata)
 
 # Whooshee (Full Text Search)
 whooshee = FlaskBBWhooshee()
