@@ -97,13 +97,18 @@
                                     <li>
                                         <a href="{{ url_for('message.view_conversation', conversation_id=message.id) }}">
                                             <div>
-                                                <span class="author-name">{{ message.from_user.username }}</span> <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
+                                                {% if message.from_user %}
+                                                    <span class="author-name">{{ message.from_user.username }}</span>
+                                                {% else %}
+                                                    {% trans %}Deleted User{% endtrans %}
+                                                {% endif %}
+                                                <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
                                                 <div class="message-subject">{{ message.subject }}</div>
                                             </div>
                                         </a>
                                     </li>
                                     {% else %}
-                                    <li><a href="#">No unread messages.</a></li>
+                                    <li><a href="#">{% trans %}No unread messages.{% endtrans %}</a></li>
                                     {% endfor %}
                                     <li class="divider"></li>
                                     <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}</a></li>

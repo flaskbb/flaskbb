@@ -10,6 +10,8 @@ import logging
 from alembic import op
 import sqlalchemy as sa
 
+import flaskbb
+
 logger = logging.getLogger("alembic.runtime.migration")
 
 # revision identifiers, used by Alembic.
@@ -32,10 +34,18 @@ def upgrade():
         if con.engine.dialect.name == "mysql":
             # user_id
             batch_op.drop_constraint("conversations_ibfk_3", type_='foreignkey')
+            # TODO: setup mysqldb and check
+            batch_op.drop_constraint("conversations_ibfk_2", type_='foreignkey')
+            batch_op.drop_constraint("conversations_ibfk_1", type_='foreignkey')
         elif con.engine.dialect.name == "postgresql":
+            batch_op.drop_constraint('conversations_to_user_id_fkey', type_='foreignkey')
+            batch_op.drop_constraint('conversations_from_user_id_fkey', type_='foreignkey')
             batch_op.drop_constraint('conversations_user_id_fkey', type_='foreignkey')
 
         batch_op.create_foreign_key(batch_op.f('fk_conversations_user_id_users'), 'users', ['user_id'], ['id'], ondelete='CASCADE')
+        batch_op.create_foreign_key(batch_op.f('fk_conversations_from_user_id_users'), 'users', ['from_user_id'], ['id'], ondelete='SET NULL')
+        batch_op.create_foreign_key(batch_op.f('fk_conversations_to_user_id_users'), 'users', ['to_user_id'], ['id'], ondelete='SET NULL')
+
 
     with op.batch_alter_table('forumgroups', schema=None) as batch_op:
         if con.engine.dialect.name == "sqlite":
@@ -97,8 +107,10 @@ def upgrade():
             batch_op.drop_constraint('messages_conversation_id_fkey', type_='foreignkey')
             batch_op.drop_constraint('messages_user_id_fkey', type_='foreignkey')
 
+        batch_op.alter_column('user_id', existing_type=flaskbb.utils.database.UTCDateTime(timezone=True), nullable=True)
+
         batch_op.create_foreign_key(batch_op.f('fk_messages_conversation_id_conversations'), 'conversations', ['conversation_id'], ['id'], ondelete='CASCADE')
-        batch_op.create_foreign_key(batch_op.f('fk_messages_user_id_users'), 'users', ['user_id'], ['id'], ondelete='CASCADE')
+        batch_op.create_foreign_key(batch_op.f('fk_messages_user_id_users'), 'users', ['user_id'], ['id'], ondelete='SET NULL')
 
     with op.batch_alter_table('moderators', schema=None) as batch_op:
         if con.engine.dialect.name == "sqlite":
@@ -202,6 +214,9 @@ def downgrade():
     with op.batch_alter_table('messages', schema=None) as batch_op:
         batch_op.drop_constraint(batch_op.f('fk_messages_user_id_users'), type_='foreignkey')
         batch_op.drop_constraint(batch_op.f('fk_messages_conversation_id_conversations'), type_='foreignkey')
+
+        batch_op.alter_column('user_id', existing_type=flaskbb.utils.database.UTCDateTime(timezone=True), nullable=False)
+
         batch_op.create_foreign_key('fk_messages_user_id_users', 'users', ['user_id'], ['id'])
         batch_op.create_foreign_key('fk_messages_conversation_id_conversations', 'conversations', ['conversation_id'], ['id'])
 

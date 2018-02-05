@@ -26,9 +26,11 @@ class Conversation(db.Model, CRUDMixin):
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.id", ondelete="CASCADE"),
                         nullable=False)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
+                                                       ondelete="SET NULL"),
                              nullable=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
+                                                     ondelete="SET NULL"),
                            nullable=True)
     shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255), nullable=True)
@@ -97,8 +99,8 @@ class Message(db.Model, CRUDMixin):
 
     # the user who wrote the message
     user_id = db.Column(db.Integer,
-                        db.ForeignKey("users.id", ondelete="CASCADE"),
-                        nullable=False)
+                        db.ForeignKey("users.id", ondelete="SET NULL"),
+                        nullable=True)
     message = db.Column(db.Text, nullable=False)
     date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                              nullable=False)

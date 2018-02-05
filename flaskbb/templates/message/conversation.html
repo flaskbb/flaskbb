@@ -98,7 +98,7 @@
                         {% endif %}
 
                         {% else %}
-                        <div class="author-name"><h4>{% trans %}Deleted{% endtrans %}</h4></div>
+                        <div class="author-name"><h4>{% trans %}Deleted User{% endtrans %}</h4></div>
                         <div class="author-title"><h5>{% trans %}Guest{% endtrans %}</h5></div>
                         {% endif %}
                     </div>
@@ -110,7 +110,7 @@
     </div>
 </div>
 
-{% if not conversation.draft %}
+{% if not conversation.draft and conversation.from_user != None and conversation.to_user != None %}
 {% from "macros.html" import render_quickreply, render_submit_field %}
 <form class="form" action="#" method="post">
     {{ form.hidden_tag() }}

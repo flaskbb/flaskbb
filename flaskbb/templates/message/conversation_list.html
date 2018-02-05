@@ -18,7 +18,7 @@
         <div class="row conversation-row hover {% if conversation.unread %}unread{% endif %}">
             <!-- avatar -->
             <div class="col-md-1 col-sm-2 col-xs-2 conversation-avatar">
-                {% if conversation.from_user.avatar %}
+                {% if conversation.from_user and conversation.from_user.avatar %}
                 <img src="{{ conversation.from_user.avatar }}" class="img-circle" alt="avatar" width="65px" height="65px" />
                 {% else %}
                 <img src="{{ url_for('static', filename='img/avatar80x80.png') }}" class="img-circle" alt="avatar" width="65px" height="65px" />
@@ -41,9 +41,20 @@
                 </div>
                 <!-- meta info (date, user) -->
                 <div class="conversation-meta">
-                    From <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
-                    to <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
-                    on {{ conversation.last_message.date_created|format_date("%d %B %Y - %H:%M") }}
+                    {% trans %}From{% endtrans %}
+                    {% if conversation.from_user %}
+                        <a href="{{ conversation.from_user.url }}">{{ conversation.from_user.username }}</a>
+                    {% else %}
+                        {% trans %}Deleted User{% endtrans %}
+                    {% endif %}
+
+                    {% trans %}to{% endtrans %}
+                    {% if conversation.to_user %}
+                        <a href="{{ conversation.to_user.url }}">{{ conversation.to_user.username }}</a>
+                    {% else %}
+                        {% trans %}Deleted User{% endtrans %}
+                    {% endif %}
+                    {% trans %}on{% endtrans %} {{ conversation.last_message.date_created|format_date("%d %B %Y - %H:%M") }}
                 </div>
                 <!-- actual content -->
                 <div class="conversation-content">
