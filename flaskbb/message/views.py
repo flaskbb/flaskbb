@@ -21,10 +21,9 @@ from flaskbb.extensions import db
 from flaskbb.message.forms import ConversationForm, MessageForm
 from flaskbb.message.models import Conversation, Message
 from flaskbb.user.models import User
-from flaskbb.utils.helpers import (format_quote, register_view,
+from flaskbb.utils.helpers import (format_quote, real, register_view,
                                    render_template, time_utcnow)
 from flaskbb.utils.settings import flaskbb_config
-
 
 logger = logging.getLogger(__name__)
 
@@ -108,8 +107,10 @@ class ViewConversation(MethodView):
             # then we have to change the id's a bit.
             if current_user.id == conversation.to_user_id:
                 to_user_id = conversation.from_user_id
+                to_user = conversation.from_user
             else:
                 to_user_id = conversation.to_user_id
+                to_user = conversation.to_user
 
             form.save(conversation=conversation, user_id=current_user.id)
 
@@ -125,8 +126,8 @@ class ViewConversation(MethodView):
             if conversation is None:
                 conversation = Conversation(
                     subject=old_conv.subject,
-                    from_user_id=current_user.id,
-                    to_user=to_user_id,
+                    from_user=real(current_user),
+                    to_user=to_user,
                     user_id=to_user_id,
                     shared_id=old_conv.shared_id
                 )
