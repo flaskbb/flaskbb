@@ -123,7 +123,7 @@
                             <!-- Edit Post -->
                             <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="Edit this post"></a>
                             {% endif %}
-                            {% if topic.first_post == post %}
+                            {% if topic.first_post_id == post.id %}
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -147,14 +147,14 @@
                             {% endif %}
 
                             {% if current_user.permissions.get('makehidden') %}
-                                {% if post.first_post %}
+                                {% if topic.first_post_id == post.id %}
                                     {% if topic.hidden %}
-                                    <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=post.topic.id) }}">
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="Unhide this topic"></button>
                                     </form>
                                     {% else %}
-                                    <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=post.topic.id) }}">
+                                    <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="Hide this topic"></button>
                                     </form>
