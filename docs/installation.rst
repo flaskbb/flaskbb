@@ -244,12 +244,14 @@ Installation
 ------------
 
 **MySQL users:** Make sure that you create the database using the
-``utf8mb4`` charset::
+``utf8`` charset::
 
-    CREATE DATABASE flaskbb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE DATABASE flaskbb CHARACTER SET utf8;
 
-See `this <https://dba.stackexchange.com/a/152383>`_ SO answer for more
-information.
+Even though the ``utf8mb4`` charset is prefered today
+(see `this <https://dba.stackexchange.com/a/152383>`_ SO answer), we have to
+create our database using the ``utf8`` charset. A good explanation about this
+issue can be found `here <https://stackoverflow.com/a/31474509>`_.
 
 For a guided install, run::
 

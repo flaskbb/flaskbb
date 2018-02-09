@@ -34,8 +34,9 @@ def upgrade():
         if con.engine.dialect.name == "mysql":
             # user_id
             batch_op.drop_constraint("conversations_ibfk_3", type_='foreignkey')
-            # TODO: setup mysqldb and check
+            # to_user_id
             batch_op.drop_constraint("conversations_ibfk_2", type_='foreignkey')
+            # from_user_id
             batch_op.drop_constraint("conversations_ibfk_1", type_='foreignkey')
         elif con.engine.dialect.name == "postgresql":
             batch_op.drop_constraint('conversations_to_user_id_fkey', type_='foreignkey')
@@ -98,6 +99,10 @@ def upgrade():
         batch_op.create_foreign_key(batch_op.f('fk_groups_users_group_id_groups'), 'groups', ['group_id'], ['id'], ondelete='CASCADE')
 
     with op.batch_alter_table('messages', schema=None) as batch_op:
+        batch_op.alter_column('user_id',
+               existing_type=sa.INTEGER(),
+               nullable=True)
+
         if con.engine.dialect.name == "mysql":
             # conversation_id
             batch_op.drop_constraint("messages_ibfk_1", type_='foreignkey')
@@ -106,8 +111,6 @@ def upgrade():
         elif con.engine.dialect.name == "postgresql":
             batch_op.drop_constraint('messages_conversation_id_fkey', type_='foreignkey')
             batch_op.drop_constraint('messages_user_id_fkey', type_='foreignkey')
-
-        batch_op.alter_column('user_id', existing_type=flaskbb.utils.database.UTCDateTime(timezone=True), nullable=True)
 
         batch_op.create_foreign_key(batch_op.f('fk_messages_conversation_id_conversations'), 'conversations', ['conversation_id'], ['id'], ondelete='CASCADE')
         batch_op.create_foreign_key(batch_op.f('fk_messages_user_id_users'), 'users', ['user_id'], ['id'], ondelete='SET NULL')
