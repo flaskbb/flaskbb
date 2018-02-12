@@ -80,41 +80,9 @@
 
                         <!-- navbar right -->
                         <ul class="nav navbar-nav navbar-right">
-
                             {% if current_user and current_user.is_authenticated %}
-                            <!-- Inbox -->
-                            <li class="dropdown {{ is_active('message.inbox') }}">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <span class="fa fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}
-                                    {% if current_user.unread_count > 0 %}
-                                    <span class="label label-danger">{{ current_user.unread_count }}</span>
-                                    {% else %}
-                                    <span class="label label-info">{{ current_user.unread_count }}</span>
-                                    {% endif %}
-                                </a>
-                                <ul class="dropdown-menu dropdown-messages">
-                                    {% for message in current_user.unread_messages %}
-                                    <li>
-                                        <a href="{{ url_for('message.view_conversation', conversation_id=message.id) }}">
-                                            <div>
-                                                {% if message.from_user %}
-                                                    <span class="author-name">{{ message.from_user.username }}</span>
-                                                {% else %}
-                                                    {% trans %}Deleted User{% endtrans %}
-                                                {% endif %}
-                                                <span class="pull-right text-muted">{{ message.last_message.date_created|time_since }}</span>
-                                                <div class="message-subject">{{ message.subject }}</div>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    {% else %}
-                                    <li><a href="#">{% trans %}No unread messages.{% endtrans %}</a></li>
-                                    {% endfor %}
-                                    <li class="divider"></li>
-                                    <li><a href="{{ url_for('message.inbox') }}"><span class="fa fa-envelope fa-fw"></span> {% trans %}Inbox{% endtrans %}</a></li>
-                                    <li><a href="{{ url_for('message.new_conversation') }}"><span class="fa fa-pencil fa-fw"></span> {% trans %}New Message{% endtrans %}</a></li>
-                                </ul>
-                            </li>
+
+                            {{ run_hook("flaskbb_tpl_before_user_nav_loggedin") }}
 
                             <!-- User Menu -->
                             <li>
@@ -137,6 +105,9 @@
                                     </ul>
                                 </div>
                             </li>
+
+                            {{ run_hook("flaskbb_tpl_after_user_nav_loggedin") }}
+
                             {% else %}
                             <!-- Not logged in - Login/Register -->
                             <li>

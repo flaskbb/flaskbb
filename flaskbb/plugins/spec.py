@@ -82,6 +82,24 @@ def flaskbb_tpl_after_navigation():
 
 
 @spec
+def flaskbb_tpl_before_user_nav_loggedin():
+    """Hook for registering additional user navigational items
+    which are only shown when a user is logged in.
+
+    in :file:`templates/layout.html`.
+    """
+
+
+@spec
+def flaskbb_tpl_after_user_nav_loggedin():
+    """Hook for registering additional user navigational items
+    which are only shown when a user is logged in.
+
+    in :file:`templates/layout.html`.
+    """
+
+
+@spec
 def flaskbb_tpl_before_registration_form():
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
