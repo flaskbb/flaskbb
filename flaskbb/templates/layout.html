@@ -176,8 +176,15 @@
             {% block footer %}
             <footer class="flaskbb-footer">
                 <div class="container">
-                    <p class="text-muted pull-right">powered by <a href="https://flaskbb.org">FlaskBB</a></p>
-                    <p class="text-muted pull-left">&copy; 2013 - 2017 <a href="https://flaskbb.org">FlaskBB Team</a></p>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="text-muted text-left">{{ flaskbb_config["PROJECT_COPYRIGHT"] | safe }}</div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="text-muted text-right">powered by <a href="https://flaskbb.org">FlaskBB</a></div>
+                            <div class="text-muted text-right">&copy; 2013 - {{ now.year }} <a href="https://flaskbb.org">FlaskBB Team</a></div>
+                        </div>
+                    </div>
                 </div>
             </footer>
             {% endblock %}

@@ -38,6 +38,12 @@ fixture = (
                 'name':         "Project subtitle",
                 'description':  "A short description of the project.",
             }),
+            ('project_copyright', {
+                'value':        "",
+                'value_type':   SettingValueType.string,
+                'name':         "Project Copyright",
+                'description':  "Copyright notice of the Project like '&copy; 2018 FlaskBB'. Leave blank to ignore.",
+            }),
             ('posts_per_page', {
                 'value':        10,
                 'value_type':   SettingValueType.integer,
