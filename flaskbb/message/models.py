@@ -23,10 +23,14 @@ class Conversation(db.Model, CRUDMixin):
     __tablename__ = "conversations"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete="CASCADE"),
+                        nullable=False)
+    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
+                                                       ondelete="SET NULL"),
                              nullable=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id",
+                                                     ondelete="SET NULL"),
                            nullable=True)
     shared_id = db.Column(UUIDType, nullable=False)
     subject = db.Column(db.String(255), nullable=True)
@@ -41,8 +45,7 @@ class Conversation(db.Model, CRUDMixin):
     messages = db.relationship(
         "Message", lazy="joined", backref="conversation",
         primaryjoin="Message.conversation_id == Conversation.id",
-        order_by="asc(Message.id)",
-        cascade="all, delete-orphan"
+        order_by="asc(Message.id)", cascade="all, delete-orphan"
     )
 
     # this is actually the users message box
@@ -89,11 +92,15 @@ class Message(db.Model, CRUDMixin):
     __tablename__ = "messages"
 
     id = db.Column(db.Integer, primary_key=True)
-    conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"),
+    conversation_id = db.Column(db.Integer,
+                                db.ForeignKey("conversations.id",
+                                              ondelete="CASCADE"),
                                 nullable=False)
 
     # the user who wrote the message
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete="SET NULL"),
+                        nullable=True)
     message = db.Column(db.Text, nullable=False)
     date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                              nullable=False)

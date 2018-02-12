@@ -2,7 +2,7 @@ import pytest
 from werkzeug import exceptions
 from flask_login import login_user
 
-from flaskbb.message import views
+from flaskbb.message import views, models
 
 
 def test_message_not_logged_in(application):
@@ -18,7 +18,8 @@ def test_message_inbox(application, default_settings, conversation_msgs, user):
     with application.test_request_context():
         login_user(user)
         resp = view.get()
-        assert 'From <a href="/user/test_normal">test_normal</a>' in resp
+        assert '<a href="/message/1/view">' in resp
+        assert '<a href="/user/test_normal">test_normal</a>' in resp
 
 
 def test_message_view_conversation(

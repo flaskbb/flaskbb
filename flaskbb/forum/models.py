@@ -27,48 +27,47 @@ logger = logging.getLogger(__name__)
 
 moderators = db.Table(
     'moderators',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+    db.Column('user_id', db.Integer(),
+              db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True,
-                            name="fk_mods_forum_id"),
+              db.ForeignKey('forums.id', ondelete="CASCADE"),
               nullable=False))
 
 
 topictracker = db.Table(
     'topictracker',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id'),
+    db.Column('user_id', db.Integer(),
+              db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('topic_id', db.Integer(),
-              db.ForeignKey('topics.id', use_alter=True,
-                            name="fk_tracker_topic_id"),
+              db.ForeignKey('topics.id', ondelete="CASCADE"),
               nullable=False))
 
 
 forumgroups = db.Table(
     'forumgroups',
-    db.Column('group_id', db.Integer(), db.ForeignKey('groups.id'),
+    db.Column('group_id', db.Integer(),
+              db.ForeignKey('groups.id', ondelete="CASCADE"),
               nullable=False),
     db.Column('forum_id', db.Integer(),
-              db.ForeignKey('forums.id', use_alter=True,
-                            name="fk_fg_forum_id"),
+              db.ForeignKey('forums.id', ondelete="CASCADE"),
               nullable=False))
 
 
 class TopicsRead(db.Model, CRUDMixin):
     __tablename__ = "topicsread"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete="CASCADE"),
                         primary_key=True)
     user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     topic_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id", use_alter=True,
-                                       name="fk_tr_topic_id"),
+                         db.ForeignKey("topics.id", ondelete="CASCADE"),
                          primary_key=True)
     topic = db.relationship('Topic', uselist=False, foreign_keys=[topic_id])
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id", use_alter=True,
-                                       name="fk_tr_forum_id"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          primary_key=True)
     forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -78,12 +77,12 @@ class TopicsRead(db.Model, CRUDMixin):
 class ForumsRead(db.Model, CRUDMixin):
     __tablename__ = "forumsread"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete="CASCADE"),
                         primary_key=True)
     user = db.relationship('User', uselist=False, foreign_keys=[user_id])
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id", use_alter=True,
-                                       name="fk_fr_forum_id"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          primary_key=True)
     forum = db.relationship('Forum', uselist=False, foreign_keys=[forum_id])
     last_read = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -149,10 +148,8 @@ class Post(HideableCRUDMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer,
-                         db.ForeignKey("topics.id",
-                                       use_alter=True,
-                                       name="fk_post_topic_id",
-                                       ondelete="CASCADE"),
+                         db.ForeignKey("topics.id", ondelete="CASCADE",
+                                       use_alter=True),
                          nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     username = db.Column(db.String(200), nullable=False)
@@ -389,9 +386,7 @@ class Topic(HideableCRUDMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     forum_id = db.Column(db.Integer,
-                         db.ForeignKey("forums.id",
-                                       use_alter=True,
-                                       name="fk_topic_forum_id"),
+                         db.ForeignKey("forums.id", ondelete="CASCADE"),
                          nullable=False)
     title = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
@@ -422,7 +417,8 @@ class Topic(HideableCRUDMixin, db.Model):
     # One-to-many
     posts = db.relationship("Post", backref="topic", lazy="dynamic",
                             primaryjoin="Post.topic_id == Topic.id",
-                            cascade="all, delete-orphan", post_update=True)
+                            cascade="all, delete-orphan",
+                            post_update=True)
 
     # Properties
     @property
@@ -667,6 +663,12 @@ class Topic(HideableCRUDMixin, db.Model):
         db.session.delete(self)
         self._fix_user_post_counts(users or self.involved_users().all())
         self._fix_post_counts(forum)
+
+        # forum.last_post_id shouldn't usually be none
+        if forum.last_post_id is None or \
+                self.last_post_id == forum.last_post_id:
+            forum.update_last_post(commit=False)
+
         db.session.commit()
         return self
 
@@ -722,8 +724,6 @@ class Topic(HideableCRUDMixin, db.Model):
             self.forum.last_post_user = None
             self.forum.last_post_username = None
             self.forum.last_post_created = None
-
-        TopicsRead.query.filter_by(topic_id=self.id).delete()
 
     def _fix_user_post_counts(self, users=None):
         # Update the post counts
@@ -789,7 +789,8 @@ class Forum(db.Model, CRUDMixin):
     __tablename__ = "forums"
 
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"),
+    category_id = db.Column(db.Integer,
+                            db.ForeignKey("categories.id", ondelete="CASCADE"),
                             nullable=False)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -803,18 +804,18 @@ class Forum(db.Model, CRUDMixin):
 
     # One-to-one
     last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"),
-                             nullable=True)
+                             nullable=True)  # we handle this case ourselfs
     last_post = db.relationship("Post", backref="last_post_forum",
                                 uselist=False, foreign_keys=[last_post_id])
 
-    last_post_user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+    # set to null if the user got deleted
+    last_post_user_id = db.Column(db.Integer,
+                                  db.ForeignKey("users.id",
+                                                ondelete="SET NULL"),
                                   nullable=True)
 
-    last_post_user = db.relationship(
-        "User",
-        uselist=False,
-        foreign_keys=[last_post_user_id]
-    )
+    last_post_user = db.relationship("User", uselist=False,
+                                     foreign_keys=[last_post_user_id])
 
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
@@ -824,12 +825,8 @@ class Forum(db.Model, CRUDMixin):
                                   default=time_utcnow, nullable=True)
 
     # One-to-many
-    topics = db.relationship(
-        "Topic",
-        backref="forum",
-        lazy="dynamic",
-        cascade="all, delete-orphan"
-    )
+    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
+                             cascade="all, delete-orphan")
 
     # Many-to-many
     moderators = db.relationship(
@@ -872,7 +869,7 @@ class Forum(db.Model, CRUDMixin):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def update_last_post(self):
+    def update_last_post(self, commit=True):
         """Updates the last post in the forum."""
         last_post = Post.query.\
             filter(Post.topic_id == Topic.id,
@@ -900,7 +897,8 @@ class Forum(db.Model, CRUDMixin):
             self.last_post_username = None
             self.last_post_created = None
 
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
     def update_read(self, user, forumsread, topicsread):
         """Updates the ForumsRead status for the user. In order to work
@@ -1020,11 +1018,6 @@ class Forum(db.Model, CRUDMixin):
         # Delete the forum
         db.session.delete(self)
         db.session.commit()
-
-        # Delete the entries for the forum in the ForumsRead and TopicsRead
-        # relation
-        ForumsRead.query.filter_by(forum_id=self.id).delete()
-        TopicsRead.query.filter_by(forum_id=self.id).delete()
 
         # Update the users post count
         if users:
