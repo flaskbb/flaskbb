@@ -13,6 +13,7 @@ import logging.config
 import os
 import sys
 import time
+from datetime import datetime
 from functools import partial
 
 from flask import Flask, request
@@ -280,6 +281,11 @@ def configure_context_processors(app):
         templates.
         """
         return dict(flaskbb_config=flaskbb_config, format_date=format_date)
+
+    @app.context_processor
+    def inject_now():
+        """Injects the current time."""
+        return dict(now=datetime.utcnow())
 
 
 def configure_before_handlers(app):
