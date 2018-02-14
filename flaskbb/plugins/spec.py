@@ -144,3 +144,9 @@ def flaskbb_tpl_profile_settings_menu():
 
     in :file:`templates/user/settings_layout.html`
     """
+
+# Event hooks
+
+@spec
+def flaskbb_evt_after_post(post, is_new):
+    """Hook for handling a post after it has been saved."""

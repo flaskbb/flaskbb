@@ -11,7 +11,7 @@
 from datetime import timedelta
 import logging
 
-from flask import abort, url_for
+from flask import abort, current_app, url_for
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
@@ -205,6 +205,7 @@ class Post(HideableCRUDMixin, db.Model):
         if self.id:
             db.session.add(self)
             db.session.commit()
+            current_app.pluggy.hook.flaskbb_evt_after_post(post=self, is_new=False)
             return self
 
         # Adding a new post
@@ -234,6 +235,7 @@ class Post(HideableCRUDMixin, db.Model):
             # And commit it!
             db.session.add(topic)
             db.session.commit()
+            current_app.pluggy.hook.flaskbb_evt_after_post(post=self, is_new=True)
             return self
 
     def delete(self):
