@@ -63,6 +63,15 @@ def flaskbb_cli(cli):
     """Hook for registering CLI commands."""
 
 
+@spec
+def flaskbb_current_user_loader(user):
+    """This hook is emitted after querying the database for
+    the current_user by the Flask-Login extension.
+
+    :param user: The user instance.
+    """
+
+
 # Template Hooks
 
 @spec
@@ -134,6 +143,7 @@ def flaskbb_tpl_after_user_details_form():
     in :file:`templates/user/change_user_details.html`.
     """
 
+
 @spec
 def flaskbb_tpl_profile_settings_menu():
     """This hook is emitted on the user settings page in order to populate the
@@ -161,4 +171,40 @@ def flaskbb_tpl_profile_settings_menu():
     supplies its own hookwrapper to flatten all the lists into a single list.
 
     in :file:`templates/user/settings_layout.html`
+    """
+
+
+@spec
+def flaskbb_tpl_profile_sidebar_stats(user):
+    """This hook is emitted on the users profile page below the standard
+    information. For example, it can be used to add additional items
+    such as a link to the profile.
+
+    in :file:`templates/user/profile_layout.html`
+
+    :param user: The user object for whom the profile is currently visited.
+    """
+
+
+@spec
+def flaskbb_tpl_before_post_author_info(user, post):
+    """This hook is emitted before the information about the
+    author of a post is displayed (but after the username).
+
+    in :file:`templates/forum/topic.html`
+
+    :param user: The user object of the post's author.
+    :param post: The post object.
+    """
+
+
+@spec
+def flaskbb_tpl_after_post_author_info(user, post):
+    """This hook is emitted after the information about the
+    author of a post is displayed (but after the username).
+
+    in :file:`templates/forum/topic.html`
+
+    :param user: The user object of the post's author.
+    :param post: The post object.
     """

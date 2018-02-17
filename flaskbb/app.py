@@ -30,7 +30,6 @@ from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 redis_store, themes, whooshee)
 from flaskbb.forum.views import forum
 from flaskbb.management.views import management
-from flaskbb.message.views import message
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
@@ -162,9 +161,6 @@ def configure_blueprints(app):
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
-    app.register_blueprint(
-        message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
-    )
 
     app.pluggy.hook.flaskbb_load_blueprints(app=app)
 
@@ -221,6 +217,9 @@ def configure_extensions(app):
         """Loads the user. Required by the `login` extension."""
 
         user_instance = User.query.filter_by(id=user_id).first()
+
+        app.pluggy.hook.flaskbb_current_user_loader(user=user_instance)
+
         if user_instance:
             return user_instance
         else:
