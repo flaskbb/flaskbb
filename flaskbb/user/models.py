@@ -160,13 +160,6 @@ class User(db.Model, UserMixin, CRUDMixin):
         single_parent=True
     )
 
-    conversations = db.relationship(
-        "Conversation",
-        primaryjoin="Conversation.user_id == User.id",
-        lazy="dynamic",
-        passive_deletes="all"  # let the dbms handle the foreignkeys
-    )
-
     # Properties
     @property
     def is_active(self):
