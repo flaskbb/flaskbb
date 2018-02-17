@@ -63,15 +63,6 @@ def flaskbb_cli(cli):
     """Hook for registering CLI commands."""
 
 
-@spec
-def flaskbb_current_user_loader(user):
-    """This hook is emitted after querying the database for
-    the current_user by the Flask-Login extension.
-
-    :param user: The user instance.
-    """
-
-
 # Template Hooks
 
 @spec

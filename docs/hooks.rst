@@ -72,3 +72,6 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_before_user_details_form
 .. autofunction:: flaskbb_tpl_after_user_details_form
 .. autofunction:: flaskbb_tpl_profile_settings_menu
+.. autofunction:: flaskbb_tpl_profile_sidebar_stats
+.. autofunction:: flaskbb_tpl_before_post_author_info
+.. autofunction:: flaskbb_tpl_after_post_author_info
