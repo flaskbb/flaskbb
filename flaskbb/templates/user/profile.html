@@ -14,20 +14,24 @@
 
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="overview">
-
+            {% if user.notes %}
             <div class="panel page-panel">
                 <div class="panel-heading page-head">{% trans %}Info{% endtrans %}</div>
                 <div class="panel-body page-body">
                     <div class="col-md-12 col-sm-12 col-xs-12 profile-field">
-                    {% if user.notes %}
                         {{ user.notes|markup }}
-                    {% else %}
-                        <p>{% trans %}User has not added any notes about him.{% endtrans %}</p>
-                    {% endif %}
                     </div>
                 </div>
             </div> <!-- end profile widget -->
-
+            {% else %}
+            <div class="row">
+                <div class="col-md-12 col-sm-12 co-xs-12">
+                    <div class="alert-message alert-message-info" role="alert">
+                        {% trans %}User has not added any notes about him.{% endtrans %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             {% if user.signature %}
             <div class="panel page-panel">

@@ -215,11 +215,7 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
-
         user_instance = User.query.filter_by(id=user_id).first()
-
-        app.pluggy.hook.flaskbb_current_user_loader(user=user_instance)
-
         if user_instance:
             return user_instance
         else:
