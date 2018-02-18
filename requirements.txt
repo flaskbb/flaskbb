@@ -23,6 +23,7 @@ Flask-SQLAlchemy==2.3.2
 Flask-Themes2==0.1.4
 flask-whooshee==0.5.0
 Flask-WTF==0.14.2
+flaskbb-plugin-conversations==1.0.0
 flaskbb-plugin-portal==1.1.0
 idna==2.6
 itsdangerous==0.24
