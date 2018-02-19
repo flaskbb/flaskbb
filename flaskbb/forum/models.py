@@ -205,7 +205,8 @@ class Post(HideableCRUDMixin, db.Model):
         if self.id:
             db.session.add(self)
             db.session.commit()
-            current_app.pluggy.hook.flaskbb_evt_after_post(post=self, is_new=False)
+            current_app.pluggy.hook.flaskbb_event_after_post(post=self,
+                                                             is_new=False)
             return self
 
         # Adding a new post
@@ -235,7 +236,8 @@ class Post(HideableCRUDMixin, db.Model):
             # And commit it!
             db.session.add(topic)
             db.session.commit()
-            current_app.pluggy.hook.flaskbb_evt_after_post(post=self, is_new=True)
+            current_app.pluggy.hook.flaskbb_event_after_post(post=self,
+                                                             is_new=True)
             return self
 
     def delete(self):
