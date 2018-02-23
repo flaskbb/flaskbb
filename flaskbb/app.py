@@ -58,6 +58,7 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -424,6 +425,10 @@ def load_plugins(app):
     except (OperationalError, ProgrammingError) as exc:
         logger.debug("Database is not setup correctly or has not been "
                      "setup yet.", exc_info=exc)
+        # load plugins even though the database isn't setup correctly
+        # i.e. when creating the initial database and wanting to install
+        # the plugins migration as well
+        app.pluggy.load_setuptools_entrypoints('flaskbb_plugins')
         return
 
     for plugin in plugins:

@@ -12,12 +12,17 @@ from __future__ import unicode_literals
 
 import collections
 import logging
+import os
+
+from flask import current_app
+from sqlalchemy_utils.functions import create_database, database_exists
+from alembic.util.exc import CommandError
 
 from flaskbb.extensions import alembic, db
 from flaskbb.forum.models import Category, Forum, Post, Topic
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import Group, User
-from sqlalchemy_utils.functions import create_database, database_exists
+
 
 logger = logging.getLogger(__name__)
 
@@ -382,14 +387,38 @@ def insert_bulk_data(topic_count=10, post_count=100):
     return created_topics, created_posts
 
 
-def create_latest_db():
+def create_latest_db(target="default@head"):
     """Creates the database including the schema using SQLAlchemy's
     db.create_all method instead of going through all the database revisions.
     The revision will be set to 'head' which indicates the latest alembic
     revision.
+
+    :param target: The target branch. Defaults to 'default@head'.
     """
     if not database_exists(db.engine.url):
         create_database(db.engine.url)
 
     db.create_all()
-    alembic.stamp()
+    alembic.stamp(target=target)
+
+
+def run_plugin_migrations(plugins=None):
+    """Runs the migrations for a list of plugins.
+
+    :param plugins: A iterable of plugins to run the migrations for. If set
+                    to ``None``, all external plugin migrations will be run.
+    """
+    if plugins is None:
+        plugins = current_app.pluggy.get_external_plugins()
+
+    for plugin in plugins:
+        plugin_name = current_app.pluggy.get_name(plugin)
+        if not os.path.exists(os.path.join(plugin.__path__[0], "migrations")):
+            logger.debug("No migrations found for plugin %s" % plugin_name)
+            continue
+        try:
+            alembic.upgrade(target="{}@head".format(plugin_name))
+        except CommandError as exc:
+            logger.debug("Couldn't run migrations for plugin {} because of "
+                         "following exception: ".format(plugin_name),
+                         exc_info=exc)

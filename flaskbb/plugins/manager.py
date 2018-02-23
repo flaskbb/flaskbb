@@ -16,6 +16,7 @@ from pkg_resources import (DistributionNotFound, VersionConflict,
 
 from flaskbb.utils.helpers import parse_pkg_metadata
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -149,3 +150,11 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     def get_disabled_plugins(self):
         """Returns a list with disabled plugins."""
         return self._disabled_plugins.keys()
+
+    def get_internal_plugins(self):
+        """Returns a set of registered internal plugins."""
+        return set(self._internal_name2plugin.values())
+
+    def get_external_plugins(self):
+        """Returns a set of registered external plugins."""
+        return set(self.get_plugins() - self.get_internal_plugins())
