@@ -64,7 +64,10 @@ class FlaskBBDomain(Domain):
                     locales=locale,
                     domain="messages"
                 )
-                translations.add(plugin_translation)
+
+                if not isinstance(plugin_translation,
+                                  babel.support.NullTranslations):
+                    translations.add(plugin_translation)
 
             self.cache[str(locale)] = translations
 
