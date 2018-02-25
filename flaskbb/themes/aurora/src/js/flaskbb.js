@@ -107,6 +107,28 @@ var send_data = function(endpoint_url, data) {
     });
 };
 
+var parse_emoji = function(value) {
+    // use this instead of twemoji.parse
+    return twemoji.parse(
+        value,
+        {
+            callback: function(icon, options, variant) {
+                // exclude some characters
+                switch ( icon ) {
+                    case 'a9':      // © copyright
+                    case 'ae':      // ® registered trademark
+                    case '2122':    // ™ trademark
+                        return false;
+                }
+                return ''.concat(options.base, options.size, '/', icon, options.ext);
+            },
+            // use svg instead of the default png
+            folder: 'svg',
+            ext: '.svg'
+        }
+    )
+};
+
 $(document).ready(function () {
     // listen on the action-checkall checkbox to un/check all
     $('.action-checkall').change(function() {
@@ -155,4 +177,6 @@ $(document).ready(function () {
             }
         );
     });
+
+    parse_emoji(document.body);
 });

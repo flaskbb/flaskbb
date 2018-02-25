@@ -25,22 +25,25 @@ $(".flaskbb-editor").markdown({
                 }
             }]
         }]
-    ]
+    ],
+    onPreview: function(e) {
+        return parse_emoji(e.getContent());
+    }
 });
 
 $('.flaskbb-editor').textcomplete([
     { // emoji strategy
         match: /\B:([\-+\w]*)$/,
         search: function (term, callback) {
-            callback($.map(emojies, function (emoji) {
-                return emoji.indexOf(term) === 0 ? emoji : null;
+            callback($.map(emojies, function (value) {
+                return value[0].indexOf(term) === 0 ? {character: value[1], name: value[0]} : null;
             }));
         },
         template: function (value) {
-            return '<img class="emoji" src="/static/emoji/' + value + '.png"></img>' + value;
+            return parse_emoji(value.character) + ' ' + value.name;
         },
         replace: function (value) {
-            return ':' + value + ': ';
+            return value.character + ' ';
         },
         index: 1
     },
