@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """change emoji shortcodes to characters
 
 Revision ID: 232e68a03aa2
@@ -5,6 +6,8 @@ Revises: af3f5579c84d
 Create Date: 2018-02-28 21:31:35.260704
 
 """
+from __future__ import unicode_literals
+
 from alembic import op
 import sqlalchemy as sa
 
