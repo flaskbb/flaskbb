@@ -36,7 +36,7 @@ $('.flaskbb-editor').textcomplete([
         match: /\B:([\-+\w]*)$/,
         search: function (term, callback) {
             callback($.map(emojies, function (value) {
-                return value[0].indexOf(term) === 0 ? {character: value[1], name: value[0]} : null;
+                return value[0].indexOf(term) !== -1 ? {character: value[1], name: value[0]} : null;
             }));
         },
         template: function (value) {

@@ -1,38 +1,29 @@
-import string
-from contextlib import suppress
+import sys
+import re
 
 import requests
 
 
+URL = 'https://unicode.org/Public/emoji/{}/emoji-test.txt'.format(sys.argv[1])
+
+
+def get_annotations():
+    resp = requests.get(URL)
+    resp.raise_for_status()
+    for line in resp.text.split('\n'):
+        match = re.match('(.+?); fully-qualified +?# .+? (.+)', line)
+        if match is not None:
+            yield (
+                ''.join(chr(int(h, 16))
+                        for h in
+                        match.group(1).strip().split(' ')),
+                match.group(2)
+            )
+
+
 with open('src/js/emoji.js', 'w') as f:
-    source = requests.get(
-        'https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json'
-    ).json()
-    output = set()
-
-    for item in source:
-        with suppress(KeyError):
-            for alias in item['aliases'] + [item['description']]:
-                output.add((
-                    ''.join(filter(
-                        set(
-                            string.ascii_letters
-                            + string.digits
-                            + '+-'
-                        ).__contains__,
-                        (
-                            alias
-                            .lower()
-                            .replace(' ', '-')
-                            .replace('_', '-')
-                            .replace('&', 'and')
-                        )
-                    )),
-                    item['emoji']
-                ))
-
     f.write('var emojies = [\n')
-    for name, character in sorted(output,
-                                  key=lambda t: (len(t[0]), t[0])):
+    for character, name in get_annotations():
+        name = name.replace(':', '').replace(' ', '_')
         f.write('    ["{}", "{}"],\n'.format(name, character))
-    f.write('];')
+    f.write('];\n')
