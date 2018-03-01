@@ -1,15 +1,10 @@
-from flaskbb.utils.markup import collect_emojis, EMOJIS, markdown
-
-
-def test_collect_emojis():
-    assert collect_emojis() == EMOJIS
+from flaskbb.utils.markup import markdown
 
 
 def test_custom_renderer():
     # custom paragraph
-    p_plain = "@sh4nks is :developing: :flaskbb:."
+    p_plain = "@sh4nks is developing flaskbb."
     assert "/user/sh4nks" in markdown.render(p_plain)
-    assert "emoji/flaskbb.png" in markdown.render(p_plain)
 
     # custom block code with pygments highlighting (jus)
     b_plain = """
