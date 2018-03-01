@@ -30,7 +30,6 @@ from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 redis_store, themes, whooshee)
 from flaskbb.forum.views import forum
 from flaskbb.management.views import management
-from flaskbb.message.views import message
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
@@ -58,6 +57,7 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
+
 
 logger = logging.getLogger(__name__)
 
@@ -162,9 +162,6 @@ def configure_blueprints(app):
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
-    app.register_blueprint(
-        message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
-    )
 
     app.pluggy.hook.flaskbb_load_blueprints(app=app)
 
@@ -219,7 +216,6 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
-
         user_instance = User.query.filter_by(id=user_id).first()
         if user_instance:
             return user_instance
@@ -429,6 +425,10 @@ def load_plugins(app):
     except (OperationalError, ProgrammingError) as exc:
         logger.debug("Database is not setup correctly or has not been "
                      "setup yet.", exc_info=exc)
+        # load plugins even though the database isn't setup correctly
+        # i.e. when creating the initial database and wanting to install
+        # the plugins migration as well
+        app.pluggy.load_setuptools_entrypoints('flaskbb_plugins')
         return
 
     for plugin in plugins:

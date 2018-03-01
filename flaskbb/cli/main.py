@@ -8,35 +8,35 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import sys
-import os
-import time
-import requests
 import binascii
-import traceback
 import logging
+import os
+import sys
+import time
+import traceback
 from datetime import datetime
 
 import click
 import click_log
+import requests
 from celery.bin.celery import CeleryCommand
-from werkzeug.utils import import_string
-from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import database_exists
 from flask_alembic import alembic_click
+from jinja2 import Environment, FileSystemLoader
+from sqlalchemy_utils.functions import database_exists
+from werkzeug.utils import import_string
 
 from flaskbb import create_app
-from flaskbb.extensions import db, whooshee, celery, alembic
-from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
-                               write_config, get_version, FlaskBBCLIError,
-                               EmailType)
-from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
-                                    create_default_groups,
-                                    create_default_settings, insert_bulk_data,
-                                    update_settings_from_fixture,
-                                    create_latest_db)
+from flaskbb.cli.utils import (EmailType, FlaskBBCLIError, get_version,
+                               prompt_config_path, prompt_save_user,
+                               write_config)
+from flaskbb.extensions import alembic, celery, db, whooshee
+from flaskbb.utils.populate import (create_default_groups,
+                                    create_default_settings, create_latest_db,
+                                    create_test_data, create_welcome_forum,
+                                    insert_bulk_data, run_plugin_migrations,
+                                    update_settings_from_fixture)
 from flaskbb.utils.translations import compile_translations
 
 
@@ -125,8 +125,10 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
+@click.option("--no-plugins", "-n", default=False, is_flag=True,
+              help="Don't run the migrations for the default plugins.")
 @with_appcontext
-def install(welcome, force, username, email, password):
+def install(welcome, force, username, email, password, no_plugins):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -153,6 +155,10 @@ def install(welcome, force, username, email, password):
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
+
+    if not no_plugins:
+        click.secho("[+] Installing default plugins...", fg="cyan")
+        run_plugin_migrations()
 
     click.secho("[+] Compiling translations...", fg="cyan")
     compile_translations()
@@ -187,6 +193,7 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
         create_latest_db()
+        run_plugin_migrations()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")
@@ -243,9 +250,10 @@ def upgrade(all_latest, fixture, force):
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
-        click.secho("[+] {settings} settings in {groups} setting groups updated.".format(
-            groups=len(count), settings=sum(len(settings) for settings in count.values())), fg="green"
-        )
+        click.secho("[+] {settings} settings in {groups} setting groups "
+                    "updated.".format(groups=len(count), settings=sum(
+                        len(settings) for settings in count.values())
+                    ), fg="green")
 
 
 @flaskbb.command("celery", add_help_option=False,

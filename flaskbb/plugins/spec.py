@@ -82,6 +82,24 @@ def flaskbb_tpl_after_navigation():
 
 
 @spec
+def flaskbb_tpl_before_user_nav_loggedin():
+    """Hook for registering additional user navigational items
+    which are only shown when a user is logged in.
+
+    in :file:`templates/layout.html`.
+    """
+
+
+@spec
+def flaskbb_tpl_after_user_nav_loggedin():
+    """Hook for registering additional user navigational items
+    which are only shown when a user is logged in.
+
+    in :file:`templates/layout.html`.
+    """
+
+
+@spec
 def flaskbb_tpl_before_registration_form():
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
@@ -116,6 +134,7 @@ def flaskbb_tpl_after_user_details_form():
     in :file:`templates/user/change_user_details.html`.
     """
 
+
 @spec
 def flaskbb_tpl_profile_settings_menu():
     """This hook is emitted on the user settings page in order to populate the
@@ -145,6 +164,7 @@ def flaskbb_tpl_profile_settings_menu():
     in :file:`templates/user/settings_layout.html`
     """
 
+
 # Event hooks
 
 @spec
@@ -153,4 +173,40 @@ def flaskbb_event_after_post(post, is_new):
 
     :param flaskbb.forum.models.Post post: The post which triggered the event
     :param bool is_new: True if the post is new, False if it is an edit
+    """
+
+
+@spec
+def flaskbb_tpl_profile_sidebar_stats(user):
+    """This hook is emitted on the users profile page below the standard
+    information. For example, it can be used to add additional items
+    such as a link to the profile.
+
+    in :file:`templates/user/profile_layout.html`
+
+    :param user: The user object for whom the profile is currently visited.
+    """
+
+
+@spec
+def flaskbb_tpl_before_post_author_info(user, post):
+    """This hook is emitted before the information about the
+    author of a post is displayed (but after the username).
+
+    in :file:`templates/forum/topic.html`
+
+    :param user: The user object of the post's author.
+    :param post: The post object.
+    """
+
+
+@spec
+def flaskbb_tpl_after_post_author_info(user, post):
+    """This hook is emitted after the information about the
+    author of a post is displayed (but after the username).
+
+    in :file:`templates/forum/topic.html`
+
+    :param user: The user object of the post's author.
+    :param post: The post object.
     """
