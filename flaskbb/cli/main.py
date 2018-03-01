@@ -361,14 +361,15 @@ def generate_config(development, output, force):
         config_path = os.path.join(config_path, "flaskbb.cfg")
 
     # An override to handle database location paths on Windows environments
-    database_path = "sqlite:///" + os.path.join(os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
+    database_path = "sqlite:///" + os.path.join(
+        os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
     if os.name == 'nt':
         database_path = database_path.replace("\\", r"\\")
 
     default_conf = {
-        "is_debug": True,
-        "server_name": "localhost:5000",
-        "url_scheme": "http",
+        "is_debug": False,
+        "server_name": "example.org",
+        "use_https": True,
         "database_uri": database_path,
         "redis_enabled": False,
         "redis_uri": "redis://localhost:6379",
@@ -395,25 +396,28 @@ def generate_config(development, output, force):
                     fg="yellow")
 
     if development:
+        default_conf["is_debug"] = True
+        default_conf["use_https"] = False
+        default_conf["server_name"] = "localhost:5000"
         write_config(default_conf, config_template, config_path)
         sys.exit(0)
 
     # SERVER_NAME
-    click.secho("The name and port number of the server.\n"
-                "This is needed to correctly generate URLs when no request "
-                "context is available.", fg="cyan")
+    click.secho("The name and port number of the exposed server.\n"
+                "If FlaskBB is accesible on port 80 you can just omit the "
+                "port.\n For example, if FlaskBB is accessible via "
+                "example.org:8080 than this is also what you would set here.",
+                fg="cyan")
     default_conf["server_name"] = click.prompt(
         click.style("Server Name", fg="magenta"), type=str,
         default=default_conf.get("server_name"))
 
-    # PREFERRED_URL_SCHEME
-    click.secho("The URL Scheme is also needed in order to generate correct "
-                "URLs when no request context is available.\n"
-                "Choose either 'https' or 'http'.", fg="cyan")
-    default_conf["url_scheme"] = click.prompt(
-        click.style("URL Scheme", fg="magenta"),
-        type=click.Choice(["https", "http"]),
-        default=default_conf.get("url_scheme"))
+    # HTTPS or HTTP
+    click.secho("Is HTTPS (recommended) or HTTP used for to serve FlaskBB?",
+                fg="cyan")
+    default_conf["use_https"] = click.confirm(
+        click.style("Use HTTPS?", fg="magenta"),
+        default=default_conf.get("use_https"))
 
     # SQLALCHEMY_DATABASE_URI
     click.secho("For Postgres use:\n"
@@ -489,7 +493,7 @@ def generate_config(development, output, force):
         click.style("Mail Sender Address", fg="magenta"),
         default=default_conf.get("mail_sender_address"))
     # ADMINS
-    click.secho("Logs and important system messages are sent to this address."
+    click.secho("Logs and important system messages are sent to this address. "
                 "Use your email address for gmail here.", fg="cyan")
     default_conf["mail_admin_address"] = click.prompt(
         click.style("Mail Admin Email", fg="magenta"),
