@@ -2,7 +2,7 @@
 
 Revision ID: 5945d8081a95
 Revises: af3f5579c84d
-Create Date: 2018-02-17 19:25:18.789610
+Create Date: 2018-03-01 21:38:34
 
 """
 from alembic import op
@@ -12,7 +12,7 @@ import sqlalchemy_utils
 
 # revision identifiers, used by Alembic.
 revision = '5945d8081a95'
-down_revision = 'af3f5579c84d'
+down_revision = '232e68a03aa2'
 branch_labels = ()
 depends_on = None
 
