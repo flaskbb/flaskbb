@@ -248,42 +248,6 @@ def upgrade(all_latest, fixture, force):
         )
 
 
-@flaskbb.command("download-emojis")
-@with_appcontext
-def download_emoji():
-    """Downloads emojis from emoji-cheat-sheet.com.
-    This command is probably going to be removed in future version.
-    """
-    click.secho("[+] Downloading emojis...", fg="cyan")
-    HOSTNAME = "https://api.github.com"
-    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"  # noqa
-    FULL_URL = "{}{}".format(HOSTNAME, REPO)
-    DOWNLOAD_PATH = os.path.join(current_app.static_folder, "emoji")
-    response = requests.get(FULL_URL)
-
-    cached_count = 0
-    count = 0
-    for image in response.json():
-        if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
-            raise FlaskBBCLIError(
-                "{} does not exist.".format(os.path.abspath(DOWNLOAD_PATH)),
-                fg="red")
-
-        full_path = os.path.join(DOWNLOAD_PATH, image["name"])
-        if not os.path.exists(full_path):
-            count += 1
-            f = open(full_path, 'wb')
-            f.write(requests.get(image["download_url"]).content)
-            f.close()
-            if count == cached_count + 50:
-                cached_count = count
-                click.secho("[+] {} out of {} Emojis downloaded...".format(
-                            cached_count, len(response.json())), fg="cyan")
-
-    click.secho("[+] Finished downloading {} Emojis.".format(count),
-                fg="green")
-
-
 @flaskbb.command("celery", add_help_option=False,
                  context_settings={"ignore_unknown_options": True,
                                    "allow_extra_args": True})
