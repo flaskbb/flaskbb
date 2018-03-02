@@ -18,9 +18,7 @@ from flaskbb.exceptions import AuthenticationError
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
-from flaskbb.forum.models import (Post, Topic, Forum, topictracker, TopicsRead,
-                                  ForumsRead)
-from flaskbb.message.models import Conversation
+from flaskbb.forum.models import Post, Topic, Forum, topictracker
 
 
 logger = logging.getLogger(__name__)
@@ -28,9 +26,11 @@ logger = logging.getLogger(__name__)
 
 groups_users = db.Table(
     'groups_users',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'),
+    db.Column('user_id', db.Integer,
+              db.ForeignKey('users.id', ondelete="CASCADE"),
               nullable=False),
-    db.Column('group_id', db.Integer, db.ForeignKey('groups.id'),
+    db.Column('group_id', db.Integer,
+              db.ForeignKey('groups.id', ondelete="CASCADE"),
               nullable=False)
 )
 
@@ -115,30 +115,50 @@ class User(db.Model, UserMixin, CRUDMixin):
     theme = db.Column(db.String(15), nullable=True)
     language = db.Column(db.String(15), default="en", nullable=True)
 
-    posts = db.relationship("Post", backref="user", lazy="dynamic", primaryjoin="User.id == Post.user_id")
-    topics = db.relationship("Topic", backref="user", lazy="dynamic", primaryjoin="User.id == Topic.user_id")
-
     post_count = db.Column(db.Integer, default=0)
 
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'),
                                  nullable=False)
 
-    primary_group = db.relationship('Group', lazy="joined",
-                                    backref="user_group", uselist=False,
-                                    foreign_keys=[primary_group_id])
+    posts = db.relationship(
+        "Post",
+        backref="user",
+        primaryjoin="User.id == Post.user_id",
+        lazy="dynamic"
+    )
 
-    secondary_groups = \
-        db.relationship('Group',
-                        secondary=groups_users,
-                        primaryjoin=(groups_users.c.user_id == id),
-                        backref=db.backref('users', lazy='dynamic'),
-                        lazy='dynamic')
+    topics = db.relationship(
+        "Topic",
+        backref="user",
+        primaryjoin="User.id == Topic.user_id",
+        lazy="dynamic"
+    )
 
-    tracked_topics = \
-        db.relationship("Topic", secondary=topictracker,
-                        primaryjoin=(topictracker.c.user_id == id),
-                        backref=db.backref("topicstracked", lazy="dynamic"),
-                        lazy="dynamic")
+    primary_group = db.relationship(
+        "Group",
+        backref="user_group",
+        uselist=False,
+        lazy="joined",
+        foreign_keys=[primary_group_id]
+    )
+
+    secondary_groups = db.relationship(
+        "Group",
+        secondary=groups_users,
+        primaryjoin=(groups_users.c.user_id == id),
+        backref=db.backref("users", lazy="dynamic"),
+        lazy="dynamic"
+    )
+
+    tracked_topics = db.relationship(
+        "Topic",
+        secondary=topictracker,
+        primaryjoin=(topictracker.c.user_id == id),
+        backref=db.backref("topicstracked", lazy="dynamic"),
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
 
     # Properties
     @property
@@ -175,16 +195,6 @@ class User(db.Model, UserMixin, CRUDMixin):
     def groups(self):
         """Returns the user groups."""
         return self.get_groups()
-
-    @property
-    def unread_messages(self):
-        """Returns the unread messages for the user."""
-        return self.get_unread_messages()
-
-    @property
-    def unread_count(self):
-        """Returns the unread message count for the user."""
-        return len(self.unread_messages)
 
     @property
     def days_registered(self):
@@ -391,27 +401,10 @@ class User(db.Model, UserMixin, CRUDMixin):
                 perms[c] = getattr(group, c) or perms.get(c, False)
         return perms
 
-    @cache.memoize()
-    def get_unread_messages(self):
-        """Returns all unread messages for the user."""
-        unread_messages = Conversation.query.\
-            filter(Conversation.unread, Conversation.user_id == self.id).all()
-        return unread_messages
-
-    def invalidate_cache(self, permissions=True, messages=True):
-        """Invalidates this objects cached metadata.
-
-        :param permissions_only: If set to ``True`` it will only invalidate
-                                 the permissions cache. Otherwise it will
-                                 also invalidate the user's unread message
-                                 cache.
-        """
-        if messages:
-            cache.delete_memoized(self.get_unread_messages, self)
-
-        if permissions:
-            cache.delete_memoized(self.get_permissions, self)
-            cache.delete_memoized(self.get_groups, self)
+    def invalidate_cache(self):
+        """Invalidates this objects cached metadata."""
+        cache.delete_memoized(self.get_permissions, self)
+        cache.delete_memoized(self.get_groups, self)
 
     def ban(self):
         """Bans the user. Returns True upon success."""
@@ -471,22 +464,6 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def delete(self):
         """Deletes the User."""
-        # This isn't done automatically...
-        Conversation.query.filter_by(user_id=self.id).delete()
-        ForumsRead.query.filter_by(user_id=self.id).delete()
-        TopicsRead.query.filter_by(user_id=self.id).delete()
-
-        # This should actually be handeld by the dbms.. but dunno why it doesnt
-        # work here
-        from flaskbb.forum.models import Forum
-
-        last_post_forums = Forum.query.\
-            filter_by(last_post_user_id=self.id).all()
-
-        for forum in last_post_forums:
-            forum.last_post_user_id = None
-            forum.save()
-
         db.session.delete(self)
         db.session.commit()
 

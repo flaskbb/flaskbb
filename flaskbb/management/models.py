@@ -10,13 +10,10 @@
 """
 import logging
 
-from flask_wtf import FlaskForm
-from flaskbb._compat import iteritems, text_type
+from flaskbb._compat import iteritems
 from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import SettingValueType, generate_settings_form
-from wtforms import (BooleanField, FloatField, IntegerField, SelectField,
-                     SelectMultipleField, TextField, validators)
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +38,7 @@ class Setting(db.Model, CRUDMixin):
     value = db.Column(db.PickleType, nullable=False)
     settingsgroup = db.Column(db.String(255),
                               db.ForeignKey('settingsgroup.key',
-                                            use_alter=True,
-                                            name="fk_settingsgroup"),
+                                            ondelete="CASCADE"),
                               nullable=False)
 
     # The name (displayed in the form)

@@ -10,11 +10,12 @@
 """
 import logging
 
+import pluggy
 from pkg_resources import (DistributionNotFound, VersionConflict,
                            iter_entry_points)
 
-import pluggy
 from flaskbb.utils.helpers import parse_pkg_metadata
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             project_name=project_name, implprefix=implprefix
         )
         self._plugin_metadata = {}
-        self._disabled_plugins = []
+        self._disabled_plugins = {}
 
         # we maintain a seperate dict for flaskbb.* internal plugins
         self._internal_name2plugin = {}
@@ -99,12 +100,6 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             if self.get_plugin(ep.name):
                 continue
 
-            if self.is_blocked(ep.name):
-                self._disabled_plugins.append((ep.name, ep.dist))
-                self._plugin_metadata[ep.name] = \
-                    parse_pkg_metadata(ep.dist.key)
-                continue
-
             try:
                 plugin = ep.load()
             except DistributionNotFound:
@@ -115,6 +110,13 @@ class FlaskBBPluginManager(pluggy.PluginManager):
                 raise pluggy.PluginValidationError(
                     "Plugin %r could not be loaded: %s!" % (ep.name, e)
                 )
+
+            if self.is_blocked(ep.name):
+                self._disabled_plugins[plugin] = (ep.name, ep.dist)
+                self._plugin_metadata[ep.name] = \
+                    parse_pkg_metadata(ep.dist.key)
+                continue
+
             self.register(plugin, name=ep.name)
             self._plugin_distinfo.append((plugin, ep.dist))
             self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
@@ -143,4 +145,16 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
     def list_disabled_plugins(self):
         """Returns a name/distinfo tuple pairs of disabled plugins."""
-        return self._disabled_plugins
+        return self._disabled_plugins.values()
+
+    def get_disabled_plugins(self):
+        """Returns a list with disabled plugins."""
+        return self._disabled_plugins.keys()
+
+    def get_internal_plugins(self):
+        """Returns a set of registered internal plugins."""
+        return set(self._internal_name2plugin.values())
+
+    def get_external_plugins(self):
+        """Returns a set of registered external plugins."""
+        return set(self.get_plugins() - self.get_internal_plugins())

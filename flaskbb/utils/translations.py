@@ -16,6 +16,7 @@ import babel
 from flask import current_app
 
 from flask_babelplus import Domain, get_locale
+from flask_babelplus.utils import get_state
 
 
 logger = logging.getLogger(__name__)
@@ -37,19 +38,39 @@ class FlaskBBDomain(Domain):
         object if used outside of the request or if a translation cannot be
         found.
         """
-        translations = super(FlaskBBDomain, self).get_translations()
-        locale = get_locale()
-        # now load and add the plugin translations
-        for plugin in self.plugin_translations:
-            logger.debug("Loading plugin translation from: {}".format(plugin))
-            plugin_translation = babel.support.Translations.load(
-                dirname=plugin,
-                locales=locale,
-                domain="messages"
-            )
-            translations.add(plugin_translation)
+        state = get_state(silent=True)
 
-        self.cache[str(locale)] = translations
+        if state is None:
+            return babel.support.NullTranslations()
+
+        locale = get_locale()
+        cache = self.get_translations_cache()
+        translations = cache.get(str(locale))
+
+        # load them into the cache
+        if translations is None:
+            dirname = self.get_translations_path(state.app)
+            translations = babel.support.Translations.load(
+                dirname,
+                locale,
+                domain=self.domain
+            )
+            # now load and add the plugin translations
+            for plugin in self.plugin_translations:
+                logger.debug("Loading plugin translation from: "
+                             "{}".format(plugin))
+                plugin_translation = babel.support.Translations.load(
+                    dirname=plugin,
+                    locales=locale,
+                    domain="messages"
+                )
+
+                if not isinstance(plugin_translation,
+                                  babel.support.NullTranslations):
+                    translations.add(plugin_translation)
+
+            self.cache[str(locale)] = translations
+
         return translations
 
 

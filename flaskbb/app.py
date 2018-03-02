@@ -8,57 +8,55 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import os
 import logging
 import logging.config
+import os
 import sys
 import time
+from datetime import datetime
 from functools import partial
 
+from flask import Flask, request
+from flask_login import current_user
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from flask import Flask, request
-from flask_login import current_user
 
-from flaskbb._compat import string_types, iteritems
-# views
-from flaskbb.user.views import user
-from flaskbb.message.views import message
+from flaskbb._compat import iteritems, string_types
 from flaskbb.auth.views import auth
-from flaskbb.management.views import management
-from flaskbb.forum.views import forum
-# models
-from flaskbb.user.models import User, Guest
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee)
-
+from flaskbb.forum.views import forum
+from flaskbb.management.views import management
+from flaskbb.plugins import spec
+from flaskbb.plugins.manager import FlaskBBPluginManager
+from flaskbb.plugins.models import PluginRegistry
+from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+# models
+from flaskbb.user.models import Guest, User
+# views
+from flaskbb.user.views import user
 # various helpers
-from flaskbb.utils.helpers import (time_utcnow, format_date, time_since,
-                                   crop_title, is_online, mark_online,
-                                   forum_is_unread, topic_is_unread,
-                                   render_template, render_markup,
-                                   app_config_from_env, get_flaskbb_config,
-                                   get_alembic_locations)
-from flaskbb.utils.translations import FlaskBBDomain
+from flaskbb.utils.helpers import (app_config_from_env, crop_title,
+                                   format_date, forum_is_unread,
+                                   get_alembic_locations, get_flaskbb_config,
+                                   is_online, mark_online, render_markup,
+                                   render_template, time_since, time_utcnow,
+                                   topic_is_unread)
 # permission checks (here they are used for the jinja filters)
-from flaskbb.utils.requirements import (IsAdmin, IsAtleastModerator,
-                                        CanBanUser, CanEditUser,
-                                        TplCanModerate, TplCanDeletePost,
+from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
+                                        IsAtleastModerator, TplCanDeletePost,
                                         TplCanDeleteTopic, TplCanEditPost,
-                                        TplCanPostTopic, TplCanPostReply)
+                                        TplCanModerate, TplCanPostReply,
+                                        TplCanPostTopic)
 # whooshees
-from flaskbb.utils.search import (PostWhoosheer, TopicWhoosheer,
-                                  ForumWhoosheer, UserWhoosheer)
+from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
+                                  TopicWhoosheer, UserWhoosheer)
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
-
-from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.manager import FlaskBBPluginManager
-from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
-from flaskbb.plugins import spec
+from flaskbb.utils.translations import FlaskBBDomain
 
 
 logger = logging.getLogger(__name__)
@@ -151,8 +149,6 @@ def configure_celery_app(app, celery):
     TaskBase = celery.Task
 
     class ContextTask(TaskBase):
-        abstract = True
-
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
@@ -165,9 +161,6 @@ def configure_blueprints(app):
     app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
-    )
-    app.register_blueprint(
-        message, url_prefix=app.config["MESSAGE_URL_PREFIX"]
     )
 
     app.pluggy.hook.flaskbb_load_blueprints(app=app)
@@ -223,7 +216,6 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
-
         user_instance = User.query.filter_by(id=user_id).first()
         if user_instance:
             return user_instance
@@ -285,6 +277,11 @@ def configure_context_processors(app):
         templates.
         """
         return dict(flaskbb_config=flaskbb_config, format_date=format_date)
+
+    @app.context_processor
+    def inject_now():
+        """Injects the current time."""
+        return dict(now=datetime.utcnow())
 
 
 def configure_before_handlers(app):
@@ -428,6 +425,10 @@ def load_plugins(app):
     except (OperationalError, ProgrammingError) as exc:
         logger.debug("Database is not setup correctly or has not been "
                      "setup yet.", exc_info=exc)
+        # load plugins even though the database isn't setup correctly
+        # i.e. when creating the initial database and wanting to install
+        # the plugins migration as well
+        app.pluggy.load_setuptools_entrypoints('flaskbb_plugins')
         return
 
     for plugin in plugins:
@@ -452,3 +453,14 @@ def load_plugins(app):
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
             logger.info("Removed Plugins: {}".format(removed))
+
+    # we need a copy of it because of
+    # RuntimeError: dictionary changed size during iteration
+    tasks = celery.tasks.copy()
+    disabled_plugins = [
+        p.__package__ for p in app.pluggy.get_disabled_plugins()
+    ]
+    for task_name, task in iteritems(tasks):
+        if task.__module__.split(".")[0] in disabled_plugins:
+            logger.debug("Unregistering task: '{}'".format(task))
+            celery.tasks.unregister(task_name)

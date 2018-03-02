@@ -9,6 +9,7 @@ Quickstart
 ----------
 
 .. code:: bash
+
     # Install the FlaskBB package and it's dependencies
     $ pip install -e .
 

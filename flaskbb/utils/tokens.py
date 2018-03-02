@@ -20,12 +20,12 @@ from flaskbb.user.models import User
 logger = logging.getLogger(__name__)
 
 
-def make_token(user, operation, expire=3600):
+def make_token(user_id, operation, expire=3600):
     """Generates a JSON Web Signature (JWS).
     See `RFC 7515 <https://tools.ietf.org/html/rfc7515>` if you want to know
     more about JWS.
 
-    :param user: The user object for whom the token should be generated.
+    :param user_id: The user_id for which the token should be generated.
     :param operation: The function of the token. For example, you might want
                       to generate two different tokens. One for a
                       password reset link, which you hypothetically want
@@ -38,7 +38,7 @@ def make_token(user, operation, expire=3600):
     s = TimedJSONWebSignatureSerializer(
         current_app.config['SECRET_KEY'], expire
     )
-    data = {"id": user.id, "op": operation}
+    data = {"id": user_id, "op": operation}
     return s.dumps(data)
 
 

@@ -8,35 +8,35 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import sys
-import os
-import time
-import requests
 import binascii
-import traceback
 import logging
+import os
+import sys
+import time
+import traceback
 from datetime import datetime
 
 import click
 import click_log
+import requests
 from celery.bin.celery import CeleryCommand
-from werkzeug.utils import import_string
-from jinja2 import Environment, FileSystemLoader
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from sqlalchemy_utils.functions import database_exists
 from flask_alembic import alembic_click
+from jinja2 import Environment, FileSystemLoader
+from sqlalchemy_utils.functions import database_exists
+from werkzeug.utils import import_string
 
 from flaskbb import create_app
-from flaskbb.extensions import db, whooshee, celery, alembic
-from flaskbb.cli.utils import (prompt_save_user, prompt_config_path,
-                               write_config, get_version, FlaskBBCLIError,
-                               EmailType)
-from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
-                                    create_default_groups,
-                                    create_default_settings, insert_bulk_data,
-                                    update_settings_from_fixture,
-                                    create_latest_db)
+from flaskbb.cli.utils import (EmailType, FlaskBBCLIError, get_version,
+                               prompt_config_path, prompt_save_user,
+                               write_config)
+from flaskbb.extensions import alembic, celery, db, whooshee
+from flaskbb.utils.populate import (create_default_groups,
+                                    create_default_settings, create_latest_db,
+                                    create_test_data, create_welcome_forum,
+                                    insert_bulk_data, run_plugin_migrations,
+                                    update_settings_from_fixture)
 from flaskbb.utils.translations import compile_translations
 
 
@@ -125,8 +125,10 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
+@click.option("--no-plugins", "-n", default=False, is_flag=True,
+              help="Don't run the migrations for the default plugins.")
 @with_appcontext
-def install(welcome, force, username, email, password):
+def install(welcome, force, username, email, password, no_plugins):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -153,6 +155,10 @@ def install(welcome, force, username, email, password):
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
+
+    if not no_plugins:
+        click.secho("[+] Installing default plugins...", fg="cyan")
+        run_plugin_migrations()
 
     click.secho("[+] Compiling translations...", fg="cyan")
     compile_translations()
@@ -187,6 +193,7 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
         create_latest_db()
+        run_plugin_migrations()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")
@@ -243,45 +250,10 @@ def upgrade(all_latest, fixture, force):
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
-        click.secho("[+] {settings} settings in {groups} setting groups updated.".format(
-            groups=len(count), settings=sum(len(settings) for settings in count.values())), fg="green"
-        )
-
-
-@flaskbb.command("download-emojis")
-@with_appcontext
-def download_emoji():
-    """Downloads emojis from emoji-cheat-sheet.com.
-    This command is probably going to be removed in future version.
-    """
-    click.secho("[+] Downloading emojis...", fg="cyan")
-    HOSTNAME = "https://api.github.com"
-    REPO = "/repos/arvida/emoji-cheat-sheet.com/contents/public/graphics/emojis"  # noqa
-    FULL_URL = "{}{}".format(HOSTNAME, REPO)
-    DOWNLOAD_PATH = os.path.join(current_app.static_folder, "emoji")
-    response = requests.get(FULL_URL)
-
-    cached_count = 0
-    count = 0
-    for image in response.json():
-        if not os.path.exists(os.path.abspath(DOWNLOAD_PATH)):
-            raise FlaskBBCLIError(
-                "{} does not exist.".format(os.path.abspath(DOWNLOAD_PATH)),
-                fg="red")
-
-        full_path = os.path.join(DOWNLOAD_PATH, image["name"])
-        if not os.path.exists(full_path):
-            count += 1
-            f = open(full_path, 'wb')
-            f.write(requests.get(image["download_url"]).content)
-            f.close()
-            if count == cached_count + 50:
-                cached_count = count
-                click.secho("[+] {} out of {} Emojis downloaded...".format(
-                            cached_count, len(response.json())), fg="cyan")
-
-    click.secho("[+] Finished downloading {} Emojis.".format(count),
-                fg="green")
+        click.secho("[+] {settings} settings in {groups} setting groups "
+                    "updated.".format(groups=len(count), settings=sum(
+                        len(settings) for settings in count.values())
+                    ), fg="green")
 
 
 @flaskbb.command("celery", add_help_option=False,
@@ -397,14 +369,15 @@ def generate_config(development, output, force):
         config_path = os.path.join(config_path, "flaskbb.cfg")
 
     # An override to handle database location paths on Windows environments
-    database_path = "sqlite:///" + os.path.join(os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
+    database_path = "sqlite:///" + os.path.join(
+        os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
     if os.name == 'nt':
         database_path = database_path.replace("\\", r"\\")
 
     default_conf = {
-        "is_debug": True,
-        "server_name": "localhost:5000",
-        "url_scheme": "http",
+        "is_debug": False,
+        "server_name": "example.org",
+        "use_https": True,
         "database_uri": database_path,
         "redis_enabled": False,
         "redis_uri": "redis://localhost:6379",
@@ -431,25 +404,28 @@ def generate_config(development, output, force):
                     fg="yellow")
 
     if development:
+        default_conf["is_debug"] = True
+        default_conf["use_https"] = False
+        default_conf["server_name"] = "localhost:5000"
         write_config(default_conf, config_template, config_path)
         sys.exit(0)
 
     # SERVER_NAME
-    click.secho("The name and port number of the server.\n"
-                "This is needed to correctly generate URLs when no request "
-                "context is available.", fg="cyan")
+    click.secho("The name and port number of the exposed server.\n"
+                "If FlaskBB is accesible on port 80 you can just omit the "
+                "port.\n For example, if FlaskBB is accessible via "
+                "example.org:8080 than this is also what you would set here.",
+                fg="cyan")
     default_conf["server_name"] = click.prompt(
         click.style("Server Name", fg="magenta"), type=str,
         default=default_conf.get("server_name"))
 
-    # PREFERRED_URL_SCHEME
-    click.secho("The URL Scheme is also needed in order to generate correct "
-                "URLs when no request context is available.\n"
-                "Choose either 'https' or 'http'.", fg="cyan")
-    default_conf["url_scheme"] = click.prompt(
-        click.style("URL Scheme", fg="magenta"),
-        type=click.Choice(["https", "http"]),
-        default=default_conf.get("url_scheme"))
+    # HTTPS or HTTP
+    click.secho("Is HTTPS (recommended) or HTTP used for to serve FlaskBB?",
+                fg="cyan")
+    default_conf["use_https"] = click.confirm(
+        click.style("Use HTTPS?", fg="magenta"),
+        default=default_conf.get("use_https"))
 
     # SQLALCHEMY_DATABASE_URI
     click.secho("For Postgres use:\n"
@@ -525,7 +501,7 @@ def generate_config(development, output, force):
         click.style("Mail Sender Address", fg="magenta"),
         default=default_conf.get("mail_sender_address"))
     # ADMINS
-    click.secho("Logs and important system messages are sent to this address."
+    click.secho("Logs and important system messages are sent to this address. "
                 "Use your email address for gmail here.", fg="cyan")
     default_conf["mail_admin_address"] = click.prompt(
         click.style("Mail Admin Email", fg="magenta"),

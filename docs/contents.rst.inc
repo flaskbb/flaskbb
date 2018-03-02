@@ -12,6 +12,7 @@ Contents
    hooks
    settings
    api
+   faq
 
 
 Additional Information

@@ -117,7 +117,7 @@ class ViewPost(MethodView):
         post = Post.query.filter_by(id=post_id).first_or_404()
         post_in_topic = Post.query.filter(Post.topic_id == post.topic_id,
                                           Post.id <= post_id).order_by(Post.id.asc()).count()
-        page = math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
+        page = int(math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE'])))
 
         return redirect(
             url_for(
@@ -143,6 +143,16 @@ class ViewTopic(MethodView):
         topic.views += 1
         topic.save()
 
+
+        # Update the topicsread status if the user hasn't read it
+        forumsread = None
+        if current_user.is_authenticated:
+            forumsread = ForumsRead.query.\
+                filter_by(user_id=current_user.id,
+                          forum_id=topic.forum_id).first()
+
+        topic.update_read(real(current_user), topic.forum, forumsread)
+
         # fetch the posts in the topic
         posts = Post.query.\
             outerjoin(User, Post.user_id == User.id).\
@@ -154,15 +164,6 @@ class ViewTopic(MethodView):
         # Abort if there are no posts on this page
         if len(posts.items) == 0:
             abort(404)
-
-        # Update the topicsread status if the user hasn't read it
-        forumsread = None
-        if current_user.is_authenticated:
-            forumsread = ForumsRead.query.\
-                filter_by(user_id=real(current_user).id,
-                          forum_id=topic.forum.id).first()
-
-        topic.update_read(real(current_user), topic.forum, forumsread)
 
         return render_template(
             'forum/topic.html', topic=topic, posts=posts, last_seen=time_diff(), form=self.form()
