@@ -10,10 +10,12 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
+
 from flask import Blueprint, flash, request
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
+from pluggy import HookimplMarker
 
 from flaskbb.user.forms import (ChangeEmailForm, ChangePasswordForm,
                                 ChangeUserDetailsForm, GeneralSettingsForm)
@@ -22,10 +24,9 @@ from flaskbb.utils.helpers import (get_available_languages,
                                    get_available_themes, register_view,
                                    render_template)
 
+impl = HookimplMarker('flaskbb')
+
 logger = logging.getLogger(__name__)
-
-
-user = Blueprint("user", __name__)
 
 
 class UserSettings(MethodView):
@@ -36,7 +37,7 @@ class UserSettings(MethodView):
         form = self.form()
 
         form.theme.choices = get_available_themes()
-        form.theme.choices.insert(0,('', 'Default'))
+        form.theme.choices.insert(0, ('', 'Default'))
         form.language.choices = get_available_languages()
         form.theme.data = current_user.theme
         form.language.data = current_user.language
@@ -47,7 +48,7 @@ class UserSettings(MethodView):
         form = self.form()
 
         form.theme.choices = get_available_themes()
-        form.theme.choices.insert(0,('', 'Default'))
+        form.theme.choices.insert(0, ('', 'Default'))
         form.language.choices = get_available_languages()
 
         if form.validate_on_submit():
@@ -85,7 +86,9 @@ class ChangeEmail(MethodView):
     form = ChangeEmailForm
 
     def get(self):
-        return render_template("user/change_email.html", form=self.form(current_user))
+        return render_template(
+            "user/change_email.html", form=self.form(current_user)
+        )
 
     def post(self):
         form = self.form(current_user)
@@ -102,7 +105,9 @@ class ChangeUserDetails(MethodView):
     form = ChangeUserDetailsForm
 
     def get(self):
-        return render_template("user/change_user_details.html", form=self.form(obj=current_user))
+        return render_template(
+            "user/change_user_details.html", form=self.form(obj=current_user)
+        )
 
     def post(self):
         form = self.form(obj=current_user)
@@ -141,18 +146,42 @@ class UserProfile(MethodView):
         return render_template("user/profile.html", user=user)
 
 
-register_view(user, routes=['/settings/email'], view_func=ChangeEmail.as_view('change_email'))
-register_view(user, routes=['/settings/general'], view_func=UserSettings.as_view('settings'))
-register_view(
-    user, routes=['/settings/password'], view_func=ChangePassword.as_view('change_password')
-)
-register_view(
-    user,
-    routes=["/settings/user-details"],
-    view_func=ChangeUserDetails.as_view('change_user_details')
-)
-register_view(user, routes=['/<username>/posts'], view_func=AllUserPosts.as_view('view_all_posts'))
-register_view(
-    user, routes=['/<username>/topics'], view_func=AllUserTopics.as_view('view_all_topics')
-)
-register_view(user, routes=['/<username>'], view_func=UserProfile.as_view('profile'))
+@impl
+def flaskbb_load_blueprints(app):
+    user = Blueprint("user", __name__)
+    register_view(
+        user,
+        routes=['/settings/email'],
+        view_func=ChangeEmail.as_view('change_email')
+    )
+    register_view(
+        user,
+        routes=['/settings/general'],
+        view_func=UserSettings.as_view('settings')
+    )
+    register_view(
+        user,
+        routes=['/settings/password'],
+        view_func=ChangePassword.as_view('change_password')
+    )
+    register_view(
+        user,
+        routes=["/settings/user-details"],
+        view_func=ChangeUserDetails.as_view('change_user_details')
+    )
+    register_view(
+        user,
+        routes=['/<username>/posts'],
+        view_func=AllUserPosts.as_view('view_all_posts')
+    )
+    register_view(
+        user,
+        routes=['/<username>/topics'],
+        view_func=AllUserTopics.as_view('view_all_topics')
+    )
+
+    register_view(
+        user, routes=['/<username>'], view_func=UserProfile.as_view('profile')
+    )
+
+    app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
