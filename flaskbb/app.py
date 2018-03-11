@@ -23,11 +23,11 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flaskbb._compat import iteritems, string_types
-from flaskbb.auth.views import auth
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee)
+from . import auth
 from flaskbb.forum.views import forum
 from flaskbb.management.views import management
 from flaskbb.message.views import message
@@ -158,7 +158,7 @@ def configure_celery_app(app, celery):
 def configure_blueprints(app):
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
-    app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
+    #app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
