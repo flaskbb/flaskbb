@@ -27,8 +27,8 @@ from flaskbb._compat import iteritems, string_types
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee)
-from . import auth
-from flaskbb.forum.views import forum
+from .auth import views as auth_views
+from .forum import views as forum_views
 from flaskbb.management.views import management
 from flaskbb.message.views import message
 from flaskbb.plugins import spec
@@ -156,9 +156,7 @@ def configure_celery_app(app, celery):
 
 
 def configure_blueprints(app):
-    app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])
-    #app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])
     app.register_blueprint(
         management, url_prefix=app.config["ADMIN_URL_PREFIX"]
     )
