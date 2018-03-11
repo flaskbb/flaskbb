@@ -41,13 +41,7 @@
                                 {{ user.date_joined|format_date('%b %d %Y') }}
                             </div>
 
-                            <div class="profile-buttons">
-                                {% if current_user.is_authenticated %}
-                                <a class="btn btn-primary" href="{{url_for('message.new_conversation') }}?to_user={{ user.username }}">
-                                    {% trans %}Message{% endtrans %}
-                                </a>
-                                {% endif %}
-                            </div>
+                            {{ run_hook("flaskbb_tpl_profile_sidebar_stats", user=user) }}
                         </div>
 
                         {% block profile_navigation %}

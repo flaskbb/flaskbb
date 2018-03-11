@@ -1,4 +1,4 @@
-alembic==0.9.7
+alembic==0.9.8
 amqp==2.1.4
 Babel==2.5.3
 billiard==3.5.0.2
@@ -23,6 +23,7 @@ Flask-SQLAlchemy==2.3.2
 Flask-Themes2==0.1.4
 flask-whooshee==0.5.0
 Flask-WTF==0.14.2
+flaskbb-plugin-conversations==1.0.0
 flaskbb-plugin-portal==1.1.0
 idna==2.6
 itsdangerous==0.24
@@ -38,18 +39,18 @@ pluggy==0.6.0
 Pygments==2.2.0
 python-dateutil==2.6.1
 python-editor==1.0.3
-pytz==2017.3
+pytz==2018.3
 redis==2.10.6
 requests==2.18.4
 simplejson==3.13.2
 six==1.11.0
 speaklater==1.3
-SQLAlchemy==1.1.15
-SQLAlchemy-Utils==0.32.21
+SQLAlchemy==1.2.4
+SQLAlchemy-Utils==0.33.0
 Unidecode==1.0.22
 urllib3==1.22
 vine==1.1.4
-Werkzeug==0.13
+Werkzeug==0.14.1
 Whoosh==2.7.4
 WTForms==2.1
 -e .
