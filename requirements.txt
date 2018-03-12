@@ -1,5 +1,6 @@
 alembic==0.9.8
 amqp==2.1.4
+attrs==17.4.0
 Babel==2.5.3
 billiard==3.5.0.2
 blinker==1.4

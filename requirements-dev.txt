@@ -1,4 +1,4 @@
--r requirements.txt
+-rrequirements.txt
 cov-core
 coverage
 py
@@ -7,3 +7,4 @@ pytest-cov
 Sphinx
 alabaster
 flake8
+tox==2.9.0

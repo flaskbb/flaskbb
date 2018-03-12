@@ -63,6 +63,10 @@ def flaskbb_cli(cli):
     """Hook for registering CLI commands."""
 
 
+@spec
+def flaskbb_user_registered(username):
+    """Hook for handling events after a user is registered"""
+
 # Template Hooks
 
 @spec

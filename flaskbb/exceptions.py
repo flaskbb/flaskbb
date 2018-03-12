@@ -10,9 +10,16 @@
 from werkzeug.exceptions import HTTPException, Forbidden
 
 
-class FlaskBBError(HTTPException):
+class BaseFlaskBBError(Exception):
     "Root exception for FlaskBB"
     description = "An internal error has occured"
+
+
+class FlaskBBHTTPError(BaseFlaskBBError, HTTPException):
+    pass
+
+
+FlaskBBError = FlaskBBHTTPError
 
 
 class AuthorizationRequired(FlaskBBError, Forbidden):

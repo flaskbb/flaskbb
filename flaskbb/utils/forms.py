@@ -15,6 +15,15 @@ from flaskbb._compat import text_type, iteritems
 from enum import Enum
 
 
+class FlaskBBForm(FlaskForm):
+    def populate_errors(self, errors):
+        for (attribute, reason) in errors:
+            self.errors.setdefault(attribute, []).append(reason)
+            field = getattr(self, attribute, None)
+            if field:
+                field.errors.append(reason)
+
+
 class SettingValueType(Enum):
     string = 0
     integer = 1
@@ -52,7 +61,7 @@ def populate_settings_form(form, settings):
 def generate_settings_form(settings):
     """Generates a settings form which includes field validation
     based on our Setting Schema."""
-    class SettingsForm(FlaskForm):
+    class SettingsForm(FlaskBBForm):
         pass
 
     # now parse the settings in this group
