@@ -69,6 +69,15 @@ def flaskbb_cli(cli):
     """Hook for registering CLI commands."""
 
 
+@spec
+def flaskbb_shell_context():
+    """
+    Hook for registering shell context handlers
+    Expected to return a single callable function that returns a dictionary or
+    iterable of key value pairs.
+    """
+
+
 # Template Hooks
 
 @spec
