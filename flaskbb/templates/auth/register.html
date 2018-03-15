@@ -13,7 +13,7 @@
     <div class="panel-body">
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
-            {{ run_hook('flaskbb_tpl_before_registration_form') }}
+            {{ run_hook('flaskbb_tpl_form_registration_before', form=form) }}
             {{ horizontal_field(form.username)}}
             {{ horizontal_field(form.email)}}
             {{ horizontal_field(form.password)}}
@@ -25,8 +25,8 @@
 
             {{ horizontal_field(form.language) }}
             {{ horizontal_field(form.accept_tos)}}
+            {{ run_hook('flaskbb_tpl_form_registration_after', form=form) }}
             {{ horizontal_field(form.submit)}}
-            {{ run_hook('flaskbb_tpl_after_registration_form') }}
         </form>
     </div>
 </div>

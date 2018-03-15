@@ -15,7 +15,6 @@ spec = HookspecMarker('flaskbb')
 
 
 # Setup Hooks
-
 @spec
 def flaskbb_extensions(app):
     """Hook for initializing any plugin loaded extensions."""
@@ -71,10 +70,27 @@ def flaskbb_cli(cli):
 
 @spec
 def flaskbb_shell_context():
-    """
-    Hook for registering shell context handlers
+    """Hook for registering shell context handlers
     Expected to return a single callable function that returns a dictionary or
     iterable of key value pairs.
+    """
+
+
+# Event hooks
+@spec
+def flaskbb_event_before_post(post):
+    """Hook for handling a post before it has been saved.
+
+    :param flaskbb.forum.models.Post post: The post which triggered the event.
+    """
+
+
+@spec
+def flaskbb_event_after_post(post, is_new):
+    """Hook for handling a post after it has been saved.
+
+    :param flaskbb.forum.models.Post post: The post which triggered the event.
+    :param bool is_new: True if the post is new, False if it is an edit.
     """
 
 
@@ -109,9 +125,8 @@ def flaskbb_form_new_post_save(form):
 
 
 # Template Hooks
-
 @spec
-def flaskbb_tpl_before_navigation():
+def flaskbb_tpl_navigation_before():
     """Hook for registering additional navigation items.
 
     in :file:`templates/layout.html`.
@@ -119,7 +134,7 @@ def flaskbb_tpl_before_navigation():
 
 
 @spec
-def flaskbb_tpl_after_navigation():
+def flaskbb_tpl_navigation_after():
     """Hook for registering additional navigation items.
 
     in :file:`templates/layout.html`.
@@ -127,7 +142,7 @@ def flaskbb_tpl_after_navigation():
 
 
 @spec
-def flaskbb_tpl_before_user_nav_loggedin():
+def flaskbb_tpl_user_nav_loggedin_before():
     """Hook for registering additional user navigational items
     which are only shown when a user is logged in.
 
@@ -136,7 +151,7 @@ def flaskbb_tpl_before_user_nav_loggedin():
 
 
 @spec
-def flaskbb_tpl_after_user_nav_loggedin():
+def flaskbb_tpl_user_nav_loggedin_after():
     """Hook for registering additional user navigational items
     which are only shown when a user is logged in.
 
@@ -145,38 +160,46 @@ def flaskbb_tpl_after_user_nav_loggedin():
 
 
 @spec
-def flaskbb_tpl_before_registration_form():
+def flaskbb_tpl_form_registration_before(form):
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
 
     in :file:`templates/auth/register.html`.
+
+    :param form: The form object.
     """
 
 
 @spec
-def flaskbb_tpl_after_registration_form():
+def flaskbb_tpl_form_registration_after(form):
     """This hook is emitted in the Registration form **after** the last
     input field but before the submit field.
 
     in :file:`templates/auth/register.html`.
+
+    :param form: The form object.
     """
 
 
 @spec
-def flaskbb_tpl_before_user_details_form():
+def flaskbb_tpl_form_user_details_before(form):
     """This hook is emitted in the Change User Details form **before** an
     input field is rendered.
 
     in :file:`templates/user/change_user_details.html`.
+
+    :param form: The form object.
     """
 
 
 @spec
-def flaskbb_tpl_after_user_details_form():
+def flaskbb_tpl_form_user_details_after(form):
     """This hook is emitted in the Change User Details form **after** the last
     input field has been rendered but before the submit field.
 
     in :file:`templates/user/change_user_details.html`.
+
+    :param form: The form object.
     """
 
 
@@ -237,17 +260,6 @@ def flaskbb_tpl_admin_settings_menu(user):
     """
 
 
-# Event hooks
-
-@spec
-def flaskbb_event_after_post(post, is_new):
-    """Hook for handling a post after it has been saved.
-
-    :param flaskbb.forum.models.Post post: The post which triggered the event
-    :param bool is_new: True if the post is new, False if it is an edit
-    """
-
-
 @spec
 def flaskbb_tpl_profile_sidebar_stats(user):
     """This hook is emitted on the users profile page below the standard
@@ -261,7 +273,7 @@ def flaskbb_tpl_profile_sidebar_stats(user):
 
 
 @spec
-def flaskbb_tpl_before_post_author_info(user, post):
+def flaskbb_tpl_post_author_info_before(user, post):
     """This hook is emitted before the information about the
     author of a post is displayed (but after the username).
 
@@ -273,7 +285,7 @@ def flaskbb_tpl_before_post_author_info(user, post):
 
 
 @spec
-def flaskbb_tpl_after_post_author_info(user, post):
+def flaskbb_tpl_post_author_info_after(user, post):
     """This hook is emitted after the information about the
     author of a post is displayed (but after the username).
 

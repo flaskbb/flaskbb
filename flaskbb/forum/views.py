@@ -57,8 +57,8 @@ class ForumIndex(MethodView):
         if not current_app.config['REDIS_ENABLED']:
             online_users = User.query.filter(User.lastseen >= time_diff()).count()
 
-            # Because we do not have server side sessions, we cannot check if there
-            # are online guests
+            # Because we do not have server side sessions,
+            # we cannot check if there are online guests
             online_guests = None
         else:
             online_users = len(get_online_users())
@@ -115,9 +115,12 @@ class ViewPost(MethodView):
     def get(self, post_id):
         '''Redirects to a post in a topic.'''
         post = Post.query.filter_by(id=post_id).first_or_404()
-        post_in_topic = Post.query.filter(Post.topic_id == post.topic_id,
-                                          Post.id <= post_id).order_by(Post.id.asc()).count()
-        page = int(math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE'])))
+        post_in_topic = Post.query.filter(
+            Post.topic_id == post.topic_id,
+            Post.id <= post_id).order_by(Post.id.asc()).count()
+        page = int(math.ceil(
+            post_in_topic / float(flaskbb_config['POSTS_PER_PAGE'])
+        ))
 
         return redirect(
             url_for(
@@ -143,30 +146,33 @@ class ViewTopic(MethodView):
         topic.views += 1
         topic.save()
 
-
         # Update the topicsread status if the user hasn't read it
         forumsread = None
         if current_user.is_authenticated:
-            forumsread = ForumsRead.query.\
-                filter_by(user_id=current_user.id,
-                          forum_id=topic.forum_id).first()
+            forumsread = ForumsRead.query.filter_by(
+                user_id=current_user.id,
+                forum_id=topic.forum_id).first()
 
         topic.update_read(real(current_user), topic.forum, forumsread)
 
         # fetch the posts in the topic
-        posts = Post.query.\
-            outerjoin(User, Post.user_id == User.id).\
-            filter(Post.topic_id == topic.id).\
-            add_entity(User).\
-            order_by(Post.id.asc()).\
-            paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
+        posts = Post.query.outerjoin(
+            User, Post.user_id == User.id
+        ).filter(
+            Post.topic_id == topic.id
+        ).add_entity(
+            User
+        ).order_by(
+            Post.id.asc()
+        ).paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
         # Abort if there are no posts on this page
         if len(posts.items) == 0:
             abort(404)
 
         return render_template(
-            'forum/topic.html', topic=topic, posts=posts, last_seen=time_diff(), form=self.form()
+            'forum/topic.html', topic=topic, posts=posts,
+            last_seen=time_diff(), form=self.form()
         )
 
     @allows.requires(CanPostReply)

@@ -201,6 +201,8 @@ class Post(HideableCRUDMixin, db.Model):
         :param user: The user who has created the post
         :param topic: The topic in which the post was created
         """
+        current_app.pluggy.hook.flaskbb_event_before_post(post=self)
+
         # update/edit the post
         if self.id:
             db.session.add(self)
@@ -346,7 +348,9 @@ class Post(HideableCRUDMixin, db.Model):
             topic_post_clauses = clauses + [
                 Post.topic_id == self.topic.id,
             ]
-            self.topic.post_count = Post.query.filter(*topic_post_clauses).count()
+            self.topic.post_count = Post.query.filter(
+                *topic_post_clauses
+            ).count()
 
         forum_post_clauses = clauses + [
             Post.topic_id == Topic.id,
@@ -354,7 +358,9 @@ class Post(HideableCRUDMixin, db.Model):
             Topic.hidden != True,
         ]
 
-        self.topic.forum.post_count = Post.query.filter(*forum_post_clauses).count()
+        self.topic.forum.post_count = Post.query.filter(
+            *forum_post_clauses
+        ).count()
 
     def _restore_post_to_topic(self):
         last_unhidden_post = Post.query.filter(
@@ -368,8 +374,8 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.last_post = self
             self.second_last_post = last_unhidden_post
 
-            # if we're the newest in the topic again, we might be the newest in the forum again
-            # only set if our parent topic isn't hidden
+            # if we're the newest in the topic again, we might be the newest
+            # in the forum again only set if our parent topic isn't hidden
             if (
                 not self.topic.hidden and
                 (
