@@ -9,15 +9,14 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from flask import Blueprint, flash, g, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
-
 from flaskbb.auth.forms import (AccountActivationForm, ForgotPasswordForm,
                                 LoginForm, LoginRecaptchaForm, ReauthForm,
                                 RegisterForm, RequestActivationForm,
@@ -33,28 +32,11 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
+from pluggy import HookimplMarker
 
+impl = HookimplMarker('flaskbb')
 
 logger = logging.getLogger(__name__)
-
-
-auth = Blueprint("auth", __name__)
-
-
-@auth.before_request
-def check_rate_limiting():
-    """Check the the rate limits for each request for this blueprint."""
-    if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
-        return None
-    return limiter.check()
-
-
-@auth.errorhandler(429)
-def login_rate_limit_error(error):
-    """Register a custom error handler for a 'Too Many Requests'
-    (HTTP CODE 429) error."""
-    return render_template("errors/too_many_logins.html",
-                           timeout=error.description)
 
 
 def login_rate_limit():
@@ -75,10 +57,6 @@ def login_rate_limit_message():
         reset_time = datetime.utcfromtimestamp(window_stats[0])
         timeout = reset_time - datetime.utcnow()
     return "{timeout}".format(timeout=format_timedelta(timeout))
-
-
-# Activate rate limiting on the whole blueprint
-limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 
 
 class Logout(MethodView):
@@ -107,9 +85,13 @@ class Login(MethodView):
             try:
                 user = User.authenticate(form.login.data, form.password.data)
                 if not login_user(user, remember=form.remember_me.data):
-                    flash(_("In order to use your account you have to "
+                    flash(
+                        _(
+                            "In order to use your account you have to "
                             "activate it through the link we have sent to "
-                            "your email address."), "danger")
+                            "your email address."
+                        ), "danger"
+                    )
                 return redirect_or_next(url_for("forum.index"))
             except AuthenticationError:
                 flash(_("Wrong username or password."), "danger")
@@ -168,8 +150,13 @@ class Register(MethodView):
                 send_activation_token.delay(
                     user_id=user.id, username=user.username, email=user.email
                 )
-                flash(_("An account activation email has been sent to "
-                        "%(email)s", email=user.email), "success")
+                flash(
+                    _(
+                        "An account activation email has been sent to "
+                        "%(email)s",
+                        email=user.email
+                    ), "success"
+                )
             else:
                 login_user(user)
                 flash(_("Thanks for registering."), "success")
@@ -198,8 +185,12 @@ class ForgotPassword(MethodView):
                 flash(_("Email sent! Please check your inbox."), "info")
                 return redirect(url_for("auth.forgot_password"))
             else:
-                flash(_("You have entered an username or email address that "
-                        "is not linked with your account."), "danger")
+                flash(
+                    _(
+                        "You have entered an username or email address that "
+                        "is not linked with your account."
+                    ), "danger"
+                )
         return render_template("auth/forgot_password.html", form=form)
 
 
@@ -242,8 +233,9 @@ class RequestActivationToken(MethodView):
     form = RequestActivationForm
 
     def get(self):
-        return render_template("auth/request_account_activation.html",
-                               form=self.form())
+        return render_template(
+            "auth/request_account_activation.html", form=self.form()
+        )
 
     def post(self):
         form = self.form()
@@ -253,13 +245,16 @@ class RequestActivationToken(MethodView):
                 user_id=user.id, username=user.username, email=user.email
             )
             flash(
-                _("A new account activation token has been sent to "
-                  "your email address."), "success"
+                _(
+                    "A new account activation token has been sent to "
+                    "your email address."
+                ), "success"
             )
             return redirect(url_for("auth.activate_account"))
 
-        return render_template("auth/request_account_activation.html",
-                               form=form)
+        return render_template(
+            "auth/request_account_activation.html", form=form
+        )
 
 
 class ActivateAccount(MethodView):
@@ -269,9 +264,7 @@ class ActivateAccount(MethodView):
     def get(self, token=None):
         expired = invalid = user = None
         if token is not None:
-            expired, invalid, user = get_token_status(
-                token, "activate_account"
-            )
+            expired, invalid, user = get_token_status(token, "activate_account")
 
         if invalid:
             flash(_("Your account activation token is invalid."), "danger")
@@ -292,18 +285,14 @@ class ActivateAccount(MethodView):
             flash(_("Your account has been activated."), "success")
             return redirect(url_for("forum.index"))
 
-        return render_template(
-            "auth/account_activation.html", form=self.form()
-        )
+        return render_template("auth/account_activation.html", form=self.form())
 
     def post(self, token=None):
         expired = invalid = user = None
         form = self.form()
 
         if token is not None:
-            expired, invalid, user = get_token_status(
-                token, "activate_account"
-            )
+            expired, invalid, user = get_token_status(token, "activate_account")
 
         elif form.validate_on_submit():
             expired, invalid, user = get_token_status(
@@ -332,31 +321,55 @@ class ActivateAccount(MethodView):
         return render_template("auth/account_activation.html", form=form)
 
 
-register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
-register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
-register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
-register_view(
-    auth,
-    routes=['/register'],
-    view_func=Register.as_view('register')
-)
-register_view(
-    auth,
-    routes=['/reset-password'],
-    view_func=ForgotPassword.as_view('forgot_password')
-)
-register_view(
-    auth,
-    routes=['/reset-password/<token>'],
-    view_func=ResetPassword.as_view('reset_password')
-)
-register_view(
-    auth,
-    routes=['/activate'],
-    view_func=RequestActivationToken.as_view('request_activation_token')
-)
-register_view(
-    auth,
-    routes=['/activate/confirm', '/activate/confirm/<token>'],
-    view_func=ActivateAccount.as_view('activate_account')
-)
+@impl(tryfirst=True)
+def flaskbb_load_blueprints(app):
+    auth = Blueprint("auth", __name__)
+
+    @auth.before_request
+    def check_rate_limiting():
+        """Check the the rate limits for each request for this blueprint."""
+        if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
+            return None
+        return limiter.check()
+
+    @auth.errorhandler(429)
+    def login_rate_limit_error(error):
+        """Register a custom error handler for a 'Too Many Requests'
+        (HTTP CODE 429) error."""
+        return render_template(
+            "errors/too_many_logins.html", timeout=error.description
+        )
+
+    # Activate rate limiting on the whole blueprint
+    limiter.limit(
+        login_rate_limit, error_message=login_rate_limit_message
+    )(auth)
+
+    register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
+    register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
+    register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
+    register_view(
+        auth, routes=['/register'], view_func=Register.as_view('register')
+    )
+    register_view(
+        auth,
+        routes=['/reset-password'],
+        view_func=ForgotPassword.as_view('forgot_password')
+    )
+    register_view(
+        auth,
+        routes=['/reset-password/<token>'],
+        view_func=ResetPassword.as_view('reset_password')
+    )
+    register_view(
+        auth,
+        routes=['/activate'],
+        view_func=RequestActivationToken.as_view('request_activation_token')
+    )
+    register_view(
+        auth,
+        routes=['/activate/confirm', '/activate/confirm/<token>'],
+        view_func=ActivateAccount.as_view('activate_account')
+    )
+
+    app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])
