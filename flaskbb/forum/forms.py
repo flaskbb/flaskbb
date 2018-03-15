@@ -13,6 +13,8 @@ from flask_wtf import FlaskForm
 from wtforms import (TextAreaField, StringField, SelectMultipleField,
                      BooleanField, SubmitField)
 from wtforms.validators import DataRequired, Optional, Length
+
+from flask import current_app
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.forum.models import Topic, Post, Report, Forum
@@ -48,6 +50,8 @@ class ReplyForm(FlaskForm):
 
         if self.track_topic.data:
             user.track_topic(topic)
+
+        current_app.pluggy.hook.flaskbb_form_new_post_save(form=self)
         return post.save(user=user, topic=topic)
 
 

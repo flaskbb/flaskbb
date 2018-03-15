@@ -78,6 +78,36 @@ def flaskbb_shell_context():
     """
 
 
+# Form hooks
+@spec
+def flaskbb_form_new_post(form):
+    """Hook for modyfing the ReplyForm.
+
+    For example::
+
+        @impl
+        def flaskbb_form_new_post(form):
+            form.example = TextField("Example Field", validators=[
+                DataRequired(message="This field is required"),
+                Length(min=3, max=50)])
+
+    :param form: The ``ReplyForm`` class.
+    """
+
+
+@spec
+def flaskbb_form_new_post_save(form):
+    """Hook for modyfing the ReplyForm.
+
+    This hook is called while populating the post object with
+    the data from the form. The post object will be saved after the hook
+    call.
+
+    :param form: The form object.
+    :param post: The post object.
+    """
+
+
 # Template Hooks
 
 @spec
@@ -251,4 +281,44 @@ def flaskbb_tpl_after_post_author_info(user, post):
 
     :param user: The user object of the post's author.
     :param post: The post object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_new_post_before(form):
+    """Hook for inserting a new form field before the first field is
+    rendered.
+
+    For example::
+
+        @impl
+        def flaskbb_tpl_form_new_post_after(form):
+            return render_template_string(
+                \"""
+                <div class="form-group">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <label>{{ form.example.label.text }}</label>
+
+                        {{ form.example(class="form-control",
+                                        placeholder=form.example.label.text) }}
+
+                        {%- for error in form.example.errors -%}
+                        <span class="help-block">{{error}}</span>
+                        {%- endfor -%}
+                    </div>
+                </div>
+                \"""
+
+    in :file:`templates/forum/new_post.html`
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_new_post_after(form):
+    """Hook for inserting a new form field after the last field is
+    rendered (but before the submit field).
+
+    :param form: The form object.
     """

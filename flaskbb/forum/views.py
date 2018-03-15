@@ -346,25 +346,34 @@ class ManageForum(MethodView):
 
 class NewPost(MethodView):
     decorators = [allows.requires(CanPostReply), login_required]
-    form = ReplyForm
 
     def get(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
-        return render_template('forum/new_post.html', topic=topic, form=self.form())
+
+        return render_template(
+            'forum/new_post.html', topic=topic, form=self.form()
+        )
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
         form = self.form()
+
         if form.validate_on_submit():
             if 'preview' in request.form:
                 return render_template(
-                    'forum/new_post.html', topic=topic, form=form, preview=form.content.data
+                    'forum/new_post.html', topic=topic, form=form,
+                    preview=form.content.data
                 )
             else:
                 post = form.save(real(current_user), topic)
                 return redirect(url_for('forum.view_post', post_id=post.id))
 
         return render_template('forum/new_post.html', topic=topic, form=form)
+
+    def form(self):
+        current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
+        return ReplyForm()
 
 
 class ReplyPost(MethodView):
