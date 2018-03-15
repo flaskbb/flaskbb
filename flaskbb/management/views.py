@@ -1012,7 +1012,7 @@ class InstallPlugin(MethodView):
         return redirect(url_for("management.plugins"))
 
 
-@impl
+@impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     management = Blueprint("management", __name__)
 

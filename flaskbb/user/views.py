@@ -146,7 +146,7 @@ class UserProfile(MethodView):
         return render_template("user/profile.html", user=user)
 
 
-@impl
+@impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     user = Blueprint("user", __name__)
     register_view(

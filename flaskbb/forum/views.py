@@ -872,7 +872,7 @@ class UnhidePost(MethodView):
         return redirect(post.topic.url)
 
 
-@impl
+@impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     forum = Blueprint("forum", __name__)
     register_view(

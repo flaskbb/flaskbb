@@ -321,7 +321,7 @@ class ActivateAccount(MethodView):
         return render_template("auth/account_activation.html", form=form)
 
 
-@impl
+@impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     auth = Blueprint("auth", __name__)
 
