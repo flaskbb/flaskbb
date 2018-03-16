@@ -297,6 +297,30 @@ def flaskbb_tpl_post_author_info_after(user, post):
 
 
 @spec
+def flaskbb_tpl_post_menu_before(post):
+    """Hook for inserting a new item at the beginning of the post menu.
+
+    :param post: The current post object.
+    """
+
+
+@spec
+def flaskbb_tpl_post_menu_after(post):
+    """Hook for inserting a new item at the end of the post menu.
+
+    :param post: The current post object.
+    """
+
+
+@spec
+def flaskbb_tpl_topic_controls(topic):
+    """Hook for inserting additional topic moderation controls.
+
+    :param topic: The current topic object.
+    """
+
+
+@spec
 def flaskbb_tpl_form_new_post_before(form):
     """Hook for inserting a new form field before the first field is
     rendered.

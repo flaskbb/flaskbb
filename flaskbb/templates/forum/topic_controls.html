@@ -115,6 +115,8 @@
             {% else %}
             <div class="btn btn-primary"><span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}</div>
             {% endif %}
+
+            {{ run_hook("flaskbb_tpl_topic_controls") }}
         </div>
     </div>
 {% endif %} {# end current_user.is_authenticated #}
