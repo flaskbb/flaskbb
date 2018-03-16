@@ -48,7 +48,7 @@ The hooks below are listed in the order they are called.
 FlaskBB CLI Hooks
 ~~~~~~~~~~~~~~~~~
 
-These are hooks are only invoked when using the ``flaskbb``
+These hooks are only invoked when using the ``flaskbb``
 CLI.
 
 .. autofunction:: flaskbb_cli
@@ -58,8 +58,10 @@ CLI.
 FlaskBB Event Hooks
 ~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: flaskbb_event_before_post
-.. autofunction:: flaskbb_event_after_post
+.. autofunction:: flaskbb_event_post_save_before
+.. autofunction:: flaskbb_event_post_save_after
+.. autofunction:: flaskbb_event_topic_save_before
+.. autofunction:: flaskbb_event_topic_save_after
 
 
 FlaskBB Form Hooks
@@ -67,6 +69,9 @@ FlaskBB Form Hooks
 
 .. autofunction:: flaskbb_form_new_post_save
 .. autofunction:: flaskbb_form_new_post
+
+.. autofunction:: flaskbb_form_new_topic
+.. autofunction:: flaskbb_form_new_topic_save
 
 
 Template Hooks
@@ -88,6 +93,8 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_form_user_details_after
 .. autofunction:: flaskbb_tpl_form_new_post_before
 .. autofunction:: flaskbb_tpl_form_new_post_after
+.. autofunction:: flaskbb_tpl_form_new_topic_before
+.. autofunction:: flaskbb_tpl_form_new_topic_after
 .. autofunction:: flaskbb_tpl_profile_settings_menu
 .. autofunction:: flaskbb_tpl_profile_sidebar_stats
 .. autofunction:: flaskbb_tpl_post_author_info_before

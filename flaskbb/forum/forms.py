@@ -74,6 +74,8 @@ class NewTopicForm(ReplyForm):
 
         if self.track_topic.data:
             user.track_topic(topic)
+
+        current_app.pluggy.hook.flaskbb_form_new_topic_save(form=self)
         return topic.save(user=user, forum=forum, post=post)
 
 

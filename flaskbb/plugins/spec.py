@@ -78,7 +78,7 @@ def flaskbb_shell_context():
 
 # Event hooks
 @spec
-def flaskbb_event_before_post(post):
+def flaskbb_event_post_save_before(post):
     """Hook for handling a post before it has been saved.
 
     :param flaskbb.forum.models.Post post: The post which triggered the event.
@@ -86,11 +86,30 @@ def flaskbb_event_before_post(post):
 
 
 @spec
-def flaskbb_event_after_post(post, is_new):
+def flaskbb_event_post_save_after(post, is_new):
     """Hook for handling a post after it has been saved.
 
     :param flaskbb.forum.models.Post post: The post which triggered the event.
     :param bool is_new: True if the post is new, False if it is an edit.
+    """
+
+
+@spec
+def flaskbb_event_topic_save_before(topic):
+    """Hook for handling a topic before it has been saved.
+
+    :param flaskbb.forum.models.Topic topic: The topic which triggered the
+                                             event.
+    """
+
+
+@spec
+def flaskbb_event_topic_save_after(topic, is_new):
+    """Hook for handling a topic after it has been saved.
+
+    :param flaskbb.forum.models.Topic topic: The topic which triggered the
+                                             event.
+    :param bool is_new: True if the topic is new, False if it is an edit.
     """
 
 
@@ -122,6 +141,16 @@ def flaskbb_form_new_post_save(form):
     :param form: The form object.
     :param post: The post object.
     """
+
+
+@spec
+def flaskbb_form_new_topic(form):
+    """ """
+
+
+@spec
+def flaskbb_form_new_topic_save(form):
+    """ """
 
 
 # Template Hooks
@@ -355,6 +384,24 @@ def flaskbb_tpl_form_new_post_before(form):
 def flaskbb_tpl_form_new_post_after(form):
     """Hook for inserting a new form field after the last field is
     rendered (but before the submit field).
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_new_topic_before(form):
+    """Hook for inserting a new form field before the first field is
+    rendered (but before the CSRF token).
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_new_topic_after(form):
+    """Hook for inserting a new form field after the last field is
+    rendered (but before the submit button).
 
     :param form: The form object.
     """

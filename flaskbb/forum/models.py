@@ -201,14 +201,14 @@ class Post(HideableCRUDMixin, db.Model):
         :param user: The user who has created the post
         :param topic: The topic in which the post was created
         """
-        current_app.pluggy.hook.flaskbb_event_before_post(post=self)
+        current_app.pluggy.hook.flaskbb_event_post_save_before(post=self)
 
         # update/edit the post
         if self.id:
             db.session.add(self)
             db.session.commit()
-            current_app.pluggy.hook.flaskbb_event_after_post(post=self,
-                                                             is_new=False)
+            current_app.pluggy.hook.flaskbb_event_post_save_after(post=self,
+                                                                  is_new=False)
             return self
 
         # Adding a new post
@@ -238,8 +238,8 @@ class Post(HideableCRUDMixin, db.Model):
             # And commit it!
             db.session.add(topic)
             db.session.commit()
-            current_app.pluggy.hook.flaskbb_event_after_post(post=self,
-                                                             is_new=True)
+            current_app.pluggy.hook.flaskbb_event_post_save_after(post=self,
+                                                                  is_new=True)
             return self
 
     def delete(self):
@@ -633,11 +633,15 @@ class Topic(HideableCRUDMixin, db.Model):
         :param forum: The forum where the topic is stored
         :param post: The post object which is connected to the topic
         """
+        current_app.pluggy.hook.flaskbb_event_topic_save_before(topic=self)
 
         # Updates the topic
         if self.id:
             db.session.add(self)
             db.session.commit()
+            current_app.pluggy.hook.flaskbb_event_topic_save_after(
+                topic=self, is_new=False
+            )
             return self
 
         # Set the forum and user id
@@ -661,6 +665,9 @@ class Topic(HideableCRUDMixin, db.Model):
         # Update the topic count
         forum.topic_count += 1
         db.session.commit()
+
+        current_app.pluggy.hook.flaskbb_event_topic_save_after(topic=self,
+                                                               is_new=True)
         return self
 
     def delete(self, users=None):

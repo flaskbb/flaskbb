@@ -30,9 +30,15 @@
                     <div class="form-group">
                         <div class="col-md-12 col-sm-12 col-xs-12">
                             <div class="editor-box">
+
+                                {{ run_hook("flaskbb_tpl_form_new_topic_before", form=form) }}
+
                                 <div class="editor">
                                     {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                                 </div>
+
+                                {{ run_hook("flaskbb_tpl_form_new_topic_after", form=form) }}
+
                                 <div class="editor-submit">
                                     {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                                 </div>
