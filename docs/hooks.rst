@@ -99,6 +99,8 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_profile_sidebar_stats
 .. autofunction:: flaskbb_tpl_post_author_info_before
 .. autofunction:: flaskbb_tpl_post_author_info_after
+.. autofunction:: flaskbb_tpl_post_content_before
+.. autofunction:: flaskbb_tpl_post_content_after
 .. autofunction:: flaskbb_tpl_post_menu_before
 .. autofunction:: flaskbb_tpl_post_menu_after
 .. autofunction:: flaskbb_tpl_topic_controls

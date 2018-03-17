@@ -91,7 +91,13 @@
                                 {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at, '%b %d %Y'))}}
                             </div>
                             {% endif %}
+
+                        {{ run_hook("flaskbb_tpl_post_content_before", post=post) }}
+
                         {{ post.content|markup }}
+
+                        {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
+
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
                         <div class="post-signature hidden-xs">

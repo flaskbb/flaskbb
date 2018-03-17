@@ -116,7 +116,7 @@ def flaskbb_event_topic_save_after(topic, is_new):
 # Form hooks
 @spec
 def flaskbb_form_new_post(form):
-    """Hook for modyfing the ReplyForm.
+    """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     For example::
 
@@ -126,13 +126,13 @@ def flaskbb_form_new_post(form):
                 DataRequired(message="This field is required"),
                 Length(min=3, max=50)])
 
-    :param form: The ``ReplyForm`` class.
+    :param form: The :class:`~flaskbb.forum.forms.ReplyForm` class.
     """
 
 
 @spec
 def flaskbb_form_new_post_save(form):
-    """Hook for modyfing the ReplyForm.
+    """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     This hook is called while populating the post object with
     the data from the form. The post object will be saved after the hook
@@ -145,12 +145,23 @@ def flaskbb_form_new_post_save(form):
 
 @spec
 def flaskbb_form_new_topic(form):
-    """ """
+    """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`
+
+    :param form: The :class:`~flaskbb.forum.forms.NewTopicForm` class.
+    """
 
 
 @spec
-def flaskbb_form_new_topic_save(form):
-    """ """
+def flaskbb_form_new_topic_save(form, topic):
+    """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`.
+
+    This hook is called while populating the topic object with
+    the data from the form. The topic object will be saved after the hook
+    call.
+
+    :param form: The form object.
+    :param topic: The topic object.
+    """
 
 
 # Template Hooks
@@ -322,6 +333,22 @@ def flaskbb_tpl_post_author_info_after(user, post):
 
     :param user: The user object of the post's author.
     :param post: The post object.
+    """
+
+
+@spec
+def flaskbb_tpl_post_content_before(post):
+    """Hook to do some stuff before the post content is rendered.
+
+    :param post: The current post object.
+    """
+
+
+@spec
+def flaskbb_tpl_post_content_after(post):
+    """Hook to do some stuff after the post content is rendered.
+
+    :param post: The current post object.
     """
 
 
