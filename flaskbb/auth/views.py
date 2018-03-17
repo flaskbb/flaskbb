@@ -219,6 +219,10 @@ class ResetPassword(MethodView):
                 return redirect(url_for("auth.forgot_password"))
 
             if user:
+                if user.email != form.email.data:
+                    form.email.errors = [_("Wrong email")]
+                    form.token.data = token
+                    return render_template("auth/reset_password.html", form=form)
                 user.password = form.password.data
                 user.save()
                 flash(_("Your password has been updated."), "success")
