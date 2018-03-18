@@ -67,14 +67,14 @@ class UserValidator(ABC):
 
 
 class RegistrationService(object):
-    def __init__(self, validators_factory, user_repo):
-        self.validators_factory = validators_factory
+    def __init__(self, validators, user_repo):
+        self.validators = validators
         self.user_repo = user_repo
 
     def register(self, user_info):
         failures = []
 
-        for v in self.validators_factory():
+        for v in self.validators:
             try:
                 v(user_info)
             except UserRegistrationError as e:

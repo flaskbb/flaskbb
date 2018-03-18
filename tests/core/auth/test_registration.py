@@ -1,4 +1,5 @@
 import pytest
+
 from flaskbb.core.auth import registration
 from flaskbb.core.user.repo import UserRepository
 
@@ -12,8 +13,7 @@ class RaisingValidator(registration.UserValidator):
 def test_doesnt_register_user_if_validator_fails_with_UserRegistrationError(
         mocker):
     repo = mocker.Mock(UserRepository)
-    service = registration.RegistrationService(lambda: [RaisingValidator()],
-                                               repo)
+    service = registration.RegistrationService([RaisingValidator()], repo)
 
     with pytest.raises(registration.StopRegistration):
         service.register(
@@ -30,7 +30,7 @@ def test_doesnt_register_user_if_validator_fails_with_UserRegistrationError(
 def test_gathers_up_all_errors_during_registration(mocker):
     repo = mocker.Mock(UserRepository)
     service = registration.RegistrationService(
-        lambda: [RaisingValidator(), RaisingValidator()], repo)
+        [RaisingValidator(), RaisingValidator()], repo)
 
     with pytest.raises(registration.StopRegistration) as excinfo:
         service.register(
@@ -49,7 +49,7 @@ def test_gathers_up_all_errors_during_registration(mocker):
 
 def test_registers_user_if_no_errors_occurs(mocker):
     repo = mocker.Mock(UserRepository)
-    service = registration.RegistrationService(lambda: [], repo)
+    service = registration.RegistrationService([], repo)
     user_info = registration.UserRegistrationInfo(
         username='fred',
         password='lol',

@@ -110,8 +110,8 @@ class Reauth(MethodView):
 class Register(MethodView):
     decorators = [anonymous_required, registration_enabled]
 
-    def __init__(self, registration_service):
-        self.registration_service = registration_service
+    def __init__(self, registration_service_factory):
+        self.registration_service_factory = registration_service_factory
 
     def form(self):
         form = RegisterForm()
@@ -135,8 +135,9 @@ class Register(MethodView):
                 language=form.language.data
             )
 
+            service = self.registration_service_factory()
             try:
-                self.registration_service.register(registration_info)
+                service.register(registration_info)
             except StopRegistration as e:
                 form.populate_errors(e.reasons)
                 return render_template("auth/register.html", form=form)
@@ -362,7 +363,7 @@ def flaskbb_load_blueprints(app):
             "errors/too_many_logins.html", timeout=error.description
         )
 
-    def validators_factory():
+    def registration_service_factory():
         with app.app_context():
             requirements = services.UsernameRequirements(
                 min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],
@@ -373,13 +374,13 @@ def flaskbb_load_blueprints(app):
                 ]
             )
 
-        return [
+        validators = [
             services.EmailUniquenessValidator(User),
             services.UsernameUniquenessValidator(User),
             services.UsernameValidator(requirements)
         ]
 
-    service = RegistrationService(validators_factory, UserRepository(db))
+        return RegistrationService(validators, UserRepository(db))
 
     # Activate rate limiting on the whole blueprint
     limiter.limit(
@@ -392,7 +393,10 @@ def flaskbb_load_blueprints(app):
     register_view(
         auth,
         routes=['/register'],
-        view_func=Register.as_view('register', registration_service=service)
+        view_func=Register.as_view(
+            'register',
+            registration_service=registration_service_factory
+        )
     )
     register_view(
         auth,
