@@ -17,6 +17,7 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
+
 from flaskbb.auth.forms import (AccountActivationForm, ForgotPasswordForm,
                                 LoginForm, LoginRecaptchaForm, ReauthForm,
                                 RegisterForm, RequestActivationForm,
@@ -33,10 +34,10 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
 
-from . import services
+from .services import registration
 from ..core.auth.password import ResetPasswordService
 from ..core.auth.registration import (RegistrationService, StopRegistration,
-                                  UserRegistrationInfo)
+                                      UserRegistrationInfo)
 from ..core.tokens import StopTokenVerification, TokenError
 from ..tokens import FlaskBBTokenSerializer
 from ..tokens.verifiers import EmailMatchesUserToken
@@ -365,19 +366,21 @@ def flaskbb_load_blueprints(app):
 
     def registration_service_factory():
         with app.app_context():
-            requirements = services.UsernameRequirements(
+            blacklist = [
+                w.strip()
+                for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
+            ]
+
+            requirements = registration.UsernameRequirements(
                 min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],
                 max=flaskbb_config["AUTH_USERNAME_MAX_LENGTH"],
-                blacklist=[
-                    w.strip()
-                    for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
-                ]
+                blacklist=blacklist
             )
 
         validators = [
-            services.EmailUniquenessValidator(User),
-            services.UsernameUniquenessValidator(User),
-            services.UsernameValidator(requirements)
+            registration.EmailUniquenessValidator(User),
+            registration.UsernameUniquenessValidator(User),
+            registration.UsernameValidator(requirements)
         ]
 
         return RegistrationService(validators, UserRepository(db))
@@ -395,7 +398,7 @@ def flaskbb_load_blueprints(app):
         routes=['/register'],
         view_func=Register.as_view(
             'register',
-            registration_service=registration_service_factory
+            registration_service_factory=registration_service_factory
         )
     )
     register_view(

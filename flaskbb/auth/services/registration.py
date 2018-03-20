@@ -14,10 +14,11 @@ from collections import namedtuple
 from sqlalchemy import func
 
 from ...core.auth.registration import UserRegistrationError, UserValidator
-from ...core.tokens import TokenVerifier, TokenVerificationError
 
-__all__ = ("UsernameRequirements", "UsernameValidator",
-           "EmailUniquenessValidator", "UsernameUniquenessValidator")
+__all__ = (
+    "UsernameRequirements", "UsernameValidator", "EmailUniquenessValidator",
+    "UsernameUniquenessValidator"
+)
 
 UsernameRequirements = namedtuple(
     'UsernameRequirements', ['min', 'max', 'blacklist']
@@ -39,7 +40,8 @@ class UsernameValidator(UserValidator):
                 )
             )
 
-        if user_info.username in self._requirements.blacklist:  # pragma: no branch
+        is_blacklisted = user_info.username in self._requirements.blacklist
+        if is_blacklisted:  # pragma: no branch
             raise UserRegistrationError(
                 'username',
                 '{} is a forbidden username'.format(user_info.username)

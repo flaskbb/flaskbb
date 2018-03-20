@@ -9,11 +9,12 @@
     :license: BSD, see LICENSE for more details
 """
 
-from ..tokens import (StopTokenVerification, Token, TokenActions, TokenError,
+from ..tokens import (StopTokenVerification, TokenActions, TokenError,
                       TokenVerificationError)
 
 
 class ResetPasswordService(object):
+
     def __init__(self, token_serializer, users, token_verifiers):
         self.token_serializer = token_serializer
         self.users = users
