@@ -1,6 +1,5 @@
 from flask import current_app
 from babel.support import Translations
-from flaskbb.utils.translations import FlaskBBDomain
 
 
 def test_flaskbbdomain_translations(default_settings):

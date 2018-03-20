@@ -10,20 +10,21 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from flask import Blueprint, flash, g, redirect, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
+
 from flaskbb.auth.forms import (AccountActivationForm, ForgotPasswordForm,
                                 LoginForm, LoginRecaptchaForm, ReauthForm,
                                 RegisterForm, RequestActivationForm,
                                 ResetPasswordForm)
 from flaskbb.email import send_activation_token, send_reset_token
 from flaskbb.exceptions import AuthenticationError
-from flaskbb.extensions import limiter
+from flaskbb.extensions import db, limiter
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    format_timedelta, get_available_languages,
@@ -32,31 +33,18 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
-from pluggy import HookimplMarker
 
-impl = HookimplMarker('flaskbb')
+from .services import registration
+from ..core.auth.password import ResetPasswordService
+from ..core.auth.registration import (RegistrationService, UserRegistrationInfo)
+from ..core.exceptions import ValidationError, StopValidation
+from ..core.tokens import TokenError
+from ..tokens import FlaskBBTokenSerializer
+from ..tokens.verifiers import EmailMatchesUserToken
+from ..user.repo import UserRepository
+from .plugins import impl
 
 logger = logging.getLogger(__name__)
-
-
-def login_rate_limit():
-    """Dynamically load the rate limiting config from the database."""
-    # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
-    return "{count}/{timeout}minutes".format(
-        count=flaskbb_config["AUTH_REQUESTS"],
-        timeout=flaskbb_config["AUTH_TIMEOUT"]
-    )
-
-
-def login_rate_limit_message():
-    """Display the amount of time left until the user can access the requested
-    resource again."""
-    current_limit = getattr(g, 'view_rate_limit', None)
-    if current_limit is not None:
-        window_stats = limiter.limiter.get_window_stats(*current_limit)
-        reset_time = datetime.utcfromtimestamp(window_stats[0])
-        timeout = reset_time - datetime.utcnow()
-    return "{timeout}".format(timeout=format_timedelta(timeout))
 
 
 class Logout(MethodView):
@@ -123,6 +111,9 @@ class Reauth(MethodView):
 class Register(MethodView):
     decorators = [anonymous_required, registration_enabled]
 
+    def __init__(self, registration_service_factory):
+        self.registration_service_factory = registration_service_factory
+
     def form(self):
         form = RegisterForm()
 
@@ -137,30 +128,37 @@ class Register(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            user = form.save()
+            registration_info = UserRegistrationInfo(
+                username=form.username.data,
+                password=form.password.data,
+                group=4,
+                email=form.email.data,
+                language=form.language.data
+            )
 
-            if flaskbb_config["ACTIVATE_ACCOUNT"]:
-                # Any call to an expired model requires a database hit, so
-                # accessing user.id would cause an DetachedInstanceError.
-                # This happens because the `user`'s session does no longer
-                # exist. So we just fire up another query to make sure that
-                # the session for the newly created user is fresh.
-                # PS: `db.session.merge(user)` did not work for me.
-                user = User.query.filter_by(email=user.email).first()
-                send_activation_token.delay(
-                    user_id=user.id, username=user.username, email=user.email
-                )
-                flash(
-                    _(
-                        "An account activation email has been sent to "
-                        "%(email)s",
-                        email=user.email
-                    ), "success"
-                )
+            service = self.registration_service_factory()
+            try:
+                service.register(registration_info)
+            except StopValidation as e:
+                form.populate_errors(e.reasons)
+                return render_template("auth/register.html", form=form)
+
             else:
-                login_user(user)
-                flash(_("Thanks for registering."), "success")
+                try:
+                    db.session.commit()
+                except Exception:  # noqa
+                    logger.exception("Uh that looks bad...")
+                    flash(
+                        _(
+                            "Could not process registration due to an unrecoverable error"
+                        ), "danger"
+                    )
 
+                    return render_template("auth/register.html", form=form)
+
+            current_app.pluggy.hook.flaskbb_user_registered(
+                username=registration_info.username
+            )
             return redirect_or_next(url_for('forum.index'))
 
         return render_template("auth/register.html", form=form)
@@ -198,6 +196,9 @@ class ResetPassword(MethodView):
     decorators = [anonymous_required]
     form = ResetPasswordForm
 
+    def __init__(self, password_reset_service_factory):
+        self.password_reset_service_factory = password_reset_service_factory
+
     def get(self, token):
         form = self.form()
         form.token.data = token
@@ -206,27 +207,28 @@ class ResetPassword(MethodView):
     def post(self, token):
         form = self.form()
         if form.validate_on_submit():
-            expired, invalid, user = get_token_status(
-                form.token.data, "reset_password"
-            )
+            try:
+                service = self.password_reset_service_factory()
+                service.reset_password(
+                    token,
+                    form.email.data,
+                    form.password.data
+                )
+                db.session.commit()
+            except TokenError as e:
+                flash(_(e.reason), 'danger')
+                return redirect(url_for('auth.forgot_password'))
+            except StopValidation as e:
+                form.populate_errors(e.reasons)
+                form.token.data = token
+                return render_template("auth/reset_password.html", form=form)
+            except Exception:
+                logger.exception("Error when resetting password")
+                flash(_('Error when resetting password'))
+                return redirect(url_for('auth.forgot_password'))
 
-            if invalid:
-                flash(_("Your password token is invalid."), "danger")
-                return redirect(url_for("auth.forgot_password"))
-
-            if expired:
-                flash(_("Your password token is expired."), "danger")
-                return redirect(url_for("auth.forgot_password"))
-
-            if user:
-                if user.email != form.email.data:
-                    form.email.errors = [_("Wrong email")]
-                    form.token.data = token
-                    return render_template("auth/reset_password.html", form=form)
-                user.password = form.password.data
-                user.save()
-                flash(_("Your password has been updated."), "success")
-                return redirect(url_for("auth.login"))
+            flash(_("Your password has been updated."), "success")
+            return redirect(url_for("auth.login"))
 
         form.token.data = token
         return render_template("auth/reset_password.html", form=form)
@@ -329,6 +331,24 @@ class ActivateAccount(MethodView):
 def flaskbb_load_blueprints(app):
     auth = Blueprint("auth", __name__)
 
+    def login_rate_limit():
+        """Dynamically load the rate limiting config from the database."""
+        # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
+        return "{count}/{timeout}minutes".format(
+            count=flaskbb_config["AUTH_REQUESTS"],
+            timeout=flaskbb_config["AUTH_TIMEOUT"]
+        )
+
+    def login_rate_limit_message():
+        """Display the amount of time left until the user can access the requested
+        resource again."""
+        current_limit = getattr(g, 'view_rate_limit', None)
+        if current_limit is not None:
+            window_stats = limiter.limiter.get_window_stats(*current_limit)
+            reset_time = datetime.utcfromtimestamp(window_stats[0])
+            timeout = reset_time - datetime.utcnow()
+        return "{timeout}".format(timeout=format_timedelta(timeout))
+
     @auth.before_request
     def check_rate_limiting():
         """Check the the rate limits for each request for this blueprint."""
@@ -344,6 +364,27 @@ def flaskbb_load_blueprints(app):
             "errors/too_many_logins.html", timeout=error.description
         )
 
+    def registration_service_factory():
+        with app.app_context():
+            blacklist = [
+                w.strip()
+                for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
+            ]
+
+            requirements = registration.UsernameRequirements(
+                min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],
+                max=flaskbb_config["AUTH_USERNAME_MAX_LENGTH"],
+                blacklist=blacklist
+            )
+
+        validators = [
+            registration.EmailUniquenessValidator(User),
+            registration.UsernameUniquenessValidator(User),
+            registration.UsernameValidator(requirements)
+        ]
+
+        return RegistrationService(validators, UserRepository(db))
+
     # Activate rate limiting on the whole blueprint
     limiter.limit(
         login_rate_limit, error_message=login_rate_limit_message
@@ -353,17 +394,40 @@ def flaskbb_load_blueprints(app):
     register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
     register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
     register_view(
-        auth, routes=['/register'], view_func=Register.as_view('register')
+        auth,
+        routes=['/register'],
+        view_func=Register.as_view(
+            'register',
+            registration_service_factory=registration_service_factory
+        )
     )
     register_view(
         auth,
         routes=['/reset-password'],
         view_func=ForgotPassword.as_view('forgot_password')
     )
+
+    def reset_service_factory():
+        token_serializer = FlaskBBTokenSerializer(
+            app.config['SECRET_KEY'],
+            expiry=timedelta(hours=1)
+        )
+        verifiers = [
+            EmailMatchesUserToken(User)
+        ]
+        return ResetPasswordService(
+            token_serializer,
+            User,
+            token_verifiers=verifiers
+        )
+
     register_view(
         auth,
         routes=['/reset-password/<token>'],
-        view_func=ResetPassword.as_view('reset_password')
+        view_func=ResetPassword.as_view(
+            'reset_password',
+            password_reset_service_factory=reset_service_factory
+        )
     )
     register_view(
         auth,

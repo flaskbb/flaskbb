@@ -7,16 +7,19 @@ import sys
 
 PY2 = sys.version_info[0] == 2
 
-if not PY2:     # pragma: no cover
+if not PY2:  # pragma: no cover
+    from abc import ABC
     text_type = str
-    string_types = (str,)
+    string_types = (str, )
     integer_types = (int, )
     intern_method = sys.intern
     range_method = range
     iterkeys = lambda d: iter(d.keys())
     itervalues = lambda d: iter(d.values())
     iteritems = lambda d: iter(d.items())
-else:           # pragma: no cover
+else:  # pragma: no cover
+    from abc import ABCMeta
+    ABC = ABCMeta('ABC', (object, ), {})
     text_type = unicode
     string_types = (str, unicode)
     integer_types = (int, long)
