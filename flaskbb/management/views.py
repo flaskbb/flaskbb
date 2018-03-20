@@ -101,7 +101,7 @@ class ManagementSettings(MethodView):
         form, old_settings, plugin_obj, active_nav = \
             self._determine_active_settings(slug, plugin)
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(ab.and_(
+        all_plugins = PluginRegistry.query.filter(db.and_(
             PluginRegistry.values != None,
             PluginRegistry.enabled == True
         )).all()
