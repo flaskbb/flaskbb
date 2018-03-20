@@ -36,9 +36,9 @@ from flaskbb.utils.tokens import get_token_status
 
 from .services import registration
 from ..core.auth.password import ResetPasswordService
-from ..core.auth.registration import (RegistrationService, StopRegistration,
-                                      UserRegistrationInfo)
-from ..core.tokens import StopTokenVerification, TokenError
+from ..core.auth.registration import (RegistrationService, UserRegistrationInfo)
+from ..core.exceptions import ValidationError, StopValidation
+from ..core.tokens import TokenError
 from ..tokens import FlaskBBTokenSerializer
 from ..tokens.verifiers import EmailMatchesUserToken
 from ..user.repo import UserRepository
@@ -139,7 +139,7 @@ class Register(MethodView):
             service = self.registration_service_factory()
             try:
                 service.register(registration_info)
-            except StopRegistration as e:
+            except StopValidation as e:
                 form.populate_errors(e.reasons)
                 return render_template("auth/register.html", form=form)
 
@@ -218,7 +218,7 @@ class ResetPassword(MethodView):
             except TokenError as e:
                 flash(_(e.reason), 'danger')
                 return redirect(url_for('auth.forgot_password'))
-            except StopTokenVerification as e:
+            except StopValidation as e:
                 form.populate_errors(e.reasons)
                 form.token.data = token
                 return render_template("auth/reset_password.html", form=form)

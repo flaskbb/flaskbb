@@ -3,20 +3,20 @@ from flaskbb.auth.services.registration import (EmailUniquenessValidator,
                                                 UsernameRequirements,
                                                 UsernameUniquenessValidator,
                                                 UsernameValidator)
-from flaskbb.core.auth.registration import (UserRegistrationError,
-                                            UserRegistrationInfo)
+from flaskbb.core.auth.registration import UserRegistrationInfo
+from flaskbb.core.exceptions import ValidationError
 from flaskbb.user.models import User
 
 
 def test_raises_if_username_too_short():
-    requirements = UsernameRequirements(
-        min=4, max=100, blacklist=set())
+    requirements = UsernameRequirements(min=4, max=100, blacklist=set())
     validator = UsernameValidator(requirements)
 
     registration = UserRegistrationInfo(
-        username='no', password='no', email='no@no.no', group=4, language='no')
+        username='no', password='no', email='no@no.no', group=4, language='no'
+    )
 
-    with pytest.raises(UserRegistrationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         validator(registration)
 
     assert excinfo.value.attribute == 'username'
@@ -24,14 +24,14 @@ def test_raises_if_username_too_short():
 
 
 def test_raises_if_username_too_long():
-    requirements = UsernameRequirements(
-        min=0, max=1, blacklist=set())
+    requirements = UsernameRequirements(min=0, max=1, blacklist=set())
     validator = UsernameValidator(requirements)
 
     registration = UserRegistrationInfo(
-        username='no', password='no', email='no@no.no', group=4, language='no')
+        username='no', password='no', email='no@no.no', group=4, language='no'
+    )
 
-    with pytest.raises(UserRegistrationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         validator(registration)
 
     assert excinfo.value.attribute == 'username'
@@ -39,14 +39,14 @@ def test_raises_if_username_too_long():
 
 
 def test_raises_if_username_in_blacklist():
-    requirements = UsernameRequirements(
-        min=1, max=100, blacklist=set(['no']))
+    requirements = UsernameRequirements(min=1, max=100, blacklist=set(['no']))
     validator = UsernameValidator(requirements)
 
     registration = UserRegistrationInfo(
-        username='no', password='no', email='no@no.no', group=4, language='no')
+        username='no', password='no', email='no@no.no', group=4, language='no'
+    )
 
-    with pytest.raises(UserRegistrationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         validator(registration)
 
     assert excinfo.value.attribute == 'username'
@@ -61,9 +61,10 @@ def test_raises_if_user_already_registered(Fred):
         email='fred@fred.fred',
         language='fred',
         group=4,
-        password='fred')
+        password='fred'
+    )
 
-    with pytest.raises(UserRegistrationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         validator(registration)
 
     assert excinfo.value.attribute == 'username'
@@ -77,9 +78,10 @@ def test_raises_if_user_email_already_registered(Fred):
         email='fred@fred.fred',
         language='fred',
         group=4,
-        password='fred')
+        password='fred'
+    )
 
-    with pytest.raises(UserRegistrationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         validator(registration)
 
     assert excinfo.value.attribute == 'email'

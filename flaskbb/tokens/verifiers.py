@@ -8,7 +8,8 @@
     :license: BSD, see LICENSE for more details
 """
 
-from ..core.tokens import TokenVerifier, TokenVerificationError
+from ..core.tokens import TokenVerifier
+from ..core.exceptions import ValidationError
 
 
 class EmailMatchesUserToken(TokenVerifier):
@@ -24,4 +25,4 @@ class EmailMatchesUserToken(TokenVerifier):
     def verify_token(self, token, email, **kwargs):
         user = self.users.query.get(token.user_id)
         if user.email.lower() != email.lower():
-            raise TokenVerificationError("email", "Wrong email")
+            raise ValidationError("email", "Wrong email")

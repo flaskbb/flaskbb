@@ -8,15 +8,12 @@
     :license: BSD, see LICENSE for more details
 """
 from werkzeug.exceptions import HTTPException, Forbidden
+from .core.exceptions import BaseFlaskBBError
 
-
-class BaseFlaskBBError(Exception):
-    "Root exception for FlaskBB"
-    description = "An internal error has occured"
 
 
 class FlaskBBHTTPError(BaseFlaskBBError, HTTPException):
-    pass
+    description = "An internal error has occured"
 
 
 FlaskBBError = FlaskBBHTTPError

@@ -9,8 +9,8 @@
     :license: BSD, see LICENSE for more details
 """
 
-from ..tokens import (StopTokenVerification, TokenActions, TokenError,
-                      TokenVerificationError)
+from ..exceptions import StopValidation, ValidationError
+from ..tokens import TokenActions, TokenError
 
 
 class ResetPasswordService(object):
@@ -26,11 +26,11 @@ class ResetPasswordService(object):
         for verifier in self.token_verifiers:
             try:
                 verifier(token, email=email)
-            except TokenVerificationError as e:
+            except ValidationError as e:
                 errors.append((e.attribute, e.reason))
 
         if errors:
-            raise StopTokenVerification(errors)
+            raise StopValidation(errors)
 
     def reset_password(self, token, email, new_password):
         token = self.token_serializer.loads(token)

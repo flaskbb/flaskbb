@@ -1,6 +1,7 @@
 import pytest
 
-from flaskbb.core.tokens import Token, TokenActions, TokenVerificationError
+from flaskbb.core.tokens import Token, TokenActions
+from flaskbb.core.exceptions import ValidationError
 from flaskbb.tokens import verifiers
 from flaskbb.user.models import User
 
@@ -9,7 +10,7 @@ def test_raises_if_email_doesnt_match_token_user(Fred):
     verifier = verifiers.EmailMatchesUserToken(User)
     token = Token(user_id=1, operation=TokenActions.RESET_PASSWORD)
 
-    with pytest.raises(TokenVerificationError) as excinfo:
+    with pytest.raises(ValidationError) as excinfo:
         verifier(token, email="not really")
 
     assert excinfo.value.attribute == "email"

@@ -14,8 +14,7 @@ from abc import abstractmethod
 import attr
 
 from .._compat import ABC
-from ..exceptions import BaseFlaskBBError
-
+from .exceptions import BaseFlaskBBError
 
 class TokenError(BaseFlaskBBError):
     """
@@ -41,35 +40,6 @@ class TokenError(BaseFlaskBBError):
     @classmethod  # pragma: no cover
     def bad(cls):
         return cls('Token cannot be processed')
-
-
-class TokenVerificationError(BaseFlaskBBError):
-    """
-    Raised from token verifiers in order to signal an error.
-
-    This is not an exception representing an invalid token
-    because it is malformed, expired, etc. This is used
-    for issues such as the token's user doesn't match
-    other information provided.
-    """
-    def __init__(self, attribute, reason):
-        self.reason = reason
-        self.attribute = attribute
-        super(TokenVerificationError, self).__init__((attribute, reason))
-
-
-class StopTokenVerification(BaseFlaskBBError):
-    """
-    Raised from services using token verifies to signal all
-    errors associated with verifiying a token.
-
-    Alternatively, can be raised from a token verifier
-    to halt all further validation and immediately
-    signify a major error.
-    """
-    def __init__(self, reasons):
-        self.reasons = reasons
-        super(StopTokenVerification, self).__init__(reasons)
 
 
 # holder for token actions
@@ -109,6 +79,9 @@ class TokenVerifier(ABC):
     Used to verify the validatity of tokens post
     deserialization, such as an email matching the
     user id in the provided token.
+
+    Should raise a flaskbb.core.exceptions.ValidationError
+    if verification fails.
     """
     @abstractmethod
     def verify_token(self, token, **kwargs):
