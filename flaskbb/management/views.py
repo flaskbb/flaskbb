@@ -83,9 +83,10 @@ class ManagementSettings(MethodView):
 
         # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(
-            PluginRegistry.values != None
-        ).all()
+        all_plugins = PluginRegistry.query.filter(db.and_(
+            PluginRegistry.values != None,
+            PluginRegistry.enabled == True
+        )).all()
         form = populate_settings_form(form, old_settings)
 
         return render_template(
@@ -100,7 +101,10 @@ class ManagementSettings(MethodView):
         form, old_settings, plugin_obj, active_nav = \
             self._determine_active_settings(slug, plugin)
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.all()
+        all_plugins = PluginRegistry.query.filter(db.and_(
+            PluginRegistry.values != None,
+            PluginRegistry.enabled == True
+        )).all()
 
         if form.validate_on_submit():
             new_settings = populate_settings_dict(form, old_settings)
