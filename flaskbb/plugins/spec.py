@@ -32,22 +32,34 @@ def flaskbb_load_migrations():
 
 @spec
 def flaskbb_load_blueprints(app):
-    """Hook for registering blueprints."""
+    """Hook for registering blueprints.
+
+    :param app: The application object.
+    """
 
 
 @spec
 def flaskbb_request_processors(app):
-    """Hook for registering pre/post request processors."""
+    """Hook for registering pre/post request processors.
+
+    :param app: The application object.
+    """
 
 
 @spec
 def flaskbb_errorhandlers(app):
-    """Hook for registering error handlers."""
+    """Hook for registering error handlers.
+
+    :param app: The application object.
+    """
 
 
 @spec
 def flaskbb_jinja_directives(app):
-    """Hook for registering jinja filters, context processors, etc."""
+    """Hook for registering jinja filters, context processors, etc.
+
+    :param app: The application object.
+    """
 
 
 @spec
@@ -60,12 +72,29 @@ def flaskbb_additional_setup(app, pluggy):
         @impl
         def flaskbb_additional_setup(app):
             app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    :param app: The application object.
+    :param pluggy: The pluggy object.
     """
 
 
 @spec
-def flaskbb_cli(cli):
-    """Hook for registering CLI commands."""
+def flaskbb_cli(cli, app):
+    """Hook for registering CLI commands.
+
+    For example::
+
+        @impl
+        def flaskbb_cli(cli):
+            @cli.command()
+            def testplugin():
+                click.echo("Hello Testplugin")
+
+            return testplugin
+
+    :param app: The application object.
+    :param cli: The FlaskBBGroup CLI object.
+    """
 
 
 @spec
@@ -285,7 +314,7 @@ def flaskbb_tpl_admin_settings_menu(user):
 
     For example::
 
-        @impl(hookwrapper=True, tryfirst=True)
+        @impl(trylast=True)
         def flaskbb_tpl_admin_settings_menu():
             # only add this item if the user is an admin
             if Permission(IsAdmin, identity=current_user):
@@ -297,6 +326,8 @@ def flaskbb_tpl_admin_settings_menu(user):
     supplies its own hookwrapper to flatten all the lists into a single list.
 
     in :file:`templates/management/management_layout.html`
+
+    :param user: The current user object.
     """
 
 
@@ -340,6 +371,8 @@ def flaskbb_tpl_post_author_info_after(user, post):
 def flaskbb_tpl_post_content_before(post):
     """Hook to do some stuff before the post content is rendered.
 
+    in :file:`templates/forum/topic.html`
+
     :param post: The current post object.
     """
 
@@ -347,6 +380,8 @@ def flaskbb_tpl_post_content_before(post):
 @spec
 def flaskbb_tpl_post_content_after(post):
     """Hook to do some stuff after the post content is rendered.
+
+    in :file:`templates/forum/topic.html`
 
     :param post: The current post object.
     """
@@ -356,6 +391,8 @@ def flaskbb_tpl_post_content_after(post):
 def flaskbb_tpl_post_menu_before(post):
     """Hook for inserting a new item at the beginning of the post menu.
 
+    in :file:`templates/forum/topic.html`
+
     :param post: The current post object.
     """
 
@@ -364,6 +401,8 @@ def flaskbb_tpl_post_menu_before(post):
 def flaskbb_tpl_post_menu_after(post):
     """Hook for inserting a new item at the end of the post menu.
 
+    in :file:`templates/forum/topic.html`
+
     :param post: The current post object.
     """
 
@@ -371,6 +410,8 @@ def flaskbb_tpl_post_menu_after(post):
 @spec
 def flaskbb_tpl_topic_controls(topic):
     """Hook for inserting additional topic moderation controls.
+
+    in :file:`templates/forum/topic_controls.html`
 
     :param topic: The current topic object.
     """
@@ -412,6 +453,8 @@ def flaskbb_tpl_form_new_post_after(form):
     """Hook for inserting a new form field after the last field is
     rendered (but before the submit field).
 
+    in :file:`templates/forum/new_post.html`
+
     :param form: The form object.
     """
 
@@ -421,6 +464,8 @@ def flaskbb_tpl_form_new_topic_before(form):
     """Hook for inserting a new form field before the first field is
     rendered (but before the CSRF token).
 
+    in :file:`templates/forum/new_topic.html`
+
     :param form: The form object.
     """
 
@@ -429,6 +474,8 @@ def flaskbb_tpl_form_new_topic_before(form):
 def flaskbb_tpl_form_new_topic_after(form):
     """Hook for inserting a new form field after the last field is
     rendered (but before the submit button).
+
+    in :file:`templates/forum/new_topic.html`
 
     :param form: The form object.
     """
