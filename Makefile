@@ -23,7 +23,7 @@ clean:
 	find . -name '__pycache__' -exec rm -rf {} +
 
 test:
-	py.test
+	tox
 
 run:
 	flaskbb run --debugger --reload

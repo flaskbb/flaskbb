@@ -142,6 +142,11 @@ def flaskbb_event_topic_save_after(topic, is_new):
     """
 
 
+@spec
+def flaskbb_user_registered(username):
+    """Hook for handling events after a user is registered"""
+
+
 # Form hooks
 @spec
 def flaskbb_form_new_post(form):

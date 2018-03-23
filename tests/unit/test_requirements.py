@@ -60,7 +60,8 @@ def test_CanEditTopic_with_member(user, topic, request_context):
     assert r.CanEditPost(user, request)
 
 
-def test_Fred_cannot_edit_other_members_post(user, Fred, topic, request_context):
+def test_Fred_cannot_edit_other_members_post(user, Fred, topic,
+                                             request_context):
     push_onto_request_context(topic=topic)
     assert not r.CanEditPost(Fred, request)
 
@@ -70,12 +71,14 @@ def test_Fred_CannotEditLockedTopic(Fred, topic_locked, request_context):
     assert not r.CanEditPost(Fred, request)
 
 
-def test_Moderator_in_Forum_CanEditLockedTopic(moderator_user, topic_locked, request_context):
+def test_Moderator_in_Forum_CanEditLockedTopic(moderator_user, topic_locked,
+                                               request_context):
     push_onto_request_context(topic=topic_locked)
     assert r.CanEditPost(moderator_user, request)
 
 
-def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(Fred, topic_locked, default_groups, request_context):
+def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(
+        Fred, topic_locked, default_groups, request_context):
 
     Fred.primary_group = default_groups[2]
 
@@ -83,7 +86,8 @@ def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(Fred, topic_locked
     assert not r.CanEditPost(Fred, request)
 
 
-def test_Fred_cannot_reply_to_locked_topic(Fred, topic_locked, request_context):
+def test_Fred_cannot_reply_to_locked_topic(Fred, topic_locked,
+                                           request_context):
     push_onto_request_context(topic=topic_locked)
     assert not r.CanPostReply(Fred, request)
 

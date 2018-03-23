@@ -1,8 +1,17 @@
 # .coveragerc to control coverage.py
 [run]
+branch = true
+source = flaskbb
 omit =
     flaskbb/_compat.py
     flaskbb/configs/*
+parallel = true
+
+[paths]
+source =
+    flaskbb/
+    .tox/*/lib/*/site-packages/flaskbb/
+
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -22,4 +31,12 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 
+    @abstractmethod
+
 ignore_errors = True
+precision = 2
+show_missing = true
+skip_covered = true
+
+[html]
+directory = tests/htmlcov

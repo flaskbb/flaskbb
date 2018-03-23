@@ -7,12 +7,10 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - "pip install -r requirements-dev.txt"
-  - "pip install coveralls"
-  - "pip install -e ."
-# command to run tests
+  - "pip install -r requirements-travis.txt"
 script:
   - flaskbb translations compile
-  - py.test --cov=flaskbb --cov-report=term-missing tests
+  - tox
 after_success:
+  - coverage combine tests
   - coveralls
