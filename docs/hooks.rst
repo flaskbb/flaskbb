@@ -62,6 +62,7 @@ FlaskBB Event Hooks
 .. autofunction:: flaskbb_event_post_save_after
 .. autofunction:: flaskbb_event_topic_save_before
 .. autofunction:: flaskbb_event_topic_save_after
+.. autofunction:: flaskbb_event_user_registered
 
 
 FlaskBB Form Hooks

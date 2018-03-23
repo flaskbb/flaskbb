@@ -143,8 +143,11 @@ def flaskbb_event_topic_save_after(topic, is_new):
 
 
 @spec
-def flaskbb_user_registered(username):
-    """Hook for handling events after a user is registered"""
+def flaskbb_event_user_registered(username):
+    """Hook for handling events after a user is registered
+
+    :param username: The username of the newly registered user.
+    """
 
 
 # Form hooks

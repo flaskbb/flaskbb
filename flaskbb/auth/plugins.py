@@ -9,7 +9,7 @@ from ..utils.settings import flaskbb_config
 
 
 @impl
-def flaskbb_user_registered(username):
+def flaskbb_event_user_registered(username):
     user = User.query.filter_by(username=username).first()
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
