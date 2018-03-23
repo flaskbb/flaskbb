@@ -48,10 +48,30 @@ The hooks below are listed in the order they are called.
 FlaskBB CLI Hooks
 ~~~~~~~~~~~~~~~~~
 
-These are hooks are only invoked when using the ``flaskbb``
+These hooks are only invoked when using the ``flaskbb``
 CLI.
 
 .. autofunction:: flaskbb_cli
+.. autofunction:: flaskbb_shell_context
+
+
+FlaskBB Event Hooks
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: flaskbb_event_post_save_before
+.. autofunction:: flaskbb_event_post_save_after
+.. autofunction:: flaskbb_event_topic_save_before
+.. autofunction:: flaskbb_event_topic_save_after
+
+
+FlaskBB Form Hooks
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: flaskbb_form_new_post_save
+.. autofunction:: flaskbb_form_new_post
+
+.. autofunction:: flaskbb_form_new_topic
+.. autofunction:: flaskbb_form_new_topic_save
 
 
 Template Hooks
@@ -63,15 +83,25 @@ Template Hooks
     hidden CSRF token field and before an submit field.
 
 
-.. autofunction:: flaskbb_tpl_before_navigation
-.. autofunction:: flaskbb_tpl_after_navigation
-.. autofunction:: flaskbb_tpl_before_user_nav_loggedin
-.. autofunction:: flaskbb_tpl_after_user_nav_loggedin
-.. autofunction:: flaskbb_tpl_before_registration_form
-.. autofunction:: flaskbb_tpl_after_registration_form
-.. autofunction:: flaskbb_tpl_before_user_details_form
-.. autofunction:: flaskbb_tpl_after_user_details_form
+.. autofunction:: flaskbb_tpl_navigation_before
+.. autofunction:: flaskbb_tpl_navigation_after
+.. autofunction:: flaskbb_tpl_user_nav_loggedin_before
+.. autofunction:: flaskbb_tpl_user_nav_loggedin_after
+.. autofunction:: flaskbb_tpl_form_registration_before
+.. autofunction:: flaskbb_tpl_form_registration_after
+.. autofunction:: flaskbb_tpl_form_user_details_before
+.. autofunction:: flaskbb_tpl_form_user_details_after
+.. autofunction:: flaskbb_tpl_form_new_post_before
+.. autofunction:: flaskbb_tpl_form_new_post_after
+.. autofunction:: flaskbb_tpl_form_new_topic_before
+.. autofunction:: flaskbb_tpl_form_new_topic_after
 .. autofunction:: flaskbb_tpl_profile_settings_menu
 .. autofunction:: flaskbb_tpl_profile_sidebar_stats
-.. autofunction:: flaskbb_tpl_before_post_author_info
-.. autofunction:: flaskbb_tpl_after_post_author_info
+.. autofunction:: flaskbb_tpl_post_author_info_before
+.. autofunction:: flaskbb_tpl_post_author_info_after
+.. autofunction:: flaskbb_tpl_post_content_before
+.. autofunction:: flaskbb_tpl_post_content_after
+.. autofunction:: flaskbb_tpl_post_menu_before
+.. autofunction:: flaskbb_tpl_post_menu_after
+.. autofunction:: flaskbb_tpl_topic_controls
+.. autofunction:: flaskbb_tpl_admin_settings_menu

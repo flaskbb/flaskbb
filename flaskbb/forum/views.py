@@ -58,8 +58,8 @@ class ForumIndex(MethodView):
             online_users = User.query.filter(User.lastseen >= time_diff()
                                              ).count()
 
-            # Because we do not have server side sessions, we cannot check if there
-            # are online guests
+            # Because we do not have server side sessions,
+            # we cannot check if there are online guests
             online_guests = None
         else:
             online_users = len(get_online_users())
@@ -156,19 +156,22 @@ class ViewTopic(MethodView):
         # Update the topicsread status if the user hasn't read it
         forumsread = None
         if current_user.is_authenticated:
-            forumsread = ForumsRead.query.\
-                filter_by(user_id=current_user.id,
-                          forum_id=topic.forum_id).first()
+            forumsread = ForumsRead.query.filter_by(
+                user_id=current_user.id,
+                forum_id=topic.forum_id).first()
 
         topic.update_read(real(current_user), topic.forum, forumsread)
 
         # fetch the posts in the topic
-        posts = Post.query.\
-            outerjoin(User, Post.user_id == User.id).\
-            filter(Post.topic_id == topic.id).\
-            add_entity(User).\
-            order_by(Post.id.asc()).\
-            paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
+        posts = Post.query.outerjoin(
+            User, Post.user_id == User.id
+        ).filter(
+            Post.topic_id == topic.id
+        ).add_entity(
+            User
+        ).order_by(
+            Post.id.asc()
+        ).paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
 
         # Abort if there are no posts on this page
         if len(posts.items) == 0:
@@ -210,7 +213,6 @@ class ViewTopic(MethodView):
 
 class NewTopic(MethodView):
     decorators = [login_required]
-    form = NewTopicForm
 
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -237,6 +239,10 @@ class NewTopic(MethodView):
             return render_template(
                 'forum/new_topic.html', forum=forum_instance, form=form
             )
+
+    def form(self):
+        current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
+        return NewTopicForm()
 
 
 class ManageForum(MethodView):
@@ -401,10 +407,10 @@ class ManageForum(MethodView):
 
 class NewPost(MethodView):
     decorators = [allows.requires(CanPostReply), login_required]
-    form = ReplyForm
 
     def get(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
+
         return render_template(
             'forum/new_post.html', topic=topic, form=self.form()
         )
@@ -412,6 +418,7 @@ class NewPost(MethodView):
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         form = self.form()
+
         if form.validate_on_submit():
             if 'preview' in request.form:
                 return render_template(
@@ -425,6 +432,10 @@ class NewPost(MethodView):
                 return redirect(url_for('forum.view_post', post_id=post.id))
 
         return render_template('forum/new_post.html', topic=topic, form=form)
+
+    def form(self):
+        current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
+        return ReplyForm()
 
 
 class ReplyPost(MethodView):
@@ -461,11 +472,11 @@ class ReplyPost(MethodView):
 
 class EditPost(MethodView):
     decorators = [allows.requires(CanEditPost), login_required]
-    form = ReplyForm
 
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
         form = self.form(obj=post)
+
         return render_template(
             'forum/new_post.html', topic=post.topic, form=form, edit_mode=True
         )
@@ -493,6 +504,10 @@ class EditPost(MethodView):
         return render_template(
             'forum/new_post.html', topic=post.topic, form=form, edit_mode=True
         )
+
+    def form(self):
+        current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
+        return ReplyForm()
 
 
 class ReportView(MethodView):

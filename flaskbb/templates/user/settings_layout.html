@@ -13,11 +13,11 @@
         <div class="sidebar">
             <ul class="nav sidenav">
                 {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False) %}
-                        {% if view == None %}
-                        <li class="sidenav-header">{{ _(text) }}</li>
-                        {% else %}
-                        {{ navlink(view, _(text)) }}
-                        {% endif %}
+                    {% if view == None %}
+                    <li class="sidenav-header">{{ _(text) }}</li>
+                    {% else %}
+                    {{ navlink(view, _(text)) }}
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>

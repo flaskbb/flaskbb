@@ -308,8 +308,8 @@
     {%- endif -%}
 {% endmacro %}
 
-{% macro navlink(endpoint, name, icon='', active=False) %}
-<li {% if endpoint == request.endpoint or active %}class="active"{% endif %}>
+{% macro navlink(endpoint, name, icon='', active='') %}
+<li {% if endpoint == request.endpoint or endpoint == active or active == True %}class="active"{% endif %}>
     <a href="{{ url_for(endpoint) }}">{% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}</a>
 </li>
 {% endmacro %}

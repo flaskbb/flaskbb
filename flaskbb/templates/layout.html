@@ -73,18 +73,18 @@
                         <ul class="nav navbar-nav forum-nav">
                             {%- from theme("macros.html") import is_active, topnav with context -%}
 
-                            {{ run_hook("flaskbb_tpl_before_navigation") }}
+                            {{ run_hook("flaskbb_tpl_navigation_before") }}
                             {{ topnav(endpoint='forum.index', name=_('Forum'), icon='fa fa-comment', active=active_forum_nav) }}
                             {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='fa fa-user') }}
                             {{ topnav(endpoint='forum.search', name=_('Search'), icon='fa fa-search') }}
-                            {{ run_hook("flaskbb_tpl_after_navigation") }}
+                            {{ run_hook("flaskbb_tpl_navigation_after") }}
                         </ul>
 
                         <!-- navbar right -->
                         <ul class="nav navbar-nav navbar-right">
                             {% if current_user and current_user.is_authenticated %}
 
-                            {{ run_hook("flaskbb_tpl_before_user_nav_loggedin") }}
+                            {{ run_hook("flaskbb_tpl_user_nav_loggedin_before") }}
 
                             <!-- User Menu -->
                             <li>
@@ -108,7 +108,7 @@
                                 </div>
                             </li>
 
-                            {{ run_hook("flaskbb_tpl_after_user_nav_loggedin") }}
+                            {{ run_hook("flaskbb_tpl_user_nav_loggedin_after") }}
 
                             {% else %}
                             <!-- Not logged in - Login/Register -->

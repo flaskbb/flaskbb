@@ -1,5 +1,5 @@
 {% set page_title = _("Banned Users") %}
-{% set active_management_user_nav=True %}
+{% set active = "management.users" %}
 
 {% extends theme("management/management_layout.html") %}
 
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_pagination, group_field,navlink with context %}
+{% from theme('macros.html') import render_pagination, group_field, navlink with context %}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">

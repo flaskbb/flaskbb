@@ -62,6 +62,10 @@ class FlaskBBGroup(FlaskGroup):
                 "Error while loading CLI Plugins",
                 exc_info=traceback.format_exc()
             )
+        else:
+            shell_context_processors = app.pluggy.hook.flaskbb_shell_context()
+            for p in shell_context_processors:
+                app.shell_context_processor(p)
 
     def get_command(self, ctx, name):
         self._load_flaskbb_plugins(ctx)

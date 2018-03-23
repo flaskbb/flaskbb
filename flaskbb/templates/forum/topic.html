@@ -43,7 +43,7 @@
                     {% endif %}
                     <div class="author-title"><h5>{{ user.primary_group.name }}</h5></div>
 
-                    {{ run_hook("flaskbb_tpl_before_post_author_info", user=user, post=post) }}
+                    {{ run_hook("flaskbb_tpl_post_author_info_before", user=user, post=post) }}
 
                     {% if user.avatar %}
                         <div class="author-avatar"><img src="{{ user.avatar }}" alt="avatar"></div>
@@ -52,7 +52,7 @@
                     <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}</div>
                     <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
 
-                    {{ run_hook("flaskbb_tpl_after_post_author_info", user=user, post=post) }}
+                    {{ run_hook("flaskbb_tpl_post_author_info_after", user=user, post=post) }}
 
                     {% else %}
                     <!-- user deleted or guest -->
@@ -91,7 +91,13 @@
                                 {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at, '%b %d %Y'))}}
                             </div>
                             {% endif %}
+
+                        {{ run_hook("flaskbb_tpl_post_content_before", post=post) }}
+
                         {{ post.content|markup }}
+
+                        {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
+
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
                         <div class="post-signature hidden-xs">
@@ -106,6 +112,7 @@
 
                             <!-- Report/Edit/Delete/Quote Post-->
                             <div class="post-menu pull-right">
+                            {{ run_hook("flaskbb_tpl_post_menu_before", post=post) }}
 
                             {% if current_user|post_reply(topic) %}
                             <!-- Quick quote -->
@@ -169,6 +176,7 @@
                                 {% endif %}
                             {% endif %}
 
+                            {{ run_hook("flaskbb_tpl_post_menu_after", post=post) }}
                             </div> <!-- end post-menu -->
                         </div> <!-- end footer -->
 

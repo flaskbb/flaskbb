@@ -101,6 +101,7 @@
 
                             <!-- Report/Edit/Delete/Quote Post-->
                             <div class="post-menu pull-right">
+                            {{ run_hook("flaskbb_tpl_post_menu_before", post=post) }}
 
                             {% if current_user|post_reply(topic) %}
                             <!-- Quick quote -->
@@ -164,6 +165,7 @@
                                 {% endif %}
                             {% endif %}
 
+                            {{ run_hook("flaskbb_tpl_post_menu_after", post=post) }}
                             </div> <!-- end post-menu -->
                         </div> <!-- end footer -->
 
