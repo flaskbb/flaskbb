@@ -72,15 +72,6 @@ class RegisterForm(FlaskBBForm):
 
     submit = SubmitField(_("Register"))
 
-    def save(self):
-        user = User(username=self.username.data,
-                    email=self.email.data,
-                    password=self.password.data,
-                    date_joined=time_utcnow(),
-                    primary_group_id=4,
-                    language=self.language.data)
-        return user.save()
-
 
 class ReauthForm(FlaskBBForm):
     password = PasswordField(_('Password'), validators=[
@@ -113,11 +104,6 @@ class ResetPasswordForm(FlaskBBForm):
     confirm_password = PasswordField(_('Confirm password'))
 
     submit = SubmitField(_("Reset password"))
-
-    def validate_email(self, field):
-        email = User.query.filter_by(email=field.data).first()
-        if not email:
-            raise ValidationError(_("Wrong email address."))
 
 
 class RequestActivationForm(FlaskBBForm):

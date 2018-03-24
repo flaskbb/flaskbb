@@ -1,11 +1,12 @@
 import json
 
 import pytest
-from flaskbb.core.auth import password
+from werkzeug.security import check_password_hash
+
+from flaskbb.auth.services import password
 from flaskbb.core.exceptions import StopValidation, ValidationError
 from flaskbb.core.tokens import Token, TokenActions, TokenError
 from flaskbb.user.models import User
-from werkzeug.security import check_password_hash
 
 
 class SimpleTokenSerializer:
@@ -64,3 +65,34 @@ class TestPasswordReset(object):
 
         service.reset_password(token, Fred.email, "newpasswordwhodis")
         assert check_password_hash(Fred.password, "newpasswordwhodis")
+
+    # need fred to initiate Users
+    def test_initiate_raises_if_user_doesnt_exist(self, Fred):
+        service = password.ResetPasswordService(
+            SimpleTokenSerializer, User, []
+        )
+        with pytest.raises(ValidationError) as excinfo:
+            service.initiate_password_reset('lol@doesnt.exist')
+
+        assert excinfo.value.attribute == 'email'
+        assert excinfo.value.reason == 'Invalid email'
+
+    def test_calls_send_reset_token_successfully_if_user_exists(
+            self, Fred, mocker
+    ):
+        service = password.ResetPasswordService(
+            SimpleTokenSerializer, User, []
+        )
+        mock = mocker.MagicMock()
+
+        with mocker.patch(
+            'flaskbb.auth.services.password.send_reset_token.delay', mock
+        ):
+            service.initiate_password_reset(Fred.email)
+
+        token = SimpleTokenSerializer.dumps(
+            Token(user_id=Fred.id, operation=TokenActions.RESET_PASSWORD)
+        )
+        mock.assert_called_once_with(
+            token=token, username=Fred.username, email=Fred.email
+        )

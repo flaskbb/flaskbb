@@ -22,7 +22,7 @@ from flaskbb.auth.forms import (AccountActivationForm, ForgotPasswordForm,
                                 LoginForm, LoginRecaptchaForm, ReauthForm,
                                 RegisterForm, RequestActivationForm,
                                 ResetPasswordForm)
-from flaskbb.email import send_activation_token, send_reset_token
+from flaskbb.email import send_activation_token
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.extensions import db, limiter
 from flaskbb.user.models import User
@@ -35,7 +35,7 @@ from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.tokens import get_token_status
 
 from .services import registration
-from ..core.auth.password import ResetPasswordService
+from .services.password import ResetPasswordService
 from ..core.auth.registration import (RegistrationService, UserRegistrationInfo)
 from ..core.exceptions import ValidationError, StopValidation
 from ..core.tokens import TokenError
@@ -168,27 +168,29 @@ class ForgotPassword(MethodView):
     decorators = [anonymous_required]
     form = ForgotPasswordForm
 
+    def __init__(self, password_reset_service_factory):
+        self.password_reset_service_factory = password_reset_service_factory
+
     def get(self):
         return render_template("auth/forgot_password.html", form=self.form())
 
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
 
-            if user:
-                send_reset_token.delay(
-                    user_id=user.id, username=user.username, email=user.email
-                )
-                flash(_("Email sent! Please check your inbox."), "info")
-                return redirect(url_for("auth.forgot_password"))
-            else:
+            try:
+                self.password_reset_service_factory().initiate_password_reset(form.email.data)
+            except ValidationError:
                 flash(
                     _(
                         "You have entered an username or email address that "
                         "is not linked with your account."
                     ), "danger"
                 )
+            else:
+                flash(_("Email sent! Please check your inbox."), "info")
+                return redirect(url_for("auth.forgot_password"))
+
         return render_template("auth/forgot_password.html", form=form)
 
 
@@ -401,11 +403,6 @@ def flaskbb_load_blueprints(app):
             registration_service_factory=registration_service_factory
         )
     )
-    register_view(
-        auth,
-        routes=['/reset-password'],
-        view_func=ForgotPassword.as_view('forgot_password')
-    )
 
     def reset_service_factory():
         token_serializer = FlaskBBTokenSerializer(
@@ -420,6 +417,15 @@ def flaskbb_load_blueprints(app):
             User,
             token_verifiers=verifiers
         )
+
+    register_view(
+        auth,
+        routes=['/reset-password'],
+        view_func=ForgotPassword.as_view(
+            'forgot_password',
+            password_reset_service_factory=reset_service_factory
+        )
+    )
 
     register_view(
         auth,
