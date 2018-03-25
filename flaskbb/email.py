@@ -14,7 +14,6 @@ from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail, celery
-from flaskbb.utils.tokens import make_token
 
 
 logger = logging.getLogger(__name__)
