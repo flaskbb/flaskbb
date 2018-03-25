@@ -249,7 +249,7 @@ class RequestActivationToken(MethodView):
             try:
                 activator.initiate_account_activation(form.email.data)
             except ValidationError as e:
-                form.populate_errors((e.attribute, e.reason))
+                form.populate_errors([(e.attribute, e.reason)])
             else:
                 flash(
                     _(
