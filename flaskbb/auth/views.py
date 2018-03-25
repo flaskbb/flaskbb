@@ -363,6 +363,21 @@ def flaskbb_load_blueprints(app):
 
         return RegistrationService(validators, UserRepository(db))
 
+    def reset_service_factory():
+        token_serializer = FlaskBBTokenSerializer(
+            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
+        )
+        verifiers = [EmailMatchesUserToken(User)]
+        return ResetPasswordService(
+            token_serializer, User, token_verifiers=verifiers
+        )
+
+    def account_activator_factory():
+        token_serializer = FlaskBBTokenSerializer(
+            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
+        )
+        return AccountActivator(token_serializer, User)
+
     # Activate rate limiting on the whole blueprint
     limiter.limit(
         login_rate_limit, error_message=login_rate_limit_message
@@ -379,15 +394,6 @@ def flaskbb_load_blueprints(app):
             registration_service_factory=registration_service_factory
         )
     )
-
-    def reset_service_factory():
-        token_serializer = FlaskBBTokenSerializer(
-            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
-        )
-        verifiers = [EmailMatchesUserToken(User)]
-        return ResetPasswordService(
-            token_serializer, User, token_verifiers=verifiers
-        )
 
     register_view(
         auth,
@@ -407,12 +413,6 @@ def flaskbb_load_blueprints(app):
         )
     )
 
-    def account_activator_factory():
-        token_serializer = FlaskBBTokenSerializer(
-            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
-        )
-        return AccountActivator(token_serializer, User)
-
     register_view(
         auth,
         routes=['/activate'],
@@ -430,5 +430,4 @@ def flaskbb_load_blueprints(app):
             account_activator_factory=account_activator_factory
         )
     )
-
     app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])
