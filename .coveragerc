@@ -36,7 +36,6 @@ exclude_lines =
 ignore_errors = True
 precision = 2
 show_missing = true
-skip_covered = true
 
 [html]
 directory = tests/htmlcov
