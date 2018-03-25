@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+    flaskbb.auth.plugins
+    ~~~~~~~~~~~~~~~~~~~~
+    Plugin implementations for FlaskBB auth hooks
+
+    :copyright: (c) 2014-2018 the FlaskBB Team.
+    :license: BSD, see LICENSE for more details
+"""
 from flask import flash
 from flask_babelplus import gettext as _
 from flask_login import login_user
