@@ -4,6 +4,8 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Factory functions for various FlaskBB auth services
 
+    These factories are provisional.
+
     :copyright: 2014-2018 the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
