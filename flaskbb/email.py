@@ -47,7 +47,7 @@ def send_reset_token(token, username, email):
 def send_activation_token(token, username, email):
     """Sends the activation token to the user's email address.
 
-    :param user_id: The user id. Used to generate the reset token.
+    :param token: The token to send to the user
     :param username: The username to whom the email should be sent.
     :param email:  The email address of the user
     """
