@@ -10,7 +10,7 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import Blueprint, current_app, flash, g, redirect, request, url_for
 from flask.views import MethodView
@@ -31,16 +31,12 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 
-from ..core.auth.registration import RegistrationService, UserRegistrationInfo
 from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
-from ..tokens import FlaskBBTokenSerializer
-from ..tokens.verifiers import EmailMatchesUserToken
-from ..user.repo import UserRepository
+from ..core.auth.registration import UserRegistrationInfo
 from .plugins import impl
-from .services import registration
-from .services.activation import AccountActivator
-from .services.password import ResetPasswordService
+from .services import (account_activator_factory, registration_service_factory,
+                       reset_service_factory)
 
 logger = logging.getLogger(__name__)
 
@@ -341,42 +337,6 @@ def flaskbb_load_blueprints(app):
         return render_template(
             "errors/too_many_logins.html", timeout=error.description
         )
-
-    def registration_service_factory():
-        with app.app_context():
-            blacklist = [
-                w.strip()
-                for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
-            ]
-
-            requirements = registration.UsernameRequirements(
-                min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],
-                max=flaskbb_config["AUTH_USERNAME_MAX_LENGTH"],
-                blacklist=blacklist
-            )
-
-        validators = [
-            registration.EmailUniquenessValidator(User),
-            registration.UsernameUniquenessValidator(User),
-            registration.UsernameValidator(requirements)
-        ]
-
-        return RegistrationService(validators, UserRepository(db))
-
-    def reset_service_factory():
-        token_serializer = FlaskBBTokenSerializer(
-            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
-        )
-        verifiers = [EmailMatchesUserToken(User)]
-        return ResetPasswordService(
-            token_serializer, User, token_verifiers=verifiers
-        )
-
-    def account_activator_factory():
-        token_serializer = FlaskBBTokenSerializer(
-            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
-        )
-        return AccountActivator(token_serializer, User)
 
     # Activate rate limiting on the whole blueprint
     limiter.limit(

@@ -13,8 +13,8 @@ from collections import namedtuple
 
 from sqlalchemy import func
 
-from ...core.auth.registration import UserValidator
-from ...core.exceptions import ValidationError
+from ...core.auth.registration import UserValidator, UserRegistrationService
+from ...core.exceptions import ValidationError, StopValidation
 
 __all__ = (
     "UsernameRequirements", "UsernameValidator", "EmailUniquenessValidator",
@@ -78,3 +78,24 @@ class EmailUniquenessValidator(UserValidator):
             raise ValidationError(
                 'email', '{} is already registered'.format(user_info.email)
             )
+
+
+class RegistrationService(UserRegistrationService):
+
+    def __init__(self, validators, user_repo):
+        self.validators = validators
+        self.user_repo = user_repo
+
+    def register(self, user_info):
+        failures = []
+
+        for v in self.validators:
+            try:
+                v(user_info)
+            except ValidationError as e:
+                failures.append((e.attribute, e.reason))
+
+        if failures:
+            raise StopValidation(failures)
+
+        self.user_repo.add(user_info)

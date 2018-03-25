@@ -45,14 +45,13 @@ def send_reset_token(token, username, email):
 
 
 @celery.task
-def send_activation_token(user_id, username, email):
+def send_activation_token(token, username, email):
     """Sends the activation token to the user's email address.
 
     :param user_id: The user id. Used to generate the reset token.
     :param username: The username to whom the email should be sent.
     :param email:  The email address of the user
     """
-    token = make_token(user_id=user_id, operation="activate_account")
     send_email(
         subject=_("Account Activation"),
         recipients=[email],
