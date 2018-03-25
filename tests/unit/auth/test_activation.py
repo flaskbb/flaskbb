@@ -5,6 +5,8 @@ from flaskbb.core.exceptions import ValidationError
 from flaskbb.core.tokens import Token, TokenActions, TokenError
 from flaskbb.user.models import User
 
+pytestmark = pytest.mark.usefixtures('default_settings')
+
 
 class TestAccountActivationInitiateActivation(object):
 

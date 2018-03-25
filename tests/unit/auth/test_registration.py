@@ -5,6 +5,8 @@ from flaskbb.core.auth.registration import UserRegistrationInfo
 from flaskbb.core.exceptions import StopValidation, ValidationError
 from flaskbb.core.user.repo import UserRepository
 
+pytestmark = pytest.mark.usefixtures('default_settings')
+
 
 class RaisingValidator(registration.UserValidator):
 

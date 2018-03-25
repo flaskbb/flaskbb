@@ -8,6 +8,8 @@
     :license: BSD, see LICENSE for more details
 """
 
+from flask_babelplus import gettext as _
+
 from ...core.auth.activation import AccountActivator as _AccountActivator
 from ...core.exceptions import ValidationError
 from ...core.tokens import Token, TokenActions, TokenError
@@ -24,10 +26,10 @@ class AccountActivator(_AccountActivator):
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
-            raise ValidationError('email', "Entered email doesn't exist")
+            raise ValidationError('email', _("Entered email doesn't exist"))
 
         if user.activated:
-            raise ValidationError('email', 'Account is already activated')
+            raise ValidationError('email', _('Account is already activated'))
 
         token = self.token_serializer.dumps(
             Token(user_id=user.id, operation=TokenActions.ACTIVATE_ACCOUNT)
@@ -43,5 +45,7 @@ class AccountActivator(_AccountActivator):
             raise TokenError.invalid()
         user = self.users.query.get(token.user_id)
         if user.activated:
-            raise ValidationError('activated', 'Account is already activated')
+            raise ValidationError(
+                'activated', _('Account is already activated')
+            )
         user.activated = True

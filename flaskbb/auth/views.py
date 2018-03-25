@@ -31,9 +31,9 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 
+from ..core.auth.registration import UserRegistrationInfo
 from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
-from ..core.auth.registration import UserRegistrationInfo
 from .plugins import impl
 from .services import (account_activator_factory, registration_service_factory,
                        reset_service_factory)
@@ -212,7 +212,7 @@ class ResetPassword(MethodView):
                 )
                 db.session.commit()
             except TokenError as e:
-                flash(_(e.reason), 'danger')
+                flash(e.reason, 'danger')
                 return redirect(url_for('auth.forgot_password'))
             except StopValidation as e:
                 form.populate_errors(e.reasons)
@@ -275,9 +275,9 @@ class ActivateAccount(MethodView):
         try:
             activator.activate_account(token)
         except TokenError as e:
-            flash(_(e.reason), 'danger')
+            flash(e.reason, 'danger')
         except ValidationError as e:
-            flash(_(e.reason), 'danger')
+            flash(e.reason, 'danger')
             return redirect('forum.index')
 
         else:
@@ -286,8 +286,9 @@ class ActivateAccount(MethodView):
             except Exception:  # noqa
                 logger.exception("Database error while activating account")
                 flash(
-                    _("Could activate account due to an unrecoverable error"),
-                    "danger"
+                    _(
+                        "Could not activate account due to an unrecoverable error"
+                    ), "danger"
                 )
 
                 return redirect('auth.request_activation_token')

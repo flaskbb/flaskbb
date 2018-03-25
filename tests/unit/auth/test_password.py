@@ -6,6 +6,8 @@ from flaskbb.core.exceptions import StopValidation, ValidationError
 from flaskbb.core.tokens import Token, TokenActions, TokenError
 from flaskbb.user.models import User
 
+pytestmark = pytest.mark.usefixtures('default_settings')
+
 
 class TestPasswordReset(object):
 

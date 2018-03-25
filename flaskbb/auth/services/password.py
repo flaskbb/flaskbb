@@ -8,6 +8,8 @@
     :license: BSD, see LICENSE for more details
 """
 
+from flask_babelplus import gettext as _
+
 from ...core.auth.password import ResetPasswordService as _ResetPasswordService
 from ...core.exceptions import StopValidation, ValidationError
 from ...core.tokens import Token, TokenActions, TokenError
@@ -25,7 +27,7 @@ class ResetPasswordService(_ResetPasswordService):
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
-            raise ValidationError('email', 'Invalid email')
+            raise ValidationError('email', _('Invalid email'))
 
         token = self.token_serializer.dumps(
             Token(user_id=user.id, operation=TokenActions.RESET_PASSWORD)
