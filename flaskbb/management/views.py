@@ -868,6 +868,22 @@ class DeleteReport(MethodView):
         return redirect(url_for("management.reports"))
 
 
+class CeleryStatus(MethodView):
+    decorators = [allows.requires(IsAtleastModerator)]
+
+    def get(self):
+        celery_inspect = celery.control.inspect()
+        try:
+            celery_running = True if celery_inspect.ping() else False
+        except Exception:
+            # catching Exception is bad, and just catching ConnectionError
+            # from redis is also bad because you can run celery with other
+            # brokers as well.
+            celery_running = False
+
+        return jsonify(celery_running=celery_running, status=200)
+
+
 class ManagementOverview(MethodView):
     decorators = [allows.requires(IsAtleastModerator)]
 
@@ -887,15 +903,6 @@ class ManagementOverview(MethodView):
             order_by(Report.id.desc()).\
             count()
 
-        celery_inspect = celery.control.inspect()
-        try:
-            celery_running = True if celery_inspect.ping() else False
-        except Exception:
-            # catching Exception is bad, and just catching ConnectionError
-            # from redis is also bad because you can run celery with other
-            # brokers as well.
-            celery_running = False
-
         python_version = "{}.{}.{}".format(
             sys.version_info[0], sys.version_info[1], sys.version_info[2]
         )
@@ -914,7 +921,6 @@ class ManagementOverview(MethodView):
             # components
             "python_version": python_version,
             "celery_version": celery_version,
-            "celery_running": celery_running,
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
@@ -1174,6 +1180,11 @@ def flaskbb_load_blueprints(app):
     )
     register_view(
         management, routes=['/users'], view_func=ManageUsers.as_view('users')
+    )
+    register_view(
+        management,
+        routes=['/celerystatus'],
+        view_func=CeleryStatus.as_view('celery_status')
     )
     register_view(
         management,
