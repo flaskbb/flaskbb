@@ -139,10 +139,14 @@
                                 <div class="value pull-right">
                                     {% if not plugin.enabled %}
                                         <span class="text-danger">not enabled</span>
-                                    {% elif plugin.enabled and plugin.is_installed %}
+                                    {% elif plugin.enabled %}
+                                        {% if plugin.is_installed %}
                                         <span class="text-success">enabled &amp; installed</span>
-                                    {% elif plugin.enabled and not plugin.is_installed %}
+                                        {% elif not plugin.is_installable %}
+                                        <span class="text-success">enabled</span>
+                                        {% elif not plugin.is_installed %}
                                         <span class="text-warning">not installed</span>
+                                        {% endif %}
                                     {% endif %}
                                     {{ plugin.version }}
                                 </div>
