@@ -18,11 +18,9 @@ from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
 
-from flaskbb.auth.forms import (AccountActivationForm, ForgotPasswordForm,
-                                LoginForm, LoginRecaptchaForm, ReauthForm,
-                                RegisterForm, RequestActivationForm,
-                                ResetPasswordForm)
-from flaskbb.email import send_activation_token
+from flaskbb.auth.forms import (ForgotPasswordForm, LoginForm,
+                                LoginRecaptchaForm, ReauthForm, RegisterForm,
+                                RequestActivationForm, ResetPasswordForm)
 from flaskbb.exceptions import AuthenticationError
 from flaskbb.extensions import db, limiter
 from flaskbb.user.models import User
@@ -32,17 +30,17 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    registration_enabled, render_template,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.tokens import get_token_status
 
-from .services import registration
-from .services.password import ResetPasswordService
-from ..core.auth.registration import (RegistrationService, UserRegistrationInfo)
-from ..core.exceptions import ValidationError, StopValidation
+from ..core.auth.registration import RegistrationService, UserRegistrationInfo
+from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
 from ..tokens import FlaskBBTokenSerializer
 from ..tokens.verifiers import EmailMatchesUserToken
 from ..user.repo import UserRepository
 from .plugins import impl
+from .services import registration
+from .services.activation import AccountActivator
+from .services.password import ResetPasswordService
 
 logger = logging.getLogger(__name__)
 
@@ -147,10 +145,11 @@ class Register(MethodView):
                 try:
                     db.session.commit()
                 except Exception:  # noqa
-                    logger.exception("Uh that looks bad...")
+                    logger.exception("Database error while resetting password")
                     flash(
                         _(
-                            "Could not process registration due to an unrecoverable error"
+                            "Could not process registration due"
+                            "to an unrecoverable error"
                         ), "danger"
                     )
 
@@ -179,7 +178,8 @@ class ForgotPassword(MethodView):
         if form.validate_on_submit():
 
             try:
-                self.password_reset_service_factory().initiate_password_reset(form.email.data)
+                self.password_reset_service_factory(
+                ).initiate_password_reset(form.email.data)
             except ValidationError:
                 flash(
                     _(
@@ -212,9 +212,7 @@ class ResetPassword(MethodView):
             try:
                 service = self.password_reset_service_factory()
                 service.reset_password(
-                    token,
-                    form.email.data,
-                    form.password.data
+                    token, form.email.data, form.password.data
                 )
                 db.session.commit()
             except TokenError as e:
@@ -240,6 +238,9 @@ class RequestActivationToken(MethodView):
     decorators = [requires_unactivated]
     form = RequestActivationForm
 
+    def __init__(self, account_activator_factory):
+        self.account_activator_factory = account_activator_factory
+
     def get(self):
         return render_template(
             "auth/request_account_activation.html", form=self.form()
@@ -248,17 +249,19 @@ class RequestActivationToken(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
-            send_activation_token.delay(
-                user_id=user.id, username=user.username, email=user.email
-            )
-            flash(
-                _(
-                    "A new account activation token has been sent to "
-                    "your email address."
-                ), "success"
-            )
-            return redirect(url_for("auth.activate_account"))
+            activator = self.account_activator_factory()
+            try:
+                activator.initiate_account_activation(form.email.data)
+            except ValidationError as e:
+                form.populate_errors((e.attribute, e.reason))
+            else:
+                flash(
+                    _(
+                        "A new account activation token has been sent to "
+                        "your email address."
+                    ), "success"
+                )
+                return redirect(url_for("auth.activate_account"))
 
         return render_template(
             "auth/request_account_activation.html", form=form
@@ -266,67 +269,40 @@ class RequestActivationToken(MethodView):
 
 
 class ActivateAccount(MethodView):
-    form = AccountActivationForm
     decorators = [requires_unactivated]
 
+    def __init__(self, account_activator_factory):
+        self.account_activator_factory = account_activator_factory
+
     def get(self, token=None):
-        expired = invalid = user = None
-        if token is not None:
-            expired, invalid, user = get_token_status(token, "activate_account")
+        activator = self.account_activator_factory()
+        try:
+            activator.activate_account(token)
+        except TokenError as e:
+            flash(_(e.reason), 'danger')
+        except ValidationError as e:
+            flash(_(e.reason), 'danger')
+            return redirect('forum.index')
 
-        if invalid:
-            flash(_("Your account activation token is invalid."), "danger")
-            return redirect(url_for("auth.request_activation_token"))
+        else:
+            try:
+                db.session.commit()
+            except Exception:  # noqa
+                logger.exception("Database error while activating account")
+                flash(
+                    _("Could activate account due to an unrecoverable error"),
+                    "danger"
+                )
 
-        if expired:
-            flash(_("Your account activation token is expired."), "danger")
-            return redirect(url_for("auth.request_activation_token"))
+                return redirect('auth.request_activation_token')
 
-        if user:
-            user.activated = True
-            user.save()
-
-            if current_user != user:
-                logout_user()
-                login_user(user)
-
-            flash(_("Your account has been activated."), "success")
-            return redirect(url_for("forum.index"))
-
-        return render_template("auth/account_activation.html", form=self.form())
-
-    def post(self, token=None):
-        expired = invalid = user = None
-        form = self.form()
-
-        if token is not None:
-            expired, invalid, user = get_token_status(token, "activate_account")
-
-        elif form.validate_on_submit():
-            expired, invalid, user = get_token_status(
-                form.token.data, "activate_account"
+            flash(
+                _("Your account has been activated and you can now login."),
+                "success"
             )
-
-        if invalid:
-            flash(_("Your account activation token is invalid."), "danger")
-            return redirect(url_for("auth.request_activation_token"))
-
-        if expired:
-            flash(_("Your account activation token is expired."), "danger")
-            return redirect(url_for("auth.request_activation_token"))
-
-        if user:
-            user.activated = True
-            user.save()
-
-            if current_user != user:
-                logout_user()
-                login_user(user)
-
-            flash(_("Your account has been activated."), "success")
             return redirect(url_for("forum.index"))
 
-        return render_template("auth/account_activation.html", form=form)
+        return render_template("auth/account_activation.html")
 
 
 @impl(tryfirst=True)
@@ -406,16 +382,11 @@ def flaskbb_load_blueprints(app):
 
     def reset_service_factory():
         token_serializer = FlaskBBTokenSerializer(
-            app.config['SECRET_KEY'],
-            expiry=timedelta(hours=1)
+            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
         )
-        verifiers = [
-            EmailMatchesUserToken(User)
-        ]
+        verifiers = [EmailMatchesUserToken(User)]
         return ResetPasswordService(
-            token_serializer,
-            User,
-            token_verifiers=verifiers
+            token_serializer, User, token_verifiers=verifiers
         )
 
     register_view(
@@ -435,15 +406,29 @@ def flaskbb_load_blueprints(app):
             password_reset_service_factory=reset_service_factory
         )
     )
+
+    def account_activator_factory():
+        token_serializer = FlaskBBTokenSerializer(
+            app.config['SECRET_KEY'], expiry=timedelta(hours=1)
+        )
+        return AccountActivator(token_serializer, User)
+
     register_view(
         auth,
         routes=['/activate'],
-        view_func=RequestActivationToken.as_view('request_activation_token')
+        view_func=RequestActivationToken.as_view(
+            'request_activation_token',
+            account_activator_factory=account_activator_factory
+        )
     )
+
     register_view(
         auth,
         routes=['/activate/confirm', '/activate/confirm/<token>'],
-        view_func=ActivateAccount.as_view('activate_account')
+        view_func=ActivateAccount.as_view(
+            'activate_account',
+            account_activator_factory=account_activator_factory
+        )
     )
 
     app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])
