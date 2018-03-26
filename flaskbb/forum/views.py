@@ -408,16 +408,25 @@ class ManageForum(MethodView):
 class NewPost(MethodView):
     decorators = [allows.requires(CanPostReply), login_required]
 
-    def get(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
-
-        return render_template(
-            'forum/new_post.html', topic=topic, form=self.form()
-        )
-
-    def post(self, topic_id, slug=None):
+    def get(self, topic_id, slug=None, post_id=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         form = self.form()
+
+        if post_id is not None:
+            post = Post.query.filter_by(id=post_id).first_or_404()
+            form.content.data = format_quote(post.username, post.content)
+
+        return render_template(
+            'forum/new_post.html', topic=topic, form=form
+        )
+
+    def post(self, topic_id, slug=None, post_id=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        form = self.form()
+
+        # check if topic exists
+        if post_id is not None:
+            post = Post.query.filter_by(id=post_id).first_or_404()
 
         if form.validate_on_submit():
             if 'preview' in request.form:
@@ -436,38 +445,6 @@ class NewPost(MethodView):
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
         return ReplyForm()
-
-
-class ReplyPost(MethodView):
-    decorators = [allows.requires(CanPostReply), login_required]
-    form = ReplyForm
-
-    def get(self, topic_id, post_id):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
-        return render_template(
-            'forum/new_post.html', topic=topic, form=self.form()
-        )
-
-    def post(self, topic_id, post_id):
-        form = self.form()
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
-        if form.validate_on_submit():
-            if 'preview' in request.form:
-                return render_template(
-                    'forum/new_post.html',
-                    topic=topic,
-                    form=form,
-                    preview=form.content.data
-                )
-            else:
-                post = form.save(real(current_user), topic)
-                return redirect(url_for('forum.view_post', post_id=post.id))
-        else:
-            form.content.data = format_quote(post.username, post.content)
-
-        return render_template(
-            'forum/new_post.html', topic=post.topic, form=form
-        )
 
 
 class EditPost(MethodView):
@@ -977,8 +954,11 @@ def flaskbb_load_blueprints(app):
     )
     register_view(
         forum,
-        routes=['/topic/<int:topic_id>/post/<int:post_id>/reply'],
-        view_func=ReplyPost.as_view('reply_post')
+        routes=[
+            '/topic/<int:topic_id>/post/<int:post_id>/reply',
+            '/topic/<int:topic_id>-<slug>/post/<int:post_id>/reply'
+        ],
+        view_func=NewPost.as_view('reply_post')
     )
     register_view(
         forum,
