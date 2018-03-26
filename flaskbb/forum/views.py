@@ -505,9 +505,9 @@ class EditPost(MethodView):
             'forum/new_post.html', topic=post.topic, form=form, edit_mode=True
         )
 
-    def form(self):
+    def form(self, **kwargs):
         current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
-        return ReplyForm()
+        return ReplyForm(**kwargs)
 
 
 class ReportView(MethodView):
