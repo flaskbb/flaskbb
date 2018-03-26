@@ -27,7 +27,7 @@ $(".flaskbb-editor").markdown({
         }]
     ],
     onPreview: function(e) {
-        return parse_emoji(e.getContent());
+        return marked(parse_emoji(e.getContent()));
     }
 });
 
