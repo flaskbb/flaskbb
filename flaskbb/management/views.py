@@ -355,7 +355,8 @@ class BanUser(MethodView):
     def post(self, user_id=None):
         if not Permission(CanBanUser, identity=current_user):
             flash(
-                _("You do not have the permissions to ban this user."), "danger"
+                _("You do not have the permissions to ban this user."),
+                "danger"
             )
             return redirect(url_for("management.overview"))
 
@@ -366,11 +367,11 @@ class BanUser(MethodView):
             data = []
             users = User.query.filter(User.id.in_(ids)).all()
             for user in users:
-                # don't let a user ban himself and do not allow a moderator to ban
-                # a admin user
-                if (current_user.id == user.id
-                        or Permission(IsAdmin, identity=user)
-                        and Permission(Not(IsAdmin), current_user)):
+                # don't let a user ban himself and do not allow a moderator
+                # to ban a admin user
+                if (current_user.id == user.id or
+                        Permission(IsAdmin, identity=user) and
+                        Permission(Not(IsAdmin), current_user)):
                     continue
 
                 elif user.ban():
@@ -435,7 +436,8 @@ class UnbanUser(MethodView):
                             "type": "unban",
                             "reverse": "ban",
                             "reverse_name": _("Ban"),
-                            "reverse_url": url_for("management.ban_user", user_id=user.id)
+                            "reverse_url": url_for("management.ban_user",
+                                                   user_id=user.id)
                         }
                     )
 
@@ -529,7 +531,8 @@ class DeleteGroup(MethodView):
     def post(self, group_id=None):
         if request.is_xhr:
             ids = request.get_json()["ids"]
-            if not (set(ids) & set(["1", "2", "3", "4", "5"])):
+            # TODO: Get rid of magic numbers
+            if not (set(ids) & set(["1", "2", "3", "4", "5", "6"])):
                 data = []
                 for group in Group.query.filter(Group.id.in_(ids)).all():
                     group.delete()
@@ -557,7 +560,7 @@ class DeleteGroup(MethodView):
             )
 
         if group_id is not None:
-            if group_id <= 5:  # there are 5 standard groups
+            if group_id <= 6:  # there are 6 standard groups
                 flash(
                     _(
                         "You cannot delete the standard groups. "
@@ -610,7 +613,8 @@ class EditForum(MethodView):
         if form.validate_on_submit():
             form.save()
             flash(_('Forum updated.'), 'success')
-            return redirect(url_for('management.edit_forum', forum_id=forum.id))
+            return redirect(url_for('management.edit_forum',
+                                    forum_id=forum.id))
         else:
             if forum.moderators:
                 form.moderators.data = ','.join(
@@ -868,6 +872,22 @@ class DeleteReport(MethodView):
         return redirect(url_for("management.reports"))
 
 
+class CeleryStatus(MethodView):
+    decorators = [allows.requires(IsAtleastModerator)]
+
+    def get(self):
+        celery_inspect = celery.control.inspect()
+        try:
+            celery_running = True if celery_inspect.ping() else False
+        except Exception:
+            # catching Exception is bad, and just catching ConnectionError
+            # from redis is also bad because you can run celery with other
+            # brokers as well.
+            celery_running = False
+
+        return jsonify(celery_running=celery_running, status=200)
+
+
 class ManagementOverview(MethodView):
     decorators = [allows.requires(IsAtleastModerator)]
 
@@ -887,15 +907,6 @@ class ManagementOverview(MethodView):
             order_by(Report.id.desc()).\
             count()
 
-        celery_inspect = celery.control.inspect()
-        try:
-            celery_running = True if celery_inspect.ping() else False
-        except Exception:
-            # catching Exception is bad, and just catching ConnectionError
-            # from redis is also bad because you can run celery with other
-            # brokers as well.
-            celery_running = False
-
         python_version = "{}.{}.{}".format(
             sys.version_info[0], sys.version_info[1], sys.version_info[2]
         )
@@ -914,7 +925,6 @@ class ManagementOverview(MethodView):
             # components
             "python_version": python_version,
             "celery_version": celery_version,
-            "celery_running": celery_running,
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
@@ -1174,6 +1184,11 @@ def flaskbb_load_blueprints(app):
     )
     register_view(
         management, routes=['/users'], view_func=ManageUsers.as_view('users')
+    )
+    register_view(
+        management,
+        routes=['/celerystatus'],
+        view_func=CeleryStatus.as_view('celery_status')
     )
     register_view(
         management,
