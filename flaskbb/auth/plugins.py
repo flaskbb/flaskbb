@@ -14,6 +14,9 @@ from flask_login import login_user
 from . import impl
 from ..user.models import User
 from ..utils.settings import flaskbb_config
+from .services.authentication import (BlockUnactivatedUser, ClearFailedLogins,
+                                      DefaultFlaskBBAuthProvider,
+                                      MarkFailedLogin)
 from .services.factories import account_activator_factory
 
 
@@ -34,3 +37,19 @@ def flaskbb_event_user_registered(username):
     else:
         login_user(user)
         flash(_("Thanks for registering."), "success")
+
+
+@impl(trylast=True)
+def flaskbb_authenticate(identifier, secret):
+    return DefaultFlaskBBAuthProvider().authenticate(identifier, secret)
+
+
+@impl(tryfirst=True)
+def flaskbb_post_authenticate(user):
+    ClearFailedLogins().handle_post_auth(user)
+    BlockUnactivatedUser().handle_post_auth(user)
+
+
+@impl
+def flaskbb_authentication_failed(identifier):
+    MarkFailedLogin().handle_authentication_failure(identifier)

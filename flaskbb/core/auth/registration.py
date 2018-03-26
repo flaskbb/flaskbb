@@ -15,7 +15,6 @@ from abc import abstractmethod
 import attr
 
 from ..._compat import ABC
-from ..exceptions import ValidationError, StopValidation
 
 
 @attr.s(hash=True, cmp=False, repr=True, frozen=True)

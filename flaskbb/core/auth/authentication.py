@@ -30,3 +30,21 @@ class AuthenticationProvider(ABC):
 
     def __call__(self, identifier, secret):
         return self.authenticate(identifier, secret)
+
+
+class AuthenticationFailureHandler(ABC):
+    @abstractmethod
+    def handle_authentication_failure(self, identifier):
+        pass
+
+    def __call__(self, identifier):
+        self.handle_authentication_failure(identifier)
+
+
+class PostAuthenticationHandler(ABC):
+    @abstractmethod
+    def handle_post_auth(self, user):
+        pass
+
+    def __call__(self, user):
+        self.handle_post_auth(user)
