@@ -21,9 +21,7 @@ from flask_login import (confirm_login, current_user, login_fresh,
 from flaskbb.auth.forms import (ForgotPasswordForm, LoginForm,
                                 LoginRecaptchaForm, ReauthForm, RegisterForm,
                                 RequestActivationForm, ResetPasswordForm)
-from flaskbb.exceptions import AuthenticationError
 from flaskbb.extensions import db, limiter
-from flaskbb.user.models import User
 from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    format_timedelta, get_available_languages,
                                    redirect_or_next, register_view,
@@ -31,6 +29,7 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 
+from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo
 from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
@@ -65,18 +64,26 @@ class Login(MethodView):
         form = self.form()
         if form.validate_on_submit():
             try:
-                user = User.authenticate(form.login.data, form.password.data)
-                if not login_user(user, remember=form.remember_me.data):
-                    flash(
-                        _(
-                            "In order to use your account you have to "
-                            "activate it through the link we have sent to "
-                            "your email address."
-                        ), "danger"
-                    )
+                user = current_app.pluggy.hook.flaskbb_authenticate(
+                    identifier=form.login.data, secret=form.password.data
+                )
+                if user is None:
+                    raise StopAuthentication(_("Wrong username or password."))
+                current_app.pluggy.hook.flaskbb_post_authenticate(user=user)
+                login_user(user, remember=form.remember_me.data)
                 return redirect_or_next(url_for("forum.index"))
-            except AuthenticationError:
-                flash(_("Wrong username or password."), "danger")
+            except StopAuthentication as e:
+                flash(e.reason, "danger")
+                current_app.pluggy.hook.flaskbb_authentication_failed(
+                    identifier=form.login.data
+                )
+            finally:
+                try:
+                    db.session.commit()
+                except Exception:
+                    logger.exception("Exception while processing login")
+                    db.session.rollback()
+                    flash(_("Unrecoverable error while handling login"))
 
         return render_template("auth/login.html", form=form)
 
@@ -142,6 +149,7 @@ class Register(MethodView):
                     db.session.commit()
                 except Exception:  # noqa
                     logger.exception("Database error while resetting password")
+                    db.session.rollback()
                     flash(
                         _(
                             "Could not process registration due"
@@ -210,7 +218,6 @@ class ResetPassword(MethodView):
                 service.reset_password(
                     token, form.email.data, form.password.data
                 )
-                db.session.commit()
             except TokenError as e:
                 flash(e.reason, 'danger')
                 return redirect(url_for('auth.forgot_password'))
@@ -222,6 +229,14 @@ class ResetPassword(MethodView):
                 logger.exception("Error when resetting password")
                 flash(_('Error when resetting password'))
                 return redirect(url_for('auth.forgot_password'))
+            finally:
+                try:
+                    db.session.commit()
+                except Exception:
+                    logger.exception(
+                        "Error while finalizing database when resetting password"
+                    )
+                    db.session.rollback()
 
             flash(_("Your password has been updated."), "success")
             return redirect(url_for("auth.login"))
@@ -285,6 +300,7 @@ class ActivateAccount(MethodView):
                 db.session.commit()
             except Exception:  # noqa
                 logger.exception("Database error while activating account")
+                db.session.rollback()
                 flash(
                     _(
                         "Could not activate account due to an unrecoverable error"
@@ -382,7 +398,6 @@ def flaskbb_load_blueprints(app):
             account_activator_factory=account_activator_factory
         )
     )
-
     register_view(
         auth,
         routes=['/activate/confirm', '/activate/confirm/<token>'],
