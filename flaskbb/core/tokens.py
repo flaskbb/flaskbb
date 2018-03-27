@@ -12,9 +12,11 @@
 from abc import abstractmethod
 
 import attr
+from flask_babelplus import gettext as _
 
 from .._compat import ABC
 from .exceptions import BaseFlaskBBError
+
 
 class TokenError(BaseFlaskBBError):
     """
@@ -22,24 +24,25 @@ class TokenError(BaseFlaskBBError):
     a token. Has helper classmethods to ensure
     consistent verbiage.
     """
+
     def __init__(self, reason):
         self.reason = reason
         super(TokenError, self).__init__(reason)
 
     @classmethod
     def invalid(cls):
-        return cls('Token is invalid')
+        return cls(_('Token is invalid'))
 
     @classmethod
     def expired(cls):
-        return cls('Token is expired')
+        return cls(_('Token is expired'))
 
     # in theory this would never be raised
     # but it's provided for a generic catchall
     # when processing goes horribly wrong
     @classmethod  # pragma: no cover
     def bad(cls):
-        return cls('Token cannot be processed')
+        return cls(_('Token cannot be processed'))
 
 
 # holder for token actions
@@ -65,6 +68,7 @@ class TokenSerializer(ABC):
     loads must accept a string representation of
     a JWT and produce a token instance
     """
+
     @abstractmethod
     def dumps(self, token):
         pass
@@ -83,6 +87,7 @@ class TokenVerifier(ABC):
     Should raise a flaskbb.core.exceptions.ValidationError
     if verification fails.
     """
+
     @abstractmethod
     def verify_token(self, token, **kwargs):
         pass

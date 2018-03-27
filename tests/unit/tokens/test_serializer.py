@@ -6,6 +6,8 @@ from freezegun import freeze_time
 from flaskbb import tokens
 from flaskbb.core.tokens import Token, TokenActions, TokenError
 
+pytestmark = pytest.mark.usefixtures('default_settings')
+
 
 def test_can_round_trip_token():
     serializer = tokens.FlaskBBTokenSerializer(

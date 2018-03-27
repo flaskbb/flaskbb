@@ -14,21 +14,19 @@ from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
 
 from flaskbb.extensions import mail, celery
-from flaskbb.utils.tokens import make_token
 
 
 logger = logging.getLogger(__name__)
 
 
 @celery.task
-def send_reset_token(user_id, username, email):
+def send_reset_token(token, username, email):
     """Sends the reset token to the user's email address.
 
-    :param user_id: The user id. Used to generate the reset token.
+    :param token: The token to send to the user
     :param username: The username to whom the email should be sent.
     :param email:  The email address of the user
     """
-    token = make_token(user_id=user_id, operation="reset_password")
     send_email(
         subject=_("Password Recovery Confirmation"),
         recipients=[email],
@@ -46,14 +44,13 @@ def send_reset_token(user_id, username, email):
 
 
 @celery.task
-def send_activation_token(user_id, username, email):
+def send_activation_token(token, username, email):
     """Sends the activation token to the user's email address.
 
-    :param user_id: The user id. Used to generate the reset token.
+    :param token: The token to send to the user
     :param username: The username to whom the email should be sent.
     :param email:  The email address of the user
     """
-    token = make_token(user_id=user_id, operation="activate_account")
     send_email(
         subject=_("Account Activation"),
         recipients=[email],

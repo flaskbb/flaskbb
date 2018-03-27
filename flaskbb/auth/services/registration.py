@@ -11,10 +11,11 @@
 
 from collections import namedtuple
 
+from flask_babelplus import gettext as _
 from sqlalchemy import func
 
-from ...core.auth.registration import UserValidator
-from ...core.exceptions import ValidationError
+from ...core.auth.registration import UserRegistrationService, UserValidator
+from ...core.exceptions import StopValidation, ValidationError
 
 __all__ = (
     "UsernameRequirements", "UsernameValidator", "EmailUniquenessValidator",
@@ -36,8 +37,10 @@ class UsernameValidator(UserValidator):
                 self._requirements.max):
             raise ValidationError(
                 'username',
-                'Username must be between {} and {} characters long'.format(
-                    self._requirements.min, self._requirements.max
+                _(
+                    'Username must be between %(min)s and %(max)s characters long',
+                    min=self._requirements.min,
+                    max=self._requirements.max
                 )
             )
 
@@ -45,7 +48,10 @@ class UsernameValidator(UserValidator):
         if is_blacklisted:  # pragma: no branch
             raise ValidationError(
                 'username',
-                '{} is a forbidden username'.format(user_info.username)
+                _(
+                    '%(username)s is a forbidden username',
+                    username=user_info.username
+                )
             )
 
 
@@ -61,7 +67,10 @@ class UsernameUniquenessValidator(UserValidator):
         if count != 0:  # pragma: no branch
             raise ValidationError(
                 'username',
-                '{} is already registered'.format(user_info.username)
+                _(
+                    '%(username)s is already registered',
+                    username=user_info.username
+                )
             )
 
 
@@ -76,5 +85,25 @@ class EmailUniquenessValidator(UserValidator):
         ).count()
         if count != 0:  # pragma: no branch
             raise ValidationError(
-                'email', '{} is already registered'.format(user_info.email)
+                'email',
+                _('%(email)s is already registered', email=user_info.email)
             )
+
+
+class RegistrationService(UserRegistrationService):
+
+    def __init__(self, validators, user_repo):
+        self.validators = validators
+        self.user_repo = user_repo
+
+    def register(self, user_info):
+        failures = []
+
+        for v in self.validators:
+            try:
+                v(user_info)
+            except ValidationError as e:
+                failures.append((e.attribute, e.reason))
+        if failures:
+            raise StopValidation(failures)
+        self.user_repo.add(user_info)

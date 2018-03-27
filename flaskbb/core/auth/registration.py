@@ -41,21 +41,7 @@ class UserValidator(ABC):
         return self.validate(user_info)
 
 
-class RegistrationService(object):
-    def __init__(self, validators, user_repo):
-        self.validators = validators
-        self.user_repo = user_repo
-
+class UserRegistrationService(ABC):
+    @abstractmethod
     def register(self, user_info):
-        failures = []
-
-        for v in self.validators:
-            try:
-                v(user_info)
-            except ValidationError as e:
-                failures.append((e.attribute, e.reason))
-
-        if failures:
-            raise StopValidation(failures)
-
-        self.user_repo.add(user_info)
+        pass

@@ -9,33 +9,17 @@
     :license: BSD, see LICENSE for more details
 """
 
-from ..exceptions import StopValidation, ValidationError
-from ..tokens import TokenActions, TokenError
+from abc import abstractmethod
+
+from ..._compat import ABC
 
 
-class ResetPasswordService(object):
+class ResetPasswordService(ABC):
 
-    def __init__(self, token_serializer, users, token_verifiers):
-        self.token_serializer = token_serializer
-        self.users = users
-        self.token_verifiers = token_verifiers
+    @abstractmethod
+    def initiate_password_reset(self, email):
+        pass
 
-    def verify_token(self, token, email):
-        errors = []
-
-        for verifier in self.token_verifiers:
-            try:
-                verifier(token, email=email)
-            except ValidationError as e:
-                errors.append((e.attribute, e.reason))
-
-        if errors:
-            raise StopValidation(errors)
-
+    @abstractmethod
     def reset_password(self, token, email, new_password):
-        token = self.token_serializer.loads(token)
-        if token.operation != TokenActions.RESET_PASSWORD:
-            raise TokenError.invalid()
-        self.verify_token(token, email)
-        user = self.users.query.get(token.user_id)
-        user.password = new_password
+        pass

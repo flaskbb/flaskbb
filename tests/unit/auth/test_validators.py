@@ -1,4 +1,5 @@
 import pytest
+
 from flaskbb.auth.services.registration import (EmailUniquenessValidator,
                                                 UsernameRequirements,
                                                 UsernameUniquenessValidator,
@@ -6,6 +7,8 @@ from flaskbb.auth.services.registration import (EmailUniquenessValidator,
 from flaskbb.core.auth.registration import UserRegistrationInfo
 from flaskbb.core.exceptions import ValidationError
 from flaskbb.user.models import User
+
+pytestmark = pytest.mark.usefixtures('default_settings')
 
 
 def test_raises_if_username_too_short():
