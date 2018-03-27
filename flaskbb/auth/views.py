@@ -17,7 +17,6 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
-
 from flaskbb.auth.forms import (ForgotPasswordForm, LoginForm,
                                 LoginRecaptchaForm, ReauthForm, RegisterForm,
                                 RequestActivationForm, ResetPasswordForm)
@@ -34,8 +33,10 @@ from ..core.auth.registration import UserRegistrationInfo
 from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
 from .plugins import impl
-from .services import (account_activator_factory, registration_service_factory,
-                       reset_service_factory)
+from .services import (account_activator_factory,
+                       authentication_manager_factory,
+                       reauthentication_manager_factory,
+                       registration_service_factory, reset_service_factory)
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,9 @@ class Logout(MethodView):
 class Login(MethodView):
     decorators = [anonymous_required]
 
+    def __init__(self, authentication_manager_factory):
+        self.authentication_manager_factory = authentication_manager_factory
+
     def form(self):
         if enforce_recaptcha(limiter):
             return LoginRecaptchaForm()
@@ -63,27 +67,17 @@ class Login(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
+            auth_manager = self.authentication_manager_factory()
             try:
-                user = current_app.pluggy.hook.flaskbb_authenticate(
+                user = auth_manager.authenticate(
                     identifier=form.login.data, secret=form.password.data
                 )
-                if user is None:
-                    raise StopAuthentication(_("Wrong username or password."))
-                current_app.pluggy.hook.flaskbb_post_authenticate(user=user)
                 login_user(user, remember=form.remember_me.data)
                 return redirect_or_next(url_for("forum.index"))
             except StopAuthentication as e:
                 flash(e.reason, "danger")
-                current_app.pluggy.hook.flaskbb_authentication_failed(
-                    identifier=form.login.data
-                )
-            finally:
-                try:
-                    db.session.commit()
-                except Exception:
-                    logger.exception("Exception while processing login")
-                    db.session.rollback()
-                    flash(_("Unrecoverable error while handling login"))
+            except Exception:
+                flash(_("Unrecoverable error while handling login"))
 
         return render_template("auth/login.html", form=form)
 
@@ -91,6 +85,9 @@ class Login(MethodView):
 class Reauth(MethodView):
     decorators = [login_required, limiter.exempt]
     form = ReauthForm
+
+    def __init__(self, reauthentication_factory):
+        self.reauthentication_factory = reauthentication_factory
 
     def get(self):
         if not login_fresh():
@@ -100,12 +97,21 @@ class Reauth(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            if current_user.check_password(form.password.data):
+
+            reauth_manager = self.reauthentication_factory()
+            try:
+                user = reauth_manager.reauthenticate(
+                    user=current_user, secret=form.password.data
+                )
                 confirm_login()
                 flash(_("Reauthenticated."), "success")
                 return redirect_or_next(current_user.url)
+            except StopAuthentication as e:
+                flash(e.reason, "danger")
+            except Exception:
+                flash(_("Unrecoverable error while handling reauthentication"))
+                raise
 
-            flash(_("Wrong password."), "danger")
         return render_template("auth/reauth.html", form=form)
 
 
@@ -361,8 +367,22 @@ def flaskbb_load_blueprints(app):
     )(auth)
 
     register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
-    register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
-    register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
+    register_view(
+        auth,
+        routes=['/login'],
+        view_func=Login.as_view(
+            'login',
+            authentication_manager_factory=authentication_manager_factory
+        )
+    )
+    register_view(
+        auth,
+        routes=['/reauth'],
+        view_func=Reauth.as_view(
+            'reauth',
+            reauthentication_factory=reauthentication_manager_factory
+        )
+    )
     register_view(
         auth,
         routes=['/register'],
@@ -406,4 +426,5 @@ def flaskbb_load_blueprints(app):
             account_activator_factory=account_activator_factory
         )
     )
+
     app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])

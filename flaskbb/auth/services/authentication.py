@@ -9,7 +9,7 @@
     :copyright: (c) 2014-2018 the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
-
+import logging
 from datetime import datetime
 
 import attr
@@ -18,12 +18,15 @@ from pytz import UTC
 from werkzeug import check_password_hash
 
 from ...core.auth.authentication import (AuthenticationFailureHandler,
+                                         AuthenticationManager,
                                          AuthenticationProvider,
                                          PostAuthenticationHandler,
                                          StopAuthentication)
 from ...extensions import db
 from ...user.models import User
 from ...utils.helpers import time_utcnow
+
+logger = logging.getLogger(__name__)
 
 
 @attr.s(frozen=True)
@@ -106,3 +109,32 @@ class ClearFailedLogins(PostAuthenticationHandler):
 
     def handle_post_auth(self, user):
         user.login_attempts = 0
+
+
+class PluginAuthenticationManager(AuthenticationManager):
+
+    def __init__(self, plugin_manager, session):
+        self.plugin_manager = plugin_manager
+        self.session = session
+
+    def authenticate(self, identifier, secret):
+        try:
+            user = self.plugin_manager.hook.flaskbb_authenticate(
+                identifier=identifier, secret=secret
+            )
+            if user is None:
+                raise StopAuthentication(_("Wrong username or password."))
+            self.plugin_manager.hook.flaskbb_post_authenticate(user=user)
+            return user
+        except StopAuthentication as e:
+            self.plugin_manager.hook.flaskbb_authentication_failed(
+                identifier=identifier
+            )
+            raise
+        finally:
+            try:
+                self.session.commit()
+            except Exception:
+                logger.exception("Exception while processing login")
+                self.session.rollback()
+                raise

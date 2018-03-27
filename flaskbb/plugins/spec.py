@@ -262,6 +262,62 @@ def flaskbb_authentication_failed(identifier):
     """
 
 
+@spec(firstresult=True)
+def flaskbb_reauth_attempt(user, secret):
+    """Hook for handling reauth in FlaskBB
+
+    These hooks receive the currently authenticated user
+    and the entered secret. Only the first response from
+    this hook is considered -- similar to the authenticate
+    hooks. A successful attempt should return True, otherwise
+    None for an unsuccessful or untried reauth from an
+    implementation. Reauth will be considered a failure if
+    no implementation return True.
+
+    If a hook decides that a reauthenticate attempt should
+    cease, it may raise StopAuthentication.
+
+    Example of checking secret or passing to the next implementer::
+
+        @impl
+        def flaskbb_reauth_attempt(user, secret):
+            if check_password(user.password, secret):
+                return True
+
+
+    Example of forcefully ending reauth::
+
+        @impl
+        def flaskbb_reauth_attempt(user, secret):
+            if user.login_attempts > 5:
+                raise StopAuthentication(_("Too many failed authentication attempts"))
+    """
+
+
+@spec
+def flaskbb_post_reauth(user):
+    """Hook called after successfully reauthenticating.
+
+    These hooks are called a user has passed the flaskbb_reauth_attempt
+    hooks but before their reauth is confirmed so a post reauth implementer
+    may still force a reauth to fail by raising StopAuthentication.
+
+    Results from these hooks are not considered.
+    """
+
+@spec
+def flaskbb_reauth_failed(user):
+    """Hook called if a reauth fails.
+
+    These hooks will only be called if no implementation
+    for flaskbb_reauth_attempt returns a True result or if
+    an implementation raises StopAuthentication.
+
+    If an implementation raises ForceLogout it should register
+    itself as trylast to give other reauth failed handlers an
+    opprotunity to run first.
+    """
+
 # Form hooks
 @spec
 def flaskbb_form_new_post(form):

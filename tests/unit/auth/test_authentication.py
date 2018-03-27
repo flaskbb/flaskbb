@@ -1,11 +1,15 @@
 from datetime import datetime, timedelta
 
 import pytest
-from freezegun import freeze_time
-from pytz import UTC
-
 from flaskbb.auth.services import authentication as auth
-from flaskbb.core.auth.authentication import StopAuthentication
+from flaskbb.core.auth.authentication import (AuthenticationFailureHandler,
+                                              AuthenticationProvider,
+                                              PostAuthenticationHandler,
+                                              StopAuthentication)
+from flaskbb.plugins import spec
+from freezegun import freeze_time
+from pluggy import HookimplMarker
+from pytz import UTC
 
 pytestmark = pytest.mark.usefixtures('default_settings')
 
@@ -105,3 +109,91 @@ class TestBlockUnactivatedUser(object):
             self.handler.handle_post_auth(unactivated_user)
 
         assert 'In order to use your account' in excinfo.value.reason
+
+
+class TestPluginAuthenticationManager(object):
+
+    def raises_stop_authentication_if_user_isnt_authenticated(
+            self, plugin_manager, mocker, database
+    ):
+        service = self._get_auth_manager(plugin_manager, database)
+        auth = mocker.MagicMock(spec=AuthenticationProvider)
+        plugin_manager.register(self.impls(auth=auth))
+
+        with pytest.raises(StopAuthentication) as excinfo:
+            service.authenticate('doesnt exist', 'nope')
+
+        auth.assert_called_once_with(identifier='doesnt exist', secret='nope')
+        assert excinfo.value.reason == "Wrong username or password."
+
+    def test_runs_failed_hooks_when_stopauthentication_is_raised(
+            self, plugin_manager, mocker, database
+    ):
+        service = self._get_auth_manager(plugin_manager, database)
+        failure = mocker.MagicMock(spec=AuthenticationFailureHandler)
+        plugin_manager.register(self.impls(failure=failure))
+
+        with pytest.raises(StopAuthentication):
+            service.authenticate('doesnt exist', 'nope')
+
+        failure.assert_called_once_with(identifier='doesnt exist')
+
+    def test_runs_post_auth_handler_if_user_authenticates(
+            self, plugin_manager, mocker, Fred, database
+    ):
+        service = self._get_auth_manager(plugin_manager, database)
+        auth = mocker.MagicMock(spec=AuthenticationProvider, return_value=Fred)
+        post_auth = mocker.MagicMock(spec=PostAuthenticationHandler)
+        plugin_manager.register(self.impls(auth=auth, post_auth=post_auth))
+
+        service.authenticate(Fred.email, 'fred')
+
+        auth.assert_called_once_with(identifier=Fred.email, secret='fred')
+        post_auth.assert_called_once_with(user=Fred)
+
+    def test_reraises_if_session_commit_fails(
+            self, mocker, plugin_manager, Fred
+    ):
+
+        class NotAnActualException(Exception):
+            pass
+
+        db = mocker.Mock()
+        db.session.commit.side_effect = NotAnActualException
+        service = self._get_auth_manager(plugin_manager, db)
+
+        with pytest.raises(NotAnActualException):
+            service.authenticate('doesnt exist', 'nope')
+
+        db.session.rollback.assert_called_once_with()
+
+    def _get_auth_manager(self, plugin_manager, db):
+        plugin_manager.add_hookspecs(spec)
+        return auth.PluginAuthenticationManager(
+            plugin_manager, session=db.session
+        )
+
+    @staticmethod
+    def impls(auth=None, post_auth=None, failure=None):
+        impl = HookimplMarker('flaskbb')
+
+        class Impls:
+            if auth is not None:
+
+                @impl
+                def flaskbb_authenticate(self, identifier, secret):
+                    return auth(identifier=identifier, secret=secret)
+
+            if post_auth is not None:
+
+                @impl
+                def flaskbb_post_authenticate(self, user):
+                    post_auth(user=user)
+
+            if failure is not None:
+
+                @impl
+                def flaskbb_authentication_failed(self, identifier):
+                    failure(identifier=identifier)
+
+        return Impls()
