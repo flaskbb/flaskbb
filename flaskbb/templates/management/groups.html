@@ -58,12 +58,15 @@
                         <a href="{{ url_for('management.edit_group', group_id = group.id) }}" class="btn btn-icon">
                             <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
+                        {# only display "Delete" if group is not part of the standard groups. #}
+                        {% if group.id > 6 %}
                         <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}">
                                 <span class="fa fa-trash text-danger"></span>
                             </button>
                         </form>
+                        {% endif %}
                     </div>
                 </div>
             {% else %}

@@ -14,3 +14,6 @@ script:
 after_success:
   - coverage combine tests
   - coveralls
+notifications:
+  webhooks: https://www.travisbuddy.com/
+  on_success: never

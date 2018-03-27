@@ -19,22 +19,14 @@
             <div class="settings-content">
                 <div class="stats">
                     <div class="row stats-row">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            {# TODO: I have a feeling that this can be done so much nicer #}
-                            {% if not celery_running %}
-                            <div class="alert-message alert-message-danger">
-                                <h4>{% trans %}There is a problem.{% endtrans %}</h4>
-                                <p>{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
-                                <p>{% trans %}You can start celery with this command:{% endtrans %}</p>
-                                <pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>
-                            </div>
-                            {% elif unread_reports > 0 %}
+                        <div class="overview-notifications col-md-12 col-sm-12 col-xs-12">
+                            {% if unread_reports > 0 %}
                             <div class="alert-message alert-message-warning">
                                 <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
                                 <p>{% trans url=url_for('management.unread_reports') %}You have <a href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
                             </div>
                             {% else %}
-                            <div class="alert-message alert-message-success">
+                            <div id="overview-no-notifications" class="alert-message alert-message-success">
                                 <h4>{% trans %}Everything seems alright.{% endtrans %}</h4>
                                 <p>{% trans %}No new notifications.{% endtrans %}</p>
                             </div>
@@ -118,13 +110,10 @@
                             </div>
                             -->
                             <div class="row stats-item">
-                                <div class="key pull-left">Celery</div><div class="value pull-right">
-                                {% if celery_running %}
-                                    <span class="text-success"><strong>running</strong></span>
-                                {% else %}
-                                <span class="text-danger"><strong>not running</strong></span>
-                                {% endif %}
-                                {{ celery_version }}
+                                <div class="key pull-left">Celery</div>
+                                <div class="value pull-right">
+                                    <span id="celery-status" class="text-warning">checking status</span>
+                                    {{ celery_version }}
                                 </div>
                             </div>
                             <div class="row stats-item">
@@ -150,10 +139,14 @@
                                 <div class="value pull-right">
                                     {% if not plugin.enabled %}
                                         <span class="text-danger">not enabled</span>
-                                    {% elif plugin.enabled and plugin.is_installed %}
+                                    {% elif plugin.enabled %}
+                                        {% if plugin.is_installed %}
                                         <span class="text-success">enabled &amp; installed</span>
-                                    {% elif plugin.enabled and not plugin.is_installed %}
+                                        {% elif not plugin.is_installable %}
+                                        <span class="text-success">enabled</span>
+                                        {% elif not plugin.is_installed %}
                                         <span class="text-warning">not installed</span>
+                                        {% endif %}
                                     {% endif %}
                                     {{ plugin.version }}
                                 </div>
@@ -166,4 +159,38 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+function celery_not_running_notification() {
+    content = "<div class='alert-message alert-message-danger'>" +
+        "<h4>{% trans %}There is a problem.{% endtrans %}</h4>" +
+        "<p>{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>" +
+        "<p>{% trans %}You can start celery with this command:{% endtrans %}</p>" +
+        "<pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>" +
+        "</div>";
+
+    // replace the no notifications notice with ours
+    if(document.getElementById("#overview-no-notifications") == null) {
+        $("#overview-no-notifications").replaceWith(content);
+    } else {
+        $(".overview-notifications").append(content);
+    }
+}
+
+$(document).ready(function () {
+    var $celerystatus = $('#celery-status');
+
+    $.getJSON('/admin/celerystatus', function(data) {
+        if(data.celery_running) {
+            $celerystatus.replaceWith("<span id='celery-status' class='text-success'><strong>running</strong></span>");
+        } else {
+            $celerystatus.replaceWith("<span id='celery-status' class='text-danger'><strong>not running</strong></span>");
+            celery_not_running_notification()
+        }
+    });
+});
+</script>
 {% endblock %}
