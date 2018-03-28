@@ -34,19 +34,47 @@ class ForceLogout(BaseFlaskBBError):
 
 
 class AuthenticationManager(ABC):
+    """
+    Used to handle the authentication process. A default is implemented,
+    however this interface is provided in case alternative flows are needed.
+
+    If a user successfully passes through the entire authentication process,
+    then it should be returned to the caller.
+    """
 
     @abstractmethod
     def authenticate(self, identifier, secret):
-        """
-        Manages the entire authentication process in FlaskBB.
-
-        If a user is successfully authenticated, it is returned
-        from this method.
-        """
         pass
 
 
 class AuthenticationProvider(ABC):
+    """
+    Used to provide an authentication service for FlaskBB.
+
+    For example, an implementer may choose to use LDAP as an authentication
+    source::
+
+        class LDAPAuthenticationProvider(AuthenticationProvider):
+            def __init__(self, ldap_client):
+                self.ldap_client = ldap_client
+
+            def authenticate(self, identifier, secret):
+                user_dn = "uid={},ou=flaskbb,ou=org".format(identifier)
+                try:
+                    self.ldap_client.bind_user(user_dn, secret)
+                    return User.query.join(
+                            UserLDAP
+                        ).filter(
+                            UserLDAP.dn==user_dn
+                        ).with_entities(User).one()
+                except Exception:
+                    return None
+
+    During an authentication process, a provider may raise a
+    :class:`flaskbb.core.auth.authentication.StopAuthentication` exception
+    to completely, but safely halt the process. This is most useful when
+    multiple providers are being used.
+    """
 
     @abstractmethod
     def authenticate(self, identifier, secret):
@@ -57,6 +85,17 @@ class AuthenticationProvider(ABC):
 
 
 class AuthenticationFailureHandler(ABC):
+    """
+    Used to post process authentication failures, such as no provider returning
+    a user or a provider raising
+    :class:`flaskbb.core.auth.authentication.StopAuthentication`.
+
+    Postprocessing may take many forms, such as incrementing the login attempts
+    locking an account if too many attempts are made, forcing a reauth if
+    the user is currently authenticated in a different session, etc.
+
+    Failure handlers should not return a value as it will not be considered.
+    """
 
     @abstractmethod
     def handle_authentication_failure(self, identifier):
@@ -67,6 +106,26 @@ class AuthenticationFailureHandler(ABC):
 
 
 class PostAuthenticationHandler(ABC):
+    """
+    Used to post process authentication success. Post authentication handlers
+    recieve the user instance that was returned by the successful
+    authentication rather than the identifer.
+
+    Postprocessors may decide to preform actions such as flashing a message
+    to the user, clearing failed login attempts, etc.
+
+    Alternatively, a postprocessor can decide to fail the authentication
+    process anyways by raising
+    :class:`flaskbb.core.auth.authentication.StopAuthentication`,
+    for example a user may successfully authenticate but has not yet activated
+    their account.
+
+    Cancelling a successful authentication will cause registered
+    :class:`flaskbb.core.auth.authentication.AuthenticationFailureHandler`
+    instances to be run.
+
+    Success handlers should not return a value as it will not be considered.
+    """
 
     @abstractmethod
     def handle_post_auth(self, user):
@@ -77,7 +136,14 @@ class PostAuthenticationHandler(ABC):
 
 
 class ReauthenticateManager(ABC):
+    """
+    Used to handle the reauthentication process in FlaskBB. A default
+    implementation is provided, however this is interface exists in case
+    alternative flows are desired.
 
+    Unlike the AuthenticationManager, there is no need to return the user to
+    the caller.
+    """
     @abstractmethod
     def reauthenticate(self, user, secret):
         pass
@@ -87,6 +153,38 @@ class ReauthenticateManager(ABC):
 
 
 class ReauthenticateProvider(ABC):
+    """
+    Used to reauthenticate a user that is already logged into the system,
+    for example when suspicious activity is detected in their session.
+
+    ReauthenticateProviders are similiar to
+    :class:`flaskbb.core.auth.authentication.AuthenticationProvider` except
+    they receive a user instance rather than an identifer for a user.
+
+    A successful reauthentication should return True while failures should
+    return None in order to give other providers an attempt run.
+
+    If a ReauthenticateProvider determines that reauthentication should
+    immediately end, it may raise
+    :class:`flaskbb.core.auth.authentication.StopAuthentication`
+    to safely end the process.
+
+
+    An example::
+
+        class LDAPReauthenticateProvider(ReauthenticateProvider):
+            def __init__(self, ldap_client):
+                self.ldap_client = ldap_client
+
+            def reauthenticate(self, user, secret):
+                user_dn = "uid={},ou=flaskbb,ou=org".format(user.username)
+                try:
+                    self.ldap_client.bind_user(user_dn, secret)
+                    return True
+                except Exception:
+                    return None
+
+    """
 
     @abstractmethod
     def reauthenticate(self, user, secret):
@@ -97,7 +195,14 @@ class ReauthenticateProvider(ABC):
 
 
 class ReauthenticateFailureHandler(ABC):
+    """
+    Used to manager reauthentication failures in FlaskBB.
 
+    ReauthenticateFailureHandlers are similiar to
+    :class:`flaskbb.core.auth.authentication.AuthenticationFailureHandler`
+    except they receive the user instance rather than an indentifier for a
+    user.
+    """
     @abstractmethod
     def handle_reauth_failure(self, user):
         pass
@@ -107,6 +212,14 @@ class ReauthenticateFailureHandler(ABC):
 
 
 class PostReauthenticateHandler(ABC):
+    """
+    Used to post process successful reauthentication attempts.
+
+    PostAuthenticationHandlers are similar to
+    :class:`flaskbb.core.auth.authentication.PostAuthenticationHandler`,
+    including their ability to cancel a successful attempt by raising
+    :class:`flaskbb.core.auth.authentication.StopAuthentication`
+    """
 
     @abstractmethod
     def handle_post_reauth(self, user):
