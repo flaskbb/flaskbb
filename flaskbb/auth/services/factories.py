@@ -20,7 +20,9 @@ from ...user.models import User
 from ...user.repo import UserRepository
 from ...utils.settings import flaskbb_config
 from .activation import AccountActivator
+from .authentication import PluginAuthenticationManager
 from .password import ResetPasswordService
+from .reauthentication import PluginReauthenticationManager
 from .registration import (EmailUniquenessValidator, RegistrationService,
                            UsernameRequirements, UsernameUniquenessValidator,
                            UsernameValidator)
@@ -62,3 +64,10 @@ def account_activator_factory():
         current_app.config['SECRET_KEY'], expiry=timedelta(hours=1)
     )
     return AccountActivator(token_serializer, User)
+
+
+def authentication_manager_factory():
+    return PluginAuthenticationManager(current_app.pluggy, db.session)
+
+def reauthentication_manager_factory():
+    return PluginReauthenticationManager(current_app.pluggy, db.session)

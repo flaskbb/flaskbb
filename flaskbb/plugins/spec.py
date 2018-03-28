@@ -150,6 +150,174 @@ def flaskbb_event_user_registered(username):
     """
 
 
+@spec(firstresult=True)
+def flaskbb_authenticate(identifier, secret):
+    """Hook for authenticating users in FlaskBB.
+    This hook should return either an instance of
+    :class:`flaskbb.user.models.User` or None.
+
+    If a hook decides that all attempts for authentication
+    should end, it may raise a
+    :class:`flaskbb.core.exceptions.StopAuthentication`
+    and include a reason why authentication was stopped.
+
+
+    Only the first User result will used and the default FlaskBB
+    authentication is tried last to give others an attempt to
+    authenticate the user instead.
+
+    Example of alternative auth::
+
+        def ldap_auth(identifier, secret):
+            "basic ldap example with imaginary ldap library"
+            user_dn = "uid={},ou=flaskbb,dc=flaskbb,dc=org"
+            try:
+                ldap.bind(user_dn, secret)
+                return User.query.join(
+                    UserLDAP
+                ).filter(
+                    UserLDAP.dn==user_dn
+                ).with_entities(User).one()
+            except:
+                return None
+
+        @impl
+        def flaskbb_authenticate(identifier, secret):
+            return ldap_auth(identifier, secret)
+
+    Example of ending authentication::
+
+        def prevent_login_with_too_many_failed_attempts(identifier):
+            user = User.query.filter(
+                db.or_(
+                    User.username == identifier,
+                    User.email == identifier
+                )
+            ).first()
+
+            if user is not None:
+                if has_too_many_failed_logins(user):
+                    raise StopAuthentication(_(
+                        "Your account is temporarily locked due to too many login attempts"
+                    ))
+
+        @impl(tryfirst=True)
+        def flaskbb_authenticate(user, identifier):
+            prevent_login_with_too_many_failed_attempts(identifier)
+
+    """
+
+
+@spec
+def flaskbb_post_authenticate(user):
+    """Hook for handling actions that occur after a user is
+    authenticated but before setting them as the current user.
+
+    This could be used to handle MFA. However, these calls will
+    be blocking and should be taken into account.
+
+    Responses from this hook are not considered at all. If a hook
+    should need to prevent the user from logging in, it should
+    register itself as tryfirst and raise a
+    :class:`flaskbb.core.exceptions.StopAuthentication`
+    and include why the login was prevented.
+
+    Example::
+
+        def post_auth(user):
+            today = utcnow()
+            if is_anniversary(today, user.date_joined):
+                flash(_("Happy registerversary!"))
+
+        @impl
+        def flaskbb_post_authenticate(user):
+            post_auth(user)
+    """
+
+
+@spec
+def flaskbb_authentication_failed(identifier):
+    """Hook for handling authentication failure events.
+    This hook will only be called when no authentication
+    providers successfully return a user or a
+    :class:`flaskbb.core.exceptions.StopAuthentication`
+    is raised during the login process.
+
+    Example::
+
+        def mark_failed_logins(identifier):
+            user = User.query.filter(
+                db.or_(
+                    User.username == identifier,
+                    User.email == identifier
+                )
+            ).first()
+
+            if user is not None:
+                if user.login_attempts is None:
+                    user.login_attempts = 1
+                else:
+                    user.login_attempts += 1
+                user.last_failed_login = utcnow()
+    """
+
+
+@spec(firstresult=True)
+def flaskbb_reauth_attempt(user, secret):
+    """Hook for handling reauth in FlaskBB
+
+    These hooks receive the currently authenticated user
+    and the entered secret. Only the first response from
+    this hook is considered -- similar to the authenticate
+    hooks. A successful attempt should return True, otherwise
+    None for an unsuccessful or untried reauth from an
+    implementation. Reauth will be considered a failure if
+    no implementation return True.
+
+    If a hook decides that a reauthenticate attempt should
+    cease, it may raise StopAuthentication.
+
+    Example of checking secret or passing to the next implementer::
+
+        @impl
+        def flaskbb_reauth_attempt(user, secret):
+            if check_password(user.password, secret):
+                return True
+
+
+    Example of forcefully ending reauth::
+
+        @impl
+        def flaskbb_reauth_attempt(user, secret):
+            if user.login_attempts > 5:
+                raise StopAuthentication(_("Too many failed authentication attempts"))
+    """
+
+
+@spec
+def flaskbb_post_reauth(user):
+    """Hook called after successfully reauthenticating.
+
+    These hooks are called a user has passed the flaskbb_reauth_attempt
+    hooks but before their reauth is confirmed so a post reauth implementer
+    may still force a reauth to fail by raising StopAuthentication.
+
+    Results from these hooks are not considered.
+    """
+
+@spec
+def flaskbb_reauth_failed(user):
+    """Hook called if a reauth fails.
+
+    These hooks will only be called if no implementation
+    for flaskbb_reauth_attempt returns a True result or if
+    an implementation raises StopAuthentication.
+
+    If an implementation raises ForceLogout it should register
+    itself as trylast to give other reauth failed handlers an
+    opprotunity to run first.
+    """
+
 # Form hooks
 @spec
 def flaskbb_form_new_post(form):
@@ -484,6 +652,5 @@ def flaskbb_tpl_form_new_topic_after(form):
     rendered (but before the submit button).
 
     in :file:`templates/forum/new_topic.html`
-
     :param form: The form object.
     """

@@ -17,13 +17,10 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (confirm_login, current_user, login_fresh,
                          login_required, login_user, logout_user)
-
 from flaskbb.auth.forms import (ForgotPasswordForm, LoginForm,
                                 LoginRecaptchaForm, ReauthForm, RegisterForm,
                                 RequestActivationForm, ResetPasswordForm)
-from flaskbb.exceptions import AuthenticationError
 from flaskbb.extensions import db, limiter
-from flaskbb.user.models import User
 from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    format_timedelta, get_available_languages,
                                    redirect_or_next, register_view,
@@ -31,12 +28,15 @@ from flaskbb.utils.helpers import (anonymous_required, enforce_recaptcha,
                                    requires_unactivated)
 from flaskbb.utils.settings import flaskbb_config
 
+from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo
 from ..core.exceptions import StopValidation, ValidationError
 from ..core.tokens import TokenError
 from .plugins import impl
-from .services import (account_activator_factory, registration_service_factory,
-                       reset_service_factory)
+from .services import (account_activator_factory,
+                       authentication_manager_factory,
+                       reauthentication_manager_factory,
+                       registration_service_factory, reset_service_factory)
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,9 @@ class Logout(MethodView):
 class Login(MethodView):
     decorators = [anonymous_required]
 
+    def __init__(self, authentication_manager_factory):
+        self.authentication_manager_factory = authentication_manager_factory
+
     def form(self):
         if enforce_recaptcha(limiter):
             return LoginRecaptchaForm()
@@ -64,19 +67,17 @@ class Login(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
+            auth_manager = self.authentication_manager_factory()
             try:
-                user = User.authenticate(form.login.data, form.password.data)
-                if not login_user(user, remember=form.remember_me.data):
-                    flash(
-                        _(
-                            "In order to use your account you have to "
-                            "activate it through the link we have sent to "
-                            "your email address."
-                        ), "danger"
-                    )
+                user = auth_manager.authenticate(
+                    identifier=form.login.data, secret=form.password.data
+                )
+                login_user(user, remember=form.remember_me.data)
                 return redirect_or_next(url_for("forum.index"))
-            except AuthenticationError:
-                flash(_("Wrong username or password."), "danger")
+            except StopAuthentication as e:
+                flash(e.reason, "danger")
+            except Exception:
+                flash(_("Unrecoverable error while handling login"))
 
         return render_template("auth/login.html", form=form)
 
@@ -84,6 +85,9 @@ class Login(MethodView):
 class Reauth(MethodView):
     decorators = [login_required, limiter.exempt]
     form = ReauthForm
+
+    def __init__(self, reauthentication_factory):
+        self.reauthentication_factory = reauthentication_factory
 
     def get(self):
         if not login_fresh():
@@ -93,12 +97,21 @@ class Reauth(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            if current_user.check_password(form.password.data):
+
+            reauth_manager = self.reauthentication_factory()
+            try:
+                user = reauth_manager.reauthenticate(
+                    user=current_user, secret=form.password.data
+                )
                 confirm_login()
                 flash(_("Reauthenticated."), "success")
                 return redirect_or_next(current_user.url)
+            except StopAuthentication as e:
+                flash(e.reason, "danger")
+            except Exception:
+                flash(_("Unrecoverable error while handling reauthentication"))
+                raise
 
-            flash(_("Wrong password."), "danger")
         return render_template("auth/reauth.html", form=form)
 
 
@@ -142,6 +155,7 @@ class Register(MethodView):
                     db.session.commit()
                 except Exception:  # noqa
                     logger.exception("Database error while resetting password")
+                    db.session.rollback()
                     flash(
                         _(
                             "Could not process registration due"
@@ -210,7 +224,6 @@ class ResetPassword(MethodView):
                 service.reset_password(
                     token, form.email.data, form.password.data
                 )
-                db.session.commit()
             except TokenError as e:
                 flash(e.reason, 'danger')
                 return redirect(url_for('auth.forgot_password'))
@@ -222,6 +235,14 @@ class ResetPassword(MethodView):
                 logger.exception("Error when resetting password")
                 flash(_('Error when resetting password'))
                 return redirect(url_for('auth.forgot_password'))
+            finally:
+                try:
+                    db.session.commit()
+                except Exception:
+                    logger.exception(
+                        "Error while finalizing database when resetting password"
+                    )
+                    db.session.rollback()
 
             flash(_("Your password has been updated."), "success")
             return redirect(url_for("auth.login"))
@@ -285,6 +306,7 @@ class ActivateAccount(MethodView):
                 db.session.commit()
             except Exception:  # noqa
                 logger.exception("Database error while activating account")
+                db.session.rollback()
                 flash(
                     _(
                         "Could not activate account due to an unrecoverable error"
@@ -345,8 +367,22 @@ def flaskbb_load_blueprints(app):
     )(auth)
 
     register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
-    register_view(auth, routes=['/login'], view_func=Login.as_view('login'))
-    register_view(auth, routes=['/reauth'], view_func=Reauth.as_view('reauth'))
+    register_view(
+        auth,
+        routes=['/login'],
+        view_func=Login.as_view(
+            'login',
+            authentication_manager_factory=authentication_manager_factory
+        )
+    )
+    register_view(
+        auth,
+        routes=['/reauth'],
+        view_func=Reauth.as_view(
+            'reauth',
+            reauthentication_factory=reauthentication_manager_factory
+        )
+    )
     register_view(
         auth,
         routes=['/register'],
@@ -382,7 +418,6 @@ def flaskbb_load_blueprints(app):
             account_activator_factory=account_activator_factory
         )
     )
-
     register_view(
         auth,
         routes=['/activate/confirm', '/activate/confirm/<token>'],
@@ -391,4 +426,5 @@ def flaskbb_load_blueprints(app):
             account_activator_factory=account_activator_factory
         )
     )
+
     app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])

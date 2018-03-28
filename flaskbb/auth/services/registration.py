@@ -9,8 +9,7 @@
     :license: BSD, see LICENSE for more details
 """
 
-from collections import namedtuple
-
+import attr
 from flask_babelplus import gettext as _
 from sqlalchemy import func
 
@@ -22,9 +21,12 @@ __all__ = (
     "UsernameUniquenessValidator"
 )
 
-UsernameRequirements = namedtuple(
-    'UsernameRequirements', ['min', 'max', 'blacklist']
-)
+
+@attr.s(hash=False, repr=True, frozen=True, cmp=False)
+class UsernameRequirements(object):
+    min = attr.ib()
+    max = attr.ib()
+    blacklist = attr.ib()
 
 
 class UsernameValidator(UserValidator):
