@@ -6,16 +6,8 @@ Authentication Interfaces
 =========================
 
 
-FlaskBB exposes several interfaces and hooks to customize authentication. The
-below should be considered an exhaustive guide for interfaces and hooks in
-FlaskBB but not necessarily their implementations in FlaskBB (though, where
-appropriate, these implementations are documented).
-
-Exceptions
-----------
-
-.. autoexception:: StopAuthentication
-.. autoexception:: ForceLogout
+FlaskBB exposes several interfaces and hooks to customize authentication and
+implementations of these. For details on the hooks see :ref:`hooks`
 
 Authentication
 --------------
@@ -27,7 +19,6 @@ Authentication
 .. autoclass:: AuthenticationProvider
    :members:
    :undoc-members:
-
 
 .. autoclass:: PostAuthenticationHandler
    :members:
@@ -56,14 +47,8 @@ Reauthentication
    :members:
    :undoc-members:
 
+Exceptions
+----------
 
-Relevant Plugin Hooks
----------------------
-
-.. module:: flaskbb.plugins.spec
-
-.. autofunction:: flaskbb_post_authenticate
-.. autofunction:: flaskbb_authentication_failed
-.. autofunction:: flaskbb_reauth_attempt
-.. autofunction:: flaskbb_post_reauth
-.. autofunction:: flaskbb_reauth_failed
+.. autoexception:: StopAuthentication
+.. autoexception:: ForceLogout
