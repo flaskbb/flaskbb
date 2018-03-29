@@ -11,14 +11,23 @@
     :license: BSD, see LICENSE for more details
 """
 
+
 class BaseFlaskBBError(Exception):
-    "Root exception for FlaskBB"
+    """
+    Root exception for FlaskBB.
+    """
 
 
 class ValidationError(BaseFlaskBBError):
     """
     Used to signal validation errors for things such as
     token verification, user registration, etc.
+
+    :param str attribute: The attribute the validation error applies to,
+        if the validation error applies to multiple attributes or to
+        the entire object, this should be set to None
+    :param str reason: Why the attribute, collection of attributes or object
+        is invalid.
     """
 
     def __init__(self, attribute, reason):
@@ -33,11 +42,11 @@ class StopValidation(BaseFlaskBBError):
     validation should end immediately and no further
     processing should be done.
 
-    The reasons passed should be an iterable of
-    tuples consisting of `(attribute, reason)`
-
     Can also be used to communicate all errors
     raised during a validation run.
+
+    :param reasons: A sequence of `(attribute, reason)` pairs explaining
+        why the object is invalid.
     """
 
     def __init__(self, reasons):

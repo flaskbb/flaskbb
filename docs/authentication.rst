@@ -2,8 +2,8 @@
 
 .. module:: flaskbb.core.auth.authentication
 
-Authentication Interfaces
-=========================
+Authentication
+==============
 
 
 FlaskBB exposes several interfaces and hooks to customize authentication and
