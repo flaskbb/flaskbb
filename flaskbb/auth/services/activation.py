@@ -17,6 +17,10 @@ from ...email import send_activation_token
 
 
 class AccountActivator(_AccountActivator):
+    """
+    Default account activator for FlaskBB, handles the activation
+    process through email.
+    """
 
     def __init__(self, token_serializer, users):
         self.token_serializer = token_serializer

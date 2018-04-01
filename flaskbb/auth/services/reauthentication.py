@@ -24,6 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class DefaultFlaskBBReauthProvider(ReauthenticateProvider):
+    """
+    This is the default reauth provider in FlaskBB, it compares the provided
+    password against the current user's hashed password.
+    """
 
     def reauthenticate(self, user, secret):
         if check_password_hash(user.password, secret):  # pragma: no branch
@@ -31,12 +35,20 @@ class DefaultFlaskBBReauthProvider(ReauthenticateProvider):
 
 
 class ClearFailedLoginsOnReauth(PostReauthenticateHandler):
+    """
+    Handler that clears failed login attempts after a successful
+    reauthentication.
+    """
 
     def handle_post_reauth(self, user):
         user.login_attempts = 0
 
 
 class MarkFailedReauth(ReauthenticateFailureHandler):
+    """
+    Failure handler that marks the failed reauth attempt as a failed login
+    and when it occurred.
+    """
 
     def handle_reauth_failure(self, user):
         user.login_attempts += 1
@@ -44,6 +56,10 @@ class MarkFailedReauth(ReauthenticateFailureHandler):
 
 
 class PluginReauthenticationManager(ReauthenticateManager):
+    """
+    Default reauthentication manager for FlaskBB, it relies on plugin hooks
+    to manage the reauthentication flow.
+    """
 
     def __init__(self, plugin_manager, session):
         self.plugin_manager = plugin_manager

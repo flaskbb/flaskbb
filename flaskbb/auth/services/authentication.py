@@ -12,9 +12,10 @@
 import logging
 from datetime import datetime
 
+from pytz import UTC
+
 import attr
 from flask_babelplus import gettext as _
-from pytz import UTC
 from werkzeug import check_password_hash
 
 from ...core.auth.authentication import (AuthenticationFailureHandler,
@@ -31,11 +32,20 @@ logger = logging.getLogger(__name__)
 
 @attr.s(frozen=True)
 class FailedLoginConfiguration(object):
+    """
+    Used to configure how many failed logins are accepted until an account
+    is temporarily locked out and how long to temporarily lock the account
+    out for.
+    """
     limit = attr.ib()
     lockout_window = attr.ib()
 
 
 class BlockTooManyFailedLogins(AuthenticationProvider):
+    """
+    Pre authentication check to block a login from an account that has too
+    many failed login attempts in place.
+    """
 
     def __init__(self, configuration):
         self.configuration = configuration
@@ -65,6 +75,15 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
 
 
 class DefaultFlaskBBAuthProvider(AuthenticationProvider):
+    """
+    This is the default username/email and password authentication checker,
+    locates the user based on the identifer passed -- either username or email
+    -- and compares the supplied password to the hash connected to the matching
+    user (if any).
+
+    Offers protection against timing attacks that would rely on the difference
+    in response time from not matching a password hash.
+    """
 
     def authenticate(self, identifier, secret):
         user = User.query.filter(
@@ -81,6 +100,10 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
 
 
 class MarkFailedLogin(AuthenticationFailureHandler):
+    """
+    Failure handler that marks the login attempt on the user and sets the
+    last failed date when it happened.
+    """
 
     def handle_authentication_failure(self, identifier):
         user = User.query.filter(
@@ -93,6 +116,10 @@ class MarkFailedLogin(AuthenticationFailureHandler):
 
 
 class BlockUnactivatedUser(PostAuthenticationHandler):
+    """
+    Post auth handler that will block a user that has managed to pass the
+    authentication check but has not actually activated their account yet.
+    """
 
     def handle_post_auth(self, user):
         if not user.activated:  # pragma: no branch
@@ -106,12 +133,20 @@ class BlockUnactivatedUser(PostAuthenticationHandler):
 
 
 class ClearFailedLogins(PostAuthenticationHandler):
+    """
+    Post auth handler that clears all failed login attempts from a user's
+    account.
+    """
 
     def handle_post_auth(self, user):
         user.login_attempts = 0
 
 
 class PluginAuthenticationManager(AuthenticationManager):
+    """
+    Authentication manager relying on plugin hooks to manage the authentication
+    process. This is the default authentication manager for FlaskBB.
+    """
 
     def __init__(self, plugin_manager, session):
         self.plugin_manager = plugin_manager

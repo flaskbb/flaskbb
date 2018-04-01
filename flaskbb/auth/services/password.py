@@ -17,6 +17,10 @@ from ...email import send_reset_token
 
 
 class ResetPasswordService(_ResetPasswordService):
+    """
+    Default password reset handler for FlaskBB, manages the process through
+    email.
+    """
 
     def __init__(self, token_serializer, users, token_verifiers):
         self.token_serializer = token_serializer
@@ -24,6 +28,13 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
+        """
+        Looks up a user by email and raises a
+        :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
+        if that user does not exist, otherwise generates a reset password
+        token and emails it to the user.
+        """
+
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
@@ -38,6 +49,18 @@ class ResetPasswordService(_ResetPasswordService):
         )
 
     def reset_password(self, token, email, new_password):
+        """
+        Resets a user's password if the email entered by the user matches
+        the email on file for the user in FlaskBB.
+
+        If the provided token is not a reset password token, then it raises a
+        :class:`TokenError<flaskbb.core.tokens.TokenError>` and if the
+        information provided by the user does not meet criteria defined
+        by the passed token verifiers, then a
+        :class:`StopValidation<flaskbb.core.exceptions.StopValidation>` is
+        raised.
+        """
+
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.RESET_PASSWORD:
             raise TokenError.invalid()
