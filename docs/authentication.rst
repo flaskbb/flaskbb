@@ -1,16 +1,15 @@
 .. _authentication:
 
-.. module:: flaskbb.core.auth.authentication
-
 Authentication
 ==============
-
 
 FlaskBB exposes several interfaces and hooks to customize authentication and
 implementations of these. For details on the hooks see :ref:`hooks`
 
-Authentication
---------------
+Authentication Interfaces
+-------------------------
+
+.. module:: flaskbb.core.auth.authentication
 
 .. autoclass:: AuthenticationManager
    :members:
@@ -28,8 +27,22 @@ Authentication
    :members:
    :undoc-members:
 
-Reauthentication
-----------------
+
+Authentication Provided Implementations
+---------------------------------------
+
+.. module:: flaskbb.auth.services.authentication
+.. autoclass:: DefaultFlaskBBAuthProvider
+.. autoclass:: MarkFailedLogin
+.. autoclass:: BlockUnactivatedUser
+.. autoclass:: ClearFailedLogins
+.. autoclass:: PluginAuthenticationManager
+
+
+Reauthentication Interfaces
+---------------------------
+
+.. module:: flaskbb.core.auth.authentication
 
 .. autoclass:: ReauthenticateManager
    :members:
@@ -47,8 +60,21 @@ Reauthentication
    :members:
    :undoc-members:
 
+
+Reauthentication Provided Implementations
+-----------------------------------------
+
+.. module:: flaskbb.auth.services.reauthentication
+.. autoclass:: DefaultFlaskBBReauthProvider
+.. autoclass:: ClearFailedLoginsOnReauth
+.. autoclass:: MarkFailedReauth
+.. autoclass:: PluginReauthenticationManager
+
+
 Exceptions
 ----------
+
+.. module:: flaskbb.core.auth.authentication
 
 .. autoexception:: StopAuthentication
 .. autoexception:: ForceLogout
