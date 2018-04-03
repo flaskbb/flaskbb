@@ -8,6 +8,7 @@ API
 
    coreexceptions
    models
+   registration
    authentication
    accountmanagement
    tokens

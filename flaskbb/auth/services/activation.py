@@ -27,14 +27,6 @@ class AccountActivator(_AccountActivator):
         self.users = users
 
     def initiate_account_activation(self, email):
-        """
-        Looks a user up via email and sends an activation token.
-
-        Will raise a
-        :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
-        if either the email doesn't exist in the application or the account
-        tied to the email is already activated.
-        """
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
@@ -52,18 +44,6 @@ class AccountActivator(_AccountActivator):
         )
 
     def activate_account(self, token):
-        """
-        Activates an account based on the supplied token.
-
-        Will raise
-        :class:`TokenError<flaskbb.core.tokens.TokenError>` if the supplied
-        token is not an account activation token and a
-        :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
-        if the account is already activated.
-
-        Otherwise marks the account as activated.
-        """
-
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.ACTIVATE_ACCOUNT:
             raise TokenError.invalid()
