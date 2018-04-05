@@ -17,6 +17,9 @@ A hook needs a hook specification which are defined in
 :mod:`flaskbb.plugins.spec`. All hooks have to be prefixed with
 ``flaskbb_`` and template hooks with ``flaskbb_tpl_``.
 
+Be sure to also check out the :ref:`api` documentation for interfaces that
+interact with these plugins in interesting ways.
+
 
 Python Hooks
 ------------
@@ -77,7 +80,6 @@ FlaskBB Form Hooks
 
 .. autofunction:: flaskbb_form_new_post_save
 .. autofunction:: flaskbb_form_new_post
-
 .. autofunction:: flaskbb_form_new_topic
 .. autofunction:: flaskbb_form_new_topic_save
 

@@ -24,12 +24,20 @@ __all__ = (
 
 @attr.s(hash=False, repr=True, frozen=True, cmp=False)
 class UsernameRequirements(object):
+    """
+    Configuration for username requirements, minimum and maximum length
+    and disallowed names.
+    """
     min = attr.ib()
     max = attr.ib()
     blacklist = attr.ib()
 
 
 class UsernameValidator(UserValidator):
+    """
+    Validates that the username for the registering user meets the minimum
+    requirements (appropriate length, not a forbidden name).
+    """
 
     def __init__(self, requirements):
         self._requirements = requirements
@@ -58,6 +66,9 @@ class UsernameValidator(UserValidator):
 
 
 class UsernameUniquenessValidator(UserValidator):
+    """
+    Validates that the provided username is unique in the application.
+    """
 
     def __init__(self, users):
         self.users = users
@@ -77,6 +88,9 @@ class UsernameUniquenessValidator(UserValidator):
 
 
 class EmailUniquenessValidator(UserValidator):
+    """
+    Validates that the provided email is unique in the application.
+    """
 
     def __init__(self, users):
         self.users = users
@@ -93,6 +107,17 @@ class EmailUniquenessValidator(UserValidator):
 
 
 class RegistrationService(UserRegistrationService):
+    """
+    Default registration service for FlaskBB, runs the registration information
+    against the provided validators and if it passes, creates the user.
+
+    If any of the provided
+    :class:`UserValidators<flaskbb.core.auth.registration.UserValidator>`
+    raise a :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
+    then the register method will raise a
+    :class:`StopValidation<flaskbb.core.exceptions.StopValidation>` with all
+    reasons why the registration was prevented.
+    """
 
     def __init__(self, validators, user_repo):
         self.validators = validators

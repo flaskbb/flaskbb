@@ -17,6 +17,10 @@ from ...email import send_reset_token
 
 
 class ResetPasswordService(_ResetPasswordService):
+    """
+    Default password reset handler for FlaskBB, manages the process through
+    email.
+    """
 
     def __init__(self, token_serializer, users, token_verifiers):
         self.token_serializer = token_serializer
@@ -24,6 +28,7 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
+
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
@@ -38,6 +43,7 @@ class ResetPasswordService(_ResetPasswordService):
         )
 
     def reset_password(self, token, email, new_password):
+
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.RESET_PASSWORD:
             raise TokenError.invalid()

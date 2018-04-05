@@ -166,6 +166,9 @@ def flaskbb_authenticate(identifier, secret):
     authentication is tried last to give others an attempt to
     authenticate the user instead.
 
+    See also:
+    :class:`AuthenticationProvider<flaskbb.core.auth.AuthenticationProvider>`
+
     Example of alternative auth::
 
         def ldap_auth(identifier, secret):
@@ -222,6 +225,9 @@ def flaskbb_post_authenticate(user):
     :class:`flaskbb.core.exceptions.StopAuthentication`
     and include why the login was prevented.
 
+    See also:
+    :class:`PostAuthenticationHandler<flaskbb.core.auth.PostAuthenticationHandler>`
+
     Example::
 
         def post_auth(user):
@@ -242,6 +248,9 @@ def flaskbb_authentication_failed(identifier):
     providers successfully return a user or a
     :class:`flaskbb.core.exceptions.StopAuthentication`
     is raised during the login process.
+
+    See also:
+    :class:`AuthenticationFailureHandler<flaskbb.core.auth.AuthenticationFailureHandler>`
 
     Example::
 
@@ -277,6 +286,9 @@ def flaskbb_reauth_attempt(user, secret):
     If a hook decides that a reauthenticate attempt should
     cease, it may raise StopAuthentication.
 
+    See also:
+    :class:`ReauthenticateProvider<flaskbb.core.auth.ReauthenticateProvider>`
+
     Example of checking secret or passing to the next implementer::
 
         @impl
@@ -303,6 +315,9 @@ def flaskbb_post_reauth(user):
     may still force a reauth to fail by raising StopAuthentication.
 
     Results from these hooks are not considered.
+
+    See also:
+    :class:`PostReauthenticateHandler<flaskbb.core.auth.PostAuthenticationHandler>`
     """
 
 @spec
@@ -316,6 +331,9 @@ def flaskbb_reauth_failed(user):
     If an implementation raises ForceLogout it should register
     itself as trylast to give other reauth failed handlers an
     opprotunity to run first.
+
+    See also:
+    :class:`ReauthenticateFailureHandler<flaskbb.core.auth.ReauthenticateFailureHandler>`
     """
 
 # Form hooks
