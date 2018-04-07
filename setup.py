@@ -64,14 +64,6 @@ def read(*parts):
         return fp.read()
 
 
-def find_version(*file_paths):
-    version_match = re.search(r'__version__\s+=\s+(.*)',
-                              read(*file_paths)).group(1)
-    if version_match:
-        return str(ast.literal_eval(version_match))
-    raise RuntimeError("Unable to find version string.")
-
-
 def get_requirements(e=None):
     rf = "requirements.txt" if e is None else 'requirements-{}.txt'.format(e)
     r = read(rf)
@@ -84,7 +76,7 @@ install_requires = get_requirements()
 
 setup(
     name='FlaskBB',
-    version=find_version("flaskbb", "__init__.py"),
+    version="2.0.0.dev0",
     url='https://github.com/sh4nks/flaskbb/',
     license='BSD',
     author='Peter Justin',
