@@ -12,7 +12,7 @@ for us. A list of available plugins can be found at the `GitHub Wiki`_. A
 proper index for FlaskBB Plugins and Themes still have to be built.
 
 If you are interested in creating new plugins, checkout out the
-:doc:`Developing new Plugins </plugin_development>` page.
+:ref:`Developing new Plugins <plugin_development>` page.
 
 .. _`pluggy plugin system`: https://pluggy.readthedocs.io/en/latest/
 .. _`GitHub Wiki`: https://github.com/sh4nks/flaskbb/wiki
