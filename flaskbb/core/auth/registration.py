@@ -33,8 +33,7 @@ class UserRegistrationInfo(object):
 class UserValidator(ABC):
     """
     Used to validate user registrations and stop the registration process
-    by raising a
-    :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`.
+    by raising a :class:`~flaskbb.core.exceptions.ValidationError`.
     """
 
     @abstractmethod
@@ -43,7 +42,7 @@ class UserValidator(ABC):
         This method is abstract.
 
         :param user_info: The provided registration information.
-        :type user_info: :class:`UserRegistrationInfo<flaskbb.core.auth.registration.UserRegistrationInfo>`
+        :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
         """
 
     def __call__(self, user_info):
@@ -63,6 +62,6 @@ class UserRegistrationService(ABC):
         This method is abstract.
 
         :param user_info: The provided user registration information.
-        :type user_info: :class:`UserRegistrationInfo<flaskbb.core.auth.registration.UserRegistrationInfo>`
+        :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
         """
         pass

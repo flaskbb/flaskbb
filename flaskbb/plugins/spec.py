@@ -387,6 +387,15 @@ def flaskbb_form_new_topic_save(form, topic):
     """
 
 
+@spec
+def flaskbb_form_registration(form):
+    """
+    Hook for modifying the :class:`~flaskbb.auth.forms.RegisterForm`.
+
+    :param form: The form class
+    """
+
+
 # Template Hooks
 @spec
 def flaskbb_tpl_navigation_before():

@@ -122,6 +122,7 @@ class Register(MethodView):
         self.registration_service_factory = registration_service_factory
 
     def form(self):
+        current_app.pluggy.hook.flaskbb_form_registration(form=RegisterForm)
         form = RegisterForm()
 
         form.language.choices = get_available_languages()
