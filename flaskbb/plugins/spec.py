@@ -79,6 +79,57 @@ def flaskbb_additional_setup(app, pluggy):
 
 
 @spec
+def flaskbb_load_post_markdown_class(app):
+    """
+    Hook for loading a mistune renderer child class in order to render
+    markdown on posts and user signatures. All classes returned by this hook
+    will be composed into a single class to render markdown for posts. Since
+    all classes will be composed together, child classes should call super as
+    appropriate and not add any new arguments to `__init__` since the class
+    will be insantiated with predetermined arguments.
+
+    Example::
+
+        class YellingRenderer(mistune.Renderer):
+            def paragraph(self, text):
+                return super(YellingRenderer, self).paragraph(text.upper())
+
+        @impl
+        def flaskbb_load_post_markdown_class():
+            return YellingRenderer
+
+    :param app: The application object associated with the class if needed
+    :type app: Flask
+    """
+
+
+@spec
+def flaskbb_load_nonpost_markdown_class(app):
+    """
+    Hook for loading a mistune renderer child class in order to render
+    markdown in locations other than posts, for example in category or
+    forum descriptions. All classes returned by this hook will be composed into
+    a single class to render markdown for posts. Since all classes will be
+    composed together, child classes should call super as appropriate and not
+    add any new arguments to `__init__` since the class will be insantiated
+    with predetermined arguments.
+
+    Example::
+
+        class YellingRenderer(mistune.Renderer):
+            def paragraph(self, text):
+                return super(YellingRenderer, self).paragraph(text.upper())
+
+        @impl
+        def flaskbb_load_nonpost_markdown_class():
+            return YellingRenderer
+
+    :param app: The application object associated with the class if needed
+    :type app: Flask
+    """
+
+
+@spec
 def flaskbb_cli(cli, app):
     """Hook for registering CLI commands.
 
@@ -320,6 +371,7 @@ def flaskbb_post_reauth(user):
     :class:`PostReauthenticateHandler<flaskbb.core.auth.PostAuthenticationHandler>`
     """
 
+
 @spec
 def flaskbb_reauth_failed(user):
     """Hook called if a reauth fails.
@@ -335,6 +387,7 @@ def flaskbb_reauth_failed(user):
     See also:
     :class:`ReauthenticateFailureHandler<flaskbb.core.auth.ReauthenticateFailureHandler>`
     """
+
 
 # Form hooks
 @spec

@@ -37,7 +37,7 @@ from flaskbb.user.models import Guest, User
 from flaskbb.utils.helpers import (app_config_from_env, crop_title,
                                    format_date, forum_is_unread,
                                    get_alembic_locations, get_flaskbb_config,
-                                   is_online, mark_online, render_markup,
+                                   is_online, mark_online,
                                    render_template, time_since, time_utcnow,
                                    topic_is_unread)
 # permission checks (here they are used for the jinja filters)
@@ -53,6 +53,7 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
+from . import markup
 from .auth import views as auth_views
 from .forum import views as forum_views
 from .management import views as management_views
@@ -225,7 +226,6 @@ def configure_template_filters(app):
     """Configures the template filters."""
     filters = {}
 
-    filters['markup'] = render_markup
     filters['format_date'] = format_date
     filters['time_since'] = time_since
     filters['is_online'] = is_online

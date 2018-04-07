@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime as dt
-from flaskbb.utils.helpers import slugify, forum_is_unread, topic_is_unread, \
-    crop_title, render_markup, is_online, format_date, format_quote, \
-    get_image_info, check_image, time_utcnow
-from flaskbb.utils.settings import flaskbb_config
+
 from flaskbb.forum.models import Forum
+from flaskbb.utils.helpers import (check_image, crop_title, format_date,
+                                   format_quote, forum_is_unread,
+                                   get_image_info, is_online,
+                                   slugify, time_utcnow, topic_is_unread)
+from flaskbb.utils.settings import flaskbb_config
 
 
 def test_slugify():
@@ -63,15 +65,17 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     assert topic_is_unread(topic, topicsread, user, forumsread)
 
     # TopicsRead is none and the forum has never been marked as read
-    assert topic_is_unread(topic, topicsread=None, user=user,
-                           forumsread=forumsread)
+    assert topic_is_unread(
+        topic, topicsread=None, user=user, forumsread=forumsread
+    )
 
     # lets mark the forum as read
     forumsread.cleared = time_utcnow()
     forumsread.last_read = time_utcnow()
     forumsread.save()
-    assert not topic_is_unread(topic, topicsread=None, user=user,
-                               forumsread=forumsread)
+    assert not topic_is_unread(
+        topic, topicsread=None, user=user, forumsread=forumsread
+    )
 
     # disabled tracker
     flaskbb_config["TRACKER_LENGTH"] = 0
@@ -91,11 +95,6 @@ def test_crop_title(default_settings):
 
     assert crop_title(short_title) == short_title
     assert crop_title(long_title) == "This is just a..."
-
-
-def test_render_markup(default_settings):
-    markdown = "**Bold**"
-    assert render_markup(markdown) == "<p><strong>Bold</strong></p>\n"
 
 
 def test_is_online(default_settings, user):

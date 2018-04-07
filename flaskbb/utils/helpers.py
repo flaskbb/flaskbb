@@ -34,7 +34,6 @@ from flask_themes2 import get_themes_list, render_theme_template
 from flaskbb._compat import (iteritems, range_method, text_type, string_types,
                              to_bytes, to_unicode)
 from flaskbb.extensions import babel, redis_store
-from flaskbb.utils.markup import markdown
 from flaskbb.utils.settings import flaskbb_config
 from jinja2 import Markup
 from PIL import ImageFile
@@ -369,14 +368,6 @@ def crop_title(title, length=None, suffix="..."):
         return title
 
     return title[:length].rsplit(' ', 1)[0] + suffix
-
-
-def render_markup(text):
-    """Renders the given text as markdown
-
-    :param text: The text that should be rendered as markdown
-    """
-    return Markup(markdown.render(text))
 
 
 def is_online(user):

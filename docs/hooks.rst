@@ -46,6 +46,8 @@ The hooks below are listed in the order they are called.
 .. autofunction:: flaskbb_errorhandlers
 .. autofunction:: flaskbb_load_migrations
 .. autofunction:: flaskbb_load_translations
+.. autofunction:: flaskbb_load_post_markdown_class
+.. autofunction:: flaskbb_load_nonpost_markdown_class
 .. autofunction:: flaskbb_additional_setup
 
 
