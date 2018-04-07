@@ -7,8 +7,24 @@ Here you can see the full list of changes between each release.
 Version 2.0.0
 -------------
 
-Unreleased
+{{ RELEASE DATE }}
 
+* Improved management panel load time by requesting celery status async (PR #429)
+* Migrated FlaskBB internal behavior to use plugin hook system (PRs
+  #369, #413, #419, #423, #426, #435, #436)
+* Migrated behavior in flaskbb.auth from living in route handlers and into
+  services (PRs #421, #424)
+* Improved emoji support (PR #417)
+* Migrated private messages into a
+  [plugin](https://github.com/sh4nks/flaskbb-plugins/tree/master/conversations)
+  (PR #414)
+* Fixed issue where user could not re-select having the default theme (PR #387)
+* Fixed issue where a reinstall would attempt to drop the entire database
+  instead of just the tables associated with FlaskBB (PR #364)
+* Added ability to hide and unhide topics and posts, preventing unprivileged
+  users from viewing them (PR #325)
+* Fixed issue where password was not required when editing a user in the admin
+  panel (PR #321)
 * Migrated from Flask-Plugins to Pluggy as plugin system for plugins.
   Plugins are now loaded via entry points and thus have to be installed
   into the same environment as FlaskBB. During this migration we also moved
