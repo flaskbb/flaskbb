@@ -83,10 +83,12 @@ def flaskbb_load_post_markdown_class(app):
     """
     Hook for loading a mistune renderer child class in order to render
     markdown on posts and user signatures. All classes returned by this hook
-    will be composed into a single class to render markdown for posts. Since
-    all classes will be composed together, child classes should call super as
-    appropriate and not add any new arguments to `__init__` since the class
-    will be insantiated with predetermined arguments.
+    will be composed into a single class to render markdown for posts.
+
+    Since all classes will be composed together, child classes should call
+    super as appropriate and not add any new arguments to `__init__` since the
+    class will be insantiated with predetermined arguments.
+
 
     Example::
 
@@ -109,10 +111,12 @@ def flaskbb_load_nonpost_markdown_class(app):
     Hook for loading a mistune renderer child class in order to render
     markdown in locations other than posts, for example in category or
     forum descriptions. All classes returned by this hook will be composed into
-    a single class to render markdown for posts. Since all classes will be
-    composed together, child classes should call super as appropriate and not
-    add any new arguments to `__init__` since the class will be insantiated
-    with predetermined arguments.
+    a single class to render markdown for nonpost content (e.g. forum and
+    category descriptions).
+
+    Since all classes will be composed together, child classes should call
+    super as appropriate and not add any new arguments to `__init__` since the
+    class will be insantiated with predetermined arguments.
 
     Example::
 
