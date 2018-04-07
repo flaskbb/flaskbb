@@ -487,6 +487,8 @@ Here's what to do:
     cd flaskbb
     pip3.5 install --user -r requirements.txt
     pip3.5 install --user -e .
+    flaskbb makeconfig
+    flaskbb install
 
 * Click the PythonAnywhere logo to go back to the dashboard,
   then go to the "Web" tab, and click the "Add a new web app" button.
