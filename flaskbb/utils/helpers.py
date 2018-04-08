@@ -40,6 +40,12 @@ from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
 
+
+try:  # compat
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 logger = logging.getLogger(__name__)
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
