@@ -53,7 +53,7 @@ def new_user(username, email, password, group):
 @click.option("--password", "-p", help="The password of the user.")
 @click.option("--group", "-g", help="The group of the user.",
               type=click.Choice(["admin", "super_mod", "mod", "member"]))
-def change_user(username, password, email, group):
+def change_user(username, email, password, group):
     """Updates an user. Omit any options to use the interactive mode."""
 
     user = prompt_save_user(username, password, email, group, only_update=True)
