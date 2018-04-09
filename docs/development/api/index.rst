@@ -3,6 +3,9 @@
 API
 ===
 
+This is the software API for FlaskBB, such as interfaces, models, exceptions
+and provided implementations where appropriate.
+
 .. toctree::
    :maxdepth: 2
 
