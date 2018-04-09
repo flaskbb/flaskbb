@@ -205,6 +205,58 @@ def flaskbb_event_user_registered(username):
     """
 
 
+@spec
+def flaskbb_gather_registration_validators():
+    """
+    Hook for gathering user registration validators, implementers must return
+    a callable that accepts a
+    :class:`~flaskbb.core.auth.registration.UserRegistrationInfo` and raises
+    a :class:`~flaskbb.core.exceptions.ValidationError` if the registration
+    is invalid or :class:`~flaskbb.core.exceptions.StopValidation` if
+    validation of the registration should end immediatey.
+
+    Example::
+
+        def cannot_be_named_fred(user_info):
+            if user_info.username.lower() == 'fred':
+                raise ValidationError(('username', 'Cannot name user fred'))
+
+        @impl
+        def flaskbb_gather_validate_user_registration():
+            return cannot_be_named_fred
+
+    .. note::
+
+        This is implemented as a hook that returns callables since the
+        callables are designed to raise exceptions.
+    """
+
+
+@spec
+def flaskbb_registration_failure_handler(user_info, failures):
+    """
+    Hook for dealing with user registration failures, receives the info
+    that user attempted to register with as well as the errors that failed
+    the registration.
+    """
+
+
+@spec
+def flaskbb_registration_post_processor(user):
+    """
+    Hook for handling actions after a user has successfully registered.
+
+    Example::
+
+        def greet_user(user):
+            flash(_("Thanks for registering {}".format(user.username)))
+
+        @impl
+        def flaskbb_registration_post_processor(user):
+            greet_user(user)
+    """
+
+
 @spec(firstresult=True)
 def flaskbb_authenticate(identifier, secret):
     """Hook for authenticating users in FlaskBB.

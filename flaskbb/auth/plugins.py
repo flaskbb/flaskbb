@@ -8,39 +8,33 @@
     :license: BSD, see LICENSE for more details
 """
 from flask import flash, redirect, url_for
-from flask_babelplus import gettext as _
-from flask_login import current_user, login_user, logout_user
-
+from flask_login import current_user, logout_user
+from ..extensions import db
 from . import impl
 from ..core.auth.authentication import ForceLogout
 from ..user.models import User
 from ..utils.settings import flaskbb_config
-from .services.authentication import (BlockUnactivatedUser, ClearFailedLogins,
-                                      DefaultFlaskBBAuthProvider,
-                                      MarkFailedLogin)
+from .services.authentication import (
+    BlockUnactivatedUser,
+    ClearFailedLogins,
+    DefaultFlaskBBAuthProvider,
+    MarkFailedLogin,
+)
 from .services.factories import account_activator_factory
-from .services.reauthentication import (ClearFailedLoginsOnReauth,
-                                        DefaultFlaskBBReauthProvider,
-                                        MarkFailedReauth)
-
-
-@impl
-def flaskbb_event_user_registered(username):
-    user = User.query.filter_by(username=username).first()
-
-    if flaskbb_config["ACTIVATE_ACCOUNT"]:
-        service = account_activator_factory()
-        service.initiate_account_activation(user.email)
-        flash(
-            _(
-                "An account activation email has been sent to "
-                "%(email)s",
-                email=user.email
-            ), "success"
-        )
-    else:
-        login_user(user)
-        flash(_("Thanks for registering."), "success")
+from .services.reauthentication import (
+    ClearFailedLoginsOnReauth,
+    DefaultFlaskBBReauthProvider,
+    MarkFailedReauth,
+)
+from .services.registration import (
+    AutoActivateUserPostProcessor,
+    AutologinPostProcessor,
+    EmailUniquenessValidator,
+    SendActivationPostProcessor,
+    UsernameRequirements,
+    UsernameUniquenessValidator,
+    UsernameValidator,
+)
 
 
 @impl(trylast=True)
@@ -83,5 +77,35 @@ def flaskbb_errorhandlers(app):
         if current_user:
             logout_user()
             if error.reason:
-                flash(error.reason, 'danger')
-        return redirect(url_for('forum.index'))
+                flash(error.reason, "danger")
+        return redirect(url_for("forum.index"))
+
+
+@impl
+def flaskbb_gather_registration_validators():
+    blacklist = [
+        w.strip() for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
+    ]
+
+    requirements = UsernameRequirements(
+        min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],
+        max=flaskbb_config["AUTH_USERNAME_MAX_LENGTH"],
+        blacklist=blacklist,
+    )
+
+    return [
+        EmailUniquenessValidator(User),
+        UsernameUniquenessValidator(User),
+        UsernameValidator(requirements),
+    ]
+
+
+@impl
+def flaskbb_registration_post_processor(user):
+    if flaskbb_config["ACTIVATE_ACCOUNT"]:
+        service = SendActivationPostProcessor(account_activator_factory())
+    else:
+        service = AutologinPostProcessor()
+
+    service.post_process(user)
+    AutoActivateUserPostProcessor(db, flaskbb_config).post_process(user)

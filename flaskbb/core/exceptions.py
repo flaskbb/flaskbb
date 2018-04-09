@@ -52,3 +52,17 @@ class StopValidation(BaseFlaskBBError):
     def __init__(self, reasons):
         self.reasons = reasons
         super(StopValidation, self).__init__(reasons)
+
+
+class PersistenceError(BaseFlaskBBError):
+    """
+    Used to catch down errors when persisting models to the database instead
+    of letting all issues percolate up, this should be raised from those
+    exceptions without smashing their tracebacks. Example::
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+        except Exception:
+            raise PersistenceError("Couldn't save user account")
+    """

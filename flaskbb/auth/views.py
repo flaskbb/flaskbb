@@ -30,7 +30,7 @@ from flaskbb.utils.settings import flaskbb_config
 
 from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo
-from ..core.exceptions import StopValidation, ValidationError
+from ..core.exceptions import StopValidation, ValidationError, PersistenceError
 from ..core.tokens import TokenError
 from .plugins import impl
 from .services import (account_activator_factory,
@@ -150,13 +150,8 @@ class Register(MethodView):
             except StopValidation as e:
                 form.populate_errors(e.reasons)
                 return render_template("auth/register.html", form=form)
-
-            else:
-                try:
-                    db.session.commit()
-                except Exception:  # noqa
-                    logger.exception("Database error while resetting password")
-                    db.session.rollback()
+            except PersistenceError:
+                    logger.exception("Database error while persisting user")
                     flash(
                         _(
                             "Could not process registration due"
@@ -189,8 +184,8 @@ class ForgotPassword(MethodView):
         if form.validate_on_submit():
 
             try:
-                self.password_reset_service_factory(
-                ).initiate_password_reset(form.email.data)
+                service = self.password_reset_service_factory()
+                service.initiate_password_reset(form.email.data)
             except ValidationError:
                 flash(
                     _(
