@@ -8,3 +8,4 @@ Sphinx
 alabaster
 flake8
 tox==2.9.0
+bumpversion==0.5.3
