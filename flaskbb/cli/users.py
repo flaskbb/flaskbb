@@ -56,7 +56,7 @@ def new_user(username, email, password, group):
 def change_user(username, email, password, group):
     """Updates an user. Omit any options to use the interactive mode."""
 
-    user = prompt_save_user(username, password, email, group, only_update=True)
+    user = prompt_save_user(username, email, password, group, only_update=True)
     if user is None:
         raise FlaskBBCLIError("The user with username {} does not exist."
                               .format(username), fg="red")
