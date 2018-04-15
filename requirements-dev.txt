@@ -7,5 +7,5 @@ pytest-cov
 Sphinx
 alabaster
 flake8
-tox==2.9.0
+tox==3.0.0
 bumpversion==0.5.3
