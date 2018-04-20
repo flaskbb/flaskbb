@@ -135,26 +135,13 @@ $(document).ready(function () {
         $('input.action-checkbox').prop('checked', this.checked);
     });
 
-    // Reply conversation
-    $('.reply-btn').click(function (event) {
-        event.preventDefault();
-        var message_id = $(this).attr('data-message-id');
-
-        $.get('/message/message/' + message_id + '/raw', function(text) {
-            var $contents = $('.flaskbb-editor');
-            $contents.val(($contents.val() + '\n' + text).trim() + '\n');
-            $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
-            $contents[0].scrollTop = $contents[0].scrollHeight;
-            window.location.href = '#content';
-        });
-    });
-
     // Reply to post
     $('.quote-btn').click(function (event) {
         event.preventDefault();
         var post_id = $(this).attr('data-post-id');
+        var urlprefix = typeof FORUM_URL_PREFIX !== typeof undefined ? FORUM_URL_PREFIX : "";
 
-        $.get('/post/' + post_id + '/raw', function(text) {
+        $.get(urlprefix + '/post/' + post_id + '/raw', function(text) {
             var $contents = $('.flaskbb-editor');
             $contents.val(($contents.val() + '\n' + text).trim() + '\n');
             $contents.selectionStart = $contents.selectionEnd = $contents.val().length;
@@ -164,7 +151,7 @@ $(document).ready(function () {
     });
 
     // Triggers the confirm dialog
-    $('button[name="confirmDialog"]').on('click', function(e){
+    $('button[name="confirmDialog"]').on('click', function(e) {
         var $form = $(this).closest('form');
         e.preventDefault();
         $('.confirmModal').modal({ keyboard: true })

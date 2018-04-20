@@ -204,15 +204,19 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
         create_test_data()
 
     if bulk_data:
+        click.secho("[+] Adding a lot of test data...", fg="cyan")
         timer = time.time()
-        topic_count, post_count = insert_bulk_data(int(topics), int(posts))
+        rv = insert_bulk_data(int(topics), int(posts))
+        if not rv and not test_data:
+            create_test_data()
+            rv = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
-        click.secho("[+] It took {} seconds to create {} topics and {} posts"
-                    .format(elapsed, topic_count, post_count), fg="cyan")
+        click.secho("[+] It took {:.2f} seconds to create {} topics and {} "
+                    "posts.".format(elapsed, rv[0], rv[1]), fg="cyan")
 
     # this just makes the most sense for the command name; use -i to
     # init the db as well
-    if not test_data:
+    if not test_data and not bulk_data:
         click.secho("[+] Populating the database with some defaults...",
                     fg="cyan")
         create_default_groups()
