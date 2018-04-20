@@ -51,7 +51,8 @@ def flaskbb_authenticate(identifier, secret):
 @impl(tryfirst=True)
 def flaskbb_post_authenticate(user):
     ClearFailedLogins().handle_post_auth(user)
-    BlockUnactivatedUser().handle_post_auth(user)
+    if flaskbb_config["ACTIVATE_ACCOUNT"]:
+        BlockUnactivatedUser().handle_post_auth(user)
 
 
 @impl
