@@ -1,36 +1,6 @@
-"""
-FlaskBB
-=======
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-FlaskBB is a Forum Software written in Python using the micro framework Flask.
-
-
-Quickstart
-----------
-
-.. code:: bash
-
-    # Install the FlaskBB package and it's dependencies
-    $ pip install -e .
-
-    # Generate a configuration
-    $ flaskbb makeconfig
-
-    # Install FlaskBB
-    $ flaskbb install
-
-    # Run the development server
-    $ flaskbb run
-     * Running on http://localhost:8080/
-
-
-Resources
----------
-
-* `website <https://flaskbb.org>`_
-* `source <https://github.com/flaskbb/flaskbb>`_
-* `issues <https://github.com/flaskbb/flaskbb/issues>`_
-"""
 import os
 import sys
 
@@ -69,6 +39,7 @@ def get_requirements(e=None):
             if not x.startswith('#') and not x.startswith("-e")]
 
 
+long_description = read("README.md")
 install_requires = get_requirements()
 
 
@@ -85,7 +56,8 @@ setup(
     author='Peter Justin',
     author_email='peter.justin@outlook.com',
     description='A classic Forum Software in Python using Flask.',
-    long_description=__doc__,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
