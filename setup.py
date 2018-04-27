@@ -28,12 +28,10 @@ Resources
 ---------
 
 * `website <https://flaskbb.org>`_
-* `source <https://github.com/sh4nks/flaskbb>`_
-* `issues <https://github.com/sh4nks/flaskbb/issues>`_
+* `source <https://github.com/flaskbb/flaskbb>`_
+* `issues <https://github.com/flaskbb/flaskbb/issues>`_
 """
-import ast
 import os
-import re
 import sys
 
 from setuptools import find_packages, setup
@@ -77,7 +75,12 @@ install_requires = get_requirements()
 setup(
     name='FlaskBB',
     version="2.0.0.dev0",
-    url='https://github.com/sh4nks/flaskbb/',
+    url='https://flaskbb.org',
+    project_urls={
+        ('Documentation', 'https://flaskbb.readthedocs.io/en/latest/'),
+        ('Code', 'https://github.com/flaskbb/flaskbb'),
+        ('Issue Tracker', 'https://github.com/flaskbb/flaskbb'),
+    },
     license='BSD',
     author='Peter Justin',
     author_email='peter.justin@outlook.com',
@@ -87,12 +90,12 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=install_requires,
     entry_points='''
         [console_scripts]
         flaskbb=flaskbb.cli:flaskbb
     ''',
-    test_suite='tests',
+    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    install_requires=install_requires,
     tests_require=[
         'py',
         'pytest',
@@ -100,6 +103,7 @@ setup(
         'cov-core',
         'coverage'
     ],
+    test_suite='tests',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
