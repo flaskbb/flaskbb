@@ -520,21 +520,27 @@ class Topic(HideableCRUDMixin, db.Model):
 
         # The tracker is disabled - abort
         if read_cutoff is None:
+            logger.debug("Readtracker is disabled.")
             return False
 
         # Else the topic is still below the read_cutoff
         elif read_cutoff > self.last_post.date_created:
+            logger.debug("Topic is below the read_cutoff (too old).")
             return False
 
         # Can be None (cleared) if the user has never marked the forum as read.
         # If this condition is false - we need to update the tracker
         if forumsread and forumsread.cleared is not None and \
                 forumsread.cleared >= self.last_post.date_created:
+            logger.debug("User has marked the forum as read. No new posts "
+                         "since then.")
             return False
 
         if topicsread and topicsread.last_read >= self.last_post.date_created:
+            logger.debug("The last post in this topic has already been read.")
             return False
 
+        logger.debug("Topic is unread.")
         return True
 
     def update_read(self, user, forum, forumsread):
@@ -566,6 +572,8 @@ class Topic(HideableCRUDMixin, db.Model):
         # A new post has been submitted that the user hasn't read.
         # Updating...
         if topicsread:
+            logger.debug("Updating existing TopicsRead '{}' object."
+                         .format(topicsread))
             topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
@@ -573,6 +581,7 @@ class Topic(HideableCRUDMixin, db.Model):
         # The user has not visited the topic before. Inserting him in
         # the TopicsRead model.
         elif not topicsread:
+            logger.debug("Creating new TopicsRead object.")
             topicsread = TopicsRead()
             topicsread.user = user
             topicsread.topic = self
@@ -955,24 +964,31 @@ class Forum(db.Model, CRUDMixin):
             filter(Topic.forum_id == self.id,
                    Topic.last_updated > read_cutoff,
                    db.or_(TopicsRead.last_read == None,  # noqa: E711
-                          TopicsRead.last_read < Topic.last_updated)).\
+                          TopicsRead.last_read < Topic.last_updated),
+                   ForumsRead.last_read < Topic.last_updated).\
             count()
 
         # No unread topics available - trying to mark the forum as read
         if unread_count == 0:
+            logger.debug("No unread topics. Trying to mark the forum as read.")
 
             if forumsread and forumsread.last_read > topicsread.last_read:
+                logger.debug("forumsread.last_read is newer than "
+                             "topicsread.last_read. Everything is read.")
                 return False
 
             # ForumRead Entry exists - Updating it because a new topic/post
             # has been submitted and has read everything (obviously, else the
             # unread_count would be useless).
             elif forumsread:
+                logger.debug("Updating existing ForumsRead '{}' object."
+                             .format(forumsread))
                 forumsread.last_read = time_utcnow()
                 forumsread.save()
                 return True
 
             # No ForumRead Entry existing - creating one.
+            logger.debug("Creating new ForumsRead object.")
             forumsread = ForumsRead()
             forumsread.user = user
             forumsread.forum = self
@@ -982,6 +998,8 @@ class Forum(db.Model, CRUDMixin):
 
         # Nothing updated, because there are still more than 0 unread
         # topicsread
+        logger.debug("No ForumsRead object updated - there are still {} "
+                     "unread topics.".format(unread_count))
         return False
 
     def recalculate(self, last_post=False):
