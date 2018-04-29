@@ -965,7 +965,8 @@ class Forum(db.Model, CRUDMixin):
                    Topic.last_updated > read_cutoff,
                    db.or_(TopicsRead.last_read == None,  # noqa: E711
                           TopicsRead.last_read < Topic.last_updated),
-                   ForumsRead.last_read < Topic.last_updated).\
+                   db.or_(ForumsRead.last_read == None,  # noqa: E711
+                          ForumsRead.last_read < Topic.last_updated)).\
             count()
 
         # No unread topics available - trying to mark the forum as read
