@@ -370,9 +370,6 @@ def configure_logging(app):
 
 
 def configure_default_logging(app):
-    # TODO: Remove this once Flask 0.13 is released
-    app.config["LOGGER_NAME"] = "flask.app"
-
     # Load default logging config
     logging.config.dictConfig(app.config["LOG_DEFAULT_CONF"])
 
