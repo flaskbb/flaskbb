@@ -48,9 +48,9 @@ setup(
     version="2.0.0.dev0",
     url='https://flaskbb.org',
     project_urls={
-        ('Documentation', 'https://flaskbb.readthedocs.io/en/latest/'),
-        ('Code', 'https://github.com/flaskbb/flaskbb'),
-        ('Issue Tracker', 'https://github.com/flaskbb/flaskbb'),
+        'Documentation': 'https://flaskbb.readthedocs.io/en/latest/',
+        'Code': 'https://github.com/flaskbb/flaskbb',
+        'Issue Tracker': 'https://github.com/flaskbb/flaskbb',
     },
     license='BSD',
     author='Peter Justin',
