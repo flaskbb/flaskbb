@@ -52,7 +52,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
-            {% for topic, topicread in topics.items %}
+            {% for topic, last_post, topicread in topics.items %}
             <div class="row forum-row hover clearfix">
 
                 <div class="col-md-5 col-sm-5 col-xs-8 topic-info">

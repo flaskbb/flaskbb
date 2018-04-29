@@ -1112,19 +1112,29 @@ class Forum(db.Model, CRUDMixin):
         :param per_page: How many topics per page should be shown
         """
         if user.is_authenticated:
+            # Now thats intersting - if i don't do the add_entity(Post)
+            # the n+1 still exists when trying to access 'topic.last_post'
+            # but without it it will fire another query.
+            # This way I don't have to use the last_post object when I
+            # iterate over the result set.
             topics = Topic.query.filter_by(forum_id=forum_id).\
                 outerjoin(TopicsRead,
                           db.and_(TopicsRead.topic_id == Topic.id,
                                   TopicsRead.user_id == user.id)).\
+                outerjoin(Post, Topic.last_post_id == Post.id).\
+                add_entity(Post).\
                 add_entity(TopicsRead).\
                 order_by(Topic.important.desc(), Topic.last_updated.desc()).\
                 paginate(page, per_page, True)
         else:
             topics = Topic.query.filter_by(forum_id=forum_id).\
+                outerjoin(Post, Topic.last_post_id == Post.id).\
+                add_entity(Post).\
                 order_by(Topic.important.desc(), Topic.last_updated.desc()).\
                 paginate(page, per_page, True)
 
-            topics.items = [(topic, None) for topic in topics.items]
+            topics.items = [(topic, last_post, None)
+                            for topic, last_post, in topics.items]
 
         return topics
 
