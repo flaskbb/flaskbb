@@ -109,14 +109,14 @@
                 </div>
 
                 <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
-                    <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                    <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
 
                     <div class="topic-author">
                         {% trans %}by{% endtrans %}
-                        {% if topic.last_post.user_id %}
-                        <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                        {% if last_post.user_id %}
+                        <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
                         {% else %}
-                        {{ topic.last_post.username }}
+                        {{ last_post.username }}
                         {% endif %}
                     </div>
                 </div>
