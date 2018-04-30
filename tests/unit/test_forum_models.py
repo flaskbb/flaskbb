@@ -281,14 +281,14 @@ def test_forum_get_topics(topic, user):
 
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
-        assert topics.items == [(topic, None)]
+        assert topics.items == [(topic, topic.last_post, None)]
 
         # Test with logged out user
         logout_user()
 
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
-        assert topics.items == [(topic, None)]
+        assert topics.items == [(topic, topic.last_post, None)]
 
 
 def test_topic_save(forum, user):

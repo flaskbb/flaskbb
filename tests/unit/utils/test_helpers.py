@@ -85,6 +85,7 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     time_posted = time_utcnow() - dt.timedelta(days=2)
     flaskbb_config["TRACKER_LENGTH"] = 1
     topic.last_post.date_created = time_posted
+    topic.last_updated = time_posted
     topic.save()
     assert not topic_is_unread(topic, None, user, None)
 
