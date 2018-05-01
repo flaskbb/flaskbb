@@ -401,6 +401,23 @@ def test_topic_tracker_needs_update(database, user, topic):
         assert topic.tracker_needs_update(forumsread, topicsread)
 
 
+def test_untracking_topic_does_not_delete_it(database, user, topic):
+    user.track_topic(topic)
+    user.save()
+    user.untrack_topic(topic)
+
+    # Note that instead of returning None from the query below, the
+    # unpatched verson will actually raise a DetachedInstanceError here,
+    # due to the fact that some relationships don't get configured in
+    # tests correctly and deleting would break them or something.  The
+    # test still fails for the same reason, however: the topic gets
+    # (albeit unsuccessfully) deleted when it is removed from
+    # topictracker, when it clearly shouldn't be.
+    user.save()
+
+    assert Topic.query.filter(Topic.id == topic.id).first()
+
+
 def test_topic_tracker_needs_update_cleared(database, user, topic):
     """Tests if the topicsread needs an update if the forum has been marked
     as cleared.

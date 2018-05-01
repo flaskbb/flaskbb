@@ -156,7 +156,6 @@ class User(db.Model, UserMixin, CRUDMixin):
         primaryjoin=(topictracker.c.user_id == id),
         backref=db.backref("topicstracked", lazy="dynamic"),
         lazy="dynamic",
-        cascade="all, delete-orphan",
         single_parent=True
     )
 
