@@ -578,8 +578,16 @@ class TopicTracker(MethodView):
                     TopicsRead.user_id == real(current_user).id
                 )).\
             outerjoin(Post, Topic.last_post_id == Post.id).\
+            outerjoin(Forum, Topic.forum_id == Forum.id).\
+            outerjoin(
+                ForumsRead,
+                db.and_(
+                    ForumsRead.forum_id == Forum.id,
+                    ForumsRead.user_id == real(current_user).id
+                )).\
             add_entity(Post).\
             add_entity(TopicsRead).\
+            add_entity(ForumsRead).\
             order_by(Topic.last_updated.desc()).\
             paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
 
