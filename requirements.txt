@@ -10,7 +10,7 @@ chardet==3.0.4
 click==6.7
 click-log==0.2.1
 enum34==1.1.6
-Flask==1.0
+Flask==1.0.2
 Flask-Alembic==2.0.1
 flask-allows==0.4.0
 Flask-BabelPlus==2.1.1
