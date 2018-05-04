@@ -52,7 +52,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
-            {% for topic, topicread in topics.items %}
+            {% for topic, last_post, topicread in topics.items %}
             <div class="row forum-row hover clearfix">
 
                 <div class="col-md-5 col-sm-5 col-xs-8 topic-info">
@@ -109,14 +109,14 @@
                 </div>
 
                 <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
-                    <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                    <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
 
                     <div class="topic-author">
                         {% trans %}by{% endtrans %}
-                        {% if topic.last_post.user_id %}
-                        <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                        {% if last_post.user_id %}
+                        <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
                         {% else %}
-                        {{ topic.last_post.username }}
+                        {{ last_post.username }}
                         {% endif %}
                     </div>
                 </div>

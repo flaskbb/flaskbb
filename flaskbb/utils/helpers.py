@@ -298,7 +298,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
         return False
 
     # check read_cutoff
-    if topic.last_post.date_created < read_cutoff:
+    if topic.last_updated < read_cutoff:
         return False
 
     # topicsread is none if the user has marked the forum as read
@@ -306,14 +306,14 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     if topicsread is None:
         # user has cleared the forum - check if there is a new post
         if forumsread and forumsread.cleared is not None:
-            return forumsread.cleared < topic.last_post.date_created
+            return forumsread.cleared < topic.last_updated
 
         # user hasn't read the topic yet, or there is a new post since the user
         # has marked the forum as read
         return True
 
     # check if there is a new post since the user's last topic visit
-    return topicsread.last_read < topic.last_post.date_created
+    return topicsread.last_read < topic.last_updated
 
 
 def mark_online(user_id, guest=False):  # pragma: no cover

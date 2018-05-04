@@ -8,7 +8,7 @@ help:
 	@echo "  lint       check the source for style errors"
 	@echo "  isort      sort the python imports"
 	@echo "  run        run the development server with the development config"
-	@echo "  wheel      creates a wheel package of flaskbb"
+	@echo "  dist       creates distribution packages (bdist_wheel, sdist)"
 	@echo "  upload     uploads a new version of FlaskBB to PyPI"
 	@echo "  docs       build the documentation"
 
@@ -50,8 +50,8 @@ isort:check-isort
 check-isort:
 	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
 
-wheel:
-	python setup.py bdist_wheel
+dist:
+	python setup.py sdist bdist_wheel
 
-upload:wheel
-	twine upload dist/*
+upload:dist
+	twine upload --skip-existing dist/*

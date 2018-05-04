@@ -35,7 +35,7 @@
                     <div class="col-md-1 col-sm-1 col-xs-2 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
                 </div>
 
-                {% for topic, topicread in topics.items %}
+                {% for topic, last_post, topicread, forumsread in topics.items %}
                 <div class="row forum-row hover clearfix">
 
                     <div class="col-md-4 col-sm-4 col-xs-6 topic-info">
@@ -85,14 +85,14 @@
                     </div>
 
                     <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
-                        <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
+                        <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
 
                         <div class="topic-author">
                             {% trans %}by{% endtrans %}
-                            {% if topic.last_post.user_id %}
-                            <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
+                            {% if last_post.user_id %}
+                            <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
                             {% else %}
-                            {{ topic.last_post.username }}
+                            {{ last_post.username }}
                             {% endif %}
                         </div>
                     </div>

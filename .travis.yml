@@ -1,19 +1,28 @@
 language: python
 sudo: false
 python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-# command to install dependencies
+- '2.7'
+- '3.4'
+- '3.5'
+- '3.6'
 install:
-  - "pip install -r requirements-travis.txt"
+- pip install -r requirements-travis.txt
 script:
-  - flaskbb translations compile
-  - tox
+- flaskbb translations compile
+- tox
 after_success:
-  - coverage combine tests
-  - coveralls
+- coverage combine tests
+- coveralls
 notifications:
   webhooks: https://www.travisbuddy.com/
   on_success: never
+deploy:
+  provider: pypi
+  user: sh4nks
+  password:
+    secure: l5aa7UjggBWYD4+EXTrgKVDB+0WcinC/DKJmAwfIGF54BtzuRz5dPyc3VLdZb2OKxbtK9vBSgDLghqsWh4jXS0KSuUmEzS7LgCU6XBocIoAC8VdqgLLLEEDWJNtib5R+pk8imXbGk9lD2O7fS8b6/2/pDM1yKRpzU76SOyICpyo=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    branch: master
+    repo: flaskbb/flaskbb

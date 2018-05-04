@@ -570,15 +570,26 @@ class TopicTracker(MethodView):
 
     def get(self):
         page = request.args.get('page', 1, type=int)
-        topics = real(current_user).tracked_topics.outerjoin(
-            TopicsRead,
-            db.and_(
-                TopicsRead.topic_id == Topic.id,
-                TopicsRead.user_id == real(current_user).id
-            )
-        ).add_entity(TopicsRead).order_by(Topic.last_updated.desc()).paginate(
-            page, flaskbb_config['TOPICS_PER_PAGE'], True
-        )
+        topics = real(current_user).tracked_topics.\
+            outerjoin(
+                TopicsRead,
+                db.and_(
+                    TopicsRead.topic_id == Topic.id,
+                    TopicsRead.user_id == real(current_user).id
+                )).\
+            outerjoin(Post, Topic.last_post_id == Post.id).\
+            outerjoin(Forum, Topic.forum_id == Forum.id).\
+            outerjoin(
+                ForumsRead,
+                db.and_(
+                    ForumsRead.forum_id == Forum.id,
+                    ForumsRead.user_id == real(current_user).id
+                )).\
+            add_entity(Post).\
+            add_entity(TopicsRead).\
+            add_entity(ForumsRead).\
+            order_by(Topic.last_updated.desc()).\
+            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
 
         return render_template('forum/topictracker.html', topics=topics)
 

@@ -81,7 +81,7 @@ class UserForm(FlaskForm):
         Optional(), URL()])
 
     signature = TextAreaField(_("Forum signature"), validators=[
-        Optional(), Length(min=0, max=250)])
+        Optional()])
 
     notes = TextAreaField(_("Notes"), validators=[
         Optional(), Length(min=0, max=5000)])
