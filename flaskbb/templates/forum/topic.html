@@ -17,7 +17,7 @@
     {% if topic.hidden %}
     <div class="alert alert-warning">
         <span class="fa fa-user-secret"></span>
-        {{ gettext("This topic is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at, '%b %d %Y'))}}
+        {{ gettext("This topic is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
     </div>
     {% endif %}
 
@@ -49,7 +49,7 @@
                         <div class="author-avatar"><img src="{{ user.avatar }}" alt="avatar"></div>
                     {% endif %}
 
-                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date('%b %d %Y') }}</div>
+                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date }}</div>
                     <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
 
                     {{ run_hook("flaskbb_tpl_post_author_info_after", user=user, post=post) }}
@@ -68,11 +68,11 @@
                         <div class="pull-left">
                             <!-- Creation date / Date modified -->
                             <a href="{{ post.url }}">
-                                {{ post.date_created|format_date('%d %B %Y - %H:%M') }}
+                                {{ post.date_created|format_datetime }}
                             </a>
                             {% if post.user_id and post.date_modified %}
                             <small>
-                                (Last modified: {{ post.date_modified|format_date('%d %B %Y - %H:%M') }} by
+                                (Last modified: {{ post.date_modified|format_datetime }} by
                                 <a href="{{ url_for('user.profile', username=post.modified_by) }}">{{ post.modified_by }}</a>.)
                             </small>
                             {% endif %}
@@ -88,7 +88,7 @@
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
-                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at, '%b %d %Y'))}}
+                                {{ gettext("This post is hidden (%(when)s  by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at)) }}
                             </div>
                             {% endif %}
 

@@ -39,7 +39,7 @@ from flaskbb.utils.helpers import (app_config_from_env, crop_title,
                                    get_alembic_locations, get_flaskbb_config,
                                    is_online, mark_online,
                                    render_template, time_since, time_utcnow,
-                                   topic_is_unread)
+                                   topic_is_unread, format_datetime)
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator, TplCanDeletePost,
@@ -227,6 +227,7 @@ def configure_template_filters(app):
     filters = {}
 
     filters['format_date'] = format_date
+    filters['format_datetime'] = format_datetime
     filters['time_since'] = time_since
     filters['is_online'] = is_online
     filters['crop_title'] = crop_title
