@@ -12,6 +12,7 @@ import ast
 import itertools
 import logging
 import operator
+import warnings
 import os
 import re
 import time
@@ -441,12 +442,21 @@ def format_datetime(datetime):
     return _format_html_time_tag(datetime, 'date-and-time')
 
 
-def format_date(datetime):
+def format_date(datetime, format=None):
     """Format the datetime for usage in templates, keeping only the date.
 
     :param value: The datetime object that should be formatted
     :rtype: Markup
     """
+    if format:
+        warnings.warn(
+            'This API has been deprecated due to i18n concerns.  Please use  '
+            'Jinja filters format_datetime and format_date without arguments '
+            'to format complete and date-only timestamps respectively.',
+            DeprecationWarning
+        )
+        if '%H' in format:
+            return format_datetime(datetime)
     return _format_html_time_tag(datetime, 'date-only')
 
 
