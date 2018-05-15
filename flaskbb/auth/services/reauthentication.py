@@ -73,7 +73,7 @@ class PluginReauthenticationManager(ReauthenticateManager):
             if not result:
                 raise StopAuthentication(_("Wrong password."))
             self.plugin_manager.hook.flaskbb_post_reauth(user=user)
-        except StopAuthentication as e:
+        except StopAuthentication:
             self.plugin_manager.hook.flaskbb_reauth_failed(user=user)
             raise
         finally:

@@ -56,7 +56,7 @@ class FlaskBBGroup(FlaskGroup):
             app = ctx.ensure_object(ScriptInfo).load_app()
             app.pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
-        except Exception as exc:
+        except Exception:
             logger.error(
                 "Error while loading CLI Plugins",
                 exc_info=traceback.format_exc()
