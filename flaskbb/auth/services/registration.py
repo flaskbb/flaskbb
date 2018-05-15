@@ -48,7 +48,7 @@ class UsernameValidator(UserValidator):
             raise ValidationError(
                 'username',
                 _(
-                    'Username must be between %(min)s and %(max)s characters long',
+                    'Username must be between %(min)s and %(max)s characters long',  # noqa
                     min=self._requirements.min,
                     max=self._requirements.max
                 )

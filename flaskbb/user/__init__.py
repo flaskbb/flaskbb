@@ -13,4 +13,6 @@ import logging
 # force plugins to be loaded
 from . import plugins
 
+__all__ = ('plugins',)
+
 logger = logging.getLogger(__name__)

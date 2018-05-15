@@ -18,7 +18,6 @@ from datetime import datetime
 
 import click
 import click_log
-import requests
 from celery.bin.celery import CeleryCommand
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
@@ -517,7 +516,7 @@ def generate_config(development, output, force):
 
     click.secho("Optional filepath to load a logging configuration file from. "
                 "See the Python logging documentation for more detail.\n"
-                "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",
+                "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",  # noqa
                 fg="cyan")
     default_conf["log_config_path"] = click.prompt(
         click.style("Logging Config Path", fg="magenta"),

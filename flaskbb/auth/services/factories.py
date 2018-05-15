@@ -69,5 +69,6 @@ def account_activator_factory():
 def authentication_manager_factory():
     return PluginAuthenticationManager(current_app.pluggy, db.session)
 
+
 def reauthentication_manager_factory():
     return PluginReauthenticationManager(current_app.pluggy, db.session)

@@ -43,7 +43,7 @@ class UserValidator(ABC):
 
         :param user_info: The provided registration information.
         :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
-        """
+        """  # noqa
 
     def __call__(self, user_info):
         return self.validate(user_info)
@@ -63,5 +63,5 @@ class UserRegistrationService(ABC):
 
         :param user_info: The provided user registration information.
         :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
-        """
+        """  # noqa
         pass
