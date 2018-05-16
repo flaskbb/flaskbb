@@ -9,7 +9,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-__version__ = "2.0.0.dev0"
+__version__ = "2.0.0"
 
 import logging
 logger = logging.getLogger(__name__)
