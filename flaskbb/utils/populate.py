@@ -123,12 +123,12 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
 
             if setting is not None:
                 setting_is_different = (
-                    setting.value != settings[1]["value"] or
-                    setting.value_type != settings[1]["value_type"] or
-                    setting.name != settings[1]["name"] or
-                    setting.description != settings[1]["description"] or
-                    setting.extra != settings[1].get("extra", "") or
-                    setting.settingsgroup != group.key
+                    setting.value != settings[1]["value"]
+                    or setting.value_type != settings[1]["value_type"]
+                    or setting.name != settings[1]["name"]
+                    or setting.description != settings[1]["description"]
+                    or setting.extra != settings[1].get("extra", "")
+                    or setting.settingsgroup != group.key
                 )
 
             if (

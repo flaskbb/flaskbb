@@ -85,9 +85,11 @@ class HideableQuery(BaseQuery):
 
     def __new__(cls, *args, **kwargs):
         inst = super(HideableQuery, cls).__new__(cls)
-        with_hidden = kwargs.pop("_with_hidden", False) or (
-            current_user and current_user.permissions.get("viewhidden", False)
+        include_hidden = kwargs.pop("_with_hidden", False)
+        has_view_hidden = current_user and current_user.permissions.get(
+            "viewhidden", False
         )
+        with_hidden = include_hidden or has_view_hidden
         if args or kwargs:
             super(HideableQuery, inst).__init__(*args, **kwargs)
             entity = inst._mapper_zero().class_
@@ -136,9 +138,7 @@ class HideableMixin(object):
     @declared_attr
     def hidden_by(cls):
         return db.relationship(
-            'User',
-            uselist=False,
-            foreign_keys=[cls.hidden_by_id],
+            "User", uselist=False, foreign_keys=[cls.hidden_by_id]
         )
 
     def hide(self, user, *args, **kwargs):
