@@ -7,7 +7,7 @@ Here you can see the full list of changes between each release.
 Version 2.0.0
 -------------
 
-{{ RELEASE DATE }}
+Released on May 16th, 2018.
 
 * Improved management panel load time by requesting celery status async (PR #429)
 * Migrated FlaskBB internal behavior to use plugin hook system (PRs
