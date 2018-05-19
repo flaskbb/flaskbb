@@ -161,6 +161,9 @@ def configure_blueprints(app):
 
 def configure_extensions(app):
     """Configures the extensions."""
+    # Flask-Allows
+    allows.init_app(app)
+    allows.identity_loader(lambda: current_user)
 
     # Flask-WTF CSRF
     csrf.init_app(app)
@@ -217,9 +220,6 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-    # Flask-Allows
-    allows.init_app(app)
-    allows.identity_loader(lambda: current_user)
 
 
 def configure_template_filters(app):
