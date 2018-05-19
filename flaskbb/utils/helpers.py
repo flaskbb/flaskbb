@@ -110,8 +110,10 @@ def do_topic_action(topics, user, action, reverse):
                                             CanDeleteTopic, Has)
 
     if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
-        flash(_("You do not have the permissions to execute this "
-                "action."), "danger")
+        flash(
+            _("You do not have the permissions to execute this action."),
+            "danger"
+        )
         return False
 
     modified_topics = 0
@@ -814,3 +816,24 @@ def requires_unactivated(f):
 def register_view(bp_or_app, routes, view_func, *args, **kwargs):
     for route in routes:
         bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)
+
+
+class FlashAndRedirect(object):
+    def __init__(self, message, level, endpoint):
+        # need to reassign to avoid capturing the reassigned endpoint
+        # in the generated closure, otherwise bad things happen at resolution
+        if not callable(endpoint):
+            # discard args and kwargs and just go to the endpoint
+            # this probably isn't *100%* correct behavior in case we need
+            # to add query params on...
+            endpoint_ = lambda *a, **k: url_for(endpoint)  # noqa
+        else:
+            endpoint_ = endpoint
+
+        self._message = message
+        self._level = level
+        self._endpoint = endpoint_
+
+    def __call__(self, *a, **k):
+        flash(self._message, self._level)
+        return redirect(self._endpoint(*a, **k))
