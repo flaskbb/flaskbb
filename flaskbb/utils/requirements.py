@@ -9,7 +9,8 @@
 """
 import logging
 
-from flask_allows import And, Or, Requirement
+from flask_allows import And, Or, Permission, Requirement
+
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.locals import current_forum, current_post, current_topic
 from flaskbb.forum.models import Forum, Post, Topic
@@ -92,7 +93,7 @@ class IsSameUser(IsAuthed):
         elif current_topic:
             return current_topic.user_id
         else:
-            raise FlaskBBError
+            raise FlaskBBError("Could not determine user")
 
 
 class TopicNotLocked(Requirement):
@@ -161,7 +162,7 @@ class ForumNotLocked(Requirement):
     def _get_forum_from_request(self):
         if current_forum:
             return current_forum
-        raise FlaskBBError
+        raise FlaskBBError("Could not determine forum")
 
 
 class CanAccessForum(Requirement):
@@ -235,9 +236,9 @@ CanDeleteTopic = Or(
 # Template Allowances -- gross, I know
 
 
-def TplCanModerate(request):
+def TplCanModerate():
 
-    def _(user, forum):
+    def can_moderate(user, forum):
         kwargs = {}
 
         if isinstance(forum, int):
@@ -245,14 +246,14 @@ def TplCanModerate(request):
         elif isinstance(forum, Forum):
             kwargs["forum"] = forum
 
-        return IsAtleastModeratorInForum(**kwargs)(user, request)
+        return Permission(IsAtleastModeratorInForum(**kwargs), identity=user)
 
-    return _
+    return can_moderate
 
 
-def TplCanPostReply(request):
+def TplCanPostReply():
 
-    def _(user, topic=None):
+    def can_post_reply(user, topic=None):
         kwargs = {}
 
         if isinstance(topic, int):
@@ -260,20 +261,21 @@ def TplCanPostReply(request):
         elif isinstance(topic, Topic):
             kwargs["topic"] = topic
 
-        return Or(
-            IsAtleastSuperModerator,
-            IsModeratorInForum(),
-            And(Has("postreply"), TopicNotLocked(**kwargs)),
-        )(
-            user, request
+        return Permission(
+            Or(
+                IsAtleastSuperModerator,
+                IsModeratorInForum(),
+                And(Has("postreply"), TopicNotLocked(**kwargs)),
+            ),
+            identity=user,
         )
 
-    return _
+    return can_post_reply
 
 
-def TplCanEditPost(request):
+def TplCanEditPost():
 
-    def _(user, topic_or_post=None):
+    def can_edit_post(user, topic_or_post=None):
         kwargs = {}
 
         if isinstance(topic_or_post, int):
@@ -283,27 +285,28 @@ def TplCanEditPost(request):
         elif isinstance(topic_or_post, Post):
             kwargs["post"] = topic_or_post
 
-        return Or(
-            IsAtleastSuperModerator,
-            And(IsModeratorInForum(), Has("editpost")),
-            And(
-                IsSameUser(topic_or_post),
-                Has("editpost"),
-                TopicNotLocked(**kwargs),
+        return Permission(
+            Or(
+                IsAtleastSuperModerator,
+                And(IsModeratorInForum(), Has("editpost")),
+                And(
+                    IsSameUser(topic_or_post),
+                    Has("editpost"),
+                    TopicNotLocked(**kwargs),
+                ),
             ),
-        )(
-            user, request
+            identity=user,
         )
 
-    return _
+    return can_edit_post
 
 
 TplCanDeletePost = TplCanEditPost
 
 
-def TplCanPostTopic(request):
+def TplCanPostTopic():
 
-    def _(user, forum):
+    def can_post_topic(user, forum):
         kwargs = {}
 
         if isinstance(forum, int):
@@ -311,20 +314,21 @@ def TplCanPostTopic(request):
         elif isinstance(forum, Forum):
             kwargs["forum"] = forum
 
-        return Or(
-            IsAtleastSuperModerator,
-            IsModeratorInForum(**kwargs),
-            And(Has("posttopic"), ForumNotLocked(**kwargs)),
-        )(
-            user, request
+        return Permission(
+            Or(
+                IsAtleastSuperModerator,
+                IsModeratorInForum(**kwargs),
+                And(Has("posttopic"), ForumNotLocked(**kwargs)),
+            ),
+            identity=user,
         )
 
-    return _
+    return can_post_topic
 
 
-def TplCanDeleteTopic(request):
+def TplCanDeleteTopic():
 
-    def _(user, topic=None):
+    def can_delete_topic(user, topic=None):
         kwargs = {}
 
         if isinstance(topic, int):
@@ -332,12 +336,15 @@ def TplCanDeleteTopic(request):
         elif isinstance(topic, Topic):
             kwargs["topic"] = topic
 
-        return Or(
-            IsAtleastSuperModerator,
-            And(IsModeratorInForum(), Has("deletetopic")),
-            And(IsSameUser(), Has("deletetopic"), TopicNotLocked(**kwargs)),
-        )(
-            user, request
+        return Permission(
+            Or(
+                IsAtleastSuperModerator,
+                And(IsModeratorInForum(), Has("deletetopic")),
+                And(
+                    IsSameUser(), Has("deletetopic"), TopicNotLocked(**kwargs)
+                ),
+            ),
+            identity=user,
         )
 
-    return _
+    return can_delete_topic

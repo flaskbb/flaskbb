@@ -245,12 +245,12 @@ def configure_template_filters(app):
     )
 
     # these create closures
-    filters['can_moderate'] = TplCanModerate(request)
-    filters['post_reply'] = TplCanPostReply(request)
-    filters['edit_post'] = TplCanEditPost(request)
-    filters['delete_post'] = TplCanDeletePost(request)
-    filters['post_topic'] = TplCanPostTopic(request)
-    filters['delete_topic'] = TplCanDeleteTopic(request)
+    filters['can_moderate'] = TplCanModerate()
+    filters['post_reply'] = TplCanPostReply()
+    filters['edit_post'] = TplCanEditPost()
+    filters['delete_post'] = TplCanDeletePost()
+    filters['post_topic'] = TplCanPostTopic()
+    filters['delete_topic'] = TplCanDeleteTopic()
 
     app.jinja_env.filters.update(filters)
 
