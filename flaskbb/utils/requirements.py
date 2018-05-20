@@ -233,7 +233,27 @@ CanDeleteTopic = Or(
 )
 
 
-# Template Allowances -- gross, I know
+def permission_with_identity(requirement, name=None):
+    """
+    Permission instance factory that can set a user at construction time
+    can optionally name the closure for nicer debugging
+    """
+    def _(user):
+        return Permission(requirement, identity=user)
+
+    if name is not None:
+        _.__name__ = name
+
+    return _
+
+
+# Template Requirements
+
+def has_permission(permission):
+    def _(user):
+        return Permission(Has(permission), identity=user)
+    _.__name__ = "Has_{}".format(permission)
+    return _
 
 
 def TplCanModerate():
