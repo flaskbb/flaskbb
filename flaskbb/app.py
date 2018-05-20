@@ -70,14 +70,13 @@ from flaskbb.utils.requirements import (
     CanEditUser,
     IsAdmin,
     IsAtleastModerator,
-    TplCanDeletePost,
-    TplCanDeleteTopic,
-    TplCanEditPost,
-    TplCanModerate,
-    TplCanPostReply,
-    TplCanPostTopic,
-    permission_with_identity,
+    can_delete_topic,
+    can_edit_post,
+    can_moderate,
+    can_post_reply,
+    can_post_topic,
     has_permission,
+    permission_with_identity,
 )
 
 # whooshees
@@ -280,19 +279,16 @@ def configure_template_filters(app):
     ]
 
     filters.update(
-        [
-            (name, permission_with_identity(perm, name=name))
-            for name, perm in permissions
-        ]
+        (name, permission_with_identity(perm, name=name))
+        for name, perm in permissions
     )
 
-    # these create closures
-    filters["can_moderate"] = TplCanModerate()
-    filters["post_reply"] = TplCanPostReply()
-    filters["edit_post"] = TplCanEditPost()
-    filters["delete_post"] = TplCanDeletePost()
-    filters["post_topic"] = TplCanPostTopic()
-    filters["delete_topic"] = TplCanDeleteTopic()
+    filters["can_moderate"] = can_moderate
+    filters["post_reply"] = can_post_reply
+    filters["edit_post"] = can_edit_post
+    filters["delete_post"] = can_edit_post
+    filters["post_topic"] = can_post_topic
+    filters["delete_topic"] = can_delete_topic
     filters["has_permission"] = has_permission
 
     app.jinja_env.filters.update(filters)

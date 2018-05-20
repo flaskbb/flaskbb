@@ -238,6 +238,7 @@ def permission_with_identity(requirement, name=None):
     Permission instance factory that can set a user at construction time
     can optionally name the closure for nicer debugging
     """
+
     def _(user):
         return Permission(requirement, identity=user)
 
@@ -249,122 +250,100 @@ def permission_with_identity(requirement, name=None):
 
 # Template Requirements
 
+
 def has_permission(permission):
+
     def _(user):
         return Permission(Has(permission), identity=user)
+
     _.__name__ = "Has_{}".format(permission)
     return _
 
 
-def TplCanModerate():
+def can_moderate(user, forum):
+    kwargs = {}
 
-    def can_moderate(user, forum):
-        kwargs = {}
+    if isinstance(forum, int):
+        kwargs["forum_id"] = forum
+    elif isinstance(forum, Forum):
+        kwargs["forum"] = forum
 
-        if isinstance(forum, int):
-            kwargs["forum_id"] = forum
-        elif isinstance(forum, Forum):
-            kwargs["forum"] = forum
-
-        return Permission(IsAtleastModeratorInForum(**kwargs), identity=user)
-
-    return can_moderate
+    return Permission(IsAtleastModeratorInForum(**kwargs), identity=user)
 
 
-def TplCanPostReply():
+def can_post_reply(user, topic=None):
+    kwargs = {}
 
-    def can_post_reply(user, topic=None):
-        kwargs = {}
+    if isinstance(topic, int):
+        kwargs["topic_id"] = topic
+    elif isinstance(topic, Topic):
+        kwargs["topic"] = topic
 
-        if isinstance(topic, int):
-            kwargs["topic_id"] = topic
-        elif isinstance(topic, Topic):
-            kwargs["topic"] = topic
+    return Permission(
+        Or(
+            IsAtleastSuperModerator,
+            IsModeratorInForum(),
+            And(Has("postreply"), TopicNotLocked(**kwargs)),
+        ),
+        identity=user,
+    )
 
-        return Permission(
-            Or(
-                IsAtleastSuperModerator,
-                IsModeratorInForum(),
-                And(Has("postreply"), TopicNotLocked(**kwargs)),
+
+def can_edit_post(user, topic_or_post=None):
+    kwargs = {}
+
+    if isinstance(topic_or_post, int):
+        kwargs["topic_id"] = topic_or_post
+    elif isinstance(topic_or_post, Topic):
+        kwargs["topic"] = topic_or_post
+    elif isinstance(topic_or_post, Post):
+        kwargs["post"] = topic_or_post
+
+    return Permission(
+        Or(
+            IsAtleastSuperModerator,
+            And(IsModeratorInForum(), Has("editpost")),
+            And(
+                IsSameUser(topic_or_post),
+                Has("editpost"),
+                TopicNotLocked(**kwargs),
             ),
-            identity=user,
-        )
-
-    return can_post_reply
-
-
-def TplCanEditPost():
-
-    def can_edit_post(user, topic_or_post=None):
-        kwargs = {}
-
-        if isinstance(topic_or_post, int):
-            kwargs["topic_id"] = topic_or_post
-        elif isinstance(topic_or_post, Topic):
-            kwargs["topic"] = topic_or_post
-        elif isinstance(topic_or_post, Post):
-            kwargs["post"] = topic_or_post
-
-        return Permission(
-            Or(
-                IsAtleastSuperModerator,
-                And(IsModeratorInForum(), Has("editpost")),
-                And(
-                    IsSameUser(topic_or_post),
-                    Has("editpost"),
-                    TopicNotLocked(**kwargs),
-                ),
-            ),
-            identity=user,
-        )
-
-    return can_edit_post
+        ),
+        identity=user,
+    )
 
 
-TplCanDeletePost = TplCanEditPost
+def can_post_topic(user, forum):
+    kwargs = {}
+
+    if isinstance(forum, int):
+        kwargs["forum_id"] = forum
+    elif isinstance(forum, Forum):
+        kwargs["forum"] = forum
+
+    return Permission(
+        Or(
+            IsAtleastSuperModerator,
+            IsModeratorInForum(**kwargs),
+            And(Has("posttopic"), ForumNotLocked(**kwargs)),
+        ),
+        identity=user,
+    )
 
 
-def TplCanPostTopic():
+def can_delete_topic(user, topic=None):
+    kwargs = {}
 
-    def can_post_topic(user, forum):
-        kwargs = {}
+    if isinstance(topic, int):
+        kwargs["topic_id"] = topic
+    elif isinstance(topic, Topic):
+        kwargs["topic"] = topic
 
-        if isinstance(forum, int):
-            kwargs["forum_id"] = forum
-        elif isinstance(forum, Forum):
-            kwargs["forum"] = forum
-
-        return Permission(
-            Or(
-                IsAtleastSuperModerator,
-                IsModeratorInForum(**kwargs),
-                And(Has("posttopic"), ForumNotLocked(**kwargs)),
-            ),
-            identity=user,
-        )
-
-    return can_post_topic
-
-
-def TplCanDeleteTopic():
-
-    def can_delete_topic(user, topic=None):
-        kwargs = {}
-
-        if isinstance(topic, int):
-            kwargs["topic_id"] = topic
-        elif isinstance(topic, Topic):
-            kwargs["topic"] = topic
-
-        return Permission(
-            Or(
-                IsAtleastSuperModerator,
-                And(IsModeratorInForum(), Has("deletetopic")),
-                And(
-                    IsSameUser(), Has("deletetopic"), TopicNotLocked(**kwargs)
-                ),
-            ),
-            identity=user,
-        )
-
-    return can_delete_topic
+    return Permission(
+        Or(
+            IsAtleastSuperModerator,
+            And(IsModeratorInForum(), Has("deletetopic")),
+            And(IsSameUser(), Has("deletetopic"), TopicNotLocked(**kwargs)),
+        ),
+        identity=user,
+    )
