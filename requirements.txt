@@ -12,7 +12,7 @@ click-log==0.2.1
 enum34==1.1.6
 Flask==1.0.2
 Flask-Alembic==2.0.1
-flask-allows==0.6.0
+flask-allows==0.6.0.dev0
 Flask-BabelPlus==2.1.1
 Flask-Caching==1.4.0
 Flask-DebugToolbar==0.10.1

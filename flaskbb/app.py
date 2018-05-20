@@ -221,7 +221,6 @@ def configure_extensions(app):
     login_manager.init_app(app)
 
 
-
 def configure_template_filters(app):
     """Configures the template filters."""
     filters = {}
