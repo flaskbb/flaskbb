@@ -131,7 +131,11 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                     or setting.settingsgroup != group.key
                 )
 
-            if (setting is not None and overwrite_setting and setting_is_different) or setting is None:
+            if (
+                setting is not None and
+                overwrite_setting and
+                setting_is_different
+            ) or setting is None:
                 if setting is not None:
                     setting.value = settings[1]["value"]
                     setting.value_type = settings[1]["value_type"]

@@ -161,7 +161,7 @@ class PluginAuthenticationManager(AuthenticationManager):
                 raise StopAuthentication(_("Wrong username or password."))
             self.plugin_manager.hook.flaskbb_post_authenticate(user=user)
             return user
-        except StopAuthentication as e:
+        except StopAuthentication:
             self.plugin_manager.hook.flaskbb_authentication_failed(
                 identifier=identifier
             )

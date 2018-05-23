@@ -53,11 +53,11 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
-from . import markup
-from .auth import views as auth_views
-from .forum import views as forum_views
-from .management import views as management_views
-from .user import views as user_views
+from . import markup  # noqa
+from .auth import views as auth_views  # noqa
+from .forum import views as forum_views  # noqa
+from .management import views as management_views  # noqa
+from .user import views as user_views  # noqa
 
 logger = logging.getLogger(__name__)
 

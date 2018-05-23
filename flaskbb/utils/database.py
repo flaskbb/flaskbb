@@ -85,13 +85,17 @@ class HideableQuery(BaseQuery):
 
     def __new__(cls, *args, **kwargs):
         inst = super(HideableQuery, cls).__new__(cls)
-        with_hidden = kwargs.pop(
-            '_with_hidden', False
-        ) or (current_user and current_user.permissions.get('viewhidden', False))
+        include_hidden = kwargs.pop("_with_hidden", False)
+        has_view_hidden = current_user and current_user.permissions.get(
+            "viewhidden", False
+        )
+        with_hidden = include_hidden or has_view_hidden
         if args or kwargs:
             super(HideableQuery, inst).__init__(*args, **kwargs)
             entity = inst._mapper_zero().class_
-            return inst.filter(entity.hidden != True) if not with_hidden else inst
+            return inst.filter(
+                entity.hidden != True
+            ) if not with_hidden else inst
         return inst
 
     def __init__(self, *args, **kwargs):
@@ -99,16 +103,20 @@ class HideableQuery(BaseQuery):
 
     def with_hidden(self):
         return self.__class__(
-            db.class_mapper(self._mapper_zero().class_), session=db.session(), _with_hidden=True
+            db.class_mapper(self._mapper_zero().class_),
+            session=db.session(),
+            _with_hidden=True,
         )
 
     def _get(self, *args, **kwargs):
         return super(HideableQuery, self).get(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        include_hidden = kwargs.pop('include_hidden', False)
+        include_hidden = kwargs.pop("include_hidden", False)
         obj = self.with_hidden()._get(*args, **kwargs)
-        return obj if obj is not None and (include_hidden or not obj.hidden) else None
+        return obj if obj is not None and (
+            include_hidden or not obj.hidden
+        ) else None
 
 
 class HideableMixin(object):
@@ -121,16 +129,16 @@ class HideableMixin(object):
     def hidden_by_id(cls):
         return db.Column(
             db.Integer,
-            db.ForeignKey('users.id', name='fk_{}_hidden_by'.format(cls.__name__)),
-            nullable=True
+            db.ForeignKey(
+                "users.id", name="fk_{}_hidden_by".format(cls.__name__)
+            ),
+            nullable=True,
         )
 
     @declared_attr
     def hidden_by(cls):
         return db.relationship(
-            'User',
-            uselist=False,
-            foreign_keys=[cls.hidden_by_id],
+            "User", uselist=False, foreign_keys=[cls.hidden_by_id]
         )
 
     def hide(self, user, *args, **kwargs):

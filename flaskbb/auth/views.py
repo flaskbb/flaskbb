@@ -100,7 +100,7 @@ class Reauth(MethodView):
 
             reauth_manager = self.reauthentication_factory()
             try:
-                user = reauth_manager.reauthenticate(
+                reauth_manager.reauthenticate(
                     user=current_user, secret=form.password.data
                 )
                 confirm_login()
@@ -241,7 +241,7 @@ class ResetPassword(MethodView):
                     db.session.commit()
                 except Exception:
                     logger.exception(
-                        "Error while finalizing database when resetting password"
+                        "Error while finalizing database when resetting password"  # noqa
                     )
                     db.session.rollback()
 
@@ -310,7 +310,7 @@ class ActivateAccount(MethodView):
                 db.session.rollback()
                 flash(
                     _(
-                        "Could not activate account due to an unrecoverable error"
+                        "Could not activate account due to an unrecoverable error"  # noqa
                     ), "danger"
                 )
 

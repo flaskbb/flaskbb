@@ -39,7 +39,6 @@ from flaskbb._compat import (iteritems, range_method, text_type, string_types,
                              to_bytes, to_unicode)
 from flaskbb.extensions import babel, redis_store
 from flaskbb.utils.settings import flaskbb_config
-from jinja2 import Markup
 from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
@@ -126,7 +125,10 @@ def do_topic_action(topics, user, action, reverse):
 
     elif action == "delete":
         if not Permission(CanDeleteTopic):
-            flash(_("You do not have the permissions to delete these topics."), "danger")
+            flash(
+                _("You do not have the permissions to delete these topics."),
+                "danger"
+            )
             return False
 
         for topic in topics:
@@ -135,7 +137,10 @@ def do_topic_action(topics, user, action, reverse):
 
     elif action == 'hide':
         if not Permission(Has('makehidden')):
-            flash(_("You do not have the permissions to hide these topics."), "danger")
+            flash(
+                _("You do not have the permissions to hide these topics."),
+                "danger"
+            )
             return False
 
         for topic in topics:
@@ -146,7 +151,10 @@ def do_topic_action(topics, user, action, reverse):
 
     elif action == 'unhide':
         if not Permission(Has('makehidden')):
-            flash(_("You do not have the permissions to unhide these topics."), "danger")
+            flash(
+                _("You do not have the permissions to unhide these topics."),
+                "danger"
+            )
             return False
 
         for topic in topics:

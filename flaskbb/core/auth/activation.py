@@ -29,7 +29,8 @@ class AccountActivator(ABC):
         form, but is recommended to take the form of a permanent communication
         such as email.
 
-        This method may raise :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
+        This method may raise
+        :class:`ValidationError<flaskbb.core.exceptions.ValidationError>`
         to communicate a failure when creating the token for the user to
         activate their account with (such as when a user has requested a token
         be sent to an email that is not registered in the installation or

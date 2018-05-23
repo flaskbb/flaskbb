@@ -304,10 +304,10 @@ class Post(HideableCRUDMixin, db.Model):
                 if second_last_post:
                     # now lets update the second last post to the last post
                     self.topic.forum.last_post = second_last_post
-                    self.topic.forum.last_post_title = second_last_post.topic.title
+                    self.topic.forum.last_post_title = second_last_post.topic.title  # noqa
                     self.topic.forum.last_post_user = second_last_post.user
-                    self.topic.forum.last_post_username = second_last_post.username
-                    self.topic.forum.last_post_created = second_last_post.date_created
+                    self.topic.forum.last_post_username = second_last_post.username  # noqa
+                    self.topic.forum.last_post_created = second_last_post.date_created  # noqa
                 else:
                     self.topic.forum.last_post = None
                     self.topic.forum.last_post_title = None
@@ -370,7 +370,10 @@ class Post(HideableCRUDMixin, db.Model):
         ).limit(1).first()
 
         # should never be None, but deal with it anyways to be safe
-        if last_unhidden_post and self.date_created > last_unhidden_post.date_created:
+        if (
+            last_unhidden_post and
+            self.date_created > last_unhidden_post.date_created
+        ):
             self.topic.last_post = self
             self.second_last_post = last_unhidden_post
 
@@ -483,9 +486,9 @@ class Topic(HideableCRUDMixin, db.Model):
             self.title = title
 
         if user:
-            # setting the user here, even with setting the id, breaks the bulk insert
-            # stuff as they use the session.bulk_save_objects which does not trigger
-            # relationships
+            # setting the user here, even with setting the id, breaks the bulk
+            # insert stuff as they use the session.bulk_save_objects which does
+            # not trigger relationships
             self.user_id = user.id
             self.username = user.username
 
@@ -783,12 +786,17 @@ class Topic(HideableCRUDMixin, db.Model):
         if self.hidden:
             post_count.append(Post.hidden != True)
         else:
-            post_count.append(db.or_(Post.hidden != True, Post.id == self.first_post.id))
+            post_count.append(
+                db.or_(Post.hidden != True, Post.id == self.first_post.id)
+            )
 
         forum.post_count = Post.query.distinct().filter(*post_count).count()
 
     def _restore_topic_to_forum(self):
-        if self.forum.last_post is None or self.forum.last_post_created < self.last_updated:
+        if (
+            self.forum.last_post is None or
+            self.forum.last_post_created < self.last_updated
+        ):
             self.forum.last_post = self.last_post
             self.forum.last_post_title = self.title
             self.forum.last_post_user = self.user
@@ -807,7 +815,9 @@ class Topic(HideableCRUDMixin, db.Model):
         """
         # todo: Find circular import and break it
         from flaskbb.user.models import User
-        return User.query.distinct().filter(Post.topic_id == self.id, User.id == Post.user_id)
+        return User.query.distinct().filter(
+            Post.topic_id == self.id, User.id == Post.user_id
+        )
 
 
 @make_comparable
@@ -1010,7 +1020,9 @@ class Forum(db.Model, CRUDMixin):
         :param last_post: If set to ``True`` it will also try to update
                           the last post columns in the forum.
         """
-        topic_count = Topic.query.filter(Topic.forum_id == self.id, Topic.hidden != True).count()
+        topic_count = Topic.query.filter(
+            Topic.forum_id == self.id, Topic.hidden != True
+        ).count()
         post_count = Post.query.filter(
             Post.topic_id == Topic.id,
             Topic.forum_id == self.id,

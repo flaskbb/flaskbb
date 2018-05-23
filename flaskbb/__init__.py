@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 from flaskbb.app import create_app  # noqa
 
 
-# monkeypatch for https://github.com/wtforms/wtforms/issues/373
-# Taken from https://github.com/indico/indico/commit/c79c562866e5efdbeb5a3101cccc97df57906f76
+# monkeypatch for https://github.com/wtforms/wtforms/issues/373 Taken from
+# https://github.com/indico/indico/commit/c79c562866e5efdbeb5a3101cccc97df57906f76
 def _patch_wtforms_sqlalchemy():
     from ._compat import text_type
     from wtforms.ext.sqlalchemy import fields

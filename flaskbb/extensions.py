@@ -43,9 +43,9 @@ class FlaskBBWhooshee(Whooshee):
         """
         self.whoosheers.append(wh)
         for model in wh.models:
-            event.listen(model, 'after_{0}'.format(INSERT_KWD), self.after_insert)
-            event.listen(model, 'after_{0}'.format(UPDATE_KWD), self.after_update)
-            event.listen(model, 'after_{0}'.format(DELETE_KWD), self.after_delete)
+            event.listen(model, 'after_{0}'.format(INSERT_KWD), self.after_insert)  # noqa
+            event.listen(model, 'after_{0}'.format(UPDATE_KWD), self.after_update)  # noqa
+            event.listen(model, 'after_{0}'.format(DELETE_KWD), self.after_delete)  # noqa
             query_class = getattr(model, 'query_class', None)
 
             if query_class is not None and isclass(query_class):
@@ -57,7 +57,9 @@ class FlaskBBWhooshee(Whooshee):
                 elif query_class not in (BaseQuery, SQLAQuery, WhoosheeQuery):
                     query_class_name = query_class.__name__
                     model.query_class = type(
-                        "Whooshee{}".format(query_class_name), (query_class, self.query), {}
+                        "Whooshee{}".format(query_class_name),
+                        (query_class, self.query),
+                        {}
                     )
                 else:
                     model.query_class = self.query

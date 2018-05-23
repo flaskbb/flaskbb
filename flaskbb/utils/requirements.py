@@ -155,19 +155,25 @@ class ForumNotLocked(Requirement):
 
 
 class CanAccessForum(Requirement):
+
     def fulfill(self, user, request):
         if not current_forum:
-            raise FlaskBBError('Could not load forum data')
+            raise FlaskBBError("Could not load forum data")
 
-        return set([g.id for g in current_forum.groups]) & set([g.id for g in user.groups])
+        forum_groups = {g.id for g in current_forum.groups}
+        user_groups = {g.id for g in user.groups}
+        return forum_groups & user_groups
 
 
 class CanAccessTopic(Requirement):
+
     def fulfill(self, user, request):
         if not current_forum:
-            raise FlaskBBError('Could not load topic data')
+            raise FlaskBBError("Could not load topic data")
 
-        return set([g.id for g in current_forum.groups]) & set([g.id for g in user.groups])
+        forum_groups = {g.id for g in current_forum.groups}
+        user_groups = {g.id for g in user.groups}
+        return forum_groups & user_groups
 
 
 def IsAtleastModeratorInForum(forum_id=None, forum=None):
@@ -259,6 +265,7 @@ def TplCanEditPost(request):
             ),
         )(user, request)
     return _
+
 
 TplCanDeletePost = TplCanEditPost
 

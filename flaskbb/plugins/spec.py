@@ -256,7 +256,8 @@ def flaskbb_authenticate(identifier, secret):
             if user is not None:
                 if has_too_many_failed_logins(user):
                     raise StopAuthentication(_(
-                        "Your account is temporarily locked due to too many login attempts"
+                        "Your account is temporarily locked due to too many"
+                        " login attempts"
                     ))
 
         @impl(tryfirst=True)
@@ -357,7 +358,9 @@ def flaskbb_reauth_attempt(user, secret):
         @impl
         def flaskbb_reauth_attempt(user, secret):
             if user.login_attempts > 5:
-                raise StopAuthentication(_("Too many failed authentication attempts"))
+                raise StopAuthentication(
+                    _("Too many failed authentication attempts")
+                )
     """
 
 
