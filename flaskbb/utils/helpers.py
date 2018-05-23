@@ -767,3 +767,25 @@ def requires_unactivated(f):
 def register_view(bp_or_app, routes, view_func, *args, **kwargs):
     for route in routes:
         bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)
+
+
+# not a decorator, used to flash and return a redirect from a decorator
+# or a flask-allows requirements runner
+def flash_and_redirect(message, level, endpoint):
+    flash(message, level)
+    return redirect(url_for(endpoint))
+
+
+def thunk(f, *a, **k):
+    """
+    Used to delay a function, potentially because it requires an app or request
+    context to be called but the function itself is eager.
+
+    The thunk itself will not respond to arguments passed but accepts any and
+    call arguments so it can fulfill any number of callback interfaces.
+    """
+
+    def thunker(*_, **__):
+        return f(*a, **k)
+
+    return thunker
