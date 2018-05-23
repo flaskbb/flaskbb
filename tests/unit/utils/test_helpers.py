@@ -2,10 +2,9 @@
 import datetime as dt
 
 from flaskbb.forum.models import Forum
-from flaskbb.utils.helpers import (check_image, crop_title, format_date,
-                                   format_quote, forum_is_unread,
-                                   get_image_info, is_online,
-                                   slugify, time_utcnow, topic_is_unread)
+from flaskbb.utils.helpers import (
+    check_image, crop_title, format_quote, forum_is_unread, get_image_info,
+    is_online, slugify, time_utcnow, topic_is_unread)
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -100,12 +99,6 @@ def test_crop_title(default_settings):
 
 def test_is_online(default_settings, user):
     assert is_online(user)
-
-
-def test_format_date():
-    date = dt.date(2015, 2, 15)
-    time = dt.datetime.combine(date, dt.datetime.min.time())
-    assert format_date(time) == "2015-02-15"
 
 
 def test_format_quote(topic):

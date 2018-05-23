@@ -38,7 +38,7 @@
                             </div>
 
                             <div class="profile-date">
-                                {{ user.date_joined|format_date('%b %d %Y') }}
+                                {{ user.date_joined|format_date }}
                             </div>
 
                             {{ run_hook("flaskbb_tpl_profile_sidebar_stats", user=user) }}

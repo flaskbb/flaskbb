@@ -51,7 +51,7 @@
         <div class="panel-body page-body topic-content">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="topic-created">
-                    {{ topic.date_created|format_date('%d %B %Y - %H:%M') }}
+                    {{ topic.date_created|format_datetime }}
                 </div>
                 <div class="topic-content">
                 {{ topic.first_post.content|markup }}

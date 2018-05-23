@@ -12,6 +12,7 @@ import ast
 import itertools
 import logging
 import operator
+import warnings
 import os
 import re
 import time
@@ -24,7 +25,10 @@ from pkg_resources import get_distribution
 import requests
 import unidecode
 from babel.core import get_locale_identifier
-from babel.dates import format_timedelta as babel_format_timedelta
+from babel.dates import (
+    format_timedelta as babel_format_timedelta,
+    format_datetime as babel_format_datetime,
+    format_date as babel_format_date)
 from werkzeug.utils import import_string, ImportStringError
 from flask import flash, g, redirect, request, session, url_for
 from flask_allows import Permission
@@ -399,26 +403,68 @@ def time_diff():
     return diff
 
 
-def format_date(value, format='%Y-%m-%d'):
-    """Returns a formatted time string
+def _get_user_locale():
+    locale = flaskbb_config.get("DEFAULT_LANGUAGE", "en")
+    if current_user.is_authenticated and current_user.language is not None:
+        locale = current_user.language
+    return locale
+
+
+def _format_html_time_tag(datetime, what_to_display):
+    if what_to_display == 'date-only':
+        content = babel_format_date(datetime, locale=_get_user_locale())
+    elif what_to_display == 'date-and-time':
+        content = babel_format_datetime(
+            datetime,
+            tzinfo=UTC,
+            locale=_get_user_locale()
+        )
+        # While this could be done with a format string, that would
+        # hinder internationalization and honestly why bother.
+        content += ' UTC'
+    else:
+        raise ValueError('what_to_display argument invalid')
+
+    isoformat = datetime.isoformat()
+
+    return Markup(
+        '<time datetime="{}" data-what_to_display="{}">{}</time>'
+        .format(isoformat, what_to_display, content)
+    )
+
+
+def format_datetime(datetime):
+    """Format the datetime for usage in templates.
 
     :param value: The datetime object that should be formatted
-
-    :param format: How the result should look like. A full list of available
-                   directives is here: http://goo.gl/gNxMHE
+    :rtype: Markup
     """
-    return value.strftime(format)
+    return _format_html_time_tag(datetime, 'date-and-time')
+
+
+def format_date(datetime, format=None):
+    """Format the datetime for usage in templates, keeping only the date.
+
+    :param value: The datetime object that should be formatted
+    :rtype: Markup
+    """
+    if format:
+        warnings.warn(
+            'This API has been deprecated due to i18n concerns.  Please use  '
+            'Jinja filters format_datetime and format_date without arguments '
+            'to format complete and date-only timestamps respectively.',
+            DeprecationWarning
+        )
+        if '%H' in format:
+            return format_datetime(datetime)
+    return _format_html_time_tag(datetime, 'date-only')
 
 
 def format_timedelta(delta, **kwargs):
     """Wrapper around babel's format_timedelta to make it user language
     aware.
     """
-    locale = flaskbb_config.get("DEFAULT_LANGUAGE", "en")
-    if current_user.is_authenticated and current_user.language is not None:
-        locale = current_user.language
-
-    return babel_format_timedelta(delta, locale=locale, **kwargs)
+    return babel_format_timedelta(delta, locale=_get_user_locale(), **kwargs)
 
 
 def time_since(time):  # pragma: no cover

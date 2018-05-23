@@ -54,7 +54,7 @@
             </div>
             <div>
                 {% trans %}Joined{% endtrans %}:
-                {{ user.date_joined|format_date('%b %d %Y') }}
+                {{ user.date_joined|format_date }}
             </div>
             <div>
                 {% trans %}Posts{% endtrans %}:
@@ -79,7 +79,7 @@
             <div>
                 {% trans %}Birthday{% endtrans %}:
                 {% if user.birthday %}
-                    {{ user.birthday|format_date('%b %d %Y') }}
+                    {{ user.birthday|format_date }}
                 {% else %}
                     {% trans %}No Info{% endtrans %}
                 {% endif %}
