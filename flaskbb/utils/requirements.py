@@ -173,18 +173,7 @@ class CanAccessForum(Requirement):
 
         forum_groups = {g.id for g in current_forum.groups}
         user_groups = {g.id for g in user.groups}
-        return forum_groups & user_groups
-
-
-class CanAccessTopic(Requirement):
-
-    def fulfill(self, user):
-        if not current_forum:
-            raise FlaskBBError("Could not load topic data")
-
-        forum_groups = {g.id for g in current_forum.groups}
-        user_groups = {g.id for g in user.groups}
-        return forum_groups & user_groups
+        return bool(forum_groups & user_groups)
 
 
 def IsAtleastModeratorInForum(forum_id=None, forum=None):
@@ -209,7 +198,7 @@ CanEditUser = Or(IsAtleastSuperModerator, Has("mod_edituser"))
 CanEditPost = Or(
     IsAtleastSuperModerator,
     And(IsModeratorInForum(), Has("editpost")),
-    And(IsSameUser(), Has("editpost"), TopicNotLocked()),
+    And(CanAccessForum(), IsSameUser(), Has("editpost"), TopicNotLocked()),
 )
 
 CanDeletePost = CanEditPost

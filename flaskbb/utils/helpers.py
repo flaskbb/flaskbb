@@ -769,23 +769,22 @@ def register_view(bp_or_app, routes, view_func, *args, **kwargs):
         bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)
 
 
-# not a decorator, used to flash and return a redirect from a decorator
-# or a flask-allows requirements runner
-def flash_and_redirect(message, level, endpoint):
-    flash(message, level)
-    return redirect(url_for(endpoint))
+class FlashAndRedirect(object):
+    def __init__(self, message, level, endpoint):
+        # need to reassign to avoid capturing the reassigned endpoint
+        # in the generated closure, otherwise bad things happen at resolution
+        if not callable(endpoint):
+            # discard args and kwargs and just go to the endpoint
+            # this probably isn't *100%* correct behavior in case we need
+            # to add query params on...
+            endpoint_ = lambda *a, **k: url_for(endpoint)  # noqa
+        else:
+            endpoint_ = endpoint
 
+        self._message = message
+        self._level = level
+        self._endpoint = endpoint_
 
-def thunk(f, *a, **k):
-    """
-    Used to delay a function, potentially because it requires an app or request
-    context to be called but the function itself is eager.
-
-    The thunk itself will not respond to arguments passed but accepts any and
-    call arguments so it can fulfill any number of callback interfaces.
-    """
-
-    def thunker(*_, **__):
-        return f(*a, **k)
-
-    return thunker
+    def __call__(self, *a, **k):
+        flash(self._message, self._level)
+        return redirect(self._endpoint(*a, **k))
