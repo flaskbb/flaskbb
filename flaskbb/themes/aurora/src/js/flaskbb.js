@@ -165,5 +165,26 @@ $(document).ready(function () {
         );
     });
 
+    $('time').each(function(i, elem) {
+        var date = new Date(elem.getAttribute('datetime'));
+
+        var options = {
+            weekday: undefined,
+            era: undefined,
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            second: undefined,
+        };
+        if (elem.dataset.what_to_display == 'date-only') {
+            options.hour = undefined;
+            options.minute = undefined;
+        } else {
+            options.hour = '2-digit';
+            options.minute = '2-digit';
+        }
+        elem.textContent = date.toLocaleString(undefined, options);
+    });
+
     parse_emoji(document.body);
 });

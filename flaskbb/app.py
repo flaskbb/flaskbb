@@ -53,6 +53,7 @@ from flaskbb.utils.helpers import (
     app_config_from_env,
     crop_title,
     format_date,
+    format_datetime,
     forum_is_unread,
     get_alembic_locations,
     get_flaskbb_config,
@@ -263,11 +264,12 @@ def configure_template_filters(app):
     """Configures the template filters."""
     filters = {}
 
-    filters["format_date"] = format_date
-    filters["time_since"] = time_since
-    filters["is_online"] = is_online
     filters["crop_title"] = crop_title
+    filters["format_date"] = format_date
+    filters["format_datetime"] = format_datetime
     filters["forum_is_unread"] = forum_is_unread
+    filters["is_online"] = is_online
+    filters["time_since"] = time_since
     filters["topic_is_unread"] = topic_is_unread
 
     permissions = [

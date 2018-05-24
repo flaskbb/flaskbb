@@ -36,7 +36,7 @@
                         <div class="author-avatar"><img src="{{ post.user.avatar }}" alt="avatar"></div>
                     {% endif %}
 
-                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ post.user.date_joined|format_date('%b %d %Y') }}</div>
+                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ post.user.date_joined|format_date }}</div>
                     <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ post.user.post_count }}</div>
                     <div class="author-pm">
                         {% if current_user.is_authenticated and post.user_id %}
@@ -62,11 +62,11 @@
                         <div class="pull-left">
                             <!-- Creation date / Date modified -->
                             <a href="{{ post.url }}">
-                                {{ post.date_created|format_date('%d %B %Y - %H:%M') }}
+                                {{ post.date_created|format_datetime }}
                             </a>
                             {% if post.user_id and post.date_modified %}
                             <small>
-                                (Last modified: {{ post.date_modified|format_date('%d %B %Y - %H:%M') }} by
+                                (Last modified: {{ post.date_modified|format_datetime }} by
                                 <a href="{{ url_for('user.profile', username=post.modified_by) }}">{{ post.modified_by }}</a>.)
                             </small>
                             {% endif %}
@@ -111,7 +111,7 @@
                 <div class="col-md-1 col-sm-1 col-xs-1">{{ user.id }}</div>
                 <div class="col-md-3 col-sm-3 col-xs-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
                 <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>
-                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date('%b %d %Y') }}</div>
+                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date }}</div>
                 <div class="col-md-3 col-sm-3 col-xs-5">{{ user.primary_group.name }}</div>
             </div>
             {% else %}
