@@ -204,13 +204,13 @@ CanEditPost = Or(
 CanDeletePost = CanEditPost
 
 CanPostReply = Or(
-    And(Has("postreply"), TopicNotLocked()),
+    And(CanAccessForum(), Has("postreply"), TopicNotLocked()),
     IsModeratorInForum(),
     IsAtleastSuperModerator,
 )
 
 CanPostTopic = Or(
-    And(Has("posttopic"), ForumNotLocked()),
+    And(CanAccessForum(), Has("posttopic"), ForumNotLocked()),
     IsAtleastSuperModerator,
     IsModeratorInForum(),
 )
@@ -218,7 +218,7 @@ CanPostTopic = Or(
 CanDeleteTopic = Or(
     IsAtleastSuperModerator,
     And(IsModeratorInForum(), Has("deletetopic")),
-    And(IsSameUser(), Has("deletetopic"), TopicNotLocked()),
+    And(CanAccessForum(), IsSameUser(), Has("deletetopic"), TopicNotLocked()),
 )
 
 
