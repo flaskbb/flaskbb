@@ -1,15 +1,20 @@
 from flask_login import login_user
 from flaskbb.management import views
-from flaskbb.exceptions import AuthorizationRequired
-import pytest
+from flask import get_flashed_messages
 
 
 def test_overview_not_authorized(application, default_settings):
     view = views.ManagementOverview.as_view('overview')
-    with application.test_request_context(), pytest.raises(AuthorizationRequired) as excinfo:  # noqa
-        view()
+    with application.test_request_context():
+        result = view()
+        messages = get_flashed_messages(with_categories=True)
 
-    assert "Authorization is required to access this area." == excinfo.value.description  # noqa
+    expected = (
+        'danger',
+        'You are not allowed to access the management panel'
+    )
+    assert result.status_code == 302
+    assert messages[0] == expected
 
 
 def test_overview_with_authorized(admin_user, application, default_settings):
