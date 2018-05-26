@@ -51,7 +51,7 @@ class ManagementSettings(MethodView):
         allows.requires(
             IsAdmin,
             on_fail=FlashAndRedirect(
-                message=_("You are not allowed to access the management settings"),
+                message=_("You are not allowed to access the management settings"),  # noqa
                 level="danger",
                 endpoint="management.overview"
             )
@@ -1088,7 +1088,7 @@ class CeleryStatus(MethodView):
         allows.requires(
             IsAtleastModerator,
             on_fail=FlashAndRedirect(
-                message=_("You are not allowed to access the management settings"),
+                message=_("You are not allowed to access the management settings"),  # noqa
                 level="danger",
                 endpoint="management.overview"
             )
