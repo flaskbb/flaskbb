@@ -39,6 +39,7 @@ from flaskbb._compat import (iteritems, range_method, text_type, string_types,
                              to_bytes, to_unicode)
 from flaskbb.extensions import babel, redis_store
 from flaskbb.utils.settings import flaskbb_config
+from jinja2 import Markup
 from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
