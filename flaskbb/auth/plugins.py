@@ -9,9 +9,10 @@
 """
 from flask import flash, redirect, url_for
 from flask_login import current_user, logout_user
-from ..extensions import db
+
 from . import impl
 from ..core.auth.authentication import ForceLogout
+from ..extensions import db
 from ..user.models import User
 from ..utils.settings import flaskbb_config
 from .services.authentication import (
@@ -44,9 +45,13 @@ def flaskbb_authenticate(identifier, secret):
 
 @impl(tryfirst=True)
 def flaskbb_post_authenticate(user):
-    ClearFailedLogins().handle_post_auth(user)
+    handlers = [ClearFailedLogins()]
+
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
-        BlockUnactivatedUser().handle_post_auth(user)
+        handlers.append(BlockUnactivatedUser())
+
+    for handler in handlers:
+        handler.handle_post_auth(user)
 
 
 @impl
@@ -102,10 +107,13 @@ def flaskbb_gather_registration_validators():
 
 @impl
 def flaskbb_registration_post_processor(user):
-    if flaskbb_config["ACTIVATE_ACCOUNT"]:
-        service = SendActivationPostProcessor(account_activator_factory())
-    else:
-        service = AutologinPostProcessor()
+    handlers = []
 
-    service.post_process(user)
-    AutoActivateUserPostProcessor(db, flaskbb_config).post_process(user)
+    if flaskbb_config["ACTIVATE_ACCOUNT"]:
+        handlers.append(SendActivationPostProcessor(account_activator_factory))
+    else:
+        handlers.append(AutologinPostProcessor())
+        handlers.append(AutoActivateUserPostProcessor(db, flaskbb_config))
+
+    for handler in handlers:
+        handler.post_process(user)
