@@ -247,6 +247,7 @@ class ViewTopic(MethodView):
 
 class NewTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(), CanPostTopic,
             on_fail=FlashAndRedirect(
@@ -255,7 +256,6 @@ class NewTopic(MethodView):
                 endpoint=lambda *a, **k: current_forum.url
             )
         ),
-        login_required
     ]
 
     def get(self, forum_id, slug=None):
@@ -290,6 +290,7 @@ class NewTopic(MethodView):
 
 class ManageForum(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             IsAtleastModeratorInForum(),
             on_fail=FlashAndRedirect(
@@ -301,7 +302,6 @@ class ManageForum(MethodView):
                 )
             )
         ),
-        login_required
     ]
 
     def get(self, forum_id, slug=None):
@@ -464,6 +464,7 @@ class ManageForum(MethodView):
 
 class NewPost(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(), CanPostReply,
             on_fail=FlashAndRedirect(
@@ -475,7 +476,6 @@ class NewPost(MethodView):
                 )
             )
         ),
-        login_required
     ]
 
     def get(self, topic_id, slug=None, post_id=None):
@@ -708,6 +708,7 @@ class Search(MethodView):
 
 class DeleteTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanDeleteTopic,
             on_fail=FlashAndRedirect(
@@ -717,7 +718,6 @@ class DeleteTopic(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
@@ -731,6 +731,7 @@ class DeleteTopic(MethodView):
 
 class LockTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             IsAtleastModeratorInForum(),
             on_fail=FlashAndRedirect(
@@ -740,7 +741,6 @@ class LockTopic(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
@@ -752,6 +752,7 @@ class LockTopic(MethodView):
 
 class UnlockTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             IsAtleastModeratorInForum(),
             on_fail=FlashAndRedirect(
@@ -761,7 +762,6 @@ class UnlockTopic(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
@@ -773,6 +773,7 @@ class UnlockTopic(MethodView):
 
 class HighlightTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             IsAtleastModeratorInForum(),
             on_fail=FlashAndRedirect(
@@ -782,7 +783,6 @@ class HighlightTopic(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
@@ -794,6 +794,7 @@ class HighlightTopic(MethodView):
 
 class TrivializeTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             IsAtleastModeratorInForum(),
             on_fail=FlashAndRedirect(
@@ -803,7 +804,6 @@ class TrivializeTopic(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id=None, slug=None):
@@ -815,6 +815,7 @@ class TrivializeTopic(MethodView):
 
 class DeletePost(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanDeletePost,
             on_fail=FlashAndRedirect(
@@ -823,7 +824,6 @@ class DeletePost(MethodView):
                 endpoint=lambda *a, **k: current_topic.url
             )
         ),
-        login_required
     ]
 
     def post(self, post_id):
@@ -842,6 +842,7 @@ class DeletePost(MethodView):
 
 class RawPost(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(),
             on_fail=FlashAndRedirect(
@@ -850,7 +851,6 @@ class RawPost(MethodView):
                 endpoint=lambda *a, **k: current_category.url
             )
         ),
-        login_required
     ]
 
     def get(self, post_id):
@@ -860,6 +860,7 @@ class RawPost(MethodView):
 
 class MarkRead(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(),
             on_fail=FlashAndRedirect(
@@ -868,7 +869,6 @@ class MarkRead(MethodView):
                 endpoint=lambda *a, **k: current_category.url
             )
         ),
-        login_required
     ]
 
     def post(self, forum_id=None, slug=None):
@@ -938,6 +938,7 @@ class WhoIsOnline(MethodView):
 
 class TrackTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(),
             on_fail=FlashAndRedirect(
@@ -946,7 +947,6 @@ class TrackTopic(MethodView):
                 endpoint=lambda *a, **k: current_category.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
@@ -958,6 +958,7 @@ class TrackTopic(MethodView):
 
 class UntrackTopic(MethodView):
     decorators = [
+        login_required,
         allows.requires(
             CanAccessForum(),
             on_fail=FlashAndRedirect(
@@ -966,7 +967,6 @@ class UntrackTopic(MethodView):
                 endpoint=lambda *a, **k: current_category.url
             )
         ),
-        login_required
     ]
 
     def post(self, topic_id, slug=None):
