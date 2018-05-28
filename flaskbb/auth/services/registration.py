@@ -139,7 +139,7 @@ class SendActivationPostProcessor(RegistrationPostProcessor):
         self.account_activator.initiate_account_activation(user.email)
         flash(
             _(
-                "An account activation email has been sent to " "%(email)s",
+                "An account activation email has been sent to %(email)s",
                 email=user.email,
             ),
             "success",
