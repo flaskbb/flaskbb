@@ -110,7 +110,9 @@ def flaskbb_registration_post_processor(user):
     handlers = []
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
-        handlers.append(SendActivationPostProcessor(account_activator_factory))
+        handlers.append(
+            SendActivationPostProcessor(account_activator_factory())
+        )
     else:
         handlers.append(AutologinPostProcessor())
         handlers.append(AutoActivateUserPostProcessor(db, flaskbb_config))
