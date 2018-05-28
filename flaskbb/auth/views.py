@@ -274,7 +274,7 @@ class RequestActivationToken(MethodView):
                         "your email address."
                     ), "success"
                 )
-                return redirect(url_for("auth.activate_account"))
+                return redirect(url_for('forum.index'))
 
         return render_template(
             "auth/request_account_activation.html", form=form
