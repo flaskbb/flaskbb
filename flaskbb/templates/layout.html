@@ -119,10 +119,14 @@
                                     </a>
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
+                                        {# MAYBE(anr): Move this into a hook?? #}
                                         {% if flaskbb_config["REGISTRATION_ENABLED"] %}
                                         <li><a href="{{ url_for('auth.register') }}"><span class="fa fa-user-plus fa-fw"></span> {% trans %}Register{% endtrans %}</a></li>
                                         {% endif %}
                                         <li><a href="{{ url_for('auth.forgot_password') }}"><span class="fa fa-undo fa-fw"></span> {% trans %}Reset Password{% endtrans %}</a></li>
+                                        {% if flaskbb_config["ACTIVATE_ACCOUNT"] %}
+                                        <li><a href="{{ url_for('auth.request_activation_token') }}"><span class="fa fa-fw fa-ticket"></span> {% trans %}Activate Account{% endtrans %}</a></li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                             </li>
