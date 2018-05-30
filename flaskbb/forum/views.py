@@ -29,13 +29,15 @@ from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (do_topic_action, format_quote,
                                    get_online_users, real, register_view,
-                                   render_template, time_diff, time_utcnow)
-from flaskbb.utils.requirements import (CanAccessForum, CanAccessTopic,
+                                   render_template, time_diff, time_utcnow,
+                                   FlashAndRedirect)
+from flaskbb.utils.requirements import (CanAccessForum,
                                         CanDeletePost, CanDeleteTopic,
                                         CanEditPost, CanPostReply,
                                         CanPostTopic, Has,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
+from .locals import current_topic, current_forum, current_category
 
 impl = HookimplMarker('flaskbb')
 
@@ -90,7 +92,14 @@ class ViewCategory(MethodView):
 
 
 class ViewForum(MethodView):
-    decorators = [allows.requires(CanAccessForum())]
+    decorators = [allows.requires(
+        CanAccessForum(),
+        on_fail=FlashAndRedirect(
+            message=_("You are not allowed to access that forum"),
+            level="warning",
+            endpoint=lambda *a, **k: current_category.url
+        )
+    )]
 
     def get(self, forum_id, slug=None):
         page = request.args.get('page', 1, type=int)
@@ -118,6 +127,14 @@ class ViewForum(MethodView):
 
 
 class ViewPost(MethodView):
+    decorators = [allows.requires(
+        CanAccessForum(),
+        on_fail=FlashAndRedirect(
+            message=_("You are not allowed to access that topic"),
+            level="warning",
+            endpoint=lambda *a, **k: current_category.url
+        )
+    )]
 
     def get(self, post_id):
         '''Redirects to a post in a topic.'''
@@ -141,7 +158,14 @@ class ViewPost(MethodView):
 
 
 class ViewTopic(MethodView):
-    decorators = [allows.requires(CanAccessTopic())]
+    decorators = [allows.requires(
+        CanAccessForum(),
+        on_fail=FlashAndRedirect(
+            message=_("You are not allowed to access that topic"),
+            level="warning",
+            endpoint=lambda *a, **k: current_category.url
+        )
+    )]
 
     def get(self, topic_id, slug=None):
         page = request.args.get('page', 1, type=int)
@@ -185,7 +209,17 @@ class ViewTopic(MethodView):
             form=self.form()
         )
 
-    @allows.requires(CanPostReply)
+    @allows.requires(
+        CanPostReply,
+        on_fail=FlashAndRedirect(
+            message=_("You are not allowed to post a reply to this topic."),
+            level="warning",
+            endpoint=lambda *a, **k: url_for(
+                "forum.view_topic",
+                topic_id=k['topic_id'],
+            )
+        )
+    )
     def post(self, topic_id, slug=None):
         topic = Topic.get_topic(topic_id=topic_id, user=real(current_user))
         form = self.form()
@@ -212,7 +246,17 @@ class ViewTopic(MethodView):
 
 
 class NewTopic(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(), CanPostTopic,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to post a topic here"),
+                level="warning",
+                endpoint=lambda *a, **k: current_forum.url
+            )
+        ),
+    ]
 
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -220,7 +264,6 @@ class NewTopic(MethodView):
             'forum/new_topic.html', forum=forum_instance, form=self.form()
         )
 
-    @allows.requires(CanPostTopic)
     def post(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         form = self.form()
@@ -246,7 +289,20 @@ class NewTopic(MethodView):
 
 
 class ManageForum(MethodView):
-    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            IsAtleastModeratorInForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage this forum"),
+                level="danger",
+                endpoint=lambda *a, **k: url_for(
+                    "forum.view_forum",
+                    forum_id=k["forum_id"],
+                )
+            )
+        ),
+    ]
 
     def get(self, forum_id, slug=None):
 
@@ -276,6 +332,7 @@ class ManageForum(MethodView):
             forumsread=forumsread,
         )
 
+    # TODO(anr): Clean this up. @_@
     def post(self, forum_id, slug=None):
         forum_instance, __ = Forum.get_forum(
             forum_id=forum_id, user=real(current_user)
@@ -406,7 +463,20 @@ class ManageForum(MethodView):
 
 
 class NewPost(MethodView):
-    decorators = [allows.requires(CanPostReply), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(), CanPostReply,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to post a reply"),
+                level="warning",
+                endpoint=lambda *a, **k: url_for(
+                    "forum.view_topic",
+                    topic_id=k["topic_id"],
+                )
+            )
+        ),
+    ]
 
     def get(self, topic_id, slug=None, post_id=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -448,7 +518,17 @@ class NewPost(MethodView):
 
 
 class EditPost(MethodView):
-    decorators = [allows.requires(CanEditPost), login_required]
+    decorators = [
+        allows.requires(
+            CanEditPost,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to edit that post"),
+                level="danger",
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+        login_required
+    ]
 
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
@@ -627,7 +707,18 @@ class Search(MethodView):
 
 
 class DeleteTopic(MethodView):
-    decorators = [allows.requires(CanDeleteTopic), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanDeleteTopic,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to delete this topic"),
+                level="danger",
+                # TODO(anr): consider the referrer -- for now, back to topic
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -639,7 +730,18 @@ class DeleteTopic(MethodView):
 
 
 class LockTopic(MethodView):
-    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            IsAtleastModeratorInForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to lock this topic"),
+                level="danger",
+                # TODO(anr): consider the referrer -- for now, back to topic
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -649,7 +751,18 @@ class LockTopic(MethodView):
 
 
 class UnlockTopic(MethodView):
-    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            IsAtleastModeratorInForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to unlock this topic"),
+                level="danger",
+                # TODO(anr): consider the referrer -- for now, back to topic
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -659,7 +772,18 @@ class UnlockTopic(MethodView):
 
 
 class HighlightTopic(MethodView):
-    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            IsAtleastModeratorInForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to highlight this topic"),
+                level="danger",
+                # TODO(anr): consider the referrer -- for now, back to topic
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -669,7 +793,18 @@ class HighlightTopic(MethodView):
 
 
 class TrivializeTopic(MethodView):
-    decorators = [allows.requires(IsAtleastModeratorInForum()), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            IsAtleastModeratorInForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to trivialize this topic"),
+                level="danger",
+                # TODO(anr): consider the referrer -- for now, back to topic
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, topic_id=None, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -679,7 +814,17 @@ class TrivializeTopic(MethodView):
 
 
 class DeletePost(MethodView):
-    decorators = [allows.requires(CanDeletePost), login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanDeletePost,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to delete this post"),
+                level="danger",
+                endpoint=lambda *a, **k: current_topic.url
+            )
+        ),
+    ]
 
     def post(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
@@ -696,7 +841,17 @@ class DeletePost(MethodView):
 
 
 class RawPost(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access that forum"),
+                level="warning",
+                endpoint=lambda *a, **k: current_category.url
+            )
+        ),
+    ]
 
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
@@ -704,7 +859,17 @@ class RawPost(MethodView):
 
 
 class MarkRead(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access that forum"),
+                level="warning",
+                endpoint=lambda *a, **k: current_category.url
+            )
+        ),
+    ]
 
     def post(self, forum_id=None, slug=None):
         # Mark a single forum as read
@@ -772,7 +937,17 @@ class WhoIsOnline(MethodView):
 
 
 class TrackTopic(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access that forum"),
+                level="warning",
+                endpoint=lambda *a, **k: current_category.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
@@ -782,7 +957,17 @@ class TrackTopic(MethodView):
 
 
 class UntrackTopic(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access that forum"),
+                level="warning",
+                endpoint=lambda *a, **k: current_category.url
+            )
+        ),
+    ]
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()

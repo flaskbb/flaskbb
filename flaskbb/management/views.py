@@ -34,7 +34,8 @@ from flaskbb.plugins.utils import validate_plugin
 from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
 from flaskbb.utils.helpers import (get_online_users, register_view,
-                                   render_template, time_diff, time_utcnow)
+                                   render_template, time_diff, time_utcnow,
+                                   FlashAndRedirect)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator,
                                         IsAtleastSuperModerator)
@@ -46,7 +47,16 @@ logger = logging.getLogger(__name__)
 
 
 class ManagementSettings(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the management settings"),  # noqa
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def _determine_active_settings(self, slug, plugin):
         """Determines which settings are active.
@@ -126,7 +136,16 @@ class ManagementSettings(MethodView):
 
 
 class ManageUsers(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = UserSearchForm
 
     def get(self):
@@ -162,7 +181,17 @@ class ManageUsers(MethodView):
 
 
 class EditUser(MethodView):
-    decorators = [allows.requires(IsAtleastModerator & CanEditUser)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator, CanEditUser,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+
+        )
+    ]
     form = EditUserForm
 
     def get(self, user_id):
@@ -244,7 +273,16 @@ class EditUser(MethodView):
 
 
 class DeleteUser(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, user_id=None):
         # ajax request
@@ -276,6 +314,7 @@ class DeleteUser(MethodView):
             )
 
         user = User.query.filter_by(id=user_id).first_or_404()
+
         if current_user.id == user.id:
             flash(_("You cannot delete yourself.", "danger"))
             return redirect(url_for("management.users"))
@@ -286,7 +325,16 @@ class DeleteUser(MethodView):
 
 
 class AddUser(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = AddUserForm
 
     def get(self):
@@ -307,7 +355,16 @@ class AddUser(MethodView):
 
 
 class BannedUsers(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = UserSearchForm
 
     def get(self):
@@ -350,7 +407,16 @@ class BannedUsers(MethodView):
 
 
 class BanUser(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, user_id=None):
         if not Permission(CanBanUser, identity=current_user):
@@ -412,7 +478,17 @@ class BanUser(MethodView):
 
 
 class UnbanUser(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview"
+            )
+
+        )
+    ]
 
     def post(self, user_id=None):
 
@@ -459,7 +535,16 @@ class UnbanUser(MethodView):
 
 
 class Groups(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify groups."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
 
@@ -473,7 +558,16 @@ class Groups(MethodView):
 
 
 class AddGroup(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify groups."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = AddGroupForm
 
     def get(self):
@@ -496,7 +590,16 @@ class AddGroup(MethodView):
 
 
 class EditGroup(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify groups."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = EditGroupForm
 
     def get(self, group_id):
@@ -526,7 +629,16 @@ class EditGroup(MethodView):
 
 
 class DeleteGroup(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify groups."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, group_id=None):
         if request.is_xhr:
@@ -579,7 +691,16 @@ class DeleteGroup(MethodView):
 
 
 class Forums(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify forums."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
         categories = Category.query.order_by(Category.position.asc()).all()
@@ -587,7 +708,16 @@ class Forums(MethodView):
 
 
 class EditForum(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify forums."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = EditForumForm
 
     def get(self, forum_id):
@@ -629,7 +759,16 @@ class EditForum(MethodView):
 
 
 class AddForum(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify forums."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = AddForumForm
 
     def get(self, category_id=None):
@@ -664,7 +803,16 @@ class AddForum(MethodView):
 
 
 class DeleteForum(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify forums"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, forum_id):
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
@@ -680,7 +828,16 @@ class DeleteForum(MethodView):
 
 
 class AddCategory(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify categories"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = CategoryForm
 
     def get(self):
@@ -704,7 +861,16 @@ class AddCategory(MethodView):
 
 
 class EditCategory(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify categories"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
     form = CategoryForm
 
     def get(self, category_id):
@@ -736,7 +902,16 @@ class EditCategory(MethodView):
 
 
 class DeleteCategory(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify categories"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, category_id):
         category = Category.query.filter_by(id=category_id).first_or_404()
@@ -752,7 +927,16 @@ class DeleteCategory(MethodView):
 
 
 class Reports(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to view reports."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
         page = request.args.get("page", 1, type=int)
@@ -764,7 +948,16 @@ class Reports(MethodView):
 
 
 class UnreadReports(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to view reports."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
         page = request.args.get("page", 1, type=int)
@@ -777,7 +970,16 @@ class UnreadReports(MethodView):
 
 
 class MarkReportRead(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to view reports."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, report_id=None):
 
@@ -839,7 +1041,16 @@ class MarkReportRead(MethodView):
 
 
 class DeleteReport(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to view reports."),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, report_id=None):
 
@@ -873,7 +1084,16 @@ class DeleteReport(MethodView):
 
 
 class CeleryStatus(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the management settings"),  # noqa
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
         celery_inspect = celery.control.inspect()
@@ -889,7 +1109,16 @@ class CeleryStatus(MethodView):
 
 
 class ManagementOverview(MethodView):
-    decorators = [allows.requires(IsAtleastModerator)]
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the management panel"),
+                level="danger",
+                endpoint="forum.index"
+            )
+        )
+    ]
 
     def get(self):
         # user and group stats
@@ -935,7 +1164,16 @@ class ManagementOverview(MethodView):
 
 
 class PluginsView(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def get(self):
         plugins = PluginRegistry.query.all()
@@ -943,7 +1181,16 @@ class PluginsView(MethodView):
 
 
 class EnablePlugin(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, name):
         validate_plugin(name)
@@ -969,7 +1216,16 @@ class EnablePlugin(MethodView):
 
 
 class DisablePlugin(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, name):
         validate_plugin(name)
@@ -994,7 +1250,16 @@ class DisablePlugin(MethodView):
 
 
 class UninstallPlugin(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, name):
         validate_plugin(name)
@@ -1006,7 +1271,16 @@ class UninstallPlugin(MethodView):
 
 
 class InstallPlugin(MethodView):
-    decorators = [allows.requires(IsAdmin)]
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
 
     def post(self, name):
         plugin_module = validate_plugin(name)
