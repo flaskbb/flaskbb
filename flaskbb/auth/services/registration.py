@@ -131,6 +131,12 @@ class EmailUniquenessValidator(UserValidator):
 
 
 class SendActivationPostProcessor(RegistrationPostProcessor):
+    """
+    Sends an activation request after registration
+
+    :param account_activator:
+    :type account_activator: :class:`~flaskbb.core.auth.activation.AccountActivator`
+    """  # noqa
 
     def __init__(self, account_activator):
         self.account_activator = account_activator
@@ -147,6 +153,9 @@ class SendActivationPostProcessor(RegistrationPostProcessor):
 
 
 class AutologinPostProcessor(RegistrationPostProcessor):
+    """
+    Automatically logs a user in after registration
+    """
 
     def post_process(self, user):
         login_user(user)
@@ -157,6 +166,9 @@ class AutoActivateUserPostProcessor(RegistrationPostProcessor):
     """
     Automatically marks the user as activated if activation isn't required
     for the forum.
+
+    :param db: Configured Flask-SQLAlchemy extension object
+    :param config: Current flaskbb configuration object
     """
 
     def __init__(self, db, config):

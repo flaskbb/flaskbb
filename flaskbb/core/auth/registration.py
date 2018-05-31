@@ -56,6 +56,13 @@ class RegistrationFailureHandler(ABC):
 
     @abstractmethod
     def handle_failure(self, user_info, failures):
+        """
+        This method is abstract.
+
+        :param user_info: The provided registration information.
+        :param failures: Tuples of (attribute, message) from the failure
+        :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
+        """  # noqa
         pass
 
     def __call__(self, user_info, failures):
@@ -71,6 +78,12 @@ class RegistrationPostProcessor(ABC):
 
     @abstractmethod
     def post_process(self, user):
+        """
+        This method is abstract.
+
+        :param user: The registered, persisted user.
+        :type user: :class:`~flaskbb.user.models.User`
+        """
         pass
 
     def __call__(self, user):
