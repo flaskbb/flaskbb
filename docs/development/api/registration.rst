@@ -19,6 +19,12 @@ Registration Interfaces
 .. autoclass:: UserRegistrationService
     :members:
 
+.. autoclass:: RegistrationFailureHandler
+    :members:
+
+.. autoclass:: RegistrationPostProcessor
+    :members:
+
 
 Registration Provided Implementations
 -------------------------------------
@@ -29,4 +35,7 @@ Registration Provided Implementations
 .. autoclass:: UsernameValidator
 .. autoclass:: UsernameUniquenessValidator
 .. autoclass:: EmailUniquenessValidator
+.. autoclass:: SendActivationPostProcessor
+.. autoclass:: AutologinPostProcessor
+.. autoclass:: AutoActivateUserPostProcessor
 .. autoclass:: RegistrationService

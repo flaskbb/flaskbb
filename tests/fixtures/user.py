@@ -72,7 +72,7 @@ def unactivated_user(default_groups):
     """
     Creates an unactivated user in the default user group
     """
-    user = User(username='notactive', email='not@active.com',
+    user = User(username='notactive', email='notactive@example.com',
                 password='password', primary_group=default_groups[3],
                 activated=False)
     user.save()

@@ -6,7 +6,6 @@ from flaskbb.core.auth.authentication import (PostReauthenticateHandler,
                                               ReauthenticateFailureHandler,
                                               ReauthenticateProvider,
                                               StopAuthentication)
-from flaskbb.plugins import spec
 from freezegun import freeze_time
 from pluggy import HookimplMarker
 from pytz import UTC
@@ -100,7 +99,6 @@ class TestPluginAuthenticationManager(object):
         db.session.rollback.assert_called_once_with()
 
     def _get_auth_manager(self, plugin_manager, db):
-        plugin_manager.add_hookspecs(spec)
         return reauth.PluginReauthenticationManager(
             plugin_manager, session=db.session
         )
