@@ -8,6 +8,7 @@ User Documentation
    cli
    plugins/index
    faq
+   deprecations
 
 
 Developer Documentation

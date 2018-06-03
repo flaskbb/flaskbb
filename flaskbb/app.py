@@ -13,6 +13,7 @@ import logging.config
 import os
 import sys
 import time
+import warnings
 from datetime import datetime
 
 from flask import Flask, request
@@ -22,39 +23,79 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from flaskbb._compat import iteritems, string_types
+
 # extensions
-from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, debugtoolbar, limiter, login_manager, mail,
-                                redis_store, themes, whooshee)
+from flaskbb.extensions import (
+    alembic,
+    allows,
+    babel,
+    cache,
+    celery,
+    csrf,
+    db,
+    debugtoolbar,
+    limiter,
+    login_manager,
+    mail,
+    redis_store,
+    themes,
+    whooshee,
+)
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+
 # models
 from flaskbb.user.models import Guest, User
+
 # various helpers
-from flaskbb.utils.helpers import (app_config_from_env, crop_title,
-                                   format_date, format_datetime,
-                                   forum_is_unread, get_alembic_locations,
-                                   get_flaskbb_config, is_online, mark_online,
-                                   render_template, time_since, time_utcnow,
-                                   topic_is_unread)
+from flaskbb.utils.helpers import (
+    app_config_from_env,
+    crop_title,
+    format_date,
+    format_datetime,
+    forum_is_unread,
+    get_alembic_locations,
+    get_flaskbb_config,
+    is_online,
+    mark_online,
+    render_template,
+    time_since,
+    time_utcnow,
+    topic_is_unread,
+)
+
 # permission checks (here they are used for the jinja filters)
-from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
-                                        IsAtleastModerator, can_delete_topic,
-                                        can_edit_post, can_moderate,
-                                        can_post_reply, can_post_topic,
-                                        has_permission,
-                                        permission_with_identity)
+from flaskbb.utils.requirements import (
+    CanBanUser,
+    CanEditUser,
+    IsAdmin,
+    IsAtleastModerator,
+    can_delete_topic,
+    can_edit_post,
+    can_moderate,
+    can_post_reply,
+    can_post_topic,
+    has_permission,
+    permission_with_identity,
+)
+
 # whooshees
-from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
-                                  TopicWhoosheer, UserWhoosheer)
+from flaskbb.utils.search import (
+    ForumWhoosheer,
+    PostWhoosheer,
+    TopicWhoosheer,
+    UserWhoosheer,
+)
+
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
 from . import markup  # noqa
 from .auth import views as auth_views  # noqa
+from .deprecation import FlaskBBDeprecation
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
 from .user import views as user_views  # noqa
@@ -134,6 +175,12 @@ def configure_app(app, config):
         config_name = config
 
     logger.info("Using config from: {}".format(config_name))
+
+    deprecation_level = app.config.get("DEPRECATION_LEVEL", "default")
+
+    # never set the deprecation level during testing, pytest will handle it
+    if not app.testing:  # pragma: no branch
+        warnings.simplefilter(deprecation_level, FlaskBBDeprecation)
 
     app.pluggy = FlaskBBPluginManager("flaskbb", implprefix="flaskbb_")
 
