@@ -31,14 +31,9 @@ logger = logging.getLogger(__name__)
 
 class UserSettings(MethodView):
     decorators = [login_required]
-    form = GeneralSettingsForm
 
     def get(self):
         form = self.form()
-
-        form.theme.choices = get_available_themes()
-        form.theme.choices.insert(0, ('', 'Default'))
-        form.language.choices = get_available_languages()
         form.theme.data = current_user.theme
         form.language.data = current_user.language
 
@@ -46,10 +41,6 @@ class UserSettings(MethodView):
 
     def post(self):
         form = self.form()
-
-        form.theme.choices = get_available_themes()
-        form.theme.choices.insert(0, ('', 'Default'))
-        form.language.choices = get_available_languages()
 
         if form.validate_on_submit():
             current_user.theme = form.theme.data
@@ -62,6 +53,13 @@ class UserSettings(MethodView):
             form.language.data = current_user.language
 
         return render_template("user/general_settings.html", form=form)
+
+    def form(self):
+        form = GeneralSettingsForm()
+        form.theme.choices = [("", "Default")] + get_available_themes()
+        form.language.choices = get_available_languages()
+
+        return form
 
 
 class ChangePassword(MethodView):
