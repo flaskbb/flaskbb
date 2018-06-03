@@ -1,16 +1,14 @@
 import warnings
 
+import pytest
+
 from flaskbb.deprecation import RemovedInNextVersion, deprecated
+
+NEXT_VERSION_STRING = ".".join([str(x) for x in RemovedInNextVersion.version])
 
 
 @deprecated("This is only a drill")
 def only_a_drill():
-    pass
-
-
-# DeprecationWarning is ignored by default
-@deprecated("This is also a drill", category=UserWarning)
-def also_a_drill():
     pass
 
 
@@ -32,22 +30,26 @@ class TestDeprecation(object):
         assert recwarn[0].filename == __file__
         # assert on the next line is conditional on the position of the call
         # to default_deprecation please don't jiggle it around too much
-        assert recwarn[0].lineno == 27
+        assert recwarn[0].lineno == 25
 
     def tests_emits_specialized_message(self, recwarn):
         warnings.simplefilter("default", RemovedInNextVersion)
         only_a_drill()
 
-        expected = "only_a_drill is deprecated. This is only a drill"
+        expected = "only_a_drill is deprecated and will be removed in version {}. This is only a drill".format(  # noqa
+            NEXT_VERSION_STRING
+        )
         assert len(recwarn) == 1
         assert expected in str(recwarn[0].message)
 
-    def tests_emits_regular_deprecation_warning(self, recwarn):
-        warnings.simplefilter("default", RemovedInNextVersion)
-        also_a_drill()
+    def tests_only_accepts_FlaskBBDeprecationWarnings(self):
+        with pytest.raises(ValueError) as excinfo:
+            # DeprecationWarning is ignored by default
+            @deprecated("This is also a drill", category=UserWarning)
+            def also_a_drill():
+                pass
 
-        assert len(recwarn) == 1
-        assert recwarn[0].category == UserWarning
+        assert "Expected subclass of FlaskBBDeprecation" in str(excinfo.value)
 
     def tests_deprecated_decorator_work_with_method(self, recwarn):
         warnings.simplefilter("default", RemovedInNextVersion)
