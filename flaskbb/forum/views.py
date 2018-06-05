@@ -21,7 +21,8 @@ from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
-from flaskbb.extensions import allows, db
+from flaskbb.extensions import allows, db, csrf
+from flaskbb.markup import make_renderer
 from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
                                  ReportForm, SearchPageForm, UserSearchForm)
 from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
@@ -1060,6 +1061,22 @@ class UnhidePost(MethodView):
         return redirect(post.topic.url)
 
 
+class MarkdownPreview(MethodView):
+    decorators = [csrf.exempt]
+
+    def post(self):
+        text = request.data.decode("utf-8")
+
+        render_cls = current_app.pluggy.hook.\
+            flaskbb_load_post_markdown_class(
+                app=current_app
+            )
+
+        renderer = make_renderer(render_cls)
+        preview = renderer(text)
+        return preview
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     forum = Blueprint("forum", __name__)
@@ -1236,6 +1253,11 @@ def flaskbb_load_blueprints(app):
         forum,
         routes=["/post/<int:post_id>/unhide"],
         view_func=UnhidePost.as_view('unhide_post')
+    )
+    register_view(
+        forum,
+        routes=["/markdown"],
+        view_func=MarkdownPreview.as_view("markdown_preview")
     )
 
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
