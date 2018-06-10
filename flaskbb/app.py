@@ -182,6 +182,22 @@ def configure_app(app, config):
     if not app.testing:  # pragma: no branch
         warnings.simplefilter(deprecation_level, FlaskBBDeprecation)
 
+    debug_panels = app.config.setdefault('DEBUG_TB_PANELS', [
+        'flask_debugtoolbar.panels.versions.VersionDebugPanel',
+        'flask_debugtoolbar.panels.timer.TimerDebugPanel',
+        'flask_debugtoolbar.panels.headers.HeaderDebugPanel',
+        'flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel',
+        'flask_debugtoolbar.panels.config_vars.ConfigVarsDebugPanel',
+        'flask_debugtoolbar.panels.template.TemplateDebugPanel',
+        'flask_debugtoolbar.panels.sqlalchemy.SQLAlchemyDebugPanel',
+        'flask_debugtoolbar.panels.logger.LoggingPanel',
+        'flask_debugtoolbar.panels.route_list.RouteListDebugPanel',
+        'flask_debugtoolbar.panels.profiler.ProfilerDebugPanel',
+    ])
+
+    if all('WarningsPanel' not in p for p in debug_panels):
+        debug_panels.append('flask_debugtoolbar_warnings.WarningsPanel')
+
     app.pluggy = FlaskBBPluginManager("flaskbb", implprefix="flaskbb_")
 
 
