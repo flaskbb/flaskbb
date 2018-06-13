@@ -15,6 +15,9 @@ def only_a_drill():
 # TODO(anr): Make the parens optional
 @deprecated()
 def default_deprecation():
+    """
+    Existing docstring
+    """
     pass
 
 
@@ -30,7 +33,8 @@ class TestDeprecation(object):
         assert recwarn[0].filename == __file__
         # assert on the next line is conditional on the position of the call
         # to default_deprecation please don't jiggle it around too much
-        assert recwarn[0].lineno == 25
+        assert recwarn[0].lineno == 28
+        assert "only_a_drill is deprecated" in only_a_drill.__doc__
 
     def tests_emits_specialized_message(self, recwarn):
         warnings.simplefilter("default", RemovedInFlaskBB3)
@@ -56,6 +60,12 @@ class TestDeprecation(object):
         self.deprecated_instance_method()
 
         assert len(recwarn) == 1
+
+    def test_adds_to_existing_docstring(self, recwarn):
+        docstring = default_deprecation.__doc__
+
+        assert "Existing docstring" in docstring
+        assert "default_deprecation is deprecated" in docstring
 
     @deprecated()
     def deprecated_instance_method(self):

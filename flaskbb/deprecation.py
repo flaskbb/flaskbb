@@ -75,6 +75,15 @@ def deprecated(message="", category=RemovedInFlaskBB3):
         if message:
             warning = "{} {}".format(warning, message)
 
+        docstring = f.__doc__
+
+        if docstring:
+            docstring = "\n".join([docstring, warning])
+        else:
+            docstring = warning
+
+        f.__doc__ = docstring
+
         @wraps(f)
         def wrapper(*a, **k):
             frame = inspect.currentframe().f_back
