@@ -1062,15 +1062,21 @@ class UnhidePost(MethodView):
 
 
 class MarkdownPreview(MethodView):
-    decorators = [csrf.exempt]
+    decorators = [login_required]
 
-    def post(self):
+    def post(self, mode=None):
         text = request.data.decode("utf-8")
 
-        render_cls = current_app.pluggy.hook.\
-            flaskbb_load_post_markdown_class(
-                app=current_app
-            )
+        if mode is not None and mode == "nonpost":
+            render_cls = current_app.pluggy.hook.\
+                flaskbb_load_nonpost_markdown_class(
+                    app=current_app
+                )
+        else:
+            render_cls = current_app.pluggy.hook.\
+                flaskbb_load_post_markdown_class(
+                    app=current_app
+                )
 
         renderer = make_renderer(render_cls)
         preview = renderer(text)
@@ -1141,7 +1147,11 @@ def flaskbb_load_blueprints(app):
         routes=["/post/<int:post_id>"],
         view_func=ViewPost.as_view("view_post")
     )
-    register_view(forum, routes=["/search"], view_func=Search.as_view("search"))
+    register_view(
+        forum,
+        routes=["/search"],
+        view_func=Search.as_view("search")
+    )
     register_view(
         forum,
         routes=[
@@ -1256,7 +1266,10 @@ def flaskbb_load_blueprints(app):
     )
     register_view(
         forum,
-        routes=["/markdown"],
+        routes=[
+            "/markdown",
+            "/markdown/<path:mode>"
+        ],
         view_func=MarkdownPreview.as_view("markdown_preview")
     )
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
