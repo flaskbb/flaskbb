@@ -21,7 +21,7 @@ from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
-from flaskbb.extensions import allows, db, csrf
+from flaskbb.extensions import allows, db
 from flaskbb.markup import make_renderer
 from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
                                  ReportForm, SearchPageForm, UserSearchForm)
@@ -178,7 +178,7 @@ class ViewTopic(MethodView):
         topic.views += 1
         topic.save()
 
-        # Update the topicsread status if the user hasn"t read it
+        # Update the topicsread status if the user hasn't read it
         forumsread = None
         if current_user.is_authenticated:
             forumsread = ForumsRead.query.filter_by(
@@ -1067,7 +1067,7 @@ class MarkdownPreview(MethodView):
     def post(self, mode=None):
         text = request.data.decode("utf-8")
 
-        if mode is not None and mode == "nonpost":
+        if mode == "nonpost":
             render_cls = current_app.pluggy.hook.\
                 flaskbb_load_nonpost_markdown_class(
                     app=current_app
