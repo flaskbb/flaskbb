@@ -268,21 +268,13 @@ class NewTopic(MethodView):
     def post(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         form = self.form()
-        if "preview" in request.form and form.validate():
-            return render_template(
-                "forum/new_topic.html",
-                forum=forum_instance,
-                form=form,
-                preview=form.content.data
-            )
-        elif "submit" in request.form and form.validate():
+        if form.validate_on_submit():
             topic = form.save(real(current_user), forum_instance)
-            # redirect to the new topic
             return redirect(url_for("forum.view_topic", topic_id=topic.id))
-        else:
-            return render_template(
-                "forum/new_topic.html", forum=forum_instance, form=form
-            )
+
+        return render_template(
+            "forum/new_topic.html", forum=forum_instance, form=form
+        )
 
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
@@ -500,16 +492,8 @@ class NewPost(MethodView):
             post = Post.query.filter_by(id=post_id).first_or_404()
 
         if form.validate_on_submit():
-            if "preview" in request.form:
-                return render_template(
-                    "forum/new_post.html",
-                    topic=topic,
-                    form=form,
-                    preview=form.content.data
-                )
-            else:
-                post = form.save(real(current_user), topic)
-                return redirect(url_for("forum.view_post", post_id=post.id))
+            post = form.save(real(current_user), topic)
+            return redirect(url_for("forum.view_post", post_id=post.id))
 
         return render_template("forum/new_post.html", topic=topic, form=form)
 
@@ -544,20 +528,11 @@ class EditPost(MethodView):
         form = self.form(obj=post)
 
         if form.validate_on_submit():
-            if "preview" in request.form:
-                return render_template(
-                    "forum/new_post.html",
-                    topic=post.topic,
-                    form=form,
-                    preview=form.content.data,
-                    edit_mode=True
-                )
-            else:
-                form.populate_obj(post)
-                post.date_modified = time_utcnow()
-                post.modified_by = real(current_user).username
-                post.save()
-                return redirect(url_for("forum.view_post", post_id=post.id))
+            form.populate_obj(post)
+            post.date_modified = time_utcnow()
+            post.modified_by = real(current_user).username
+            post.save()
+            return redirect(url_for("forum.view_post", post_id=post.id))
 
         return render_template(
             "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
@@ -1062,23 +1037,22 @@ class UnhidePost(MethodView):
 
 
 class MarkdownPreview(MethodView):
-    decorators = [login_required]
 
     def post(self, mode=None):
         text = request.data.decode("utf-8")
 
         if mode == "nonpost":
-            render_cls = current_app.pluggy.hook.\
+            render_classes = current_app.pluggy.hook.\
                 flaskbb_load_nonpost_markdown_class(
                     app=current_app
                 )
         else:
-            render_cls = current_app.pluggy.hook.\
+            render_classes = current_app.pluggy.hook.\
                 flaskbb_load_post_markdown_class(
                     app=current_app
                 )
 
-        renderer = make_renderer(render_cls)
+        renderer = make_renderer(render_classes)
         preview = renderer(text)
         return preview
 
