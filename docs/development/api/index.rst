@@ -15,3 +15,4 @@ and provided implementations where appropriate.
    authentication
    accountmanagement
    tokens
+   deprecations
