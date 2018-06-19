@@ -13,13 +13,34 @@ deprecate a particular function it could do::
         version = (2, 0, 0)
 
 
-    @deprecated
+    @deprecated(category=RemovedInPluginV2)
     def thing_removed_in_plugin_v2():
         ...
 
 
-Now the plugin will issue deprecation warnings in the same fashion as the rest
-of FlaskBB.
+When used in live code, a warning will be issue like::
+
+    warning: RemovedInPluginV2: thing_removed_in_plugin_v2 and will be removed
+        in version 2.0.0.
+
+Optionally, a message can be provided to give further information about the
+warning::
+
+    @deprecated(message="Use plugin.frobinator instead.", category=RemovedInPluginV2)
+    def thing_also_removed_in_plugin_v2():
+        ...
+
+This will produce a warning like::
+
+    warning: RemovedInPluginV2: thing_removed_in_plugin_v2 and will be removed
+        in version 2.0.0. Use plugin.frobinator instead.
+
+
+If a decorated function has a docstring, the entire warning message will be
+appended to it for introspection and documentation purposes.
+
+Helpers
+~~~~~~~
 
 .. module:: flaskbb.deprecation
 
