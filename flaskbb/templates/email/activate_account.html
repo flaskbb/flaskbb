@@ -1,4 +1,4 @@
-{% set link = url_for('auth.activate_account', token=token, _external=True) %}
+{% set link = url_for('auth.autoactivate_account', token=token, _external=True) %}
 
 <p>{% trans %}Dear {{ username }},{% endtrans %}</p>
 
