@@ -19,7 +19,7 @@ from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.forum.models import Post, Topic, Forum, topictracker
-
+from flaskbb.deprecation import deprecated
 
 logger = logging.getLogger(__name__)
 
@@ -250,6 +250,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         return check_password_hash(self.password, password)
 
     @classmethod
+    @deprecated("Use authentication services instead.")
     def authenticate(cls, login, password):
         """A classmethod for authenticating users.
         It returns the user object if the user/password combination is ok.

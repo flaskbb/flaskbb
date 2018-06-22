@@ -16,6 +16,7 @@ flask-allows==0.6.0
 Flask-BabelPlus==2.1.1
 Flask-Caching==1.4.0
 Flask-DebugToolbar==0.10.1
+flask-debugtoolbar-warnings>=0.1.0
 Flask-Limiter==1.0.1
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
