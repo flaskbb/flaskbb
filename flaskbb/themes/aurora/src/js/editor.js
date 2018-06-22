@@ -27,7 +27,26 @@ $(".flaskbb-editor").markdown({
         }]
     ],
     onPreview: function(e) {
-        return parse_emoji(marked(e.getContent()));
+        var urlprefix = typeof FORUM_URL_PREFIX !== typeof undefined ? FORUM_URL_PREFIX : "";
+
+        $.ajax({
+            type: 'POST',
+            data: e.getContent(),
+            dataType: "text",
+            contentType: "text/plain",
+            url: urlprefix + '/markdown',
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        })
+        .done(function(msg) {
+            parse_emoji(output);
+        })
+        .fail(function(error) {
+            console.error("Couldn't send text to markdown preview endpoint: " + error);
+        });
     }
 });
 

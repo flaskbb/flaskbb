@@ -171,8 +171,10 @@
         {% block javascript %}
         <!-- jquery and bootstrap and flaskbb.js -->
         <script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
-        <!-- Enable tooltips in all templates -->
-        <script>
+
+        <script type="text/javascript">
+        var FORUM_URL_PREFIX="{{ config['FORUM_URL_PREFIX'] }}";
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })

@@ -43,7 +43,6 @@ class ReplyForm(FlaskForm):
                                validators=[Optional()])
 
     submit = SubmitField(_("Reply"))
-    preview = SubmitField(_("Preview"))
 
     def save(self, user, topic):
         post = Post(content=self.content.data)
@@ -66,7 +65,6 @@ class NewTopicForm(ReplyForm):
                                validators=[Optional()])
 
     submit = SubmitField(_("Post Topic"))
-    preview = SubmitField(_("Preview"))
 
     def save(self, user, forum):
         topic = Topic(title=self.title.data)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
     flaskbb.forum.views
     ~~~~~~~~~~~~~~~~~~~
 
@@ -8,7 +8,7 @@
 
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
-'''
+"""
 import logging
 import math
 
@@ -22,6 +22,7 @@ from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
 from flaskbb.extensions import allows, db
+from flaskbb.markup import make_renderer
 from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
                                  ReportForm, SearchPageForm, UserSearchForm)
 from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
@@ -39,7 +40,7 @@ from flaskbb.utils.requirements import (CanAccessForum,
 from flaskbb.utils.settings import flaskbb_config
 from .locals import current_topic, current_forum, current_category
 
-impl = HookimplMarker('flaskbb')
+impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +57,7 @@ class ForumIndex(MethodView):
         newest_user = User.query.order_by(User.id.desc()).first()
 
         # Check if we use redis or not
-        if not current_app.config['REDIS_ENABLED']:
+        if not current_app.config["REDIS_ENABLED"]:
             online_users = User.query.filter(User.lastseen >= time_diff()
                                              ).count()
 
@@ -68,7 +69,7 @@ class ForumIndex(MethodView):
             online_guests = len(get_online_users(guest=True))
 
         return render_template(
-            'forum/index.html',
+            "forum/index.html",
             categories=categories,
             user_count=user_count,
             topic_count=topic_count,
@@ -87,7 +88,7 @@ class ViewCategory(MethodView):
         )
 
         return render_template(
-            'forum/category.html', forums=forums, category=category
+            "forum/category.html", forums=forums, category=category
         )
 
 
@@ -102,7 +103,7 @@ class ViewForum(MethodView):
     )]
 
     def get(self, forum_id, slug=None):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
 
         forum_instance, forumsread = Forum.get_forum(
             forum_id=forum_id, user=real(current_user)
@@ -115,11 +116,11 @@ class ViewForum(MethodView):
             forum_id=forum_instance.id,
             user=real(current_user),
             page=page,
-            per_page=flaskbb_config['TOPICS_PER_PAGE']
+            per_page=flaskbb_config["TOPICS_PER_PAGE"]
         )
 
         return render_template(
-            'forum/forum.html',
+            "forum/forum.html",
             forum=forum_instance,
             topics=topics,
             forumsread=forumsread,
@@ -137,22 +138,22 @@ class ViewPost(MethodView):
     )]
 
     def get(self, post_id):
-        '''Redirects to a post in a topic.'''
+        """Redirects to a post in a topic."""
         post = Post.query.filter_by(id=post_id).first_or_404()
         post_in_topic = Post.query.filter(
             Post.topic_id == post.topic_id, Post.id <= post_id
         ).order_by(Post.id.asc()).count()
         page = int(
-            math.ceil(post_in_topic / float(flaskbb_config['POSTS_PER_PAGE']))
+            math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"]))
         )
 
         return redirect(
             url_for(
-                'forum.view_topic',
+                "forum.view_topic",
                 topic_id=post.topic.id,
                 slug=post.topic.slug,
                 page=page,
-                _anchor='pid{}'.format(post.id)
+                _anchor="pid{}".format(post.id)
             )
         )
 
@@ -168,7 +169,7 @@ class ViewTopic(MethodView):
     )]
 
     def get(self, topic_id, slug=None):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
 
         # Fetch some information about the topic
         topic = Topic.get_topic(topic_id=topic_id, user=real(current_user))
@@ -195,14 +196,14 @@ class ViewTopic(MethodView):
             User
         ).order_by(
             Post.id.asc()
-        ).paginate(page, flaskbb_config['POSTS_PER_PAGE'], False)
+        ).paginate(page, flaskbb_config["POSTS_PER_PAGE"], False)
 
         # Abort if there are no posts on this page
         if len(posts.items) == 0:
             abort(404)
 
         return render_template(
-            'forum/topic.html',
+            "forum/topic.html",
             topic=topic,
             posts=posts,
             last_seen=time_diff(),
@@ -216,7 +217,7 @@ class ViewTopic(MethodView):
             level="warning",
             endpoint=lambda *a, **k: url_for(
                 "forum.view_topic",
-                topic_id=k['topic_id'],
+                topic_id=k["topic_id"],
             )
         )
     )
@@ -225,18 +226,18 @@ class ViewTopic(MethodView):
         form = self.form()
 
         if not form:
-            flash(_('Cannot post reply'), 'warning')
-            return redirect('forum.view_topic', topic_id=topic_id, slug=slug)
+            flash(_("Cannot post reply"), "warning")
+            return redirect("forum.view_topic", topic_id=topic_id, slug=slug)
 
         elif form.validate_on_submit():
             post = form.save(real(current_user), topic)
-            return redirect(url_for('forum.view_post', post_id=post.id))
+            return redirect(url_for("forum.view_post", post_id=post.id))
 
         else:
-            for e in form.errors.get('content', []):
-                flash(e, 'danger')
+            for e in form.errors.get("content", []):
+                flash(e, "danger")
             return redirect(
-                url_for('forum.view_topic', topic_id=topic_id, slug=slug)
+                url_for("forum.view_topic", topic_id=topic_id, slug=slug)
             )
 
     def form(self):
@@ -261,27 +262,19 @@ class NewTopic(MethodView):
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         return render_template(
-            'forum/new_topic.html', forum=forum_instance, form=self.form()
+            "forum/new_topic.html", forum=forum_instance, form=self.form()
         )
 
     def post(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         form = self.form()
-        if 'preview' in request.form and form.validate():
-            return render_template(
-                'forum/new_topic.html',
-                forum=forum_instance,
-                form=form,
-                preview=form.content.data
-            )
-        elif 'submit' in request.form and form.validate():
+        if form.validate_on_submit():
             topic = form.save(real(current_user), forum_instance)
-            # redirect to the new topic
-            return redirect(url_for('forum.view_topic', topic_id=topic.id))
-        else:
-            return render_template(
-                'forum/new_topic.html', forum=forum_instance, form=form
-            )
+            return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+        return render_template(
+            "forum/new_topic.html", forum=forum_instance, form=form
+        )
 
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
@@ -316,16 +309,16 @@ class ManageForum(MethodView):
         # remove the current forum from the select field (move).
         available_forums = Forum.query.order_by(Forum.position).all()
         available_forums.remove(forum_instance)
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         topics = Forum.get_topics(
             forum_id=forum_instance.id,
             user=real(current_user),
             page=page,
-            per_page=flaskbb_config['TOPICS_PER_PAGE']
+            per_page=flaskbb_config["TOPICS_PER_PAGE"]
         )
 
         return render_template(
-            'forum/edit_forum.html',
+            "forum/edit_forum.html",
             forum=forum_instance,
             topics=topics,
             available_forums=available_forums,
@@ -338,83 +331,83 @@ class ManageForum(MethodView):
             forum_id=forum_id, user=real(current_user)
         )
         mod_forum_url = url_for(
-            'forum.manage_forum',
+            "forum.manage_forum",
             forum_id=forum_instance.id,
             slug=forum_instance.slug
         )
 
-        ids = request.form.getlist('rowid')
+        ids = request.form.getlist("rowid")
         tmp_topics = Topic.query.filter(Topic.id.in_(ids)).all()
 
         if not len(tmp_topics) > 0:
             flash(
                 _(
-                    'In order to perform this action you have to select at '
-                    'least one topic.'
-                ), 'danger'
+                    "In order to perform this action you have to select at "
+                    "least one topic."
+                ), "danger"
             )
             return redirect(mod_forum_url)
 
         # locking/unlocking
-        if 'lock' in request.form:
+        if "lock" in request.form:
             changed = do_topic_action(
                 topics=tmp_topics,
                 user=real(current_user),
-                action='locked',
+                action="locked",
                 reverse=False
             )
 
-            flash(_('%(count)s topics locked.', count=changed), 'success')
+            flash(_("%(count)s topics locked.", count=changed), "success")
             return redirect(mod_forum_url)
 
-        elif 'unlock' in request.form:
+        elif "unlock" in request.form:
             changed = do_topic_action(
                 topics=tmp_topics,
                 user=real(current_user),
-                action='locked',
+                action="locked",
                 reverse=True
             )
-            flash(_('%(count)s topics unlocked.', count=changed), 'success')
+            flash(_("%(count)s topics unlocked.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # highlighting/trivializing
-        elif 'highlight' in request.form:
+        elif "highlight" in request.form:
             changed = do_topic_action(
                 topics=tmp_topics,
                 user=real(current_user),
-                action='important',
+                action="important",
                 reverse=False
             )
-            flash(_('%(count)s topics highlighted.', count=changed), 'success')
+            flash(_("%(count)s topics highlighted.", count=changed), "success")
             return redirect(mod_forum_url)
 
-        elif 'trivialize' in request.form:
+        elif "trivialize" in request.form:
             changed = do_topic_action(
                 topics=tmp_topics,
                 user=real(current_user),
-                action='important',
+                action="important",
                 reverse=True
             )
-            flash(_('%(count)s topics trivialized.', count=changed), 'success')
+            flash(_("%(count)s topics trivialized.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # deleting
-        elif 'delete' in request.form:
+        elif "delete" in request.form:
             changed = do_topic_action(
                 topics=tmp_topics,
                 user=real(current_user),
-                action='delete',
+                action="delete",
                 reverse=False
             )
-            flash(_('%(count)s topics deleted.', count=changed), 'success')
+            flash(_("%(count)s topics deleted.", count=changed), "success")
             return redirect(mod_forum_url)
 
         # moving
-        elif 'move' in request.form:
-            new_forum_id = request.form.get('forum')
+        elif "move" in request.form:
+            new_forum_id = request.form.get("forum")
 
             if not new_forum_id:
-                flash(_('Please choose a new forum for the topics.'), 'info')
+                flash(_("Please choose a new forum for the topics."), "info")
                 return redirect(mod_forum_url)
 
             new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
@@ -424,15 +417,15 @@ class ManageForum(MethodView):
                     And(IsAtleastModeratorInForum(forum_id=new_forum_id),
                         IsAtleastModeratorInForum(forum=forum_instance))):
                 flash(
-                    _('You do not have the permissions to move this topic.'),
-                    'danger'
+                    _("You do not have the permissions to move this topic."),
+                    "danger"
                 )
                 return redirect(mod_forum_url)
 
             if new_forum.move_topics_to(tmp_topics):
-                flash(_('Topics moved.'), 'success')
+                flash(_("Topics moved."), "success")
             else:
-                flash(_('Failed to move topics.'), 'danger')
+                flash(_("Failed to move topics."), "danger")
 
             return redirect(mod_forum_url)
 
@@ -458,7 +451,7 @@ class ManageForum(MethodView):
             return redirect(mod_forum_url)
 
         else:
-            flash(_('Unknown action requested'), 'danger')
+            flash(_("Unknown action requested"), "danger")
             return redirect(mod_forum_url)
 
 
@@ -487,7 +480,7 @@ class NewPost(MethodView):
             form.content.data = format_quote(post.username, post.content)
 
         return render_template(
-            'forum/new_post.html', topic=topic, form=form
+            "forum/new_post.html", topic=topic, form=form
         )
 
     def post(self, topic_id, slug=None, post_id=None):
@@ -499,18 +492,10 @@ class NewPost(MethodView):
             post = Post.query.filter_by(id=post_id).first_or_404()
 
         if form.validate_on_submit():
-            if 'preview' in request.form:
-                return render_template(
-                    'forum/new_post.html',
-                    topic=topic,
-                    form=form,
-                    preview=form.content.data
-                )
-            else:
-                post = form.save(real(current_user), topic)
-                return redirect(url_for('forum.view_post', post_id=post.id))
+            post = form.save(real(current_user), topic)
+            return redirect(url_for("forum.view_post", post_id=post.id))
 
-        return render_template('forum/new_post.html', topic=topic, form=form)
+        return render_template("forum/new_post.html", topic=topic, form=form)
 
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
@@ -535,7 +520,7 @@ class EditPost(MethodView):
         form = self.form(obj=post)
 
         return render_template(
-            'forum/new_post.html', topic=post.topic, form=form, edit_mode=True
+            "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
         )
 
     def post(self, post_id):
@@ -543,23 +528,14 @@ class EditPost(MethodView):
         form = self.form(obj=post)
 
         if form.validate_on_submit():
-            if 'preview' in request.form:
-                return render_template(
-                    'forum/new_post.html',
-                    topic=post.topic,
-                    form=form,
-                    preview=form.content.data,
-                    edit_mode=True
-                )
-            else:
-                form.populate_obj(post)
-                post.date_modified = time_utcnow()
-                post.modified_by = real(current_user).username
-                post.save()
-                return redirect(url_for('forum.view_post', post_id=post.id))
+            form.populate_obj(post)
+            post.date_modified = time_utcnow()
+            post.modified_by = real(current_user).username
+            post.save()
+            return redirect(url_for("forum.view_post", post_id=post.id))
 
         return render_template(
-            'forum/new_post.html', topic=post.topic, form=form, edit_mode=True
+            "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
         )
 
     def form(self, **kwargs):
@@ -572,58 +548,58 @@ class ReportView(MethodView):
     form = ReportForm
 
     def get(self, post_id):
-        return render_template('forum/report_post.html', form=self.form())
+        return render_template("forum/report_post.html", form=self.form())
 
     def post(self, post_id):
         form = self.form()
         if form.validate_on_submit():
             post = Post.query.filter_by(id=post_id).first_or_404()
             form.save(real(current_user), post)
-            flash(_('Thanks for reporting.'), 'success')
+            flash(_("Thanks for reporting."), "success")
 
-        return render_template('forum/report_post.html', form=form)
+        return render_template("forum/report_post.html", form=form)
 
 
 class MemberList(MethodView):
     form = UserSearchForm
 
     def get(self):
-        page = request.args.get('page', 1, type=int)
-        sort_by = request.args.get('sort_by', 'reg_date')
-        order_by = request.args.get('order_by', 'asc')
+        page = request.args.get("page", 1, type=int)
+        sort_by = request.args.get("sort_by", "reg_date")
+        order_by = request.args.get("order_by", "asc")
 
-        if order_by == 'asc':
+        if order_by == "asc":
             order_func = asc
         else:
             order_func = desc
 
-        if sort_by == 'reg_date':
+        if sort_by == "reg_date":
             sort_obj = User.id
-        elif sort_by == 'post_count':
+        elif sort_by == "post_count":
             sort_obj = User.post_count
         else:
             sort_obj = User.username
 
         users = User.query.order_by(order_func(sort_obj)).paginate(
-            page, flaskbb_config['USERS_PER_PAGE'], False
+            page, flaskbb_config["USERS_PER_PAGE"], False
         )
         return render_template(
-            'forum/memberlist.html', users=users, search_form=self.form()
+            "forum/memberlist.html", users=users, search_form=self.form()
         )
 
     def post(self):
-        page = request.args.get('page', 1, type=int)
-        sort_by = request.args.get('sort_by', 'reg_date')
-        order_by = request.args.get('order_by', 'asc')
+        page = request.args.get("page", 1, type=int)
+        sort_by = request.args.get("sort_by", "reg_date")
+        order_by = request.args.get("order_by", "asc")
 
-        if order_by == 'asc':
+        if order_by == "asc":
             order_func = asc
         else:
             order_func = desc
 
-        if sort_by == 'reg_date':
+        if sort_by == "reg_date":
             sort_obj = User.id
-        elif sort_by == 'post_count':
+        elif sort_by == "post_count":
             sort_obj = User.post_count
         else:
             sort_obj = User.username
@@ -631,17 +607,17 @@ class MemberList(MethodView):
         form = self.form()
         if form.validate():
             users = form.get_results().paginate(
-                page, flaskbb_config['USERS_PER_PAGE'], False
+                page, flaskbb_config["USERS_PER_PAGE"], False
             )
             return render_template(
-                'forum/memberlist.html', users=users, search_form=form
+                "forum/memberlist.html", users=users, search_form=form
             )
 
         users = User.query.order_by(order_func(sort_obj)).paginate(
-            page, flaskbb_config['USERS_PER_PAGE'], False
+            page, flaskbb_config["USERS_PER_PAGE"], False
         )
         return render_template(
-            'forum/memberlist.html', users=users, search_form=form
+            "forum/memberlist.html", users=users, search_form=form
         )
 
 
@@ -649,7 +625,7 @@ class TopicTracker(MethodView):
     decorators = [login_required]
 
     def get(self):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         topics = real(current_user).tracked_topics.\
             outerjoin(
                 TopicsRead,
@@ -669,12 +645,12 @@ class TopicTracker(MethodView):
             add_entity(TopicsRead).\
             add_entity(ForumsRead).\
             order_by(Topic.last_updated.desc()).\
-            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], True)
+            paginate(page, flaskbb_config["TOPICS_PER_PAGE"], True)
 
-        return render_template('forum/topictracker.html', topics=topics)
+        return render_template("forum/topictracker.html", topics=topics)
 
     def post(self):
-        topic_ids = request.form.getlist('rowid')
+        topic_ids = request.form.getlist("rowid")
         tmp_topics = Topic.query.filter(Topic.id.in_(topic_ids)).all()
 
         for topic in tmp_topics:
@@ -683,27 +659,27 @@ class TopicTracker(MethodView):
         real(current_user).save()
 
         flash(
-            _('%(topic_count)s topics untracked.', topic_count=len(tmp_topics)),
-            'success'
+            _("%(topic_count)s topics untracked.", topic_count=len(tmp_topics)),
+            "success"
         )
-        return redirect(url_for('forum.topictracker'))
+        return redirect(url_for("forum.topictracker"))
 
 
 class Search(MethodView):
     form = SearchPageForm
 
     def get(self):
-        return render_template('forum/search_form.html', form=self.form())
+        return render_template("forum/search_form.html", form=self.form())
 
     def post(self):
         form = self.form()
         if form.validate_on_submit():
             result = form.get_results()
             return render_template(
-                'forum/search_result.html', form=form, result=result
+                "forum/search_result.html", form=form, result=result
             )
 
-        return render_template('forum/search_form.html', form=form)
+        return render_template("forum/search_form.html", form=form)
 
 
 class DeleteTopic(MethodView):
@@ -726,7 +702,7 @@ class DeleteTopic(MethodView):
             Post.topic_id == topic.id, User.id == Post.user_id
         ).all()
         topic.delete(users=involved_users)
-        return redirect(url_for('forum.view_forum', forum_id=topic.forum_id))
+        return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 
 class LockTopic(MethodView):
@@ -895,9 +871,9 @@ class MarkRead(MethodView):
 
             flash(
                 _(
-                    'Forum %(forum)s marked as read.',
+                    "Forum %(forum)s marked as read.",
                     forum=forum_instance.title
-                ), 'success'
+                ), "success"
             )
 
             return redirect(forum_instance.url)
@@ -919,20 +895,20 @@ class MarkRead(MethodView):
         db.session.add_all(forumsread_list)
         db.session.commit()
 
-        flash(_('All forums marked as read.'), 'success')
+        flash(_("All forums marked as read."), "success")
 
-        return redirect(url_for('forum.index'))
+        return redirect(url_for("forum.index"))
 
 
 class WhoIsOnline(MethodView):
 
     def get(self):
-        if current_app.config['REDIS_ENABLED']:
+        if current_app.config["REDIS_ENABLED"]:
             online_users = get_online_users()
         else:
             online_users = User.query.filter(User.lastseen >= time_diff()).all()
         return render_template(
-            'forum/online_users.html', online_users=online_users
+            "forum/online_users.html", online_users=online_users
         )
 
 
@@ -981,14 +957,14 @@ class HideTopic(MethodView):
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
-        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(
+        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(
                 forum=topic.forum)):
             flash(_("You do not have permission to hide this topic"), "danger")
             return redirect(topic.url)
         topic.hide(user=current_user)
         topic.save()
 
-        if Permission(Has('viewhidden')):
+        if Permission(Has("viewhidden")):
             return redirect(topic.url)
         return redirect(topic.forum.url)
 
@@ -998,7 +974,7 @@ class UnhideTopic(MethodView):
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
-        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(
+        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(
                 forum=topic.forum)):
             flash(
                 _("You do not have permission to unhide this topic"), "danger"
@@ -1015,7 +991,7 @@ class HidePost(MethodView):
     def post(self, post_id):
         post = Post.query.filter(Post.id == post_id).first_or_404()
 
-        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(
+        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(
                 forum=post.topic.forum)):
             flash(_("You do not have permission to hide this post"), "danger")
             return redirect(post.topic.url)
@@ -1045,7 +1021,7 @@ class UnhidePost(MethodView):
     def post(self, post_id):
         post = Post.query.filter(Post.id == post_id).first_or_404()
 
-        if not Permission(Has('makehidden'), IsAtleastModeratorInForum(
+        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(
                 forum=post.topic.forum)):
             flash(_("You do not have permission to unhide this post"), "danger")
             return redirect(post.topic.url)
@@ -1060,164 +1036,189 @@ class UnhidePost(MethodView):
         return redirect(post.topic.url)
 
 
+class MarkdownPreview(MethodView):
+
+    def post(self, mode=None):
+        text = request.data.decode("utf-8")
+
+        if mode == "nonpost":
+            render_classes = current_app.pluggy.hook.\
+                flaskbb_load_nonpost_markdown_class(
+                    app=current_app
+                )
+        else:
+            render_classes = current_app.pluggy.hook.\
+                flaskbb_load_post_markdown_class(
+                    app=current_app
+                )
+
+        renderer = make_renderer(render_classes)
+        preview = renderer(text)
+        return preview
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     forum = Blueprint("forum", __name__)
     register_view(
         forum,
         routes=[
-            '/category/<int:category_id>', '/category/<int:category_id>-<slug>'
+            "/category/<int:category_id>", "/category/<int:category_id>-<slug>"
         ],
-        view_func=ViewCategory.as_view('view_category')
+        view_func=ViewCategory.as_view("view_category")
     )
     register_view(
         forum,
         routes=[
-            '/forum/<int:forum_id>/edit', '/forum/<int:forum_id>-<slug>/edit'
+            "/forum/<int:forum_id>/edit", "/forum/<int:forum_id>-<slug>/edit"
         ],
-        view_func=ManageForum.as_view('manage_forum')
+        view_func=ManageForum.as_view("manage_forum")
     )
     register_view(
         forum,
-        routes=['/forum/<int:forum_id>', '/forum/<int:forum_id>-<slug>'],
-        view_func=ViewForum.as_view('view_forum')
+        routes=["/forum/<int:forum_id>", "/forum/<int:forum_id>-<slug>"],
+        view_func=ViewForum.as_view("view_forum")
     )
     register_view(
         forum,
-        routes=['/<int:forum_id>/markread', '/<int:forum_id>-<slug>/markread'],
-        view_func=MarkRead.as_view('markread')
+        routes=["/<int:forum_id>/markread", "/<int:forum_id>-<slug>/markread"],
+        view_func=MarkRead.as_view("markread")
     )
     register_view(
         forum,
         routes=[
-            '/<int:forum_id>/topic/new', '/<int:forum_id>-<slug>/topic/new'
+            "/<int:forum_id>/topic/new", "/<int:forum_id>-<slug>/topic/new"
         ],
-        view_func=NewTopic.as_view('new_topic')
+        view_func=NewTopic.as_view("new_topic")
     )
     register_view(
         forum,
-        routes=['/memberlist'],
-        view_func=MemberList.as_view('memberlist')
+        routes=["/memberlist"],
+        view_func=MemberList.as_view("memberlist")
     )
     register_view(
         forum,
-        routes=['/post/<int:post_id>/delete'],
-        view_func=DeletePost.as_view('delete_post')
+        routes=["/post/<int:post_id>/delete"],
+        view_func=DeletePost.as_view("delete_post")
     )
     register_view(
         forum,
-        routes=['/post/<int:post_id>/edit'],
-        view_func=EditPost.as_view('edit_post')
+        routes=["/post/<int:post_id>/edit"],
+        view_func=EditPost.as_view("edit_post")
     )
     register_view(
         forum,
-        routes=['/post/<int:post_id>/raw'],
-        view_func=RawPost.as_view('raw_post')
+        routes=["/post/<int:post_id>/raw"],
+        view_func=RawPost.as_view("raw_post")
     )
     register_view(
         forum,
-        routes=['/post/<int:post_id>/report'],
-        view_func=ReportView.as_view('report_post')
+        routes=["/post/<int:post_id>/report"],
+        view_func=ReportView.as_view("report_post")
     )
     register_view(
         forum,
-        routes=['/post/<int:post_id>'],
-        view_func=ViewPost.as_view('view_post')
+        routes=["/post/<int:post_id>"],
+        view_func=ViewPost.as_view("view_post")
     )
-    register_view(forum, routes=['/search'], view_func=Search.as_view('search'))
     register_view(
         forum,
-        routes=[
-            '/topic/<int:topic_id>/delete',
-            '/topic/<int:topic_id>-<slug>/delete'
-        ],
-        view_func=DeleteTopic.as_view('delete_topic')
+        routes=["/search"],
+        view_func=Search.as_view("search")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/highlight',
-            '/topic/<int:topic_id>-<slug>/highlight'
+            "/topic/<int:topic_id>/delete",
+            "/topic/<int:topic_id>-<slug>/delete"
         ],
-        view_func=HighlightTopic.as_view('highlight_topic')
+        view_func=DeleteTopic.as_view("delete_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/lock', '/topic/<int:topic_id>-<slug>/lock'
+            "/topic/<int:topic_id>/highlight",
+            "/topic/<int:topic_id>-<slug>/highlight"
         ],
-        view_func=LockTopic.as_view('lock_topic')
+        view_func=HighlightTopic.as_view("highlight_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/post/<int:post_id>/reply',
-            '/topic/<int:topic_id>-<slug>/post/<int:post_id>/reply'
+            "/topic/<int:topic_id>/lock", "/topic/<int:topic_id>-<slug>/lock"
         ],
-        view_func=NewPost.as_view('reply_post')
+        view_func=LockTopic.as_view("lock_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/post/new',
-            '/topic/<int:topic_id>-<slug>/post/new'
+            "/topic/<int:topic_id>/post/<int:post_id>/reply",
+            "/topic/<int:topic_id>-<slug>/post/<int:post_id>/reply"
         ],
-        view_func=NewPost.as_view('new_post')
-    )
-    register_view(
-        forum,
-        routes=['/topic/<int:topic_id>', '/topic/<int:topic_id>-<slug>'],
-        view_func=ViewTopic.as_view('view_topic')
+        view_func=NewPost.as_view("reply_post")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/trivialize',
-            '/topic/<int:topic_id>-<slug>/trivialize'
+            "/topic/<int:topic_id>/post/new",
+            "/topic/<int:topic_id>-<slug>/post/new"
         ],
-        view_func=TrivializeTopic.as_view('trivialize_topic')
+        view_func=NewPost.as_view("new_post")
+    )
+    register_view(
+        forum,
+        routes=["/topic/<int:topic_id>", "/topic/<int:topic_id>-<slug>"],
+        view_func=ViewTopic.as_view("view_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topic/<int:topic_id>/unlock',
-            '/topic/<int:topic_id>-<slug>/unlock'
+            "/topic/<int:topic_id>/trivialize",
+            "/topic/<int:topic_id>-<slug>/trivialize"
         ],
-        view_func=UnlockTopic.as_view('unlock_topic')
+        view_func=TrivializeTopic.as_view("trivialize_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topictracker/<int:topic_id>/add',
-            '/topictracker/<int:topic_id>-<slug>/add'
+            "/topic/<int:topic_id>/unlock",
+            "/topic/<int:topic_id>-<slug>/unlock"
         ],
-        view_func=TrackTopic.as_view('track_topic')
+        view_func=UnlockTopic.as_view("unlock_topic")
     )
     register_view(
         forum,
         routes=[
-            '/topictracker/<int:topic_id>/delete',
-            '/topictracker/<int:topic_id>-<slug>/delete'
+            "/topictracker/<int:topic_id>/add",
+            "/topictracker/<int:topic_id>-<slug>/add"
         ],
-        view_func=UntrackTopic.as_view('untrack_topic')
+        view_func=TrackTopic.as_view("track_topic")
     )
     register_view(
         forum,
-        routes=['/topictracker'],
-        view_func=TopicTracker.as_view('topictracker')
+        routes=[
+            "/topictracker/<int:topic_id>/delete",
+            "/topictracker/<int:topic_id>-<slug>/delete"
+        ],
+        view_func=UntrackTopic.as_view("untrack_topic")
     )
-    register_view(forum, routes=['/'], view_func=ForumIndex.as_view('index'))
     register_view(
         forum,
-        routes=['/who-is-online'],
-        view_func=WhoIsOnline.as_view('who_is_online')
+        routes=["/topictracker"],
+        view_func=TopicTracker.as_view("topictracker")
+    )
+    register_view(forum, routes=["/"], view_func=ForumIndex.as_view("index"))
+    register_view(
+        forum,
+        routes=["/who-is-online"],
+        view_func=WhoIsOnline.as_view("who_is_online")
     )
     register_view(
         forum,
         routes=[
             "/topic/<int:topic_id>/hide", "/topic/<int:topic_id>-<slug>/hide"
         ],
-        view_func=HideTopic.as_view('hide_topic')
+        view_func=HideTopic.as_view("hide_topic")
     )
     register_view(
         forum,
@@ -1225,17 +1226,24 @@ def flaskbb_load_blueprints(app):
             "/topic/<int:topic_id>/unhide",
             "/topic/<int:topic_id>-<slug>/unhide"
         ],
-        view_func=UnhideTopic.as_view('unhide_topic')
+        view_func=UnhideTopic.as_view("unhide_topic")
     )
     register_view(
         forum,
         routes=["/post/<int:post_id>/hide"],
-        view_func=HidePost.as_view('hide_post')
+        view_func=HidePost.as_view("hide_post")
     )
     register_view(
         forum,
         routes=["/post/<int:post_id>/unhide"],
-        view_func=UnhidePost.as_view('unhide_post')
+        view_func=UnhidePost.as_view("unhide_post")
     )
-
+    register_view(
+        forum,
+        routes=[
+            "/markdown",
+            "/markdown/<path:mode>"
+        ],
+        view_func=MarkdownPreview.as_view("markdown_preview")
+    )
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
