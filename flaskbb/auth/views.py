@@ -333,7 +333,7 @@ class AutoActivateAccount(MethodView):
                     ), "danger"
                 )
 
-                return redirect('auth.request_activation_token')
+                return redirect(url_for('auth.request_activation_token'))
 
             flash(
                 _("Your account has been activated and you can now login."),
@@ -382,7 +382,7 @@ class ActivateAccount(MethodView):
                         ), "danger"
                     )
 
-                    return redirect('auth.request_activation_token')
+                    return redirect(url_for('auth.request_activation_token'))
 
                 flash(
                     _("Your account has been activated and you can now login."),

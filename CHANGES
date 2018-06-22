@@ -4,6 +4,14 @@ Changelog
 Here you can see the full list of changes between each release.
 
 
+Version 2.0.1
+-------------
+
+Releases June 21st, 2018
+
+* Fix issue where activation tokens would fail with an exception
+
+
 Version 2.0.0
 -------------
 
