@@ -26,3 +26,4 @@ deploy:
     tags: true
     all_branches: true
     repo: flaskbb/flaskbb
+    python: '3.6'
