@@ -8,9 +8,9 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from inspect import isclass
-
 from celery import Celery
+from sqlalchemy import MetaData
+
 from flask_alembic import Alembic
 from flask_allows import Allows
 from flask_babelplus import Babel
@@ -21,54 +21,12 @@ from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_redis import FlaskRedis
-from flask_sqlalchemy import BaseQuery, SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
-from flask_whooshee import (DELETE_KWD, INSERT_KWD, UPDATE_KWD, Whooshee,
-                            WhoosheeQuery)
+from flask_whooshee import Whooshee
 from flask_wtf.csrf import CSRFProtect
+
 from flaskbb.exceptions import AuthorizationRequired
-from sqlalchemy import MetaData, event
-from sqlalchemy.orm import Query as SQLAQuery
-
-
-class FlaskBBWhooshee(Whooshee):
-
-    def register_whoosheer(self, wh):
-        """This will register the given whoosher on `whoosheers`, create the
-        neccessary SQLAlchemy event listeners, replace the `query_class` with
-        our own query class which will provide the search functionality
-        and store the app on the whoosheer, so that we can always work
-        with that.
-        :param wh: The whoosher which should be registered.
-        """
-        self.whoosheers.append(wh)
-        for model in wh.models:
-            event.listen(model, 'after_{0}'.format(INSERT_KWD), self.after_insert)  # noqa
-            event.listen(model, 'after_{0}'.format(UPDATE_KWD), self.after_update)  # noqa
-            event.listen(model, 'after_{0}'.format(DELETE_KWD), self.after_delete)  # noqa
-            query_class = getattr(model, 'query_class', None)
-
-            if query_class is not None and isclass(query_class):
-                # already a subclass, ignore it
-                if issubclass(query_class, self.query):
-                    pass
-
-                # ensure there can be a stable MRO
-                elif query_class not in (BaseQuery, SQLAQuery, WhoosheeQuery):
-                    query_class_name = query_class.__name__
-                    model.query_class = type(
-                        "Whooshee{}".format(query_class_name),
-                        (query_class, self.query),
-                        {}
-                    )
-                else:
-                    model.query_class = self.query
-            else:
-                model.query_class = self.query
-
-        if self.app:
-            wh.app = self.app
-        return wh
 
 
 # Permissions Manager
@@ -77,16 +35,16 @@ allows = Allows(throws=AuthorizationRequired)
 # Database
 metadata = MetaData(
     naming_convention={
-        "ix": 'ix_%(column_0_label)s',
+        "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s"
+        "pk": "pk_%(table_name)s",
     }
 )
 db = SQLAlchemy(metadata=metadata)
 
 # Whooshee (Full Text Search)
-whooshee = FlaskBBWhooshee()
+whooshee = Whooshee()
 
 # Login
 login_manager = LoginManager()
