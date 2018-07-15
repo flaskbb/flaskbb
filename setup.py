@@ -100,7 +100,7 @@ tests_require = ["py", "pytest", "pytest-cov", "cov-core", "coverage"]
 
 setup(
     name="FlaskBB",
-    version="2.0.1",
+    version="2.0.2",
     url="https://flaskbb.org",
     project_urls={
         "Documentation": "https://flaskbb.readthedocs.io/en/latest/",
