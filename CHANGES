@@ -3,11 +3,17 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 2.0.2
+-------------
+
+Released July 15th, 2018
+
+* Fix issue with declaring log config file path
 
 Version 2.0.1
 -------------
 
-Releases June 21st, 2018
+Released June 21st, 2018
 
 * Fix issue where activation tokens would fail with an exception
 
