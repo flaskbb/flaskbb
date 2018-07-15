@@ -171,7 +171,11 @@ ADMINS = ["{{ mail_admin_address }}"]
 # and the default logging setting.
 #
 # If set to a file path, this should be an absolute file path
-LOG_CONF_FILE = {{ log_config_path or None }}
+{% if log_config_path %}
+LOG_CONF_FILE = "{{ log_config_path }}"
+{% else %}
+LOG_CONF_FILE = None
+{% endif %}
 
 # Path to store the INFO and ERROR logs
 # If None this defaults to flaskbb/logs
