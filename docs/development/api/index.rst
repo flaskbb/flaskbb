@@ -11,8 +11,11 @@ and provided implementations where appropriate.
 
    coreexceptions
    models
+   changesets
    registration
+   userprofiles
    authentication
    accountmanagement
    tokens
    deprecations
+   display

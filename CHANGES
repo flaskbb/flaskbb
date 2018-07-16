@@ -3,6 +3,16 @@ Changelog
 
 Here you can see the full list of changes between each release.
 
+Version 2.1.0
+-------------
+* Reimplemented User views using services
+* Services for changing email, password, settings and details
+* Hooks for email, password, settings and details updates
+* Hook for user profile sidebar links
+* Added helper for generating dynamic navbar content
+* Gender is now a text field rather than a dropdown
+
+
 Version 2.0.2
 -------------
 

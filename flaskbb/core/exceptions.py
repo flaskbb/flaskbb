@@ -66,3 +66,18 @@ class PersistenceError(BaseFlaskBBError):
         except Exception:
             raise PersistenceError("Couldn't save user account")
     """
+
+
+def accumulate_errors(caller, validators, throw=True):
+    errors = []
+
+    for validator in validators:
+        try:
+            caller(validator)
+        except ValidationError as e:
+            errors.append((e.attribute, e.reason))
+
+    if len(errors) and throw:
+        raise StopValidation(errors)
+
+    return errors

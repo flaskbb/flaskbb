@@ -3,16 +3,24 @@ import datetime as dt
 
 from flaskbb.forum.models import Forum
 from flaskbb.utils.helpers import (
-    check_image, crop_title, format_quote, forum_is_unread, get_image_info,
-    is_online, slugify, time_utcnow, topic_is_unread)
+    check_image,
+    crop_title,
+    format_quote,
+    forum_is_unread,
+    get_image_info,
+    is_online,
+    slugify,
+    time_utcnow,
+    topic_is_unread,
+)
 from flaskbb.utils.settings import flaskbb_config
 
 
 def test_slugify():
     """Test the slugify helper method."""
-    assert slugify(u'Hello world') == u'hello-world'
+    assert slugify(u"Hello world") == u"hello-world"
 
-    assert slugify(u'¿Cómo está?') == u'como-esta'
+    assert slugify(u"¿Cómo está?") == u"como-esta"
 
 
 def test_forum_is_unread(guest, user, forum, topic, forumsread):
@@ -64,17 +72,13 @@ def test_topic_is_unread(guest, user, forum, topic, topicsread, forumsread):
     assert topic_is_unread(topic, topicsread, user, forumsread)
 
     # TopicsRead is none and the forum has never been marked as read
-    assert topic_is_unread(
-        topic, topicsread=None, user=user, forumsread=forumsread
-    )
+    assert topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
 
     # lets mark the forum as read
     forumsread.cleared = time_utcnow()
     forumsread.last_read = time_utcnow()
     forumsread.save()
-    assert not topic_is_unread(
-        topic, topicsread=None, user=user, forumsread=forumsread
-    )
+    assert not topic_is_unread(topic, topicsread=None, user=user, forumsread=forumsread)
 
     # disabled tracker
     flaskbb_config["TRACKER_LENGTH"] = 0
@@ -107,66 +111,66 @@ def test_format_quote(topic):
     assert actual == expected_markdown
 
 
-def test_get_image_info():
-    # some random jpg/gif/png images from my imgur account
-    jpg = "http://i.imgur.com/NgVIeRG.jpg"
-    gif = "http://i.imgur.com/l3Vmp4m.gif"
-    png = "http://i.imgur.com/JXzKxNs.png"
-
-    # Issue #207 Image - This works now
-    # issue_img = "http://b.reich.io/gtlbjc.jpg"
-    # issue_img = get_image_info(issue_img)
-    # assert issue_img["content_type"] == "JPEG"
-
-    jpg_img = get_image_info(jpg)
+def test_get_image_info_jpg(responses, image_jpg):
+    responses.add(image_jpg)
+    jpg_img = get_image_info(image_jpg.url)
     assert jpg_img["content_type"] == "JPEG"
     assert jpg_img["height"] == 1024
     assert jpg_img["width"] == 1280
     assert jpg_img["size"] == 209.06
 
-    gif_img = get_image_info(gif)
+
+def test_get_image_info_gif(responses, image_gif):
+    responses.add(image_gif)
+    gif_img = get_image_info(image_gif.url)
     assert gif_img["content_type"] == "GIF"
     assert gif_img["height"] == 168
     assert gif_img["width"] == 400
     assert gif_img["size"] == 576.138
 
-    png_img = get_image_info(png)
+
+def test_get_image_info_png(responses, image_png):
+    responses.add(image_png)
+    png_img = get_image_info(image_png.url)
     assert png_img["content_type"] == "PNG"
     assert png_img["height"] == 1080
     assert png_img["width"] == 1920
     assert png_img["size"] == 269.409
 
 
-def test_check_image(default_settings):
-    # test200_100.png
-    img_width = "http://i.imgur.com/4dAWAZI.png"
-    # test100_200.png
-    img_height = "http://i.imgur.com/I7GwF3D.png"
-    # test100_100.png
-    img_ok = "http://i.imgur.com/CYV6NzT.png"
-    # random too big image
-    img_size = "http://i.imgur.com/l3Vmp4m.gif"
-    # random image wrong type
-    img_type = "https://flaskbb.org/static/imgs/flask.svg"
+def assert_bad_image_check(result, mesg):
+    assert not result[1]
+    assert mesg in result[0]
 
-    data = check_image(img_width)
-    assert "wide" in data[0]
-    assert not data[1]
 
-    data = check_image(img_height)
-    assert "high" in data[0]
-    assert not data[1]
-
-    data = check_image(img_type)
-    assert "type" in data[0]
-    assert not data[1]
-
-    data = check_image(img_ok)
-    assert data[0] is None
-    assert data[1]
+def test_check_image_too_big(image_too_big, default_settings, responses):
+    responses.add(image_too_big)
 
     flaskbb_config["AVATAR_WIDTH"] = 1000
     flaskbb_config["AVATAR_HEIGHT"] = 1000
-    data = check_image(img_size)
-    assert "big" in data[0]
-    assert not data[1]
+    assert_bad_image_check(check_image(image_too_big.url), "big")
+
+
+def test_check_image_too_tall(image_too_tall, default_settings, responses):
+    responses.add(image_too_tall)
+
+    assert_bad_image_check(check_image(image_too_tall.url), "high")
+
+
+def test_check_image_too_wide(image_too_wide, default_settings, responses):
+    responses.add(image_too_wide)
+
+    assert_bad_image_check(check_image(image_too_wide.url), "wide")
+
+
+def test_check_image_wrong_mime(image_wrong_mime, default_settings, responses):
+    responses.add(image_wrong_mime)
+
+    assert_bad_image_check(check_image(image_wrong_mime.url), "type")
+
+
+def test_check_image_just_right(image_just_right, default_settings, responses):
+    responses.add(image_just_right)
+
+    result = check_image(image_just_right.url)
+    assert result[1]

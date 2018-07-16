@@ -9,34 +9,6 @@
 </ul>
 {% endblock %}
 
-{% block profile_navigation %}
-<ul class="nav profile-sidenav" id="profile-tabs" role="tablist">
-    <li>
-        <a href="{{ user.url }}">
-            <span class="fa fa-home"></span> {% trans %}Overview{% endtrans %}
-        </a>
-    </li>
-    {#
-    <li>
-        <a href="{{ user.url }}">
-            <span class="fa fa-line-chart"></span> {% trans %}Statistics{% endtrans %}
-        </a>
-    </li>
-    #}
-    <li class="active">
-        <a href="{{ url_for('user.view_all_topics', username=user.username) }}">
-            <span class="fa fa-comments"></span> {% trans %}Topics{% endtrans %}
-        </a>
-    </li>
-
-    <li>
-        <a href="{{ url_for('user.view_all_posts', username=user.username) }}">
-            <span class="fa fa-comment"></span> {% trans %}Posts{% endtrans %}
-        </a>
-    </li>
-</ul>
-{% endblock %}
-
 {% block profile_content %}
 <!-- middle column -->
 <div class="col-md-9 col-sm-9 col-xs-12 profile-content">

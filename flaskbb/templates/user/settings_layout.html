@@ -14,7 +14,7 @@
     <div class="col-sm-3">
         <div class="sidebar">
             <ul class="nav sidenav">
-                {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False) %}
+                {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False, user=current_user) %}
                     {% if view == None %}
                     <li class="sidenav-header">{{ _(text) }}</li>
                     {% else %}
