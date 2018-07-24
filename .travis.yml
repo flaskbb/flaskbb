@@ -1,10 +1,15 @@
 language: python
-sudo: false
-python:
-- '2.7'
-- '3.4'
-- '3.5'
-- '3.6'
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.4
+    - python: 3.5
+    - python: 3.6
+    # see the following issue on why 3.7 is weirdo
+    # https://github.com/travis-ci/travis-ci/issues/9815
+    - python: 3.7
+      dist: xenial
+      sudo: true
 install:
 - pip install -r requirements-travis.txt
 script:
