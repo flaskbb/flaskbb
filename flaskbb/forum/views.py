@@ -39,6 +39,7 @@ from flaskbb.utils.requirements import (CanAccessForum,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
 from .locals import current_topic, current_forum, current_category
+from .utils import force_login_if_needed
 
 impl = HookimplMarker("flaskbb")
 
@@ -1246,4 +1247,6 @@ def flaskbb_load_blueprints(app):
         ],
         view_func=MarkdownPreview.as_view("markdown_preview")
     )
+
+    forum.before_request(force_login_if_needed)
     app.register_blueprint(forum, url_prefix=app.config["FORUM_URL_PREFIX"])
