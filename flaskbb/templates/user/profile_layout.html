@@ -10,6 +10,9 @@
             <div class="panel page-panel">
                 <div class="panel-heading page-head">
                     <a href="{{ user.url }}">{{ user.username }}</a>
+                    {% if current_user|can_edit_user %}
+                    <a class="btn btn-xs btn-default pull-right" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                    {% endif %}
                 </div>
                 <div class="panel-body page-body profile-body">
                     {% block profile_sidebar %}
