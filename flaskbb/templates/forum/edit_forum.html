@@ -32,7 +32,7 @@
                     <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
                     <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Views{% endtrans %}</div>
                     <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
-                    <div class="col-md-1 col-sm-1 col-xs-2 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
+                    <div class="col-md-1 col-sm-1 col-xs-2 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="{% trans %}Select all{% endtrans %}"/></div>
                 </div>
 
                 {% for topic, last_post, topicread in topics.items %}
@@ -98,7 +98,7 @@
                     </div>
 
                     <div class="col-md-1 col-sm-1 col-xs-2 topic-select">
-                        <input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="Select Topic"/>
+                        <input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="{% trans %}Select topic{% endtrans %}"/>
                     </div>
                 </div>
                 {% else %}

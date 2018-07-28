@@ -1,4 +1,6 @@
 {% extends theme("layout.html") %}
+{% set page_title = _("%(user)s - User", user=user.username) %}
+
 {% block content %}
 
 {% block breadcrumb %}
@@ -29,15 +31,15 @@
 
                         <div class="profile-online" data-toggle="tooltip" data-placement="top" title="{%- if user.lastseen -%} {{ user.lastseen|time_since }} {%- else -%} {% trans %}Never seen{% endtrans %} {%- endif -%}">
                             {%- if user|is_online %}
-                            <span class="label label-success">online</span>
+                            <span class="label label-success">{% trans %}online{% endtrans %}</span>
                             {%- else %}
-                            <span class="label label-default">offline</span>
+                            <span class="label label-default">{% trans %}offline{% endtrans %}</span>
                             {%- endif %}
                         </div>
 
                         <div class="profile-sidebar-stats">
                             <div class="profile-posts">
-                                {{ user.post_count }} posts
+                                {{ user.post_count }} {% trans %}posts{% endtrans %}
                             </div>
 
                             <div class="profile-date">

@@ -1,4 +1,10 @@
-{% set page_title = _("New Post") %}
+{% if edit_mode %}
+    {% set title = _("Edit Post") %}
+{% else %}
+    {% set title = _("New Post") %}
+{% endif %}
+
+{% set page_title = title %}
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
@@ -12,11 +18,7 @@
         <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
         <li><a href="{{ topic.url }}">{{ topic.title }}</a></li>
         <li class="active">
-            {% if edit_mode %}
-                {% trans %}Edit Post{% endtrans %}
-            {% else %}
-                {% trans %}New Post{% endtrans %}
-            {% endif %}
+            {{ title }}
         </li>
     </ol>
 
@@ -24,11 +26,7 @@
         {{ form.hidden_tag() }}
         <div class="panel page-panel">
             <div class="panel-heading page-head">
-                {% if edit_mode %}
-                    {% trans %}Edit Post{% endtrans %}
-                {% else %}
-                    {% trans %}New Post{% endtrans %}
-                {% endif %}
+                {{ title }}
             </div>
 
             <div class="panel-body page-body">
