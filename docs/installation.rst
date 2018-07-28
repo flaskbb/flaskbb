@@ -27,7 +27,7 @@ are running Linux) to install them.
 
 For example, on archlinux you can install them with::
 
-    $ sudo pacman -S python2-virtualenvwrapper
+    $ sudo pacman -S python-virtualenvwrapper
 
 or, on macOS, you can install them with::
 
@@ -38,7 +38,7 @@ virtualenv and the package manager will resolve all the dependencies for you.
 
 After that, you can create your virtualenv with::
 
-    $ mkvirtualenv -a /path/to/flaskbb -p $(which python2) flaskbb
+    $ mkvirtualenv -a /path/to/flaskbb -p $(which python) flaskbb
 
 This will create a virtualenv named ``flaskbb`` using the python interpreter in
 version 2 and it will set your project directory to ``/path/to/flaskbb``.
@@ -382,12 +382,9 @@ Just install gunicorn via pip inside your virtualenv::
 
     pip install gunicorn
 
-FlaskBB has an built-in command to gunicorn::
+and run FlaskBB using the  ``gunicorn`` command::
 
-    flaskbb start
-
-To see a full list of options either type ``flaskbb start --help`` or
-visit the :ref:`cli <commandline>` docs.
+    gunicorn wsgi:flaskbb --log-file logs/gunicorn.log --pid gunicorn.pid -w 4
 
 
 nginx
