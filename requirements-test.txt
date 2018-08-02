@@ -1,7 +1,5 @@
 -rrequirements.txt
 -rrequirements-cov.txt
-flake8==3.5.0
-pytest==3.6.2
-pytest-flake8==1.0.1
-pytest-mock==1.10.0
-freezegun==0.3.10
+pytest>=3.6.4
+pytest-mock>=1.10.0
+freezegun>=0.3.10

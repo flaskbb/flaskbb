@@ -126,7 +126,7 @@ class HideableMixin(object):
     hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
 
     @declared_attr
-    def hidden_by_id(cls):
+    def hidden_by_id(cls):  # noqa: B902
         return db.Column(
             db.Integer,
             db.ForeignKey(
@@ -136,7 +136,7 @@ class HideableMixin(object):
         )
 
     @declared_attr
-    def hidden_by(cls):
+    def hidden_by(cls):  # noqa: B902
         return db.relationship(
             "User", uselist=False, foreign_keys=[cls.hidden_by_id]
         )

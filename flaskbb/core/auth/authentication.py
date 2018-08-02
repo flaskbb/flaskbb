@@ -150,7 +150,7 @@ class PostAuthenticationHandler(ABC):
     their account.
 
     Cancelling a successful authentication will cause registered
-    :class:`AuthenticationFailureHandler<flaskbb.core.auth.authentication.AuthenticationFailureHandler>`
+    :class:`~flaskbb.core.auth.authentication.AuthenticationFailureHandler`
     instances to be run.
 
     Success handlers should not return a value as it will not be considered.
@@ -179,6 +179,7 @@ class ReauthenticateManager(ABC):
     Unlike the AuthenticationManager, there is no need to return the user to
     the caller.
     """
+
     @abstractmethod
     def reauthenticate(self, user, secret):
         """
@@ -200,7 +201,7 @@ class ReauthenticateProvider(ABC):
     for example when suspicious activity is detected in their session.
 
     ReauthenticateProviders are similiar to
-    :class:`AuthenticationProvider<flaskbb.core.auth.authentication.AuthenticationProvider>`
+    :class:`~flaskbb.core.auth.authentication.AuthenticationProvider`
     except they receive a user instance rather than an identifer for a user.
 
     A successful reauthentication should return True while failures should
@@ -208,7 +209,7 @@ class ReauthenticateProvider(ABC):
 
     If a ReauthenticateProvider determines that reauthentication should
     immediately end, it may raise
-    :class:`StopAuthentication<flaskbb.core.auth.authentication.StopAuthentication>`
+    :class:~flaskbb.core.auth.authentication.StopAuthentication`
     to safely end the process.
 
 
@@ -250,9 +251,10 @@ class ReauthenticateFailureHandler(ABC):
     Used to manager reauthentication failures in FlaskBB.
 
     ReauthenticateFailureHandlers are similiar to
-    :class:`AuthenticationFailureHandler<flaskbb.core.auth.authentication.AuthenticationFailureHandler>`
+    :class:`~flaskbb.core.auth.authentication.AuthenticationFailureHandler`
     except they receive the user instance rather than an indentifier for a user
     """
+
     @abstractmethod
     def handle_reauth_failure(self, user):
         """
@@ -272,7 +274,7 @@ class PostReauthenticateHandler(ABC):
     Used to post process successful reauthentication attempts.
 
     PostAuthenticationHandlers are similar to
-    :class:`PostAuthenticationHandler<flaskbb.core.auth.authentication.PostAuthenticationHandler>`,
+    :class:`~flaskbb.core.auth.authentication.PostAuthenticationHandler`,
     including their ability to cancel a successful attempt by raising
     :class:`StopAuthentication<flaskbb.core.auth.authentication.StopAuthentication>`
     """

@@ -15,6 +15,9 @@ from itsdangerous import (BadData, BadSignature, SignatureExpired,
 from ..core import tokens
 
 
+_DEFAULT_EXPIRY = timedelta(hours=1)
+
+
 class FlaskBBTokenSerializer(tokens.TokenSerializer):
     """
     Default token serializer for FlaskBB. Generates JWTs
@@ -33,7 +36,7 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
     :timedelta expiry: Expiration of tokens
     """
 
-    def __init__(self, secret_key, expiry=timedelta(hours=1)):
+    def __init__(self, secret_key, expiry=_DEFAULT_EXPIRY):
         self._serializer = TimedJSONWebSignatureSerializer(
             secret_key, int(expiry.total_seconds())
         )

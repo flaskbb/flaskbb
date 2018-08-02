@@ -92,7 +92,8 @@ def render_template(template, **context):  # pragma: no cover
     return render_theme_template(theme, template, **context)
 
 
-def do_topic_action(topics, user, action, reverse):
+# TODO(anr): clean this up
+def do_topic_action(topics, user, action, reverse):  # noqa: C901
     """Executes a specific action for topics. Returns a list with the modified
     topic objects.
 
