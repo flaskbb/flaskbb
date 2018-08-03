@@ -1,4 +1,6 @@
 {% extends theme("layout.html") %}
+{% set page_title = _("Settings - %(user)s - User", user=current_user.username) %}
+
 {% block content %}
 {%- from theme('macros.html') import navlink with context -%}
 

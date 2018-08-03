@@ -17,7 +17,7 @@
     {% if topic.hidden %}
     <div class="alert alert-warning">
         <span class="fa fa-user-secret"></span>
-        {{ gettext("This topic is hidden (%(when)s  by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+        {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
     </div>
     {% endif %}
 
@@ -44,9 +44,9 @@
 
                             <!-- check whether user is online or not -->
                             {% if user|is_online %}
-                            <div class="author-online" data-toggle="tooltip" data-placement="top" title="online"></div>
+                            <div class="author-online" data-toggle="tooltip" data-placement="top" title="{% trans %}online{% endtrans %}"></div>
                             {% else %}
-                            <div class="author-offline" data-toggle="tooltip" data-placement="top" title="offline"></div>
+                            <div class="author-offline" data-toggle="tooltip" data-placement="top" title="{% trans %}offline{% endtrans %}"></div>
                             {% endif %}
                             <div class="author-title"><h5>{{ user.primary_group.name }}</h5></div>
                             {{ run_hook("flaskbb_tpl_before_post_author_info", user=user, post=post) }}
@@ -73,8 +73,7 @@
                             </a>
                             {% if post.user_id and post.date_modified %}
                             <small>
-                                (Last modified: {{ post.date_modified|format_datetime }} by
-                                <a href="{{ url_for('user.profile', username=post.modified_by) }}">{{ post.modified_by }}</a>.)
+                                ({% trans date=post.date_modified|format_datetime, user_url=url_for('user.profile', username=post.modified_by), user=post.modified_by %}Last modified: {{ date }} by <a href="{{ user_url }}">{{ user }}</a>{% endtrans %})
                             </small>
                             {% endif %}
                         </div>
@@ -105,20 +104,20 @@
 
                             {% if current_user|post_reply(topic) %}
                             <!-- Quick quote -->
-                                <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="Quote this post"></a>
+                                <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>
                             <!-- Full quote/reply -->
-                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="Full Reply"></a>
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="{% trans %}Full Reply{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user|edit_post(post) %}
                             <!-- Edit Post -->
-                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="Edit this post"></a>
+                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
                             {% endif %}
                             {% if topic.first_post == post %}
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this topic"></button>
+                                    <button class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this topic{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
@@ -126,7 +125,7 @@
                             <!-- Delete Post -->
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="Delete this post"></button>
+                                    <button  class="btn btn-icon icon-delete" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this post{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
 
@@ -134,7 +133,7 @@
 
                             {% if current_user.is_authenticated %}
                             <!-- Report post -->
-                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="Report this post"></a>
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="{% trans %}Report this post{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user.permissions.get('makehidden') %}
@@ -142,24 +141,24 @@
                                     {% if topic.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="Unhide this topic"></button>
+                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this topic{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="Hide this topic"></button>
+                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this topic{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% else %}
                                     {% if post.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="Unhide this post"></button>
+                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this post{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="Hide this post"></button>
+                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this post{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% endif %}
