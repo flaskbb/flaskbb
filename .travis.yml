@@ -1,15 +1,31 @@
 language: python
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+env:
 matrix:
+  fast_finish: true
   include:
     - python: 2.7
-    - python: 3.4
-    - python: 3.5
+      env: TOXENV=py27-unpinned
     - python: 3.6
+      env: TOXENV=flake8
+    - python: 3.6
+      env: TOXENV=py36-unpinned
+    - python: 3.6
+      env: TOXENV=black
     # see the following issue on why 3.7 is weirdo
     # https://github.com/travis-ci/travis-ci/issues/9815
     - python: 3.7
       dist: xenial
       sudo: true
+  allow_failures:
+    # until the entire code base is properly formatted
+    # allow failures to occur here rather than doing a
+    # big all at once reformat that could hide errors
+    - env: TOXENV=black
 install:
 - pip install -r requirements-travis.txt
 script:
@@ -31,4 +47,4 @@ deploy:
     tags: true
     all_branches: true
     repo: flaskbb/flaskbb
-    python: '3.6'
+    python: '3.7'

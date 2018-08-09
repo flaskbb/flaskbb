@@ -58,7 +58,8 @@ def populate_settings_form(form, settings):
     return form
 
 
-def generate_settings_form(settings):
+# TODO(anr): clean this up
+def generate_settings_form(settings):  # noqa: C901
     """Generates a settings form which includes field validation
     based on our Setting Schema."""
     class SettingsForm(FlaskBBForm):

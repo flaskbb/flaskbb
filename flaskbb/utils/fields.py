@@ -159,16 +159,20 @@ class SelectBirthdayWidget(object):
         '%Y': 'select_date_year'
     }
 
-    def __init__(self, years=range(1930, datetime.utcnow().year + 1)):
+    def __init__(self, years=None):
         """Initialzes the widget.
 
         :param years: The min year which should be chooseable.
                       Defatuls to ``1930``.
         """
+        if years is None:
+            years = range(1930, datetime.utcnow().year + 1)
+
         super(SelectBirthdayWidget, self).__init__()
         self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
 
-    def __call__(self, field, **kwargs):
+    # TODO(anr): clean up
+    def __call__(self, field, **kwargs):  # noqa: C901
         field_id = kwargs.pop('id', field.id)
         html = []
         allowed_format = ['%d', '%m', '%Y']
