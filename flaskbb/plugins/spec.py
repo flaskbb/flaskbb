@@ -882,6 +882,35 @@ def flaskbb_tpl_admin_settings_menu(user):
 
 
 @spec
+def flaskbb_tpl_admin_settings_sidebar(user):
+    """This hook is emitted in the admin panels setting tab and used
+    to add additional navigation links to the sidebar settings menu.
+
+    Implementations of this hook should return a list of tuples
+    that are view name and display text.
+    The display text will be provided to the translation service so it
+    is unnecessary to supply translated text.
+
+    For example::
+
+        @impl(trylast=True)
+        def flaskbb_tpl_admin_settings_menu():
+            return [
+                ("myplugin.foobar", "Foobar")
+            ]
+
+    Only admins can view the Settings tab.
+
+    Hookwrappers for this spec should not be registered as FlaskBB
+    supplies its own hookwrapper to flatten all the lists into a single list.
+
+    in :file:`templates/management/settings.html`
+
+    :param user: The current user object.
+    """
+
+
+@spec
 def flaskbb_tpl_profile_sidebar_stats(user):
     """This hook is emitted on the users profile page below the standard
     information. For example, it can be used to add additional items
