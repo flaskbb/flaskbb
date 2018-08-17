@@ -1,10 +1,9 @@
 import pytest
 
 from flaskbb import create_app
-from flaskbb.extensions import db
 from flaskbb.configs.testing import TestingConfig as Config
-from flaskbb.utils.populate import create_default_groups, \
-    create_default_settings
+from flaskbb.extensions import db
+from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
 @pytest.yield_fixture(autouse=True)
@@ -23,6 +22,12 @@ def application():
 @pytest.yield_fixture()
 def request_context(application):
     with application.test_request_context():
+        yield
+
+
+@pytest.fixture()
+def post_request_context(application):
+    with application.test_request_context(method="POST"):
         yield
 
 

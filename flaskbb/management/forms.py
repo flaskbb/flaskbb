@@ -14,12 +14,25 @@ from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
-from wtforms import (BooleanField, HiddenField, IntegerField, PasswordField,
-                     SelectField, StringField, SubmitField, TextAreaField)
-from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
-                                           QuerySelectMultipleField)
-from wtforms.validators import (URL, DataRequired, Email, Length, Optional,
-                                ValidationError, regexp)
+from wtforms import (
+    BooleanField,
+    HiddenField,
+    IntegerField,
+    PasswordField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms.validators import (
+    URL,
+    DataRequired,
+    Email,
+    Length,
+    Optional,
+    ValidationError,
+    regexp,
+)
 
 from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
@@ -68,10 +81,7 @@ class UserForm(FlaskForm):
     birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
         Optional()])
 
-    gender = SelectField(_("Gender"), default="None", choices=[
-        ("None", ""),
-        ("Male", _("Male")),
-        ("Female", _("Female"))])
+    gender = StringField(_("Gender"), validators=[Optional()])
 
     location = StringField(_("Location"), validators=[
         Optional()])

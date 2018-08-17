@@ -21,7 +21,6 @@ Registration Events
 .. autofunction:: flaskbb_registration_post_processor
 .. autofunction:: flaskbb_registration_failure_handler
 
-
 Authentication Events
 ---------------------
 
@@ -32,3 +31,13 @@ Authentication Events
 .. autofunction:: flaskbb_post_reauth
 .. autofunction:: flaskbb_reauth_failed
 
+Profile Edit Events
+-------------------
+
+.. autofunction:: flaskbb_gather_password_validators
+.. autofunction:: flaskbb_password_updated
+.. autofunction:: flaskbb_gather_email_validators
+.. autofunction:: flaskbb_email_updated
+.. autofunction:: flaskbb_gather_details_update_validators
+.. autofunction:: flaskbb_details_updated
+.. autofunction:: flaskbb_settings_updated

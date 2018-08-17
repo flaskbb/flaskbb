@@ -14,6 +14,7 @@ from flask_login import current_user
 from flask_sqlalchemy import BaseQuery
 from sqlalchemy.ext.declarative import declared_attr
 from flaskbb.extensions import db
+from ..core.exceptions import PersistenceError
 
 
 logger = logging.getLogger(__name__)
@@ -158,3 +159,10 @@ class HideableMixin(object):
 
 class HideableCRUDMixin(HideableMixin, CRUDMixin):
     pass
+
+
+def try_commit(session, message="Error while saving"):
+    try:
+        session.commit()
+    except Exception:
+        raise PersistenceError(message)

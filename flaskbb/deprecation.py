@@ -24,6 +24,7 @@ class FlaskBBWarning(Warning):
     Base class for any warnings that FlaskBB itself needs to issue, provided
     for convenient filtering.
     """
+
     pass
 
 
@@ -37,6 +38,7 @@ class FlaskBBDeprecation(DeprecationWarning, FlaskBBWarning, ABC):
         class RemovedInPluginv3(FlaskBBDeprecation):
             version = (3, 0, 0)
     """
+
     version = abstractproperty(lambda self: None)
 
 
@@ -44,6 +46,7 @@ class RemovedInFlaskBB3(FlaskBBDeprecation):
     """
     warning for features removed in FlaskBB3
     """
+
     version = (3, 0, 0)
 
 

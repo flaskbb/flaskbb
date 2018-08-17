@@ -99,6 +99,7 @@ from .deprecation import FlaskBBDeprecation
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
 from .user import views as user_views  # noqa
+from .display.navigation import NavigationContentType
 
 logger = logging.getLogger(__name__)
 
@@ -320,6 +321,7 @@ def configure_template_filters(app):
     app.jinja_env.filters.update(filters)
 
     app.jinja_env.globals["run_hook"] = template_hook
+    app.jinja_env.globals["NavigationContentType"] = NavigationContentType
 
     app.pluggy.hook.flaskbb_jinja_directives(app=app)
 
