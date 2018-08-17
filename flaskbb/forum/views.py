@@ -263,7 +263,10 @@ class NewTopic(MethodView):
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         return render_template(
-            "forum/new_topic.html", forum=forum_instance, form=self.form()
+            "forum/new_topic.html",
+            forum=forum_instance,
+            form=self.form(),
+            edit_mode=False,
         )
 
     def post(self, forum_id, slug=None):
@@ -274,12 +277,60 @@ class NewTopic(MethodView):
             return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
         return render_template(
-            "forum/new_topic.html", forum=forum_instance, form=form
+            "forum/new_topic.html",
+            forum=forum_instance,
+            form=form,
+            edit_mode=False,
         )
 
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
         return NewTopicForm()
+
+
+class EditTopic(MethodView):
+    decorators = [
+        login_required,
+        allows.requires(
+            CanAccessForum(),
+            CanPostTopic,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to edit that topic"),
+                level="warning",
+                endpoint=lambda *a, **k: current_forum.url,
+            ),
+        ),
+    ]
+
+    def get(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        form = self.form(obj=topic.first_post, title=topic.title)
+
+        return render_template(
+            "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
+        )
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        post = topic.first_post
+        form = self.form(obj=post, title=topic.title)
+
+        if form.validate_on_submit():
+            form.populate_obj(topic)
+            form.populate_obj(post)
+            post.date_modified = time_utcnow()
+            post.modified_by = real(current_user).username
+            post.save()
+            topic.save()
+            return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+        return render_template(
+            "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
+        )
+
+    def form(self, **kwargs):
+        current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
+        return NewTopicForm(**kwargs)
 
 
 class ManageForum(MethodView):
@@ -518,6 +569,10 @@ class EditPost(MethodView):
 
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
+
+        if post.topic.first_post_id == post.id:
+            return redirect(url_for("forum.edit_topic", topic_id=post.topic_id))
+
         form = self.form(obj=post)
 
         return render_template(
@@ -1091,6 +1146,14 @@ def flaskbb_load_blueprints(app):
             "/<int:forum_id>/topic/new", "/<int:forum_id>-<slug>/topic/new"
         ],
         view_func=NewTopic.as_view("new_topic")
+    )
+    register_view(
+        forum,
+        routes=[
+            "/topic/<int:topic_id>/edit",
+            "/topic/<int:topic_id>-<slug>/edit",
+        ],
+        view_func=EditTopic.as_view("edit_topic"),
     )
     register_view(
         forum,

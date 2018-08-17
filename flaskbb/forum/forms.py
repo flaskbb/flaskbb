@@ -58,12 +58,6 @@ class NewTopicForm(ReplyForm):
     title = StringField(_("Topic title"), validators=[
         DataRequired(message=_("Please choose a title for your topic."))])
 
-    content = TextAreaField(_("Content"), validators=[
-        DataRequired(message=_("You cannot post a reply without content."))])
-
-    track_topic = BooleanField(_("Track this topic"), default=False,
-                               validators=[Optional()])
-
     submit = SubmitField(_("Post Topic"))
 
     def save(self, user, forum):
