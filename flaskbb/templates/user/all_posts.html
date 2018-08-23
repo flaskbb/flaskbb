@@ -9,15 +9,16 @@
 </ul>
 {% endblock %}
 
-
 {% block profile_content %}
 <!-- middle column -->
 <div class="col-md-9 col-sm-9 col-xs-12 profile-content">
 
     {% for post in posts.items %}
     <div class="panel page-panel">
-        <div class="panel-heading page-head">
-            <a href="{{ post.topic.url }}">{{ post.topic.title }}</a>
+        <div class="panel-heading page-head topic-head">
+            {# no attribute access in translated strings #}
+            {% set topic_title = post.topic.title %}
+            <a href="{{ post.url }}">{% trans %}In topic <strong>{{ topic_title }}</strong>{% endtrans %}</a>
         </div>
         <div class="panel-body page-body topic-content">
             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -34,13 +35,13 @@
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="alert-message alert-message-info" role="alert">
-                {% trans %}The user has not written any posts yet.{% endtrans %}
+                {% trans %}No posts yet{% endtrans %}
             </div>
         </div>
     </div>
     {% endfor %}
 
-    {% if posts.items|length > 1 %}
+    {% if posts.items %}
     <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
         <div class="pull-left">
             {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
