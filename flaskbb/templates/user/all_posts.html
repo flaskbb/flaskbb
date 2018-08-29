@@ -16,9 +16,7 @@
     {% for post in posts.items %}
     <div class="panel page-panel">
         <div class="panel-heading page-head topic-head">
-            {# no attribute access in translated strings #}
-            {% set topic_title = post.topic.title %}
-            <a href="{{ post.url }}">{% trans %}In topic <strong>{{ topic_title }}</strong>{% endtrans %}</a>
+            <a href="{{ post.url }}">{% trans topic_title=post.topic.title %}In topic <strong>{{ topic_title }}</strong>{% endtrans %}</a>
         </div>
         <div class="panel-body page-body topic-content">
             <div class="col-md-12 col-sm-12 col-xs-12">
