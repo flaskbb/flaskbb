@@ -14,35 +14,40 @@
 <div class="col-md-9 col-sm-9 col-xs-12 profile-content">
 
     {% for topic in topics.items %}
-
     <div class="panel page-panel">
         <div class="panel-heading page-head topic-head">
-            <strong><a href="{{ topic.url }}">{{ topic.title }}</a></strong> in <a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a>
+            {% trans trimmed
+                topic_url=topic.url,
+                topic_title=topic.title,
+                forum_url=topic.forum.url,
+                forum_title=topic.forum.title
+            %}
+                <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
+                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+            {% endtrans %}
         </div>
-
         <div class="panel-body page-body topic-content">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="topic-created">
                     {{ topic.date_created|format_datetime }}
                 </div>
                 <div class="topic-content">
-                {{ topic.first_post.content|markup }}
+                    {{ topic.first_post.content|markup }}
                 </div>
             </div>
         </div>
     </div>
-
     {% else %}
     <div class="row">
-        <div class="col-md-12 col-sm-12 co-xs-12">
+        <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="alert-message alert-message-info" role="alert">
-                {% trans %}The user has not opened any topics yet.{% endtrans %}
+                {% trans %}No topics yet{% endtrans %}
             </div>
         </div>
-    </div> <!-- end forum-row -->
+    </div>
     {% endfor %}
 
-    {% if topics.items|length > 1 %}
+    {% if topics.items %}
     <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
         <div class="pull-left">
             {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
