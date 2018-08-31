@@ -125,9 +125,11 @@ def make_renderer(render_classes, inline_classes, block_classes):
     InlineCls = type('FlaskBBInlineLexer', tuple(inline_classes), {})
     BlockCls = type('FlaskBBBlockLexer', tuple(block_classes), {})
 
-    renderer = RenderCls(escape=True, hard_wrap=True)
-    inline = InlineCls(renderer)
-    block = BlockCls()
+    kwargs = {'escape': True, 'hard_wrap': True}
+
+    renderer = RenderCls(**kwargs)
+    inline = InlineCls(renderer, **kwargs)
+    block = BlockCls(**kwargs)
 
     markup = mistune.Markdown(renderer=renderer, inline=inline, block=block)
     return lambda text: Markup(markup.render(text))
