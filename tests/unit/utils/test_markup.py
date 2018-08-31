@@ -1,6 +1,8 @@
 from flaskbb.markup import FlaskBBRenderer, make_renderer
+from mistune import InlineLexer, BlockLexer
 
-markdown = make_renderer([FlaskBBRenderer])
+
+markdown = make_renderer([FlaskBBRenderer], [InlineLexer], [BlockLexer])
 
 
 def test_custom_renderer():
