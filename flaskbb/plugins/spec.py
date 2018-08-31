@@ -132,12 +132,14 @@ def flaskbb_load_nonpost_markdown_class(app):
     :type app: Flask
     """
 
+
 @spec
 def flaskbb_load_post_inline_class(app):
     """
     See flaskbb_load_post_markdown_class. Provides the inline lexer class for
     posts.
     """
+
 
 def flaskbb_load_nonpost_inline_class(app):
     """
