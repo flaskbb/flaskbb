@@ -76,18 +76,37 @@ def flaskbb_load_nonpost_markdown_class():
 
 
 @impl
+def flaskbb_load_post_inline_class():
+    return mistune.InlineLexer
+
+
+@impl
+def flaskbb_load_nonpost_inline_class():
+    return mistune.InlineLexer
+
+
+@impl
 def flaskbb_jinja_directives(app):
     render_classes = app.pluggy.hook.flaskbb_load_post_markdown_class(app=app)
-    app.jinja_env.filters['markup'] = make_renderer(render_classes)
+    lexer_classes = app.pluggy.hook.flaskbb_load_post_inline_class(app=app)
+    app.jinja_env.filters['markup'] = make_renderer(render_classes, lexer_classes)
 
     render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(
         app=app
     )
-    app.jinja_env.filters['nonpost_markup'] = make_renderer(render_classes)
+    lexer_classes = app.pluggy.hook.flaskbb_load_nonpost_inline_class(app=app)
+    app.jinja_env.filters['nonpost_markup'] = make_renderer(
+        render_classes,
+        lexer_classes
+    )
 
 
-def make_renderer(classes):
-    RenderCls = type('FlaskBBRenderer', tuple(classes), {})
+def make_renderer(render_classes, lexer_classes):
+    RenderCls = type('FlaskBBRenderer', tuple(render_classes), {})
+    LexerCls = type('FlaskBBInlineLexer', tuple(lexer_classes), {})
 
-    markup = mistune.Markdown(renderer=RenderCls(escape=True, hard_wrap=True))
+    renderer = RenderCls(escape=True, hard_wrap=True)
+    lexer = LexerCls(renderer)
+
+    markup = mistune.Markdown(renderer=renderer, inline=lexer)
     return lambda text: Markup(markup.render(text))
