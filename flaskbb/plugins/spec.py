@@ -149,6 +149,21 @@ def flaskbb_load_nonpost_inline_class(app):
 
 
 @spec
+def flaskbb_load_post_block_class(app):
+    """
+    See flaskbb_load_post_markdown_class. Provides the block lexer class for
+    posts.
+    """
+
+
+def flaskbb_load_nonpost_block_class(app):
+    """
+    See flaskbb_load_post_markdown_class. Provides the block lexer class for
+    non-post areas.
+    """
+
+
+@spec
 def flaskbb_cli(cli, app):
     """Hook for registering CLI commands.
 
