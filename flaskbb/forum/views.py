@@ -22,24 +22,26 @@ from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
 from flaskbb.extensions import allows, db
-from flaskbb.markup import make_renderer
-from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
-                                 ReportForm, SearchPageForm, UserSearchForm)
+from flaskbb.forum.forms import (EditTopicForm, NewTopicForm, QuickreplyForm,
+                                 ReplyForm, ReportForm, SearchPageForm,
+                                 UserSearchForm)
 from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
                                   TopicsRead)
+from flaskbb.markup import make_renderer
 from flaskbb.user.models import User
-from flaskbb.utils.helpers import (do_topic_action, format_quote,
-                                   get_online_users, real, register_view,
-                                   render_template, time_diff, time_utcnow,
-                                   FlashAndRedirect)
-from flaskbb.utils.requirements import (CanAccessForum,
-                                        CanDeletePost, CanDeleteTopic,
-                                        CanEditPost, CanPostReply,
-                                        CanPostTopic, Has,
+from flaskbb.utils.helpers import (FlashAndRedirect, do_topic_action,
+                                   format_quote, get_online_users, real,
+                                   register_view, render_template, time_diff,
+                                   time_utcnow)
+from flaskbb.utils.requirements import (CanAccessForum, CanDeletePost,
+                                        CanDeleteTopic, CanEditPost,
+                                        CanPostReply, CanPostTopic, Has,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
-from .locals import current_topic, current_forum, current_category
+
+from .locals import current_category, current_forum, current_topic
 from .utils import force_login_if_needed
+
 
 impl = HookimplMarker("flaskbb")
 
@@ -292,8 +294,8 @@ class EditTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
             CanPostTopic,
+            CanEditPost,
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that topic"),
                 level="warning",
@@ -305,6 +307,7 @@ class EditTopic(MethodView):
     def get(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         form = self.form(obj=topic.first_post, title=topic.title)
+        form.track_topic.data = current_user.is_tracking_topic(topic)
 
         return render_template(
             "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
@@ -316,10 +319,15 @@ class EditTopic(MethodView):
         form = self.form(obj=post, title=topic.title)
 
         if form.validate_on_submit():
-            form.populate_obj(topic)
-            form.populate_obj(post)
+            form.populate_obj(topic, post)
             post.date_modified = time_utcnow()
             post.modified_by = real(current_user).username
+
+            if form.track_topic.data:
+                current_user.track_topic(topic)
+            else:
+                current_user.untrack_topic(topic)
+
             post.save()
             topic.save()
             return redirect(url_for("forum.view_topic", topic_id=topic.id))
@@ -330,7 +338,7 @@ class EditTopic(MethodView):
 
     def form(self, **kwargs):
         current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
-        return NewTopicForm(**kwargs)
+        return EditTopicForm(**kwargs)
 
 
 class ManageForum(MethodView):
@@ -570,10 +578,11 @@ class EditPost(MethodView):
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
 
-        if post.topic.first_post_id == post.id:
+        if post.is_first_post():
             return redirect(url_for("forum.edit_topic", topic_id=post.topic_id))
 
         form = self.form(obj=post)
+        form.track_topic.data = current_user.is_tracking_topic(post.topic)
 
         return render_template(
             "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
@@ -587,6 +596,10 @@ class EditPost(MethodView):
             form.populate_obj(post)
             post.date_modified = time_utcnow()
             post.modified_by = real(current_user).username
+
+            if not form.track_topic.data and current_user.is_tracking_topic(post.topic):
+                current_user.untrack_topic(post.topic)
+
             post.save()
             return redirect(url_for("forum.view_post", post_id=post.id))
 

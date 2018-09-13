@@ -24,52 +24,73 @@ from flaskbb.user.models import User
 logger = logging.getLogger(__name__)
 
 
-class QuickreplyForm(FlaskForm):
-    content = TextAreaField(_("Quick reply"), validators=[
+class PostForm(FlaskForm):
+    content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
     submit = SubmitField(_("Reply"))
 
     def save(self, user, topic):
         post = Post(content=self.content.data)
+        current_app.pluggy.hook.flaskbb_form_new_post_save(form=self)
         return post.save(user=user, topic=topic)
 
 
-class ReplyForm(FlaskForm):
+class QuickreplyForm(PostForm):
+    pass
+
+
+class ReplyForm(PostForm):
+    track_topic = BooleanField(_("Track this topic"), default=False,
+                               validators=[Optional()])
+
+    def save(self, user, topic):
+        if self.track_topic.data:
+            user.track_topic(topic)
+        else:
+            user.untrack_topic(topic)
+
+        return super(ReplyForm, self).save(user, topic)
+
+
+class TopicForm(FlaskForm):
+    title = StringField(_("Topic title"), validators=[
+        DataRequired(message=_("Please choose a title for your topic."))])
+
     content = TextAreaField(_("Content"), validators=[
         DataRequired(message=_("You cannot post a reply without content."))])
 
     track_topic = BooleanField(_("Track this topic"), default=False,
                                validators=[Optional()])
 
-    submit = SubmitField(_("Reply"))
-
-    def save(self, user, topic):
-        post = Post(content=self.content.data)
-
-        if self.track_topic.data:
-            user.track_topic(topic)
-
-        current_app.pluggy.hook.flaskbb_form_new_post_save(form=self)
-        return post.save(user=user, topic=topic)
-
-
-class NewTopicForm(ReplyForm):
-    title = StringField(_("Topic title"), validators=[
-        DataRequired(message=_("Please choose a title for your topic."))])
-
-    submit = SubmitField(_("Post Topic"))
+    submit = SubmitField(_("Post topic"))
 
     def save(self, user, forum):
-        topic = Topic(title=self.title.data)
-        post = Post(content=self.content.data)
+        topic = Topic(title=self.title.data, content=self.content.data)
 
         if self.track_topic.data:
             user.track_topic(topic)
+        else:
+            user.untrack_topic(topic)
 
         current_app.pluggy.hook.flaskbb_form_new_topic_save(form=self,
                                                             topic=topic)
-        return topic.save(user=user, forum=forum, post=post)
+        return topic.save(user=user, forum=forum)
+
+
+class NewTopicForm(TopicForm):
+    pass
+
+
+class EditTopicForm(TopicForm):
+    def populate_obj(self, *objs):
+        """
+        Populates the attributes of the passed `obj`s with data from the
+        form's fields. This is especially useful to populate the topic and
+        post objects at the same time.
+        """
+        for obj in objs:
+            super(EditTopicForm, self).populate_obj(obj)
 
 
 class ReportForm(FlaskForm):

@@ -10,7 +10,7 @@
 {% extends theme("layout.html") %}
 
 {% block content %}
-{% from theme("macros.html") import render_quickreply, render_submit_field, render_field %}
+{% from theme("macros.html") import render_field, render_submit_field, render_quickreply, render_boolean_field %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
@@ -42,6 +42,8 @@
                                 <div class="editor">
                                     {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                                 </div>
+
+                                {{ render_boolean_field(form.track_topic) }}
 
                                 {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
 

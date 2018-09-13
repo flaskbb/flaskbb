@@ -193,6 +193,10 @@ class Post(HideableCRUDMixin, db.Model):
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
+    def is_first_post(self):
+        """Checks whether this post is the first post in the topic or not."""
+        return self.topic.is_first_post(self)
+
     def save(self, user=None, topic=None):
         """Saves a new post. If no parameters are passed we assume that
         you will just update an existing post. It returns the object after the
@@ -433,7 +437,6 @@ class Topic(HideableCRUDMixin, db.Model):
                             cascade="all, delete-orphan",
                             post_update=True)
 
-    # Properties
     @property
     def second_last_post(self):
         """Returns the second last post or None."""
@@ -451,6 +454,40 @@ class Topic(HideableCRUDMixin, db.Model):
     def url(self):
         """Returns the slugified url for the topic."""
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
+
+    def __init__(self, title=None, user=None, content=None):
+        """Creates a topic object with some initial values.
+
+        :param title: The title of the topic.
+        :param user: The user of the post.
+        """
+        if title:
+            self.title = title
+
+        if user:
+            # setting the user here, even with setting the id, breaks the bulk
+            # insert stuff as they use the session.bulk_save_objects which does
+            # not trigger relationships
+            self.user_id = user.id
+            self.username = user.username
+
+        if content:
+            self._post = Post(content=content)
+
+        self.date_created = self.last_updated = time_utcnow()
+
+    def __repr__(self):
+        """Set to a unique key specific to the object in the database.
+        Required for cache.memoize() to work across requests.
+        """
+        return "<{} {}>".format(self.__class__.__name__, self.id)
+
+    def is_first_post(self, post):
+        """Checks if the post is the first post in the topic.
+
+        :param post: The post object.
+        """
+        return self.first_post_id == post.id
 
     def first_unread(self, topicsread, user, forumsread=None):
         """Returns the url to the first unread post. If no unread posts exist
@@ -474,31 +511,6 @@ class Topic(HideableCRUDMixin, db.Model):
                 return post.url
 
         return self.url
-
-    # Methods
-    def __init__(self, title=None, user=None):
-        """Creates a topic object with some initial values.
-
-        :param title: The title of the topic.
-        :param user: The user of the post.
-        """
-        if title:
-            self.title = title
-
-        if user:
-            # setting the user here, even with setting the id, breaks the bulk
-            # insert stuff as they use the session.bulk_save_objects which does
-            # not trigger relationships
-            self.user_id = user.id
-            self.username = user.username
-
-        self.date_created = self.last_updated = time_utcnow()
-
-    def __repr__(self):
-        """Set to a unique key specific to the object in the database.
-        Required for cache.memoize() to work across requests.
-        """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
 
     @classmethod
     def get_topic(cls, topic_id, user):
@@ -668,11 +680,14 @@ class Topic(HideableCRUDMixin, db.Model):
         db.session.add(self)
         db.session.commit()
 
+        if post is not None:
+            self._post = post
+
         # Create the topic post
-        post.save(user, self)
+        self._post.save(user, self)
 
         # Update the first and last post id
-        self.last_post = self.first_post = post
+        self.last_post = self.first_post = self._post
 
         # Update the topic count
         forum.topic_count += 1
