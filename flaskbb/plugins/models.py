@@ -16,7 +16,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from flaskbb._compat import itervalues
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
-from flaskbb.utils.forms import generate_settings_form, SettingValueType
+from flaskbb.utils.forms import SettingValueType, generate_settings_form
 
 
 class PluginStore(CRUDMixin, db.Model):
@@ -28,20 +28,18 @@ class PluginStore(CRUDMixin, db.Model):
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
     extra = db.Column(db.PickleType, nullable=True)
-    plugin_id = db.Column(db.Integer,
-                          db.ForeignKey("plugin_registry.id",
-                                        ondelete="CASCADE"))
+    plugin_id = db.Column(
+        db.Integer, db.ForeignKey("plugin_registry.id", ondelete="CASCADE")
+    )
 
     # Display stuff
     name = db.Column(db.Unicode(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
 
-    __table_args__ = (
-        UniqueConstraint('key', 'plugin_id', name='plugin_kv_uniq'),
-    )
+    __table_args__ = (UniqueConstraint("key", "plugin_id", name="plugin_kv_uniq"),)
 
     def __repr__(self):
-        return '<PluginSetting plugin={} key={} value={}>'.format(
+        return "<PluginSetting plugin={} key={} value={}>".format(
             self.plugin.name, self.key, self.value
         )
 
@@ -56,15 +54,30 @@ class PluginStore(CRUDMixin, db.Model):
             return obj
         return PluginStore()
 
+    @classmethod
+    def from_dict(cls, plugin, key, dct):
+        store = cls()
+        store.populate(plugin, key, dct)
+        return store
+
+    def populate(self, plugin, key, dct):
+        self.key = key
+        self.plugin = plugin
+        self.value = dct["value"]
+        self.value_type = dct["value_type"]
+        self.extra = dct["extra"]
+        self.name = dct["name"]
+        self.description = dct["description"]
+
 
 class PluginRegistry(CRUDMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(255), unique=True, nullable=False)
     enabled = db.Column(db.Boolean, default=True)
     values = db.relationship(
-        'PluginStore',
-        collection_class=attribute_mapped_collection('key'),
-        backref='plugin',
+        "PluginStore",
+        collection_class=attribute_mapped_collection("key"),
+        backref="plugin",
         cascade="all, delete-orphan",
     )
 
@@ -82,7 +95,7 @@ class PluginRegistry(CRUDMixin, db.Model):
     def is_installable(self):
         """Returns True if the plugin has settings that can be installed."""
         plugin_module = current_app.pluggy.get_plugin(self.name)
-        return True if plugin_module.SETTINGS else False
+        return getattr(plugin_module, "SETTINGS", False)
 
     @property
     def is_installed(self):
@@ -101,8 +114,7 @@ class PluginRegistry(CRUDMixin, db.Model):
         :param settings: A dictionary containing setting items.
         """
         pluginstore = PluginStore.query.filter(
-            PluginStore.plugin_id == self.id,
-            PluginStore.key.in_(settings.keys())
+            PluginStore.plugin_id == self.id, PluginStore.key.in_(settings.keys())
         ).all()
 
         setting_list = []
@@ -129,15 +141,51 @@ class PluginRegistry(CRUDMixin, db.Model):
 
             pluginstore.key = key
             pluginstore.plugin = self
-            pluginstore.value = settings[key]['value']
-            pluginstore.value_type = settings[key]['value_type']
-            pluginstore.extra = settings[key]['extra']
-            pluginstore.name = settings[key]['name']
-            pluginstore.description = settings[key]['description']
+            pluginstore.value = settings[key]["value"]
+            pluginstore.value_type = settings[key]["value_type"]
+            pluginstore.extra = settings[key]["extra"]
+            pluginstore.name = settings[key]["name"]
+            pluginstore.description = settings[key]["description"]
             plugin_settings.append(pluginstore)
 
         db.session.add_all(plugin_settings)
         db.session.commit()
 
+    def upgrade_settings(self):
+        plugin_module = current_app.pluggy.get_plugin(self.name)
+        settings = plugin_module.SETTINGS
+
+        deleted_settings = [
+            (key, s) for key, s in self.values.items() if key not in settings
+        ]
+        added_settings = [
+            PluginStore.from_dict(self, key, values)
+            for key, values in settings.items()
+            if key not in self.values
+        ]
+        # but what do here?
+        # updated_settings = []
+
+        db.session.add_all(added_settings)
+        for setting in deleted_settings:
+            db.session.delete(setting[1])
+
+        db.session.commit()
+
+        return {
+            "added": [p.key for p in added_settings],
+            "removed": [d[0] for d in deleted_settings],
+            "updated": []
+        }
+
+    def has_new_settings(self):
+        if not self.is_installable or not self.is_installed:
+            return False
+
+        plugin_module = current_app.pluggy.get_plugin(self.name)
+        settings = plugin_module.SETTINGS
+
+        return set(settings.keys()) != set(self.values.keys())
+
     def __repr__(self):
-        return '<Plugin name={} enabled={}>'.format(self.name, self.enabled)
+        return "<Plugin name={} enabled={}>".format(self.name, self.enabled)

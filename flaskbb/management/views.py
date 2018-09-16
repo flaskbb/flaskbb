@@ -1300,6 +1300,42 @@ class InstallPlugin(MethodView):
         return redirect(url_for("management.plugins"))
 
 
+class UpgradePlugin(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview"
+            )
+        )
+    ]
+
+    def post(self, name):
+        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+
+        if not plugin.enabled:
+            flash(
+                _(
+                    "Can't upgrade plugin. Enable '%(plugin)s' plugin first.",
+                    plugin=plugin.name
+                ), "danger"
+            )
+            return redirect(url_for("management.plugins"))
+
+        if not plugin.is_installed:
+            flash(
+                _("Install '%(plugin)s' plugin first", plugin=plugin.name),
+                "danger"
+            )
+            return redirect(url_for("management.plugins"))
+
+        plugin.upgrade_settings()
+        flash(_("Plugin has been upgraded."), "success")
+        return redirect(url_for("management.plugins"))
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
     management = Blueprint("management", __name__)
@@ -1393,6 +1429,12 @@ def flaskbb_load_blueprints(app):
         management,
         routes=['/plugins'],
         view_func=PluginsView.as_view('plugins')
+    )
+
+    register_view(
+        management,
+        routes=['/plugins/<path:name>/upgrade'],
+        view_func=UpgradePlugin.as_view('upgrade_plugin')
     )
 
     # Reports
