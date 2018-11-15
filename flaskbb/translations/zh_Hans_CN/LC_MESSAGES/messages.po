@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-11-15 03:20-0400\n"
+"POT-Creation-Date: 2018-11-15 04:52-0400\n"
 "PO-Revision-Date: 2018-05-03 10:17+0000\n"
 "Last-Translator: Peter Justin\n"
 "Language: zh_Hans_CN\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: flaskbb/deprecation.py:73
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr ""
+msgstr "%(name)s已弃用并且会在版本%(version)s中被移除。"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -357,6 +357,10 @@ msgstr "发帖"
 msgid "Topic"
 msgstr "主题"
 
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:6
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_forum_overview.html:8
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:7
+#: flaskbb-plugin-test-mail/test_mail/templates/test_mail.html:7
 #: flaskbb/forum/forms.py:111 flaskbb/templates/forum/category.html:9
 #: flaskbb/templates/forum/category_layout.html:8
 #: flaskbb/templates/forum/edit_forum.html:13
@@ -580,6 +584,8 @@ msgstr "性别"
 msgid "Location"
 msgstr "位置"
 
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:43
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:97
 #: flaskbb/management/forms.py:89 flaskbb/user/forms.py:105
 msgid "Website"
 msgstr "网站"
@@ -768,7 +774,7 @@ msgstr "已存在来宾用户组。"
 
 #: flaskbb/management/forms.py:322
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "无法赋予该用户组任何权限。"
 
 #: flaskbb/management/forms.py:360
 msgid "Forum title"
@@ -1152,6 +1158,8 @@ msgstr "关注的主题"
 msgid "Settings"
 msgstr "设置"
 
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:8
+#: flaskbb-plugin-test-mail/test_mail/templates/test_mail.html:8
 #: flaskbb/templates/layout.html:102
 #: flaskbb/templates/management/banned_users.html:9
 #: flaskbb/templates/management/category_form.html:9
@@ -1291,6 +1299,8 @@ msgstr "为防止暴力攻击账户我们限制了该路由的请求数量."
 msgid "Topics"
 msgstr "主题"
 
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:40
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:91
 #: flaskbb/templates/forum/category_layout.html:10
 #: flaskbb/templates/forum/edit_forum.html:32
 #: flaskbb/templates/forum/forum.html:50
@@ -1526,12 +1536,15 @@ msgstr "在线"
 msgid "offline"
 msgstr "离线"
 
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:39
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:90
 #: flaskbb/templates/forum/search_result.html:41
 #: flaskbb/templates/forum/topic.html:52
 #: flaskbb/templates/forum/topic_horizontal.html:59
 msgid "Joined"
 msgstr "加入于"
 
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:102
 #: flaskbb/templates/forum/search_result.html:49
 #: flaskbb/templates/forum/topic.html:60
 msgid "Guest"
@@ -1801,6 +1814,7 @@ msgstr "帖子"
 msgid "topics"
 msgstr "主题"
 
+#: flaskbb-plugin-portal/portal/templates/index.html:136
 #: flaskbb/templates/management/overview.html:76
 msgid "Statistics"
 msgstr "统计"
@@ -1960,10 +1974,9 @@ msgstr "还没有帖子"
 msgid ""
 "<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in forum "
 "<a href=\"%(forum_url)s\">%(forum_title)s</a>"
-msgstr "<strong>"
-"<a href=\"%(topic_url)s\">%(topic_title)s</a>"
-"</strong> 论坛： "
-"<a href=\"%(forum_url)s\">%(forum_title)s</a>"
+msgstr ""
+"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> 论坛： <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/user/all_topics.html:44
 msgid "No topics yet"
@@ -2123,35 +2136,120 @@ msgstr "注册已被禁止."
 msgid "This account is already activated."
 msgstr "账户已激活."
 
-#~ msgid "Preview"
-#~ msgstr "预览"
+#: flaskbb-plugin-conversations/conversations/templates/_inject_navlink.html:7
+#: flaskbb-plugin-conversations/conversations/templates/_inject_navlink.html:33
+#: flaskbb-plugin-conversations/conversations/templates/inbox.html:1
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:18
+msgid "Inbox"
+msgstr "收件箱"
 
-#~ msgid "Male"
-#~ msgstr "男"
+#: flaskbb-plugin-conversations/conversations/templates/_inject_navlink.html:22
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:101
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:48
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:55
+msgid "Deleted User"
+msgstr "已删除用户"
 
-#~ msgid "Female"
-#~ msgstr "女"
+#: flaskbb-plugin-conversations/conversations/templates/_inject_navlink.html:30
+msgid "No unread messages."
+msgstr "无未读消息"
 
-#~ msgid "Message"
-#~ msgstr "消息"
+#: flaskbb-plugin-conversations/conversations/templates/_inject_navlink.html:34
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:16
+msgid "New Message"
+msgstr "新消息"
 
-#~ msgid "This topic is hidden (%(when)s  by %(who)s)"
-#~ msgstr "该主题已隐藏(由%(who)s于%(when)s 执行)"
+#: flaskbb-plugin-conversations/conversations/templates/_inject_new_message_button.html:4
+#: flaskbb-plugin-conversations/conversations/templates/_inject_new_message_link.html:3
+#: flaskbb-plugin-conversations/conversations/templates/conversation.html:93
+msgid "Message"
+msgstr "消息"
 
-#~ msgid "This post is hidden (%(when)s  by %(who)s)"
-#~ msgstr "该帖子已隐藏(由%(who)s于%(when)s执行)"
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:7
+msgid "Conversations"
+msgstr "会话"
 
-#~ msgid "The user has not written any posts yet."
-#~ msgstr "用户没有发布任何帖子"
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:44
+msgid "From"
+msgstr "来自"
 
-#~ msgid "The user has not opened any topics yet."
-#~ msgstr "用户没有发布任何主题"
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:51
+msgid "to"
+msgstr "发送到"
 
-#~ msgid "User has not added any notes about him."
-#~ msgstr "该用户没有添加关于他的备注。"
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:57
+msgid "on"
+msgstr "在"
 
-#~ msgid "Old password is wrong."
-#~ msgstr "原密码错误"
+#: flaskbb-plugin-conversations/conversations/templates/conversation_list.html:103
+msgid "No conversations found."
+msgstr "没有找到会话。"
 
-#~ msgid "Could not process registration dueto an unrecoverable error"
-#~ msgstr "无法"
+#: flaskbb-plugin-conversations/conversations/templates/drafts.html:1
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:20
+msgid "Drafts"
+msgstr "草稿箱"
+
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:8
+msgid "Private Message"
+msgstr "私信"
+
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:19
+msgid "Sent"
+msgstr "已发送"
+
+#: flaskbb-plugin-conversations/conversations/templates/message_layout.html:21
+#: flaskbb-plugin-conversations/conversations/templates/trash.html:1
+msgid "Trash"
+msgstr "垃圾箱"
+
+#: flaskbb-plugin-conversations/conversations/templates/sent.html:1
+msgid "Sent Messages"
+msgstr "已发送的消息"
+
+#: flaskbb-plugin-portal/portal/templates/index.html:87
+msgid "News"
+msgstr "新消息"
+
+#: flaskbb-plugin-portal/portal/templates/index.html:113
+msgid "Recent Topics"
+msgstr "最近的主题"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_forum_overview.html:1
+msgid "Ranks Overview"
+msgstr "等级一览"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:1
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:31
+msgid "Ranks"
+msgstr "等级"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:9
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:19
+msgid "Manage Ranks"
+msgstr "管理等级"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/rank_management_base.html:22
+msgid "Add Rank"
+msgstr "增加等级"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/ranks_management_overview.html:4
+msgid "Name"
+msgstr "名字"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/ranks_management_overview.html:5
+msgid "Display"
+msgstr "显示名称"
+
+#: flaskbb-plugin-ranks/src/flaskbb_ranks/templates/ranks_management_overview.html:6
+msgid "Requirement"
+msgstr "需求"
+
+#: flaskbb-plugin-test-mail/test_mail/templates/test_mail.html:1
+#: flaskbb-plugin-test-mail/test_mail/templates/test_mail.html:9
+msgid "Test Mail Server"
+msgstr "邮件测试服务器"
+
+#: flaskbb-plugin-test-mail/test_mail/templates/test_mail.html:20
+msgid "Back to Settings"
+msgstr "回到设置页面"
