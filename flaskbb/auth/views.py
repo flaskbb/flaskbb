@@ -177,7 +177,7 @@ class Register(MethodView):
                     logger.exception("Database error while persisting user")
                     flash(
                         _(
-                            "Could not process registration due"
+                            "Could not process registration due "
                             "to an unrecoverable error"
                         ), "danger"
                     )
