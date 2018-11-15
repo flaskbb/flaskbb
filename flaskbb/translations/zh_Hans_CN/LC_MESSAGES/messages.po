@@ -2155,4 +2155,3 @@ msgstr "账户已激活."
 
 #~ msgid "Could not process registration dueto an unrecoverable error"
 #~ msgstr "无法"
-
