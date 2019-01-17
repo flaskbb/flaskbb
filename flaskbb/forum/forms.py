@@ -9,17 +9,16 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
-from flask_wtf import FlaskForm
-from wtforms import (TextAreaField, StringField, SelectMultipleField,
-                     BooleanField, SubmitField)
-from wtforms.validators import DataRequired, Optional, Length
 
 from flask import current_app
+
 from flask_babelplus import lazy_gettext as _
-
-from flaskbb.forum.models import Topic, Post, Report, Forum
+from flask_wtf import FlaskForm
+from flaskbb.forum.models import Forum, Post, Report, Topic
 from flaskbb.user.models import User
-
+from wtforms import (BooleanField, SelectMultipleField, StringField,
+                     SubmitField, TextAreaField)
+from wtforms.validators import DataRequired, Length, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +82,9 @@ class NewTopicForm(TopicForm):
 
 
 class EditTopicForm(TopicForm):
+
+    submit = SubmitField(_("Save topic"))
+
     def populate_obj(self, *objs):
         """
         Populates the attributes of the passed `obj`s with data from the
