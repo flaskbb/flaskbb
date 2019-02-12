@@ -42,7 +42,6 @@ from flaskbb.utils.settings import flaskbb_config
 from .locals import current_category, current_forum, current_topic
 from .utils import force_login_if_needed
 
-
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
@@ -320,16 +319,8 @@ class EditTopic(MethodView):
 
         if form.validate_on_submit():
             form.populate_obj(topic, post)
-            post.date_modified = time_utcnow()
-            post.modified_by = real(current_user).username
+            topic = form.save(real(current_user), topic.forum)
 
-            if form.track_topic.data:
-                current_user.track_topic(topic)
-            else:
-                current_user.untrack_topic(topic)
-
-            post.save()
-            topic.save()
             return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
         return render_template(
@@ -534,6 +525,7 @@ class NewPost(MethodView):
     def get(self, topic_id, slug=None, post_id=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         form = self.form()
+        form.track_topic.data = current_user.is_tracking_topic(topic)
 
         if post_id is not None:
             post = Post.query.filter_by(id=post_id).first_or_404()
@@ -594,13 +586,7 @@ class EditPost(MethodView):
 
         if form.validate_on_submit():
             form.populate_obj(post)
-            post.date_modified = time_utcnow()
-            post.modified_by = real(current_user).username
-
-            if not form.track_topic.data and current_user.is_tracking_topic(post.topic):
-                current_user.untrack_topic(post.topic)
-
-            post.save()
+            post = form.save(real(current_user), post.topic)
             return redirect(url_for("forum.view_post", post_id=post.id))
 
         return render_template(

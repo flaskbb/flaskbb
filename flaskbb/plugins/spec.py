@@ -502,7 +502,7 @@ def flaskbb_form_new_post(form):
 
 
 @spec
-def flaskbb_form_new_post_save(form):
+def flaskbb_form_post_save(form):
     """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     This hook is called while populating the post object with
@@ -523,7 +523,7 @@ def flaskbb_form_new_topic(form):
 
 
 @spec
-def flaskbb_form_new_topic_save(form, topic):
+def flaskbb_form_topic_save(form, topic):
     """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`.
 
     This hook is called while populating the topic object with

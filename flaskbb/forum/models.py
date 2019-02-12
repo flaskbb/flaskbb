@@ -8,8 +8,8 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from flask import abort, current_app, url_for
 from sqlalchemy.orm import aliased
@@ -20,7 +20,6 @@ from flaskbb.utils.database import (CRUDMixin, HideableCRUDMixin, UTCDateTime,
 from flaskbb.utils.helpers import (get_categories_and_forums, get_forums,
                                    slugify, time_utcnow, topic_is_unread)
 from flaskbb.utils.settings import flaskbb_config
-
 
 logger = logging.getLogger(__name__)
 
