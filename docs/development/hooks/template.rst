@@ -34,3 +34,4 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_post_menu_after
 .. autofunction:: flaskbb_tpl_topic_controls
 .. autofunction:: flaskbb_tpl_admin_settings_menu
+.. autofunction:: flaskbb_tpl_admin_settings_sidebar

@@ -30,3 +30,14 @@ def flaskbb_tpl_admin_settings_menu(user):
 
     outcome = yield
     outcome.force_result(chain(results, *outcome.get_result()))
+
+
+@impl(hookwrapper=True, tryfirst=True)
+def flaskbb_tpl_admin_settings_sidebar():
+    """
+    Flattens the lists that come back from the hook
+    into a single iterable that can be used to populate
+    the menu
+    """
+    outcome = yield
+    outcome.force_result(chain(*outcome.get_result()))

@@ -11,8 +11,8 @@
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_boolean_field, render_select_field, render_field, navlink with context %}
-
+{% from theme('macros.html') import render_boolean_field, render_select_field, render_field, sidebaritems %}
+{% set extra_setting_links = run_hook("flaskbb_tpl_admin_settings_sidebar", user=current_user, is_markup=False) %}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -25,15 +25,15 @@
                 <li><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
             {% endif %}
         {% endfor %}
-        {% if all_plugins %}
+        {% if all_plugins or extra_setting_links|length %}
         <li class="nav-header">Plugin Settings</li>
         {% for plugin in all_plugins %}
-            {% if plugin.name == active_nav.get('key') %}
-                <li class="active"><a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a></li>
-            {% else %}
-                <li><a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a></li>
-            {% endif %}
+            <li {% if plugin.name == active_nav.get('key') %}class="active"{% endif %}>
+                <a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
+            </li>
         {% endfor %}
+
+        {{ sidebaritems(extra_setting_links) }}
         {% endif %}
         </ul>
     </div>

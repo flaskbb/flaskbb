@@ -337,7 +337,14 @@
 {% macro sidebar(items, extra_class="") %}
 {% if items %}
 <ul class="nav {% if extra_class %}{{ extra_class }}{% endif %}">
-    {% for item in items %}
+    {{ sidebaritems(items) }}
+</ul>
+{% endif %}
+{% endmacro %}
+
+
+{% macro sidebaritems(items) %}
+{% for item in items %}
     {% if item.content_type == NavigationContentType.link %}
     {{ navlink(item.endpoint, item.name, item.icon, item.active, item.urlforkwargs) }}
     {% elif item.content_type == NavigationContentType.external_link %}
@@ -349,10 +356,9 @@
     {% else %}
     {# skip unknown #}
     {% endif %}
-    {% endfor %}
-</ul>
-{% endif %}
+{% endfor %}
 {% endmacro %}
+
 
 {% macro tablink_href(endpoint, name, active=False) %}
 <li {% if endpoint == request.endpoint or active %}class="active"{% endif %} >
