@@ -22,23 +22,24 @@ from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
 from flaskbb.extensions import allows, db
-from flaskbb.markup import make_renderer
-from flaskbb.forum.forms import (NewTopicForm, QuickreplyForm, ReplyForm,
-                                 ReportForm, SearchPageForm, UserSearchForm)
+from flaskbb.forum.forms import (EditTopicForm, NewTopicForm, QuickreplyForm,
+                                 ReplyForm, ReportForm, SearchPageForm,
+                                 UserSearchForm)
 from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
                                   TopicsRead)
+from flaskbb.markup import make_renderer
 from flaskbb.user.models import User
-from flaskbb.utils.helpers import (do_topic_action, format_quote,
-                                   get_online_users, real, register_view,
-                                   render_template, time_diff, time_utcnow,
-                                   FlashAndRedirect)
-from flaskbb.utils.requirements import (CanAccessForum,
-                                        CanDeletePost, CanDeleteTopic,
-                                        CanEditPost, CanPostReply,
-                                        CanPostTopic, Has,
+from flaskbb.utils.helpers import (FlashAndRedirect, do_topic_action,
+                                   format_quote, get_online_users, real,
+                                   register_view, render_template, time_diff,
+                                   time_utcnow)
+from flaskbb.utils.requirements import (CanAccessForum, CanDeletePost,
+                                        CanDeleteTopic, CanEditPost,
+                                        CanPostReply, CanPostTopic, Has,
                                         IsAtleastModeratorInForum)
 from flaskbb.utils.settings import flaskbb_config
-from .locals import current_topic, current_forum, current_category
+
+from .locals import current_category, current_forum, current_topic
 from .utils import force_login_if_needed
 
 impl = HookimplMarker("flaskbb")
@@ -263,7 +264,10 @@ class NewTopic(MethodView):
     def get(self, forum_id, slug=None):
         forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
         return render_template(
-            "forum/new_topic.html", forum=forum_instance, form=self.form()
+            "forum/new_topic.html",
+            forum=forum_instance,
+            form=self.form(),
+            edit_mode=False,
         )
 
     def post(self, forum_id, slug=None):
@@ -274,12 +278,58 @@ class NewTopic(MethodView):
             return redirect(url_for("forum.view_topic", topic_id=topic.id))
 
         return render_template(
-            "forum/new_topic.html", forum=forum_instance, form=form
+            "forum/new_topic.html",
+            forum=forum_instance,
+            form=form,
+            edit_mode=False,
         )
 
     def form(self):
         current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
         return NewTopicForm()
+
+
+class EditTopic(MethodView):
+    decorators = [
+        login_required,
+        allows.requires(
+            CanPostTopic,
+            CanEditPost,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to edit that topic"),
+                level="warning",
+                endpoint=lambda *a, **k: current_forum.url,
+            ),
+        ),
+    ]
+
+    def get(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        form = self.form(obj=topic.first_post, title=topic.title)
+        form.track_topic.data = current_user.is_tracking_topic(topic)
+
+        return render_template(
+            "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
+        )
+
+    def post(self, topic_id, slug=None):
+        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+        post = topic.first_post
+        form = self.form(obj=post, title=topic.title)
+
+        if form.validate_on_submit():
+            form.populate_obj(topic, post)
+            topic = form.save(real(current_user), topic.forum)
+
+            return redirect(url_for("forum.view_topic", topic_id=topic.id))
+
+        return render_template(
+            "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
+        )
+
+    def form(self, **kwargs):
+        current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
+        return EditTopicForm(**kwargs)
 
 
 class ManageForum(MethodView):
@@ -475,6 +525,7 @@ class NewPost(MethodView):
     def get(self, topic_id, slug=None, post_id=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
         form = self.form()
+        form.track_topic.data = current_user.is_tracking_topic(topic)
 
         if post_id is not None:
             post = Post.query.filter_by(id=post_id).first_or_404()
@@ -518,7 +569,12 @@ class EditPost(MethodView):
 
     def get(self, post_id):
         post = Post.query.filter_by(id=post_id).first_or_404()
+
+        if post.is_first_post():
+            return redirect(url_for("forum.edit_topic", topic_id=post.topic_id))
+
         form = self.form(obj=post)
+        form.track_topic.data = current_user.is_tracking_topic(post.topic)
 
         return render_template(
             "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
@@ -530,9 +586,7 @@ class EditPost(MethodView):
 
         if form.validate_on_submit():
             form.populate_obj(post)
-            post.date_modified = time_utcnow()
-            post.modified_by = real(current_user).username
-            post.save()
+            post = form.save(real(current_user), post.topic)
             return redirect(url_for("forum.view_post", post_id=post.id))
 
         return render_template(
@@ -1091,6 +1145,14 @@ def flaskbb_load_blueprints(app):
             "/<int:forum_id>/topic/new", "/<int:forum_id>-<slug>/topic/new"
         ],
         view_func=NewTopic.as_view("new_topic")
+    )
+    register_view(
+        forum,
+        routes=[
+            "/topic/<int:topic_id>/edit",
+            "/topic/<int:topic_id>-<slug>/edit",
+        ],
+        view_func=EditTopic.as_view("edit_topic"),
     )
     register_view(
         forum,

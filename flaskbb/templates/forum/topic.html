@@ -114,16 +114,22 @@
                             {{ run_hook("flaskbb_tpl_post_menu_before", post=post) }}
 
                             {% if current_user|post_reply(topic) %}
-                            <!-- Quick quote -->
+                                <!-- Quick quote -->
                                 <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>
-                            <!-- Full quote/reply -->
+                                <!-- Full quote/reply -->
                                 <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="{% trans %}Full Reply{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user|edit_post(post) %}
-                            <!-- Edit Post -->
-                            <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
+                                {% if topic.first_post_id == post.id %}
+                                <!-- Edit Topic -->
+                                <a href="{{ url_for('forum.edit_topic', topic_id=topic.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this topic{% endtrans %}"></a>
+                                {% else %}
+                                <!-- Edit Post -->
+                                <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
+                                {% endif %}
                             {% endif %}
+
                             {% if topic.first_post_id == post.id %}
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
