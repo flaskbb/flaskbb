@@ -285,7 +285,7 @@ class NewTopic(MethodView):
         )
 
     def form(self):
-        current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
+        current_app.pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
         return NewTopicForm()
 
 
@@ -328,7 +328,7 @@ class EditTopic(MethodView):
         )
 
     def form(self, **kwargs):
-        current_app.pluggy.hook.flaskbb_form_new_topic(form=NewTopicForm)
+        current_app.pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
         return EditTopicForm(**kwargs)
 
 
@@ -550,7 +550,7 @@ class NewPost(MethodView):
         return render_template("forum/new_post.html", topic=topic, form=form)
 
     def form(self):
-        current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
+        current_app.pluggy.hook.flaskbb_form_post(form=ReplyForm)
         return ReplyForm()
 
 
@@ -594,7 +594,7 @@ class EditPost(MethodView):
         )
 
     def form(self, **kwargs):
-        current_app.pluggy.hook.flaskbb_form_new_post(form=ReplyForm)
+        current_app.pluggy.hook.flaskbb_form_post(form=ReplyForm)
         return ReplyForm(**kwargs)
 
 

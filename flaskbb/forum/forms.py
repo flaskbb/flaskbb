@@ -36,7 +36,7 @@ class PostForm(FlaskForm):
 
     def save(self, user, topic):
         post = Post(content=self.content.data)
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self)
+        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=post)
         return post.save(user=user, topic=topic)
 
 
@@ -66,7 +66,9 @@ class ReplyForm(PostForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self)
+        current_app.pluggy.hook.flaskbb_form_post_save(
+            form=self, post=self.post
+        )
         return self.post.save(user=user, topic=topic)
 
 

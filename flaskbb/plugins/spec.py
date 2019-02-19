@@ -486,13 +486,13 @@ def flaskbb_reauth_failed(user):
 
 # Form hooks
 @spec
-def flaskbb_form_new_post(form):
+def flaskbb_form_post(form):
     """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     For example::
 
         @impl
-        def flaskbb_form_new_post(form):
+        def flaskbb_form_post(form):
             form.example = TextField("Example Field", validators=[
                 DataRequired(message="This field is required"),
                 Length(min=3, max=50)])
@@ -502,7 +502,7 @@ def flaskbb_form_new_post(form):
 
 
 @spec
-def flaskbb_form_post_save(form):
+def flaskbb_form_post_save(form, post):
     """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     This hook is called while populating the post object with
@@ -515,8 +515,16 @@ def flaskbb_form_post_save(form):
 
 
 @spec
-def flaskbb_form_new_topic(form):
+def flaskbb_form_topic(form):
     """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`
+
+    For example::
+
+        @impl
+        def flaskbb_form_topic(form):
+            form.example = TextField("Example Field", validators=[
+                DataRequired(message="This field is required"),
+                Length(min=3, max=50)])
 
     :param form: The :class:`~flaskbb.forum.forms.NewTopicForm` class.
     """
