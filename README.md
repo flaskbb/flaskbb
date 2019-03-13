@@ -1,8 +1,7 @@
 # FlaskBB
 
 [![Build Status](https://travis-ci.org/flaskbb/flaskbb.svg?branch=master)](https://travis-ci.org/flaskbb/flaskbb)
-[![Coverage Status](https://coveralls.io/repos/sh4nks/flaskbb/badge.png)](https://coveralls.io/r/sh4nks/flaskbb)
-[![Code Health](https://landscape.io/github/sh4nks/flaskbb/master/landscape.svg?style=flat)](https://landscape.io/github/sh4nks/flaskbb/master)
+[![codecov](https://codecov.io/gh/flaskbb/flaskbb/branch/master/graph/badge.svg)](https://codecov.io/gh/flaskbb/flaskbb)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://flaskbb.org)
 [![flaskbb@freenode](https://img.shields.io/badge/irc.freenode.net-%23flaskbb-blue.svg)](https://webchat.freenode.net/?channels=flaskbb)
 
@@ -47,11 +46,11 @@ This is how you set up an development instance of FlaskBB:
 
 ## License
 
-FlaskBB is licensed under the [BSD License](https://github.com/sh4nks/flaskbb/blob/master/LICENSE).
+FlaskBB is licensed under the [BSD License](https://github.com/flaskbb/flaskbb/blob/master/LICENSE).
 
 
 # Links
 
 * [Project Website](https://flaskbb.org)
 * [Documentation](https://flaskbb.readthedocs.io)
-* [Source Code](https://github.com/sh4nks/flaskbb)
+* [Source Code](https://github.com/flaskbb/flaskbb)

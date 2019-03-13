@@ -33,7 +33,7 @@ script:
 - tox
 after_success:
 - coverage combine tests
-- coveralls
+- codecov
 notifications:
   webhooks: https://www.travisbuddy.com/
   on_success: never
