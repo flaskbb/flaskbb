@@ -1,11 +1,11 @@
-#-rrequirements.txt
+-rrequirements.txt
 Sphinx
 alabaster
 bumpversion>=0.5.3
 cov-core
 coverage
 flake8
-flake8-bugbear
+flake8-bugbear ; python_version>'3.5'
 freezegun
 py
 pytest

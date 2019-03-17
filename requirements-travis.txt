@@ -1,4 +1,0 @@
--r requirements-cov.txt
--rrequirements.txt
-tox-travis>=0.10
-codecov>=2.0.15

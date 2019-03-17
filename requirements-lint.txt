@@ -1,2 +1,0 @@
-flake8>=3.5.0
-flake8-bugbear>=18.2.0

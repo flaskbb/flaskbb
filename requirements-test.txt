@@ -1,7 +1,0 @@
--rrequirements-cov.txt
-flake8==3.6.0
-freezegun==0.3.11
-mock==2.0.0 ; python_version<'3.3'
-pytest==4.1.1
-pytest-mock==1.10.0
-responses==0.10.5
