@@ -1,11 +1,15 @@
 -rrequirements.txt
+Sphinx
+alabaster
+bumpversion>=0.5.3
 cov-core
 coverage
+flake8
+flake8-bugbear ; python_version>'3.5'
+freezegun
 py
 pytest
 pytest-cov
-Sphinx
-alabaster
-flake8
+pytest-mock
+responses
 tox>=3.0.0
-bumpversion>=0.5.3

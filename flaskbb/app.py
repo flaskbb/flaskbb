@@ -199,7 +199,7 @@ def configure_app(app, config):
     if all('WarningsPanel' not in p for p in debug_panels):
         debug_panels.append('flask_debugtoolbar_warnings.WarningsPanel')
 
-    app.pluggy = FlaskBBPluginManager("flaskbb", implprefix="flaskbb_")
+    app.pluggy = FlaskBBPluginManager("flaskbb")
 
 
 def configure_celery_app(app, celery):

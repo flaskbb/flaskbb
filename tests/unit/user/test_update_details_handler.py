@@ -3,8 +3,9 @@ from uuid import uuid4
 import pytest
 from pluggy import HookimplMarker
 
-from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
-from flaskbb.core.changesets import ChangeSetValidator, ChangeSetPostProcessor
+from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
+from flaskbb.core.exceptions import (PersistenceError, StopValidation,
+                                     ValidationError)
 from flaskbb.core.user.update import UserDetailsChange
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultDetailsUpdateHandler
@@ -12,15 +13,15 @@ from flaskbb.user.services.update import DefaultDetailsUpdateHandler
 
 class TestDefaultDetailsUpdateHandler(object):
     def test_raises_stop_validation_if_errors_occur(
-        self, mock, user, database, plugin_manager
+        self, mocker, user, database, plugin_manager
     ):
-        validator = mock.Mock(spec=ChangeSetValidator)
+        validator = mocker.Mock(spec=ChangeSetValidator)
         validator.validate.side_effect = ValidationError(
             "location", "Dont be from there"
         )
 
         details = UserDetailsChange()
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         handler = DefaultDetailsUpdateHandler(
             validators=[validator], db=database, plugin_manager=plugin_manager
@@ -32,12 +33,14 @@ class TestDefaultDetailsUpdateHandler(object):
         assert excinfo.value.reasons == [("location", "Dont be from there")]
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_raises_persistence_error_if_save_fails(self, mock, user, plugin_manager):
+    def test_raises_persistence_error_if_save_fails(
+        self, mocker, user, plugin_manager
+    ):
         details = UserDetailsChange()
-        db = mock.Mock()
+        db = mocker.Mock()
         db.session.commit.side_effect = Exception("no")
 
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         handler = DefaultDetailsUpdateHandler(
             validators=[], db=db, plugin_manager=plugin_manager
@@ -49,10 +52,12 @@ class TestDefaultDetailsUpdateHandler(object):
         assert "Could not update details" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_users_details(self, user, database, plugin_manager, mock):
+    def test_actually_updates_users_details(
+        self, user, database, plugin_manager, mocker
+    ):
         location = str(uuid4())
         details = UserDetailsChange(location=location)
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         handler = DefaultDetailsUpdateHandler(
             db=database, plugin_manager=plugin_manager

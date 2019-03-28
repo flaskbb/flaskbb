@@ -3,8 +3,9 @@ from uuid import uuid4
 import pytest
 from pluggy import HookimplMarker
 
-from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
 from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
+from flaskbb.core.exceptions import (PersistenceError, StopValidation,
+                                     ValidationError)
 from flaskbb.core.user.update import EmailUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultEmailUpdateHandler
@@ -16,13 +17,13 @@ def random_email():
 
 class TestDefaultEmailUpdateHandler(object):
     def test_raises_stop_validation_if_errors_occur(
-        self, mock, user, database, plugin_manager
+        self, mocker, user, database, plugin_manager
     ):
-        validator = mock.Mock(spec=ChangeSetValidator)
+        validator = mocker.Mock(spec=ChangeSetValidator)
         validator.validate.side_effect = ValidationError(
             "new_email", "That's not even valid"
         )
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         email_change = EmailUpdate(user.email, random_email())
         handler = DefaultEmailUpdateHandler(
@@ -35,11 +36,13 @@ class TestDefaultEmailUpdateHandler(object):
         assert excinfo.value.reasons == [("new_email", "That's not even valid")]
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_raises_persistence_error_if_save_fails(self, mock, user, plugin_manager):
+    def test_raises_persistence_error_if_save_fails(
+        self, mocker, user, plugin_manager
+    ):
         email_change = EmailUpdate(user.email, random_email())
-        db = mock.Mock()
+        db = mocker.Mock()
         db.session.commit.side_effect = Exception("no")
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         handler = DefaultEmailUpdateHandler(
             db=db, validators=[], plugin_manager=plugin_manager
@@ -51,10 +54,12 @@ class TestDefaultEmailUpdateHandler(object):
         assert "Could not update email" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_email(self, user, database, mock, plugin_manager):
+    def test_actually_updates_email(
+        self, user, database, mocker, plugin_manager
+    ):
         new_email = random_email()
         email_change = EmailUpdate("test", new_email)
-        hook_impl = mock.Mock(spec=ChangeSetPostProcessor)
+        hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         handler = DefaultEmailUpdateHandler(
             db=database, validators=[], plugin_manager=plugin_manager
