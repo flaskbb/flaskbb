@@ -160,7 +160,7 @@ as explained in `Configuration <#configuration>`_::
 
     flaskbb makeconfig -d
 
-or
+or::
 
     flaskbb makeconfig --development
 
