@@ -16,7 +16,6 @@ from pkg_resources import (DistributionNotFound, VersionConflict,
 
 from flaskbb.utils.helpers import parse_pkg_metadata
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -25,9 +24,9 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     specific stuff.
     """
 
-    def __init__(self, project_name, implprefix=None):
+    def __init__(self, project_name):
         super(FlaskBBPluginManager, self).__init__(
-            project_name=project_name, implprefix=implprefix
+            project_name=project_name
         )
         self._plugin_metadata = {}
         self._disabled_plugins = {}
