@@ -9,17 +9,18 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import url_for
-from flask_login import UserMixin, AnonymousUserMixin
 
-from flaskbb.extensions import db, cache
+from flask import url_for
+from flask_login import AnonymousUserMixin, UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from flaskbb.deprecation import deprecated
 from flaskbb.exceptions import AuthenticationError
+from flaskbb.extensions import cache, db
+from flaskbb.forum.models import Forum, Post, Topic, topictracker
+from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
-from flaskbb.forum.models import Post, Topic, Forum, topictracker
-from flaskbb.deprecation import deprecated
 
 logger = logging.getLogger(__name__)
 
@@ -286,8 +287,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def recalculate(self):
         """Recalculates the post count from the user."""
-        post_count = Post.query.filter_by(user_id=self.id).count()
-        self.post_count = post_count
+        self.post_count = Post.query.filter_by(user_id=self.id).count()
         self.save()
         return self
 
