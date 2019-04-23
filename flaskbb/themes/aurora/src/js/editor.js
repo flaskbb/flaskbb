@@ -26,7 +26,7 @@ $(".flaskbb-editor").markdown({
             }]
         }]
     ],
-    onPreview: function(e) {
+    onPreview: function(e, replacementContainer) {
         var urlprefix = typeof FORUM_URL_PREFIX !== typeof undefined ? FORUM_URL_PREFIX : "";
 
         $.ajax({
@@ -42,7 +42,9 @@ $(".flaskbb-editor").markdown({
             }
         })
         .done(function(msg) {
-            parse_emoji(output);
+            parse_emoji(msg);
+            var $html = $(replacementContainer);
+            $(msg).appendTo($html.empty());
         })
         .fail(function(error) {
             console.error("Couldn't send text to markdown preview endpoint: " + error);
