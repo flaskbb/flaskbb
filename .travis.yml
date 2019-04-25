@@ -6,6 +6,7 @@ python:
   - 3.5
   - 3.6
   - 3.7
+
 matrix:
   fast_finish: true
   include:
@@ -27,13 +28,15 @@ matrix:
 install:
 - pip install -r requirements-dev.txt
 - pip install tox-travis
+- pip install codecov
 
 script:
 - flaskbb translations compile
 - tox
 
 after_success:
-- coverage combine
+- coverage combine tests
+- coverage report
 - codecov
 
 cache:
