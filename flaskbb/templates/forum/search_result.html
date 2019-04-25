@@ -32,7 +32,7 @@
                     {% endif %}
                     <div class="author-title"><h5>{{ post.user.primary_group.name }}</h5></div>
 
-                    {{ run_hook("flaskbb_tpl_post_author_info_before", user=user, post=post) }}
+                    {{ run_hook("flaskbb_tpl_post_author_info_before", user=post.user, post=post) }}
 
                     {% if post.user.avatar %}
                         <div class="author-avatar"><img src="{{ post.user.avatar }}" alt="avatar"></div>
@@ -41,7 +41,7 @@
                     <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ post.user.date_joined|format_date }}</div>
                     <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ post.user.post_count }}</div>
 
-                    {{ run_hook("flaskbb_tpl_post_author_info_after", user=user, post=post) }}
+                    {{ run_hook("flaskbb_tpl_post_author_info_after", user=post.user, post=post) }}
 
                     {% else %}
                     <!-- user deleted or guest -->
