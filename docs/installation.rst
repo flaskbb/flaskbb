@@ -482,6 +482,12 @@ Here's what to do:
 
     git clone https://github.com/sh4nks/flaskbb.git
     cd flaskbb
+
+Before continuing the installation it is advised to create a virtualenv as is
+described in section `Virtualenv Setup <#virtualenv-setup>`_.
+
+Finish the installation of FlaskBB by executing following commands::
+
     pip3.5 install --user -r requirements.txt
     pip3.5 install --user -e .
     flaskbb makeconfig
