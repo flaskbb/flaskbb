@@ -42,6 +42,13 @@ jobs:
         env:
           # Can't define in section 'variables' due it being a secret one
           CODECOV_TOKEN: $(codecov.token)
+          PR: $(system.pullRequest.pullRequestNumber)
+          BRANCH: $(system.pullRequest.sourceBranch)
+          COMMIT: $(system.pullRequest.sourceCommitId)
+          BUILD_ID: $(Build.BuildNumber)
+          BUILD_COMMIT: $(Build.SourceVersion)
+          BUILD_REASON: $(Build.Reason)
+          BUILD_BRANCH: $(Build.SourceBranchName)
 
       - task: PublishTestResults@2
         displayName: Publish test results
