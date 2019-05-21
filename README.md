@@ -1,6 +1,6 @@
 # FlaskBB
 
-[![Build Status](https://travis-ci.org/flaskbb/flaskbb.svg?branch=master)](https://travis-ci.org/flaskbb/flaskbb)
+[![Build Status](https://dev.azure.com/flaskbb/flaskbb/_apis/build/status/flaskbb.flaskbb?branchName=master)](https://dev.azure.com/flaskbb/flaskbb/_build/latest?definitionId=1&branchName=master)
 [![codecov](https://codecov.io/gh/flaskbb/flaskbb/branch/master/graph/badge.svg)](https://codecov.io/gh/flaskbb/flaskbb)
 [![requires](https://requires.io/github/flaskbb/flaskbb/requirements.svg?branch=master)](https://requires.io/github/flaskbb/flaskbb/requirements/?branch=master)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://flaskbb.org)
