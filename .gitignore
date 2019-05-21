@@ -141,3 +141,4 @@ bower_components
 node_modules
 .DS_Store
 .pytest_cache
+test-results.xml
