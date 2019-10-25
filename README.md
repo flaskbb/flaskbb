@@ -21,11 +21,9 @@ Currently, following features are implemented:
 * Plugin System
 * Command Line Interface
 
-Feel free to checkout it's feature on our testing instance over at
-[test.flaskbb.org](https://test.flaskbb.org). You can use the demo user (``demo//demo``) to
-avoid the registration process.
 
-The official forums where all the fun happens can be reached via [forums.flaskbb.org](https://forums.flaskbb.org).
+The official forums which are powered by FlaskBB can be reached via
+[forums.flaskbb.org](https://forums.flaskbb.org).
 
 
 ## Quickstart
