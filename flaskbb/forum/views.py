@@ -753,10 +753,7 @@ class DeleteTopic(MethodView):
 
     def post(self, topic_id, slug=None):
         topic = Topic.query.filter_by(id=topic_id).first_or_404()
-        involved_users = User.query.filter(
-            Post.topic_id == topic.id, User.id == Post.user_id
-        ).all()
-        topic.delete(users=involved_users)
+        topic.delete()
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
 

@@ -696,15 +696,15 @@ class Topic(HideableCRUDMixin, db.Model):
                                                                is_new=True)
         return self
 
-    def delete(self, users=None):
-        """Deletes a topic with the corresponding posts. If a list with
-        user objects is passed it will also update their post counts
+    def delete(self):
+        """Deletes a topic with the corresponding posts."""
 
-        :param users: A list with user objects
-        """
         forum = self.forum
+        # get the users before deleting the topic
+        invovled_users = self.involved_users().all()
+
         db.session.delete(self)
-        self._fix_user_post_counts(users or self.involved_users().all())
+        self._fix_user_post_counts(invovled_users)
         self._fix_post_counts(forum)
 
         # forum.last_post_id shouldn't usually be none
@@ -715,30 +715,33 @@ class Topic(HideableCRUDMixin, db.Model):
         db.session.commit()
         return self
 
-    def hide(self, user, users=None):
+    def hide(self, user):
         """Soft deletes a topic from a forum
+
+        :param user: The user who hid the topic.
         """
         if self.hidden:
             return
 
+        involved_users = self.involved_users().all()
         self._remove_topic_from_forum()
         super(Topic, self).hide(user)
         self._handle_first_post()
-        self._fix_user_post_counts(users or self.involved_users().all())
+        self._fix_user_post_counts(involved_users)
         self._fix_post_counts(self.forum)
         db.session.commit()
         return self
 
-    def unhide(self, users=None):
-        """Restores a hidden topic to a forum
-        """
+    def unhide(self):
+        """Restores a hidden topic to a forum"""
         if not self.hidden:
             return
 
+        involved_users = self.involved_users().all()
         super(Topic, self).unhide()
         self._handle_first_post()
         self._restore_topic_to_forum()
-        self._fix_user_post_counts(users or self.involved_users().all())
+        self._fix_user_post_counts(involved_users)
         self.forum.recalculate()
         db.session.commit()
         return self

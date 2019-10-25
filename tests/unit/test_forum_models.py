@@ -325,7 +325,7 @@ def test_topic_delete(topic):
     assert topic.forum.topic_count == 1
     assert topic.forum.post_count == 1
 
-    topic.delete(users=[topic.user])
+    topic.delete()
 
     forum = Forum.query.filter_by(id=topic.forum_id).first()
     user = User.query.filter_by(id=topic.user_id).first()
