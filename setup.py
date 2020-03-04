@@ -89,7 +89,7 @@ install_requires = [
     "Unidecode>=1.0.22",
     "urllib3>=1.23",
     "vine>=1.1.4",
-    "Werkzeug>=0.14.1",
+    "Werkzeug==0.16.1",
     "Whoosh>=2.7.4",
     "WTForms>=2.2.1",
 ]
