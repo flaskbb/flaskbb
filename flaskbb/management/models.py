@@ -68,7 +68,7 @@ class Setting(db.Model, CRUDMixin):
         return cls.query.all()
 
     @classmethod
-    def update(cls, settings, app=None):
+    def update(cls, settings):
         """Updates the cache and stores the changes in the
         database.
 

@@ -122,7 +122,7 @@ class ManagementSettings(MethodView):
             if plugin_obj is not None:
                 plugin_obj.update_settings(new_settings)
             else:
-                Setting.update(settings=new_settings, app=current_app)
+                Setting.update(settings=new_settings)
 
             flash(_("Settings saved."), "success")
 
