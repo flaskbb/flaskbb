@@ -16,7 +16,7 @@ from pytz import UTC
 
 import attr
 from flask_babelplus import gettext as _
-from werkzeug import check_password_hash
+from werkzeug.security import check_password_hash
 
 from ...core.auth.authentication import (AuthenticationFailureHandler,
                                          AuthenticationManager,

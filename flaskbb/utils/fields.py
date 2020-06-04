@@ -19,10 +19,10 @@ except ImportError:
     from urllib import request as http
 
 from flask import request, current_app, Markup, json
-from werkzeug import url_encode
+from werkzeug.urls import url_encode
 from wtforms import ValidationError
 from wtforms.fields import DateField, Field
-from wtforms.widgets.core import Select, HTMLString, html_params
+from wtforms.widgets.core import Select, html_params
 
 from flaskbb._compat import to_bytes, to_unicode
 from flaskbb.utils.settings import flaskbb_config
@@ -229,7 +229,7 @@ class SelectBirthdayWidget(object):
 
             html.append(' ')
 
-        return HTMLString(''.join(html))
+        return Markup(''.join(html))
 
 
 class BirthdayField(DateField):

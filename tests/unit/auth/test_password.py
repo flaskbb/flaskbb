@@ -71,9 +71,11 @@ class TestPasswordReset(object):
         service = password.ResetPasswordService(token_serializer, User, [])
         mock = mocker.MagicMock()
 
-        with mocker.patch(
-                'flaskbb.auth.services.password.send_reset_token.delay', mock):
-            service.initiate_password_reset(Fred.email)
+        mocker.patch(
+            'flaskbb.auth.services.password.send_reset_token.delay',
+            mock
+        )
+        service.initiate_password_reset(Fred.email)
 
         token = token_serializer.dumps(
             Token(user_id=Fred.id, operation=TokenActions.RESET_PASSWORD)

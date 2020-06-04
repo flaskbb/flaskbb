@@ -31,10 +31,11 @@ class TestAccountActivationInitiateActivation(object):
     ):
         service = activation.AccountActivator(token_serializer, User)
         mock = mocker.MagicMock()
-        with mocker.patch(
-                'flaskbb.auth.services.activation.send_activation_token.delay',
-                mock):
-            service.initiate_account_activation(unactivated_user.email)
+        mocker.patch(
+            'flaskbb.auth.services.activation.send_activation_token.delay',
+            mock
+        )
+        service.initiate_account_activation(unactivated_user.email)
 
         token = token_serializer.dumps(
             Token(
