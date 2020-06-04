@@ -512,8 +512,16 @@ def get_image_info(url):
 
     :param url: The URL of the image.
     """
-    r = requests.get(url, stream=True)
-    image_size = r.headers.get("content-length")
+
+    try:
+        r = requests.get(url, stream=True)
+    except requests.ConnectionError:
+        return None
+
+    image_size = r.headers.get("content-length", None)
+    if image_size is None:
+        return None
+
     image_size = float(image_size) / 1000  # in kilobyte
     image_max_size = 10000
     image_data = {
@@ -557,6 +565,10 @@ def check_image(url):
     """
     img_info = get_image_info(url)
     error = None
+
+    if img_info is None:
+        error = "Couldn't get image info. Try a different hoster and/or image."
+        return error, False
 
     if img_info["size"] > flaskbb_config["AVATAR_SIZE"]:
         error = "Image is too big! {}kb are allowed.".format(
