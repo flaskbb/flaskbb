@@ -142,6 +142,8 @@ class DefaultConfig(object):
 
     # Database
     # ------------------------------
+    # For MySQL:
+    #SQLALCHEMY_DATABASE_URI="mysql+pymysql://flaskbb:password@localhost:3306/flaskbb"
     # For PostgresSQL:
     #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
     # For SQLite:
