@@ -41,6 +41,7 @@ olefile==0.46
 Pillow==7.2.0
 pluggy==0.13.1
 Pygments==2.6.1
+PyMySQL==0.10.0
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytz==2020.1
