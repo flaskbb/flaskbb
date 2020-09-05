@@ -1,4 +1,4 @@
--rrequirements.txt
+-r requirements.txt
 Sphinx
 alabaster
 bumpversion>=0.5.3
