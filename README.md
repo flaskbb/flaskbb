@@ -1,4 +1,4 @@
-# FlaskBB
+# FlaskBB 
 
 [![Build Status](https://dev.azure.com/flaskbb/flaskbb/_apis/build/status/flaskbb.flaskbb?branchName=master)](https://dev.azure.com/flaskbb/flaskbb/_build/latest?definitionId=1&branchName=master)
 [![codecov](https://codecov.io/gh/flaskbb/flaskbb/branch/master/graph/badge.svg)](https://codecov.io/gh/flaskbb/flaskbb)
@@ -20,6 +20,7 @@ Currently, following features are implemented:
 * Completely Themeable
 * Plugin System
 * Command Line Interface
+* Easy to learn and use
 
 
 The official forums which are powered by FlaskBB can be reached via
