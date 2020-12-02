@@ -19,7 +19,7 @@ from ...core.exceptions import StopValidation, ValidationError
 from ...utils.helpers import check_image
 
 
-@attr.s(cmp=False, hash=False, frozen=True, repr=True)
+@attr.s(eq=False, order=False, hash=False, frozen=True, repr=True)
 class CantShareEmailValidator(ChangeSetValidator):
     """
     Validates that the new email for the user isn't currently registered by

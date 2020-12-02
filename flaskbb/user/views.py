@@ -38,7 +38,7 @@ impl = HookimplMarker("flaskbb")
 logger = logging.getLogger(__name__)
 
 
-@attr.s(frozen=True, cmp=False, hash=False, repr=True)
+@attr.s(frozen=True, eq=False, order=False, hash=False, repr=True)
 class UserSettings(MethodView):
     form = attr.ib(factory=settings_form_factory)
     settings_update_handler = attr.ib(factory=settings_update_handler)
@@ -73,7 +73,7 @@ class UserSettings(MethodView):
         return redirect(url_for("user.settings"))
 
 
-@attr.s(frozen=True, hash=False, cmp=False, repr=True)
+@attr.s(frozen=True, hash=False, eq=False, order=False, repr=True)
 class ChangePassword(MethodView):
     form = attr.ib(factory=change_password_form_factory)
     password_update_handler = attr.ib(factory=password_update_handler)
@@ -107,7 +107,7 @@ class ChangePassword(MethodView):
         return redirect(url_for("user.change_password"))
 
 
-@attr.s(frozen=True, cmp=False, hash=False, repr=True)
+@attr.s(frozen=True, eq=False, order=False, hash=False, repr=True)
 class ChangeEmail(MethodView):
     form = attr.ib(factory=change_email_form_factory)
     update_email_handler = attr.ib(factory=email_update_handler)
@@ -141,7 +141,7 @@ class ChangeEmail(MethodView):
         return redirect(url_for("user.change_email"))
 
 
-@attr.s(frozen=True, repr=True, cmp=False, hash=False)
+@attr.s(frozen=True, repr=True, eq=False, order=False, hash=False)
 class ChangeUserDetails(MethodView):
     form = attr.ib(factory=change_details_form_factory)
     details_update_handler = attr.ib(factory=details_update_factory)

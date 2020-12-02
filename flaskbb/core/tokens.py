@@ -72,7 +72,7 @@ class TokenActions:
     ACTIVATE_ACCOUNT = 'activate_account'
 
 
-@attr.s(frozen=True, cmp=True, hash=True)
+@attr.s(frozen=True, eq=True, order=True, hash=True)
 class Token(object):
     """
     :param int user_id:

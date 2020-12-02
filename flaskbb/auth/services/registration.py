@@ -43,7 +43,7 @@ __all__ = (
 )
 
 
-@attr.s(hash=False, repr=True, frozen=True, cmp=False)
+@attr.s(hash=False, repr=True, frozen=True, eq=False, order=False)
 class UsernameRequirements(object):
     """
     Configuration for username requirements, minimum and maximum length

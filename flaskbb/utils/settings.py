@@ -9,12 +9,12 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import collections
+from collections.abc import MutableMapping
 
 from flaskbb.management.models import Setting
 
 
-class FlaskBBConfig(collections.MutableMapping):
+class FlaskBBConfig(MutableMapping):
     """Provides a dictionary like interface for interacting with FlaskBB's
     Settings cache.
     """

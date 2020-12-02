@@ -16,7 +16,7 @@ from ...core.changesets import ChangeSetHandler
 from ...utils.database import try_commit
 
 
-@attr.s(cmp=False, frozen=True, repr=True, hash=False)
+@attr.s(eq=False, order=False, frozen=True, repr=True, hash=False)
 class DefaultDetailsUpdateHandler(ChangeSetHandler):
     """
     Validates and updates a user's details and persists the changes to the database.
@@ -37,7 +37,7 @@ class DefaultDetailsUpdateHandler(ChangeSetHandler):
         )
 
 
-@attr.s(cmp=False, frozen=True, repr=True, hash=False)
+@attr.s(eq=False, order=False, frozen=True, repr=True, hash=False)
 class DefaultPasswordUpdateHandler(ChangeSetHandler):
     """
     Validates and updates a user's password and persists the changes to the database.
@@ -56,7 +56,7 @@ class DefaultPasswordUpdateHandler(ChangeSetHandler):
         self.plugin_manager.hook.flaskbb_password_updated(user=model)
 
 
-@attr.s(cmp=False, frozen=True, repr=True, hash=False)
+@attr.s(eq=False, order=False, frozen=True, repr=True, hash=False)
 class DefaultEmailUpdateHandler(ChangeSetHandler):
     """
     Validates and updates a user's email and persists the changes to the database.
@@ -75,7 +75,7 @@ class DefaultEmailUpdateHandler(ChangeSetHandler):
         )
 
 
-@attr.s(cmp=False, frozen=True, repr=True, hash=False)
+@attr.s(eq=False, order=False, frozen=True, repr=True, hash=False)
 class DefaultSettingsUpdateHandler(ChangeSetHandler):
     """
     Updates a user's settings and persists the changes to the database.

@@ -22,7 +22,7 @@ def _should_assign(current, new):
     return not is_empty(new) and current != new
 
 
-@attr.s(hash=True, cmp=True, repr=True, frozen=True)
+@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
 class UserDetailsChange(object):
     """
     Object representing a change user details.
@@ -42,7 +42,7 @@ class UserDetailsChange(object):
                 setattr(user, name, value)
 
 
-@attr.s(hash=True, cmp=True, repr=False, frozen=True)
+@attr.s(hash=True, eq=True, order=True, repr=False, frozen=True)
 class PasswordUpdate(object):
     """
     Object representing an update to a user's password.
@@ -52,7 +52,7 @@ class PasswordUpdate(object):
     new_password = attr.ib()
 
 
-@attr.s(hash=True, cmp=True, repr=True, frozen=True)
+@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
 class EmailUpdate(object):
     """
     Object representing a change to a user's email address.
@@ -63,7 +63,7 @@ class EmailUpdate(object):
     new_email = attr.ib(converter=lambda x: x.lower())
 
 
-@attr.s(hash=True, cmp=True, repr=True, frozen=True)
+@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
 class SettingsUpdate(object):
     """
     Object representing an update to a user's settings.
