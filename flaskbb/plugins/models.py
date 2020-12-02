@@ -13,7 +13,6 @@ from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
-from flaskbb._compat import itervalues
 from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import generate_settings_form, SettingValueType
@@ -71,7 +70,7 @@ class PluginRegistry(CRUDMixin, db.Model):
     @property
     def settings(self):
         """Returns a dict with contains all the settings in a plugin."""
-        return {kv.key: kv.value for kv in itervalues(self.values)}
+        return {kv.key: kv.value for kv in self.values.values()}
 
     @property
     def info(self):

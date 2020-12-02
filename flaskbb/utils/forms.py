@@ -11,7 +11,6 @@
 from wtforms import (TextField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
-from flaskbb._compat import text_type, iteritems
 from enum import Enum
 
 
@@ -35,7 +34,7 @@ class SettingValueType(Enum):
 
 def populate_settings_dict(form, settings):
     new_settings = {}
-    for key, value in iteritems(settings):
+    for key, value in settings.items():
         try:
             # check if the value has changed
             if value == form[key].data:
@@ -49,7 +48,7 @@ def populate_settings_dict(form, settings):
 
 
 def populate_settings_form(form, settings):
-    for key, value in iteritems(settings):
+    for key, value in settings.items():
         try:
             form[key].data = value
         except (KeyError, ValueError):
@@ -118,7 +117,7 @@ def generate_settings_form(settings):  # noqa: C901
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
             else:
-                coerce_to = text_type
+                coerce_to = str
 
             setattr(
                 SettingsForm, setting.key,
@@ -136,7 +135,7 @@ def generate_settings_form(settings):  # noqa: C901
             if "coerce" in setting.extra:
                 coerce_to = setting.extra['coerce']
             else:
-                coerce_to = text_type
+                coerce_to = str
 
             setattr(
                 SettingsForm, setting.key,

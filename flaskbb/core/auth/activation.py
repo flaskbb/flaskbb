@@ -8,10 +8,7 @@
     :copyright: (c) 2014-2018 the FlaskBB Team
     :license: BSD, see LICENSE for more details
 """
-
-from abc import abstractmethod
-
-from ..._compat import ABC
+from abc import ABC, abstractmethod
 
 
 class AccountActivator(ABC):

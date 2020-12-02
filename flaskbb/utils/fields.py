@@ -12,11 +12,7 @@
 """
 from datetime import datetime
 import logging
-try:
-    import urllib2 as http
-except ImportError:
-    # Python 3
-    from urllib import request as http
+import urllib
 
 from flask import request, current_app, Markup, json
 from werkzeug.urls import url_encode
@@ -24,7 +20,7 @@ from wtforms import ValidationError
 from wtforms.fields import DateField, Field
 from wtforms.widgets.core import Select, html_params
 
-from flaskbb._compat import to_bytes, to_unicode
+from flaskbb.utils.helpers import to_bytes, to_unicode
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -86,7 +82,7 @@ class RecaptchaValidator(object):
             'response': response
         })
 
-        http_response = http.urlopen(RECAPTCHA_VERIFY_SERVER, to_bytes(data))
+        http_response = urllib.request.urlopen(RECAPTCHA_VERIFY_SERVER, to_bytes(data))
 
         if http_response.code != 200:
             return False

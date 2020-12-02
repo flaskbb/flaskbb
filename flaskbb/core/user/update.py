@@ -10,11 +10,10 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 import attr
 
-from ..._compat import ABC
 from ..changesets import empty, is_empty
 
 

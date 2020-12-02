@@ -9,10 +9,9 @@
     :license: BSD, see LICENSE for more details
 """
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from inspect import isclass
 
-from .._compat import ABC
 
 empty = None
 

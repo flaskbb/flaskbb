@@ -8,13 +8,11 @@
     :copyright: (c) 2018 the FlaskBB Team
     :license: BSD, see LICENSE for more details
 """
-
-from abc import abstractproperty
+from abc import ABC, abstractproperty
 from enum import Enum
 
 import attr
 
-from .._compat import ABC
 
 __all__ = (
     "NavigationContentType",

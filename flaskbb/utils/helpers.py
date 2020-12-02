@@ -38,19 +38,27 @@ from pytz import UTC
 from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
 
-from flaskbb._compat import (iteritems, range_method, string_types, text_type,
-                             to_bytes, to_unicode)
 from flaskbb.extensions import babel, redis_store
 from flaskbb.utils.settings import flaskbb_config
 
-try:  # compat
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 logger = logging.getLogger(__name__)
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+
+
+def to_bytes(text, encoding="utf-8"):
+    """Transform string to bytes."""
+    if isinstance(text, str):
+        text = text.encode(encoding)
+    return text
+
+
+def to_unicode(input_bytes, encoding="utf-8"):
+    """Decodes input_bytes to text if needed."""
+    if not isinstance(input_bytes, str):
+        input_bytes = input_bytes.decode(encoding)
+    return input_bytes
 
 
 def slugify(text, delim=u"-"):
@@ -65,7 +73,7 @@ def slugify(text, delim=u"-"):
     for word in _punct_re.split(text.lower()):
         if word:
             result.append(word)
-    return text_type(delim.join(result))
+    return str(delim.join(result))
 
 
 def redirect_or_next(endpoint, **kwargs):
@@ -366,7 +374,7 @@ def get_online_users(guest=False):  # pragma: no cover
     :param guest: If True, it will return the online guests
     """
     current = int(time.time()) // 60
-    minutes = range_method(flaskbb_config["ONLINE_LAST_MINUTES"])
+    minutes = range(flaskbb_config["ONLINE_LAST_MINUTES"])
     if guest:
         users = redis_store.sunion(
             ["online-guests/%d" % (current - x) for x in minutes]
@@ -647,7 +655,7 @@ def app_config_from_env(app, prefix="FLASKBB_"):
     :param app: The application object.
     :param prefix: The prefix of the environment variables.
     """
-    for key, value in iteritems(os.environ):
+    for key, value in os.environ.items():
         if key.startswith(prefix):
             key = key[len(prefix) :]
             try:
@@ -672,7 +680,7 @@ def get_flaskbb_config(app, config_file):
     """
     if config_file is not None:
         # config is an object
-        if not isinstance(config_file, string_types):
+        if not isinstance(config_file, str):
             return config_file
 
         # config is a file

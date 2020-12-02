@@ -9,12 +9,11 @@
     :copyright: (c) 2014-2018 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details
 """
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 import attr
 from flask_babelplus import gettext as _
 
-from .._compat import ABC
 from .exceptions import BaseFlaskBBError
 
 

@@ -10,7 +10,6 @@
 """
 import logging
 
-from flaskbb._compat import iteritems
 from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import SettingValueType, generate_settings_form
@@ -75,7 +74,7 @@ class Setting(db.Model, CRUDMixin):
         :param settings: A dictionary with setting items.
         """
         # update the database
-        for key, value in iteritems(settings):
+        for key, value in settings.items():
             setting = cls.query.filter(Setting.key == key.lower()).first()
 
             setting.value = value

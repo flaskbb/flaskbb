@@ -6,9 +6,8 @@
     :license: BSD, see LICENSE for more details
 """
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
-from ..._compat import ABC
 from ..exceptions import BaseFlaskBBError
 
 

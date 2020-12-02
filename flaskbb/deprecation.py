@@ -8,15 +8,13 @@
     :copyright: (c) 2018 the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-
+from abc import ABC
 import inspect
 import warnings
 from abc import abstractproperty
 from functools import wraps
 
 from flask_babelplus import gettext as _
-
-from ._compat import ABC
 
 
 class FlaskBBWarning(Warning):
