@@ -94,6 +94,7 @@ install_requires = [
     "Werkzeug>=1.0.1",
     "Whoosh>=2.7.4",
     "WTForms>=2.3.3",
+    "WTForms-SQLAlchemy>=0.2",
 ]
 
 

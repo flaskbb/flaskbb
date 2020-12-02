@@ -23,7 +23,7 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.validators import (
     URL,
     DataRequired,
