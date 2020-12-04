@@ -34,8 +34,8 @@ from flaskbb.plugins.utils import validate_plugin
 from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
 from flaskbb.utils.helpers import (get_online_users, register_view,
-                                   render_template, time_diff, time_utcnow,
-                                   FlashAndRedirect)
+                                   render_template, redirect_or_next,
+                                   time_diff, time_utcnow, FlashAndRedirect)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator,
                                         IsAtleastSuperModerator)
@@ -478,7 +478,8 @@ class BanUser(MethodView):
             flash(_("User is now banned."), "success")
         else:
             flash(_("Could not ban user."), "danger")
-        return redirect(url_for("management.banned_users"))
+
+        return redirect_or_next(url_for("management.banned_users"))
 
 
 class UnbanUser(MethodView):
@@ -541,7 +542,7 @@ class UnbanUser(MethodView):
         else:
             flash(_("Could not unban user."), "danger")
 
-        return redirect(url_for("management.banned_users"))
+        return redirect_or_next(url_for("management.users"))
 
 
 class Groups(MethodView):
@@ -1040,13 +1041,13 @@ class MarkReportRead(MethodView):
                     _("Report %(id)s is already marked as read.", id=report.id),
                     "success"
                 )
-                return redirect(url_for("management.reports"))
+                return redirect_or_next(url_for("management.reports"))
 
             report.zapped_by = current_user.id
             report.zapped = time_utcnow()
             report.save()
             flash(_("Report %(id)s marked as read.", id=report.id), "success")
-            return redirect(url_for("management.reports"))
+            return redirect_or_next(url_for("management.reports"))
 
         # mark all as read
         reports = Report.query.filter(Report.zapped == None).all()
@@ -1060,7 +1061,7 @@ class MarkReportRead(MethodView):
         db.session.commit()
 
         flash(_("All reports were marked as read."), "success")
-        return redirect(url_for("management.reports"))
+        return redirect_or_next(url_for("management.reports"))
 
 
 class DeleteReport(MethodView):
@@ -1108,7 +1109,7 @@ class DeleteReport(MethodView):
         report = Report.query.filter_by(id=report_id).first_or_404()
         report.delete()
         flash(_("Report deleted."), "success")
-        return redirect(url_for("management.reports"))
+        return redirect_or_next(url_for("management.reports"))
 
 
 class CeleryStatus(MethodView):

@@ -19,6 +19,7 @@ import warnings
 from datetime import datetime, timedelta
 from email import message_from_string
 from functools import wraps
+from urllib.parse import urlparse, urljoin
 
 import pkg_resources
 import requests
@@ -63,10 +64,10 @@ def to_unicode(input_bytes, encoding="utf-8"):
 
 def slugify(text, delim=u"-"):
     """Generates an slightly worse ASCII-only slug.
-    Taken from the Flask Snippets page.
+     Taken from the Flask Snippets page.
 
-   :param text: The text which should be slugified
-   :param delim: Default "-". The delimeter for whitespace
+    :param text: The text which should be slugified
+    :param delim: Default "-". The delimeter for whitespace
     """
     text = unidecode.unidecode(text)
     result = []
@@ -76,13 +77,40 @@ def slugify(text, delim=u"-"):
     return str(delim.join(result))
 
 
-def redirect_or_next(endpoint, **kwargs):
+def is_safe_url(target):
+    """Check if target will lead to the same server
+    Ref: https://web.archive.org/web/20190128010142/http://flask.pocoo.org/snippets/62/
+
+    :param target: The redirect target
+    """
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return (
+        test_url.scheme in ("http", "https")
+        and ref_url.netloc == test_url.netloc
+    )
+
+
+def redirect_url(endpoint, use_referrer=True):
+    """Generates a redirect url based on the referrer or endpoint."""
+    targets = [endpoint]
+    if use_referrer:
+        targets.insert(0, request.referrer)
+    for target in targets:
+        if target and is_safe_url(target):
+            return target
+
+
+def redirect_or_next(endpoint, use_referrer=True):
     """Redirects the user back to the page they were viewing or to a specified
     endpoint. Wraps Flasks :func:`Flask.redirect` function.
 
     :param endpoint: The fallback endpoint.
     """
-    return redirect(request.args.get("next") or endpoint, **kwargs)
+    return redirect(
+        request.args.get("next")
+        or redirect_url(endpoint, use_referrer)
+    )
 
 
 def render_template(template, **context):  # pragma: no cover
@@ -179,34 +207,34 @@ def do_topic_action(topics, user, action, reverse):  # noqa: C901
 
 def get_categories_and_forums(query_result, user):
     """Returns a list with categories. Every category has a list for all
-    their associated forums.
+     their associated forums.
 
-    The structure looks like this::
-        [(<Category 1>,
-          [(<Forum 1>, None),
-           (<Forum 2>, <flaskbb.forum.models.ForumsRead at 0x38fdb50>)]),
-         (<Category 2>,
-          [(<Forum 3>, None),
-          (<Forum 4>, None)])]
+     The structure looks like this::
+         [(<Category 1>,
+           [(<Forum 1>, None),
+            (<Forum 2>, <flaskbb.forum.models.ForumsRead at 0x38fdb50>)]),
+          (<Category 2>,
+           [(<Forum 3>, None),
+           (<Forum 4>, None)])]
 
-    and to unpack the values you can do this::
-        In [110]: for category, forums in x:
-           .....:     print category
-           .....:     for forum, forumsread in forums:
-           .....:         print "\t", forum, forumsread
+     and to unpack the values you can do this::
+         In [110]: for category, forums in x:
+            .....:     print category
+            .....:     for forum, forumsread in forums:
+            .....:         print "\t", forum, forumsread
 
-   This will print something like this:
-        <Category 1>
-            <Forum 1> None
-            <Forum 2> <flaskbb.forum.models.ForumsRead object at 0x38fdb50>
-        <Category 2>
-            <Forum 3> None
-            <Forum 4> None
+    This will print something like this:
+         <Category 1>
+             <Forum 1> None
+             <Forum 2> <flaskbb.forum.models.ForumsRead object at 0x38fdb50>
+         <Category 2>
+             <Forum 3> None
+             <Forum 4> None
 
-    :param query_result: A tuple (KeyedTuple) with all categories and forums
+     :param query_result: A tuple (KeyedTuple) with all categories and forums
 
-    :param user: The user object is needed because a signed out user does not
-                 have the ForumsRead relation joined.
+     :param user: The user object is needed because a signed out user does not
+                  have the ForumsRead relation joined.
     """
     it = itertools.groupby(query_result, operator.itemgetter(0))
 
@@ -611,8 +639,7 @@ def get_alembic_locations(plugin_dirs):
     the unique identifier of the plugin.
     """
     branches_dirs = [
-        tuple([os.path.basename(os.path.dirname(p)), p])
-        for p in plugin_dirs
+        tuple([os.path.basename(os.path.dirname(p)), p]) for p in plugin_dirs
     ]
 
     return branches_dirs
