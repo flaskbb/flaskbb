@@ -13,9 +13,31 @@
             <div class="panel page-panel">
                 <div class="panel-heading page-head">
                     <a href="{{ user.url }}">{{ user.username }}</a>
-                    {% if current_user|can_edit_user %}
-                    <a class="btn btn-xs btn-default pull-right" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                    <div class="pull-right">
+                    {# Ban user #}
+                    {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                    <form class="inline-form" method="post" action="{{ url_for('management.ban_user', user_id=user.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-xs btn-danger">
+                            <i class="fa fa-ban"></i> {% trans %}Ban{% endtrans %}
+                        </button>
+                    </form>
                     {% endif %}
+
+                    {# Unban user #}
+                    {% if current_user|can_ban_user and user.permissions['banned'] %}
+                    <form class="inline-form" method="post" action="{{ url_for('management.unban_user', user_id=user.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button class="btn btn-xs btn-warning">
+                            <i class="fa fa-ban"></i> {% trans %}Unban{% endtrans %}
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    {% if current_user|can_edit_user %}
+                    <a class="btn btn-xs btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                    {% endif %}
+                    </div>
                 </div>
                 <div class="panel-body page-body profile-body">
                     {% block profile_sidebar %}
