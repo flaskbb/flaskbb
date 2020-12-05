@@ -157,7 +157,7 @@ class DefaultConfig(object):
     SQLALCHEMY_ECHO = False
 
     ALEMBIC = {
-        'script_location': os.path.join(basedir, "migrations"),
+        'script_location': os.path.join(basedir, "flaskbb/migrations"),
         'version_locations': '',
         'file_template': '%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s'
     }
