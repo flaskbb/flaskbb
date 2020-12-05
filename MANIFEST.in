@@ -14,7 +14,6 @@ include requirements-dev.txt
 
 graft flaskbb
 graft tests
-graft migrations
 
 prune flaskbb/themes/*/node_modules
 prune flaskbb/themes/*/.sass-cache
@@ -23,3 +22,6 @@ prune flaskbb/themes/*/src/*
 global-exclude __pycache__
 global-exclude *.py[co]
 global-exclude *.sw[a-z]
+global-exclude *.log
+global-exclude .directory
+global-exclude .coverage
