@@ -2,29 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
-
-
-class PyTestCommand(TestCommand):
-    user_options = [("pytest-args=", "a", "Arguments to pass to py.test")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = []
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest  # noqa
-
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
 
 
 def read(*parts):
@@ -144,5 +123,4 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    cmdclass={"test": PyTestCommand},
 )
