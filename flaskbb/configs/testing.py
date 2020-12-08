@@ -28,10 +28,12 @@ class TestingConfig(DefaultConfig):
     # Use the in-memory storage
     WHOOSHEE_MEMORY_STORAGE = True
 
-    CELERY_ALWAYS_EAGER = True
-    CELERY_RESULT_BACKEND = "cache"
-    CELERY_CACHE_BACKEND = "memory"
-    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+    CELERY_CONFIG = {
+        "always_eager": True,
+        "eager_propagates_exceptions": True,
+        "result_backend": "cache",
+        "cache_backend": "memory",
+    }
 
     LOG_DEFAULT_CONF = {
         'version': 1,
