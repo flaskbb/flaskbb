@@ -11,7 +11,6 @@
     :copyright: (c) 2016 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-import os
 from flaskbb.app import create_app
 from flaskbb.extensions import celery  # noqa
 

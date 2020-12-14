@@ -132,9 +132,9 @@ def configure_app(app, config):
     old_celery_config = app.config.get_namespace('CELERY_')
     celery_config = {}
     for key, value in old_celery_config.items():
-        config_key = f"CELERY_{key.upper()}"
         # config is the new format
         if key != "config":
+            config_key = f"CELERY_{key.upper()}"
             celery_config[key] = value
             try:
                 del app.config[config_key]
