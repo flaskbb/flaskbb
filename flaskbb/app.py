@@ -78,6 +78,8 @@ def create_app(config=None, instance_path=None):
                    For example, if the config is specified via an file
                    and a ENVVAR, it will load the config via the file and
                    later overwrite it from the ENVVAR.
+                   If no config is provided, FlaskBB will try to load the
+                   config named ``flaskbb.cfg`` from the instance path.
     """
 
     app = Flask(
