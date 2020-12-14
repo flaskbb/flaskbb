@@ -304,7 +304,12 @@ def shell_command():
 
     try:
         import IPython
-        IPython.embed(banner1=banner, user_ns=ctx)
+        from traitlets.config import get_config
+
+        c = get_config()
+        # This makes the prompt to use colors again
+        c.InteractiveShellEmbed.colors = "Linux"
+        IPython.embed(config=c, banner1=banner, user_ns=ctx)
     except ImportError:
         code.interact(banner=banner, local=ctx)
 
