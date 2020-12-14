@@ -107,8 +107,11 @@ REDIS_DATABASE = 0
 
 # Celery
 # ------------------------------
-CELERY_BROKER_URL = "{{ redis_uri }}"
-CELERY_RESULT_BACKEND = "{{ redis_uri }}"
+CELERY_CONFIG = {
+    "broker_url": "{{ redis_uri }}",
+    "result_backend": "{{ redis_uri }}",
+    "broker_transport_options": {"max_retries": 1},
+}
 
 
 # Rate Limiting

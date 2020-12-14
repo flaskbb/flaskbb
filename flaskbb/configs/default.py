@@ -265,10 +265,11 @@ class DefaultConfig(object):
     REDIS_DATABASE = 0
 
     # Celery
-    CELERY_BROKER_URL = 'redis://localhost:6379'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-    BROKER_TRANSPORT_OPTIONS = {'max_retries': 1}  # necessary as there's no default
-
+    CELERY_CONFIG = {
+        "broker_url": 'redis://localhost:6379',
+        "result_backend": 'redis://localhost:6379',
+        "broker_transport_options": {'max_retries': 1},
+    }
 
     # FlaskBB Settings
     # ------------------------------ #

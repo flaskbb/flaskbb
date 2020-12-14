@@ -18,7 +18,6 @@ from datetime import datetime
 
 import click
 import click_log
-from celery.bin.celery import CeleryCommand
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from flask_alembic import alembic_click
@@ -270,9 +269,7 @@ def upgrade(all_latest, fixture, force):
 @with_appcontext
 def start_celery(ctx):
     """Preconfigured wrapper around the 'celery' command."""
-    CeleryCommand(celery).execute_from_commandline(
-        ["flaskbb celery"] + ctx.args
-    )
+    celery.start(ctx.args)
 
 
 @flaskbb.command("shell", short_help="Runs a shell in the app context.")
