@@ -95,7 +95,7 @@ def redirect_or_next(endpoint, use_referrer=True):
     :param endpoint: The fallback endpoint.
     """
     return redirect(
-        request.args.get("next")
+        redirect_url(request.args.get("next"), use_referrer)
         or redirect_url(endpoint, use_referrer)
     )
 
