@@ -9,7 +9,7 @@ def push_onto_request_context(**kw):
         setattr(_request_ctx_stack.top, name, value)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def request_context(application):
     with application.test_request_context():
         yield

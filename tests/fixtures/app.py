@@ -6,7 +6,7 @@ from flaskbb.extensions import db
 from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
-@pytest.yield_fixture(autouse=True)
+@pytest.fixture(autouse=True)
 def application():
     """application with context."""
     app = create_app(Config)
@@ -19,7 +19,7 @@ def application():
     ctx.pop()
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def request_context(application):
     with application.test_request_context():
         yield
@@ -43,7 +43,7 @@ def default_settings(database):
     return create_default_settings()
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def database():
     """database setup."""
     db.create_all()  # Maybe use migration instead?
