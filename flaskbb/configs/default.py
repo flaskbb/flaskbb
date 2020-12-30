@@ -47,6 +47,12 @@ class DefaultConfig(object):
     # This only affects the url generation with 'url_for'.
     PREFERRED_URL_SCHEME = "http"
 
+    # Allowed Hosts
+    # A List of allowed hosts who will be considered "safe" when redirecting
+    # urls. If set to None only the host currently serving this website
+    # will be considered "safe".
+    ALLOWED_HOSTS = None
+
     # Logging Settings
     # ------------------------------
     # This config section will deal with the logging settings

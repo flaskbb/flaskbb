@@ -19,7 +19,6 @@ import warnings
 from datetime import datetime, timedelta
 from email import message_from_string
 from functools import wraps
-from urllib.parse import urlparse, urljoin
 
 import pkg_resources
 import requests
@@ -28,7 +27,7 @@ from babel.core import get_locale_identifier
 from babel.dates import format_date as babel_format_date
 from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_timedelta as babel_format_timedelta
-from flask import flash, g, redirect, request, session, url_for
+from flask import current_app, flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
@@ -40,6 +39,7 @@ from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
 
 from flaskbb.extensions import babel, redis_store
+from flaskbb.utils.http import is_safe_url
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -77,27 +77,14 @@ def slugify(text, delim=u"-"):
     return str(delim.join(result))
 
 
-def is_safe_url(target):
-    """Check if target will lead to the same server
-    Ref: https://web.archive.org/web/20190128010142/http://flask.pocoo.org/snippets/62/
-
-    :param target: The redirect target
-    """
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return (
-        test_url.scheme in ("http", "https")
-        and ref_url.netloc == test_url.netloc
-    )
-
-
 def redirect_url(endpoint, use_referrer=True):
     """Generates a redirect url based on the referrer or endpoint."""
     targets = [endpoint]
+    allowed_hosts = current_app.config["ALLOWED_HOSTS"]
     if use_referrer:
         targets.insert(0, request.referrer)
     for target in targets:
-        if target and is_safe_url(target):
+        if target and is_safe_url(target, allowed_hosts):
             return target
 
 
