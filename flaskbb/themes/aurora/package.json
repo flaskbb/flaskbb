@@ -47,6 +47,6 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.5.1",
     "jquery-textcomplete": "^1.8.5",
-    "marked": "^1.2.5"
+    "marked": "^2.0.0"
   }
 }
