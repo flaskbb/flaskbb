@@ -12,7 +12,7 @@ Links
 -----
 
 `website <https://flaskbb.org>`_ |
-`documentation <https://flaskbb.readthedocs.org/en/latest/index.html/>`_ |
+`documentation <https://flaskbb.readthedocs.org/en/latest/index.html>`_ |
 `source code <https://github.com/sh4nks/flaskbb>`_
 
 
