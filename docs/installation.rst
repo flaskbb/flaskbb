@@ -11,8 +11,7 @@ Installation
 Basic Setup
 -----------
 
-We recommend installing FlaskBB in an isolated Python environment. This can be
-achieved with `virtualenv`_. In our little guide we will use a wrapper around
+We recommend installing FlaskBB in an isolated Python environment using `virtualenv`_. In our little guide we will use a wrapper around
 virtualenv - the `virtualenvwrapper`_. In addition to virtualenv, we will also
 use the package manager `pip`_ to install the dependencies for FlaskBB.
 
@@ -44,7 +43,7 @@ This will create a virtualenv named ``flaskbb`` using the python interpreter in
 version 2 and it will set your project directory to ``/path/to/flaskbb``.
 This comes handy when typing ``workon flaskbb`` as it will change your
 current directory automatically to ``/path/to/flaskbb``.
-To deactivate it you just have to type ``deactivate`` and if you want to work
+To deactivate it, you just have to type ``deactivate`` and if you want to work
 on it again, just type ``workon flaskbb``.
 
 It is also possible to use ``virtualenv`` without the ``virtualenvwrapper``.
@@ -123,8 +122,8 @@ Production
 
 FlaskBB already sets some sane defaults, so you shouldn't have to change much.
 To make this whole process a little bit easier for you, we have created
-a little wizard which will ask you some questions and with the answers
-you provide it will generate a configuration for you. You can of course
+a little wizard which will ask you some questions and based on the answers that
+you provide, it will generate a configuration for you. You can of course
 further adjust the generated configuration.
 
 The setup wizard can be started with::
@@ -132,8 +131,8 @@ The setup wizard can be started with::
     flaskbb makeconfig
 
 
-These are the only settings you have to make sure to setup accordingly if
-you want to run FlaskBB in production:
+To be able to run FlaskBB in production, the only settings 
+that you need to modify are the following:
 
 - ``SERVER_NAME = "example.org"``
 - ``PREFERRED_URL_SCHEME = "https"``
@@ -261,8 +260,8 @@ or::
 
     flaskbb install
 
-During the installation process you are asked about your username,
-your email address and the password for your administrator user. Using the
+During the installation process, you will be asked to provide a username, email adddress 
+and password for your administrator user. Using the
 ``make install`` command is recommended as it checks that the dependencies
 are also installed.
 
@@ -281,7 +280,7 @@ Deploying
 
 This chapter will describe how to set up Supervisor + uWSGI + nginx for
 FlaskBB as well as document how to use the built-in WSGI server (gunicorn)
-that can be used in a productive environment.
+that can be used in a production environment.
 
 
 Supervisor
@@ -301,7 +300,7 @@ the configuration to the end in the ``/etc/supervisor/supervisord.conf`` file.
 The second way would be to create a new file in the ``/etc/supervisor/conf.d/``
 directory. For example, such a file could be named ``uwsgi.conf``.
 
-After you have choosen the you way you like, simply put the snippet below in the
+After you have chosen the way you like, simply put the snippet below in the
 configuration file.
 
 ::
@@ -331,7 +330,7 @@ For the configuration, you need to create a file in the
 file ``flaskbb.ini``. After that, you can start with configuring it.
 My config looks like this for `flaskbb.org` (see below). As you might have noticed, I'm
 using a own user for my apps whose home directory is located at `/var/apps/`.
-In this directory there are living all my Flask apps.
+All my flask apps live in this directory.
 
 ::
 
