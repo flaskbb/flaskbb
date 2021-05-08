@@ -45,7 +45,7 @@ install_requires = [
     "flaskbb-plugin-conversations>=1.0.7",
     "flaskbb-plugin-portal>=1.1.3",
     "future>=0.18.2",
-    "idna>=2.10",
+    "idna<3",
     "itsdangerous>=1.1.0",
     "Jinja2>=2.11.2",
     "kombu>=5.0.2",
