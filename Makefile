@@ -23,10 +23,13 @@ clean:
 	find . -name '__pycache__' -exec rm -rf {} +
 
 test:
-	tox
+	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose run --rm flaskbb tox
+
+prepare:
+	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose build 
 
 run:
-	flaskbb run --debugger --reload
+	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose up
 
 devconfig:dependencies
 	flaskbb makeconfig -d

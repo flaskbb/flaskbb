@@ -14,8 +14,8 @@ COPY . /app
 WORKDIR /app
 
 RUN set -ex \
-    && apk add zlib-dev jpeg-dev \
-    && apk add --no-cache --virtual .build-deps build-base git\
+    && apk add zlib-dev jpeg-dev git \
+    && apk add --no-cache --virtual .build-deps build-base \
     && pip install -r requirements-dev.txt \
     && pip install psycopg2 \
     && apk del .build-deps
