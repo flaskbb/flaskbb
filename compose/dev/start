@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+flaskbb --config flaskbb.cfg install -f -u admin -p admin -e admin@admin.com
+flaskbb --config flaskbb-dev.cfg run --host=0.0.0.0
+
+exec "$@"

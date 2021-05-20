@@ -1,0 +1,52 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_static_data: {}
+
+services:
+
+  flaskbb:
+    build:
+      context: .
+      dockerfile: ./compose/prod/flaskbb/Dockerfile
+    image: flaskbb/prod
+    volumes: 
+      - local_static_data:/app/flaskbb
+    depends_on:
+      - postgres
+      - redis
+      - celery
+    env_file:
+      - ./.environments/prod/postgres/.postgres
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/prod/nginx/Dockerfile
+    image: nginx-flaskbb
+    volumes:
+      - local_static_data:/var/apps/flaskbb
+    ports:
+      - 80:80
+
+  celery:
+    build:
+      context: .
+      dockerfile: ./compose/prod/flaskbb/Dockerfile
+    command: "flaskbb --config /app/flaskbb.cfg celery worker"
+    image: flaskbb/prod
+    env_file:
+      - ./.environments/prod/postgres/.postgres
+    depends_on:
+      - redis
+     
+  postgres:
+    image: postgres:10.5
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.environments/prod/postgres/.postgres
+
+  redis:
+    image: redis
