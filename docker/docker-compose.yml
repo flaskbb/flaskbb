@@ -8,8 +8,8 @@ services:
 
   flaskbb:
     build:
-      context: .
-      dockerfile: ./compose/prod/flaskbb/Dockerfile
+      context: ../
+      dockerfile: ./docker/prod/flaskbb/Dockerfile
     image: flaskbb/prod
     volumes: 
       - local_static_data:/app/flaskbb
@@ -22,19 +22,18 @@ services:
 
   nginx:
     build:
-      context: .
-      dockerfile: ./compose/prod/nginx/Dockerfile
+      context: ../
+      dockerfile: ./docker/prod/nginx/Dockerfile
     image: nginx-flaskbb
     volumes:
       - local_static_data:/var/apps/flaskbb
+    depends_on:
+      - flaskbb
     ports:
       - 80:80
 
   celery:
-    build:
-      context: .
-      dockerfile: ./compose/prod/flaskbb/Dockerfile
-    command: "flaskbb --config /app/flaskbb.cfg celery worker"
+    command: "flaskbb --config /app/docker/config/prod/flaskbb.cfg celery worker"
     image: flaskbb/prod
     env_file:
       - ./.environments/prod/postgres/.postgres

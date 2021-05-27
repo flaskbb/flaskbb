@@ -1,0 +1,52 @@
+
+.PHONY: clean install help test lint isort run dependencies docs wheel upload
+
+help:
+	@echo "  build           generate docker images for development (install all dependencies)"
+	@echo "  test            			 run the testsuite in container"
+	@echo "  run             			 run the development server with the development config"
+	@echo "  enter           			 enter to container shell"
+	@echo "  shell                       enter to flaskbb dev shell"
+	@echo "  destroy                     delete development container"
+	@echo "  destroy-dev-storage         delete development persisten storage (Database and Assets)"
+	@echo "  build-prod      			 generate docker images for production (install all dependencies)"
+	@echo "  run-prod        			 run the development server with the development config"
+	@echo "  destroy-prod                delete production container container"
+	@echo "  destroy-prod-storage        delete development persisten storage (Database and Assets) be carefull this can delete all production data"
+
+build:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose build
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose run --rm --service-ports flaskbb flaskbb --config ./docker/config/dev/flaskbb-dev.cfg install -f -u admin -p admin -e admin@admin.com
+
+test:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose run --rm flaskbb tox
+
+run:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose up
+
+enter:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose run --rm --service-ports flaskbb bash
+
+shell:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose run --rm --service-ports flaskbb flaskbb shell
+
+destroy:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose down
+
+destroy-dev-storage:
+	export COMPOSE_FILE=docker/docker-compose-dev.yml; docker-compose down
+	docker volume rm  docker_local_postgres_data docker_local_static_data
+
+build-prod:
+	export COMPOSE_FILE=docker/docker-compose.yml; docker-compose build
+	export COMPOSE_FILE=docker/docker-compose.yml; docker-compose run --rm --service-ports flaskbb flaskbb --config ./docker/config/prod/flaskbb.cfg install -f -u admin -p admin -e admin@admin.com
+
+run-prod:
+	export COMPOSE_FILE=docker/docker-compose.yml; docker-compose up
+
+destroy-prod:
+	export COMPOSE_FILE=docker/docker-compose.yml; docker-compose down
+
+destroy-prod-storage:
+	export COMPOSE_FILE=docker/docker-compose.yml; docker-compose down
+	docker volume rm  docker_local_postgres_data docker_local_static_data

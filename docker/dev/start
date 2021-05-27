@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+flaskbb --config ./docker/config/dev/flaskbb-dev.cfg run --host=0.0.0.0
+
+exec "$@"

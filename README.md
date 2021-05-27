@@ -42,7 +42,14 @@ This is how you set up an development instance of FlaskBB:
     * `make run`
 * Visit [localhost:5000](http://localhost:5000)
 
+If you have docker and docker-compose installled on your system you can run this command for automatic setup of the project
 
+* Configuration
+    * `make -f Makefile.docker build`
+
+* Run the development server
+    * `make -f Makefile.docker run`
+* Visit [localhost:5000](http://localhost:5000)
 ## License
 
 FlaskBB is licensed under the [BSD License](https://github.com/flaskbb/flaskbb/blob/master/LICENSE).

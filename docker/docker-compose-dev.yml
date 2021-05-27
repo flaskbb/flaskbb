@@ -7,11 +7,11 @@ services:
 
   flaskbb:
     build:
-      context: .
-      dockerfile: ./compose/dev/Dockerfile
+      context: ../
+      dockerfile: ./docker/dev/Dockerfile
     image: flaskbb/test
     volumes:
-      - ./flaskbb:/app/flaskbb
+      - ../flaskbb:/app/flaskbb
     depends_on:
       - postgres
       - redis
@@ -22,10 +22,7 @@ services:
       - 5000:5000
 
   celery:
-    build:
-      context: .
-      dockerfile: ./compose/dev/Dockerfile
-    command: "flaskbb --config /app/flaskbb.cfg celery worker"
+    command: "flaskbb --config /app/docker/config/dev/flaskbb-dev.cfg celery worker"
     image: flaskbb/test
     env_file:
       - ./.environments/dev/postgres/.postgres

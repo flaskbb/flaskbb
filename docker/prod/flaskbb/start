@@ -4,7 +4,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-flaskbb --config flaskbb.cfg install -f -u admin -p admin -e admin@admin.com
+ln -s ./docker/config/prod/flaskbb.cfg flaskbb.cfg 
 gunicorn wsgi:flaskbb -b 0.0.0.0:5000
 
 exec "$@"

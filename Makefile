@@ -1,3 +1,4 @@
+
 .PHONY: clean install help test lint isort run dependencies docs wheel upload
 
 help:
@@ -23,13 +24,10 @@ clean:
 	find . -name '__pycache__' -exec rm -rf {} +
 
 test:
-	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose run --rm flaskbb tox
-
-prepare:
-	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose build 
+	tox
 
 run:
-	export COMPOSE_FILE=docker-compose-dev.yml; docker-compose up
+	flaskbb run --debugger --reload
 
 devconfig:dependencies
 	flaskbb makeconfig -d

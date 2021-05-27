@@ -25,7 +25,7 @@ RUN echo 'export PS1="\[\e[36m\]flaskbb>\[\e[m\] "' >> /root/.bashrc
 RUN echo 'export PYTHONPATH="${PYTHONPATH}:/app/"' >> /root/.bashrc
 RUN echo 'function flaskbb_local { flaskbb --config flaskbb-dev.cfg run --host=0.0.0.0; }' >> /root/.bashrc
 
-COPY ./compose/dev/start /
+COPY ./docker/dev/start /
 RUN chmod +x /start
 
 CMD ["/start"]
