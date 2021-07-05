@@ -74,7 +74,12 @@ class FlaskBBGroup(FlaskGroup):
         return super(FlaskBBGroup, self).list_commands(ctx)
 
 
-def make_app(script_info):
+def make_app():
+    ctx = click.get_current_context(silent=True)
+    script_info = None
+    if ctx is not None:
+        script_info = ctx.obj
+
     config_file = getattr(script_info, "config_file", None)
     instance_path = getattr(script_info, "instance_path", None)
     return create_app(config_file, instance_path)
