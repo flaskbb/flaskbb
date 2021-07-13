@@ -83,28 +83,26 @@ class UTCDateTime(db.TypeDecorator):
 
 
 class HideableQuery(BaseQuery):
+    _with_hidden = False
 
     def __new__(cls, *args, **kwargs):
-        inst = super(HideableQuery, cls).__new__(cls)
+        obj = super(HideableQuery, cls).__new__(cls)
         include_hidden = kwargs.pop("_with_hidden", False)
         has_view_hidden = current_user and current_user.permissions.get(
             "viewhidden", False
         )
-        with_hidden = include_hidden or has_view_hidden
+        obj._with_hidden = include_hidden or has_view_hidden
         if args or kwargs:
-            super(HideableQuery, inst).__init__(*args, **kwargs)
-            entity = inst._mapper_zero().class_
-            return inst.filter(
-                entity.hidden != True
-            ) if not with_hidden else inst
-        return inst
+            super(HideableQuery, obj).__init__(*args, **kwargs)
+            return obj.filter_by(hidden=False) if not obj._with_hidden else obj
+        return obj
 
     def __init__(self, *args, **kwargs):
         pass
 
     def with_hidden(self):
         return self.__class__(
-            db.class_mapper(self._mapper_zero().class_),
+            self._only_full_mapper_zero('get'),
             session=db.session(),
             _with_hidden=True,
         )
@@ -113,11 +111,8 @@ class HideableQuery(BaseQuery):
         return super(HideableQuery, self).get(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        include_hidden = kwargs.pop("include_hidden", False)
-        obj = self.with_hidden()._get(*args, **kwargs)
-        return obj if obj is not None and (
-            include_hidden or not obj.hidden
-        ) else None
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is None and (self._with_hidden or not obj.hidden) else None
 
 
 class HideableMixin(object):
