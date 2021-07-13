@@ -32,7 +32,7 @@ Flask-WTF==0.15.1
 flaskbb-plugin-conversations==1.0.7
 flaskbb-plugin-portal==1.1.3
 future==0.18.2
-idna==2.10
+idna==3.2
 itsdangerous==2.0.1
 Jinja2==3.0.1
 kombu==5.1.0
@@ -41,7 +41,7 @@ Mako==1.1.4
 MarkupSafe==2.0.1
 mistune==0.8.4
 olefile==0.46
-Pillow==8.2.0
+Pillow==8.3.1
 pluggy==0.13.1
 prompt-toolkit==3.0.19
 Pygments==2.9.0
@@ -49,8 +49,8 @@ python-dateutil==2.8.1
 python-editor==1.0.4
 pytz==2021.1
 redis==3.5.3
-requests==2.25.1
-simplejson==3.17.2
+requests==2.26
+simplejson==3.17.3
 six==1.16.0
 speaklater==1.3
 SQLAlchemy==1.3.24
