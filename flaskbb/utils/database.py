@@ -12,7 +12,7 @@ import logging
 import pytz
 from flask_login import current_user
 from flask_sqlalchemy import BaseQuery
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_mixin, declared_attr
 from flaskbb.extensions import db
 from ..core.exceptions import PersistenceError
 
@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 def make_comparable(cls):
-
     def __eq__(self, other):
         return isinstance(other, cls) and self.id == other.id
 
@@ -38,7 +37,6 @@ def make_comparable(cls):
 
 
 class CRUDMixin(object):
-
     def __repr__(self):
         return "<{}>".format(self.__class__.__name__)
 
@@ -62,6 +60,7 @@ class CRUDMixin(object):
 
 class UTCDateTime(db.TypeDecorator):
     impl = db.DateTime
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         """Way into the database."""
@@ -102,7 +101,7 @@ class HideableQuery(BaseQuery):
 
     def with_hidden(self):
         return self.__class__(
-            self._only_full_mapper_zero('get'),
+            self._only_full_mapper_zero("get"),
             session=db.session(),
             _with_hidden=True,
         )
@@ -111,10 +110,13 @@ class HideableQuery(BaseQuery):
         return super(HideableQuery, self).get(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        obj = self.with_deleted()._get(*args, **kwargs)
-        return obj if obj is None and (self._with_hidden or not obj.hidden) else None
+        obj = self.with_hidden()._get(*args, **kwargs)
+        return (
+            obj if obj is None or self._with_hidden or not obj.hidden else None
+        )
 
 
+@declarative_mixin
 class HideableMixin(object):
     query_class = HideableQuery
 

@@ -41,7 +41,7 @@ metadata = MetaData(
         "pk": "pk_%(table_name)s",
     }
 )
-db = SQLAlchemy(metadata=metadata)
+db = SQLAlchemy(metadata=metadata, session_options={"future": True})
 
 # Whooshee (Full Text Search)
 whooshee = Whooshee()
