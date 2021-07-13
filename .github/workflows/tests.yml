@@ -40,13 +40,27 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         
+    - name: Get pip cache dir
+      id: pip-cache
+      run: echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: pip|${{ runner.os }}|3.9|${{ hashFiles('requirements*.txt') }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install wheel
         pip install -r requirements-dev.txt
         pip install -e .
-        
+
+    - name: Prepare FlaskBB
+      run: |
+        flaskbb translations compile
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
