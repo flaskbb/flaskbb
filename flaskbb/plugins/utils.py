@@ -11,7 +11,7 @@
 """
 from flask import current_app, flash, redirect, url_for
 from flask_babelplus import gettext as _
-from jinja2 import Markup
+from markupsafe import Markup
 
 from flaskbb.extensions import db
 from flaskbb.plugins.models import PluginRegistry

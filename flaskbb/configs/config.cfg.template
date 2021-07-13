@@ -135,7 +135,7 @@ RATELIMIT_STORAGE_URL = "{% if redis_enabled %}{{ redis_uri }}{% else %}memory:/
 # ------------------------------
 # For all available caching types, have a look at the Flask-Cache docs
 # https://pythonhosted.org/Flask-Caching/#configuring-flask-caching
-CACHE_TYPE = "{% if redis_enabled %}redis{% else %}simple{% endif %}"
+CACHE_TYPE = "{% if redis_enabled %}RedisCache{% else %}SimpleCache{% endif %}"
 CACHE_DEFAULT_TIMEOUT = 60
 
 

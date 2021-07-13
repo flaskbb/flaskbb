@@ -13,7 +13,7 @@ import re
 
 import mistune
 from flask import url_for
-from jinja2 import Markup
+from markupsafe import Markup
 from pluggy import HookimplMarker
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
