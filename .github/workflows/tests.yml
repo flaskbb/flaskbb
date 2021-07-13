@@ -48,7 +48,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
-        key: pip|${{ runner.os }}|3.9|${{ hashFiles('requirements*.txt') }}
+        key: pip|${{ runner.os }}|${{ matrix.python-version }}|${{ hashFiles('requirements*.txt') }}
 
     - name: Install dependencies
       run: |
