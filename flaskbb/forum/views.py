@@ -149,13 +149,18 @@ class ViewPost(MethodView):
             math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"]))
         )
 
+        url_kwargs = {
+            "topic_id": post.topic.id,
+            "page": page,
+            "_anchor": f"pid{post.id}"
+        }
+        if post.topic.slug:
+            url_kwargs["slug"] = post.topic.slug
+
         return redirect(
             url_for(
                 "forum.view_topic",
-                topic_id=post.topic.id,
-                slug=post.topic.slug,
-                page=page,
-                _anchor="pid{}".format(post.id)
+                **url_kwargs
             )
         )
 
@@ -229,18 +234,16 @@ class ViewTopic(MethodView):
 
         if not form:
             flash(_("Cannot post reply"), "warning")
-            return redirect("forum.view_topic", topic_id=topic_id, slug=slug)
+            return redirect(topic.url)
 
         elif form.validate_on_submit():
             post = form.save(real(current_user), topic)
-            return redirect(url_for("forum.view_post", post_id=post.id))
+            return redirect(post.url)
 
         else:
             for e in form.errors.get("content", []):
                 flash(e, "danger")
-            return redirect(
-                url_for("forum.view_topic", topic_id=topic_id, slug=slug)
-            )
+            return redirect(topic.url)
 
     def form(self):
         if Permission(CanPostReply):
@@ -275,7 +278,7 @@ class NewTopic(MethodView):
         form = self.form()
         if form.validate_on_submit():
             topic = form.save(real(current_user), forum_instance)
-            return redirect(url_for("forum.view_topic", topic_id=topic.id))
+            return redirect(topic.url)
 
         return render_template(
             "forum/new_topic.html",
@@ -321,7 +324,7 @@ class EditTopic(MethodView):
             form.populate_obj(topic, post)
             topic = form.save(real(current_user), topic.forum)
 
-            return redirect(url_for("forum.view_topic", topic_id=topic.id))
+            return redirect(topic.url)
 
         return render_template(
             "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
@@ -545,7 +548,7 @@ class NewPost(MethodView):
 
         if form.validate_on_submit():
             post = form.save(real(current_user), topic)
-            return redirect(url_for("forum.view_post", post_id=post.id))
+            return redirect(post.url)
 
         return render_template("forum/new_post.html", topic=topic, form=form)
 
@@ -587,7 +590,7 @@ class EditPost(MethodView):
         if form.validate_on_submit():
             form.populate_obj(post)
             post = form.save(real(current_user), post.topic)
-            return redirect(url_for("forum.view_post", post_id=post.id))
+            return redirect(post.url)
 
         return render_template(
             "forum/new_post.html", topic=post.topic, form=form, edit_mode=True

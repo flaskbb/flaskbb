@@ -452,6 +452,8 @@ class Topic(HideableCRUDMixin, db.Model):
     @property
     def url(self):
         """Returns the slugified url for the topic."""
+        if not self.slug:
+            return url_for("forum.view_topic", topic_id=self.id)
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
     def __init__(self, title=None, user=None, content=None):
