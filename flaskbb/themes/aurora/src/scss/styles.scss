@@ -2,13 +2,18 @@
 @import "bootstrap-variables";
 
 // Import Bootstrap for Sass
-@import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap";
 
 // Import fontawesome icons
-@import "../../node_modules/font-awesome/scss/font-awesome";
+$fa-font-path: "~font-awesome/fonts";
+@import "~font-awesome/scss/font-awesome";
 
 // Import FlaskBB theme
 @import "aurora";
 
+// Import pygments style
+@import "pygments";
+
 // Import the Bootstrap-Markdown editor
-@import "../../node_modules/bootstrap-markdown/css/bootstrap-markdown.min";
+@import "~bootstrap-markdown/css/bootstrap-markdown.min";

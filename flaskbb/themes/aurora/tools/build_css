@@ -1,4 +1,0 @@
-sass \
-    src/scss/styles.scss:static/css/styles.css \
-    --load-path='node_modules/bootstrap-sass/assets/stylesheets/bootstrap node_modules/font-awesome/scss/font-awesome' \
-    --style='compressed'

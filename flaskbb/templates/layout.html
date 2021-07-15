@@ -20,10 +20,8 @@
         </title>
 
         {% block stylesheets %}
-        <!-- syntax highlighting -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
-        <!-- bootstrap & aurora theme -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <!-- style -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
         <!-- lato font -->
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
         <!-- emoji -->
@@ -170,7 +168,8 @@
 
         {% block javascript %}
         <!-- jquery and bootstrap and flaskbb.js -->
-        <script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='vendors.js') }}"></script>
+        <script src="{{ url_for('static', filename='app.js') }}"></script>
 
         <script type="text/javascript">
         var FORUM_URL_PREFIX="{{ config['FORUM_URL_PREFIX'] }}";
