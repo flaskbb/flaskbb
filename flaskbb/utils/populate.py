@@ -280,37 +280,38 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
     user2 = User.query.filter_by(id=2).first()
 
     # create 2 categories
-    for i in range(1, categories + 1):
-        category_title = "Test Category %s" % i
-        category = Category(title=category_title,
-                            description="Test Description")
-        category.save()
-        data_created['categories'] += 1
+    with db.session.no_autoflush:
+        for i in range(1, categories + 1):
+            category_title = "Test Category %s" % i
+            category = Category(title=category_title,
+                                description="Test Description")
+            category.save()
+            data_created['categories'] += 1
 
-        # create 2 forums in each category
-        for j in range(1, forums + 1):
-            if i == 2:
-                j += 2
+            # create 2 forums in each category
+            for j in range(1, forums + 1):
+                if i == 2:
+                    j += 2
 
-            forum_title = "Test Forum %s %s" % (j, i)
-            forum = Forum(title=forum_title, description="Test Description",
-                          category_id=i)
-            forum.save()
-            data_created['forums'] += 1
+                forum_title = "Test Forum %s %s" % (j, i)
+                forum = Forum(title=forum_title, description="Test Description",
+                              category_id=i)
+                forum.save()
+                data_created['forums'] += 1
 
-            for _ in range(1, topics + 1):
-                # create a topic
-                topic = Topic(title="Test Title %s" % j)
-                post = Post(content="Test Content")
+                for _ in range(1, topics + 1):
+                    # create a topic
+                    topic = Topic(title="Test Title %s" % j)
+                    post = Post(content="Test Content")
+                    topic.save(post=post, user=user1, forum=forum)
+                    data_created['topics'] += 1
 
-                topic.save(post=post, user=user1, forum=forum)
-                data_created['topics'] += 1
-
-                for _ in range(1, posts + 1):
-                    # create a second post in the forum
-                    post = Post(content="Test Post")
-                    post.save(user=user2, topic=topic)
-                    data_created['posts'] += 1
+                    for _ in range(1, posts + 1):
+                        # create a second post in the forum
+                        post = Post(content="Test Post")
+                        #db.session.add_all([post, user2, topic])
+                        post.save(user=user2, topic=topic)
+                        data_created['posts'] += 1
 
     return data_created
 
@@ -337,46 +338,27 @@ def insert_bulk_data(topic_count=10, post_count=100):
     if not (user1 or user2 or forum):
         return False
 
-    db.session.begin(subtransactions=True)
-
-    for i in range(1, topic_count + 1):
-        last_post_id += 1
-
-        # create a topic
-        topic = Topic(title="Test Title %s" % i)
-        post = Post(content="First Post")
-        topic.save(post=post, user=user1, forum=forum)
-        created_topics += 1
-
-        # create some posts in the topic
-        for _ in range(1, post_count + 1):
+    with db.session.no_autoflush:
+        for i in range(1, topic_count + 1):
             last_post_id += 1
-            post = Post(content="Some other Post", user=user2, topic=topic.id)
-            topic.last_updated = post.date_created
-            topic.post_count += 1
 
-            # FIXME: Is there a way to ignore IntegrityErrors?
-            # At the moment, the first_post_id is also the last_post_id.
-            # This does no harm, except that in the forums view, you see
-            # the information for the first post instead of the last one.
-            # I run a little benchmark:
-            # 5.3643078804 seconds to create 100 topics and 10000 posts
-            # Using another method (where data integrity is ok) I benchmarked
-            # these stats:
-            # 49.7832770348 seconds to create 100 topics and 10000 posts
+            # create a topic
+            topic = Topic(title="Test Title %s" % i)
+            post = Post(content="First Post")
+            topic.save(post=post, user=user1, forum=forum)
+            created_topics += 1
 
-            # Uncomment the line underneath and the other line to reduce
-            # performance but fixes the above mentioned problem.
-            # topic.last_post_id = last_post_id
+            # create some posts in the topic
+            for _ in range(1, post_count + 1):
+                last_post_id += 1
+                post = Post(content="Some other Post", user=user2, topic=topic.id)
+                topic.last_updated = post.date_created
+                topic.post_count += 1
 
-            created_posts += 1
-            posts.append(post)
+                created_posts += 1
+                posts.append(post)
 
-        # uncomment this and delete the one below, also uncomment the
-        # topic.last_post_id line above. This will greatly reduce the
-        # performance.
-        # db.session.bulk_save_objects(posts)
-    db.session.bulk_save_objects(posts)
+        db.session.bulk_save_objects(posts)
 
     # and finally, lets update some stats
     forum.recalculate(last_post=True)

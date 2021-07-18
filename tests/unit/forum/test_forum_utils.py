@@ -12,17 +12,20 @@ class TestForceLoginHelpers(object):
     def test_would_not_force_login_for_anon_in_guest_allowed(self, forum, guest):
         assert not utils.should_force_login(guest, forum)
 
-    def test_would_force_login_for_anon_in_guest_unallowed(self, guest, category):
-        forum = Forum(title="no guest", category=category)
-        forum.groups = Group.query.filter(Group.guest == False).all()
-
+    def test_would_force_login_for_anon_in_guest_unallowed(self, database, guest, category):
+        with database.session.no_autoflush:
+            forum = Forum(title="no guest", category=category)
+            forum.groups = Group.query.filter(Group.guest == False).all()
+            forum.save()
         assert utils.should_force_login(guest, forum)
 
     def test_redirects_to_login_with_anon(
-        self, guest, category, request_context, application
+        self, database, guest, category, request_context, application
     ):
-        forum = Forum(title="no guest", category=category)
-        forum.groups = Group.query.filter(Group.guest == False).all()
+        with database.session.no_autoflush:
+            forum = Forum(title="no guest", category=category)
+            forum.groups = Group.query.filter(Group.guest == False).all()
+            forum.save()
         # sets current_forum
         _request_ctx_stack.top.forum = forum
 

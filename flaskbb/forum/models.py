@@ -206,7 +206,7 @@ class Post(HideableCRUDMixin, db.Model):
         """
         current_app.pluggy.hook.flaskbb_event_post_save_before(post=self)
 
-        # update/edit the post
+        # update a post
         if self.id:
             db.session.add(self)
             db.session.commit()
@@ -216,30 +216,31 @@ class Post(HideableCRUDMixin, db.Model):
 
         # Adding a new post
         if user and topic:
-            created = time_utcnow()
-            self.user = user
-            self.username = user.username
-            self.topic = topic
-            self.date_created = created
+            with db.session.no_autoflush:
+                created = time_utcnow()
+                self.user = user
+                self.username = user.username
+                self.topic = topic
+                self.date_created = created
 
-            if not topic.hidden:
-                topic.last_updated = created
-                topic.last_post = self
+                if not topic.hidden:
+                    topic.last_updated = created
+                    topic.last_post = self
 
-                # Update the last post info for the forum
-                topic.forum.last_post = self
-                topic.forum.last_post_user = self.user
-                topic.forum.last_post_title = topic.title
-                topic.forum.last_post_username = user.username
-                topic.forum.last_post_created = created
+                    # Update the last post info for the forum
+                    topic.forum.last_post = self
+                    topic.forum.last_post_user = self.user
+                    topic.forum.last_post_title = topic.title
+                    topic.forum.last_post_username = user.username
+                    topic.forum.last_post_created = created
 
-                # Update the post counts
-                user.post_count += 1
-                topic.post_count += 1
-                topic.forum.post_count += 1
+                    # Update the post counts
+                    user.post_count += 1
+                    topic.post_count += 1
+                    topic.forum.post_count += 1
 
             # And commit it!
-            db.session.add(topic)
+            db.session.add(self)
             db.session.commit()
             current_app.pluggy.hook.flaskbb_event_post_save_after(post=self,
                                                                   is_new=True)
@@ -669,31 +670,32 @@ class Topic(HideableCRUDMixin, db.Model):
             )
             return self
 
-        # Set the forum and user id
-        self.forum = forum
-        self.user = user
-        self.username = user.username
+        with db.session.no_autoflush:
+            # Set the forum and user id
+            self.forum = forum
+            self.user = user
+            self.username = user.username
 
-        # Set the last_updated time. Needed for the readstracker
-        self.date_created = self.last_updated = time_utcnow()
+            # Set the last_updated time. Needed for the readstracker
+            self.date_created = self.last_updated = time_utcnow()
 
-        # Insert and commit the topic
-        db.session.add(self)
+            # Insert and commit the topic
+            db.session.add(self)
+            db.session.commit()
+
+            if post is not None:
+                self._post = post
+
+            # Create the topic post
+            self._post.save(user, self)
+
+            # Update the first and last post id
+            self.last_post = self.first_post = self._post
+
+            # Update the topic count
+            forum.topic_count += 1
+
         db.session.commit()
-
-        if post is not None:
-            self._post = post
-
-        # Create the topic post
-        self._post.save(user, self)
-
-        # Update the first and last post id
-        self.last_post = self.first_post = self._post
-
-        # Update the topic count
-        forum.topic_count += 1
-        db.session.commit()
-
         current_app.pluggy.hook.flaskbb_event_topic_save_after(topic=self,
                                                                is_new=True)
         return self
@@ -1067,11 +1069,12 @@ class Forum(db.Model, CRUDMixin):
         if self.id:
             db.session.merge(self)
         else:
-            if groups is None:
-                # importing here because of circular dependencies
-                from flaskbb.user.models import Group
-                self.groups = Group.query.order_by(Group.name.asc()).all()
-            db.session.add(self)
+            with db.session.no_autoflush:
+                if groups is None:
+                    # importing here because of circular dependencies
+                    from flaskbb.user.models import Group
+                    self.groups = Group.query.order_by(Group.name.asc()).all()
+                db.session.add(self)
 
         db.session.commit()
         return self

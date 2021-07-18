@@ -445,10 +445,10 @@ class User(db.Model, UserMixin, CRUDMixin):
         """
         if groups is not None:
             # TODO: Only remove/add groups that are selected
-            secondary_groups = self.secondary_groups.all()
-            for group in secondary_groups:
-                self.remove_from_group(group)
-            db.session.commit()
+            with db.session.no_autoflush:
+                secondary_groups = self.secondary_groups.all()
+                for group in secondary_groups:
+                    self.remove_from_group(group)
 
             for group in groups:
                 # Do not add the primary group to the secondary groups

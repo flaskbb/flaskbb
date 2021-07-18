@@ -645,7 +645,7 @@ def test_retrieving_hidden_posts(topic, user):
     new_post.hide(user)
 
     assert Post.query.get(new_post.id) is None
-    assert Post.query.get(new_post.id, include_hidden=True) == new_post
+    assert Post.query.with_hidden().get(new_post.id) == new_post
     assert Post.query.filter(Post.id == new_post.id).first() is None
     hidden_post = Post.query\
         .with_hidden()\
@@ -658,7 +658,7 @@ def test_retrieving_hidden_topics(topic, user):
     topic.hide(user)
 
     assert Topic.query.get(topic.id) is None
-    assert Topic.query.get(topic.id, include_hidden=True) == topic
+    assert Topic.query.with_hidden().get(topic.id) == topic
     assert Topic.query.filter(Topic.id == topic.id).first() is None
     hidden_topic = Topic.query\
         .with_hidden()\
