@@ -394,9 +394,13 @@ def run_plugin_migrations(plugins=None):
 
     for plugin in plugins:
         plugin_name = current_app.pluggy.get_name(plugin)
-        if not os.path.exists(os.path.join(plugin.__path__[0], "migrations")):
+
+        migrations_path = os.path.join(plugin.__path__[0], "migrations")
+        has_migrations = len(os.listdir(migrations_path)) != 0
+        if not os.path.exists(migrations_path) or not has_migrations:
             logger.debug("No migrations found for plugin %s" % plugin_name)
             continue
+
         try:
             alembic.upgrade(target="{}@head".format(plugin_name))
         except CommandError as exc:
