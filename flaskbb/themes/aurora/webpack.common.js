@@ -1,11 +1,10 @@
 const path = require("path");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
     entry: {
-        app: "./src/app",
+        app: "./src/app.js",
     },
     output: {
         filename: "[name].js",
@@ -13,21 +12,21 @@ module.exports = {
         path: path.resolve("./static/"),
         library: "[name]",
         libraryTarget: "umd",
+        assetModuleFilename: '[name][ext]',
+        devtoolModuleFilenameTemplate: 'http://[resource-path]?[loaders]',
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"],
     },
     plugins: [
-        new CleanWebpackPlugin({
-            cleanStaleWebpackAssets: false,
-        }),
         new MiniCssExtractPlugin({
             filename: "[name].css",
-            chunkFilename: "[id].css",
+            chunkFilename: "[name].css",
         }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
+            'window.jQuery': 'jquery',
         }),
     ],
     optimization: {
@@ -62,6 +61,14 @@ module.exports = {
     },
     module: {
         rules: [
+              {
+                test: require.resolve("jquery"),
+                loader: "expose-loader",
+                options: {
+                  exposes: ["$", "jQuery"],
+                },
+              },
+
             {
                 test: /\.(j|t)sx?$/,
                 exclude: /node_modules/,
@@ -92,23 +99,47 @@ module.exports = {
                 test: /\.scss$/,
                 use: [
                     { loader: MiniCssExtractPlugin.loader },
-                    { loader: "css-loader" },
-                    { loader: "postcss-loader" },
-                    { loader: "sass-loader" },
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: true,
+                        }
+                    },
+                    {
+                        loader: "postcss-loader",
+                        options: {
+                            sourceMap: true,
+                            postcssOptions: {
+                                plugins: [
+                                    [
+                                        "autoprefixer"
+                                    ],
+                                ],
+                            },
+                        },
+                    },
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            sourceMap: true,
+                        }
+                    },
                 ],
             },
+
             {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader"],
             },
+
             {
-                test: /\.(ico|jpg|jpeg|png|gif|pdf|eot|otf|webp|svg|ttf|woff|woff2|xml|webmanifest)(\?.*)?$/,
-                use: {
-                    loader: "file-loader",
-                    options: {
-                        name: "[name].[ext]",
-                    },
-                },
+                test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
+                type: 'asset/resource',
+            },
+
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
             },
         ],
     },
