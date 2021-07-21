@@ -34,7 +34,7 @@
 
             <div class="pull-right action-buttons">
                 <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-default btn-xs" onclick="return show_management_search()">
+                    <button type="button" class="btn btn-default btn-xs" onclick="return window.app.show_management_search()">
                         <span class="fa fa-search"></span> {% trans %}Search{% endtrans %}
                     </button>
                 </div>
@@ -153,6 +153,6 @@
 
 {% block scripts %}
     <script>
-    var bulk_actions = new BulkActions();
+    var bulk_actions = new window.app.BulkActions();
     </script>
 {% endblock %}
