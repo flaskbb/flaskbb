@@ -1,4 +1,5 @@
-/* This file just holds some configuration values for the editor */
+import marked from "marked";
+
 marked.setOptions({
     gfm: true,
     tables: true,
