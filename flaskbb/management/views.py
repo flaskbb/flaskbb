@@ -520,7 +520,7 @@ class UnbanUser(MethodView):
                     data.append(
                         {
                             "id": user.id,
-                            "type": "unban",
+                            "type": "ban",
                             "reverse": "ban",
                             "reverse_name": _("Ban"),
                             "reverse_url": url_for("management.ban_user",

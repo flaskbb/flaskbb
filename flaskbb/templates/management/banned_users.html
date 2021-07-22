@@ -89,7 +89,7 @@
                     <div class="col-md-2 col-sm-2 col-xs-3">{{ user.primary_group.name }}</div>
                     <div class="col-md-2 col-sm-2 col-xs-2">
                     {% if current_user|can_ban_user and user.permissions['banned'] %}
-                        <form class="inline-form" id="unban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                        <form class="inline-form" id="ban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                             <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}">
