@@ -15,35 +15,9 @@
 }
 
 .btn-icon {
-    font-family: 'FontAwesome';
-    font-size: 1.15em;
+    font-family: 'Font Awesome 5 Free';
+    font-size: 1em;
     line-height: 1.50em;
-    font-weight: normal;
     background: none;
     border-radius: 0;
-}
-
-.icon-delete:before {
-    content: "\f014";
-    color: $red;
-}
-
-.icon-report:before {
-    content: "\f024";
-    color: $orange;
-}
-
-.icon-edit:before {
-    content: "\f040";
-    color: $green;
-}
-
-.icon-reply:before {
-    content: "\f10e";
-    color: $blue;
-}
-
-.icon-replyall:before {
-    content: "\f122";
-    color: $light-blue;
 }

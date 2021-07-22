@@ -142,18 +142,18 @@
 
                             {% if current_user|post_reply(topic) %}
                                 <!-- Quick quote -->
-                                <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>
+                                <a href="#" class="btn btn-icon fas fa-reply text-blue quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>
                                 <!-- Full quote/reply -->
-                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon icon-replyall" data-toggle="tooltip" data-placement="top" title="{% trans %}Full Reply{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon fas fa-reply-all text-light-blue" data-toggle="tooltip" data-placement="top" title="{% trans %}Full Reply{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user|edit_post(post) %}
                                 {% if topic.first_post_id == post.id %}
                                 <!-- Edit Topic -->
-                                <a href="{{ url_for('forum.edit_topic', topic_id=topic.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this topic{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.edit_topic', topic_id=topic.id) }}" class="btn btn-icon far fa-edit text-green" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this topic{% endtrans %}"></a>
                                 {% else %}
                                 <!-- Edit Post -->
-                                <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon icon-edit" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon far fa-edit text-green" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
                                 {% endif %}
                             {% endif %}
 
@@ -161,7 +161,7 @@
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-icon icon-delete" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this topic{% endtrans %}"></button>
+                                    <button class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this topic{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
@@ -169,7 +169,7 @@
                             <!-- Delete Post -->
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-icon icon-delete" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this post{% endtrans %}"></button>
+                                    <button  class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this post{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
 
@@ -177,7 +177,7 @@
 
                             {% if current_user.is_authenticated %}
                             <!-- Report post -->
-                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon icon-report" data-toggle="tooltip" data-placement="top" title="{% trans %}Report this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon far fa-flag text-orange" data-toggle="tooltip" data-placement="top" title="{% trans %}Report this post{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user.permissions.get('makehidden') %}
@@ -185,24 +185,24 @@
                                     {% if topic.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this topic{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this topic{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% else %}
                                     {% if post.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this post{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon fa fa-user-secret" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this post{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% endif %}

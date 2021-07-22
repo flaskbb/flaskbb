@@ -1,0 +1,39 @@
+.text-red {
+    color: $red;
+
+    &:hover {
+        color: $red;
+    }
+}
+
+.text-orange {
+    color: $orange;
+
+    &:hover {
+        color: $orange;
+    }
+}
+
+.text-green {
+    color: $green;
+
+    &:hover {
+        color: $green;
+    }
+}
+
+.text-blue {
+    color: $blue;
+
+    &:hover {
+        color: $blue;
+    }
+}
+
+.text-light-blue {
+    color: $light-blue;
+
+    &:hover {
+        color: $light-blue;
+    }
+}
