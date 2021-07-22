@@ -3,7 +3,6 @@
  * Copyright: (C) 2015 - FlaskBB Team
  * License: BSD - See LICENSE for more details.
  */
-import { $ } from 'jquery';
 
 // get the csrf token from the header
 let csrf_token = document.querySelector('meta[name=csrf-token]').content
@@ -32,77 +31,82 @@ function flash_message(message) {
         flashed_message += '<span class="fas fa-info-sign"></span>&nbsp;';
     }
     flashed_message += '<button type="button" class="close" data-dismiss="alert">&times;</button>' + message.message + '</div>';
-    container.insertAdjacentText('beforeend', flashed_message);
+    container.insertAdjacentHTML('beforeend', flashed_message);
 };
 
 export class BulkActions {
     execute(endpoint) {
-        let selected = $('input.action-checkbox:checked').length;
+        let selected = document.querySelectorAll('input.action-checkbox:checked');
         let data = { "ids": [] };
 
         // don't do anything if nothing is selected
-        if (selected === 0) {
+        if (selected.length === 0) {
             return false;
         }
 
-        $('input.action-checkbox:checked').each(function(k, v) {
-            data.ids.push($(v).val());
-        });
-
-        this.confirm(endpoint, data);
+        for (let selection of selected) {
+            data.ids.push(selection.value);
+        }
+        send_data(endpoint, data);
+        //this.confirm(endpoint, data);
         return false;
     };
 
     confirm(endpoint, data) {
-        $('.confirmModal').modal({ keyboard: false })
-            .one('click', '.confirmBtn', function() {
-                $('.confirmModal').modal('hide');
-                send_data(endpoint, data);
-            })
-            .on('hidden.bs.modal', function() {
-                $('.confirmBtn').unbind();
-            }
-            );
+        const confirmModalElement = document.getElementById("confirmModal");
+        // Get the instance of this modal
+        //let confirmModal = Modal.getInstance(confirmModalElement);
+
+        // the confirm button of the modal
+        let confirmButton = confirmModalElement.querySelector(".confirmBtn");
+        confirmButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            confirmModal.hide();
+            send_data(endpoint, data);
+        }, {
+            once: true,
+        });
     };
 };
 
 export function send_data(endpoint_url, data) {
-    $.ajax({
-        url: endpoint_url,
-        method: "POST",
-        data: JSON.stringify(data),
-        dataType: "json",
-        contentType: "application/json",
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
+    fetch(endpoint_url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrf_token,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
     })
-        .done(function(response) {
-            flash_message(response);
-            $.each(response.data, function(k, v) {
+        .then(response => response.json())
+        .then(data => {
+            flash_message(data);
+            for (let obj of data.data) {
                 // get the form
-                let form = $('#' + v.type + '-' + v.id);
+                const form_id = `#${obj.type}-${obj.id}`
+                let form = document.querySelector(form_id);
 
                 // check if there is something to reverse it, otherwise remove the DOM.
-                if (v.reverse) {
-                    form.attr('action', v.reverse_url);
-                    if (v.type == 'ban') {
-                        reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="' + v.reverse_name + '"></span>';
-                    } else if (v.type == 'unban') {
-                        reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="' + v.reverse_name + '"></span>';
-                    }
-                    form.find('button').html(reverse_html);
-                } else if (v.type == "delete") {
-                    form.parents(".row").remove();
-                }
+                if (obj.reverse) {
+                    form.setAttribute('action', obj.reverse_url)
 
-            });
+                    let reverse_html = '';
+                    if (obj.reverse == 'ban') {
+                        reverse_html = '<span class="fa fa-flag text-success" data-toggle="tooltip" data-placement="top" title="' + obj.reverse_name + '"></span>';
+                    } else if (obj.reverse == 'unban') {
+                        reverse_html = '<span class="fa fa-flag text-warning" data-toggle="tooltip" data-placement="top" title="' + obj.reverse_name + '"></span>';
+                    }
+                    form.querySelector('button').innerHTML = reverse_html;
+
+                } else if (obj.type == "delete") {
+                    form.parentNode.parentNode.remove();
+                }
+            }
         })
-        .fail(function(error) {
-            flash_message(error);
-        });
+        .catch(error => {
+            flash_message(error)
+        })
+
 };
 
 export function parse_emoji(value) {
