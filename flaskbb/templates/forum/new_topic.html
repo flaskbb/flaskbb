@@ -34,22 +34,15 @@
 
                     <div class="form-group">
                         <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="editor-box">
+                            {{ run_hook("flaskbb_tpl_form_new_topic_before", form=form) }}
 
-                                {{ run_hook("flaskbb_tpl_form_new_topic_before", form=form) }}
+                            {{ form.content(class="flaskbb-editor", style="display: none") }}
 
-                                <div class="editor">
-                                    {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
-                                </div>
+                            {{ render_boolean_field(form.track_topic) }}
 
-                                {{ render_boolean_field(form.track_topic) }}
+                            {{ run_hook("flaskbb_tpl_form_new_topic_after", form=form) }}
 
-                                {{ run_hook("flaskbb_tpl_form_new_topic_after", form=form) }}
-
-                                <div class="editor-submit">
-                                    {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
-                                </div>
-                            </div>
+                            {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                         </div>
                     </div>
                 </div>

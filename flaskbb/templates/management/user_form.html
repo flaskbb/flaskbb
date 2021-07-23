@@ -47,8 +47,8 @@
                     {{ horizontal_field(form.primary_group) }}
                     {{ horizontal_field(form.secondary_groups) }}
                     {{ horizontal_field(form.activated) }}
-                    {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
-                    {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
+                    {{ horizontal_field(form.signature, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
+                    {{ horizontal_field(form.notes, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
 
                     {{ horizontal_field(form.submit) }}
 
