@@ -5,9 +5,9 @@
 {% block content %}
 
 <div class="index-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li class="active">{{ category.title }}</li>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{{ category.title }}</li>
     </ol>
 
     {% include theme("forum/category_layout.html") %}

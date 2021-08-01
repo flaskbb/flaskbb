@@ -3,15 +3,15 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("macros.html") import horizontal_field %}
+{% from theme("_macros/form.html") import horizontal_field %}
 
-<div class="panel page-panel">
-    <div class="panel-heading page-head">
+<div class="card page">
+    <div class="card-header page-header">
         {% trans %}Register{% endtrans %}
     </div>
 
-    <div class="panel-body">
-        <form class="form-horizontal" role="form" method="POST">
+    <div class="card-body page-body">
+        <form role="form" method="POST">
             {{ form.hidden_tag() }}
             {{ run_hook('flaskbb_tpl_form_registration_before', form=form) }}
             {{ horizontal_field(form.username)}}
@@ -24,9 +24,9 @@
             {% endif %}
 
             {{ horizontal_field(form.language) }}
-            {{ horizontal_field(form.accept_tos)}}
+            {{ horizontal_field(form.accept_tos, div_class="offset-3 col-4")}}
             {{ run_hook('flaskbb_tpl_form_registration_after', form=form) }}
-            {{ horizontal_field(form.submit)}}
+            {{ horizontal_field(form.submit, div_class="offset-3 col-4")}}
         </form>
     </div>
 </div>

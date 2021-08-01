@@ -3,32 +3,34 @@
 {% set active_forum_nav=True %}
 
 {% block content %}
-{% from theme('macros.html') import render_pagination, form_field, generate_obj_id, generate_post_url %}
+{% from theme('_macros/pagination.html') import render_pagination, generate_obj_id, generate_post_url %}
+{% from theme('_macros/form.html') import render_input_field, render_submit_field %}
 
 <div class="topic-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
-        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-        <li class="active">{{ topic.title }}</li>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        <li class="breadcrumb-item active">{{ topic.title }}</li>
     </ol>
 
     {% include theme('forum/topic_controls.html') %}
+
     {% if topic.hidden %}
     <div class="alert alert-warning">
-        <span class="fa fa-user-secret"></span>
+        <span class="fas fa-user-secret"></span>
         {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
     </div>
     {% endif %}
 
 
-    <div class="panel topic-panel">
-        <div class="panel-heading topic-head">
+    <div class="card topic">
+        <div class="card-header topic-header">
             <a href="{{ topic.url }}">{{ topic.title }}</a>
         </div>
-        <div class="panel-body topic-body">
+        <div class="card-body topic-body">
             {% for post, user in posts.items %}
-            <div id="{{ post.id }}" class="row post-row clearfix">
+            <div id="{{ post.id }}" class="row post-row">
 
                 <div class="author col-md-2 col-sm-3 col-xs-12">
                     <!-- Registered User -->
@@ -37,9 +39,9 @@
 
                     <!-- check if user is online or not -->
                     {% if user|is_online %}
-                    <div class="author-online" data-toggle="tooltip" data-placement="top" title="{% trans %}online{% endtrans %}"></div>
+                    <div class="author-online" tabindex="0" data-bs-toggle="tooltip" title="{% trans %}online{% endtrans %}"></div>
                     {% else %}
-                    <div class="author-offline" data-toggle="tooltip" data-placement="top" title="{% trans %}offline{% endtrans %}"></div>
+                    <div class="author-offline" data-bs-toggle="tooltip" title="{% trans %}offline{% endtrans %}"></div>
                     {% endif %}
                     <div class="author-title"><h5>{{ user.primary_group.name }}</h5></div>
 
@@ -66,8 +68,8 @@
                         {% if current_user|can_ban_user and not user.permissions['banned'] %}
                         <form class="inline-form" method="post" action="{{ url_for('management.ban_user', user_id=user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-xs btn-danger">
-                                <i class="fa fa-ban"></i> {% trans %}Ban{% endtrans %}
+                            <button class="btn btn-sm btn-danger">
+                                <span class="fas fa-ban"></span> {% trans %}Ban{% endtrans %}
                             </button>
                         </form>
                         {% endif %}
@@ -76,14 +78,16 @@
                         {% if current_user|can_ban_user and user.permissions['banned'] %}
                         <form class="inline-form" method="post" action="{{ url_for('management.unban_user', user_id=user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-xs btn-warning">
-                                <i class="fa fa-ban"></i> {% trans %}Unban{% endtrans %}
+                            <button class="btn btn-sm btn-warning">
+                                <span class="fas fa-ban"></span> {% trans %}Unban{% endtrans %}
                             </button>
                         </form>
                         {% endif %}
 
                         {% if current_user|can_edit_user %}
-                        <a class="btn btn-xs btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('management.edit_user', user_id=user.id)}}" role="button">
+                            <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
+                        </a>
                         {% endif %}
                     </div>
                     {% endif %}
@@ -91,8 +95,8 @@
 
                 <div class="post-box col-md-10 col-sm-9 col-xs-12">
 
-                    <div class="post-meta clearfix">
-                        <div class="pull-left">
+                    <div class="post-meta row">
+                        <div class="col-auto me-auto g-0">
                             <!-- Creation date / Date modified -->
                             <a href="{{ post.url }}">
                                 {{ post.date_created|format_datetime }}
@@ -105,12 +109,12 @@
                         </div>
 
                         <!-- Post number -->
-                        <div class="pull-right">
+                        <div class="col-auto g-0">
                             <strong>#{{ generate_obj_id(posts, loop.index, flaskbb_config["POSTS_PER_PAGE"]) }}</strong>
                         </div>
                     </div>
 
-                        <div class="post-content clearfix" id="pid{{ post.id }}">
+                        <div class="post-content" id="pid{{ post.id }}">
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
@@ -134,42 +138,42 @@
                         <!-- Signature End -->
                     </div>
 
-                        <div class="post-footer clearfix">
+                        <div class="post-footer">
 
                             <!-- Report/Edit/Delete/Quote Post-->
-                            <div class="post-menu pull-right">
+                            <div class="post-menu float-end">
                             {{ run_hook("flaskbb_tpl_post_menu_before", post=post) }}
 
                             {% if current_user|post_reply(topic) %}
                                 <!-- Quick quote -->
-                                <a href="#" class="btn btn-icon fas fa-reply text-blue quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>
+                                <a href="#" class="btn btn-icon fas fa-reply text-blue quote-btn" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" title="{% trans %}Quote this post{% endtrans %}"></a>
                                 <!-- Full quote/reply -->
-                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon fas fa-reply-all text-light-blue" data-toggle="tooltip" data-placement="top" title="{% trans %}Full Reply{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon fas fa-reply-all text-light-blue" data-bs-toggle="tooltip" title="{% trans %}Full Reply{% endtrans %}"></a>
                             {% endif %}
 
                             {% if current_user|edit_post(post) %}
                                 {% if topic.first_post_id == post.id %}
                                 <!-- Edit Topic -->
-                                <a href="{{ url_for('forum.edit_topic', topic_id=topic.id) }}" class="btn btn-icon far fa-edit text-green" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this topic{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.edit_topic', topic_id=topic.id) }}" class="btn btn-icon far fa-edit text-green" data-bs-toggle="tooltip" title="{% trans %}Edit this topic{% endtrans %}"></a>
                                 {% else %}
                                 <!-- Edit Post -->
-                                <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon far fa-edit text-green" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.edit_post', post_id=post.id) }}" class="btn btn-icon far fa-edit text-green" data-bs-toggle="tooltip" title="{% trans %}Edit this post{% endtrans %}"></a>
                                 {% endif %}
                             {% endif %}
 
+                            <!-- Delete Post/Topic -->
                             {% if topic.first_post_id == post.id %}
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this topic{% endtrans %}"></button>
+                                    <button class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-bs-toggle="tooltip" title="{% trans %}Delete this topic{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
                                 {% if current_user|delete_post(post) %}
-                            <!-- Delete Post -->
                                 <form class="inline-form" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete this post{% endtrans %}"></button>
+                                    <button  class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-bs-toggle="tooltip" title="{% trans %}Delete this post{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
 
@@ -177,32 +181,33 @@
 
                             {% if current_user.is_authenticated %}
                             <!-- Report post -->
-                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon far fa-flag text-orange" data-toggle="tooltip" data-placement="top" title="{% trans %}Report this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon far fa-flag text-orange" data-bs-toggle="tooltip" title="{% trans %}Report this post{% endtrans %}"></a>
                             {% endif %}
 
+                            <!-- Hide Post -->
                             {% if current_user.permissions.get('makehidden') %}
                                 {% if topic.first_post_id == post.id %}
                                     {% if topic.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="unhide" title="{% trans %}Unhide this topic{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye-slash" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="hide" title="{% trans %}Hide this topic{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% else %}
                                     {% if post.hidden %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye" name="unhide" data-toggle="tooltip" data-placement="top" title="{% trans %}Unhide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="unhide" title="{% trans %}Unhide this post{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="inline-form" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye-slash" name="hide" data-toggle="tooltip" data-placement="top" title="{% trans %}Hide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="hide" title="{% trans %}Hide this post{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% endif %}
@@ -219,21 +224,21 @@
         </div> <!-- end topic-body -->
     </div> <!-- end topic-panel -->
 
-    {% include theme('forum/topic_controls.html') %}
-    {% from theme("macros.html") import render_field, render_submit_field %}
+    <div class="pt-2">
+        {% include theme('forum/topic_controls.html') %}
+    </div>
+
     {% if form %}
-    <form class="form" action="#" method="post">
+    <form class="form" method="post">
         {{ form.hidden_tag() }}
         <div class="row">
-            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
-                {{ form.content(class='flaskbb-editor', style="display:none") }}
-                {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+            <div class="offset-md-2 offset-sm-3 col-md-10 col-sm-9 col-xs-12">
+                {{ render_input_field(form.content, class='flaskbb-editor', style="display: none", required="required") }}
+                {{ render_submit_field(form.submit, div_class="mt-2 float-end") }}
             </div>
         </div>
     </form>
-    {% include theme('editor_help.html') %}
     {% endif %}
 
 </div>
-{% include theme('confirm_dialog.html') %}
 {% endblock %}

@@ -2,30 +2,30 @@
 {% set active_forum_nav=True %}
 
 {% extends theme("layout.html") %}
-{% from theme("macros.html") import horizontal_field %}
+{% from theme("_macros/form.html") import horizontal_field %}
 {% block content %}
 
-<div class="panel page-panel">
-    <div class="panel-heading page-head">
+<div class="card page">
+    <div class="card-header page-header">
         {% trans %}Login{% endtrans %}
     </div>
 
-    <div class="panel-body">
-        <form class="form-horizontal" role="form" method="POST">
+    <div class="card-body page-body">
+        <form role="form" method="POST">
             {{ form.hidden_tag() }}
             {{ horizontal_field(form.login)}}
             {{ horizontal_field(form.password)}}
-            {{ horizontal_field(form.remember_me) }}
+            {{ horizontal_field(form.remember_me, div_class="offset-3 col-4") }}
             {% if flaskbb_config["RECAPTCHA_ENABLED"] %}
                 {{ horizontal_field(form.recaptcha) }}
             {% endif %}
 
-            {{ horizontal_field(form.submit) }}
+            {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
 
-            <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-4">
-                    <a class="pull-left" href="{{ url_for('auth.register') }}"><small>{% trans %}Not a member yet?{% endtrans %}</small></a>
-                    <a class="pull-right" href="{{ url_for('auth.forgot_password') }}"><small>{% trans %}Forgot your Password?{% endtrans %}</small></a>
+            <div class="row mb-3">
+                <div class="offset-3 col-4">
+                    <a href="{{ url_for('auth.register') }}"><small>{% trans %}Not a member yet?{% endtrans %}</small></a>
+                    <a class="float-end" href="{{ url_for('auth.forgot_password') }}"><small>{% trans %}Forgot your Password?{% endtrans %}</small></a>
                 </div>
             </div>
         </form>

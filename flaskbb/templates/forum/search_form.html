@@ -2,12 +2,12 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("macros.html") import horizontal_field %}
+{% from theme("_macros/form.html") import horizontal_field %}
 
 <div class="page-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li class="active">{% trans %}Search{% endtrans %}</li>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Search{% endtrans %}</li>
     </ol>
 
     <div class="panel page-panel">

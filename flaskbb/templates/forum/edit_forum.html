@@ -3,88 +3,87 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme('macros.html') import render_pagination, topic_pages %}
+{% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
 
 <form class="form" role="form" method="POST">
-    <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
+    <div class="d-none"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
 
     <div class="forum-view">
-        <ol class="breadcrumb flaskbb-breadcrumb">
-            <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-            <li><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
-            <li class="active">{{ forum.title }}</li>
+        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+            <li class="breadcrumb-item"><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
+            <li class="breadcrumb-item active">{{ forum.title }}</li>
         </ol>
 
-        <div class="row controls-row">
-            <div class="pull-left">
+        <div class="row controls-row pt-0">
+            <div class="col me-auto g-0">
                 {{ render_pagination(topics, forum.url) }}
             </div> <!-- end span pagination -->
         </div>
 
-        <div class="panel forum-panel">
-            <div class="panel-heading forum-head">
+        <div class="card forum">
+            <div class="card-header forum-header">
                 <a href="{{ forum.url }}">{{ forum.title }}</a>
             </div>
 
-            <div class="panel-body forum-body">
-                <div class="forum-meta">
-                    <div class="col-md-4 col-sm-4 col-xs-6 topic-name">{% trans %}Topic{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Views{% endtrans %}</div>
-                    <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
-                    <div class="col-md-1 col-sm-1 col-xs-2 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="{% trans %}Select all{% endtrans %}"/></div>
+            <div class="card-body forum-body">
+                <div class="row m-0 forum-meta">
+                    <div class="col-7 col-sm-4 topic-name">{% trans %}Topic{% endtrans %}</div>
+                    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
+                    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
+                    <div class="col-4 col-sm-3 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+                    <div class="col-1 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="{% trans %}Select all{% endtrans %}"/></div>
                 </div>
 
                 {% for topic, last_post, topicread in topics.items %}
-                <div class="row forum-row hover clearfix">
-
-                    <div class="col-md-4 col-sm-4 col-xs-6 topic-info">
-                        <div class="row">
-                            <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
-                            {% if topic.locked %}
-                                <span class="fa fa-lock fa-fw topic-locked"></span>
-                            {% elif topic.important %}
-                                {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                    <span class="fa fa-star fa-fw topic-starred-unread"></span>
-                                {% else %}
-                                    <span class="fa fa-star-o fa-fw topic-starred-read"></span>
-                                {% endif %}
+                <div class="row forum-row hover">
+                    <div class="col-7 col-sm-4 topic-info">
+                        <div class="col-auto topic-status">
+                        {% if topic.locked %}
+                            <span class="fas fa-lock fa-fw topic-locked"></span>
+                        {% elif topic.hidden %}
+                            <span class="far fa-eye"></span>
+                        {% elif topic.important %}
+                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                <span class="far fa-star fa-fw topic-starred-unread"></span>
                             {% else %}
-                                {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                    <span class="fa fa-comment fa-fw topic-unread"></span>
-                                {% else %}
-                                    <span class="fa fa-comment-o fa-fw topic-read"></span>
-                                {% endif %}
+                                <span class="fas fa-star fa-fw topic-starred-read"></span>
                             {% endif %}
-                            </div>
-                            <div class="col-md-11 col-sm-10 col-xs-10">
-                                <div class="topic-name">
-                                    <a href="{{ topic.url }}">{{ topic.title }}</a>
-                                    <!-- Topic Pagination -->
-                                    <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
-                                </div>
-
-                                <div class="topic-author">
-                                    {% trans %}by{% endtrans %}
-                                    {% if topic.user_id %}
-                                     <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
-                                    {% else %}
-                                    {{ topic.username }}
-                                    {% endif %}
-                                </div>
-                            </div>
+                        {% else %}
+                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                <span class="fas fa-comment fa-fw topic-unread"></span>
+                            {% else %}
+                                <span class="far fa-comment fa-fw topic-read"></span>
+                            {% endif %}
+                        {% endif %}
                         </div>
+
+                        <div class="topic-name">
+                            <a href="{{ topic.url }}">{{ topic.title }}</a>
+                            <!-- Topic Pagination -->
+                            <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+                        </div>
+
+                        <div class="topic-author">
+                            {% trans %}by{% endtrans %}
+                            {% if topic.user_id %}
+                             <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                            {% else %}
+                            {{ topic.username }}
+                            {% endif %}
+                        </div>
+
                     </div>
 
-                    <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                    <div class="col-sm-2 d-none d-sm-block topic-stats">
                         {{ topic.post_count }}
                     </div>
 
-                    <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                    <div class="col-sm-2 d-none d-sm-block topic-stats">
                         {{ topic.views }}
                     </div>
 
-                    <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
+                    <div class="col-4 col-sm-3 topic-last-post">
                         <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
 
                         <div class="topic-author">
@@ -97,90 +96,81 @@
                         </div>
                     </div>
 
-                    <div class="col-md-1 col-sm-1 col-xs-2 topic-select">
+                    <div class="col-1 topic-select">
                         <input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="{% trans %}Select topic{% endtrans %}"/>
                     </div>
                 </div>
                 {% else %}
-                <div class="row forum-row clearfix">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="row forum-row">
+                    <div class="col-12">
                         {% trans %}No Topics.{% endtrans %}
                     </div>
                 </div> <!-- end forum-row -->
                 {% endfor %}
             </div>
         </div>
-        <div class="row controls-row">
-            <div class="col-md-2 col-sm-2 col-xs-2 controls-col">
-                <div class="pull-left">
-                    <a class="btn btn-default" href="{{ forum.url }}">
-                        <span class="fa fa-arrow-left"></span> {% trans %}Back{% endtrans %}
-                    </a>
-                </div>
+        <div class="row g-0 pt-2">
+            <div class="col-2">
+                <a class="btn btn-outline-dark" href="{{ forum.url }}">
+                    <span class="fas fa-arrow-left"></span> {% trans %}Back{% endtrans %}
+                </a>
             </div>
 
-            <div class="col-md-10 col-sm-8 col-xs-8 controls-col">
-                <div class="pull-right">
-                    <div class="form-group">
+            <div class="col-10">
+                <div class="form-group float-end">
 
-                        <div class="btn-group" role="group">
-                            <button name="lock" class="btn btn-warning">
-                                <span class="fa fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
-                            </button>
-                            <button name="unlock" class="btn btn-warning">
-                                <span class="fa fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
-                            </button>
-                        </div>
-
-                        <div class="btn-group" role="group">
-                            <button name="highlight" class="btn btn-success">
-                                <span class="fa fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
-                            </button>
-                            <button name="trivialize" class="btn btn-success">
-                                <span class="fa fa-star-o fa-fw"></span> {% trans %}Trivialize{% endtrans %}
-                            </button>
-                        </div>
-
-                        <button name="delete" class="btn btn-danger">
-                            <span class="fa fa-trash-o fa-fw"></span> {% trans %}Delete{% endtrans %}
+                    <div class="btn-group" role="group">
+                        <button name="lock" class="btn btn-warning">
+                            <span class="fas fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
                         </button>
-
-                        {% if current_user.permissions.get('makehidden') %}
-                        <div class="btn-group" role="group">
-                            <button name="hide" class="btn btn-info">
-                                <span class="fa fa-user-secret fa-fw"></span> {% trans %}Hide{% endtrans %}
-                            </button>
-                            <button name="unhide" class="btn btn-info">
-                                <span class="fa fa-user fa-fw"></span> {% trans %}Unhide{% endtrans %}
-                            </button>
-                        </div>
-                        {% endif %}
-
+                        <button name="unlock" class="btn btn-warning">
+                            <span class="fas fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
+                        </button>
                     </div>
+
+                    <div class="btn-group" role="group">
+                        <button name="highlight" class="btn btn-success">
+                            <span class="fas fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
+                        </button>
+                        <button name="trivialize" class="btn btn-success">
+                            <span class="far fa-star fa-fw"></span> {% trans %}Trivialize{% endtrans %}
+                        </button>
+                    </div>
+
+                    <button name="delete" class="btn btn-danger">
+                        <span class="fas fa-trash fa-fw"></span> {% trans %}Delete{% endtrans %}
+                    </button>
+
+                    {% if current_user.permissions.get('makehidden') %}
+                    <div class="btn-group" role="group">
+                        <button name="hide" class="btn btn-info">
+                            <span class="fas fa-eye-slash fa-fw"></span> {% trans %}Hide{% endtrans %}
+                        </button>
+                        <button name="unhide" class="btn btn-info">
+                            <span class="fas fa-eye fa-fw"></span> {% trans %}Unhide{% endtrans %}
+                        </button>
+                    </div>
+                    {% endif %}
+
                 </div>
             </div>
+        </div>
+        <div class="row">
+            <div class="col-auto ms-auto pt-2">
+                <div class="input-group">
+                    <select class="form-select" id="forum" name="forum">
+                        <option selected value="">{% trans %}Move to...{% endtrans %}</option>
+                        {% for forum in available_forums %}
+                        <option value={{forum.id}}>{{ forum.title }}</option>
+                        {% endfor %}
+                    </select>
 
-            <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
-                <div class="pull-right">
-                    <div class="form-group ">
-
-                        <div class="form-inline">
-                            <select class="form-control" id="forum" name="forum">
-                                <option selected value="">{% trans %}Move to...{% endtrans %}</option>
-                                {% for forum in available_forums %}
-                                    <option value={{forum.id}}>{{ forum.title }}</option>
-                                {% endfor %}
-                            </select>
-
-                            <button name="move" class="btn btn-info">
-                                <span class="fa fa-plane"></span> {% trans %}Move{% endtrans %}
-                            </button>
-                        </div>
-
-                    </div>
+                    <button name="move" class="btn btn-outline-dark">
+                        <span class="fas fa-plane"></span> {% trans %}Move{% endtrans %}
+                    </button>
                 </div>
             </div>
-        </div> <!-- end controls-row -->
+        </div>
     </div> <!-- end forum-view -->
 </form>
 {% endblock %}

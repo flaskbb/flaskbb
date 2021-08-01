@@ -10,45 +10,39 @@
 {% extends theme("layout.html") %}
 
 {% block content %}
-{% from theme("macros.html") import render_field, render_submit_field, render_quickreply, render_boolean_field %}
+{% from theme("_macros/form.html") import render_field, render_input_field, render_submit_field %}
 
 <div class="page-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-        <li><a href="{{ topic.url }}">{{ topic.title }}</a></li>
-        <li class="active">
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ topic.url }}">{{ topic.title }}</a></li>
+        <li class="breadcrumb-item active">
             {{ title }}
         </li>
     </ol>
 
     <form class="form-horizontal" role="form" method="post">
         {{ form.hidden_tag() }}
-        <div class="panel page-panel">
-            <div class="panel-heading page-head">
+        <div class="card page">
+            <div class="card-header page-header">
                 {{ title }}
             </div>
 
-            <div class="panel-body page-body">
-                <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="card-body page-body">
 
-                    <div class="form-group">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            {{ run_hook("flaskbb_tpl_form_new_post_before", form=form) }}
+                <div class="row p-3">
+                    {{ run_hook("flaskbb_tpl_form_new_post_before", form=form) }}
 
-                            {{ form.content(class="flaskbb-editor", style="display: none") }}
+                    {{ render_input_field(form.content, class='flaskbb-editor', style="display: none", required="required") }}
+                    {{ render_field(form.track_topic) }}
 
-                            {{ render_boolean_field(form.track_topic) }}
+                    {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
 
-                            {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
-
-                            {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
-                        </div>
-                    </div>
+                    {{ render_field(form.submit) }}
                 </div>
             </div>
         </div>
-        {% include theme('editor_help.html') %}
     </form>
 </div>
 

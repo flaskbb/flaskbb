@@ -3,19 +3,19 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("macros.html") import horizontal_field %}
+{% from theme("_macros/form.html") import horizontal_field %}
 
-<div class="panel page-panel">
-    <div class="panel-heading page-head">
+<div class="card page">
+    <div class="card-header page-header">
         {% trans %}Request Account Activation{% endtrans %}
     </div>
 
-    <div class="panel-body">
-        <form class="form-horizontal" role="form" method="POST">
+    <div class="card-body page-body">
+        <form role="form" method="POST">
             {{ form.hidden_tag() }}
             {{ horizontal_field(form.username) }}
             {{ horizontal_field(form.email) }}
-            {{ horizontal_field(form.submit)}}
+            {{ horizontal_field(form.submit, div_class="offset-3 col-4")}}
         </form>
     </div>
 </div>

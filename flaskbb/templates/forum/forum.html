@@ -3,112 +3,110 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme('macros.html') import render_pagination, topic_pages %}
+{% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
 
 <div class="forum-view">
-    <ol class="breadcrumb flaskbb-breadcrumb">
-        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
-        <li class="active">{{ forum.title }}</li>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
+        <li class="breadcrumb-item active">{{ forum.title }}</li>
     </ol>
 
-    <div class="row controls-row">
-        <div class="pull-left">
+    <div class="row controls-row pt-0">
+        <div class="col me-auto g-0">
             {{ render_pagination(topics, forum.url) }}
         </div> <!-- end span pagination -->
 
         {% if current_user|post_topic(forum) %}
-        <div class="pull-right">
+        <div class="col-auto g-0">
             <form class="inline-form" method="post" action="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <button class="btn btn-default">
-                    <span class="fa fa-check fa-fw"></span> {% trans %}Mark as Read{% endtrans %}
+                <button class="btn btn-white">
+                    <span class="fas fa-check fa-fw"></span> {% trans %}Mark as Read{% endtrans %}
                 </button>
             </form>
 
             {% if forum.locked %}
             <span class="btn btn-primary">
-                <span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}
+                <span class="fas fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}
             </span>
             {% else %}
             <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-primary">
-                <span class="fa fa-pencil fa-fw"></span> {% trans %}New Topic{% endtrans %}
+                <span class="fas fa-plus fa-fw"></span> {% trans %}New Topic{% endtrans %}
             </a>
             {% endif %}
         </div>
         {% endif %}
     </div>
 
-    <div class="panel forum-panel">
-        <div class="panel-heading forum-head">
+    <div class="card forum">
+        <div class="card-header forum-header">
             <a href="{{ forum.url }}">{{ forum.title }}</a>
         </div>
 
-        <div class="panel-body forum-body">
-            <div class="forum-meta">
-                <div class="col-md-5 col-sm-5 col-xs-8 topic-name">{% trans %}Topic{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Views{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+        <div class="card-body forum-body">
+            <div class="row m-0 forum-meta">
+                <div class="col-8 col-sm-4 topic-name">{% trans %}Topic{% endtrans %}</div>
+                <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
+                <div class="col-4 col-sm-3 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
             {% for topic, last_post, topicread in topics.items %}
-            <div class="row forum-row hover clearfix">
+            <div class="row forum-row hover">
 
-                <div class="col-md-5 col-sm-5 col-xs-8 topic-info">
-                    <div class="row">
-                        <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
-                        {% if topic.locked %}
-                            <span class="fa fa-lock fa-fw topic-locked"></span>
-                        {% elif topic.hidden %}
-                            <span class="fa fa-user-secret"></span>
-                        {% elif topic.important %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-star fa-fw topic-starred-unread"></span>
-                            {% else %}
-                                <span class="fa fa-star-o fa-fw topic-starred-read"></span>
-                            {% endif %}
+                <div class="col-8 col-sm-4 topic-info">
+                    <div class="topic-status">
+                    {% if topic.locked %}
+                        <span class="fas fa-lock fa-fw topic-locked"></span>
+                    {% elif topic.hidden %}
+                        <span class="far fa-eye"></span>
+                    {% elif topic.important %}
+                        {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                            <span class="far fa-star fa-fw topic-starred-unread"></span>
                         {% else %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fa fa-comment fa-fw topic-unread"></span>
-                            {% else %}
-                                <span class="fa fa-comment-o fa-fw topic-read"></span>
-                            {% endif %}
+                            <span class="fas fa-star fa-fw topic-starred-read"></span>
                         {% endif %}
-                        </div>
-                        <div class="col-md-11 col-sm-10 col-xs-10">
-                            <div class="topic-name">
-                                <a href="{{ topic.first_unread(topicread, current_user, forumsread) }}">{{ topic.title }}</a>
-                                <!-- Topic Pagination -->
-                                <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
-                            </div>
-
-                            <div class="topic-author">
-                                {% trans %}by{% endtrans %}
-                                {% if topic.user_id %}
-                                 <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
-                                {% else %}
-                                {{ topic.username }}
-                                {% endif %}
-                            </div>
-
-                            {% if topic.hidden %}
-                            <div class="topic-author">
-                                {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
-                            </div>
-                            {% endif %}
-                        </div>
+                    {% else %}
+                        {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                            <span class="fas fa-comment fa-fw topic-unread"></span>
+                        {% else %}
+                            <span class="far fa-comment fa-fw topic-read"></span>
+                        {% endif %}
+                    {% endif %}
                     </div>
+
+                    <div class="topic-name">
+                        <a href="{{ topic.first_unread(topicread, current_user, forumsread) }}">{{ topic.title }}</a>
+                        <!-- Topic Pagination -->
+                        <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+                    </div>
+
+                    <div class="topic-author">
+                        {% trans %}by{% endtrans %}
+                        {% if topic.user_id %}
+                         <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                        {% else %}
+                        {{ topic.username }}
+                        {% endif %}
+                    </div>
+
+                    {% if topic.hidden %}
+                    <div class="topic-author">
+                        {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
                     {{ topic.post_count }}
                 </div>
 
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
                     {{ topic.views }}
                 </div>
 
-                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
+                <div class="col-4 col-sm-3 topic-last-post">
                     <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
 
                     <div class="topic-author">
@@ -134,9 +132,11 @@
 
     {% if current_user|can_moderate(forum) %}
     <div class="row controls-row">
-        <a class="btn btn-default" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
-            <span class="fa fa-tasks fa-fw"></span> {% trans %}Moderation Mode{% endtrans %}
+        <div class="col-auto ms-auto g-0">
+        <a class="btn btn-outline-dark" href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
+            <span class="fas fa-tasks fa-fw"></span> {% trans %}Moderation Mode{% endtrans %}
         </a>
+        </div>
     </div>
     {% endif %}
 </div>
