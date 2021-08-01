@@ -4,7 +4,8 @@ function loadEditor(element) {
     const easyMDE = new EasyMDE({
         autoDownloadFontAwesome: false,
         element: element,
-        autoRefresh: true,
+        //autoRefresh: true,
+        forceSync: true,
         spellChecker: false,
         sideBySideFullscreen: false,
         status: false
