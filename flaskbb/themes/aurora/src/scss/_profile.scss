@@ -106,10 +106,10 @@
 }
 
 // conversation specific values
-.conversation-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+.conversation {
     margin-bottom: 0;
-    .panel-heading {
+
+    .conversation-header {
         font-weight: bold;
     }
 
@@ -133,7 +133,7 @@
     }
 }
 
-.conversation-panel {
+.conversation {
     .conversation-body {
         .row > .conversation-row {
             &:not(:last-child) {

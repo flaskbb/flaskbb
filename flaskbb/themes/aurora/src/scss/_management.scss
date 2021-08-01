@@ -1,16 +1,13 @@
 // Management Panel
-.management-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
-
+.management {
     .search-form {
         display: none;
         padding: 15px;
-
-        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+            border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
-    .management-head {
+    .management-header {
         background-color: $blue;
     }
     .management-body {
@@ -18,11 +15,11 @@
     }
 }
 
-.panel.settings-panel {
+.settings {
     border: none;
     margin-bottom: 0;
 
-    .settings-head {
+    .settings-header {
         background-color: $panel-hover;
         border-bottom: 1px solid $border-color;
     }
@@ -165,7 +162,7 @@
     }
 
     &.alert-message-success {
-        background-color: #F4FDF0;
+        background-color: #f4fdf0;
         border-color: $dark-green;
     }
     &.alert-message-success h4 {
@@ -193,15 +190,15 @@
         color: $light-blue;
     }
     &.alert-message-default {
-        background-color: #EEE;
+        background-color: #eee;
         border-color: $gray;
     }
     &.alert-message-default h4 {
         color: #000;
     }
     &.alert-message-notice {
-        background-color: #FCFCDD;
-        border-color: #BDBD89;
+        background-color: #fcfcdd;
+        border-color: #bdbd89;
     }
     &.alert-message-notice h4 {
         color: #444;

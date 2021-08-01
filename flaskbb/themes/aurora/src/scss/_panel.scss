@@ -1,7 +1,6 @@
 // default values for the panels
-.page-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
-    .panel-heading {
+.page {
+    .page-header {
         font-weight: bold;
     }
 

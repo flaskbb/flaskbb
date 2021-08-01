@@ -1,9 +1,6 @@
 // Import custom Bootstrap variables
-@import "bootstrap-variables";
-
-// Import Bootstrap for Sass
-$icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
-@import "bootstrap-sass/assets/stylesheets/bootstrap";
+@import "bootstrap-custom";
+@import "bootstrap/scss/bootstrap";
 
 // Import fontawesome icons
 $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
@@ -12,7 +9,20 @@ $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 @import "@fortawesome/fontawesome-free/scss/regular";
 
 // Import FlaskBB theme
-@import "aurora";
+@import "variables";
+
+@import "text";
+@import "misc";
+@import "navigation";
+@import "button";
+
+@import "category";
+@import "forum";
+@import "topic";
+@import "panel";
+@import "profile";
+
+@import "management";
 
 // Import pygments style
 @import "pygments";

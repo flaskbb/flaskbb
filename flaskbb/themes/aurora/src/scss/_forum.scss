@@ -1,9 +1,7 @@
 // forum specific values
-.forum-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
-    margin-bottom: 0;
+.forum {
 
-    .panel-heading {
+    .forum-header {
         font-weight: bold;
     }
 

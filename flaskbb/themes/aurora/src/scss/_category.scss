@@ -1,8 +1,7 @@
 // category specific values
-.category-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+.category {
 
-    .panel-heading {
+    .category-header {
         font-weight: bold;
     }
 

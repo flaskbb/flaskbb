@@ -1,21 +1,18 @@
-.topic-panel {
-    @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
+.topic {
     margin-bottom: 0;
 
-    .panel-heading {
+    .topic-header {
         font-weight: bold;
     }
 
     .topic-body {
-        padding-top: 0;
-        padding-bottom: 0;
+        padding: 0;
     }
 }
 
 .post-row {
     background: $author-box-bg;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
     padding-top: 0;
     padding-bottom: 0;
 
@@ -100,6 +97,7 @@
 
 // author
 .author {
+    padding: 0.5rem 1rem;
     text-shadow: 0px 1px 0px #fff;
 
     // probably not the best name but i couldn't come up with a better one
@@ -146,8 +144,8 @@
     }
 
     .author-online, .author-offline {
-        margin-top: 0.75em;
-        margin-left: 0.25em;
+        margin-top: 0.25em;
+        margin-left: 0.1em;
         float: left;
         width: 0.5em;
         height: 0.5em;
@@ -160,5 +158,9 @@
 
     .author-offline {
         background: $author-offline;
+    }
+
+    .author-adminactions {
+        text-shadow: none;
     }
 }

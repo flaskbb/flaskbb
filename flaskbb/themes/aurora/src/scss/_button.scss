@@ -1,23 +1,21 @@
-// a "link" that is actually a button
-.btn.btn-link {
-    border: none;
-    color: #337ab7;
+.btn-link {
     text-decoration: none;
-    padding: 0;
-    // for some (yet for me unkown) reasons this required to be on the same
-    // height as for normal links (happens when using the inline-forms)
-    margin-bottom: 2px;
-
-    &:focus, &:hover {
-    color: #23527c;
-    text-decoration: underline;
-}
 }
 
 .btn-icon {
-    font-family: 'Font Awesome 5 Free';
+    font-family: "Font Awesome 5 Free";
     font-size: 1em;
-    line-height: 1.50em;
+    line-height: 1.5em;
     background: none;
     border-radius: 0;
+}
+
+.btn-white {
+    @include button-variant(
+        $background: #fff,
+        $border: #ccc,
+        $hover-background: #e6e5e5,
+        $hover-border: #adadad,
+        $hover-color: #333
+    );
 }
