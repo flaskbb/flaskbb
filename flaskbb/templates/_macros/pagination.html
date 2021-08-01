@@ -1,0 +1,109 @@
+{% macro render_pagination(page_obj, url, ul_class='', sort_by=None, asc=True) %}
+<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}'>
+    {% set ordering = 'asc' if asc == True else 'desc' %}
+    {% set sorting = '&sort_by='+(sort_by|urlencode)+'&order_by='+ordering if sort_by is string else '' %}
+    <li class="page-item disabled"><a class="page-link" href="#"><span class="pages-label">{% trans %}Pages{% endtrans %}</span></a></li>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li class="page-item"><a class="page-link" href="{{ url }}?page={{ page }}{{ sorting }}">{{ page }}</a></li>
+            {% else %}
+                <li class="page-item active"><a class="page-link" href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="{{ url }}?page={{ page_obj.next_num }}{{ sorting }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+{% macro render_topic_pagination(page_obj, url) %}
+<ul class="pagination pagelink">
+    <li class="page-item disabled"><a class="page-link" href="#"><span class="pages-label">Pages: </span></a></li>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li class="page-item"><a class="page-link" href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="page-item disabled"><a class="page-link" href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="{{ url }}?page={{ page_obj.next_num }}">Next</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+
+{% macro message_pagination(page_obj, url) %}
+<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination pagination-sm{%- endif -%}'>
+    {%- for page in page_obj.iter_pages() %}
+        {% if page %}
+            {% if page != page_obj.page %}
+                <li><a href="{{ url }}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="active"><a href="#">{{ page }}</a></li>
+            {% endif %}
+        {% endif %}
+    {%- else -%}
+        <li class="active"><a href="#">1</a></li>
+    {%- endfor %}
+    {% if page_obj.has_next %}
+        <li><a href="{{ url }}?page={{ page_obj.next_num }}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endmacro %}
+
+
+{# Generates a some kind of pagination for the posts in topic in the forum view. #}
+{%- macro topic_pages(topic_obj, per_page=10) -%}
+{% set pages = (topic_obj.post_count / per_page)|round(method='ceil')|int %}
+{% set max_pages = 4 %}
+{% set page_count = pages if pages <= max_pages else max_pages %}
+
+{%- if pages > 1 -%}
+[
+    {%- for page in range(1, page_count+1) -%}
+        {% if pages > max_pages and page == max_pages-1 %}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page }}">{{ page }}</a> ...
+        {% elif pages > max_pages and loop.last %}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ pages }}">{{ pages }}</a>
+        {% else %}
+            <a href="{{ url_for('forum.view_topic', topic_id=topic_obj.id) }}?page={{ page }}">{{ page }}</a>
+        {% endif %}
+    {%- endfor -%}
+]
+{%- endif -%}
+{%- endmacro -%}
+
+
+{#
+Generates a topic url with an anchor to the post
+XXX: Rename to generate_anchor_url to make it universally useful
+#}
+{%- macro generate_post_url(topic, post, page) -%}
+    {%- if page > 1 -%}
+        {{ topic.url }}?page={{ page }}#pid{{ post.id }}
+    {%- else -%}
+        {{ topic.url }}#pid{{ post.id }}
+    {%- endif -%}
+{%- endmacro -%}
+
+
+{#
+Generates the pagination object id in a list.
+For example, on id should continue with 11 on page 2 if per_page is set to 10
+#}
+{%- macro generate_obj_id(obj, page, per_page) -%}
+    {%- if obj.page == 1 -%}
+        {{ page }}
+    {%- else -%}
+        {{ page + (obj.page - 1) * per_page }}
+    {%- endif -%}
+{%- endmacro -%}

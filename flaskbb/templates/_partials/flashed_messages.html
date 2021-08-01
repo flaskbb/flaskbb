@@ -1,0 +1,19 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == 'error' %}
+                {% set icon = 'fas fa-exclamation' %}
+            {% elif category == 'success' %}
+                {% set icon = 'fas fa-check' %}
+            {% else %}
+                {% set icon = 'fas fa-info' %}
+            {% endif %}
+
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <span class="{{ icon }} me-2"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}

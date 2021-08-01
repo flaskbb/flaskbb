@@ -1,0 +1,144 @@
+{%- macro field_label(field) -%}
+    {# don't render labels for buttons and radio fields #}
+    {% if field.type != "SubmitField" and field.type != "BooleanField" %}
+        {% set css_class = kwargs['class'] if kwargs['class'] else 'form-label' %}
+        <label class="{{ css_class }}" for="{{ field.id }}">{{ field.label.text }}</label>
+    {% endif %}
+{% endmacro %}
+
+
+{%- macro field_description(field) -%}
+    {% if field.description %}
+        <div class="form-text">{{ field.description|safe }}</div>
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro field_errors(field) -%}
+    {% if field.errors %}
+        {%- for error in field.errors -%}
+        <div class="invalid-feedback">
+            {{error}}
+        </div>
+        {%- endfor -%}
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_input_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {% set placeholder = kwargs['placeholder']|length or field.label.text %}
+    {% set css_error = ' is-invalid' if field.errors else '' %}
+    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-control' %}
+    {% set css_class = css_class + css_error if css_error else css_class %}
+
+    {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+
+{% if div_class %}
+</div>
+{% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_boolean_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {% set css_error = ' is-invalid' if field.errors else '' %}
+    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-check-input' %}
+    {% set css_class = css_class + css_error if css_error else css_class %}
+    <div class="form-check">
+        {{ field(class=css_class, **kwargs) }}
+        <label class="form-check-label" for="{{ field.id }}">
+        {{ field.label.text }}
+        </label>
+        {{ field_description(field) }}
+        {{ field_errors(field) }}
+    </div>
+
+{% if div_class %}
+</div>
+{% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_select_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {% set css_error = ' is-invalid' if field.errors else '' %}
+    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-select' %}
+    {% set css_class = css_class + css_error if css_error else css_class %}
+
+    {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
+        {{ field(multiple=True, class=css_class) }}
+    {% else %}
+        {{ field(class=css_class) }}
+    {%- endif -%}
+
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+
+{% if div_class %}
+</div>
+{% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_submit_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {% set css_class = kwargs['class'] if kwargs['class'] else 'btn btn-success' %}
+    {{ field(class=css_class) }}
+
+{% if div_class %}
+</div>
+{% endif %}
+{%- endmacro -%}
+
+
+{%- macro render_field(field, div_class='mb-3 col-12') -%}
+<div class="{{ div_class }}">
+    {{ field_label(field) }}
+
+    {% if field.type == "BooleanField" %}
+        {{ render_boolean_field(field, **kwargs) }}
+    {% elif field.type == "SelectField" or field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
+        {{ render_select_field(field, **kwargs) }}
+    {% elif field.type == "SubmitField" %}
+        {{ render_submit_field(field, **kwargs) }}
+    {% else %}
+        {{ render_input_field(field, **kwargs) }}
+    {% endif %}
+</div>
+{%- endmacro -%}
+
+
+{%- macro horizontal_field(field, label_class='col-3 form-label text-end', div_class='col-4') -%}
+<div class="row mb-3">
+
+    {{ field_label(field, class=label_class) }}
+
+    <div class="{{ div_class }}">
+    {% if field.type == "BooleanField" %}
+        {{ render_boolean_field(field, **kwargs) }}
+    {% elif field.type == "SelectField" or field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
+        {{ render_select_field(field, **kwargs) }}
+    {% elif field.type == "SubmitField" %}
+        {{ render_submit_field(field, **kwargs) }}
+    {% else %}
+        {{ render_input_field(field, **kwargs) }}
+    {% endif %}
+    </div>
+
+</div>
+{%- endmacro -%}
