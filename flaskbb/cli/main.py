@@ -139,6 +139,14 @@ def install(welcome, force, username, email, password, no_plugins):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
+    if not current_app.config["CONFIG_PATH"]:
+        click.secho(
+            "[!] No 'flaskbb.cfg' config found. "
+            "You can generate a configuration file with 'flaskbb makeconfig'.",
+            fg="red",
+        )
+        sys.exit(1)
+
     click.secho("[+] Installing FlaskBB...", fg="cyan")
     if database_exists(db.engine.url):
         if force or click.confirm(click.style(

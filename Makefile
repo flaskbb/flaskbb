@@ -28,8 +28,7 @@ devconfig:dependencies ## Generates a development config
 	flaskbb makeconfig -d
 
 install:dependencies ## Installs the dependencies and FlaskBB
-	@[ -f ./flaskbb.cfg ] || (echo "flaskbb.cfg not found. You can generate a configuration file with 'flaskbb makeconfig'."; exit 1)
-	flaskbb --config ./flaskbb.cfg install
+	flaskbb install
 
 docs: ## Builds the Sphinx docs
 	$(MAKE) -C docs html
