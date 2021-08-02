@@ -26,15 +26,25 @@ from sqlalchemy_utils.functions import database_exists
 from werkzeug.utils import import_string
 
 from flaskbb import create_app
-from flaskbb.cli.utils import (EmailType, FlaskBBCLIError, get_version,
-                               prompt_config_path, prompt_save_user,
-                               write_config)
+from flaskbb.cli.utils import (
+    EmailType,
+    FlaskBBCLIError,
+    get_version,
+    prompt_config_path,
+    prompt_save_user,
+    write_config,
+)
 from flaskbb.extensions import alembic, celery, db, whooshee
-from flaskbb.utils.populate import (create_default_groups,
-                                    create_default_settings, create_latest_db,
-                                    create_test_data, create_welcome_forum,
-                                    insert_bulk_data, run_plugin_migrations,
-                                    update_settings_from_fixture)
+from flaskbb.utils.populate import (
+    create_default_groups,
+    create_default_settings,
+    create_latest_db,
+    create_test_data,
+    create_welcome_forum,
+    insert_bulk_data,
+    run_plugin_migrations,
+    update_settings_from_fixture,
+)
 from flaskbb.utils.translations import compile_translations
 
 
@@ -57,8 +67,7 @@ class FlaskBBGroup(FlaskGroup):
             self._loaded_flaskbb_plugins = True
         except Exception:
             logger.error(
-                "Error while loading CLI Plugins",
-                exc_info=traceback.format_exc()
+                "Error while loading CLI Plugins", exc_info=traceback.format_exc()
             )
         else:
             shell_context_processors = app.pluggy.hook.flaskbb_shell_context()
@@ -96,20 +105,44 @@ def set_instance(ctx, param, value):
     ctx.ensure_object(ScriptInfo).instance_path = value
 
 
-@click.group(cls=FlaskBBGroup, create_app=make_app, add_version_option=False,
-             invoke_without_command=True)
-@click.option("--config", expose_value=False, callback=set_config,
-              required=False, is_flag=False, is_eager=True, metavar="CONFIG",
-              help="Specify the config to use either in dotted module "
-                   "notation e.g. 'flaskbb.configs.default.DefaultConfig' "
-                   "or by using a path like '/path/to/flaskbb.cfg'")
-@click.option("--instance", expose_value=False, callback=set_instance,
-              required=False, is_flag=False, is_eager=True, metavar="PATH",
-              help="Specify the instance path to use. By default the folder "
-                   "'instance' next to the package or module is assumed to "
-                   "be the instance path.")
-@click.option("--version", expose_value=False, callback=get_version,
-              is_flag=True, is_eager=True, help="Show the FlaskBB version.")
+@click.group(
+    cls=FlaskBBGroup,
+    create_app=make_app,
+    add_version_option=False,
+    invoke_without_command=True,
+)
+@click.option(
+    "--config",
+    expose_value=False,
+    callback=set_config,
+    required=False,
+    is_flag=False,
+    is_eager=True,
+    metavar="CONFIG",
+    help="Specify the config to use either in dotted module "
+    "notation e.g. 'flaskbb.configs.default.DefaultConfig' "
+    "or by using a path like '/path/to/flaskbb.cfg'",
+)
+@click.option(
+    "--instance",
+    expose_value=False,
+    callback=set_instance,
+    required=False,
+    is_flag=False,
+    is_eager=True,
+    metavar="PATH",
+    help="Specify the instance path to use. By default the folder "
+    "'instance' next to the package or module is assumed to "
+    "be the instance path.",
+)
+@click.option(
+    "--version",
+    expose_value=False,
+    callback=get_version,
+    is_flag=True,
+    is_eager=True,
+    help="Show the FlaskBB version.",
+)
 @click.pass_context
 @click_log.simple_verbosity_option(logger)
 def flaskbb(ctx):
@@ -124,16 +157,22 @@ flaskbb.add_command(alembic_click, "db")
 
 
 @flaskbb.command()
-@click.option("--welcome", "-w", default=True, is_flag=True,
-              help="Disable the welcome forum.")
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Doesn't ask for confirmation.")
+@click.option(
+    "--welcome", "-w", default=True, is_flag=True, help="Disable the welcome forum."
+)
+@click.option(
+    "--force", "-f", default=False, is_flag=True, help="Doesn't ask for confirmation."
+)
 @click.option("--username", "-u", help="The username of the user.")
-@click.option("--email", "-e", type=EmailType(),
-              help="The email address of the user.")
+@click.option("--email", "-e", type=EmailType(), help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
-@click.option("--no-plugins", "-n", default=False, is_flag=True,
-              help="Don't run the migrations for the default plugins.")
+@click.option(
+    "--no-plugins",
+    "-n",
+    default=False,
+    is_flag=True,
+    help="Don't run the migrations for the default plugins.",
+)
 @with_appcontext
 def install(welcome, force, username, email, password, no_plugins):
     """Installs flaskbb. If no arguments are used, an interactive setup
@@ -149,9 +188,12 @@ def install(welcome, force, username, email, password, no_plugins):
 
     click.secho("[+] Installing FlaskBB...", fg="cyan")
     if database_exists(db.engine.url):
-        if force or click.confirm(click.style(
-            "Existing database found. Do you want to delete the old one and "
-            "create a new one?", fg="magenta")
+        if force or click.confirm(
+            click.style(
+                "Existing database found. Do you want to delete the old one and "
+                "create a new one?",
+                fg="magenta",
+            )
         ):
             db.drop_all()
         else:
@@ -178,23 +220,33 @@ def install(welcome, force, username, email, password, no_plugins):
     click.secho("[+] Compiling translations...", fg="cyan")
     compile_translations()
 
-    click.secho("[+] FlaskBB has been successfully installed!",
-                fg="green", bold=True)
+    click.secho("[+] FlaskBB has been successfully installed!", fg="green", bold=True)
 
 
 @flaskbb.command()
-@click.option("--test-data", "-t", default=False, is_flag=True,
-              help="Adds some test data.")
-@click.option("--bulk-data", "-b", default=False, is_flag=True,
-              help="Adds a lot of data.")
-@click.option("--posts", default=100,
-              help="Number of posts to create in each topic (default: 100).")
-@click.option("--topics", default=100,
-              help="Number of topics to create (default: 100).")
-@click.option("--force", "-f", is_flag=True,
-              help="Will delete the database before populating it.")
-@click.option("--initdb", "-i", is_flag=True,
-              help="Initializes the database before populating it.")
+@click.option(
+    "--test-data", "-t", default=False, is_flag=True, help="Adds some test data."
+)
+@click.option(
+    "--bulk-data", "-b", default=False, is_flag=True, help="Adds a lot of data."
+)
+@click.option(
+    "--posts",
+    default=100,
+    help="Number of posts to create in each topic (default: 100).",
+)
+@click.option(
+    "--topics", default=100, help="Number of topics to create (default: 100)."
+)
+@click.option(
+    "--force", "-f", is_flag=True, help="Will delete the database before populating it."
+)
+@click.option(
+    "--initdb",
+    "-i",
+    is_flag=True,
+    help="Initializes the database before populating it.",
+)
 def populate(bulk_data, test_data, posts, topics, force, initdb):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
@@ -222,14 +274,16 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
             create_test_data()
             rv = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
-        click.secho("[+] It took {:.2f} seconds to create {} topics and {} "
-                    "posts.".format(elapsed, rv[0], rv[1]), fg="cyan")
+        click.secho(
+            "[+] It took {:.2f} seconds to create {} topics and {} "
+            "posts.".format(elapsed, rv[0], rv[1]),
+            fg="cyan",
+        )
 
     # this just makes the most sense for the command name; use -i to
     # init the db as well
     if not test_data and not bulk_data:
-        click.secho("[+] Populating the database with some defaults...",
-                    fg="cyan")
+        click.secho("[+] Populating the database with some defaults...", fg="cyan")
         create_default_groups()
         create_default_settings()
 
@@ -242,42 +296,57 @@ def reindex():
 
 
 @flaskbb.command()
-@click.option("all_latest", "--all", "-a", default=False, is_flag=True,
-              help="Upgrades migrations AND fixtures to the latest version.")
-@click.option("--fixture/", "-f", default=None,
-              help="The fixture which should be upgraded or installed.")
-@click.option("--force", default=False, is_flag=True,
-              help="Forcefully upgrades the fixtures.")
+@click.option(
+    "all_latest",
+    "--all",
+    "-a",
+    default=False,
+    is_flag=True,
+    help="Upgrades migrations AND fixtures to the latest version.",
+)
+@click.option(
+    "--fixture/",
+    "-f",
+    default=None,
+    help="The fixture which should be upgraded or installed.",
+)
+@click.option(
+    "--force", default=False, is_flag=True, help="Forcefully upgrades the fixtures."
+)
 def upgrade(all_latest, fixture, force):
     """Updates the migrations and fixtures."""
     if all_latest:
-        click.secho("[+] Upgrading migrations to the latest version...",
-                    fg="cyan")
+        click.secho("[+] Upgrading migrations to the latest version...", fg="cyan")
         alembic.upgrade()
 
     if fixture or all_latest:
         try:
-            settings = import_string(
-                "flaskbb.fixtures.{}".format(fixture)
-            )
+            settings = import_string("flaskbb.fixtures.{}".format(fixture))
             settings = settings.fixture
         except ImportError:
-            raise FlaskBBCLIError("{} fixture is not available"
-                                  .format(fixture), fg="red")
+            raise FlaskBBCLIError(
+                "{} fixture is not available".format(fixture), fg="red"
+            )
 
         click.secho("[+] Updating fixtures...", fg="cyan")
         count = update_settings_from_fixture(
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
-        click.secho("[+] {settings} settings in {groups} setting groups "
-                    "updated.".format(groups=len(count), settings=sum(
-                        len(settings) for settings in count.values())
-                    ), fg="green")
+        click.secho(
+            "[+] {settings} settings in {groups} setting groups "
+            "updated.".format(
+                groups=len(count),
+                settings=sum(len(settings) for settings in count.values()),
+            ),
+            fg="green",
+        )
 
 
-@flaskbb.command("celery", add_help_option=False,
-                 context_settings={"ignore_unknown_options": True,
-                                   "allow_extra_args": True})
+@flaskbb.command(
+    "celery",
+    add_help_option=False,
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
+)
 @click.pass_context
 @with_appcontext
 def start_celery(ctx):
@@ -299,6 +368,7 @@ def shell_command():
     available.
     """
     import code
+
     banner = "Python %s on %s\nInstance Path: %s" % (
         sys.version,
         sys.platform,
@@ -328,20 +398,22 @@ def shell_command():
 
 
 @flaskbb.command("urls", short_help="Show routes for the app.")
-@click.option("--route", "-r", "order_by", flag_value="rule", default=True,
-              help="Order by route")
-@click.option("--endpoint", "-e", "order_by", flag_value="endpoint",
-              help="Order by endpoint")
-@click.option("--methods", "-m", "order_by", flag_value="methods",
-              help="Order by methods")
+@click.option(
+    "--route", "-r", "order_by", flag_value="rule", default=True, help="Order by route"
+)
+@click.option(
+    "--endpoint", "-e", "order_by", flag_value="endpoint", help="Order by endpoint"
+)
+@click.option(
+    "--methods", "-m", "order_by", flag_value="methods", help="Order by methods"
+)
 @with_appcontext
 def list_urls(order_by):
     """Lists all available routes."""
     from flask import current_app
 
     rules = sorted(
-        current_app.url_map.iter_rules(),
-        key=lambda rule: getattr(rule, order_by)
+        current_app.url_map.iter_rules(), key=lambda rule: getattr(rule, order_by)
     )
 
     max_rule_len = max(len(rule.rule) for rule in rules)
@@ -355,11 +427,14 @@ def list_urls(order_by):
 
     column_header_len = max_rule_len + max_endpoint_len + max_method_len + 4
     column_template = "{:<%s}  {:<%s}  {:<%s}" % (
-        max_rule_len, max_endpoint_len, max_method_len
+        max_rule_len,
+        max_endpoint_len,
+        max_method_len,
     )
 
-    click.secho(column_template.format("Route", "Endpoint", "Methods"),
-                fg="blue", bold=True)
+    click.secho(
+        column_template.format("Route", "Endpoint", "Methods"), fg="blue", bold=True
+    )
     click.secho("=" * column_header_len, bold=True)
 
     for rule in rules:
@@ -368,19 +443,33 @@ def list_urls(order_by):
 
 
 @flaskbb.command("makeconfig")
-@click.option("--development", "-d", default=False, is_flag=True,
-              help="Creates a development config with DEBUG set to True.")
-@click.option("--output", "-o", required=False,
-              help="The path where the config file will be saved at. "
-                   "Defaults to the flaskbb's root folder.")
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Overwrite any existing config file if one exists.")
+@click.option(
+    "--development",
+    "-d",
+    default=False,
+    is_flag=True,
+    help="Creates a development config with DEBUG set to True.",
+)
+@click.option(
+    "--output",
+    "-o",
+    required=False,
+    help="The path where the config file will be saved at. "
+    "Defaults to the flaskbb's root folder.",
+)
+@click.option(
+    "--force",
+    "-f",
+    default=False,
+    is_flag=True,
+    help="Overwrite any existing config file if one exists.",
+)
 def generate_config(development, output, force):
     """Generates a FlaskBB configuration file."""
     config_env = Environment(
         loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))
     )
-    config_template = config_env.get_template('config.cfg.template')
+    config_template = config_env.get_template("config.cfg.template")
 
     if output:
         config_path = os.path.abspath(output)
@@ -392,8 +481,9 @@ def generate_config(development, output, force):
 
     # An override to handle database location paths on Windows environments
     database_path = "sqlite:///" + os.path.join(
-        os.path.dirname(current_app.instance_path), "flaskbb.sqlite")
-    if os.name == 'nt':
+        os.path.dirname(current_app.instance_path), "flaskbb.sqlite"
+    )
+    if os.name == "nt":
         database_path = database_path.replace("\\", r"\\")
 
     default_conf = {
@@ -416,15 +506,16 @@ def generate_config(development, output, force):
         "csrf_secret_key": binascii.hexlify(os.urandom(24)).decode(),
         "timestamp": datetime.utcnow().strftime("%A, %d. %B %Y at %H:%M"),
         "log_config_path": "",
-        "deprecation_level": "default"
+        "deprecation_level": "default",
     }
 
     if not force:
         config_path = prompt_config_path(config_path)
 
     if force and os.path.exists(config_path):
-        click.secho("Overwriting existing config file: {}".format(config_path),
-                    fg="yellow")
+        click.secho(
+            "Overwriting existing config file: {}".format(config_path), fg="yellow"
+        )
 
     if development:
         default_conf["is_debug"] = True
@@ -434,109 +525,149 @@ def generate_config(development, output, force):
         sys.exit(0)
 
     # SERVER_NAME
-    click.secho("The name and port number of the exposed server.\n"
-                "If FlaskBB is accesible on port 80 you can just omit the "
-                "port.\n For example, if FlaskBB is accessible via "
-                "example.org:8080 than this is also what you would set here.",
-                fg="cyan")
+    click.secho(
+        "The name and port number of the exposed server.\n"
+        "If FlaskBB is accesible on port 80 you can just omit the "
+        "port.\n For example, if FlaskBB is accessible via "
+        "example.org:8080 than this is also what you would set here.",
+        fg="cyan",
+    )
     default_conf["server_name"] = click.prompt(
-        click.style("Server Name", fg="magenta"), type=str,
-        default=default_conf.get("server_name"))
+        click.style("Server Name", fg="magenta"),
+        type=str,
+        default=default_conf.get("server_name"),
+    )
 
     # HTTPS or HTTP
-    click.secho("Is HTTPS (recommended) or HTTP used for to serve FlaskBB?",
-                fg="cyan")
+    click.secho("Is HTTPS (recommended) or HTTP used for to serve FlaskBB?", fg="cyan")
     default_conf["use_https"] = click.confirm(
-        click.style("Use HTTPS?", fg="magenta"),
-        default=default_conf.get("use_https"))
+        click.style("Use HTTPS?", fg="magenta"), default=default_conf.get("use_https")
+    )
 
     # SQLALCHEMY_DATABASE_URI
-    click.secho("For Postgres use:\n"
-                "    postgresql://flaskbb@localhost:5432/flaskbb\n"
-                "For more options see the SQLAlchemy docs:\n"
-                "    http://docs.sqlalchemy.org/en/latest/core/engines.html",
-                fg="cyan")
+    click.secho(
+        "For Postgres use:\n"
+        "    postgresql://flaskbb@localhost:5432/flaskbb\n"
+        "For more options see the SQLAlchemy docs:\n"
+        "    http://docs.sqlalchemy.org/en/latest/core/engines.html",
+        fg="cyan",
+    )
     default_conf["database_uri"] = click.prompt(
         click.style("Database URI", fg="magenta"),
-        default=default_conf.get("database_uri"))
+        default=default_conf.get("database_uri"),
+    )
 
     # REDIS_ENABLED
-    click.secho("Redis will be used for things such as the task queue, "
-                "caching and rate limiting.", fg="cyan")
+    click.secho(
+        "Redis will be used for things such as the task queue, "
+        "caching and rate limiting.",
+        fg="cyan",
+    )
     default_conf["redis_enabled"] = click.confirm(
-        click.style("Would you like to use redis?", fg="magenta"),
-        default=True)  # default_conf.get("redis_enabled") is False
+        click.style("Would you like to use redis?", fg="magenta"), default=True
+    )  # default_conf.get("redis_enabled") is False
 
     # REDIS_URI
     if default_conf.get("redis_enabled", False):
         default_conf["redis_uri"] = click.prompt(
             click.style("Redis URI", fg="magenta"),
-            default=default_conf.get("redis_uri"))
+            default=default_conf.get("redis_uri"),
+        )
     else:
         default_conf["redis_uri"] = ""
 
     # MAIL_SERVER
-    click.secho("To use 'localhost' make sure that you have sendmail or\n"
-                "something similar installed. Gmail is also supprted.",
-                fg="cyan")
+    click.secho(
+        "To use 'localhost' make sure that you have sendmail or\n"
+        "something similar installed. Gmail is also supprted.",
+        fg="cyan",
+    )
     default_conf["mail_server"] = click.prompt(
         click.style("Mail Server", fg="magenta"),
-        default=default_conf.get("mail_server"))
+        default=default_conf.get("mail_server"),
+    )
     # MAIL_PORT
-    click.secho("The port on which the SMTP server is listening on.",
-                fg="cyan")
+    click.secho("The port on which the SMTP server is listening on.", fg="cyan")
     default_conf["mail_port"] = click.prompt(
         click.style("Mail Server SMTP Port", fg="magenta"),
-        default=default_conf.get("mail_port"))
+        default=default_conf.get("mail_port"),
+    )
     # MAIL_USE_TLS
-    click.secho("If you are using a local SMTP server like sendmail this is "
-                "not needed. For external servers it is required.",
-                fg="cyan")
+    click.secho(
+        "If you are using a local SMTP server like sendmail this is "
+        "not needed. For external servers it is required.",
+        fg="cyan",
+    )
     default_conf["mail_use_tls"] = click.confirm(
         click.style("Use TLS for sending mails?", fg="magenta"),
-        default=default_conf.get("mail_use_tls"))
+        default=default_conf.get("mail_use_tls"),
+    )
     # MAIL_USE_SSL
     click.secho("Same as above. TLS is the successor to SSL.", fg="cyan")
     default_conf["mail_use_ssl"] = click.confirm(
         click.style("Use SSL for sending mails?", fg="magenta"),
-        default=default_conf.get("mail_use_ssl"))
+        default=default_conf.get("mail_use_ssl"),
+    )
     # MAIL_USERNAME
-    click.secho("Not needed if you are using a local smtp server.\nFor gmail "
-                "you have to put in your email address here.", fg="cyan")
+    click.secho(
+        "Not needed if you are using a local smtp server.\nFor gmail "
+        "you have to put in your email address here.",
+        fg="cyan",
+    )
     default_conf["mail_username"] = click.prompt(
         click.style("Mail Username", fg="magenta"),
-        default=default_conf.get("mail_username"))
+        default=default_conf.get("mail_username"),
+    )
     # MAIL_PASSWORD
-    click.secho("Not needed if you are using a local smtp server.\nFor gmail "
-                "you have to put in your gmail password here.", fg="cyan")
+    click.secho(
+        "Not needed if you are using a local smtp server.\nFor gmail "
+        "you have to put in your gmail password here.",
+        fg="cyan",
+    )
     default_conf["mail_password"] = click.prompt(
         click.style("Mail Password", fg="magenta"),
-        default=default_conf.get("mail_password"))
+        default=default_conf.get("mail_password"),
+    )
     # MAIL_DEFAULT_SENDER
-    click.secho("The name of the sender. You probably want to change it to "
-                "something like '<your_community> Mailer'.", fg="cyan")
+    click.secho(
+        "The name of the sender. You probably want to change it to "
+        "something like '<your_community> Mailer'.",
+        fg="cyan",
+    )
     default_conf["mail_sender_name"] = click.prompt(
         click.style("Mail Sender Name", fg="magenta"),
-        default=default_conf.get("mail_sender_name"))
-    click.secho("On localhost you want to use a noreply address here. "
-                "Use your email address for gmail here.", fg="cyan")
+        default=default_conf.get("mail_sender_name"),
+    )
+    click.secho(
+        "On localhost you want to use a noreply address here. "
+        "Use your email address for gmail here.",
+        fg="cyan",
+    )
     default_conf["mail_sender_address"] = click.prompt(
         click.style("Mail Sender Address", fg="magenta"),
-        default=default_conf.get("mail_sender_address"))
+        default=default_conf.get("mail_sender_address"),
+    )
     # ADMINS
-    click.secho("Logs and important system messages are sent to this address. "
-                "Use your email address for gmail here.", fg="cyan")
+    click.secho(
+        "Logs and important system messages are sent to this address. "
+        "Use your email address for gmail here.",
+        fg="cyan",
+    )
     default_conf["mail_admin_address"] = click.prompt(
         click.style("Mail Admin Email", fg="magenta"),
-        default=default_conf.get("mail_admin_address"))
+        default=default_conf.get("mail_admin_address"),
+    )
 
-    click.secho("Optional filepath to load a logging configuration file from. "
-                "See the Python logging documentation for more detail.\n"
-                "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",  # noqa
-                fg="cyan")
+    click.secho(
+        "Optional filepath to load a logging configuration file from. "
+        "See the Python logging documentation for more detail.\n"
+        "\thttps://docs.python.org/library/logging.config.html#logging-config-fileformat",  # noqa
+        fg="cyan",
+    )
     default_conf["log_config_path"] = click.prompt(
         click.style("Logging Config Path", fg="magenta"),
-        default=default_conf.get("log_config_path"))
+        default=default_conf.get("log_config_path"),
+    )
 
     deprecation_mesg = (
         "Warning level for deprecations. options are: \n"
@@ -553,14 +684,18 @@ def generate_config(development, output, force):
     click.secho(deprecation_mesg, fg="cyan")
     default_conf["deprecation_level"] = click.prompt(
         click.style("Deperecation warning level", fg="magenta"),
-        default=default_conf.get("deprecation_level")
+        default=default_conf.get("deprecation_level"),
     )
 
     write_config(default_conf, config_template, config_path)
 
     # Finished
-    click.secho("The configuration file has been saved to:\n{cfg}\n"
-                "Feel free to adjust it as needed."
-                .format(cfg=config_path), fg="blue", bold=True)
-    click.secho("Usage: \nflaskbb --config {cfg} run"
-                .format(cfg=config_path), fg="green")
+    click.secho(
+        "The configuration file has been saved to:\n{cfg}\n"
+        "Feel free to adjust it as needed.".format(cfg=config_path),
+        fg="blue",
+        bold=True,
+    )
+    click.secho(
+        "Usage: \nflaskbb --config {cfg} run".format(cfg=config_path), fg="green"
+    )
