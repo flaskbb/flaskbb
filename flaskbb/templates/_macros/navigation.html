@@ -1,42 +1,49 @@
-{% macro topnav(endpoint, name, icon='', id='', active=False) %}
-<li {% if id %}id={{id}}{% endif %} class="nav-item">
-    <a class="nav-link{% if endpoint == request.endpoint or active == True %} active{% endif %}" href="{{ url_for(endpoint) }}">
+{% macro is_active(endpoint, active='') %}
+    {%- if endpoint == request.endpoint or endpoint == active or active == True -%}
+        active
+    {%- endif -%}
+{% endmacro %}
+
+
+{% macro topnav(endpoint, name, icon='', id='', active='') %}
+<li {% if id %}id="{{ id }}"{% endif %} class="nav-item">
+    <a class="nav-link {{ is_active(endpoint, active) }}" href="{{ url_for(endpoint) }}">
         {% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ name }}
     </a>
 </li>
 {% endmacro %}
 
-{% macro is_active(endpoint, active=False) %}
-    {%- if endpoint == request.endpoint or active == True -%}
-        active
-    {%- endif -%}
-{% endmacro %}
 
 {% macro navlink(endpoint, name, icon='', active='', urlforkwargs=None) %}
-<li {% if endpoint == request.endpoint or endpoint == active or active == True %}class="active"{% endif %}>
-    <a href="{% if urlforkwargs %}{{ url_for(endpoint, **urlforkwargs) }}{% else %}{{ url_for(endpoint) }}{% endif %}">
+<li class="nav-item">
+    <a class="nav-link {{ is_active(endpoint, active) }}" href="{% if urlforkwargs %}{{ url_for(endpoint, **urlforkwargs) }}{% else %}{{ url_for(endpoint) }}{% endif %}">
         {% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}
     </a>
 </li>
 {% endmacro %}
 
+
 {% macro externalnavlink(uri, name, icon='') %}
-<li>
-    <a href="{{uri}}">{% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}</a>
+<li class="nav-item">
+    <a class="nav-link" href="{{uri}}">{% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}</a>
 </li>
 {% endmacro %}
 
+
 {% macro navtext(text, icon="", cls="") %}
-<li{% if cls %} class="{{ cls }}"{% endif %}><a href="#">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ text }}</a></li>
+<li {%- if cls -%}class="{{ cls }}"{%- endif -%}><a href="#">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ text }}</a></li>
 {% endmacro %}
+
 
 {% macro navheader(text, icon="", cls="nav-header") %}
 {{ navtext(text, icon, cls) }}
 {% endmacro %}
 
+
 {% macro navdivider() %}
 <li class="nav-divider"></li>
 {% endmacro %}
+
 
 {% macro sidebar(items, extra_class="") %}
 {% if items %}
@@ -62,11 +69,3 @@
     {% endif %}
 {% endfor %}
 {% endmacro %}
-
-
-{% macro tablink_href(endpoint, name, active=False) %}
-<li {% if endpoint == request.endpoint or active %}class="active"{% endif %} >
-    <a href={{ endpoint }} role="tab" data-toggle="tab">{{ name }}</a>
-</li>
-{% endmacro %}
-
