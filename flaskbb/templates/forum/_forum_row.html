@@ -1,0 +1,73 @@
+<div class="row forum-row hover">
+
+    <div class="{% if with_checkbox %}col-7{% else %}col-8{% endif %} col-sm-4 topic-info">
+        <div class="topic-status">
+        {% if topic.locked %}
+            <span class="fas fa-lock fa-fw topic-locked"></span>
+        {% elif topic.hidden %}
+            <span class="far fa-eye"></span>
+        {% elif topic.important %}
+            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                <span class="far fa-star fa-fw topic-starred-unread"></span>
+            {% else %}
+                <span class="fas fa-star fa-fw topic-starred-read"></span>
+            {% endif %}
+        {% else %}
+            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                <span class="fas fa-comment fa-fw topic-unread"></span>
+            {% else %}
+                <span class="far fa-comment fa-fw topic-read"></span>
+            {% endif %}
+        {% endif %}
+        </div>
+
+        <div class="topic-name">
+            <a href="{{ topic.first_unread(topicread, current_user, forumsread) }}">{{ topic.title }}</a>
+            <!-- Topic Pagination -->
+            <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+        </div>
+
+        <div class="topic-author">
+            {% trans %}by{% endtrans %}
+            {% if topic.user_id %}
+             <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+            {% else %}
+            {{ topic.username }}
+            {% endif %}
+        </div>
+
+        {% if topic.hidden %}
+        <div class="topic-author">
+            {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
+        {{ topic.post_count }}
+    </div>
+
+    <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
+        {{ topic.views }}
+    </div>
+
+    <div class="col-4 col-sm-3 topic-last-post">
+        <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
+
+        <div class="topic-author">
+            {% trans %}by{% endtrans %}
+            {% if last_post.user_id %}
+            <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
+            {% else %}
+            {{ last_post.username }}
+            {% endif %}
+        </div>
+    </div>
+
+    {% if with_checkbox %}
+    <div class="col-1 topic-select">
+        <input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="{% trans %}Select topic{% endtrans %}"/>
+    </div>
+    {% endif %}
+
+</div>  <!-- end forum-row -->

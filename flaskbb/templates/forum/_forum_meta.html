@@ -1,0 +1,11 @@
+<div class="row m-0 forum-meta">
+    <div class="{% if with_checkbox %}col-7{% else %}col-8{% endif %} col-sm-4 topic-name">{% trans %}Topic{% endtrans %}</div>
+    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
+    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
+    <div class="col-4 col-sm-3 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+    {% if with_checkbox %}
+    <div class="col-1 topic-select-all">
+        <input type="checkbox" name="rowtoggle" class="action-checkall" title="{% trans %}Select all{% endtrans %}"/>
+    </div>
+    {% endif %}
+</div>
