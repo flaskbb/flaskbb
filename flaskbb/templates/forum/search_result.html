@@ -2,7 +2,8 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("_macros/form.html") import render_pagination, group_field, topic_pages %}
+{% from theme("_macros/form.html") import group_field %}
+{% from theme("_macros/pagination.html") import render_pagination, topic_pages %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
@@ -11,11 +12,11 @@
     </ol>
 
     {% if result['post'] %}
-    <div class="panel topic-panel">
-        <div class="panel-heading topic-head">
+    <div class="card topic">
+        <div class="card-header topic-header">
             {% trans %}Posts{% endtrans %}
         </div>
-        <div class="panel-body topic-body">
+        <div class="card-body topic-body">
             {% for post in result['post'] %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
@@ -88,11 +89,11 @@
     {% endif %}
 
     {% if result['user'] %}
-    <div class="panel panel-default page-panel">
-        <div class="panel-heading page-head">
+    <div class="card page">
+        <div class="card-header page-header">
             {% trans %}Users{% endtrans %}
         </div>
-        <div class="panel-body page-body">
+        <div class="card-body page-body">
             <div class="page-meta">
                 <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
                 <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Username{% endtrans %}</div>
@@ -118,12 +119,12 @@
     {% endif %}
 
     {% if result['topic'] %}
-    <div class="panel panel-default forum-panel">
-        <div class="panel-heading forum-head">
+    <div class="card forum">
+        <div class="card-header forum-header">
             {% trans %}Topics{% endtrans %}
         </div>
 
-        <div class="panel-body forum-body">
+        <div class="card-body forum-body">
             <div class="forum-meta">
                 <div class="col-md-5 col-sm-5 col-xs-8 topic-name">{% trans %}Topic{% endtrans %}</div>
                 <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
@@ -197,12 +198,12 @@
     {% endif %}
 
     {% if result['forum'] %}
-    <div class="panel panel-default category-panel">
-        <div class="panel-heading category-head">
+    <div class="card category">
+        <div class="card-header category-header">
             {% trans %}Forums{% endtrans %}
         </div>
 
-        <div class="panel-body category-body">
+        <div class="card-body category-body">
             <div class="category-meta">
                 <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Forum{% endtrans %}</div>
                 <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics{% endtrans %}</div>

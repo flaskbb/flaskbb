@@ -22,11 +22,11 @@
     {% endif %}
 
 
-    <div class="panel topic-panel">
-        <div class="panel-heading topic-head">
+    <div class="card topic">
+        <div class="card-header topic-header">
             <a href="{{ topic.url }}">{{ topic.title }}</a>
         </div>
-        <div class="panel-body topic-body">
+        <div class="card-body topic-body">
             {% for post, user in posts.items %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
@@ -173,7 +173,7 @@
             {% endfor %}
 
         </div> <!-- end topic-body -->
-    </div> <!-- end topic-panel -->
+    </div> <!-- end topic -->
 
     {% include theme('forum/topic_controls.html') %}
     {% from theme("macros.html") import render_field, render_quickreply, render_submit_field %}
