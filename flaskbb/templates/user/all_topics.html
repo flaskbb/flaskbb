@@ -1,21 +1,20 @@
 {% extends theme("user/profile_layout.html") %}
-{% from theme('macros.html') import render_pagination, topic_pages %}
+{%- from theme("_macros/pagination.html") import render_pagination, topic_pages %}
 
 {% block breadcrumb %}
-<ul class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ user.url }}">{{ user.username }}</a></li>
-    <li class="active">{% trans %}Topics{% endtrans %}</li>
-</ul>
+<ol class="breadcrumb flaskbb-breadcrumb bg-light">
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ user.url }}">{{ user.username }}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Topics{% endtrans %}</li>
+</ol>
 {% endblock %}
 
 {% block profile_content %}
-<!-- middle column -->
-<div class="col-md-9 col-sm-9 col-xs-12 profile-content">
+<div class="col-12 profile-content">
 
     {% for topic in topics.items %}
-    <div class="panel page-panel">
-        <div class="panel-heading page-head topic-head">
+    <div class="card page mb-3">
+        <div class="card-header page-header topic-header fw-normal">
             {% trans trimmed
                 topic_url=topic.url,
                 topic_title=topic.title,
@@ -26,8 +25,8 @@
                 in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
             {% endtrans %}
         </div>
-        <div class="panel-body page-body topic-content">
-            <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="card-body page-body topic-content">
+            <div class="col-12 ps-3">
                 <div class="topic-created">
                     {{ topic.date_created|format_datetime }}
                 </div>
@@ -39,7 +38,7 @@
     </div>
     {% else %}
     <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="col-12">
             <div class="alert-message alert-message-info" role="alert">
                 {% trans %}No topics yet{% endtrans %}
             </div>
@@ -48,10 +47,8 @@
     {% endfor %}
 
     {% if topics.items %}
-    <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
-        <div class="pull-left">
-            {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
-        </div>
+    <div class="col-12 controls-col">
+        {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
     </div>
     {% endif %}
 
