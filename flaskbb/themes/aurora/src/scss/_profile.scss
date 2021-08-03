@@ -40,8 +40,7 @@
 
 .profile-content {
     background-color: #fff;
-    border-left: 1px solid $border-color;
-    min-height: 32.25em;
+    min-height: 100%;
 
     .topic-head {
         font-weight: normal;
@@ -71,20 +70,7 @@
     text-shadow: 0 1px 0 #fff;
 }
 
-.profile-groupname,
-.profile-online,
-.profile-location,
-.profile-posts,
-.profile-date,
-.profile-buttons {
-    text-align: center;
-    margin-top: 0.2em;
-}
-
-
 .profile-groupname {
-    text-align: center;
-    margin-top: 0.75em;
     color: $fresh-blue;
     font-size: 1.2em;
     font-weight: 600;

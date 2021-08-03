@@ -1,17 +1,17 @@
 {% extends theme("user/settings_layout.html") %}
 
 {% block settings_content %}
-{% from theme("macros.html") import horizontal_field, horizontal_select_field %}
+{%- from theme("_macros/form.html") import horizontal_field, render_select_field %}
 
-<div class="panel page-panel">
-    <div class="panel-heading page-head">
+<div class="card page">
+    <div class="card-header page-header">
         {% trans %}Change User Details{% endtrans %}
     </div>
-    <div class="panel-body page-body">
-        <form class="form-horizontal" role="form" method="POST">
+    <div class="card-body page-body">
+        <form role="form" method="POST">
             {{ form.hidden_tag() }}
             {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
-            {{ horizontal_select_field(form.birthday, select_class="form-control", surrounded_div="col-sm-4") }}
+            {{ horizontal_field(form.birthday, div_class="row col-5", class="form-select", surrounded_div="col-4") }}
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
             {{ horizontal_field(form.website) }}
@@ -19,9 +19,9 @@
             {{ horizontal_field(form.signature, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
             {{ horizontal_field(form.notes, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
             {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
-            {{ horizontal_field(form.submit) }}
 
-            {% include theme('editor_help.html') %}
+            {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+
         </form>
     </div>
 </div>

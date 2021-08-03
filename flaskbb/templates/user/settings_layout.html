@@ -2,12 +2,12 @@
 {% set page_title = _("Settings - %(user)s - User", user=current_user.username) %}
 
 {% block content %}
-{%- from theme('macros.html') import navlink with context -%}
+{%- from theme("_macros/navigation.html") import navlink with context -%}
 
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
-    <li class="active">{% trans %}Settings{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Settings{% endtrans %}</li>
 </ol>
 
 <div class="row">
