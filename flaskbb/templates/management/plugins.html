@@ -72,6 +72,14 @@
                                 {% trans %}Uninstall{% endtrans %}
                             </button>
                         </form>
+                        {% if plugin.has_new_settings() %}
+                        <form class="inline-form" method="post" action="{{ url_for('management.upgrade_plugin', name=plugin.name) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-info" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="Upgrades the settings">
+                                {% trans %}Upgrade{% endtrans %}
+                            </button>
+                        </form>
+                        {% endif %}
 
                         <a class="btn btn-info" href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
                         {% endif %}

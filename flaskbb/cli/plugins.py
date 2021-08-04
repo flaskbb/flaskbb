@@ -55,6 +55,18 @@ def list_plugins():
                 p_dist.version), bold=True
             )
 
+    upgradable_plugins = [
+        p for p in PluginRegistry.query.all() if p.has_new_settings()
+    ]
+    if len(upgradable_plugins) > 0:
+        click.secho(
+            "[+] Upgradable Plugins (have new settings):", fg="magenta", bold=True
+        )
+        for plugin in upgradable_plugins:
+            click.secho("\t- {}".format(
+                plugin.name.title()), bold=True
+            )
+
 
 @plugins.command("enable")
 @click.argument("plugin_name")
@@ -166,3 +178,38 @@ def new_plugin(template, out_dir, force):
     r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
     click.secho("[+] Created new plugin in {}".format(r),
                 fg="green", bold=True)
+
+
+@plugins.command("upgrade")
+@click.argument("plugin_name")
+@with_appcontext
+def upgrade(plugin_name):
+    "Upgrades a plugin's settings if it has new ones"
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+
+    if not plugin.enabled:
+        click.secho("[+] Can't upgrade disabled plugin. "
+                    "Enable '{}' Plugin first.".format(plugin.name), fg="red")
+        sys.exit(0)
+
+    if plugin.has_new_settings():
+        result = plugin.upgrade_settings()
+        click.secho("[+] Plugin's settings have been upgraded.", fg="green")
+
+        if result["removed"]:
+            click.secho("[-] Removed Settings.", fg="red", bold=True)
+            for name in result["removed"]:
+                click.secho("\t- {}".format(name), bold=True)
+
+        if result["added"]:
+            click.secho("[-] Added Settings", fg="green", bold=True)
+            for name in result["added"]:
+                click.secho("\t- {}".format(name), bold=True)
+
+        if result["updated"]:
+            click.secho("[-] Updated Settings", fg="magenta", bold=True)
+            for name in result["upgraded"]:
+                click.secho("\t- {}".format(name), bold=True)
+    else:
+        click.secho("[+] Nothing to upgrade.", fg="green")
