@@ -4,14 +4,15 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Manage Groups{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Manage Groups{% endtrans %}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_pagination, navlink with context %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -23,11 +24,11 @@
 </div>
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-users"></span> {% trans %}Groups{% endtrans %}
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
             <div class="settings-content">
                 <div class="settings-meta row">
                     <div class="col-md-1 col-sm-1 col-xs-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
@@ -76,12 +77,12 @@
             {% endfor %}
             </div>
         </div>
-        <div class="panel-footer settings-footer">
+        <div class="card-footer settings-footer">
             {{ render_pagination(groups, url_for('management.groups')) }}
         </div>
     </div>
 </div>
-{% include theme('confirm_dialog.html') %}
+{% include theme('_partials/confirm_dialog.html') %}
 {% endblock %}
 
 {% block scripts %}

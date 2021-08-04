@@ -107,7 +107,10 @@
 
 
 {%- macro render_field(field, div_class='mb-3 col-12') -%}
+{% if div_class %}
 <div class="{{ div_class }}">
+{% endif %}
+
     {{ field_label(field) }}
 
     {% if field.type == "BooleanField" %}
@@ -119,7 +122,10 @@
     {% else %}
         {{ render_input_field(field, **kwargs) }}
     {% endif %}
+
+{% if div_class %}
 </div>
+{% endif %}
 {%- endmacro -%}
 
 

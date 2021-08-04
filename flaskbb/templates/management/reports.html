@@ -5,32 +5,31 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Reports{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Reports{% endtrans %}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_pagination, navlink with context %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
 
 
-<div class="col-md-3 settings-col">
-    <div class="nav-sidebar">
-        <ul class="nav">
-            {{ navlink('management.reports', _("Show all Reports")) }}
-            {{ navlink('management.unread_reports', _("Show unread Reports")) }}
-        </ul>
-    </div>
+<div class="col-3 settings-col">
+    <ul class="nav nav-sidebar">
+        {{ navlink('management.reports', _("Show all Reports")) }}
+        {{ navlink('management.unread_reports', _("Show unread Reports")) }}
+    </ul>
 </div>
 
 
-<div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+<div class="col-9 settings-col with-left-border">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-flag"></span> {% trans %}Reports{% endtrans %}
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
             <div class="settings-content">
                 <div class="settings-meta row">
                     <div class="col-md-1 col-sm-1 col-xs-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
@@ -91,13 +90,13 @@
                 </div>
             {% endfor %}
             </div>
-            <div class="panel-footer settings-footer">
+            <div class="card-footer settings-footer">
                 {{ render_pagination(reports, url_for(request.endpoint)) }}
             </div>
         </div>
     </div>
 </div>
-{% include theme('confirm_dialog.html') %}
+{% include theme('_partials/confirm_dialog.html') %}
 {% endblock %}
 
 {% block scripts %}

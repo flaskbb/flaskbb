@@ -2,18 +2,19 @@
 {% set active = "management.users" %}
 
 {% extends theme("management/management_layout.html") %}
+{%- from theme("_macros/pagination.html") import render_pagination %}
+{%- from theme("_macros/navigation.html") import navlink with context %}
+{%- from theme("_macros/form.html") import render_input_field %}
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Manage Users{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_pagination, group_field, navlink with context %}
-
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
@@ -28,8 +29,8 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
 
             <span class="fa fa-user-times"></span> {% trans %}Banned Users{% endtrans %}
 
@@ -42,13 +43,13 @@
             </div>
 
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
 
             <div class="settings-search">
                 <form class="search-form" role="form" method="post">
                     {{ search_form.hidden_tag() }}
                     <div class="input-group">
-                        {{ group_field(search_form.search_query, css_class="form-control") }}
+                        {{ render_input_field(search_form.search_query) }}
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
                         </span>
@@ -107,12 +108,11 @@
 
             </div> <!-- end settings content -->
         </div>
-        <div class="panel-footer settings-footer">
+        <div class="card-footer settings-footer">
             {{ render_pagination(users, url_for('management.banned_users')) }}
         </div>
     </div>
 </div>
-{% include theme('confirm_dialog.html') %}
 {% endblock %}
 
 {% block scripts %}

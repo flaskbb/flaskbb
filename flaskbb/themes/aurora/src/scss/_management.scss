@@ -10,6 +10,7 @@
     .management-header {
         background-color: $blue;
     }
+
     .management-body {
         padding: 0;
     }
@@ -25,9 +26,6 @@
     }
     .settings-body {
         padding: 0;
-        .settings-form {
-            padding-top: 10px;
-        }
     }
 
     .settings-meta {
@@ -39,7 +37,7 @@
             font-weight: bold;
         }
     }
-    .settings-content > .category-panel {
+    .settings-content > .category {
         border-left: none;
         border-right: none;
         border-bottom: none;
@@ -91,6 +89,7 @@
 .stats {
     margin-top: 15px;
     margin-bottom: 15px;
+
     .stats-widget {
         text-align: center;
         padding-top: 20px;

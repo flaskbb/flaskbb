@@ -5,14 +5,17 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Manage Users{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme("macros.html") import horizontal_field, horizontal_select_field, navlink with context %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import horizontal_field -%}
+
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -28,18 +31,21 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-user-plus"></span> {{ title }}
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
             <div class="settings-content">
                 <form class="form-horizontal settings-form" role="form" method="post">
                     {{ form.hidden_tag() }}
+
+                    {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
+
                     {{ horizontal_field(form.username) }}
                     {{ horizontal_field(form.email) }}
                     {{ horizontal_field(form.password) }}
-                    {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
+                    {{ horizontal_field(form.birthday, div_class="row col-5", class="form-select", surrounded_div="col-4") }}
                     {{ horizontal_field(form.gender) }}
                     {{ horizontal_field(form.location) }}
                     {{ horizontal_field(form.website) }}
@@ -50,9 +56,9 @@
                     {{ horizontal_field(form.signature, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
                     {{ horizontal_field(form.notes, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
 
-                    {{ horizontal_field(form.submit) }}
+                    {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
 
-                    {% include theme('editor_help.html') %}
+                    {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
                 </form>
             </div>
         </div>

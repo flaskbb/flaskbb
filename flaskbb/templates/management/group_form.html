@@ -5,14 +5,16 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Manage Groups{% endtrans %}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Manage Groups{% endtrans %}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme("macros.html") import render_field, render_boolean_field, render_submit_field, navlink with context %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import render_field -%}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -24,41 +26,39 @@
 </div>
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-user-plus"></span> {{ title }}
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
             <div class="settings-content">
-                <form class="form-horizontal settings-form" role="form" method="post">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+                <form class="settings-form" role="form" method="post">
+                    <div class="col-12">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.name) }}
 
                         {{ render_field(form.description, div_class="col-sm-10", class="flaskbb-editor", style="display:none") }}
-                        {{ render_boolean_field(form.admin) }}
-                        {{ render_boolean_field(form.super_mod) }}
+                        {{ render_field(form.admin) }}
+                        {{ render_field(form.super_mod) }}
 
-                        {{ render_boolean_field(form.mod) }}
-                        {{ render_boolean_field(form.banned) }}
-                        {{ render_boolean_field(form.guest) }}
+                        {{ render_field(form.mod) }}
+                        {{ render_field(form.banned) }}
+                        {{ render_field(form.guest) }}
 
-                        {{ render_boolean_field(form.mod_edituser) }}
-                        {{ render_boolean_field(form.mod_banuser) }}
+                        {{ render_field(form.mod_edituser) }}
+                        {{ render_field(form.mod_banuser) }}
 
-                        {{ render_boolean_field(form.editpost) }}
-                        {{ render_boolean_field(form.deletepost) }}
-                        {{ render_boolean_field(form.deletetopic) }}
-                        {{ render_boolean_field(form.posttopic) }}
-                        {{ render_boolean_field(form.postreply) }}
-                        {{ render_boolean_field(form.makehidden) }}
-                        {{ render_boolean_field(form.viewhidden) }}
+                        {{ render_field(form.editpost) }}
+                        {{ render_field(form.deletepost) }}
+                        {{ render_field(form.deletetopic) }}
+                        {{ render_field(form.posttopic) }}
+                        {{ render_field(form.postreply) }}
+                        {{ render_field(form.makehidden) }}
+                        {{ render_field(form.viewhidden) }}
 
-
-                        {{ render_submit_field(form.submit, div_class="form-group col-sm-5") }}
+                        {{ render_field(form.submit) }}
                     </div>
 
-                    {% include theme('editor_help.html') %}
                 </form>
             </div>
         </div>

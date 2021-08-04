@@ -9,7 +9,6 @@
     }
 }
 
-
 /* Sidebar Nav */
 .sidebar {
     padding-top: 1em;
@@ -48,7 +47,7 @@
         background-color: $navigation-hover-color;
     }
 
-    .nav-item > .active ,
+    .nav-item > .active,
     .nav-item > .active:hover,
     .nav-item > .active:focus {
         font-weight: normal;
@@ -61,11 +60,7 @@
     width: 100%;
     padding: 0;
 
-    a {
-        color: $navigation-color;
-    }
-
-    li.nav-header {
+    .nav-header {
         position: relative;
         display: block;
         padding: 10px 7.5px;
@@ -73,21 +68,63 @@
         font-weight: bold;
         text-transform: uppercase;
     }
-
-    .active a {
-        cursor: default;
-        background-color: $navigation-bg;
-        color: $navigation-color;
+    .nav-item {
+        width: 100%;
     }
 
-    li.active {
-        border-top: 1px solid $border-color;
-        border-bottom: 1px solid $border-color;
-        &:first-child {
-            border-top: none;
+    .nav-link {
+        color: $navigation-color;
+
+        &:hover {
+            background-color: $navigation-bg;
+        }
+
+        &.active {
+            border-top: 1px solid $border-color;
+            border-bottom: 1px solid $border-color;
+
+            cursor: default;
+            background-color: $navigation-bg;
         }
     }
-    .active a:hover {
-        background-color: $navigation-bg;
+
+    .nav-item:first-child > .nav-link:first-child.active {
+        border-top: none;
+    }
+}
+
+.card-tabs {
+    > .card-header {
+        padding: 0;
+        font-weight: 500;
+    }
+    > .card-header > .nav-tabs {
+        border-bottom: none;
+
+        .nav-link {
+            border-radius: 0;
+            border-color: transparent;
+        }
+
+        .nav-link.active,
+        .nav-item.show .nav-link {
+            background-color: $fresh-blue;
+        }
+
+        // non-active and hover
+        .nav-item {
+            .nav-link {
+                color: $header-subtitle-color;
+                border: 1px solid $blue;
+
+                // different background color when hovering
+                &.active,
+                &:hover,
+                &:focus {
+                    background-color: $fresh-blue;
+                    border: 1px solid $fresh-blue;
+                }
+            }
+        }
     }
 }

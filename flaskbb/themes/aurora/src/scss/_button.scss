@@ -19,3 +19,17 @@
         $hover-color: #333
     );
 }
+
+.btn-xs {
+    $btn-xs-py: 1px;
+    $btn-xs-px: 5px;
+    $btn-xs-font-size: 11px;
+    //$border-radius: 3px;
+
+    @include button-size(
+        $btn-xs-py,
+        $btn-xs-px,
+        $btn-xs-font-size,
+        $border-radius
+    );
+}

@@ -5,14 +5,16 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{{ title }}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{{ title }}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme("macros.html") import render_field, render_submit_field, render_boolean_field, render_select_field, navlink with context %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import render_field -%}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -25,13 +27,13 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-comment-o"></span> {{ title }}
         </div>
-        <div class="panel-body settings-body">
+        <div class="card-body settings-body">
             <div class="settings-content">
-                <form class="form-horizontal settings-form" role="form" method="post">
+                <form class="settings-form" role="form" method="post">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         {{ form.hidden_tag() }}
                         {{ render_field(form.title) }}
@@ -40,13 +42,11 @@
                         {{ render_field(form.position) }}
                         {{ render_field(form.external) }}
                         {{ render_field(form.moderators) }}
-                        {{ render_boolean_field(form.show_moderators) }}
-                        {{ render_boolean_field(form.locked) }}
-                        {{ render_select_field(form.groups) }}
-                        {{ render_submit_field(form.submit, div_class="form-group col-sm-5") }}
+                        {{ render_field(form.show_moderators) }}
+                        {{ render_field(form.locked) }}
+                        {{ render_field(form.groups) }}
+                        {{ render_field(form.submit) }}
                     </div>
-
-                    {% include theme('editor_help.html') %}
                 </form>
             </div>
         </div>

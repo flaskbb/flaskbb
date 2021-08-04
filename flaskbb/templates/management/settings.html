@@ -4,32 +4,38 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{{ active_nav.get('title') }}</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{{ active_nav.get('title') }}</li>
 </ol>
 {% endblock %}
 
 {% block management_content %}
-{% from theme('macros.html') import render_boolean_field, render_select_field, render_field, sidebaritems %}
+{%- from theme('_macros/navigation.html') import sidebaritems -%}
+{%- from theme('_macros/form.html') import render_field -%}
+
 {% set extra_setting_links = run_hook("flaskbb_tpl_admin_settings_sidebar", user=current_user, is_markup=False) %}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
-        <li class="nav-header">FlaskBB Settings</li>
+            <li class="nav-item nav-header">FlaskBB Settings</li>
         {% for group in all_groups %}
             {% if group.key == active_nav.get('key') %}
-                <li class="active"><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a>
+                </li>
             {% else %}
-                <li><a href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a>
+                </li>
             {% endif %}
         {% endfor %}
         {% if all_plugins or extra_setting_links|length %}
-        <li class="nav-header">Plugin Settings</li>
+            <li class="nav-item nav-header">Plugin Settings</li>
         {% for plugin in all_plugins %}
-            <li {% if plugin.name == active_nav.get('key') %}class="active"{% endif %}>
-                <a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
+            <li class="nav-item">
+                <a class="nav-link {% if plugin.name == active_nav.get('key') %}active{% endif %}" href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
             </li>
         {% endfor %}
 
@@ -40,42 +46,28 @@
 </div><!--/.col-md-3 -->
 
 <div class="col-md-9 settings-col with-left-border">
-    <div class="panel settings-panel">
-        <div class="panel-heading settings-head">
+    <div class="card settings">
+        <div class="card-header settings-header">
             <span class="fa fa-cogs"></span> {{ active_nav.get('title') }}
         </div>
-        <div class="panel-body settings-body">
-            <div class="settings-content">
-                <form class="form-horizontal settings-form" role="form" method="post">
-                    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="card-body settings-body">
+            <form class="row p-2" role="form" method="post">
+                {{ form.hidden_tag() }}
+                {% for field in form %}
+                    {% if field.type != "CSRFTokenField" %}
+                        {{ render_field(field, div_class="col-12 mb-3") }}
+                    {% endif %}
+                {% endfor %}
 
-                        {{ form.hidden_tag() }}
-                        {% for field in form %}
-                            {% if field.type not in ["TextField", "IntegerField"] %}
-                                {% if field.type == "BooleanField" %}
-                                    {{ render_boolean_field(field) }}
-                                {% endif %}
+                <div class="form-group">
+                    <div class="col-sm-5">
+                        <button type="submit" class="btn btn-success">
+                            {% trans %}Save{% endtrans %}
+                        </button>
+                    </div>
+                </div>
 
-                                {% if field.type in ["SelectField", "SelectMultipleField"] %}
-                                    {{ render_select_field(field) }}
-                                {% endif %}
-                            {% else %}
-                                {{ render_field(field) }}
-                            {% endif %}
-                        {% endfor %}
-
-                        <div class="form-group">
-                            <div class="col-sm-5">
-                                <button type="submit" class="btn btn-success">
-                                    {% trans %}Save{% endtrans %}
-                                </button>
-                            </div>
-                        </div>
-
-                    </div> <!-- end col-md-12...-->
-                </form>
-
-            </div>
+            </form>
         </div> <!-- end settings-body -->
     </div>
 </div>
