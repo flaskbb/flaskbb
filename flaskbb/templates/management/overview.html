@@ -19,7 +19,7 @@
             <div class="settings-content">
                 <div class="stats">
                     <div class="row stats-row">
-                        <div class="overview-notifications col-md-12 col-sm-12 col-xs-12">
+                        <div class="overview-notifications col-12">
                             {% if unread_reports > 0 %}
                             <div class="alert-message alert-message-warning">
                                 <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="row stats-row">
-                        <div class="col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
                                      <i class="fa fa-users text-success"></i>
@@ -46,7 +46,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
                                      <i class="fa fa-comment text-primary"></i>
@@ -58,7 +58,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
                                      <i class="fa fa-comments text-info"></i>
@@ -98,7 +98,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-4">
                             <div class="row stats-heading">{% trans %}Components{% endtrans %}</div>
 
                             <div class="row">
@@ -119,7 +119,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-4">
                             <div class="row stats-heading">{% trans %}Plugins{% endtrans %}</div>
 
                             {% for plugin in plugins %}
@@ -159,33 +159,20 @@
 {% block scripts %}
 <script>
 
-function celery_not_running_notification() {
-    content = "<div class='alert-message alert-message-danger'>" +
-        "<h4>{% trans %}There is a problem.{% endtrans %}</h4>" +
-        "<p>{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>" +
-        "<p>{% trans %}You can start celery with this command:{% endtrans %}</p>" +
-        "<pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>" +
-        "</div>";
+// TOOD: Put this into management.celery_status
+const running = "<span id='celery-status' class='text-success'><strong>{% trans %}running{% endtrans %}</strong></span>";
+const not_running = "<span id='celery-status' class='text-danger'><strong>{% trans %}not running{% endtrans %}</strong></span>";
 
-    // replace the no notifications notice with ours
-    if(document.getElementById("#overview-no-notifications") == null) {
-        $("#overview-no-notifications").replaceWith(content);
-    } else {
-        $(".overview-notifications").append(content);
-    }
-}
+const notification = `
+    <div class='alert-message alert-message-danger'>
+        <h4>{% trans %}There is a problem.{% endtrans %}</h4>
+        <p class="mb-0">{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
+        <p class="mb-0">{% trans %}You can start celery with this command:{% endtrans %}</p>
+        <pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>
+    </div>
+`;
+const endpoint = "{{ url_for('management.celery_status') }}";
 
-$(document).ready(function () {
-    var $celerystatus = $('#celery-status');
-
-    $.getJSON('/admin/celerystatus', function(data) {
-        if(data.celery_running) {
-            $celerystatus.replaceWith("<span id='celery-status' class='text-success'><strong>{% trans %}running{% endtrans %}</strong></span>");
-        } else {
-            $celerystatus.replaceWith("<span id='celery-status' class='text-danger'><strong>{% trans %}not running{% endtrans %}</strong></span>");
-            celery_not_running_notification()
-        }
-    });
-});
+window.app.check_overview_status(endpoint, notification, running, not_running);
 </script>
 {% endblock %}
