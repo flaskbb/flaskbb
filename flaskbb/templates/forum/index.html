@@ -13,12 +13,12 @@
         </div>
         <div class="card-body page-body">
             <div class="row page-row">
-                <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="col-md-6 col-sm-6 col-12">
                     <p class="flaskbb-stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
                     <p class="flaskbb-stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>
                     <p class="flaskbb-stats">{% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong></p>
                 </div>
-                <div class="col-md-6 col-sm-6 col-xs-12">
+                <div class="col-md-6 col-sm-6 col-12">
                     <p class="flaskbb-stats">{% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}</p>
                     <p class="flaskbb-stats">{% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong></p>
                     {% if config["REDIS_ENABLED"] %}

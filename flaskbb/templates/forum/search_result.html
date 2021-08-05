@@ -20,7 +20,7 @@
             {% for post in result['post'] %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
-                <div class="author col-md-2 col-sm-3 col-xs-12">
+                <div class="author col-md-2 col-sm-3 col-12">
                     <!-- Registered User -->
                     {% if post.user_id %}
                     <div class="author-name"><h4><a href="{{ post.user.url }}">{{ post.user.username }}</a></h4></div>
@@ -52,7 +52,7 @@
 
                 </div>
 
-                <div class="post-box col-md-10 col-sm-9 col-xs-12">
+                <div class="post-box col-md-10 col-sm-9 col-12">
 
                     <div class="post-meta clearfix">
                         <div class="pull-left">
@@ -81,7 +81,7 @@
             {% else %}
             <!-- cheating a bit here with page-row :P -->
             <div class="row page-row clearfix">
-                <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No posts found matching your search criteria.{% endtrans %}</div>
+                <div class="col-md-12 col-sm-12 col-12">{% trans %}No posts found matching your search criteria.{% endtrans %}</div>
             </div>
             {% endfor %}
         </div>
@@ -95,23 +95,23 @@
         </div>
         <div class="card-body page-body">
             <div class="page-meta">
-                <div class="col-md-1 col-sm-1 col-xs-1 meta-item">#</div>
-                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Username{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs meta-item">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 hidden-xs meta-item">{% trans %}Date registered{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-xs-5 meta-item">{% trans %}Group{% endtrans %}</div>
+                <div class="col-md-1 col-sm-1 col-1 meta-item">#</div>
+                <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Username{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
             </div>
             {% for user in result['user'].all() %}
             <div class="row page-row hover clearfix">
-                <div class="col-md-1 col-sm-1 col-xs-1">{{ user.id }}</div>
-                <div class="col-md-3 col-sm-3 col-xs-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
-                <div class="col-md-2 col-sm-2 hidden-xs">{{ user.post_count }}</div>
-                <div class="col-md-3 col-sm-3 hidden-xs">{{ user.date_joined|format_date }}</div>
-                <div class="col-md-3 col-sm-3 col-xs-5">{{ user.primary_group.name }}</div>
+                <div class="col-md-1 col-sm-1 col-1">{{ user.id }}</div>
+                <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block">{{ user.post_count }}</div>
+                <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
+                <div class="col-md-3 col-sm-3 col-5">{{ user.primary_group.name }}</div>
             </div>
             {% else %}
             <div class="row page-row hover clearfix">
-                <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No users found matching your search criteria.{% endtrans %}</div>
+                <div class="col-md-12 col-sm-12 col-12">{% trans %}No users found matching your search criteria.{% endtrans %}</div>
             </div>
             {% endfor %}
         </div>
@@ -126,18 +126,18 @@
 
         <div class="card-body forum-body">
             <div class="forum-meta">
-                <div class="col-md-5 col-sm-5 col-xs-8 topic-name">{% trans %}Topic{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">{% trans %}Views{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+                <div class="col-md-5 col-sm-5 col-8 topic-name">{% trans %}Topic{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
             {% for topic in result['topic'].all() %}
             <div class="row forum-row hover clearfix">
 
-                <div class="col-md-5 col-sm-5 col-xs-8 topic-info">
+                <div class="col-md-5 col-sm-5 col-8 topic-info">
                     <div class="row">
-                        <div class="col-md-1 col-sm-2 col-xs-2 topic-status">
+                        <div class="col-md-1 col-sm-2 col-2 topic-status">
                         {% if topic.locked %}
                             <span class="fa fa-lock topic-locked"></span>
                         {% elif topic.important %}
@@ -146,7 +146,7 @@
                             <span class="fa fa-comment-o topic-read"></span>
                         {% endif %}
                         </div>
-                        <div class="col-md-11 col-sm-10 col-xs-10">
+                        <div class="col-md-11 col-sm-10 col-10">
                             <div class="topic-name">
                                 <a href="{{ topic.url }}">{{ topic.title }}</a>
                                 <!-- Topic Pagination -->
@@ -164,15 +164,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
                     {{ topic.post_count }}
                 </div>
 
-                <div class="col-md-2 col-sm-2 hidden-xs topic-stats">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
                     {{ topic.views }}
                 </div>
 
-                <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">
+                <div class="col-md-3 col-sm-3 col-4 topic-last-post">
                     <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
 
                     <div class="topic-author">
@@ -205,23 +205,23 @@
 
         <div class="card-body category-body">
             <div class="category-meta">
-                <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Forum{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
+                <div class="col-md-5 col-sm-5 col-8 forum-name">{% trans %}Forum{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-stats">{% trans %}Topics{% endtrans %}</div>
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-stats">{% trans %}Posts{% endtrans %}</div>
+                <div class="col-md-3 col-sm-3 col-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
             {% for forum in result['forum'].all() %}
             <div class="row category-row hover">
 
                 {% if forum.external %}
-                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+                <div class="col-md-5 col-sm-5 col-8 forum-info">
                     <div class="row">
                         <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                        <div class="col-md-1 col-sm-2 col-2 forum-status">
                             <span class="fa fa-external-link forum-external"></span>
                         </div>
 
-                        <div class="col-md-11 col-sm-10 col-xs-10">
+                        <div class="col-md-11 col-sm-10 col-10">
                             <!-- Forum Name -->
                             <div class="forum-name">
                                 <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
@@ -236,24 +236,24 @@
                 </div> <!-- end forum-info -->
 
                 <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-posts">
                     -
                 </div>
 
                 <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-topics">
                     -
                 </div>
 
                 <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
+                <div class="col-md-3 col-sm-3 col-4 forum-last-post">
                     ---
                 </div>
                 {% else %}
-                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+                <div class="col-md-5 col-sm-5 col-8 forum-info">
                     <div class="row">
                         <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                        <div class="col-md-1 col-sm-2 col-2 forum-status">
                             {% if forum.locked %}
                                 <span class="fa fa-lock forum-locked"></span>
                             {% else %}
@@ -261,7 +261,7 @@
                             {% endif %}
                         </div>
 
-                        <div class="col-md-11 col-sm-10 col-xs-10">
+                        <div class="col-md-11 col-sm-10 col-10">
                             <!-- Forum Name -->
                             <div class="forum-name">
                                 <a href="{{ forum.url }}">{{ forum.title }}</a>
@@ -286,17 +286,17 @@
                 </div> <!-- end forum-info -->
 
                 <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-topics">
                 {{ forum.topic_count }}
                 </div>
 
                 <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
+                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-posts">
                 {{ forum.post_count }}
                 </div>
 
                 <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
+                <div class="col-md-3 col-sm-3 col-4 forum-last-post">
                     {% if forum.last_post_id %}
                     <div class="last-post-title">
                         <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
@@ -326,7 +326,7 @@
             </div> <!-- end category-content -->
             {% else %}
             <div class="row category-row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="col-md-12 col-sm-12 col-12">
                     {% trans %}No forums found matching your search criteria.{% endtrans %}
                 </div>
             </div>

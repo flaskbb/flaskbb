@@ -32,7 +32,7 @@
             {% for post, user in posts.items %}
             <div id="{{ post.id }}" class="row post-row">
 
-                <div class="author col-md-2 col-sm-3 col-xs-12">
+                <div class="author col-md-2 col-sm-3 col-12">
                     <!-- Registered User -->
                     {% if post.user_id %}
                     <div class="author-name"><h4><a href="{{ user.url }}">{{ user.username }}</a></h4></div>
@@ -93,7 +93,7 @@
                     {% endif %}
                 </div>
 
-                <div class="post-box col-md-10 col-sm-9 col-xs-12">
+                <div class="post-box col-md-10 col-sm-9 col-12">
 
                     <div class="post-meta row">
                         <div class="col-auto me-auto g-0">
@@ -130,7 +130,7 @@
 
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
-                        <div class="post-signature hidden-xs">
+                        <div class="post-signature d-none d-sm-block">
                         <hr />
                             {{ user.signature|markup }}
                         </div>
@@ -232,7 +232,7 @@
     <form class="form" method="post">
         {{ form.hidden_tag() }}
         <div class="row">
-            <div class="offset-md-2 offset-sm-3 col-md-10 col-sm-9 col-xs-12">
+            <div class="offset-md-2 offset-sm-3 col-md-10 col-sm-9 col-12">
                 {{ render_input_field(form.content, class='flaskbb-editor', style="display: none", required="required") }}
                 {{ render_submit_field(form.submit, div_class="mt-2 float-end") }}
             </div>

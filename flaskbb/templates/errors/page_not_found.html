@@ -4,12 +4,10 @@
 {% block content %}
 
 <div class="card page">
-    <div class="card-body page-body">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <h1>{% trans %}404 - Page not found!{% endtrans %}</h1>
-            <p>{% trans %}The page you were looking for does not exist.{% endtrans %}</p>
-            <p><a href="{{url_for('forum.index')}}">{% trans %}Back to the Forums{% endtrans %}</a></p>
-        </div>
+    <div class="card-body">
+        <h1 class="card-title">{% trans %}404 - Page not found!{% endtrans %}</h1>
+        <p class="card-text mb-0">{% trans %}The page you were looking for does not exist.{% endtrans %}</p>
+        <p class="card-text"><a href="{{url_for('forum.index')}}">{% trans %}Back to the Forums{% endtrans %}</a></p>
     </div>
 </div>
 

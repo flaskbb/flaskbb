@@ -17,7 +17,7 @@
             <div class="col-md-5 col-sm-5 col-8 forum-info ps-3">
                 <!-- Icon -->
                 <div class="forum-status">
-                    <span class="fa fa-external-link fa-fw forum-external"></span>
+                    <span class="fas fa-external-link fa-fw forum-external"></span>
                 </div>
 
                 <!-- Forum Name -->
@@ -50,7 +50,7 @@
                 <!-- Icon -->
                 <div class="forum-status">
                     {% if forum.locked %}
-                        <span class="fa fa-lock fa-fw forum-locked"></span>
+                        <span class="fas fa-lock fa-fw forum-locked"></span>
                     {% elif forum|forum_is_unread(forumsread, current_user) %}
                         <span class="fas fa-comments fa-fw forum-unread"></span>
                     {% else %}

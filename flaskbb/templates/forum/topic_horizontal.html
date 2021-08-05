@@ -30,11 +30,11 @@
             {% for post, user in posts.items %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
-                <div class="author author-horizontal col-md-12 col-sm-12 col-xs-12">
+                <div class="author author-horizontal col-md-12 col-sm-12 col-12">
                     <div class="pull-left">
                         {% if user.avatar %}
                         <div class="author-box">
-                            <div class="author-avatar hidden-xs"><img src="{{ user.avatar }}" alt="avatar"></div>
+                            <div class="author-avatar d-none d-sm-block"><img src="{{ user.avatar }}" alt="avatar"></div>
                         </div>
                         {% endif %}
 
@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="post-box post-horizontal col-md-12 col-sm-12 col-xs-12">
+                <div class="post-box post-horizontal col-md-12 col-sm-12 col-12">
                     <div class="post-meta clearfix">
                         <div class="pull-left">
                             <!-- Creation date / Date modified -->
@@ -88,7 +88,7 @@
                         {{ post.content|markup }}
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
-                        <div class="post-signature hidden-xs">
+                        <div class="post-signature d-none d-sm-block">
                         <hr />
                             {{ user.signature|markup }}
                         </div>
@@ -181,7 +181,7 @@
     <form class="form" action="#" method="post">
         {{ form.hidden_tag() }}
         <div class="row">
-            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
+            <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-12">
                 <div class="editor-box">
                     <div class="editor quickreply">
                             {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
