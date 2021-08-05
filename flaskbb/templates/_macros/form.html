@@ -148,3 +148,17 @@
 
 </div>
 {%- endmacro -%}
+
+
+{% macro action_confirm(id, url, title, icon='', btn='btn btn-icon', icon_only=True) %}
+<form class="d-inline" id="{{ id }}" method="post" action="{{ url }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <button type="button" class="{{ btn }}" data-bs-toggle="modal" data-bs-target="#confirmModal">
+        {% if icon_only %}
+        <span class="{{ icon }}" data-bs-toggle="tooltip" title="{{ title }}"></span>
+        {% else %}
+        <span class="{{ icon }}"></span> {{ title }}
+        {% endif %}
+    </button>
+</form>
+{% endmacro %}

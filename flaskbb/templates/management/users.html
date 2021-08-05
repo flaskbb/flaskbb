@@ -13,7 +13,7 @@
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
 {%- from theme('_macros/navigation.html') import navlink with context -%}
-{%- from theme('_macros/form.html') import render_input_field -%}
+{%- from theme('_macros/form.html') import render_input_field, action_confirm -%}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -62,33 +62,35 @@
                     <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
                     <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Group{% endtrans %}</div>
                     <div class="col-md-2 col-sm-2 col-2">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <span class="fa fa-fw fa-cog"></span>
+                                {% trans %}Actions{% endtrans %}
+                            </a>
 
-  <div class="dropdown">
-    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-        <span class="fa fa-fw fa-cog"></span> {% trans %}Actions{% endtrans %}
-    </a>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Action</a></li>
-    <li>
-        <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.ban_user') }}')">
-            <span class="far fa-fw fa-flag text-warning"></span> {% trans %}Ban selected Users{% endtrans %}
-        </button>
-    </li>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.ban_user') }}')">
+                                    <span class="fas fa-fw fa-flag text-warning"></span>
+                                    {% trans %}Ban selected Users{% endtrans %}
+                                    </button>
+                                </li>
 
-    <li>
-        <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}')">
-            <span class="far fa-fw fa-flag text-success"></span> {% trans %}Unban selected Users{% endtrans %}
-        </button>
-    </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}')">
+                                        <span class="fas fa-fw fa-flag text-success"></span>
+                                        {% trans %}Unban selected Users{% endtrans %}
+                                    </button>
+                                </li>
 
-    <li>
-        <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.delete_user') }}')">
-            <span class="far fa-fw fa-trash text-danger"></span> {% trans %}Delete selected Users{% endtrans %}
-        </button>
-    </li>
-    </ul>
-  </div>
-
+                                <li>
+                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.delete_user') }}')">
+                                        <span class="far fa-fw fa-trash-alt text-danger"></span>
+                                        {% trans %}Delete selected Users{% endtrans %}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             {% for user in users.items %}
@@ -101,38 +103,41 @@
                     <div class="col-2">
                     {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
                         <a href="{{ url_for('management.edit_user', user_id = user.id) }}" class="btn btn-icon">
-                            <span class="fa fa-edit text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
+                            <span class="fas fa-edit text-primary" data-bs-toggle="tooltip" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
                     {% endif %}
 
                     {% if current_user|can_ban_user and not user.permissions['banned'] %}
-                        <form class="d-inline" id="ban-{{user.id}}" method="post" action="{{ url_for('management.ban_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Ban{% endtrans %}">
-                                <span class="fas fa-flag text-warning"></span>
-                            </button>
-                        </form>
+                        {{
+                            action_confirm(
+                                id="ban-" ~ user.id,
+                                url=url_for('management.ban_user', user_id=user.id),
+                                title=_("Ban"),
+                                icon="fas fa-flag text-warning"
+                            )
+                        }}
                     {% endif %}
 
                     {% if current_user|can_ban_user and user.permissions['banned'] %}
-                        <form class="d-inline" id="ban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                            <button class="btn btn-icon" name="confirmDialog">
-                                <span class="fas fa-flag text-success" data-toggle="tooltip" data-placement="top" title="{% trans %}Unban{% endtrans %}"></span>
-                            </button>
-                        </form>
+                        {{
+                            action_confirm(
+                                id="ban-" ~ user.id,
+                                url=url_for('management.unban_user', user_id=user.id),
+                                title=_("Unban"),
+                                icon="fas fa-flag text-success"
+                            )
+                        }}
                     {% endif %}
 
                     {% if current_user|is_admin %}
-                        <form class="d-inline" id="delete-{{user.id}}" method="post" action="{{ url_for('management.delete_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}">
-                                <span class="far fa-trash-alt text-danger"></span>
-                            </button>
-                        </form>
+                        {{
+                            action_confirm(
+                                id="delete-" ~ user.id,
+                                url=url_for('management.delete_user', user_id=user.id),
+                                title=_("Delete"),
+                                icon="far fa-trash-alt text-danger"
+                            )
+                        }}
                     {% endif %}
                     </div>
                 </div>

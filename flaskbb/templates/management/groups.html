@@ -13,6 +13,7 @@
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
 {%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import action_confirm -%}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -31,18 +32,20 @@
         <div class="card-body settings-body">
             <div class="settings-content">
                 <div class="settings-meta row">
-                    <div class="col-md-1 col-sm-1 col-xs-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
-                    <div class="col-md-4 col-sm-4 col-xs-5 meta-item">{% trans %}Group Name{% endtrans %}</div>
-                    <div class="col-md-5 col-sm-5 hidden-xs meta-item">{% trans %}Description{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-xs-5">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                <span class="fa fa-fw fa-cog"></span> {% trans %}Actions{% endtrans %}
-                            </button>
-                            <ul class="dropdown-menu slidedown">
+                    <div class="col-md-1 col-sm-1 col-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
+                    <div class="col-md-4 col-sm-4 col-5 meta-item">{% trans %}Group Name{% endtrans %}</div>
+                    <div class="col-md-5 col-sm-5 d-none d-sm-block meta-item">{% trans %}Description{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 col-5">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <span class="fa fa-fw fa-cog"></span>
+                                {% trans %}Actions{% endtrans %}
+                            </a>
+                            <ul class="dropdown-menu">
                                 <li>
-                                    <button class="btn btn-link" onclick="return bulk_actions.execute('{{ url_for('management.delete_group') }}')">
-                                        <span class="fa fa-fw fa-trash text-danger"></span> {% trans %}Delete selected Groups{% endtrans %}
+                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.delete_group') }}')">
+                                        <span class="far fa-fw fa-trash-alt text-danger"></span>
+                                        {% trans %}Delete selected Groups{% endtrans %}
                                     </button>
                                 </li>
                             </ul>
@@ -51,28 +54,30 @@
                 </div>
 
             {% for group in groups.items %}
-                <div class="row settings-row hover clearfix">
-                    <div class="col-md-1 col-sm-1 col-xs-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ group.id }}" title="Select Group"/></div>
-                    <div class="col-md-4 col-sm-4 col-xs-5">{{ group.name }}</div>
-                    <div class="col-md-5 col-sm-5 hidden-xs">{{ group.description }}</div>
-                    <div class="col-md-2 col-sm-2 col-xs-5">
+                <div class="row settings-row hover">
+                    <div class="col-md-1 col-sm-1 col-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ group.id }}" title="Select Group"/></div>
+                    <div class="col-md-4 col-sm-4 col-5">{{ group.name }}</div>
+                    <div class="col-md-5 col-sm-5 d-none d-sm-block">{{ group.description }}</div>
+                    <div class="col-md-2 col-sm-2 col-5">
                         <a href="{{ url_for('management.edit_group', group_id = group.id) }}" class="btn btn-icon">
-                            <span class="fa fa-pencil text-primary" data-toggle="tooltip" data-placement="top" title="{% trans %}Edit{% endtrans %}"></span>
+                            <span class="fas fa-edit text-primary" data-bs-toggle="tooltip" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
                         {# only display "Delete" if group is not part of the standard groups. #}
                         {% if group.id > 6 %}
-                        <form class="inline-form" id="delete-{{group.id}}" method="post" action="{{ url_for('management.delete_group', group_id=group.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-icon" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="{% trans %}Delete{% endtrans %}">
-                                <span class="fa fa-trash text-danger"></span>
-                            </button>
-                        </form>
+                            {{
+                                action_confirm(
+                                    id="delete-" ~ group.id,
+                                    url=url_for('management.delete_group', group_id=group.id),
+                                    title=_("Delete"),
+                                    icon="far fa-trash-alt text-danger"
+                                )
+                            }}
                         {% endif %}
                     </div>
                 </div>
             {% else %}
-                <div class="row settings-row clearfix">
-                    <div class="col-md-12 col-sm-12 col-xs-12">{% trans %}No groups found.{% endtrans %}</div>
+                <div class="row settings-row">
+                    <div class="col-12">{% trans %}No groups found.{% endtrans %}</div>
                 </div>
             {% endfor %}
             </div>

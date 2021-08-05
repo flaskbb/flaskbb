@@ -12,6 +12,7 @@
 
 {% block management_content %}
 {%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import action_confirm -%}
 
 <div class="col-md-12 settings-col">
     <div class="card settings">
@@ -22,14 +23,14 @@
             <div class="settings-content">
                 <div class="settings-meta">
                     <div class="row settings-row">
-                        <div class="col-md-4 col-sm-4 col-xs-4 meta-item">{% trans %}Plugin{% endtrans %}</div>
-                        <div class="col-md-4 col-sm-4 col-xs-4 meta-item">{% trans %}Information{% endtrans %}</div>
-                        <div class="col-md-4 col-sm-4 col-xs-4 meta-item">{% trans %}Manage{% endtrans %}</div>
+                        <div class="col-md-4 col-sm-4 col-4 meta-item">{% trans %}Plugin{% endtrans %}</div>
+                        <div class="col-md-4 col-sm-4 col-4 meta-item">{% trans %}Information{% endtrans %}</div>
+                        <div class="col-md-4 col-sm-4 col-4 meta-item">{% trans %}Manage{% endtrans %}</div>
                     </div>
                 </div>
                 {% for plugin in plugins %}
                 <div class="row settings-row hover with-border-bottom">
-                    <div class="col-md-4 col-sm-4 col-xs-4">
+                    <div class="col-md-4 col-sm-4 col-4">
                     {{ plugin.name.title() }}
                     (
                     {%- if plugin.info.get('home_page') -%}
@@ -40,40 +41,49 @@
                     )
 
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4">
+                    <div class="col-md-4 col-sm-4 col-4">
                         <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugin.info.get('version') }}</div>
                         <div class="plugin-description">{{ plugin.info.get('summary') }}</div>
                         <div class="plugin-author">{% trans %}by{% endtrans %} {{ plugin.info.get('author') }}</div>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-4">
+                    <div class="col-md-4 col-sm-4 col-4">
                         {% if not plugin.enabled %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.enable_plugin', name=plugin.name) }}">
+                        <form class="d-inline" method="post" action="{{ url_for('management.enable_plugin', name=plugin.name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-success">{% trans %}Enable{% endtrans %}</button>
                         </form>
                         {% else %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.disable_plugin', name=plugin.name) }}">
+                        <form class="d-inline" method="post" action="{{ url_for('management.disable_plugin', name=plugin.name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-warning">{% trans %}Disable{% endtrans %}</button>
                         </form>
                         {% endif %}
 
                         {% if plugin.is_installable and not plugin.is_installed %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.install_plugin', name=plugin.name) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-info" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="Creates the settings for the plugin">
-                                {% trans %}Install{% endtrans %}
-                            </button>
-                        </form>
-                        {% elif plugin.is_installable and plugin.is_installed %}
-                        <form class="inline-form" method="post" action="{{ url_for('management.uninstall_plugin', name=plugin.name) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <button class="btn btn-danger" name="confirmDialog" data-toggle="tooltip" data-placement="top" title="Removes the settings">
-                                {% trans %}Uninstall{% endtrans %}
-                            </button>
-                        </form>
 
-                        <a class="btn btn-info" href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
+                            {{
+                                action_confirm(
+                                    id="plugin-inst-" ~ plugin.name,
+                                    url=url_for('management.install_plugin', name=plugin.name),
+                                    title=_("Install"),
+                                    btn="btn btn-info",
+                                    icon_only=False
+                                )
+                            }}
+
+                        {% elif plugin.is_installable and plugin.is_installed %}
+
+                            {{
+                                action_confirm(
+                                    id="plugin-uninst-" ~ plugin.name,
+                                    url=url_for('management.uninstall_plugin', name=plugin.name),
+                                    title=_("Uninstall"),
+                                    btn="btn btn-danger",
+                                    icon_only=False
+                                )
+                            }}
+
+                        <a class="btn btn-outline-dark" href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
                         {% endif %}
                     </div>
                 </div>
