@@ -10,6 +10,11 @@
 $fbb-bg: #f6f9fc;
 $fbb-border-color: #cad7e1;
 
+//
+// For more variables check out this file:
+// https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss
+// raw: https://raw.githubusercontent.com/twbs/bootstrap/main/scss/_variables.scss
+//
 
 //$enable-caret:                true !default;
 //$enable-rounded:              false;
@@ -58,61 +63,6 @@ $border-radius-lg:            .3rem !default;
 $border-radius-pill:          50rem !default;
 
 
-// Dropdowns
-$dropdown-border-radius:            $border-radius !default;
-
-
-// Pagination
-$pagination-border-radius:          $border-radius !default;
-
-$pagination-border-radius-sm:       $border-radius-sm !default;
-$pagination-border-radius-lg:       $border-radius-lg !default;
-
-
 // Cards
 $card-border-radius: none;
 
-
-// Accordion
-$accordion-border-radius:                 $border-radius !default;
-
-
-// Tooltips
-$tooltip-border-radius:             $border-radius !default;
-$form-feedback-tooltip-border-radius: $tooltip-border-radius !default;
-
-
-// Popovers
-$popover-border-radius:             $border-radius-lg !default;
-
-
-// Toasts
-$toast-border-radius:               $border-radius !default;
-
-
-// Badges
-$badge-border-radius:               $border-radius !default;
-
-
-// Modals
-$modal-content-border-radius:       $border-radius-lg !default;
-
-
-// Alerts
-$alert-border-radius:           $border-radius !default;
-
-
-// Progress bars
-$progress-border-radius:            $border-radius !default;
-
-
-// List group
-$list-group-border-radius:          $border-radius !default;
-
-
-// Image thumbnails
-$thumbnail-border-radius:           $border-radius !default;
-
-
-// Breadcrumbs
-$breadcrumb-border-radius:          null !default;
