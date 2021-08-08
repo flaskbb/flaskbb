@@ -14,6 +14,17 @@
 {% endmacro %}
 
 
+{% macro topnavitems(items) %}
+{% for item in items %}
+    {% if item.content_type == NavigationContentType.link %}
+    {{ topnav(item.endpoint, item.name, item.icon, '', item.active) }}
+    {% else %}
+    {# skip unsupported types #}
+    {% endif %}
+{% endfor %}
+{% endmacro %}
+
+
 {% macro navlink(endpoint, name, icon='', active='', urlforkwargs=None) %}
 <li class="nav-item">
     <a class="nav-link {{ is_active(endpoint, active) }}" href="{% if urlforkwargs %}{{ url_for(endpoint, **urlforkwargs) }}{% else %}{{ url_for(endpoint) }}{% endif %}">

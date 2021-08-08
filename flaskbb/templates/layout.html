@@ -62,17 +62,34 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNavDropdown">
                         <ul class="navbar-nav me-auto">
-                            {%- from theme("_macros/navigation.html") import is_active, topnav with context -%}
+                            {%- from theme("_macros/navigation.html") import is_active, topnavitems, topnav with context -%}
 
-                            {{ run_hook("flaskbb_tpl_navigation_before") }}
+                            {{ topnavitems(
+                                run_hook(
+                                    "flaskbb_tpl_navigation_before",
+                                    is_markup=False
+                                ))
+                            }}
+
                             {{ topnav(endpoint='forum.index', name=_('Forum'), icon='far fa-comment', active=active_forum_nav) }}
                             {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='far fa-user') }}
                             {{ topnav(endpoint='forum.search', name=_('Search'), icon='fas fa-search') }}
-                            {{ run_hook("flaskbb_tpl_navigation_after") }}
+
+                            {{ topnavitems(
+                                run_hook(
+                                    "flaskbb_tpl_navigation_after",
+                                    is_markup=False
+                                ))
+                            }}
                         </ul>
 
                         <ul class="navbar-nav">
-                            {{ run_hook("flaskbb_tpl_user_nav_loggedin_before") }}
+                            {{ topnavitems(
+                                run_hook(
+                                    "flaskbb_tpl_user_nav_loggedin_before",
+                                    is_markup=False
+                                ))
+                            }}
 
                             {% if current_user and current_user.is_authenticated %}
                             <!-- User Menu -->
@@ -121,7 +138,13 @@
                                     </ul>
                                 </div>
                             </li>
-                            {{ run_hook("flaskbb_tpl_user_nav_loggedin_after") }}
+                            {{ topnavitems(
+                                run_hook(
+                                    "flaskbb_tpl_user_nav_loggedin_after",
+                                    user=current_user,
+                                    is_markup=False
+                                ))
+                            }}
 
                             {% else %}
                             <!-- Not logged in - Login/Register -->
