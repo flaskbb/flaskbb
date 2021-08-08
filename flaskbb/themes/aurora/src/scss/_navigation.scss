@@ -14,7 +14,7 @@
     padding-top: 1em;
     padding-bottom: 1em;
     text-shadow: none;
-    background-color: $navigation-bg;
+    background-color: $fbb-navigation-bg;
     border: 1px solid $border-color;
 
     .sidenav {
@@ -44,15 +44,15 @@
     .nav-item > a:hover,
     .nav-item > a:focus {
         text-decoration: none;
-        background-color: $navigation-hover-color;
+        background-color: $fbb-navigation-hover-color;
     }
 
     .nav-item > .active,
     .nav-item > .active:hover,
     .nav-item > .active:focus {
         font-weight: normal;
-        color: $navigation-color;
-        background-color: $navigation-hover-color;
+        color: $fbb-navigation-color;
+        background-color: $fbb-navigation-hover-color;
     }
 }
 
@@ -73,10 +73,10 @@
     }
 
     .nav-link {
-        color: $navigation-color;
+        color: $fbb-navigation-color;
 
         &:hover {
-            background-color: $navigation-bg;
+            background-color: $fbb-navigation-bg;
         }
 
         &.active {
@@ -84,7 +84,7 @@
             border-bottom: 1px solid $border-color;
 
             cursor: default;
-            background-color: $navigation-bg;
+            background-color: $fbb-navigation-bg;
         }
     }
 
@@ -114,7 +114,7 @@
         // non-active and hover
         .nav-item {
             .nav-link {
-                color: $header-subtitle-color;
+                color: $fbb-header-subtitle-color;
                 border: 1px solid $blue;
 
                 // different background color when hovering

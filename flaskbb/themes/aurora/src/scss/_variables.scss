@@ -1,4 +1,4 @@
-// bootstrap colros
+// bootstrap3 colros
 $blue: #337ab7;
 $fresh-blue: #0088cc;
 $light-blue: #5bc0de;
@@ -9,43 +9,95 @@ $red: #d9534f;
 $gray: #555;
 
 
-// main colors
-$background-color: #f6f9fc; // old: #e8f1f2
-$font-color: #333;
-$border-color: #cad7e1;
-$head-background: #f5f5f5;
-$meta-background: #eaf1f5;
-$hover: #f8f8f8;
+// FlaskBB Variables
+$fbb-bg: #f6f9fc;
+$fbb-border-color: #cad7e1;
+$fbb-active-bg: #e7e7e7;
+$fbb-link-color: #337ab7;
+$fbb-link-hover-color: #275b89;
 
-$navigation-color: #555;
-$navigation-bg: #f8f8f8;
-$navigation-hover-color: #e7e7e7;
+$fbb-bg-dark: #f6f9fc;
+$fbb-bg-light: #fff;
 
-// header colors
-$header-title-color: #fff;
-$header-subtitle-color: #E8F1F2;
-$header-background-primary: #0088cc;  // old: #3276b1
-$header-background-secondary: #285e8e;
+// header && footer colors
+$fbb-header-title-color: #fff;
+$fbb-header-subtitle-color: #E8F1F2;
+$fbb-header-bg-primary: #0088cc;  // old: #3276b1
+$fbb-header-bg-secondary: #285e8e;
+$fbb-footer-bg: #333333;
 
-// panel colors
-$panel-bg: #fff;            // panel body background
-$panel-head-bg: $head-background;    // panel head background
-$panel-meta-bg: $meta-background;    // panel meta background
-$panel-meta-border: $border-color;   // panel meta (bottom) border
-$panel-border: $border-color;        // panel border (all over)
-$panel-hover: $hover;
+$fbb-navigation-color: #555;
+$fbb-navigation-bg: #f8f8f8;
+$fbb-navigation-hover-color: #e7e7e7;
+
+
+// page colors
+$page-bg: #fff;            // page body background
+$page-head-bg: #f5f5f5;    // page head background
+$page-meta-bg: #eaf1f5;    // page meta background
+$page-meta-border: $fbb-border-color;   // page meta (bottom) border
+$page-border: $fbb-border-color;        // page border (all over)
+$page-hover: #f8f8f8;                // page-row hover
 
 
 // post colors
-$post-box-bg: $panel-bg;
-$post-box-border: $border-color;
-$post-meta-border: $panel-meta-bg;
-$post-meta-bg: $panel-bg;
-$post-signature-border: $panel-meta-bg;
-$post-footer-border: $border-color;
-$post-footer-bg: $panel-bg;
+$post-box-bg: $page-bg;
+$post-box-border: $fbb-border-color;
+$post-meta-border: $page-meta-bg;
+$post-meta-bg: $page-bg;
+$post-signature-border: $page-meta-bg;
+$post-footer-border: $fbb-border-color;
+$post-footer-bg: $page-bg;
 
 
 $author-box-bg: #e8ecf1;
 $author-online: $green;
 $author-offline: $gray;
+
+
+// Bootstrap Variables
+
+//
+// For more variables check out this file:
+// https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss
+// raw: https://raw.githubusercontent.com/twbs/bootstrap/main/scss/_variables.scss
+//
+
+$body-bg:                   $fbb-bg;
+
+// Links
+//
+// Style anchor elements.
+$link-color:                              $fbb-link-color !default;
+$link-decoration:                         none !default;
+$link-shade-percentage:                   20% !default;
+$link-hover-decoration:                   underline !default;
+
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+
+$border-width:                1px !default;
+$border-widths: (
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px
+) !default;
+
+$border-color:                $fbb-border-color;
+$border-radius:               .25rem !default;
+$border-radius-sm:            .2rem !default;
+$border-radius-lg:            .3rem !default;
+$border-radius-pill:          50rem !default;
+
+
+// Cards
+$card-border-radius: none;
+
+// Navbar
+$navbar-light-color:                $link-color;
+$navbar-light-hover-color:          $link-hover-decoration;
+$navbar-light-active-color:         $link-color;

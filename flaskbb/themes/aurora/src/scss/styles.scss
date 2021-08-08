@@ -1,5 +1,5 @@
 // Import custom Bootstrap variables
-@import "bootstrap-custom";
+@import "variables";
 @import "bootstrap/scss/bootstrap";
 
 // Import fontawesome icons
@@ -9,8 +9,6 @@ $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 @import "@fortawesome/fontawesome-free/scss/regular";
 
 // Import FlaskBB theme
-@import "variables";
-
 @import "text";
 @import "misc";
 @import "navigation";
@@ -19,7 +17,7 @@ $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 @import "category";
 @import "forum";
 @import "topic";
-@import "panel";
+@import "page";
 @import "profile";
 
 @import "management";

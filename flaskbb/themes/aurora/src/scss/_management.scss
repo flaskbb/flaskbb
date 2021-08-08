@@ -21,7 +21,7 @@
     margin-bottom: 0;
 
     .settings-header {
-        background-color: $panel-hover;
+        background-color: $page-hover;
         border-bottom: 1px solid $border-color;
     }
     .settings-body {
@@ -29,7 +29,7 @@
     }
 
     .settings-meta {
-        background-color: $panel-meta-bg;
+        background-color: $page-meta-bg;
         margin: 0;
         padding: 5px 0 5px 0;
         border-bottom: 1px solid $border-color;
@@ -46,7 +46,7 @@
             border-top: none;
         }
         &:last-child {
-            border-bottom: 1px solid $panel-border;
+            border-bottom: 1px solid $page-border;
             margin-bottom: 1em;
         }
     }
@@ -60,7 +60,7 @@
         }
 
         &.hover:hover {
-            background-color: $panel-hover;
+            background-color: $page-hover;
         }
 
         .btn-icon {
@@ -94,7 +94,7 @@
         text-align: center;
         padding-top: 20px;
         padding-bottom: 20px;
-        //background-color: $panel-hover;
+        //background-color: $page-hover;
         border: 1px solid $border-color;
 
         .icon {

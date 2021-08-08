@@ -33,11 +33,11 @@ body {
     color: #fff;
     text-align: left;
     text-shadow: 0 1px 0 rgba(0,0,0,.1);
-    background-color: $header-background-primary;
-    background-image: -webkit-linear-gradient(top, $header-background-secondary 0%, $header-background-primary 100%);
-    background-image: linear-gradient(to bottom, $header-background-secondary 0%, $header-background-primary 100%);
+    background-color: $fbb-header-bg-primary;
+    background-image: -webkit-linear-gradient(top, $fbb-header-bg-secondary 0%, $fbb-header-bg-primary 100%);
+    background-image: linear-gradient(to bottom, $fbb-header-bg-secondary 0%, $fbb-header-bg-primary 100%);
     background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$header-background-secondary', endColorstr='$header-background-primary', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$fbb-header-bg-secondary', endColorstr='$fbb-header-bg-primary', GradientType=0);
     border: 1px solid $border-color;
     border-bottom: 0;
 
@@ -48,12 +48,12 @@ body {
 
     .flaskbb-meta {
         .flaskbb-title {
-            color: $header-title-color;
+            color: $fbb-header-title-color;
             font-size: 3em;
             font-weight: bold;
         }
         .flaskbb-subtitle {
-            color: $header-subtitle-color;
+            color: $fbb-header-subtitle-color;
         }
     }
 }

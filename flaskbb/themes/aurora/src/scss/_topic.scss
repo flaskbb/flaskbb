@@ -17,7 +17,7 @@
     padding-bottom: 0;
 
     &:not(:last-child) {
-        border-bottom: 1px solid $panel-border;
+        border-bottom: 1px solid $page-border;
     }
 }
 
@@ -89,7 +89,7 @@
             padding-left: 0;
 
             .btn-icon:hover {
-                background-color: $panel-hover;
+                background-color: $page-hover;
             }
         }
     }

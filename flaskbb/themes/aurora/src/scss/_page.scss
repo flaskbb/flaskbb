@@ -8,8 +8,8 @@
         font-weight: bold;
         padding-top: 0.5em;
         height: 2.5em;
-        background-color: $panel-meta-bg;
-        border-bottom: 1px solid $panel-meta-border;
+        background-color: $page-meta-bg;
+        border-bottom: 1px solid $page-meta-border;
     }
 
     .page-body {
@@ -32,16 +32,16 @@
         padding-top: 0.5em;
         padding-bottom: 0.5em;
         &:not(:last-child) {
-            border-bottom: 1px solid $panel-border;
+            border-bottom: 1px solid $page-border;
         }
         &.hover:hover {
-            background-color: $panel-hover;
+            background-color: $page-hover;
         }
     }
 
     .row > .page-row {
         &:not(:last-child) {
-            border-bottom: 1px solid $panel-border;
+            border-bottom: 1px solid $page-border;
         }
     }
 }

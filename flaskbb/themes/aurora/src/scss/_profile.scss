@@ -72,13 +72,13 @@
         padding-top: 0.5em;
         padding-bottom: 0.5em;
         &:not(:last-child) {
-            border-bottom: 1px solid $panel-border;
+            border-bottom: 1px solid $page-border;
         }
         &.hover:hover {
-            background-color: $panel-hover;
+            background-color: $page-hover;
         }
         &.unread {
-            background-color: $panel-head-bg;
+            background-color: $page-head-bg;
         }
     }
 }
@@ -87,7 +87,7 @@
     .conversation-body {
         .row > .conversation-row {
             &:not(:last-child) {
-                border-bottom: 1px solid $panel-border;
+                border-bottom: 1px solid $page-border;
             }
         }
     }
