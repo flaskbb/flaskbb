@@ -15,7 +15,7 @@
 
             {% if current_user|delete_topic(topic) %}
             <li>
-                <form class="inline-form" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
+                <form class="d-inline" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button class="btn btn-link">
                         <span class="fas fa-trash fa-fw"></span> {% trans %}Delete Topic{% endtrans %}

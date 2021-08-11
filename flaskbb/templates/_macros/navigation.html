@@ -19,7 +19,8 @@
     {% if item.content_type == NavigationContentType.link %}
     {{ topnav(item.endpoint, item.name, item.icon, '', item.active) }}
     {% else %}
-    {# skip unsupported types #}
+    {# custom markup provided #}
+    {{ item|safe }}
     {% endif %}
 {% endfor %}
 {% endmacro %}

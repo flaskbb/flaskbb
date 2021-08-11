@@ -27,9 +27,9 @@
 
                     <!-- check if user is online or not -->
                     {% if post.user|is_online %}
-                    <div class="author-online" data-toggle="tooltip" data-placement="top" title="{% trans %}online{% endtrans %}"></div>
+                    <div class="author-online" data-bs-toggle="tooltip" data-placement="top" title="{% trans %}online{% endtrans %}"></div>
                     {% else %}
-                    <div class="author-offline" data-toggle="tooltip" data-placement="top" title="{% trans %}offline{% endtrans %}"></div>
+                    <div class="author-offline" data-bs-toggle="tooltip" data-placement="top" title="{% trans %}offline{% endtrans %}"></div>
                     {% endif %}
                     <div class="author-title"><h5>{{ post.user.primary_group.name }}</h5></div>
 

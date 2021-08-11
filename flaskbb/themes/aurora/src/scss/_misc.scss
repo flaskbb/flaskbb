@@ -63,6 +63,23 @@ body {
     border-left: 1px solid $border-color;
     border-right: 1px solid $border-color;
     margin-bottom: 1rem;
+
+    &.navbar {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .nav-link {
+        padding: 1rem 1rem;
+
+        &:hover,
+        &.active,
+        &.dropdown-toggle.show {
+            background-color: $fbb-navigation-hover-color;
+        }
+    }
+
+
 }
 
 .flaskbb-breadcrumb {
@@ -97,13 +114,6 @@ p.flaskbb-stats {
     padding: 0;
 }
 
-.inline-form {
-    display: inline;
-}
-
-.form {
-    padding-bottom: 1.5em;
-}
 
 .cheatsheet {
     h2 {
@@ -131,5 +141,25 @@ p.flaskbb-stats {
         .markup {
             padding: 0;
         }
+    }
+}
+
+.EasyMDEContainer {
+
+    .CodeMirror {
+        border-color: $border-color !important;
+    }
+
+    .editor-toolbar {
+        border-color: $border-color;
+        //background-color: #e8ecf1;
+    }
+
+    .CodeMirror-focused {
+        //color: #212529;
+        //background-color: #f6f9fc;
+        border-color: #99bddb;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(51, 122, 183, 0.25);
     }
 }

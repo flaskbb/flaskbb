@@ -73,14 +73,14 @@
 {%- if theme_fixed_sidebar|lower == 'true' %}
   <div class="container">
     {% if render_sidebar %}
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-4 col-md-4 col-lg-3">
             {{ sidebar() }}
         </div>
     {% endif %}
 
     {%- block document %}
 
-          <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 page-content" role="main">
+          <div class="col-12 col-sm-8 col-md-8 col-lg-9 page-content" role="main">
             <div class="paper">
             {% block body %} {% endblock %}
             </div>
@@ -99,18 +99,18 @@
 <footer>
     <div class="container">
         <div class="row">
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
                 <p class="copyright text-muted small pull-left">
                     &copy; 2013 - 2021 <a href="https://flaskbb.org">FlaskBB Team</a>
                 </p>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
                 <p class="made-in text-muted small" style="text-align: center">
                     <i style="color: white" class="fa fa-fw fa-code"></i> with
                     <i style="color: red" class="fa fa-fw fa-heart"></i> on Earth
                 </p>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
                 <p class="powered-by text-muted small pull-right">
                     Powered by <a href="http://sphinx-doc.org/">Sphinx {{ sphinx_version }}</a>
                     {%- if show_source and has_source and sourcename %}

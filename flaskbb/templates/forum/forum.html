@@ -4,7 +4,6 @@
 {% extends theme("layout.html") %}
 {% block content %}
 {% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
-{% from theme('_macros/forum.html') import forum_meta, forum_row %}
 
 <div class="forum-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
@@ -20,7 +19,7 @@
 
         {% if current_user|post_topic(forum) %}
         <div class="col-auto g-0">
-            <form class="inline-form" method="post" action="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}">
+            <form class="d-inline" method="post" action="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button class="btn btn-white">
                     <span class="fas fa-check fa-fw"></span> {% trans %}Mark as Read{% endtrans %}

@@ -35,7 +35,7 @@
                                 {%- endif %}
                             </small>
                         </div>
-                        <div class="mt-2">
+                        <div class="mt-2 profile-actions">
 
                             {% if current_user|can_edit_user %}
                             <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}">
@@ -61,9 +61,11 @@
                             </form>
                             {% endif %}
 
+                            {{ run_hook("flaskbb_tpl_profile_actions", user=user) }}
+
                         </div>
                     </div>
-                    <div class="text-sm-right col-2">
+                    <div class="text-sm-right col-2 profile-stats">
                         <!-- TODO: Make this nicer -->
                         <div class="row">
                             <div class="col text-end text-nowrap" style="max-width: 80px;">Joined:</div>
@@ -79,6 +81,9 @@
                             <div class="col text-end text-nowrap" style="max-width: 80px;">Topics:</div>
                             <div class="col ps-0 float-start text-nowrap">{{ user.topic_count }}</div>
                         </div>
+
+                        {{ run_hook("flaskbb_tpl_profile_stats", user=user) }}
+
                     </div>
                 </div>
 
@@ -87,7 +92,7 @@
 
                 {{ sidebar(
                     run_hook(
-                        "flaskbb_tpl_profile_sidebar_links",
+                        "flaskbb_tpl_profile_links",
                         user=user,
                         is_markup=False
                     ),
