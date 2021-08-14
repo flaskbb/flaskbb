@@ -1,0 +1,11 @@
+{%- macro avatar_img(user, size="80", class="rounded-circle me-1") -%}
+    {% set avatar_url = url_for('static', filename="avatar100x100.png") %}
+    {% set alt = "default profile picture" %}
+
+    {% if user and user.avatar %}
+    {% set avatar_url = user.avatar %}
+    {% set alt = user.username ~ "profile picture" %}
+    {% endif %}
+
+    <img src="{{ avatar_url }}" class="{{ class }}" alt="{{ alt }}" width="{{ size }}" height="{{ size }}">
+{%- endmacro -%}
