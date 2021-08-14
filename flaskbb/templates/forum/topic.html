@@ -65,7 +65,7 @@
                     {% if current_user|is_admin %}
                     <div class="author-adminactions">
                         {# Ban user #}
-                        {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                        {% if current_user|can_ban_user and not user.permissions['banned'] and not current_user == user %}
                         <form class="d-inline" method="post" action="{{ url_for('management.ban_user', user_id=user.id) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-sm btn-danger text-white">
@@ -166,14 +166,14 @@
                                 {% if current_user|delete_topic(topic) %}
                                 <form class="d-inline" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-bs-toggle="tooltip" title="{% trans %}Delete this topic{% endtrans %}"></button>
+                                    <button class="btn btn-icon far fa-trash-alt text-red" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" title="{% trans %}Delete this topic{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
                             {% else %}
                                 {% if current_user|delete_post(post) %}
                                 <form class="d-inline" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                    <button  class="btn btn-icon far fa-trash-alt text-red" name="confirmDialog" data-bs-toggle="tooltip" title="{% trans %}Delete this post{% endtrans %}"></button>
+                                    <button  class="btn btn-icon far fa-trash-alt text-red" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" title="{% trans %}Delete this post{% endtrans %}"></button>
                                 </form>
                                 {% endif %}
 
@@ -190,24 +190,24 @@
                                     {% if topic.hidden %}
                                     <form class="d-inline" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="unhide" title="{% trans %}Unhide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="unhide" title="{% trans %}Unhide this topic{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="d-inline" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="hide" title="{% trans %}Hide this topic{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="hide" title="{% trans %}Hide this topic{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% else %}
                                     {% if post.hidden %}
                                     <form class="d-inline" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="unhide" title="{% trans %}Unhide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="unhide" title="{% trans %}Unhide this post{% endtrans %}"></button>
                                     </form>
                                     {% else %}
                                     <form class="d-inline" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" name="hide" title="{% trans %}Hide this post{% endtrans %}"></button>
+                                        <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="hide" title="{% trans %}Hide this post{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% endif %}
