@@ -47,7 +47,7 @@ def flaskbb_tpl_profile_settings_menu():
 
 
 @impl(hookwrapper=True, tryfirst=True)
-def flaskbb_tpl_profile_sidebar_links(user):
+def flaskbb_tpl_profile_links(user):
     results = [
         NavigationLink(
             endpoint="user.profile",
