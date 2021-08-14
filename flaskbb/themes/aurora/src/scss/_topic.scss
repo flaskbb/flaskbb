@@ -53,8 +53,8 @@
 
         // scale larger (than the div) images to the size of the div
         img {
-            max-width:100%;
-            max-height:100%;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         blockquote {
@@ -112,7 +112,8 @@
                 margin-right: 1em;
             }
 
-            .author-online, .author-offline {
+            .author-online,
+            .author-offline {
                 margin-top: 0.5em;
             }
 
@@ -120,17 +121,6 @@
                 margin-top: -0.5em;
             }
         }
-    }
-
-    .author-name h4 {
-        float: left;
-        margin-bottom: 0;
-    }
-
-    .author-title h5 {
-        margin-top: 0;
-        font-weight: 600;
-        clear: both;
     }
 
     .author-avatar {
@@ -143,7 +133,8 @@
         }
     }
 
-    .author-online, .author-offline {
+    .author-online,
+    .author-offline {
         margin-top: 0.25em;
         margin-left: 0.1em;
         float: left;
@@ -163,4 +154,19 @@
     .author-adminactions {
         text-shadow: none;
     }
+}
+
+.author-name h4,
+h4.author-name {
+    float: left;
+    margin-bottom: 0;
+}
+
+.author-title h5,
+h5.author-title {
+    text-shadow: 0px 1px 0px #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0;
+    clear: both;
 }

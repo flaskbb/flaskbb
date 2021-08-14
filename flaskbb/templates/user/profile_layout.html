@@ -20,8 +20,8 @@
                 </div>
                 <div class="col d-flex flex-column flex-sm-row justify-content-between mb-3">
                     <div class="text-sm-left mb-2 mb-sm-0">
-                        <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap">{{ user.username }}</h4>
-                        <p class="mb-0">{{ user.primary_group.name }}</p>
+                        <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap author-name">{{ user.username }}</h4>
+                        <h5 class="author-title mb-0">{{ user.primary_group.name }}</h5>
                         <div class="text-muted">
                             <small>
                                 {%- if user|is_online %}
@@ -37,7 +37,11 @@
                         </div>
                         <div class="mt-2 profile-actions">
 
-                            {% if current_user|can_edit_user %}
+                            {% if current_user == user %}
+                            <a class="btn btn-sm btn-primary" href="{{ url_for('user.settings')}}">
+                                <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
+                            </a>
+                            {% elif current_user|can_edit_user %}
                             <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}">
                                 <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
                             </a>
@@ -51,6 +55,7 @@
                                     <span class="fas fa-ban"></span> {% trans %}Ban{% endtrans %}
                                 </button>
                             </form>
+
                             {# Unban user #}
                             {% elif current_user|can_ban_user and user.permissions['banned'] %}
                             <form class="d-inline" method="post" action="{{ url_for('management.unban_user', user_id=user.id) }}">
