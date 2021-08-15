@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "esnext",
+    // disallow features that require cross-file information for emit
+    "isolatedModules": true,
+
+    "strict": false,
+    //"strictNullChecks": false,
+
+    // process & infer types from .js files
+    "allowJs": true,
+    // allow babel to transform files
+    "noEmit": false,
+
+    // Import non-ES modules as default imports
+    "esModuleInterop": true,
+
+    //"skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["app/**/*", "scss/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
