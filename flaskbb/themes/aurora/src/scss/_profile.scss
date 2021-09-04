@@ -67,6 +67,7 @@
         padding: 0;
     }
 
+
     .conversation-row {
         margin: 0;
         padding-top: 0.5em;
@@ -117,51 +118,4 @@
 
     }
 
-    @media (min-width: 992px) {
-        .arrow:after, .arrow:before {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            border: solid transparent;
-        }
-
-        .arrow.left:after, .arrow.left:before {
-            border-left: 0;
-        }
-
-        // Left Arrow
-        .arrow.left:before {
-            left: 0px;
-            top: 40px;
-            border-right-color: inherit;
-            border-width: 16px;
-        }
-
-        .arrow.left:after {
-            left: 1px;
-            top: 41px;
-            border-right-color: #FFFFFF;
-            border-width: 15px;
-        }
-
-        // Right Arrow
-        .arrow.right:before {
-            right: -16px;
-            top: 40px;
-            border-left-color: inherit;
-            border-width: 16px;
-        }
-
-        .arrow.right:after {
-            right: -14px;
-            top: 41px;
-            border-left-color: #FFFFFF;
-            border-width: 15px;
-        }
-    }
-}
-
-.conversation-reply {
-    padding-top: 2em;
 }
