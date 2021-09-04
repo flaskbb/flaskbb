@@ -4,6 +4,7 @@
  * License: BSD - See LICENSE for more details.
  */
 import { Modal } from "bootstrap";
+import { EDITORS } from "./editor.js";
 
 // get the csrf token from the header
 let csrf_token = document.querySelector("meta[name=csrf-token]").content;
@@ -195,11 +196,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
                     : "";
             const url = `${urlprefix}post/${post_id}/raw`;
 
-            const editor = document.querySelector(".flaskbb-editor");
+            const editor = EDITORS.get("content");
             fetch(url)
                 .then((response) => response.text())
                 .then((data) => {
-                    editor.value = data;
+                    editor.value(data);
                     editor.selectionStart = editor.selectionEnd =
                         editor.value.length;
                     editor.scrollTop = editor.scrollHeight;

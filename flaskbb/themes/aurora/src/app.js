@@ -8,6 +8,7 @@ import "./app/confirm_modal.js";
 
 import "./scss/styles.scss";
 export { BulkActions, show_management_search, check_overview_status } from "./app/flaskbb.js";
+export { EDITORS } from './app/editor.js';
 
 var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip="tooltip"]'))
 var tooltipList = tooltips.map(function (el) {
