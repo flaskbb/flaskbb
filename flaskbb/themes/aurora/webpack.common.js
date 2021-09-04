@@ -23,11 +23,6 @@ module.exports = {
             filename: "[name].css",
             chunkFilename: "[name].css",
         }),
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-            'window.jQuery': 'jquery',
-        }),
     ],
     optimization: {
         splitChunks: {
@@ -61,14 +56,6 @@ module.exports = {
     },
     module: {
         rules: [
-              {
-                test: require.resolve("jquery"),
-                loader: "expose-loader",
-                options: {
-                  exposes: ["$", "jQuery"],
-                },
-              },
-
             {
                 test: /\.(j|t)sx?$/,
                 exclude: /node_modules/,
