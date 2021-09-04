@@ -127,7 +127,7 @@
                 </markdown-toolbar>
 
                 <button class="btn btn-sm btn-primary me-2" for="{{ field.id }}">Preview</button>
-                <button class="btn btn-sm btn-success"><span class="fas fa-question"></span></button>
+                <button type="button" class="btn btn-sm btn-white" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
             </div>
         </div>
         {{ field(class=css_class, placeholder=placeholder, **kwargs) }}

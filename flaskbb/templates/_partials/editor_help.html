@@ -1,10 +1,10 @@
 <!-- Modal -->
 <div class="modal fade" id="editor-help" tabindex="-1" role="dialog" aria-labelledby="editor-help">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="editor-help">Editor Cheatsheet</h4>
+                <h5 class="modal-title" id="editor-help">Markdown Cheatsheet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="cheatsheet">
@@ -35,19 +35,19 @@
                     <h2>Links</h2>
                     <p class="text-center">[Google](http://www.google.com)</p>
                     <p class="text-center">[Google](http://www.google.com "Google")</p>
-                    <p class="text-center">&hellip;</p>
+                    <h2>Images</h2>
                     <p class="text-center">![Img Description](/path/to/kittens.jpg)</p>
                     <p class="text-center">[![Description](http://kittens.com/kitty.jpg)](http://google.com)</p>
                     <h2>Code</h2>
                     <div class="code-hints" style="margin-top: 2em;">
-                        <div class="code-example">
-                            <span>
-                            ```python <br>
+                        <div class="code-example row">
+                            <span class="offset-3 col-3">
+                            ```python<br>
                             print "Hello world"<br>
                             ```
                             </span>
 
-                            <span class="markup">{{ '```python\r print "Hello World"\n```' | markup }}</span>
+                            <span class="col-3 markup">{{ '```python\r print "Hello World"\n```' | markup }}</span>
                         </div>
                     </div>
                     <p class="credit text-center" style="bottom: 10px; position: absolute; left: 0; right: 0; margin: 0 auto">
