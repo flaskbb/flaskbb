@@ -34,7 +34,7 @@ from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
 from flaskbb.user.models import Guest, User
 # various helpers
 from flaskbb.utils.helpers import (app_config_from_env, crop_title,
-                                   format_date, format_datetime,
+                                   format_date, format_time, format_datetime,
                                    forum_is_unread, get_alembic_locations,
                                    get_flaskbb_config, is_online, mark_online,
                                    render_template, time_since, time_utcnow,
@@ -273,6 +273,7 @@ def configure_template_filters(app):
 
     filters["crop_title"] = crop_title
     filters["format_date"] = format_date
+    filters["format_time"] = format_time
     filters["format_datetime"] = format_datetime
     filters["forum_is_unread"] = forum_is_unread
     filters["is_online"] = is_online

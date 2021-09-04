@@ -27,6 +27,7 @@ from babel.core import get_locale_identifier
 from babel.dates import format_date as babel_format_date
 from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_timedelta as babel_format_timedelta
+from babel.dates import format_time as babel_format_time
 from flask import current_app, flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
@@ -447,10 +448,12 @@ def _get_user_locale():
         locale = current_user.language
     return locale
 
-
+#http://babel.pocoo.org/en/latest/api/dates.html#babel.dates.format_time
 def _format_html_time_tag(datetime, what_to_display):
     if what_to_display == "date-only":
         content = babel_format_date(datetime, locale=_get_user_locale())
+    elif what_to_display == "time-only":
+        content = babel_format_time(datetime, format="short", locale=_get_user_locale())
     elif what_to_display == "date-and-time":
         content = babel_format_datetime(
             datetime, tzinfo=UTC, locale=_get_user_locale()
@@ -465,7 +468,7 @@ def _format_html_time_tag(datetime, what_to_display):
 
     return Markup(
         '<time datetime="{}" data-what_to_display="{}">{}</time>'.format(
-            isoformat, what_to_display, content
+            isoformat, what_to_display, content, content
         )
     )
 
@@ -479,22 +482,22 @@ def format_datetime(datetime):
     return _format_html_time_tag(datetime, "date-and-time")
 
 
-def format_date(datetime, format=None):
+def format_date(datetime):
     """Format the datetime for usage in templates, keeping only the date.
 
     :param value: The datetime object that should be formatted
     :rtype: Markup
     """
-    if format:
-        warnings.warn(
-            "This API has been deprecated due to i18n concerns.  Please use  "
-            "Jinja filters format_datetime and format_date without arguments "
-            "to format complete and date-only timestamps respectively.",
-            DeprecationWarning,
-        )
-        if "%H" in format:
-            return format_datetime(datetime)
     return _format_html_time_tag(datetime, "date-only")
+
+
+def format_time(datetime):
+    """Format the datetime for usage in templates, keeping only the time.
+
+    :param value: The datetime object that should be formatted
+    :rtype: Markup
+    """
+    return _format_html_time_tag(datetime, "time-only")
 
 
 def format_timedelta(delta, **kwargs):
