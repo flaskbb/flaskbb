@@ -21,9 +21,15 @@ def get_annotations():
             )
 
 
-with open('src/js/emoji.js', 'w') as f:
-    f.write('var emojies = [\n')
+def format_name(name):
+    # name is somthing like: E11_big_smile
+    # --> convert it to big_smile
+    return "_".join(name.split("_")[1:])
+
+
+with open('src/app/emoji.js', 'w') as f:
+    f.write('const EMOJIS = [\n')
     for character, name in get_annotations():
         name = name.replace(':', '').replace(' ', '_')
-        f.write('    ["{}", "{}"],\n'.format(name, character))
+        f.write('    ["{}", "{}"],\n'.format(format_name(name), character))
     f.write('];\n')
