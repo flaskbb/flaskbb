@@ -4,7 +4,7 @@
  * License: BSD - See LICENSE for more details.
  */
 import { Modal } from "bootstrap";
-import { EDITORS } from "./editor.js";
+import twemoji from "twemoji";
 
 // get the csrf token from the header
 let csrf_token = document.querySelector("meta[name=csrf-token]").content;
@@ -196,11 +196,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
                     : "";
             const url = `${urlprefix}post/${post_id}/raw`;
 
-            const editor = EDITORS.get("content");
+            const editor = document.querySelector(".flaskbb-editor");
             fetch(url)
                 .then((response) => response.text())
                 .then((data) => {
-                    editor.value(data);
+                    editor.value = data;
                     editor.selectionStart = editor.selectionEnd =
                         editor.value.length;
                     editor.scrollTop = editor.scrollHeight;
@@ -235,6 +235,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (el.dataset.what_to_display == "date-only") {
             options.hour = undefined;
             options.minute = undefined;
+        } else if (el.dataset.what_to_display== "time-only") {
+            options.year = undefined;
+            options.month = undefined;
+            options.day = undefined;
+            options.hour = "2-digit";
+            options.minute = "2-digit";
         } else {
             options.hour = "2-digit";
             options.minute = "2-digit";

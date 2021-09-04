@@ -34,7 +34,7 @@
             <form class="row p-2" role="form" method="post">
                 {{ form.hidden_tag() }}
                 {{ render_field(form.title) }}
-                {{ render_field(form.description, div_class="col-sm-10", class="flaskbb-editor", style="display:none") }}
+                {{ render_field(form.description, div_class="col-sm-10 mb-3") }}
 
                 {{ render_field(form.position) }}
                 {{ render_field(form.submit) }}

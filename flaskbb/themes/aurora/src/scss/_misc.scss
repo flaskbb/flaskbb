@@ -10,9 +10,10 @@ body {
 }
 
 .emoji {
-    vertical-align: middle;
-    width: 20px;
-    height: 20px;
+   height: 1em;
+   width: 1em;
+   margin: 0 .05em 0 .1em;
+   vertical-align: -0.1em;
 }
 
 .flaskbb-footer {
@@ -32,10 +33,13 @@ body {
 .flaskbb-header {
     color: #fff;
     text-align: left;
-    text-shadow: 0 1px 0 rgba(0,0,0,.1);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
     background-color: $fbb-header-bg-primary;
-    background-image: -webkit-linear-gradient(top, $fbb-header-bg-secondary 0%, $fbb-header-bg-primary 100%);
-    background-image: linear-gradient(to bottom, $fbb-header-bg-secondary 0%, $fbb-header-bg-primary 100%);
+    background-image: linear-gradient(
+        to bottom,
+        $fbb-header-bg-secondary 0%,
+        $fbb-header-bg-primary 100%
+    );
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$fbb-header-bg-secondary', endColorstr='$fbb-header-bg-primary', GradientType=0);
     border: 1px solid $border-color;
@@ -78,8 +82,6 @@ body {
             background-color: $fbb-navigation-hover-color;
         }
     }
-
-
 }
 
 .flaskbb-breadcrumb {
@@ -93,7 +95,6 @@ p.flaskbb-stats {
     margin: 0;
     padding: 0;
 }
-
 
 .controls-row {
     padding: 0.5em 0;
@@ -113,7 +114,6 @@ p.flaskbb-stats {
 .settings-col {
     padding: 0;
 }
-
 
 .cheatsheet {
     h2 {
@@ -144,22 +144,29 @@ p.flaskbb-stats {
     }
 }
 
-.EasyMDEContainer {
+.textcomplete-dropdown {
+    border: 1px solid #ddd;
+    background-color: white;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-    .CodeMirror {
-        border-color: $border-color !important;
-    }
+.textcomplete-dropdown li {
+    margin: 0;
+}
 
-    .editor-toolbar {
-        border-color: $border-color;
-        //background-color: #e8ecf1;
-    }
+.textcomplete-footer,
+.textcomplete-item {
+    border-top: 1px solid #ddd;
+}
 
-    .CodeMirror-focused {
-        //color: #212529;
-        //background-color: #f6f9fc;
-        border-color: #99bddb;
-        outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(51, 122, 183, 0.25);
-    }
+.textcomplete-item {
+    padding: 2px 5px;
+    cursor: pointer;
+}
+
+.textcomplete-item:hover,
+.textcomplete-item.active {
+    background-color: rgb(110, 183, 219);
 }

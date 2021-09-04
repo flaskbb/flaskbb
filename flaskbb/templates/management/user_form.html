@@ -52,8 +52,8 @@
                 {{ horizontal_field(form.primary_group) }}
                 {{ horizontal_field(form.secondary_groups) }}
                 {{ horizontal_field(form.activated, div_class="offset-3 col-4") }}
-                {{ horizontal_field(form.signature, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
-                {{ horizontal_field(form.notes, div_class="col-sm-8", class="flaskbb-editor", style="display:none") }}
+                {{ horizontal_field(form.signature, rows=4, div_class="col-sm-8") }}
+                {{ horizontal_field(form.notes, rows=8, div_class="col-sm-8") }}
 
                 {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
 

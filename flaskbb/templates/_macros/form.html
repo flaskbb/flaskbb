@@ -92,6 +92,54 @@
 {%- endmacro -%}
 
 
+{%- macro render_editor_field(field, div_class='') -%}
+{% if div_class %}
+<div class="{{ div_class }}">
+{% endif %}
+
+    {% set placeholder = kwargs['placeholder']|length or field.label.text %}
+    {% set css_error = ' is-invalid' if field.errors else '' %}
+    {% set css_class = kwargs['class'] if kwargs['class'] else 'flaskbb-editor form-control border-0 rounded-0' %}
+    {% set css_class = css_class + css_error if css_error else css_class %}
+    <div class="card">
+        <div class="card-header">
+            <div class="btn-toolbar">
+                <markdown-toolbar for="{{ field.id }}">
+                    <div class="btn-group btn-group-sm me-2">
+                        <md-header class="btn btn-white" data-tooltip="tooltip" title="Heading"><span class="fas fa-heading"></span></md-header>
+                        <md-bold class="btn btn-white" data-tooltip="tooltip" title="Bold"><span class="fas fa-bold"></span></md-bold>
+                        <md-italic class="btn btn-white" data-tooltip="tooltip" title="Italic"><span class="fas fa-italic"></span></md-italic>
+                        <md-strikethrough class="btn btn-white" data-tooltip="tooltip" title="Strikethrough"><span class="fas fa-strikethrough"></span></md-strikethrough>
+                    </div>
+
+                    <div class="btn-group btn-group-sm me-2">
+                        <md-quote class="btn btn-white" data-tooltip="tooltip" title="Quote"><span class="fas fa-quote-left"></span></md-quote>
+                        <md-code class="btn btn-white" data-tooltip="tooltip" title="Code"><span class="fas fa-code"></span></md-code>
+                        <md-link class="btn btn-white" data-tooltip="tooltip" title="Insert Link"><span class="fas fa-link"></span></md-link>
+                        <md-image class="btn btn-white" data-tooltip="tooltip" title="Insert Image"><span class="fas fa-image"></span></md-image>
+                    </div>
+
+                    <div class="btn-group btn-group-sm me-2">
+                        <md-unordered-list class="btn btn-white" data-tooltip="tooltip" title="Unordered List"><span class="fas fa-list-ul"></span></md-unordered-list>
+                        <md-ordered-list class="btn btn-white" data-tooltip="tooltip" title="Ordered List"><span class="fas fa-list-ol"></span></md-ordered-list>
+                        <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
+                    </div>
+                </markdown-toolbar>
+
+                <button class="btn btn-sm btn-primary me-2" for="{{ field.id }}">Preview</button>
+                <button class="btn btn-sm btn-success"><span class="fas fa-question"></span></button>
+            </div>
+        </div>
+        {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+    </div>
+    {{ field_description(field) }}
+    {{ field_errors(field) }}
+{% if div_class %}
+</div>
+{% endif %}
+{%- endmacro -%}
+
+
 {%- macro render_submit_field(field, div_class='') -%}
 {% if div_class %}
 <div class="{{ div_class }}">
@@ -119,6 +167,8 @@
         {{ render_select_field(field, **kwargs) }}
     {% elif field.type == "SubmitField" %}
         {{ render_submit_field(field, **kwargs) }}
+    {% elif field.type == "TextAreaField" %}
+        {{ render_editor_field(field, **kwargs) }}
     {% else %}
         {{ render_input_field(field, **kwargs) }}
     {% endif %}
@@ -141,6 +191,8 @@
         {{ render_select_field(field, **kwargs) }}
     {% elif field.type == "SubmitField" %}
         {{ render_submit_field(field, **kwargs) }}
+    {% elif field.type == "TextAreaField" %}
+        {{ render_editor_field(field, **kwargs) }}
     {% else %}
         {{ render_input_field(field, **kwargs) }}
     {% endif %}

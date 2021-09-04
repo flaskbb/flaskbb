@@ -4,7 +4,7 @@
 
 {% block content %}
 {% from theme('_macros/pagination.html') import render_pagination, generate_obj_id, generate_post_url %}
-{% from theme('_macros/form.html') import render_input_field, render_submit_field %}
+{% from theme('_macros/form.html') import render_input_field, render_editor_field, render_submit_field %}
 
 <div class="topic-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
@@ -233,7 +233,7 @@
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="offset-md-2 offset-sm-3 col-md-10 col-sm-9 col-12">
-                {{ render_input_field(form.content, class='flaskbb-editor', style="display: none", required="required") }}
+                {{ render_editor_field(form.content, rows=6) }}
                 {{ render_submit_field(form.submit, div_class="mt-2 float-end") }}
             </div>
         </div>

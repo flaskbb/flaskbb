@@ -1,36 +1,20 @@
-import EasyMDE from "easymde";
-import { CodeMirrorEditor } from "@textcomplete/codemirror";
-import EMOJIS from "./emoji";
+import { TextareaEditor } from "@textcomplete/textarea";
 import { Textcomplete } from "@textcomplete/core";
+import EMOJIS from "./emoji";
 import { parse_emoji } from "./flaskbb";
-export const EDITORS = new Map();
 
-
-
-function startsWith(term, limit = 10) {
-    const results = [];
-    // Whether previous key started with the term
-    let prevMatch = false
-    for (const [key, url] of EMOJIS) {
-        if (key.startsWith(term)) {
-            results.push([key, url])
-            if (results.length === limit) break
-            prevMatch = true
-        } else if (prevMatch) {
-            break
-        }
+const TEXTCOMPLETE_CONFIG = {
+    dropdown: {
+        maxCount: 5
     }
-    return results
 }
-
 
 const EMOJI_STRATEGY = {
     id: "emoji",
     match: /\B:([\-+\w]*)$/,
     search: (term, callback) => {
         callback(EMOJIS.map(value => {
-            let x =  value[0].indexOf(term) !== -1 ? { character: value[1], name: value[0] } : null;
-            return x;
+            return value[0].indexOf(term) !== -1 ? { character: value[1], name: value[0] } : null;
         }))
     },
     replace: (value) => {
@@ -54,21 +38,22 @@ const EMOJI_STRATEGY = {
     },
 }
 
+function configureAutocomplete(element) {
+    const editor = new TextareaEditor(element)
+    const textcomplete = new Textcomplete(editor, [EMOJI_STRATEGY], TEXTCOMPLETE_CONFIG)
+}
 
 
-function loadEditor(element) {
-    const easyMDE = new EasyMDE({
-        autoDownloadFontAwesome: false,
-        element: element,
-        autoRefresh: true,
-        forceSync: true,
-        spellChecker: false,
-        sideBySideFullscreen: false,
-        status: false,
-    });
-    const textCompleteEditor = new CodeMirrorEditor(easyMDE.codemirror);
-    const textcomp = new Textcomplete(textCompleteEditor, [EMOJI_STRATEGY], { dropdown: { maxCount: 5 }})
-    return easyMDE;
+function setupEditor() {
+    const editors = document.querySelectorAll(".flaskbb-editor");
+    for(const e of editors) {
+        configureAutocomplete(e);
+    }
+}
+
+
+function markdownPreview(element) {
+
 }
 
 
@@ -93,12 +78,4 @@ for (const e of tareas) {
     autoresizeTextarea(e);
 }
 
-const editorsSelector = document.querySelectorAll(".flaskbb-editor");
-editorsSelector.forEach((value, index) => {
-    if (typeof value.id != 'undefined') {
-        EDITORS.set(value.id, loadEditor(value));
-    } else {
-        EDITORS.set(`easyMDE-${index}`, loadEditor(value));
-    }
-
-});
+setupEditor()

@@ -10,7 +10,7 @@
 {% extends theme("layout.html") %}
 
 {% block content %}
-{% from theme("_macros/form.html") import render_field, render_input_field, render_submit_field %}
+{% from theme("_macros/form.html") import render_field, render_editor_field, render_submit_field %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
@@ -34,7 +34,7 @@
                 <div class="row p-3">
                     {{ run_hook("flaskbb_tpl_form_new_post_before", form=form) }}
 
-                    {{ render_input_field(form.content, class='flaskbb-editor', style="display: none", required="required") }}
+                    {{ render_editor_field(form.content, rows=6) }}
                     {{ render_field(form.track_topic) }}
 
                     {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
