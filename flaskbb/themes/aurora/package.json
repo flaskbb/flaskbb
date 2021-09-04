@@ -24,26 +24,28 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
-    "@popperjs/core": "^2.9.3",
+    "@github/markdown-toolbar-element": "^1.5.1",
+    "@popperjs/core": "^2.10.1",
+    "@textcomplete/core": "^0.1.9",
+    "@textcomplete/textarea": "^0.1.9",
     "bootstrap": "^5.1.0",
-    "easymde": "^2.15.0",
-    "jquery": "^3.6.0"
+    "twemoji": "^13.1.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
+    "@babel/cli": "^7.15.4",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
     "@babel/preset-typescript": "^7.15.0",
-    "autoprefixer": "^10.3.1",
+    "autoprefixer": "^10.3.4",
     "babel-loader": "^8.2.2",
-    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.2.0",
     "expose-loader": "^3.0.0",
-    "mini-css-extract-plugin": "^2.2.0",
+    "mini-css-extract-plugin": "^2.2.2",
     "postcss-loader": "^6.1.1",
-    "sass": "^1.37.5",
+    "sass": "^1.39.0",
     "sass-loader": "^12.1.0",
-    "webpack": "^5.48.0",
-    "webpack-cli": "^4.7.2"
+    "webpack": "^5.52.0",
+    "webpack-cli": "^4.8.0"
   }
 }
