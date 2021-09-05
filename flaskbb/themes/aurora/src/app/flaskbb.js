@@ -5,6 +5,8 @@
  */
 import { Modal } from "bootstrap";
 import twemoji from "twemoji";
+import { isHidden } from "./utils";
+
 
 // get the csrf token from the header
 let csrf_token = document.querySelector("meta[name=csrf-token]").content;
@@ -12,7 +14,7 @@ let csrf_token = document.querySelector("meta[name=csrf-token]").content;
 export function show_management_search() {
     let form = document.querySelector(".search-form");
 
-    if (window.getComputedStyle(form).display === "none") {
+    if (isHidden(form)) {
         form.style.display = "block";
         form.querySelector("input").focus();
     } else {
@@ -104,15 +106,9 @@ export function send_data(endpoint_url, data) {
 
                     let reverse_html = "";
                     if (obj.reverse == "ban") {
-                        reverse_html =
-                            '<span class="fas fa-flag text-success" data-bs-toggle="tooltip" title="' +
-                            obj.reverse_name +
-                            '"></span>';
+                        reverse_html = `<span class="fas fa-flag text-success" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
                     } else if (obj.reverse == "unban") {
-                        reverse_html =
-                            '<span class="fas fa-flag text-warning" data-bs-toggle="tooltip" title="' +
-                            obj.reverse_name +
-                            '"></span>';
+                        reverse_html = `<span class="fas fa-flag text-warning" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
                     }
                     form.querySelector("button").innerHTML = reverse_html;
                 } else if (obj.type == "delete") {

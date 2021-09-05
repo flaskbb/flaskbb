@@ -124,13 +124,15 @@
                         <md-ordered-list class="btn btn-white" data-tooltip="tooltip" title="Ordered List"><span class="fas fa-list-ol"></span></md-ordered-list>
                         <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
                     </div>
+
+                    <button class="btn btn-sm btn-primary me-2 preview-btn" data-preview="{{ field.id }}">Preview</button>
+                    <button type="button" class="btn btn-sm btn-white help-btn" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
                 </markdown-toolbar>
 
-                <button class="btn btn-sm btn-primary me-2" for="{{ field.id }}">Preview</button>
-                <button type="button" class="btn btn-sm btn-white" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
             </div>
         </div>
         {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
+        <div class="preview" id="{{ field.id }}-preview" style="display: none; padding:  0.375rem 0.75rem"></div>
     </div>
     {{ field_description(field) }}
     {{ field_errors(field) }}

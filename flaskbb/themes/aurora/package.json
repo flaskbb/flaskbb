@@ -29,6 +29,8 @@
     "@textcomplete/core": "^0.1.9",
     "@textcomplete/textarea": "^0.1.9",
     "bootstrap": "^5.1.0",
+    "dompurify": "^2.3.1",
+    "marked": "^3.0.2",
     "twemoji": "^13.1.0"
   },
   "devDependencies": {
