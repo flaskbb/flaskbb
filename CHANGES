@@ -5,12 +5,22 @@ Here you can see the full list of changes between each release.
 
 Version 2.1.0
 -------------
+
+Released September 9th, 2021
+
+The most notable changes are following:
+
 * Reimplemented User views using services
 * Services for changing email, password, settings and details
 * Hooks for email, password, settings and details updates
 * Hook for user profile sidebar links
 * Added helper for generating dynamic navbar content
 * Gender is now a text field rather than a dropdown
+* Upgrade to Flask 2.0 and SQLAlchemy 1.4
+* Upgrade Bootstrap 3 to Bootstrap 5
+* Remove JQuery dependency by rewriting some parts to be plain JS
+* Replace Bootstrap-Markdown editor with GitHub-Markdown-Toolbar
+* ... and lots of other fixes and improvements
 
 
 Version 2.0.2
