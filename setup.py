@@ -1,18 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
-
-def read(*parts):
-    here = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(here, *parts), "r") as fp:
-        return fp.read()
-
-
-long_description = read("README.md")
 install_requires = [
     "alembic>=1.6.5",
     "amqp>=5.0.6",
@@ -78,51 +69,12 @@ install_requires = [
     "WTForms-SQLAlchemy>=0.2",
 ]
 
-
 extras_require = {"postgres": ["psycopg2-binary"]}
 
 tests_require = ["py", "pytest", "pytest-cov", "cov-core", "coverage"]
 
 setup(
-    name="FlaskBB",
-    version="2.0.2",
-    url="https://flaskbb.org",
-    project_urls={
-        "Documentation": "https://flaskbb.readthedocs.io/en/latest/",
-        "Code": "https://github.com/flaskbb/flaskbb",
-        "Issue Tracker": "https://github.com/flaskbb/flaskbb",
-    },
-    license="BSD",
-    author="Peter Justin",
-    author_email="peter.justin@outlook.com",
-    description="A classic Forum Software in Python using Flask.",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    packages=find_packages(),
-    include_package_data=True,
-    zip_safe=False,
-    platforms="any",
-    entry_points="""
-        [console_scripts]
-        flaskbb=flaskbb.cli:flaskbb
-    """,
-    python_requires=">3.5",
     install_requires=install_requires,
     extras_require=extras_require,
-    tests_require=tests_require,
-    test_suite="tests",
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "Intended Audience :: End Users/Desktop",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-    ],
+    tests_require=tests_require
 )
