@@ -17,7 +17,6 @@ import traceback
 from datetime import datetime
 
 import click
-import click_log
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from flask_alembic import alembic_click
@@ -49,7 +48,6 @@ from flaskbb.utils.translations import compile_translations
 
 
 logger = logging.getLogger(__name__)
-click_log.basic_config(logger)
 
 
 class FlaskBBGroup(FlaskGroup):
@@ -144,7 +142,6 @@ def set_instance(ctx, param, value):
     help="Show the FlaskBB version.",
 )
 @click.pass_context
-@click_log.simple_verbosity_option(logger)
 def flaskbb(ctx):
     """This is the commandline interface for flaskbb."""
     if ctx.invoked_subcommand is None:
