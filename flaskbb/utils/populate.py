@@ -383,6 +383,13 @@ def create_latest_db(target="default@head"):
     alembic.stamp(target=target)
 
 
+def has_migrations(plugin):
+    migrations_path = os.path.join(plugin.__path__[0], "migrations")
+    if os.path.exists(migrations_path) and len(os.listdir(migrations_path)) != 0:
+        return True
+    return False
+
+
 def run_plugin_migrations(plugins=None):
     """Runs the migrations for a list of plugins.
 
@@ -395,9 +402,7 @@ def run_plugin_migrations(plugins=None):
     for plugin in plugins:
         plugin_name = current_app.pluggy.get_name(plugin)
 
-        migrations_path = os.path.join(plugin.__path__[0], "migrations")
-        has_migrations = len(os.listdir(migrations_path)) != 0
-        if not os.path.exists(migrations_path) or not has_migrations:
+        if not has_migrations(plugin):
             logger.debug("No migrations found for plugin %s" % plugin_name)
             continue
 
