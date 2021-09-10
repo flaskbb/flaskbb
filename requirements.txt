@@ -29,8 +29,8 @@ Flask-SQLAlchemy==2.5.1
 Flask-Themes2==1.0.0
 flask-whooshee==0.8.1
 Flask-WTF==0.15.1
-flaskbb-plugin-conversations==1.0.8
-flaskbb-plugin-portal==1.1.3
+flaskbb-plugin-conversations==1.1.0
+flaskbb-plugin-portal==1.2.0
 greenlet==1.1.1
 idna==3.2
 itsdangerous==2.0.1
