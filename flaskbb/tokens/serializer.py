@@ -7,10 +7,9 @@
     :license: BSD, see LICENSE for more details
 """
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from itsdangerous import (BadData, BadSignature, SignatureExpired,
-                          TimedJSONWebSignatureSerializer)
+import jwt
 
 from ..core import tokens
 
@@ -37,9 +36,15 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
     """
 
     def __init__(self, secret_key, expiry=_DEFAULT_EXPIRY):
-        self._serializer = TimedJSONWebSignatureSerializer(
-            secret_key, int(expiry.total_seconds())
-        )
+        self.secret_key = secret_key
+        self.algorithm = "HS256"
+
+        if isinstance(expiry, timedelta):
+            self.expiry = datetime.utcnow() + expiry
+        elif isinstance(expiry, datetime):
+            self.expiry = expiry
+        else:
+            raise TypeError("'expiry' must be of type timedelta or datetime")
 
     def dumps(self, token):
         """
@@ -49,11 +54,10 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         :flaskbb.core.tokens.Token token: Token to transformed into a JWT
         :returns str: A fully serialized token
         """
-        return self._serializer.dumps(
-            {
-                'id': token.user_id,
-                'op': token.operation,
-            }
+        return jwt.encode(
+            payload={"id": token.user_id, "op": token.operation, "exp": self.expiry},
+            key=self.secret_key,
+            algorithm=self.algorithm,
         )
 
     def loads(self, raw_token):
@@ -69,16 +73,18 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         :returns flaskbb.core.tokens.Token: Parsed token
         """
         try:
-            parsed = self._serializer.loads(raw_token)
-        except SignatureExpired:
+            parsed = jwt.decode(
+                raw_token, key=self.secret_key, algorithms=[self.algorithm]
+            )
+        except jwt.ExpiredSignatureError:
             raise tokens.TokenError.expired()
-        except BadSignature:  # pragma: no branch
+        except jwt.DecodeError:  # pragma: no branch
             raise tokens.TokenError.invalid()
-        # ideally we never end up here as BadSignature should
+        # ideally we never end up here as DecodeError should
         # catch everything else, however since this is the root
-        # exception for itsdangerous we'll catch it down and
+        # exception for PyJWT we'll catch it down and
         # and re-raise our own
-        except BadData:  # pragma: no cover
+        except jwt.InvalidTokenError:  # pragma: no cover
             raise tokens.TokenError.bad()
         else:
-            return tokens.Token(user_id=parsed['id'], operation=parsed['op'])
+            return tokens.Token(user_id=parsed["id"], operation=parsed["op"])

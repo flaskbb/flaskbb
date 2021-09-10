@@ -51,6 +51,7 @@ install_requires = [
     "pluggy>=0.13.1",
     "prompt-toolkit>=3.0.19",
     "Pygments>=2.9.0",
+    "PyJWT>=2.1.0",
     "python-dateutil>=2.8.2",
     "python-editor>=1.0.4",
     "pytz>=2021.1",
