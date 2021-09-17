@@ -218,6 +218,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
         })
     );
 
+    // listen on set-checkbox to check the nearest checkbox
+    document.querySelectorAll(".set-checkbox").forEach((el) =>
+        el.addEventListener("click", (event) => {
+            const cb = el.querySelector("input.action-checkbox");
+            cb.checked = !cb.checked;
+        })
+    );
+
     document.querySelectorAll("time").forEach((el) => {
         let date = new Date(el.getAttribute("datetime"));
         const options = {

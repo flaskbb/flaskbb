@@ -28,6 +28,7 @@
 
             <div class="card-body forum-body">
                 {% set with_checkbox = True %}
+                {% set forum_row_css_class = 'set-checkbox' %}
                 {% include theme("forum/_forum_meta.html") %}
 
                 {% for topic, last_post, topicread in topics.items %}
