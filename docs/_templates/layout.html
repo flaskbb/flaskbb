@@ -9,7 +9,7 @@
   {% if theme_canonical_url %}
     <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html"/>
   {% endif %}
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 {% endblock %}
 
 {# Disable base theme's top+bottom related navs; we have our own in sidebar #}
@@ -18,30 +18,26 @@
 
 {# Nav should appear before content, not after #}
 {%- block content %}
-<nav class="navbar navbar-default navbar-top topnav" role="navigation">
-    <div class="container topnav">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topnav-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand topnav" href="https://flaskbb.org">FlaskBB</a>
-        </div>
+<nav class="navbar fixed-top navbar-expand-md navbar-light bg-light border-bottom flaskbb-navbar" role="navigation">
+    <div class="container">
+        <a class="navbar-brand" href="https://flaskbb.org">FlaskBB</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topnav-collapse" aria-controls="topnav-collapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
         <div class="collapse navbar-collapse" id="topnav-collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="https://flaskbb.org">Home</a>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://flaskbb.org">Home</a>
                 </li>
-                <li>
-                    <a href="https://flaskbb.org/about">About</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://flaskbb.org/about">About</a>
                 </li>
-                <li>
-                    <a href="https://forums.flaskbb.org">Community</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://forums.flaskbb.org">Community</a>
                 </li>
-                <li class="active">
-                    <a href="https://flaskbb.readthedocs.io">Documentation</a>
+                <li class="nav-item">
+                    <a class="nav-link active" href="https://flaskbb.readthedocs.io">Documentation</a>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->
@@ -70,8 +66,10 @@
   {%- endif %}
 {%- endmacro %}
 
+<main role="main" class="flex-shrink-0">
+    <div class="container">
 {%- if theme_fixed_sidebar|lower == 'true' %}
-  <div class="container">
+  <div class="row">
     {% if render_sidebar %}
         <div class="col-12 col-sm-4 col-md-4 col-lg-3">
             {{ sidebar() }}
@@ -93,26 +91,28 @@
 {%- else %}
 {{ super() }}
 {%- endif %}
+    </div>
+</main>
 {%- endblock %}
 
 {%- block footer %}
-<footer>
+<footer class="footer mt-auto py-3">
     <div class="container">
-        <div class="row">
-            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
-                <p class="copyright text-muted small pull-left">
-                    &copy; 2013 - 2021 <a href="https://flaskbb.org">FlaskBB Team</a>
+        <div class="row justify-content-between align-items-center">
+            <div class="col-4">
+                <p class="copyright text-muted small text-start mt-auto mb-auto">
+                    &copy; 2013 - <script type="text/javascript">document.write(new Date().getFullYear());</script> <a href="https://flaskbb.org">FlaskBB Team</a>
                 </p>
             </div>
-            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
-                <p class="made-in text-muted small" style="text-align: center">
-                    <i style="color: white" class="fa fa-fw fa-code"></i> with
-                    <i style="color: red" class="fa fa-fw fa-heart"></i> on Earth
+            <div class="col-4">
+                <p class="made-in text-muted small text-center mt-auto mb-auto">
+                    <i style="color: white" class="fas fa-fw fa-code"></i> with
+                    <i style="color: red" class="fas fa-fw fa-heart"></i> on Earth
                 </p>
             </div>
-            <div class="col-4 col-sm-4 col-md-4 col-lg-4">
-                <p class="powered-by text-muted small pull-right">
-                    Powered by <a href="http://sphinx-doc.org/">Sphinx {{ sphinx_version }}</a>
+            <div class="col-4">
+                <p class="powered-by text-muted small text-end mt-auto mb-auto">
+                    Powered by <a href="https://www.sphinx-doc.org/">Sphinx {{ sphinx_version }}</a>
                     {%- if show_source and has_source and sourcename %}
                     {% if show_copyright or theme_show_powered_by %}|{% endif %}
                     <a href="{{ pathto('_sources/' + sourcename, true)|e }}"
@@ -124,19 +124,5 @@
     </div>
 </footer>
 <!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-{% if theme_analytics_id %}
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '{{ theme_analytics_id }}']);
-  _gaq.push(['_setDomainName', 'none']);
-  _gaq.push(['_setAllowLinker', true]);
-  _gaq.push(['_trackPageview']);
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-{% endif %}
+<link rel="stylesheet" href="{{ pathto('_static/main.js', 1) }}" type="text/css" />
 {%- endblock %}
