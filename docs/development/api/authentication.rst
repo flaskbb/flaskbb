@@ -43,6 +43,7 @@ Reauthentication Interfaces
 ---------------------------
 
 .. module:: flaskbb.core.auth.authentication
+   :noindex:
 
 .. autoclass:: ReauthenticateManager
    :members:
@@ -75,6 +76,7 @@ Exceptions
 ----------
 
 .. module:: flaskbb.core.auth.authentication
+   :noindex:
 
 .. autoexception:: StopAuthentication
 .. autoexception:: ForceLogout
