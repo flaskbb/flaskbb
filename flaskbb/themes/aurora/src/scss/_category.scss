@@ -48,6 +48,12 @@
             font-weight: bold;
         }
 
+        .forum-description {
+            & > p {
+                margin-bottom: 0;
+            }
+        }
+
         .forum-moderators {
             font-style: italic;
         }

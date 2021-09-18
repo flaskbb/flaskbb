@@ -115,6 +115,13 @@ p.flaskbb-stats {
     padding: 0;
 }
 
+.conversation-content img,
+.message-content img {
+    width: 100%;
+    height:100%;
+    object-fit:contain;
+}
+
 .cheatsheet {
     h2 {
         text-align: center;
