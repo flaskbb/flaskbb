@@ -99,3 +99,6 @@ intersphinx_mapping = {
 }
 
 autodoc_member_order = 'bysource'
+
+# due to rtd using sphinx < 2
+root_doc = master_doc = 'index'
