@@ -1,4 +1,6 @@
 {%- from theme("_macros/navigation.html") import sidebar with context -%}
+{%- from theme("_macros/utils.html") import avatar_img -%}
+
 {% extends theme("layout.html") %}
 {% set page_title = _("%(user)s - User", user=user.username) %}
 
@@ -14,7 +16,7 @@
                 <div class="col-12 col-sm-auto mb-3">
                     <div class="mx-auto" style="width: 150px;">
                         <div class="d-flex justify-content-center align-items-center">
-                            <img class="rounded" src="{{ url_for('static', filename='avatar150x150.png') }}" alt="" />
+                            {{ avatar_img(user, size=150, class="rounded") }}
                         </div>
                     </div>
                 </div>
