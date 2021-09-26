@@ -10,15 +10,17 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2018-05-03 10:17+0000\n"
-"Last-Translator: Peter Justin\n"
-"Language-Team: German (http://www.transifex.com/flaskbb/flaskbb/language/de/)\n"
+"PO-Revision-Date: 2021-09-27 02:37+0000\n"
+"Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"de/>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.9-dev\n"
 "Generated-By: Babel 2.5.3\n"
-"Language: de\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -86,13 +88,13 @@ msgstr "E-Mail-Adresse"
 #: flaskbb/auth/forms.py:124 flaskbb/auth/forms.py:154
 #: flaskbb/management/forms.py:60 flaskbb/user/forms.py:40
 msgid "A valid email address is required."
-msgstr "Bitte gültige E-Mail-Adresse eingeben"
+msgstr "Bitte gültige E-Mail-Adresse eingeben."
 
 #: flaskbb/auth/forms.py:68 flaskbb/auth/forms.py:155
 #: flaskbb/management/forms.py:61 flaskbb/user/forms.py:41
 #: flaskbb/user/forms.py:46 flaskbb/user/forms.py:49
 msgid "Invalid email address."
-msgstr "E-Mail-Adresse ungültig"
+msgstr "E-Mail-Adresse ungültig."
 
 #: flaskbb/auth/forms.py:76 flaskbb/auth/forms.py:133
 msgid "Passwords must match."
@@ -108,11 +110,11 @@ msgstr "Sprache"
 
 #: flaskbb/auth/forms.py:87
 msgid "I accept the Terms of Service"
-msgstr "Ich aktzeptiere die Nutzungsbediengungen."
+msgstr "Ich aktzeptiere die Nutzungsbediengungen"
 
 #: flaskbb/auth/forms.py:88
 msgid "Please accept the TOS."
-msgstr "Bitte Nutzungsbedingungen akzeptieren"
+msgstr "Bitte Nutzungsbedingungen akzeptieren."
 
 #: flaskbb/auth/forms.py:92 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:123
@@ -134,7 +136,7 @@ msgstr "Passwort zurücksetzen"
 
 #: flaskbb/auth/forms.py:146 flaskbb/management/forms.py:56
 msgid "A valid username is required."
-msgstr "Bitte einen gültigen Benutzernamen angeben"
+msgstr "Bitte einen gültigen Benutzernamen angeben."
 
 #: flaskbb/auth/forms.py:159
 msgid "Send Confirmation Mail"
@@ -143,11 +145,11 @@ msgstr "Bestätigungs-E-Mail senden"
 #: flaskbb/auth/plugins.py:35
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
-msgstr ""
+msgstr "Eine E-Mail zur Kontoaktivierung wurde an %(email)s gesendet"
 
 #: flaskbb/auth/plugins.py:43
 msgid "Thanks for registering."
-msgstr "Vielen Dank für's registrieren!"
+msgstr "Danke für die Registrierung."
 
 #: flaskbb/auth/views.py:49
 msgid "Logged out"
@@ -159,7 +161,7 @@ msgstr ""
 
 #: flaskbb/auth/views.py:107
 msgid "Reauthenticated."
-msgstr "Neuangemeldet"
+msgstr "Neuangemeldet."
 
 #: flaskbb/auth/views.py:112
 msgid "Unrecoverable error while handling reauthentication"
@@ -174,10 +176,12 @@ msgid ""
 "You have entered an username or email address that is not linked with your "
 "account."
 msgstr ""
+"Du hast einen Benutzernamen oder eine E-Mail-Adresse eingegeben, die nicht "
+"mit deinem Konto verknüpft ist."
 
 #: flaskbb/auth/views.py:202
 msgid "Email sent! Please check your inbox."
-msgstr ""
+msgstr "E-Mail gesendet! Bitte prüfe deinen Posteingang."
 
 #: flaskbb/auth/views.py:237
 msgid "Error when resetting password"
@@ -190,6 +194,7 @@ msgstr ""
 #: flaskbb/auth/views.py:277
 msgid "A new account activation token has been sent to your email address."
 msgstr ""
+"Ein neues Kontoaktivierungs-Token wurde an deine E-Mail-Adresse gesendet."
 
 #: flaskbb/auth/views.py:312
 msgid "Could not activate account due to an unrecoverable error"
@@ -201,7 +206,7 @@ msgstr ""
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "Die eingegebene E-Mail existiert nicht"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
@@ -225,7 +230,7 @@ msgstr ""
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "Ungültige E-Mail-Adresse"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
@@ -249,7 +254,7 @@ msgstr ""
 #: flaskbb/auth/services/registration.py:105
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s ist bereits registriert"
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
@@ -422,7 +427,7 @@ msgstr ""
 
 #: flaskbb/forum/views.py:370
 msgid "You do not have the permissions to move this topic."
-msgstr "Du hast nicht die Berechtigung um dieses Thema zu verschieben"
+msgstr "Du hast nicht die Berechtigung, um dieses Thema zu verschieben."
 
 #: flaskbb/forum/views.py:376
 msgid "Topics moved."
@@ -583,7 +588,9 @@ msgstr ""
 
 #: flaskbb/management/forms.py:168
 msgid "With this option the group has access to the admin panel."
-msgstr "Mit dieser Option haben alle Benutzer dieser Gruppe zugriff auf das Administrator Panel"
+msgstr ""
+"Mit dieser Option haben alle Benutzer dieser Gruppe Zugriff auf das "
+"Administrator-Panel."
 
 #: flaskbb/management/forms.py:172
 msgid "Is 'Super Moderator' group?"
@@ -669,6 +676,8 @@ msgid ""
 "Allow moderators to edit another user's profile including password and email"
 " changes."
 msgstr ""
+"Moderatoren die Möglichkeit geben, das Profil eines anderen Benutzers zu "
+"bearbeiten, einschließlich Passwort- und E-Mail-Änderungen."
 
 #: flaskbb/management/forms.py:221
 msgid "Moderators can ban users"
@@ -859,7 +868,7 @@ msgstr "Benutzer wurde gebannt."
 
 #: flaskbb/management/views.py:410
 msgid "Could not ban user."
-msgstr "Konnte den Benutzer nicht bannen, sorry."
+msgstr "Konnte den Benutzer nicht bannen."
 
 #: flaskbb/management/views.py:421
 msgid "You do not have the permissions to unban this user."
@@ -875,7 +884,7 @@ msgstr "Benutzer wurde entbannt."
 
 #: flaskbb/management/views.py:456
 msgid "Could not unban user."
-msgstr "Konnte den Benutzer nicht entbannen, sorry."
+msgstr "Konnte den Benutzer nicht entbannen."
 
 #: flaskbb/management/views.py:483 flaskbb/management/views.py:494
 #: flaskbb/templates/management/group_form.html:21
@@ -885,7 +894,7 @@ msgstr "Gruppe hinzufügen"
 
 #: flaskbb/management/views.py:490
 msgid "Group added."
-msgstr ""
+msgstr "Gruppe hinzugefügt."
 
 #: flaskbb/management/views.py:506 flaskbb/management/views.py:524
 msgid "Edit Group"
@@ -1158,7 +1167,7 @@ msgstr ""
 
 #: flaskbb/templates/errors/server_error.html:10
 msgid "Something went wrong!"
-msgstr "Es ist etwas schief gelaufen."
+msgstr "Es ist etwas schief gelaufen!"
 
 #: flaskbb/templates/errors/too_many_logins.html:1
 msgid "Too Many Requests"
@@ -1716,7 +1725,7 @@ msgstr ""
 
 #: flaskbb/templates/management/reports.html:37
 msgid "Poster"
-msgstr "Poster"
+msgstr "Beiträger"
 
 #: flaskbb/templates/management/reports.html:40
 msgid "Reporter"
@@ -1752,7 +1761,7 @@ msgstr ""
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
-msgstr "E-Mail Adresse ändern"
+msgstr "E-Mail-Adresse ändern"
 
 #: flaskbb/templates/user/change_password.html:7
 msgid "Change Password"
@@ -1788,19 +1797,19 @@ msgstr "Thema"
 
 #: flaskbb/user/forms.py:39
 msgid "Old email address"
-msgstr ""
+msgstr "Alte E-Mail-Adresse"
 
 #: flaskbb/user/forms.py:43
 msgid "New email address"
-msgstr ""
+msgstr "Neue E-Mail-Adresse"
 
 #: flaskbb/user/forms.py:45
 msgid "Email addresses must match."
-msgstr ""
+msgstr "Die E-Mail-Adressen müssen übereinstimmen."
 
 #: flaskbb/user/forms.py:48
 msgid "Confirm email address"
-msgstr ""
+msgstr "E-Mail-Adresse bestätigen"
 
 #: flaskbb/user/forms.py:70
 msgid "New password"
@@ -1832,7 +1841,7 @@ msgstr "Passwort aktualisiert."
 
 #: flaskbb/user/views.py:99
 msgid "Email address updated."
-msgstr ""
+msgstr "E-Mail-Adresse aktualisiert."
 
 #: flaskbb/user/views.py:119
 msgid "User details updated."
