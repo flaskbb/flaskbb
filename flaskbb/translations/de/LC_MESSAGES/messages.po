@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2021-09-27 02:37+0000\n"
+"PO-Revision-Date: 2021-09-28 03:36+0000\n"
 "Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "de/>\n"
@@ -1022,21 +1022,23 @@ msgstr "Plugin installiert."
 
 #: flaskbb/templates/confirm_dialog.html:6
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sind Sie sicher?"
 
 #: flaskbb/templates/confirm_dialog.html:9
 msgid ""
 "Are you sure that you want to perform this action? This action is "
 "irreversible."
 msgstr ""
+"Sind Sie sicher, dass Sie diese Aktion durchführen wollen? Diese Aktion ist "
+"unumkehrbar."
 
 #: flaskbb/templates/confirm_dialog.html:12
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: flaskbb/templates/confirm_dialog.html:13
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:13
@@ -1049,7 +1051,7 @@ msgstr "Benutzerliste"
 #: flaskbb/templates/forum/topictracker.html:26
 #: flaskbb/templates/layout.html:97
 msgid "Topic Tracker"
-msgstr "Thema Tracker"
+msgstr "Themen-Tracker"
 
 #: flaskbb/templates/layout.html:100
 #: flaskbb/templates/user/settings_layout.html:8
