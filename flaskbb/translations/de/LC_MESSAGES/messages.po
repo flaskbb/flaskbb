@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2021-09-28 03:36+0000\n"
+"PO-Revision-Date: 2021-09-29 04:37+0000\n"
 "Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "de/>\n"
@@ -1337,7 +1337,7 @@ msgstr ""
 
 #: flaskbb/templates/forum/index.html:11
 msgid "Board Statistics"
-msgstr "Foren Statistiken"
+msgstr "Foren-Statistiken"
 
 #: flaskbb/templates/forum/index.html:12
 msgid "Who is online?"
