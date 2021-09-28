@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2021-09-27 02:37+0000\n"
+"PO-Revision-Date: 2021-09-28 03:36+0000\n"
 "Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "fr/>\n"
@@ -974,11 +974,11 @@ msgstr "Forum supprimé."
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 msgid "Add Category"
-msgstr ""
+msgstr "Ajouter une catégorie"
 
 #: flaskbb/management/views.py:698
 msgid "Category added."
-msgstr ""
+msgstr "Catégorie ajoutée."
 
 #: flaskbb/management/views.py:718 flaskbb/management/views.py:734
 #: flaskbb/templates/management/forums.html:46
@@ -996,7 +996,7 @@ msgstr "Catégorie avec tous les forums associés supprimés."
 #: flaskbb/management/views.py:815
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "Le signalement %(id)s est déjà marqué comme lu."
 
 #: flaskbb/management/views.py:823
 #, python-format
@@ -1005,7 +1005,7 @@ msgstr "Signalement %(id)s marqué comme lu."
 
 #: flaskbb/management/views.py:837
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "Tous les signalements sont considérés comme lus."
 
 #: flaskbb/management/views.py:871
 msgid "Report deleted."
