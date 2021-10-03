@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2021-09-27 02:37+0000\n"
+"PO-Revision-Date: 2021-10-04 09:35+0000\n"
 "Last-Translator: Artem <Localizer_in_Russian@protonmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "ru/>\n"
@@ -1828,11 +1828,11 @@ msgstr ""
 
 #: flaskbb/user/views.py:59
 msgid "Settings updated."
-msgstr ""
+msgstr "Настройки обновлены."
 
 #: flaskbb/user/views.py:80
 msgid "Password updated."
-msgstr ""
+msgstr "Пароль обновлён."
 
 #: flaskbb/user/views.py:99
 msgid "Email address updated."
