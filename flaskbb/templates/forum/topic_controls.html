@@ -17,8 +17,8 @@
             <li>
                 <form class="d-inline" method="post" action="{{ url_for('forum.delete_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button class="btn btn-link">
-                        <span class="fas fa-trash fa-fw"></span> {% trans %}Delete Topic{% endtrans %}
+                    <button class="btn btn-link far text-red" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" title="{% trans %}Delete this topic{% endtrans %}">
+                    <span class="fas fa-trash fa-fw"></span> {% trans %}Delete Topic{% endtrans %}
                     </button>
                 </form>
             </li>
