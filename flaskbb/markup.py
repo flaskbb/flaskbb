@@ -38,6 +38,9 @@ def plugin_userify(md):
     md.inline.rules.append('flaskbb_user_link')
 
 
+DEFAULT_PLUGINS = [plugin_url, plugin_strikethrough, plugin_userify]
+
+
 class FlaskBBRenderer(mistune.HTMLRenderer):
     """Mistune renderer that uses pygments to apply code highlighting."""
 
@@ -72,7 +75,7 @@ def flaskbb_load_nonpost_markdown_class():
 @impl
 def flaskbb_jinja_directives(app):
     render_classes = app.pluggy.hook.flaskbb_load_post_markdown_class(app=app)
-    plugins = [plugin_url, plugin_strikethrough, plugin_userify]
+    plugins = DEFAULT_PLUGINS
     app.jinja_env.filters['markup'] = make_renderer(render_classes, plugins)
 
     render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(
