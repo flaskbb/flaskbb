@@ -75,10 +75,19 @@ def flaskbb_load_nonpost_markdown_class():
 @impl
 def flaskbb_jinja_directives(app):
     render_classes = app.pluggy.hook.flaskbb_load_post_markdown_class(app=app)
-    plugins = DEFAULT_PLUGINS
+    plugins = DEFAULT_PLUGINS[:]
+    app.pluggy.hook.flaskbb_load_post_markdown_plugins(
+        plugins=plugins,
+        app=app
+    )
     app.jinja_env.filters['markup'] = make_renderer(render_classes, plugins)
 
     render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(
+        app=app
+    )
+    plugins = DEFAULT_PLUGINS[:]
+    plugins = app.pluggy.hook.flaskbb_load_nonpost_markdown_plugins(
+        plugins=plugins,
         app=app
     )
     app.jinja_env.filters['nonpost_markup'] = make_renderer(

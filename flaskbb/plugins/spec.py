@@ -134,6 +134,71 @@ def flaskbb_load_nonpost_markdown_class(app):
 
 
 @spec
+def flaskbb_load_post_markdown_plugins(plugins, app):
+    """
+    Hook for loading mistune renderer plugins used when rendering markdown on
+    posts and user signatures. Implementations should modify the `plugins`
+    list directly.
+
+    Example of adding plugins::
+
+        from mistune.plugins import plugin_abbr, plugin_table
+
+        @impl
+        def flaskbb_load_post_markdown_plugins(plugins):
+            # add the built-in mistune table and abbr plugins
+            plugins.extend([plugin_abbr, plugin_table])
+
+    Example of removing plugins::
+
+        from flaskbb.markup import plugin_userify
+
+        @impl
+        def flaskbb_load_post_markdown_plugins(plugins):
+            try:
+                # remove the FlaskBB user mention link plugin
+                plugins.remove(plugin_userify)
+            except ValueError:
+                # other FlaskBB plugins might beat you to removing a plugin,
+                # which is not an error. You should not raise an exception in
+                # this case.
+                pass
+
+    :param plugins: List of mistune plugins to load.
+    :type plugins: list
+    :param app: The application object.
+    :type app: Flask
+
+    .. seealso::
+        https://mistune.readthedocs.io/en/v2.0.2/advanced.html#create-plugins
+            Mistune plugin documentation.
+        :data:`~flaskbb.markup.plugin_userify`
+            FlaskBB-provided plugin that links user mentions to their profiles.
+        :data:`~flaskbb.markup.DEFAULT_PLUGINS`
+            List of plugins loaded by default.
+        :func:`flaskbb_load_nonpost_markdown_plugins`
+            Hook to modify the list of plugins for markdown rendering in
+            non-post areas.
+    """
+
+
+@spec
+def flaskbb_load_nonpost_markdown_plugins(plugins, app):
+    """
+    Hook for loading mistune renderer plugins used when rendering markdown in
+    locations other than posts, for example in category or forum
+    descriptions. Implementations should modify the `plugins` list directly.
+
+    See :func:`flaskbb_load_post_markdown_plugins` for more details.
+
+    :param plugins: List of mistune plugins to load.
+    :type plugins: list
+    :param app: The application object.
+    :type app: Flask
+    """
+
+
+@spec
 def flaskbb_cli(cli, app):
     """Hook for registering CLI commands.
 
