@@ -11,6 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2021-09-29 04:37+0000\n"
 "Last-Translator: J. Lavoie <j.lavoie@net-c.ca>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+
 "fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -28,6 +29,7 @@ msgstr "Confirmation de la récupération du mot de passe"
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
 msgstr "Activation du compte"
+
 
 #: flaskbb/auth/forms.py:26 flaskbb/management/forms.py:35
 msgid "You can only use letters, numbers or dashes."
@@ -770,6 +772,7 @@ msgstr "Lien externe"
 msgid "A link to a website i.e. 'http://flaskbb.org'."
 msgstr "Un lien vers un site web, par exemple : « http://flaskbb.org »."
 
+
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
 #: flaskbb/templates/forum/search_result.html:283
@@ -1163,7 +1166,7 @@ msgstr "Interdit"
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 msgid "403 - Forbidden Page"
-msgstr "403 - Page interdite"
+msgstr "403 - Page non autorisée"
 
 #: flaskbb/templates/errors/forbidden_page.html:10
 msgid "You do not have the permission to view this page."
@@ -1181,6 +1184,7 @@ msgstr "Page introuvable"
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "404 - Page not found!"
 msgstr "404 – Page introuvable !"
+
 
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "The page you were looking for does not exist."
@@ -1205,6 +1209,7 @@ msgstr "Trop de demandes"
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid "429 - Too Many Requests"
 msgstr "429 - Trop de demandes"
+
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid ""
