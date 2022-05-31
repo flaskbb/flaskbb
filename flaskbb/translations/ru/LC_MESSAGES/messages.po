@@ -10,15 +10,19 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2018-05-03 10:17+0000\n"
-"Last-Translator: Peter Justin\n"
-"Language-Team: Russian (http://www.transifex.com/flaskbb/flaskbb/language/ru/)\n"
+"PO-Revision-Date: 2021-10-04 09:35+0000\n"
+"Last-Translator: Artem <Localizer_in_Russian@protonmail.com>\n"
+"Language-Team: Russian <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"ru/>\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+"X-Generator: Weblate 4.9-dev\n"
 "Generated-By: Babel 2.5.3\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -265,7 +269,7 @@ msgstr ""
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
-msgstr ""
+msgstr "Быстрый ответ"
 
 #: flaskbb/forum/forms.py:29 flaskbb/forum/forms.py:40
 #: flaskbb/forum/forms.py:63
@@ -288,7 +292,7 @@ msgstr ""
 
 #: flaskbb/forum/forms.py:46 flaskbb/forum/forms.py:69
 msgid "Preview"
-msgstr ""
+msgstr "Предпросмотр"
 
 #: flaskbb/forum/forms.py:59
 msgid "Topic title"
@@ -426,7 +430,7 @@ msgstr "У Вас нет прав перемещать эту тему."
 
 #: flaskbb/forum/views.py:376
 msgid "Topics moved."
-msgstr ""
+msgstr "Темы перемещены."
 
 #: flaskbb/forum/views.py:378
 msgid "Failed to move topics."
@@ -482,7 +486,7 @@ msgstr ""
 
 #: flaskbb/forum/views.py:840
 msgid "Topic hidden"
-msgstr ""
+msgstr "Тема скрыта"
 
 #: flaskbb/forum/views.py:842
 msgid "Post hidden"
@@ -1099,7 +1103,7 @@ msgstr "Запросить активацию аккаунта"
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Уважаемый %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
@@ -1627,7 +1631,7 @@ msgstr ""
 
 #: flaskbb/templates/management/overview.html:76
 msgid "Statistics"
-msgstr ""
+msgstr "Статистика"
 
 #: flaskbb/templates/management/overview.html:79
 msgid "Registered users"
@@ -1650,7 +1654,7 @@ msgstr "Жалобы"
 
 #: flaskbb/templates/management/overview.html:102
 msgid "Components"
-msgstr ""
+msgstr "Компоненты"
 
 #: flaskbb/templates/management/overview.html:128
 #: flaskbb/templates/management/plugins.html:1
@@ -1684,7 +1688,7 @@ msgstr "Информация"
 
 #: flaskbb/templates/management/plugins.html:27
 msgid "Manage"
-msgstr ""
+msgstr "Управление"
 
 #: flaskbb/templates/management/plugins.html:44
 msgid "Version"
@@ -1824,11 +1828,11 @@ msgstr ""
 
 #: flaskbb/user/views.py:59
 msgid "Settings updated."
-msgstr ""
+msgstr "Настройки обновлены."
 
 #: flaskbb/user/views.py:80
 msgid "Password updated."
-msgstr ""
+msgstr "Пароль обновлён."
 
 #: flaskbb/user/views.py:99
 msgid "Email address updated."
