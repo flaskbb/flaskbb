@@ -8,15 +8,17 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2018-05-03 10:17+0000\n"
-"Last-Translator: Peter Justin\n"
-"Language-Team: French (http://www.transifex.com/flaskbb/flaskbb/language/fr/)\n"
+"PO-Revision-Date: 2021-09-18 18:36+0000\n"
+"Last-Translator: Nathan <bonnemainsnathan@gmail.com>\n"
+"Language-Team: French <https://hosted.weblate.org/projects/flaskbb/glossary/"
+"fr/>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.9-dev\n"
 "Generated-By: Babel 2.5.3\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -25,7 +27,7 @@ msgstr ""
 #: flaskbb/email.py:55 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
-msgstr ""
+msgstr "Activation du comptr"
 
 #: flaskbb/auth/forms.py:26 flaskbb/management/forms.py:35
 msgid "You can only use letters, numbers or dashes."
@@ -204,7 +206,7 @@ msgstr ""
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "Le compte est déjà activé"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid ""
@@ -460,7 +462,7 @@ msgstr ""
 
 #: flaskbb/forum/views.py:749
 msgid "All forums marked as read."
-msgstr ""
+msgstr "Tous les forums sont marqués comme lus."
 
 #: flaskbb/forum/views.py:793
 msgid "You do not have permission to hide this topic"
@@ -674,7 +676,7 @@ msgstr ""
 
 #: flaskbb/management/forms.py:222
 msgid "Allow moderators to ban other users."
-msgstr ""
+msgstr "Autoriser les modérateurs à bannir d'autres utilisateurs."
 
 #: flaskbb/management/forms.py:226
 msgid "Can view hidden posts and topics"
@@ -742,7 +744,7 @@ msgstr ""
 
 #: flaskbb/management/forms.py:369
 msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr ""
+msgstr "Un lien vers un site Web, par ex : « http://flashbb.org »"
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
@@ -831,7 +833,7 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:24
 #: flaskbb/templates/management/users.html:23
 msgid "Add User"
-msgstr ""
+msgstr "Ajouter un utilisateur"
 
 #: flaskbb/management/views.py:301
 msgid "User added."
@@ -879,7 +881,7 @@ msgstr ""
 #: flaskbb/templates/management/group_form.html:21
 #: flaskbb/templates/management/groups.html:20
 msgid "Add Group"
-msgstr ""
+msgstr "Ajouter un groupe"
 
 #: flaskbb/management/views.py:490
 msgid "Group added."
@@ -924,7 +926,7 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:20
 #: flaskbb/templates/management/forums.html:43
 msgid "Add Forum"
-msgstr ""
+msgstr "Ajouter un forum"
 
 #: flaskbb/management/views.py:653
 msgid "Forum added."
@@ -939,7 +941,7 @@ msgstr ""
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 msgid "Add Category"
-msgstr ""
+msgstr "Ajouter une catégorie"
 
 #: flaskbb/management/views.py:698
 msgid "Category added."
@@ -1123,7 +1125,7 @@ msgstr ""
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 msgid "403 - Forbidden Page"
-msgstr ""
+msgstr "403 - Page non autorisée"
 
 #: flaskbb/templates/errors/forbidden_page.html:10
 msgid "You do not have the permission to view this page."
@@ -1140,7 +1142,7 @@ msgstr ""
 
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "404 - Page not found!"
-msgstr ""
+msgstr "404 - Page introuvable !"
 
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "The page you were looking for does not exist."
@@ -1152,7 +1154,7 @@ msgstr ""
 
 #: flaskbb/templates/errors/server_error.html:9
 msgid "500 - Server Error"
-msgstr ""
+msgstr "500 - Erreur du serveur"
 
 #: flaskbb/templates/errors/server_error.html:10
 msgid "Something went wrong!"
@@ -1164,7 +1166,7 @@ msgstr ""
 
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid "429 - Too Many Requests"
-msgstr ""
+msgstr "429 - Trop de tentatives"
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid ""
@@ -1517,7 +1519,7 @@ msgstr ""
 #: flaskbb/templates/management/reports.html:45
 #: flaskbb/templates/management/users.html:68
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: flaskbb/templates/management/banned_users.html:75
 #: flaskbb/templates/management/users.html:79
