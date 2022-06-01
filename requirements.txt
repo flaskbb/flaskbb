@@ -40,7 +40,7 @@ limits==1.5.1
 Mako==1.1.5
 MarkupSafe==2.0.1
 mistune==2.0.2
-Pillow==8.3.2
+Pillow==9.0.1
 pluggy==1.0.0
 prompt-toolkit==3.0.20
 Pygments==2.10.0
