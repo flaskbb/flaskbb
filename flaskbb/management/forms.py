@@ -22,6 +22,7 @@ from wtforms import (
     StringField,
     SubmitField,
     TextAreaField,
+    DateField
 )
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.validators import (
@@ -37,7 +38,6 @@ from wtforms.validators import (
 from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import Group, User
-from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
 from flaskbb.utils.requirements import IsAtleastModerator
 
@@ -78,7 +78,7 @@ class UserForm(FlaskForm):
     password = PasswordField("Password", validators=[
         DataRequired()])
 
-    birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
+    birthday = DateField(_("Birthday"), format="%d %m %Y", validators=[
         Optional()])
 
     gender = StringField(_("Gender"), validators=[Optional()])

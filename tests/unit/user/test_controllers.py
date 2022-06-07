@@ -136,7 +136,7 @@ class TestChangePasswordView(object):
             PasswordUpdate(old_password="password", new_password="newpassword"),
         )
 
-    def test_updates_user_password_fails_with_invalid_inpit(self, mocker, user):
+    def test_updates_user_password_fails_with_invalid_input(self, mocker, user):
         form = self.produce_form(
             old_password="password",
             new_password="newpassword",
@@ -314,7 +314,7 @@ class TestChangeUserDetailsView(object):
 
         view.post()
 
-        assert form.errors == {"birthday": ["Not a valid date value"]}
+        assert form.errors == {"birthday": ["Not a valid date value."]}
 
     def test_update_user_fails_with_stopvalidation(self, mocker):
         form = self.produce_form(birthday="25 04 2000")

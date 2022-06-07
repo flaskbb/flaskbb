@@ -11,7 +11,14 @@
 import logging
 
 from flask_babelplus import lazy_gettext as _
-from wtforms import PasswordField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms import (
+    PasswordField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+    DateField,
+)
 from wtforms.validators import (
     URL,
     DataRequired,
@@ -22,7 +29,6 @@ from wtforms.validators import (
     Optional,
 )
 
-from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.forms import FlaskBBForm
 
 from ..core.user.update import (
@@ -99,7 +105,7 @@ class ChangePasswordForm(FlaskBBForm):
 
 
 class ChangeUserDetailsForm(FlaskBBForm):
-    birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[Optional()])
+    birthday = DateField(_("Birthday"), format="%d %m %Y", validators=[Optional()])
     gender = StringField(_("Gender"), validators=[Optional()])
     location = StringField(_("Location"), validators=[Optional()])
     website = StringField(_("Website"), validators=[Optional(), URL()])
