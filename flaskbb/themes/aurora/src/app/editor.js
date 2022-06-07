@@ -3,7 +3,7 @@ import { Textcomplete } from "@textcomplete/core";
 import EMOJIS from "./emoji";
 import { hideElement, isHidden, showElement } from "./utils";
 import { parse_emoji } from "./flaskbb";
-import marked from "marked";
+import { marked } from "marked";
 import DOMPurify from "dompurify";
 
 const buttonSelectors = [
