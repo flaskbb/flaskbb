@@ -8,7 +8,7 @@
     :copyright: (c) 2017 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from wtforms import (TextField, IntegerField, FloatField, BooleanField,
+from wtforms import (StringField, IntegerField, FloatField, BooleanField,
                      SelectField, SelectMultipleField, validators)
 from flask_wtf import FlaskForm
 from enum import Enum
@@ -103,11 +103,11 @@ def generate_settings_form(settings):  # noqa: C901
                            description=setting.description)
             )
 
-        # TextField
+        # StringField
         elif setting.value_type == SettingValueType.string:
             setattr(
                 SettingsForm, setting.key,
-                TextField(setting.name, validators=field_validators,
+                StringField(setting.name, validators=field_validators,
                           description=setting.description)
             )
 

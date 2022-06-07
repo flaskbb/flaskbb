@@ -15,7 +15,6 @@ import operator
 import os
 import re
 import time
-import warnings
 from datetime import datetime, timedelta
 from email import message_from_string
 from functools import wraps
@@ -33,7 +32,7 @@ from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
-from jinja2 import Markup
+from markupsafe import Markup
 from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy

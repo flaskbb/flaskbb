@@ -9,9 +9,12 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import logging
 from collections.abc import MutableMapping
 
 from flaskbb.management.models import Setting
+
+logger = logging.getLogger(__name__)
 
 
 class FlaskBBConfig(MutableMapping):
@@ -23,7 +26,11 @@ class FlaskBBConfig(MutableMapping):
         self.update(dict(*args, **kwargs))
 
     def __getitem__(self, key):
-        return Setting.as_dict()[key]
+        try:
+            return Setting.as_dict()[key]
+        except KeyError:
+            logger.info(f"Couldn't find setting for key ${key}")
+            return None
 
     def __setitem__(self, key, value):
         Setting.update({key.lower(): value})

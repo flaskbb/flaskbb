@@ -10,15 +10,14 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
-from datetime import datetime
 import logging
 import urllib
 
-from flask import request, current_app, Markup, json
+from flask import request, current_app, json
 from werkzeug.urls import url_encode
+from markupsafe import Markup
 from wtforms import ValidationError
-from wtforms.fields import DateField, Field
-from wtforms.widgets.core import Select, html_params
+from wtforms.fields import Field
 
 from flaskbb.utils.helpers import to_bytes, to_unicode
 from flaskbb.utils.settings import flaskbb_config
@@ -138,115 +137,3 @@ class RecaptchaField(Field):
     def __init__(self, label='', validators=None, **kwargs):
         validators = validators or [RecaptchaValidator()]
         super(RecaptchaField, self).__init__(label, validators, **kwargs)
-
-
-class SelectBirthdayWidget(object):
-    """Renders a DateTime field with 3 selects.
-    For more information see: http://stackoverflow.com/a/14664504
-    """
-    FORMAT_CHOICES = {
-        '%d': [(x, str(x)) for x in range(1, 32)],
-        '%m': [(x, str(x)) for x in range(1, 13)]
-    }
-
-    FORMAT_CLASSES = {
-        '%d': 'select_date_day',
-        '%m': 'select_date_month',
-        '%Y': 'select_date_year'
-    }
-
-    def __init__(self, years=None):
-        """Initialzes the widget.
-
-        :param years: The min year which should be chooseable.
-                      Defatuls to ``1930``.
-        """
-        if years is None:
-            years = range(1930, datetime.utcnow().year + 1)
-
-        super(SelectBirthdayWidget, self).__init__()
-        self.FORMAT_CHOICES['%Y'] = [(x, str(x)) for x in years]
-
-    # TODO(anr): clean up
-    def __call__(self, field, **kwargs):  # noqa: C901
-        field_id = kwargs.pop('id', field.id)
-        html = []
-        allowed_format = ['%d', '%m', '%Y']
-        surrounded_div = kwargs.pop('surrounded_div', None)
-        css_class = kwargs.get('class', None)
-
-        for date_format in field.format.split():
-            if date_format in allowed_format:
-                choices = self.FORMAT_CHOICES[date_format]
-                id_suffix = date_format.replace('%', '-')
-                id_current = field_id + id_suffix
-
-                if css_class is not None:  # pragma: no cover
-                    select_class = "{} {}".format(
-                        css_class, self.FORMAT_CLASSES[date_format]
-                    )
-                else:
-                    select_class = self.FORMAT_CLASSES[date_format]
-
-                kwargs['class'] = select_class
-
-                try:
-                    del kwargs['placeholder']
-                except KeyError:
-                    pass
-
-                if surrounded_div is not None:
-                    html.append('<div class="%s">' % surrounded_div)
-
-                html.append('<select %s>' % html_params(name=field.name,
-                                                        id=id_current,
-                                                        **kwargs))
-
-                if field.data:
-                    current_value = int(field.data.strftime(date_format))
-                else:
-                    current_value = None
-
-                for value, label in choices:
-                    selected = (value == current_value)
-
-                    # Defaults to blank
-                    if value == 1 or value == 1930:
-                        html.append(
-                            Select.render_option("None", " ", selected)
-                        )
-
-                    html.append(Select.render_option(value, label, selected))
-
-                html.append('</select>')
-
-                if surrounded_div is not None:
-                    html.append("</div>")
-
-            html.append(' ')
-
-        return Markup(''.join(html))
-
-
-class BirthdayField(DateField):
-    """Same as DateField, except it allows ``None`` values in case a user
-    wants to delete his birthday.
-    """
-    widget = SelectBirthdayWidget()
-
-    def __init__(self, label=None, validators=None, format='%Y-%m-%d',
-                 **kwargs):
-        DateField.__init__(self, label, validators, format, **kwargs)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            date_str = ' '.join(valuelist)
-            try:
-                self.data = datetime.strptime(date_str, self.format).date()
-            except ValueError:
-                self.data = None
-
-                # Only except the None value if all values are None.
-                # A bit dirty though
-                if valuelist != ["None", "None", "None"]:
-                    raise ValueError("Not a valid date value")
