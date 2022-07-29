@@ -39,7 +39,7 @@ kombu==5.2.4
 limits==2.6.3
 Mako==1.2.0
 MarkupSafe==2.1.1
-mistune==2.0.2
+mistune==2.0.3
 Pillow==9.1.1
 pluggy==1.0.0
 prompt-toolkit==3.0.29
