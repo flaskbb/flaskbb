@@ -68,7 +68,7 @@ class RegistrationFailureHandler(ABC):
 
 class RegistrationPostProcessor(ABC):
     """
-    Used to post proccess successful registrations by the time this
+    Used to post process successful registrations by the time this
     interface is called, the user has already been persisted into the
     database.
     """

@@ -579,7 +579,7 @@ def test_forumsread(topic, user):
 
 
 def test_topicsread(topic, user):
-    """Tests if the topicsread trakcer can be saved/edited and deleted with the
+    """Tests if the topicsread tracker can be saved/edited and deleted with the
     implemented save and delete methods."""
     topicsread = TopicsRead()
     topicsread.user_id = user.id

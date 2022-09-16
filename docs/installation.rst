@@ -260,7 +260,7 @@ or::
 
     flaskbb install
 
-During the installation process, you will be asked to provide a username, email adddress 
+During the installation process, you will be asked to provide a username, email address 
 and password for your administrator user. Using the
 ``make install`` command is recommended as it checks that the dependencies
 are also installed.

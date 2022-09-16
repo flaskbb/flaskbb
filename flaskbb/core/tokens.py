@@ -117,7 +117,7 @@ class TokenSerializer(ABC):
 
 class TokenVerifier(ABC):
     """
-    Used to verify the validatity of tokens post
+    Used to verify the validity of tokens post
     deserialization, such as an email matching the
     user id in the provided token.
 
