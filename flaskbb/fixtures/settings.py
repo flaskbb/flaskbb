@@ -28,7 +28,7 @@ fixture = (
                 (
                     "project_title",
                     {
-                        "value": "FlaskBB",
+                        "value": "Intel-BB",
                         "value_type": SettingValueType.string,
                         "name": "Project title",
                         "description": "The title of the project.",
@@ -37,7 +37,7 @@ fixture = (
                 (
                     "project_subtitle",
                     {
-                        "value": "A lightweight forum software in Flask",
+                        "value": "A flask application to demonstrate CI with Terraform!",
                         "value_type": SettingValueType.string,
                         "name": "Project subtitle",
                         "description": "A short description of the project.",
