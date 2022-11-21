@@ -78,7 +78,7 @@ class UserForm(FlaskForm):
     password = PasswordField("Password", validators=[
         DataRequired()])
 
-    birthday = DateField(_("Birthday"), format="%d %m %Y", validators=[
+    birthday = DateField(_("Birthday"), format="%Y-%m-%d", validators=[
         Optional()])
 
     gender = StringField(_("Gender"), validators=[Optional()])
