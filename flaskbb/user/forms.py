@@ -105,7 +105,7 @@ class ChangePasswordForm(FlaskBBForm):
 
 
 class ChangeUserDetailsForm(FlaskBBForm):
-    birthday = DateField(_("Birthday"), format="%d %m %Y", validators=[Optional()])
+    birthday = DateField(_("Birthday"), format="%Y-%m-%d", validators=[Optional()])
     gender = StringField(_("Gender"), validators=[Optional()])
     location = StringField(_("Location"), validators=[Optional()])
     website = StringField(_("Website"), validators=[Optional(), URL()])
