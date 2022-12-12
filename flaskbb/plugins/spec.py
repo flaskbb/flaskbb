@@ -284,7 +284,7 @@ def flaskbb_gather_registration_validators():
     :class:`~flaskbb.core.auth.registration.UserRegistrationInfo` and raises
     a :class:`~flaskbb.core.exceptions.ValidationError` if the registration
     is invalid or :class:`~flaskbb.core.exceptions.StopValidation` if
-    validation of the registration should end immediatey.
+    validation of the registration should end immediately.
 
     Example::
 
