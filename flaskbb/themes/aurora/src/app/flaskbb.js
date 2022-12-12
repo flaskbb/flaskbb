@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 typeof FORUM_URL_PREFIX !== typeof undefined
                     ? FORUM_URL_PREFIX
                     : "";
-            const url = `${urlprefix}post/${post_id}/raw`;
+            const url = `${urlprefix}/post/${post_id}/raw`;
 
             const editor = document.querySelector(".flaskbb-editor");
             fetch(url)
