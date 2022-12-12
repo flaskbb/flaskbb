@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2022-02-26 16:55+0000\n"
+"PO-Revision-Date: 2022-06-14 01:23+0000\n"
 "Last-Translator: xlivevil <xlivevil@163.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
 "flaskbb/flaskbb/zh_Hans/>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11.1-dev\n"
+"X-Generator: Weblate 4.13-dev\n"
 "Generated-By: Babel 2.5.3\n"
 
 #: flaskbb/email.py:31
@@ -34,7 +34,7 @@ msgstr "账户激活"
 
 #: flaskbb/auth/forms.py:26 flaskbb/management/forms.py:35
 msgid "You can only use letters, numbers or dashes."
-msgstr "您只能使用字母、数字与短划线"
+msgstr "您只能使用字母、数字与短划线。"
 
 #: flaskbb/auth/forms.py:32
 msgid "Username or Email address"
@@ -42,7 +42,7 @@ msgstr "用户名或邮件地址"
 
 #: flaskbb/auth/forms.py:35
 msgid "Please enter your username or email address."
-msgstr "请输入您的用户名或邮件地址"
+msgstr "请输入您的用户名或邮件地址。"
 
 #: flaskbb/auth/forms.py:41 flaskbb/auth/forms.py:73 flaskbb/auth/forms.py:97
 #: flaskbb/auth/forms.py:130 flaskbb/user/forms.py:67
@@ -51,7 +51,7 @@ msgstr "密码"
 
 #: flaskbb/auth/forms.py:42 flaskbb/auth/forms.py:98 flaskbb/user/forms.py:68
 msgid "Please enter your password."
-msgstr "请输入您的密码"
+msgstr "请输入您的密码。"
 
 #: flaskbb/auth/forms.py:45
 msgid "Remember me"
@@ -89,13 +89,13 @@ msgstr "邮件地址"
 #: flaskbb/auth/forms.py:124 flaskbb/auth/forms.py:154
 #: flaskbb/management/forms.py:60 flaskbb/user/forms.py:40
 msgid "A valid email address is required."
-msgstr "需要有效的邮件地址"
+msgstr "需要有效的邮件地址。"
 
 #: flaskbb/auth/forms.py:68 flaskbb/auth/forms.py:155
 #: flaskbb/management/forms.py:61 flaskbb/user/forms.py:41
 #: flaskbb/user/forms.py:46 flaskbb/user/forms.py:49
 msgid "Invalid email address."
-msgstr "无效邮件地址"
+msgstr "无效邮件地址。"
 
 #: flaskbb/auth/forms.py:76 flaskbb/auth/forms.py:133
 msgid "Passwords must match."
@@ -166,7 +166,7 @@ msgstr "重新认证身份。"
 
 #: flaskbb/auth/views.py:112
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "重新身份验证时出现无法恢复的错误"
 
 #: flaskbb/auth/views.py:161
 msgid "Could not process registration dueto an unrecoverable error"
@@ -196,25 +196,25 @@ msgstr "新的账户激活信息已发送到您的邮箱."
 
 #: flaskbb/auth/views.py:312
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "由于无法恢复的错误，无法激活帐户"
 
 #: flaskbb/auth/views.py:320
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "您的帐户已激活，现在可以登录。"
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "输入的电子邮箱不存在"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "账号已经激活"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid ""
 "Your account is currently locked out due to too many failed login attempts"
-msgstr ""
+msgstr "由于登录失败次数太多，您的帐户当前被锁定"
 
 #: flaskbb/auth/services/authentication.py:127
 msgid ""
@@ -228,43 +228,43 @@ msgstr "错误用户名或密码."
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "无效邮箱"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
-msgstr "错误密码"
+msgstr "错误密码。"
 
 #: flaskbb/auth/services/registration.py:50
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "用户名长度必须介于 %(min)s 到 %(max)s 个字符之间"
 
 #: flaskbb/auth/services/registration.py:61
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s 是禁止使用的用户名"
 
 #: flaskbb/auth/services/registration.py:83
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s 已经被注册"
 
 #: flaskbb/auth/services/registration.py:105
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s 已经被注册"
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "令牌无效"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "令牌过期"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "无法处理令牌"
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
@@ -299,7 +299,7 @@ msgstr "主题标题"
 
 #: flaskbb/forum/forms.py:60
 msgid "Please choose a title for your topic."
-msgstr "请选择一个标题"
+msgstr "请选择一个标题。"
 
 #: flaskbb/forum/forms.py:68
 msgid "Post Topic"
@@ -447,7 +447,7 @@ msgstr "%(count)s 主题取消隐藏."
 
 #: flaskbb/forum/views.py:404
 msgid "Unknown action requested"
-msgstr "请求未知操作."
+msgstr "请求未知操作"
 
 #: flaskbb/forum/views.py:502
 msgid "Thanks for reporting."
@@ -469,19 +469,19 @@ msgstr "所有论坛已被标记为已读。"
 
 #: flaskbb/forum/views.py:793
 msgid "You do not have permission to hide this topic"
-msgstr "你没有权限隐藏该主题."
+msgstr "你没有权限隐藏该主题"
 
 #: flaskbb/forum/views.py:811
 msgid "You do not have permission to unhide this topic"
-msgstr "你没有权限取消隐藏该主题."
+msgstr "你没有权限取消隐藏该主题"
 
 #: flaskbb/forum/views.py:827
 msgid "You do not have permission to hide this post"
-msgstr "你没有权限隐藏该帖子."
+msgstr "你没有权限隐藏该帖子"
 
 #: flaskbb/forum/views.py:831
 msgid "Post is already hidden"
-msgstr "帖子已被隐藏."
+msgstr "帖子已被隐藏"
 
 #: flaskbb/forum/views.py:840
 msgid "Topic hidden"
@@ -629,7 +629,7 @@ msgstr "可编辑帖子"
 
 #: flaskbb/management/forms.py:191
 msgid "Check this, if the users in this group can edit posts."
-msgstr "勾上本选项后该组用户可以编辑帖子"
+msgstr "勾上本选项后该组用户可以编辑帖子。"
 
 #: flaskbb/management/forms.py:194
 msgid "Can delete posts"
@@ -637,7 +637,7 @@ msgstr "可删除帖子"
 
 #: flaskbb/management/forms.py:195
 msgid "Check this, if the users in this group can delete posts."
-msgstr "勾上本选项后本组用户可以删除帖子"
+msgstr "勾上本选项后本组用户可以删除帖子。"
 
 #: flaskbb/management/forms.py:199
 msgid "Can delete topics"
@@ -661,7 +661,7 @@ msgstr "能创建回复"
 
 #: flaskbb/management/forms.py:210
 msgid "Check this, if the users in this group can post replies."
-msgstr "勾上本选项后本组用户可以创建回复"
+msgstr "勾上本选项后本组用户可以创建回复。"
 
 #: flaskbb/management/forms.py:215
 msgid "Moderators can edit user profiles"
@@ -671,7 +671,7 @@ msgstr "版主能够修改用户资料"
 msgid ""
 "Allow moderators to edit another user's profile including password and email"
 " changes."
-msgstr "允许版主能够编辑其他用户的资料（包括密码和邮箱地址）"
+msgstr "允许版主能够编辑其他用户的资料（包括密码和邮箱地址）。"
 
 #: flaskbb/management/forms.py:221
 msgid "Moderators can ban users"
@@ -699,7 +699,7 @@ msgstr "允许用户隐藏帖子和主题"
 
 #: flaskbb/management/forms.py:251
 msgid "This group name is already taken."
-msgstr "该用户组名已被使用"
+msgstr "该用户组名已被使用。"
 
 #: flaskbb/management/forms.py:265
 msgid "There is already a group of type 'Banned'."
@@ -711,7 +711,7 @@ msgstr "已存在来宾用户组。"
 
 #: flaskbb/management/forms.py:303
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "无法向此组分配任何权限。"
 
 #: flaskbb/management/forms.py:341
 msgid "Forum title"
@@ -719,7 +719,7 @@ msgstr "论坛标题"
 
 #: flaskbb/management/forms.py:342
 msgid "Please enter a forum title."
-msgstr "请输入一个论坛标题"
+msgstr "请输入一个论坛标题。"
 
 #: flaskbb/management/forms.py:348 flaskbb/management/forms.py:467
 msgid "You can format your description with Markdown."
@@ -776,7 +776,7 @@ msgstr "加锁？"
 
 #: flaskbb/management/forms.py:385
 msgid "Disable new posts and topics in this forum."
-msgstr "在该论坛禁止发表新主题和帖子"
+msgstr "在该论坛禁止发表新主题和帖子。"
 
 #: flaskbb/management/forms.py:389
 msgid "Group access"
@@ -817,7 +817,7 @@ msgstr "设置已被保存。"
 
 #: flaskbb/management/views.py:197 flaskbb/management/views.py:242
 msgid "Edit User"
-msgstr "编辑用户。"
+msgstr "编辑用户"
 
 #: flaskbb/management/views.py:238
 msgid "User updated."
@@ -994,7 +994,7 @@ msgstr "插件%(plugin)s已启用.请重启FlaskBB."
 #: flaskbb/management/views.py:980
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "插件 %(plugin)s 已经被禁用。"
 
 #: flaskbb/management/views.py:988
 #, python-format
@@ -1008,7 +1008,7 @@ msgstr "插件已被卸载。"
 #: flaskbb/management/views.py:1017
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
-msgstr ""
+msgstr "无法安装插件。请先启用 '%(plugin)s'插件。"
 
 #: flaskbb/management/views.py:1025
 msgid "Plugin has been installed."
@@ -1102,7 +1102,7 @@ msgstr "需要激活账户"
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "亲爱的 %(username)s，"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
@@ -1137,7 +1137,7 @@ msgstr "您没有权限访问该页面。"
 #: flaskbb/templates/errors/forbidden_page.html:11
 #: flaskbb/templates/errors/page_not_found.html:11
 msgid "Back to the Forums"
-msgstr "返回论坛。"
+msgstr "返回论坛"
 
 #: flaskbb/templates/errors/page_not_found.html:1
 msgid "Page not found"
@@ -1145,7 +1145,7 @@ msgstr "没有找到页面"
 
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "404 - Page not found!"
-msgstr "404 - 没有找到页面"
+msgstr "404 - 没有找到页面！"
 
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "The page you were looking for does not exist."
@@ -1161,7 +1161,7 @@ msgstr "500 - 服务器错误"
 
 #: flaskbb/templates/errors/server_error.html:10
 msgid "Something went wrong!"
-msgstr "服务器报告了一个错误。"
+msgstr "服务器报告了一个错误！"
 
 #: flaskbb/templates/errors/too_many_logins.html:1
 msgid "Too Many Requests"
@@ -1242,7 +1242,7 @@ msgstr "来自"
 #: flaskbb/templates/forum/category_layout.html:123
 #: flaskbb/templates/forum/search_result.html:326
 msgid "No posts."
-msgstr "无新帖"
+msgstr "无新帖。"
 
 #: flaskbb/templates/forum/edit_forum.html:33
 #: flaskbb/templates/forum/forum.html:51
@@ -1304,7 +1304,7 @@ msgstr "移动"
 #: flaskbb/templates/management/reports.html:50
 #: flaskbb/templates/management/reports.html:74
 msgid "Mark as Read"
-msgstr "标记为已读。"
+msgstr "标记为已读"
 
 #: flaskbb/templates/forum/forum.html:31
 #: flaskbb/templates/forum/topic_controls.html:116
@@ -1321,7 +1321,7 @@ msgstr "新建主题"
 #: flaskbb/templates/forum/forum.html:97
 #, python-format
 msgid "Hidden on %(when)s  by %(who)s"
-msgstr "由 %(who)s 隐藏于 %(when)s "
+msgstr "由 %(who)s 隐藏于 %(when)s"
 
 #: flaskbb/templates/forum/forum.html:138
 msgid "Moderation Mode"
@@ -1423,7 +1423,7 @@ msgstr "来宾用户"
 
 #: flaskbb/templates/forum/search_result.html:89
 msgid "No posts found matching your search criteria."
-msgstr "没有找到符合条件的帖子"
+msgstr "没有找到符合条件的帖子。"
 
 #: flaskbb/templates/forum/search_result.html:119
 #: flaskbb/templates/management/banned_users.html:104
@@ -1433,11 +1433,11 @@ msgstr "没有找到符合条件的用户。"
 
 #: flaskbb/templates/forum/search_result.html:197
 msgid "No topics found matching your search criteria."
-msgstr "没有找到符合条件的主题"
+msgstr "没有找到符合条件的主题。"
 
 #: flaskbb/templates/forum/search_result.html:335
 msgid "No forums found matching your search criteria."
-msgstr "没有找到符合条件的论坛"
+msgstr "没有找到符合条件的论坛。"
 
 #: flaskbb/templates/forum/topic.html:2
 #: flaskbb/templates/forum/topic_horizontal.html:2
@@ -1589,7 +1589,7 @@ msgstr "编辑"
 
 #: flaskbb/templates/management/groups.html:74
 msgid "No groups found."
-msgstr "未找到用户组"
+msgstr "未找到用户组。"
 
 #: flaskbb/templates/management/overview.html:1
 #: flaskbb/templates/management/overview.html:16
@@ -1614,7 +1614,7 @@ msgstr "一切正常."
 
 #: flaskbb/templates/management/overview.html:31
 msgid "No new notifications."
-msgstr "无新提醒"
+msgstr "无新提醒。"
 
 #: flaskbb/templates/management/overview.html:44
 msgid "users"
@@ -1747,11 +1747,11 @@ msgstr "删除选择的用户"
 
 #: flaskbb/templates/user/all_posts.html:65
 msgid "The user has not written any posts yet."
-msgstr "用户没有发布任何帖子"
+msgstr "用户没有发布任何帖子。"
 
 #: flaskbb/templates/user/all_topics.html:67
 msgid "The user has not opened any topics yet."
-msgstr "用户没有发布任何主题"
+msgstr "用户没有发布任何主题。"
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
@@ -1819,7 +1819,7 @@ msgstr "确认新密码"
 
 #: flaskbb/user/forms.py:81
 msgid "Old password is wrong."
-msgstr "原密码错误"
+msgstr "原密码错误。"
 
 #: flaskbb/user/forms.py:102
 msgid "Forum Signature"
@@ -1843,7 +1843,7 @@ msgstr "用户信息更新成功。"
 
 #: flaskbb/utils/helpers.py:109
 msgid "You do not have the permissions to execute this action."
-msgstr "你没有权限执行该操作"
+msgstr "你没有权限执行该操作。"
 
 #: flaskbb/utils/helpers.py:125
 msgid "You do not have the permissions to delete these topics."
