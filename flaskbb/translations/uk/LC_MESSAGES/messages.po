@@ -8,63 +8,67 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-07-28 11:36+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2022-12-24 00:15+0000\n"
+"Last-Translator: пан Пітон <uapython@gmail.com>\n"
+"Language-Team: Ukrainian <https://hosted.weblate.org/projects/flaskbb/"
+"flaskbb/uk/>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.15.1-dev\n"
 "Generated-By: Babel 2.6.0\n"
 
 #: flaskbb/deprecation.py:70
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr ""
+msgstr "%(name)s застаріла та буде видалена в версії %(version)s."
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
-msgstr ""
+msgstr "Підтвердження відновлення пароля"
 
 #: flaskbb/email.py:55 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
-msgstr ""
+msgstr "Активація Аккаунту"
 
 #: flaskbb/auth/forms.py:37 flaskbb/management/forms.py:35
 msgid "You can only use letters, numbers or dashes."
-msgstr ""
+msgstr "Ви можете використовувати лише літери, цифри або тире."
 
 #: flaskbb/auth/forms.py:43
 msgid "Username or Email address"
-msgstr ""
+msgstr "Ім'я користувача або Електронна пошта"
 
 #: flaskbb/auth/forms.py:46
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "Будь ласка, введіть своє ім'я користувача або адресу електронної пошти."
 
 #: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:84 flaskbb/auth/forms.py:108
 #: flaskbb/auth/forms.py:141 flaskbb/user/forms.py:67
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:109 flaskbb/user/forms.py:68
 msgid "Please enter your password."
-msgstr ""
+msgstr "Будь ласка, введіть свій пароль."
 
 #: flaskbb/auth/forms.py:56
 msgid "Remember me"
-msgstr ""
+msgstr "Запам'ятати мене"
 
 #: flaskbb/auth/forms.py:58 flaskbb/templates/auth/login.html:1
 #: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:118
 msgid "Login"
-msgstr ""
+msgstr "Логін"
 
 #: flaskbb/auth/forms.py:59 flaskbb/auth/forms.py:63 flaskbb/auth/forms.py:93
 #: flaskbb/auth/forms.py:124
 msgid "Captcha"
-msgstr ""
+msgstr "Капча"
 
 #: flaskbb/auth/forms.py:68 flaskbb/auth/forms.py:155
 #: flaskbb/management/forms.py:55 flaskbb/templates/forum/memberlist.html:45
@@ -72,255 +76,263 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:62
 #: flaskbb/templates/management/users.html:61
 msgid "Username"
-msgstr ""
+msgstr "Ім'я користувача"
 
 #: flaskbb/auth/forms.py:70
 msgid "A valid username is required"
-msgstr ""
+msgstr "Потрібне дійсне ім’я користувача"
 
 #: flaskbb/auth/forms.py:76 flaskbb/auth/forms.py:117 flaskbb/auth/forms.py:133
 #: flaskbb/auth/forms.py:163 flaskbb/management/forms.py:59
 msgid "Email address"
-msgstr ""
+msgstr "Електронна адреса"
 
 #: flaskbb/auth/forms.py:78 flaskbb/auth/forms.py:119 flaskbb/auth/forms.py:135
 #: flaskbb/auth/forms.py:165 flaskbb/management/forms.py:60
 #: flaskbb/user/forms.py:40
 msgid "A valid email address is required."
-msgstr ""
+msgstr "Потрібна дійсна адреса електронної пошти."
 
 #: flaskbb/auth/forms.py:79 flaskbb/auth/forms.py:166
 #: flaskbb/management/forms.py:61 flaskbb/user/forms.py:41
 #: flaskbb/user/forms.py:46 flaskbb/user/forms.py:49
 msgid "Invalid email address."
-msgstr ""
+msgstr "Невірна адреса електронної пошти."
 
 #: flaskbb/auth/forms.py:87 flaskbb/auth/forms.py:144
 msgid "Passwords must match."
-msgstr ""
+msgstr "Паролі мають збігатися."
 
 #: flaskbb/auth/forms.py:91 flaskbb/auth/forms.py:148
 msgid "Confirm password"
-msgstr ""
+msgstr "Підтвердьте пароль"
 
 #: flaskbb/auth/forms.py:95 flaskbb/user/forms.py:32
 msgid "Language"
-msgstr ""
+msgstr "Мова"
 
 #: flaskbb/auth/forms.py:98
 msgid "I accept the Terms of Service"
-msgstr ""
+msgstr "Я приймаю Загальні положення та Умови"
 
 #: flaskbb/auth/forms.py:99
 msgid "Please accept the TOS."
-msgstr ""
+msgstr "Будь ласка, прийміть умови використання."
 
 #: flaskbb/auth/forms.py:103 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:124
 msgid "Register"
-msgstr ""
+msgstr "Зареєструватися"
 
 #: flaskbb/auth/forms.py:112 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:10
 msgid "Refresh Login"
-msgstr ""
+msgstr "Оновити логін"
 
 #: flaskbb/auth/forms.py:126
 msgid "Request Password"
-msgstr ""
+msgstr "Запит пароля"
 
 #: flaskbb/auth/forms.py:150
 msgid "Reset password"
-msgstr ""
+msgstr "Скинути пароль"
 
 #: flaskbb/auth/forms.py:157 flaskbb/management/forms.py:56
 msgid "A valid username is required."
-msgstr ""
+msgstr "Потрібне дійсне ім’я користувача."
 
 #: flaskbb/auth/forms.py:170
 msgid "Send Confirmation Mail"
-msgstr ""
+msgstr "Надіслати лист із підтвердженням"
 
 #: flaskbb/auth/forms.py:175
 msgid "Email confirmation token"
-msgstr ""
+msgstr "Ключ підтвердження електронної пошти"
 
 #: flaskbb/auth/forms.py:177
 msgid "Please enter the token we have sent to you."
-msgstr ""
+msgstr "Будь ласка, введіть ключ, який ми вам надіслали."
 
 #: flaskbb/auth/forms.py:180
 msgid "Confirm Email"
-msgstr ""
+msgstr "Підтвердити електронну адресу"
 
 #: flaskbb/auth/views.py:72
 msgid "Logged out"
-msgstr ""
+msgstr "Вийшов з системи"
 
 #: flaskbb/auth/views.py:103
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "Невиправна помилка під час входу"
 
 #: flaskbb/auth/views.py:130
 msgid "Reauthenticated."
-msgstr ""
+msgstr "Переавтентифіковано."
 
 #: flaskbb/auth/views.py:135
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "Невиправна помилка під час обробки повторної автентифікації"
 
 #: flaskbb/auth/views.py:179
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "Не вдалося обробити реєстрацію через невиправну помилку"
 
 #: flaskbb/auth/views.py:214
 msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
+"Ви ввели ім’я користувача або електронну адресу, які не пов’язані з вашим "
+"обліковим записом."
 
 #: flaskbb/auth/views.py:220
 msgid "Email sent! Please check your inbox."
-msgstr ""
+msgstr "Листа відправлено! Будь ласка, перевірте свою поштову скриньку."
 
 #: flaskbb/auth/views.py:255
 msgid "Error when resetting password"
-msgstr ""
+msgstr "Помилка під час скидання пароля"
 
 #: flaskbb/auth/views.py:266
 msgid "Your password has been updated."
-msgstr ""
+msgstr "Ваш пароль оновлено."
 
 #: flaskbb/auth/views.py:295
 msgid "A new account activation token has been sent to your email address."
 msgstr ""
+"На вашу електронну адресу надіслано новий ключ активації облікового запису."
 
 #: flaskbb/auth/views.py:331 flaskbb/auth/views.py:380
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "Не вдалося активувати обліковий запис через невиправну помилку"
 
 #: flaskbb/auth/views.py:339 flaskbb/auth/views.py:388
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "Ваш обліковий запис активовано, і тепер ви можете увійти."
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "Введена адреса електронної пошти не існує"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "Обліковий запис уже активовано"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"Ваш обліковий запис наразі заблоковано через забагато невдалих спроб входу"
 
 #: flaskbb/auth/services/authentication.py:127
 msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
+"Щоб скористатися своїм обліковим записом, ви повинні активувати його за "
+"посиланням, яке ми надіслали на вашу електронну адресу."
 
 #: flaskbb/auth/services/authentication.py:161
 msgid "Wrong username or password."
-msgstr ""
+msgstr "Неправильне ім'я користувача або пароль."
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "Недійсна електронна адреса"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
-msgstr ""
+msgstr "Неправильний пароль."
 
 #: flaskbb/auth/services/registration.py:74
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "Ім’я користувача має містити від %(min)s до %(max)s символів"
 
 #: flaskbb/auth/services/registration.py:85
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s є забороненим іменем користувача"
 
 #: flaskbb/auth/services/registration.py:107
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s вже зареєстровано"
 
 #: flaskbb/auth/services/registration.py:129
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s вже зареєстровано"
 
 #: flaskbb/auth/services/registration.py:147
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
 msgstr ""
+"Електронний лист для активації облікового запису надіслано на адресу "
+"%(email)s"
 
 #: flaskbb/auth/services/registration.py:162
 msgid "Thanks for registering."
-msgstr ""
+msgstr "Дякуємо за реєстрацію."
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "Ключ недійсний"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "Термін дії ключа минув"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "Неможливо обробити ключ"
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
-msgstr ""
+msgstr "Швидка відповідь"
 
 #: flaskbb/forum/forms.py:29 flaskbb/forum/forms.py:40
 #: flaskbb/forum/forms.py:62
 msgid "You cannot post a reply without content."
-msgstr ""
+msgstr "Ви не можете опублікувати відповідь без вмісту."
 
 #: flaskbb/forum/forms.py:31 flaskbb/forum/forms.py:45
 #: flaskbb/templates/forum/topic_controls.html:113
 msgid "Reply"
-msgstr ""
+msgstr "Відповідь"
 
 #: flaskbb/forum/forms.py:39 flaskbb/forum/forms.py:61
 #: flaskbb/forum/forms.py:109
 msgid "Content"
-msgstr ""
+msgstr "Зміст"
 
 #: flaskbb/forum/forms.py:42 flaskbb/forum/forms.py:64
 msgid "Track this topic"
-msgstr ""
+msgstr "Слідкувати за цією темою"
 
 #: flaskbb/forum/forms.py:58
 msgid "Topic title"
-msgstr ""
+msgstr "Назва теми"
 
 #: flaskbb/forum/forms.py:59
 msgid "Please choose a title for your topic."
-msgstr ""
+msgstr "Будь ласка, виберіть назву для вашої теми."
 
 #: flaskbb/forum/forms.py:67
 msgid "Post Topic"
-msgstr ""
+msgstr "Опублікувати тему"
 
 #: flaskbb/forum/forms.py:82 flaskbb/templates/management/reports.html:39
 msgid "Reason"
-msgstr ""
+msgstr "Причина"
 
 #: flaskbb/forum/forms.py:83
 msgid "What is the reason for reporting this post?"
-msgstr ""
+msgstr "Яка причина скарги на цю публікацію?"
 
 #: flaskbb/forum/forms.py:86
 msgid "Report post"
-msgstr ""
+msgstr "Поскаржитись на пост"
 
 #: flaskbb/forum/forms.py:94 flaskbb/forum/forms.py:98
 #: flaskbb/forum/forms.py:113 flaskbb/templates/forum/memberlist.html:29
@@ -333,15 +345,15 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:39
 #: flaskbb/templates/management/users.html:38
 msgid "Search"
-msgstr ""
+msgstr "Пошук"
 
 #: flaskbb/forum/forms.py:106
 msgid "Criteria"
-msgstr ""
+msgstr "Критерії"
 
 #: flaskbb/forum/forms.py:110
 msgid "Post"
-msgstr ""
+msgstr "Опублікувати"
 
 #: flaskbb/forum/forms.py:110 flaskbb/templates/forum/edit_forum.html:31
 #: flaskbb/templates/forum/forum.html:49
@@ -349,7 +361,7 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:31
 #: flaskbb/templates/management/reports.html:38
 msgid "Topic"
-msgstr ""
+msgstr "Тема"
 
 #: flaskbb/forum/forms.py:111 flaskbb/templates/forum/category.html:9
 #: flaskbb/templates/forum/category_layout.html:8
@@ -383,552 +395,561 @@ msgstr ""
 #: flaskbb/templates/user/profile.html:5
 #: flaskbb/templates/user/settings_layout.html:8
 msgid "Forum"
-msgstr ""
+msgstr "Форум"
 
 #: flaskbb/forum/forms.py:111 flaskbb/templates/forum/search_result.html:93
 #: flaskbb/templates/management/users.html:1
 #: flaskbb/templates/management/users.html:33
 msgid "Users"
-msgstr ""
+msgstr "Користувачі"
 
 #: flaskbb/forum/views.py:100 flaskbb/forum/views.py:826
 #: flaskbb/forum/views.py:844 flaskbb/forum/views.py:922
 #: flaskbb/forum/views.py:942
 msgid "You are not allowed to access that forum"
-msgstr ""
+msgstr "Ви не маєте доступу до цього форуму"
 
 #: flaskbb/forum/views.py:135 flaskbb/forum/views.py:166
 msgid "You are not allowed to access that topic"
-msgstr ""
+msgstr "Ви не маєте доступу до цієї теми"
 
 #: flaskbb/forum/views.py:217
 msgid "You are not allowed to post a reply to this topic."
-msgstr ""
+msgstr "Ви не маєте доступу до цієї теми."
 
 #: flaskbb/forum/views.py:230
 msgid "Cannot post reply"
-msgstr ""
+msgstr "Неможливо опублікувати відповідь"
 
 #: flaskbb/forum/views.py:256
 msgid "You are not allowed to post a topic here"
-msgstr ""
+msgstr "Вам заборонено розміщувати тут тему"
 
 #: flaskbb/forum/views.py:291
 msgid "You are not allowed to manage this forum"
-msgstr ""
+msgstr "Вам не дозволено керувати цим форумом"
 
 #: flaskbb/forum/views.py:345
 msgid "In order to perform this action you have to select at least one topic."
-msgstr ""
+msgstr "Щоб виконати цю дію, необхідно вибрати принаймні одну тему."
 
 #: flaskbb/forum/views.py:361
 #, python-format
 msgid "%(count)s topics locked."
-msgstr ""
+msgstr "%(count)s тем заблоковано."
 
 #: flaskbb/forum/views.py:371
 #, python-format
 msgid "%(count)s topics unlocked."
-msgstr ""
+msgstr "%(count)s тем розблоковано."
 
 #: flaskbb/forum/views.py:382
 #, python-format
 msgid "%(count)s topics highlighted."
-msgstr ""
+msgstr "Виділено %(count)s тем."
 
 #: flaskbb/forum/views.py:392
 #, python-format
 msgid "%(count)s topics trivialized."
-msgstr ""
+msgstr "%(count)s тем применшено."
 
 #: flaskbb/forum/views.py:403
 #, python-format
 msgid "%(count)s topics deleted."
-msgstr ""
+msgstr "%(count)s тем видалено."
 
 #: flaskbb/forum/views.py:411
 msgid "Please choose a new forum for the topics."
-msgstr ""
+msgstr "Виберіть новий форум для тем."
 
 #: flaskbb/forum/views.py:421
 msgid "You do not have the permissions to move this topic."
-msgstr ""
+msgstr "У вас немає прав на переміщення цієї теми."
 
 #: flaskbb/forum/views.py:427
 msgid "Topics moved."
-msgstr ""
+msgstr "Теми перенесено."
 
 #: flaskbb/forum/views.py:429
 msgid "Failed to move topics."
-msgstr ""
+msgstr "Не вдалося перемістити теми."
 
 #: flaskbb/forum/views.py:441
 #, python-format
 msgid "%(count)s topics hidden."
-msgstr ""
+msgstr "Приховано %(count)s тем."
 
 #: flaskbb/forum/views.py:451
 #, python-format
 msgid "%(count)s topics unhidden."
-msgstr ""
+msgstr "Показано %(count)s тем."
 
 #: flaskbb/forum/views.py:455
 msgid "Unknown action requested"
-msgstr ""
+msgstr "Потрібна невідома дія"
 
 #: flaskbb/forum/views.py:465
 msgid "You are not allowed to post a reply"
-msgstr ""
+msgstr "Ви не маєте права публікувати відповідь"
 
 #: flaskbb/forum/views.py:511
 msgid "You are not allowed to edit that post"
-msgstr ""
+msgstr "Ви не маєте права редагувати цю публікацію"
 
 #: flaskbb/forum/views.py:559
 msgid "Thanks for reporting."
-msgstr ""
+msgstr "Дякуємо за повідомлення."
 
 #: flaskbb/forum/views.py:663
 #, python-format
 msgid "%(topic_count)s topics untracked."
-msgstr ""
+msgstr "%(topic_count)s тем не відстежено."
 
 #: flaskbb/forum/views.py:692
 msgid "You are not allowed to delete this topic"
-msgstr ""
+msgstr "Ви не можете видалити цю тему"
 
 #: flaskbb/forum/views.py:715
 msgid "You are not allowed to lock this topic"
-msgstr ""
+msgstr "Ви не можете заблокувати цю тему"
 
 #: flaskbb/forum/views.py:736
 msgid "You are not allowed to unlock this topic"
-msgstr ""
+msgstr "Вам не дозволено розблокувати цю тему"
 
 #: flaskbb/forum/views.py:757
 msgid "You are not allowed to highlight this topic"
-msgstr ""
+msgstr "Вам заборонено виділяти цю тему"
 
 #: flaskbb/forum/views.py:778
 msgid "You are not allowed to trivialize this topic"
-msgstr ""
+msgstr "Вам заборонено применшувати цю тему"
 
 #: flaskbb/forum/views.py:799
 msgid "You are not allowed to delete this post"
-msgstr ""
+msgstr "Ви не можете видалити цю публікацію"
 
 #: flaskbb/forum/views.py:874
 #, python-format
 msgid "Forum %(forum)s marked as read."
-msgstr ""
+msgstr "Форум %(forum)s позначено як прочитаний."
 
 #: flaskbb/forum/views.py:899
 msgid "All forums marked as read."
-msgstr ""
+msgstr "Усі форуми позначені як прочитані."
 
 #: flaskbb/forum/views.py:963
 msgid "You do not have permission to hide this topic"
-msgstr ""
+msgstr "Ви не маєте дозволу приховувати цю тему"
 
 #: flaskbb/forum/views.py:981
 msgid "You do not have permission to unhide this topic"
-msgstr ""
+msgstr "Ви не маєте дозволу показувати цю тему"
 
 #: flaskbb/forum/views.py:997
 msgid "You do not have permission to hide this post"
-msgstr ""
+msgstr "Ви не маєте дозволу приховувати цю публікацію"
 
 #: flaskbb/forum/views.py:1001
 msgid "Post is already hidden"
-msgstr ""
+msgstr "Публікація вже прихована"
 
 #: flaskbb/forum/views.py:1010
 msgid "Topic hidden"
-msgstr ""
+msgstr "Тему приховано"
 
 #: flaskbb/forum/views.py:1012
 msgid "Post hidden"
-msgstr ""
+msgstr "Публікація прихована"
 
 #: flaskbb/forum/views.py:1027
 msgid "You do not have permission to unhide this post"
-msgstr ""
+msgstr "Ви не маєте дозволу показувати цю публікацію"
 
 #: flaskbb/forum/views.py:1031
 msgid "Post is already unhidden"
-msgstr ""
+msgstr "Публікацію вже показано"
 
 #: flaskbb/forum/views.py:1036
 msgid "Post unhidden"
-msgstr ""
+msgstr "Повідомлення показано"
 
 #: flaskbb/management/forms.py:66 flaskbb/user/forms.py:85
 msgid "Birthday"
-msgstr ""
+msgstr "День народження"
 
 #: flaskbb/management/forms.py:69 flaskbb/user/forms.py:88
 msgid "Gender"
-msgstr ""
+msgstr "Стать"
 
 #: flaskbb/management/forms.py:71 flaskbb/user/forms.py:90
 msgid "Male"
-msgstr ""
+msgstr "Чоловік"
 
 #: flaskbb/management/forms.py:72 flaskbb/user/forms.py:91
 msgid "Female"
-msgstr ""
+msgstr "Жінка"
 
 #: flaskbb/management/forms.py:74 flaskbb/user/forms.py:93
 msgid "Location"
-msgstr ""
+msgstr "Місцезнаходження"
 
 #: flaskbb/management/forms.py:77 flaskbb/user/forms.py:96
 msgid "Website"
-msgstr ""
+msgstr "Веб-сайт"
 
 #: flaskbb/management/forms.py:80 flaskbb/user/forms.py:99
 msgid "Avatar"
-msgstr ""
+msgstr "Аватар"
 
 #: flaskbb/management/forms.py:83
 msgid "Forum signature"
-msgstr ""
+msgstr "Підпис на форумі"
 
 #: flaskbb/management/forms.py:86 flaskbb/user/forms.py:105
 msgid "Notes"
-msgstr ""
+msgstr "Примітки"
 
 #: flaskbb/management/forms.py:89
 msgid "Is active?"
-msgstr ""
+msgstr "Активний?"
 
 #: flaskbb/management/forms.py:93
 msgid "Primary group"
-msgstr ""
+msgstr "Основна група"
 
 #: flaskbb/management/forms.py:98
 msgid "Secondary groups"
-msgstr ""
+msgstr "Другорядні групи"
 
 #: flaskbb/management/forms.py:104 flaskbb/management/forms.py:235
 #: flaskbb/management/forms.py:395 flaskbb/management/forms.py:477
 #: flaskbb/templates/management/settings.html:70 flaskbb/user/forms.py:35
 #: flaskbb/user/forms.py:51 flaskbb/user/forms.py:77 flaskbb/user/forms.py:108
 msgid "Save"
-msgstr ""
+msgstr "Зберегти"
 
 #: flaskbb/management/forms.py:120
 msgid "This username is already taken."
-msgstr ""
+msgstr "Це ім'я користувача вже зайняте."
 
 #: flaskbb/management/forms.py:136 flaskbb/user/forms.py:63
 msgid "This email address is already taken."
-msgstr ""
+msgstr "Ця електронна адреса вже зайнята."
 
 #: flaskbb/management/forms.py:160
 msgid "Group name"
-msgstr ""
+msgstr "Назва групи"
 
 #: flaskbb/management/forms.py:161
 msgid "Please enter a name for the group."
-msgstr ""
+msgstr "Будь ласка, введіть назву для групи."
 
 #: flaskbb/management/forms.py:163 flaskbb/management/forms.py:346
 #: flaskbb/management/forms.py:465 flaskbb/templates/management/groups.html:35
 msgid "Description"
-msgstr ""
+msgstr "Опис"
 
 #: flaskbb/management/forms.py:167
 msgid "Is 'Admin' group?"
-msgstr ""
+msgstr "Це група «Адміністратор»?"
 
 #: flaskbb/management/forms.py:168
 msgid "With this option the group has access to the admin panel."
-msgstr ""
+msgstr "За допомогою цієї опції група має доступ до панелі адміністратора."
 
 #: flaskbb/management/forms.py:172
 msgid "Is 'Super Moderator' group?"
-msgstr ""
+msgstr "Це група «Супермодератор»?"
 
 #: flaskbb/management/forms.py:173
 msgid ""
 "Check this, if the users in this group are allowed to moderate every "
 "forum."
 msgstr ""
+"Позначте це, якщо користувачам цієї групи дозволено модерувати кожен форум."
 
 #: flaskbb/management/forms.py:177
 msgid "Is 'Moderator' group?"
-msgstr ""
+msgstr "Це група «Модератор»?"
 
 #: flaskbb/management/forms.py:178
 msgid ""
 "Check this, if the users in this group are allowed to moderate specified "
 "forums."
 msgstr ""
+"Позначте це, якщо користувачам цієї групи дозволено модерувати вказані "
+"форуми."
 
 #: flaskbb/management/forms.py:182
 msgid "Is 'Banned' group?"
-msgstr ""
+msgstr "Група \"Забанено\"?"
 
 #: flaskbb/management/forms.py:183
 msgid "Only one group of type 'Banned' is allowed."
-msgstr ""
+msgstr "Дозволена лише одна група типу \"Забанено\"."
 
 #: flaskbb/management/forms.py:186
 msgid "Is 'Guest' group?"
-msgstr ""
+msgstr "Це група «Гість»?"
 
 #: flaskbb/management/forms.py:187
 msgid "Only one group of type 'Guest' is allowed."
-msgstr ""
+msgstr "Дозволена лише одна група типу «Гість»."
 
 #: flaskbb/management/forms.py:190
 msgid "Can edit posts"
-msgstr ""
+msgstr "Може редагувати дописи"
 
 #: flaskbb/management/forms.py:191
 msgid "Check this, if the users in this group can edit posts."
 msgstr ""
+"Позначте це, якщо користувачі в цій групі можуть редагувати повідомлення."
 
 #: flaskbb/management/forms.py:194
 msgid "Can delete posts"
-msgstr ""
+msgstr "Може видаляти пости"
 
 #: flaskbb/management/forms.py:195
 msgid "Check this, if the users in this group can delete posts."
-msgstr ""
+msgstr "Позначте це, якщо користувачі в цій групі можуть видаляти дописи."
 
 #: flaskbb/management/forms.py:199
 msgid "Can delete topics"
-msgstr ""
+msgstr "Може видаляти теми"
 
 #: flaskbb/management/forms.py:200
 msgid "Check this, if the users in this group can delete topics."
-msgstr ""
+msgstr "Позначте це, якщо користувачі цієї групи можуть видаляти теми."
 
 #: flaskbb/management/forms.py:204
 msgid "Can create topics"
-msgstr ""
+msgstr "Може створювати теми"
 
 #: flaskbb/management/forms.py:205
 msgid "Check this, if the users in this group can create topics."
-msgstr ""
+msgstr "Позначте це, якщо користувачі цієї групи можуть створювати теми."
 
 #: flaskbb/management/forms.py:209
 msgid "Can post replies"
-msgstr ""
+msgstr "Може публікувати відповіді"
 
 #: flaskbb/management/forms.py:210
 msgid "Check this, if the users in this group can post replies."
-msgstr ""
+msgstr "Позначте це, якщо користувачі цієї групи можуть публікувати відповіді."
 
 #: flaskbb/management/forms.py:215
 msgid "Moderators can edit user profiles"
-msgstr ""
+msgstr "Модератори можуть редагувати профілі користувачів"
 
 #: flaskbb/management/forms.py:216
 msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
+"Дозволити модераторам редагувати профіль іншого користувача, включаючи зміну "
+"пароля та електронної пошти."
 
 #: flaskbb/management/forms.py:221
 msgid "Moderators can ban users"
-msgstr ""
+msgstr "Модератори можуть забанити користувачів"
 
 #: flaskbb/management/forms.py:222
 msgid "Allow moderators to ban other users."
-msgstr ""
+msgstr "Дозволити модераторам банити інших користувачів."
 
 #: flaskbb/management/forms.py:226
 msgid "Can view hidden posts and topics"
-msgstr ""
+msgstr "Може переглядати приховані повідомлення та теми"
 
 #: flaskbb/management/forms.py:227
 msgid "Allows a user to view hidden posts and topics"
-msgstr ""
+msgstr "Дозволяє користувачеві переглядати приховані повідомлення та теми"
 
 #: flaskbb/management/forms.py:231
 msgid "Can hide posts and topics"
-msgstr ""
+msgstr "Можна приховувати дописи та теми"
 
 #: flaskbb/management/forms.py:232
 msgid "Allows a user to hide posts and topics"
-msgstr ""
+msgstr "Дозволяє користувачеві приховувати публікації та теми"
 
 #: flaskbb/management/forms.py:251
 msgid "This group name is already taken."
-msgstr ""
+msgstr "Ця назва групи вже зайнята."
 
 #: flaskbb/management/forms.py:265
 msgid "There is already a group of type 'Banned'."
-msgstr ""
+msgstr "Вже існує група типу \"Забанено\"."
 
 #: flaskbb/management/forms.py:280
 msgid "There is already a group of type 'Guest'."
-msgstr ""
+msgstr "Вже є група типу \"Гість\"."
 
 #: flaskbb/management/forms.py:303
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "Неможливо призначити жодні дозволи цій групі."
 
 #: flaskbb/management/forms.py:341
 msgid "Forum title"
-msgstr ""
+msgstr "Назва форуму"
 
 #: flaskbb/management/forms.py:342
 msgid "Please enter a forum title."
-msgstr ""
+msgstr "Будь ласка, введіть назву форуму."
 
 #: flaskbb/management/forms.py:348 flaskbb/management/forms.py:467
 msgid "You can format your description with Markdown."
-msgstr ""
+msgstr "Ви можете відформатувати свій опис за допомогою Markdown."
 
 #: flaskbb/management/forms.py:352 flaskbb/management/forms.py:471
 msgid "Position"
-msgstr ""
+msgstr "Позиція"
 
 #: flaskbb/management/forms.py:354
 msgid "Please enter a position for theforum."
-msgstr ""
+msgstr "Будь ласка, введіть позицію на форумі."
 
 #: flaskbb/management/forms.py:359
 msgid "Category"
-msgstr ""
+msgstr "Категорія"
 
 #: flaskbb/management/forms.py:363
 msgid "The category that contains this forum."
-msgstr ""
+msgstr "Категорія, яка містить цей форум."
 
 #: flaskbb/management/forms.py:367
 msgid "External link"
-msgstr ""
+msgstr "Зовнішнє посилання"
 
 #: flaskbb/management/forms.py:369
 msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr ""
+msgstr "Посилання на веб-сайт, наприклад «http://flaskbb.org»."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
 #: flaskbb/templates/forum/search_result.html:277
 #: flaskbb/templates/management/forums.html:136
 msgid "Moderators"
-msgstr ""
+msgstr "Модератори"
 
 #: flaskbb/management/forms.py:374
 msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
+"Імена користувачів, розділені комами. Залиште це поле порожнім, якщо ви не "
+"хочете встановлювати модераторів."
 
 #: flaskbb/management/forms.py:379
 msgid "Show moderators"
-msgstr ""
+msgstr "Показати модераторів"
 
 #: flaskbb/management/forms.py:380
 msgid "Do you want to show the moderators on the index page?"
-msgstr ""
+msgstr "Ви хочете показати модераторів на сторінці індексу?"
 
 #: flaskbb/management/forms.py:384
 msgid "Locked?"
-msgstr ""
+msgstr "Заблоковано?"
 
 #: flaskbb/management/forms.py:385
 msgid "Disable new posts and topics in this forum."
-msgstr ""
+msgstr "Вимкнути нові повідомлення та теми на цьому форумі."
 
 #: flaskbb/management/forms.py:389
 msgid "Group access"
-msgstr ""
+msgstr "Груповий доступ"
 
 #: flaskbb/management/forms.py:392
 msgid "Select the groups that can access this forum."
-msgstr ""
+msgstr "Виберіть групи, які мають доступ до цього форуму."
 
 #: flaskbb/management/forms.py:400
 msgid "You cannot convert a forum that contains topics into an external link."
 msgstr ""
+"Ви не можете перетворити форум, який містить теми, на зовнішнє посилання."
 
 #: flaskbb/management/forms.py:406
 msgid "You also need to specify some moderators."
-msgstr ""
+msgstr "Вам також потрібно вказати кілька модераторів."
 
 #: flaskbb/management/forms.py:418
 #, python-format
 msgid "%(user)s is not in a moderators group."
-msgstr ""
+msgstr "%(user)s не входить до групи модераторів."
 
 #: flaskbb/management/forms.py:461
 msgid "Category title"
-msgstr ""
+msgstr "Назва категорії"
 
 #: flaskbb/management/forms.py:462
 msgid "Please enter a category title."
-msgstr ""
+msgstr "Будь ласка, введіть назву категорії."
 
 #: flaskbb/management/forms.py:473
 msgid "Please enter a position for the category."
-msgstr ""
+msgstr "Будь ласка, введіть посаду для категорії."
 
 #: flaskbb/management/views.py:54 flaskbb/management/views.py:1091
 msgid "You are not allowed to access the management settings"
-msgstr ""
+msgstr "Ви не маєте доступу до налаштувань керування"
 
 #: flaskbb/management/views.py:127
 msgid "Settings saved."
-msgstr ""
+msgstr "Налаштування збережено."
 
 #: flaskbb/management/views.py:143 flaskbb/management/views.py:188
 #: flaskbb/management/views.py:280 flaskbb/management/views.py:332
 #: flaskbb/management/views.py:362 flaskbb/management/views.py:414
 #: flaskbb/management/views.py:485
 msgid "You are not allowed to manage users"
-msgstr ""
+msgstr "Вам не дозволено керувати користувачами"
 
 #: flaskbb/management/views.py:226 flaskbb/management/views.py:271
 msgid "Edit User"
-msgstr ""
+msgstr "Редагувати користувача"
 
 #: flaskbb/management/views.py:267
 msgid "User updated."
-msgstr ""
+msgstr "Користувач оновлено."
 
 #: flaskbb/management/views.py:319
 msgid "You cannot delete yourself."
-msgstr ""
+msgstr "Ви не можете видалити себе."
 
 #: flaskbb/management/views.py:323
 msgid "User deleted."
-msgstr ""
+msgstr "Користувача видалено."
 
 #: flaskbb/management/views.py:342 flaskbb/management/views.py:353
 #: flaskbb/templates/management/banned_users.html:24
 #: flaskbb/templates/management/user_form.html:24
 #: flaskbb/templates/management/users.html:23
 msgid "Add User"
-msgstr ""
+msgstr "Додати користувача"
 
 #: flaskbb/management/views.py:349
 msgid "User added."
-msgstr ""
+msgstr "Користувача додано."
 
 #: flaskbb/management/views.py:424
 msgid "You do not have the permissions to ban this user."
-msgstr ""
+msgstr "Ви не маєте прав, щоб забанити цього користувача."
 
 #: flaskbb/management/views.py:453
 #: flaskbb/templates/management/banned_users.html:95
 #: flaskbb/templates/management/users.html:121
 msgid "Unban"
-msgstr ""
+msgstr "Розблокувати"
 
 #: flaskbb/management/views.py:470
 msgid "A moderator cannot ban an admin user."
-msgstr ""
+msgstr "Модератор не може забанити користувача адміністратора."
 
 #: flaskbb/management/views.py:474
 msgid "User is now banned."
-msgstr ""
+msgstr "Тепер користувача забанено."
 
 #: flaskbb/management/views.py:476
 msgid "Could not ban user."
