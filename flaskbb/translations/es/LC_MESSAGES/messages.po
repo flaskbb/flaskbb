@@ -10,15 +10,17 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2018-05-03 10:17+0000\n"
-"Last-Translator: Peter Justin\n"
-"Language-Team: Spanish (http://www.transifex.com/flaskbb/flaskbb/language/es/)\n"
+"PO-Revision-Date: 2022-12-29 14:49+0000\n"
+"Last-Translator: gallegonovato <fran-carro@hotmail.es>\n"
+"Language-Team: Spanish <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.15.1-dev\n"
 "Generated-By: Babel 2.5.3\n"
-"Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -86,7 +88,7 @@ msgstr "Dirección de correo electrónico"
 #: flaskbb/auth/forms.py:124 flaskbb/auth/forms.py:154
 #: flaskbb/management/forms.py:60 flaskbb/user/forms.py:40
 msgid "A valid email address is required."
-msgstr "Se necesita una dirección de correo electrónico válida"
+msgstr "Se requiere una dirección de correo electrónico válida."
 
 #: flaskbb/auth/forms.py:68 flaskbb/auth/forms.py:155
 #: flaskbb/management/forms.py:61 flaskbb/user/forms.py:41
@@ -112,7 +114,7 @@ msgstr "Acepto los términos del servicio"
 
 #: flaskbb/auth/forms.py:88
 msgid "Please accept the TOS."
-msgstr "Por favor acepta los términos del servicio"
+msgstr "Por favor acepta los términos del servicio."
 
 #: flaskbb/auth/forms.py:92 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:123
@@ -155,7 +157,7 @@ msgstr "Desconectado"
 
 #: flaskbb/auth/views.py:80
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "Error irrecuperable al manejar el inicio de sesión"
 
 #: flaskbb/auth/views.py:107
 msgid "Reauthenticated."
@@ -163,11 +165,11 @@ msgstr "Volver a autenticarse."
 
 #: flaskbb/auth/views.py:112
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "Error irrecuperable al manejar la nueva verificación de identidad"
 
 #: flaskbb/auth/views.py:161
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "No se pudo procesar el registro debido a un error irrecuperable"
 
 #: flaskbb/auth/views.py:196
 msgid ""
@@ -181,7 +183,7 @@ msgstr "Correo electrónico enviado! Por favor comprueba tu bandeja de entrada."
 
 #: flaskbb/auth/views.py:237
 msgid "Error when resetting password"
-msgstr ""
+msgstr "No se pudo restablecer la contraseña"
 
 #: flaskbb/auth/views.py:248
 msgid "Your password has been updated."
@@ -193,25 +195,27 @@ msgstr "Un token de activacion de nueva cuenta ha sido enviado a tu dirección d
 
 #: flaskbb/auth/views.py:312
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "No se pudo activar la cuenta debido a un error irrecuperable"
 
 #: flaskbb/auth/views.py:320
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "Su cuenta ha sido activada y ahora puede iniciar sesión."
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "El email introducido no existe"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "La cuenta ya está activada"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid ""
 "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"Su cuenta está bloqueada debido a demasiados intentos fallidos de inicio de "
+"sesión"
 
 #: flaskbb/auth/services/authentication.py:127
 msgid ""
@@ -225,7 +229,7 @@ msgstr "Nombre de usuario o contraseña inválidos."
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "Correo electrónico no válido"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
@@ -234,34 +238,34 @@ msgstr "Contraseña inválida."
 #: flaskbb/auth/services/registration.py:50
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "El nombre de usuario debe tener entre %(min)s y %(max)s caracteres"
 
 #: flaskbb/auth/services/registration.py:61
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s es un nombre de usuario prohibido"
 
 #: flaskbb/auth/services/registration.py:83
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s ya está registrado"
 
 #: flaskbb/auth/services/registration.py:105
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s ya se ha registrado"
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "La clave no es válida"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "La clave ha caducado"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "No se puede procesar la clave"
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
@@ -426,11 +430,11 @@ msgstr "No tienes permisos para mover este tema."
 
 #: flaskbb/forum/views.py:376
 msgid "Topics moved."
-msgstr ""
+msgstr "Temas movidos."
 
 #: flaskbb/forum/views.py:378
 msgid "Failed to move topics."
-msgstr ""
+msgstr "No se han podido mover los temas."
 
 #: flaskbb/forum/views.py:390
 #, python-format
@@ -708,7 +712,7 @@ msgstr "Ya existe un grupo de tipo 'Invitado'."
 
 #: flaskbb/management/forms.py:303
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "No se pueden asignar permisos a este grupo."
 
 #: flaskbb/management/forms.py:341
 msgid "Forum title"
@@ -716,7 +720,7 @@ msgstr "Título del foro"
 
 #: flaskbb/management/forms.py:342
 msgid "Please enter a forum title."
-msgstr "Por favor introduce un título para el foro"
+msgstr "Por favor introduce un título para el foro."
 
 #: flaskbb/management/forms.py:348 flaskbb/management/forms.py:467
 msgid "You can format your description with Markdown."
@@ -736,7 +740,7 @@ msgstr "Categoría"
 
 #: flaskbb/management/forms.py:363
 msgid "The category that contains this forum."
-msgstr "La categoría que contiene este foro"
+msgstr "La categoría que contiene este foro."
 
 #: flaskbb/management/forms.py:367
 msgid "External link"
@@ -744,7 +748,7 @@ msgstr "Enlace externo"
 
 #: flaskbb/management/forms.py:369
 msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "Un enlace a un sitio e.j.: \"http://flaskbb.org\""
+msgstr "Un enlace a un sitio web, por ejemplo \"http://flaskbb.org\"."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
@@ -761,7 +765,7 @@ msgstr "Nombres de usuarios separados por coma. Déjalo en blanco si no quieres 
 
 #: flaskbb/management/forms.py:379
 msgid "Show moderators"
-msgstr "Mostrar moderadores."
+msgstr "Mostrar los moderadores"
 
 #: flaskbb/management/forms.py:380
 msgid "Do you want to show the moderators on the index page?"
@@ -798,7 +802,7 @@ msgstr "%(user)s no está en el grupo de moderadores."
 
 #: flaskbb/management/forms.py:461
 msgid "Category title"
-msgstr "Título de la categoría."
+msgstr "Título de la categoría"
 
 #: flaskbb/management/forms.py:462
 msgid "Please enter a category title."
@@ -958,7 +962,7 @@ msgstr "Categoría actualizada."
 
 #: flaskbb/management/views.py:750
 msgid "Category with all associated forums deleted."
-msgstr "Categoría borrada junto con todos los foros asociados"
+msgstr "Categoría con todos los foros asociados eliminados."
 
 #: flaskbb/management/views.py:815
 #, python-format
@@ -991,7 +995,7 @@ msgstr "Extensión %(plugin)s activada. Por favor reinicia FlaskBB ahora."
 #: flaskbb/management/views.py:980
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "El complemento %(plugin)s ya está deshabilitado."
 
 #: flaskbb/management/views.py:988
 #, python-format
@@ -1006,6 +1010,8 @@ msgstr "El complemento ha sido desinstalado."
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
 msgstr ""
+"No se puede instalar el complemento. Habilite primero el complemento "
+"'%(plugin)s'."
 
 #: flaskbb/management/views.py:1025
 msgid "Plugin has been installed."
@@ -1071,7 +1077,7 @@ msgstr "Cerrar sesión"
 #: flaskbb/templates/auth/reset_password.html:10
 #: flaskbb/templates/layout.html:125
 msgid "Reset Password"
-msgstr "Restablecer  contraseña"
+msgstr "Restablecer la contraseña"
 
 #: flaskbb/templates/macros.html:327
 msgid "Pages"
@@ -1099,7 +1105,7 @@ msgstr "Solicitar activación de cuenta"
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Estimado(s) %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
