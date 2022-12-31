@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-07-28 11:36+0200\n"
-"PO-Revision-Date: 2022-12-24 00:15+0000\n"
+"PO-Revision-Date: 2022-12-31 20:00+0000\n"
 "Last-Translator: пан Пітон <uapython@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/flaskbb/"
 "flaskbb/uk/>\n"
@@ -953,76 +953,78 @@ msgstr "Тепер користувача забанено."
 
 #: flaskbb/management/views.py:476
 msgid "Could not ban user."
-msgstr ""
+msgstr "Не вдалося забанити користувача."
 
 #: flaskbb/management/views.py:497
 msgid "You do not have the permissions to unban this user."
-msgstr ""
+msgstr "У вас немає дозволу на розблокування цього користувача."
 
 #: flaskbb/management/views.py:514 flaskbb/templates/management/users.html:110
 msgid "Ban"
-msgstr ""
+msgstr "Забанити"
 
 #: flaskbb/management/views.py:530
 msgid "User is now unbanned."
-msgstr ""
+msgstr "Тепер користувача розблоковано."
 
 #: flaskbb/management/views.py:532
 msgid "Could not unban user."
-msgstr ""
+msgstr "Не вдалося розблокувати користувача."
 
 #: flaskbb/management/views.py:542 flaskbb/management/views.py:565
 #: flaskbb/management/views.py:597 flaskbb/management/views.py:636
 msgid "You are not allowed to modify groups."
-msgstr ""
+msgstr "Ви не маєте права змінювати групи."
 
 #: flaskbb/management/views.py:577 flaskbb/management/views.py:588
 #: flaskbb/templates/management/group_form.html:21
 #: flaskbb/templates/management/groups.html:20
 msgid "Add Group"
-msgstr ""
+msgstr "Додати групу"
 
 #: flaskbb/management/views.py:584
 msgid "Group added."
-msgstr ""
+msgstr "Групу додано."
 
 #: flaskbb/management/views.py:609 flaskbb/management/views.py:627
 msgid "Edit Group"
-msgstr ""
+msgstr "Редагувати групу"
 
 #: flaskbb/management/views.py:623
 msgid "Group updated."
-msgstr ""
+msgstr "Групу оновлено."
 
 #: flaskbb/management/views.py:668
 msgid "You cannot delete one of the standard groups."
-msgstr ""
+msgstr "Ви не можете видалити одну зі стандартних груп."
 
 #: flaskbb/management/views.py:677
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr ""
+"Ви не можете видалити стандартні групи. Натомість спробуйте перейменувати "
+"його."
 
 #: flaskbb/management/views.py:686
 msgid "Group deleted."
-msgstr ""
+msgstr "Групу видалено."
 
 #: flaskbb/management/views.py:689
 msgid "No group chosen."
-msgstr ""
+msgstr "Групу не вибрано."
 
 #: flaskbb/management/views.py:698 flaskbb/management/views.py:715
 #: flaskbb/management/views.py:766
 msgid "You are not allowed to modify forums."
-msgstr ""
+msgstr "Вам заборонено змінювати форуми."
 
 #: flaskbb/management/views.py:736 flaskbb/management/views.py:757
 #: flaskbb/templates/management/forums.html:155
 msgid "Edit Forum"
-msgstr ""
+msgstr "Редагувати форум"
 
 #: flaskbb/management/views.py:745
 msgid "Forum updated."
-msgstr ""
+msgstr "Форум оновлено."
 
 #: flaskbb/management/views.py:784 flaskbb/management/views.py:801
 #: flaskbb/templates/management/category_form.html:21
@@ -1030,150 +1032,150 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:20
 #: flaskbb/templates/management/forums.html:43
 msgid "Add Forum"
-msgstr ""
+msgstr "Додати форум"
 
 #: flaskbb/management/views.py:792
 msgid "Forum added."
-msgstr ""
+msgstr "Форум додано."
 
 #: flaskbb/management/views.py:810
 msgid "You are not allowed to modify forums"
-msgstr ""
+msgstr "Вам заборонено змінювати форуми"
 
 #: flaskbb/management/views.py:826
 msgid "Forum deleted."
-msgstr ""
+msgstr "Форум видалено."
 
 #: flaskbb/management/views.py:835 flaskbb/management/views.py:868
 #: flaskbb/management/views.py:909
 msgid "You are not allowed to modify categories"
-msgstr ""
+msgstr "Ви не маєте права змінювати категорії"
 
 #: flaskbb/management/views.py:847 flaskbb/management/views.py:859
 #: flaskbb/templates/management/category_form.html:22
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 msgid "Add Category"
-msgstr ""
+msgstr "Додати категорію"
 
 #: flaskbb/management/views.py:855
 msgid "Category added."
-msgstr ""
+msgstr "Категорію додано."
 
 #: flaskbb/management/views.py:884 flaskbb/management/views.py:900
 #: flaskbb/templates/management/forums.html:46
 msgid "Edit Category"
-msgstr ""
+msgstr "Редагувати категорію"
 
 #: flaskbb/management/views.py:894
 msgid "Category updated."
-msgstr ""
+msgstr "Категорію оновлено."
 
 #: flaskbb/management/views.py:925
 msgid "Category with all associated forums deleted."
-msgstr ""
+msgstr "Категорію з усіма пов’язаними форумами видалено."
 
 #: flaskbb/management/views.py:934 flaskbb/management/views.py:955
 #: flaskbb/management/views.py:977 flaskbb/management/views.py:1048
 msgid "You are not allowed to view reports."
-msgstr ""
+msgstr "Ви не можете переглядати підозри."
 
 #: flaskbb/management/views.py:1017
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "Підозра %(id)s уже позначено як прочитаний."
 
 #: flaskbb/management/views.py:1025
 #, python-format
 msgid "Report %(id)s marked as read."
-msgstr ""
+msgstr "Підозра %(id)s позначено як прочитане."
 
 #: flaskbb/management/views.py:1039
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "Усі підозри позначені як прочитані."
 
 #: flaskbb/management/views.py:1082
 msgid "Report deleted."
-msgstr ""
+msgstr "Підозри видалено."
 
 #: flaskbb/management/views.py:1116
 msgid "You are not allowed to access the management panel"
-msgstr ""
+msgstr "Ви не маєте доступу до панелі керування"
 
 #: flaskbb/management/views.py:1171 flaskbb/management/views.py:1188
 #: flaskbb/management/views.py:1223 flaskbb/management/views.py:1257
 #: flaskbb/management/views.py:1278
 msgid "You are not allowed to modify plugins"
-msgstr ""
+msgstr "Вам заборонено змінювати плагіни"
 
 #: flaskbb/management/views.py:1201
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
-msgstr ""
+msgstr "Плагін %(plugin)s уже ввімкнено."
 
 #: flaskbb/management/views.py:1210
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Плагін %(plugin)s увімкнено. Перезапустіть FlaskBB."
 
 #: flaskbb/management/views.py:1236
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "Плагін %(plugin)s уже вимкнено."
 
 #: flaskbb/management/views.py:1244
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Плагін %(plugin)s вимкнено. Перезапустіть FlaskBB."
 
 #: flaskbb/management/views.py:1269
 msgid "Plugin has been uninstalled."
-msgstr ""
+msgstr "Плагін видалено."
 
 #: flaskbb/management/views.py:1291
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
-msgstr ""
+msgstr "Не вдається встановити плагін. Спочатку ввімкніть плагін '%(plugin)s'."
 
 #: flaskbb/management/views.py:1299
 msgid "Plugin has been installed."
-msgstr ""
+msgstr "Плагін встановлено."
 
 #: flaskbb/templates/confirm_dialog.html:6
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ти впевнений?"
 
 #: flaskbb/templates/confirm_dialog.html:9
 msgid ""
 "Are you sure that you want to perform this action? This action is "
 "irreversible."
-msgstr ""
+msgstr "Ви впевнені, що бажаєте виконати цю дію? Ця дія незворотна."
 
 #: flaskbb/templates/confirm_dialog.html:12
 msgid "Cancel"
-msgstr ""
+msgstr "Скасувати"
 
 #: flaskbb/templates/confirm_dialog.html:13
 msgid "Yes"
-msgstr ""
+msgstr "Так"
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:13
 #: flaskbb/templates/forum/memberlist.html:39 flaskbb/templates/layout.html:78
 msgid "Memberlist"
-msgstr ""
+msgstr "Список учасників"
 
 #: flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:15
 #: flaskbb/templates/forum/topictracker.html:26
 #: flaskbb/templates/layout.html:97
 msgid "Topic Tracker"
-msgstr ""
+msgstr "Відстеження тем"
 
 #: flaskbb/templates/layout.html:100
 #: flaskbb/templates/user/settings_layout.html:10
 msgid "Settings"
-msgstr ""
+msgstr "Налаштування"
 
 #: flaskbb/templates/layout.html:102
 #: flaskbb/templates/management/banned_users.html:9
@@ -1189,122 +1191,124 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:9
 #: flaskbb/templates/management/users.html:8
 msgid "Management"
-msgstr ""
+msgstr "Управління"
 
 #: flaskbb/templates/layout.html:106
 msgid "Logout"
-msgstr ""
+msgstr "Вийти"
 
 #: flaskbb/templates/auth/reset_password.html:1
 #: flaskbb/templates/auth/reset_password.html:10
 #: flaskbb/templates/layout.html:126
 msgid "Reset Password"
-msgstr ""
+msgstr "Скинути пароль"
 
 #: flaskbb/templates/layout.html:128
 msgid "Activate Account"
-msgstr ""
+msgstr "Активувати акаунт"
 
 #: flaskbb/templates/macros.html:327
 msgid "Pages"
-msgstr ""
+msgstr "Сторінки"
 
 #: flaskbb/templates/auth/forgot_password.html:1
 #: flaskbb/templates/auth/forgot_password.html:10
 msgid "Forgot Password"
-msgstr ""
+msgstr "Забули пароль"
 
 #: flaskbb/templates/auth/login.html:27
 msgid "Not a member yet?"
-msgstr ""
+msgstr "Ще не учасник?"
 
 #: flaskbb/templates/auth/login.html:28
 msgid "Forgot your Password?"
-msgstr ""
+msgstr "Забули свій пароль?"
 
 #: flaskbb/templates/auth/request_account_activation.html:1
 #: flaskbb/templates/auth/request_account_activation.html:10
 msgid "Request Account Activation"
-msgstr ""
+msgstr "Запит на активацію облікового запису"
 
 #: flaskbb/templates/email/activate_account.html:3
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Шановний %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
-msgstr ""
+msgstr "Натисніть посилання нижче, щоб активувати свій обліковий запис:"
 
 #: flaskbb/templates/email/activate_account.html:9
 #: flaskbb/templates/email/reset_password.html:8
 msgid "Sincerely,"
-msgstr ""
+msgstr "З повагою"
 
 #: flaskbb/templates/email/activate_account.html:10
 #: flaskbb/templates/email/reset_password.html:9
 msgid "The Administration"
-msgstr ""
+msgstr "Адміністрація"
 
 #: flaskbb/templates/email/reset_password.html:4
 msgid "Click the link below to reset your password:"
-msgstr ""
+msgstr "Натисніть посилання нижче, щоб скинути пароль:"
 
 #: flaskbb/templates/errors/forbidden_page.html:1
 msgid "Forbidden"
-msgstr ""
+msgstr "Заборонено"
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 msgid "403 - Forbidden Page"
-msgstr ""
+msgstr "403 - Заборонена сторінка"
 
 #: flaskbb/templates/errors/forbidden_page.html:10
 msgid "You do not have the permission to view this page."
-msgstr ""
+msgstr "Ви не маєте дозволу на перегляд цієї сторінки."
 
 #: flaskbb/templates/errors/forbidden_page.html:11
 #: flaskbb/templates/errors/page_not_found.html:11
 msgid "Back to the Forums"
-msgstr ""
+msgstr "Назад до форумів"
 
 #: flaskbb/templates/errors/page_not_found.html:1
 msgid "Page not found"
-msgstr ""
+msgstr "Сторінку не знайдено"
 
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "404 - Page not found!"
-msgstr ""
+msgstr "404 - Сторінка не знайдена!"
 
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "The page you were looking for does not exist."
-msgstr ""
+msgstr "Сторінка, яку ви шукали, не існує."
 
 #: flaskbb/templates/errors/server_error.html:1
 msgid "Server Error"
-msgstr ""
+msgstr "Помилка серверу"
 
 #: flaskbb/templates/errors/server_error.html:9
 msgid "500 - Server Error"
-msgstr ""
+msgstr "500 - Помилка сервера"
 
 #: flaskbb/templates/errors/server_error.html:10
 msgid "Something went wrong!"
-msgstr ""
+msgstr "Щось пішло не так!"
 
 #: flaskbb/templates/errors/too_many_logins.html:1
 msgid "Too Many Requests"
-msgstr ""
+msgstr "Забагато запитів"
 
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid "429 - Too Many Requests"
-msgstr ""
+msgstr "429 - Забагато запитів"
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
+"Щоб запобігти атакам грубої сили на облікові записи, ми обмежили кількість "
+"запитів на цьому маршруті."
 
 #: flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/forum/search_result.html:123
@@ -1315,7 +1319,7 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:28
 #: flaskbb/templates/user/profile_layout.html:68
 msgid "Topics"
-msgstr ""
+msgstr "Теми"
 
 #: flaskbb/templates/forum/category_layout.html:10
 #: flaskbb/templates/forum/edit_forum.html:32
@@ -1337,7 +1341,7 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:34
 #: flaskbb/templates/user/profile_layout.html:74
 msgid "Posts"
-msgstr ""
+msgstr "Пости"
 
 #: flaskbb/templates/forum/category_layout.html:11
 #: flaskbb/templates/forum/edit_forum.html:34
@@ -1346,13 +1350,13 @@ msgstr ""
 #: flaskbb/templates/forum/search_result.html:210
 #: flaskbb/templates/forum/topictracker.html:34
 msgid "Last Post"
-msgstr ""
+msgstr "Останній пост"
 
 #: flaskbb/templates/forum/category_layout.html:27
 #: flaskbb/templates/forum/search_result.html:226
 #: flaskbb/templates/management/forums.html:79
 msgid "Link to"
-msgstr ""
+msgstr "Посилання на"
 
 #: flaskbb/templates/forum/category_layout.html:114
 #: flaskbb/templates/forum/edit_forum.html:68
@@ -1365,206 +1369,206 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:91
 #: flaskbb/templates/management/plugins.html:46
 msgid "by"
-msgstr ""
+msgstr "за"
 
 #: flaskbb/templates/forum/category_layout.html:123
 #: flaskbb/templates/forum/search_result.html:320
 msgid "No posts."
-msgstr ""
+msgstr "Немає дописів."
 
 #: flaskbb/templates/forum/edit_forum.html:33
 #: flaskbb/templates/forum/forum.html:51
 #: flaskbb/templates/forum/search_result.html:130
 #: flaskbb/templates/forum/topictracker.html:33
 msgid "Views"
-msgstr ""
+msgstr "Перегляди"
 
 #: flaskbb/templates/forum/edit_forum.html:35
 #: flaskbb/templates/forum/topictracker.html:35
 msgid "Select all"
-msgstr ""
+msgstr "Вибрати все"
 
 #: flaskbb/templates/forum/edit_forum.html:101
 #: flaskbb/templates/forum/topictracker.html:101
 msgid "Select topic"
-msgstr ""
+msgstr "Виберіть тему"
 
 #: flaskbb/templates/forum/edit_forum.html:107
 #: flaskbb/templates/forum/forum.html:128
 #: flaskbb/templates/forum/topictracker.html:107
 msgid "No Topics."
-msgstr ""
+msgstr "Немає тем."
 
 #: flaskbb/templates/forum/edit_forum.html:117
 msgid "Back"
-msgstr ""
+msgstr "Повернутися"
 
 #: flaskbb/templates/forum/edit_forum.html:128
 msgid "Lock"
-msgstr ""
+msgstr "Заблокувати"
 
 #: flaskbb/templates/forum/edit_forum.html:131
 msgid "Unlock"
-msgstr ""
+msgstr "Розблокувати"
 
 #: flaskbb/templates/forum/edit_forum.html:137
 msgid "Highlight"
-msgstr ""
+msgstr "Підсвітити"
 
 #: flaskbb/templates/forum/edit_forum.html:140
 msgid "Trivialize"
-msgstr ""
+msgstr "Тривіалізувати"
 
 #: flaskbb/templates/forum/edit_forum.html:145
 #: flaskbb/templates/management/groups.html:65
 #: flaskbb/templates/management/reports.html:82
 #: flaskbb/templates/management/users.html:130
 msgid "Delete"
-msgstr ""
+msgstr "Видалити"
 
 #: flaskbb/templates/forum/edit_forum.html:151
 msgid "Hide"
-msgstr ""
+msgstr "Сховати"
 
 #: flaskbb/templates/forum/edit_forum.html:154
 msgid "Unhide"
-msgstr ""
+msgstr "Показати"
 
 #: flaskbb/templates/forum/edit_forum.html:169
 msgid "Move to..."
-msgstr ""
+msgstr "Перемістити до..."
 
 #: flaskbb/templates/forum/edit_forum.html:176
 msgid "Move"
-msgstr ""
+msgstr "Перемістити"
 
 #: flaskbb/templates/forum/forum.html:25
 #: flaskbb/templates/management/reports.html:50
 #: flaskbb/templates/management/reports.html:74
 msgid "Mark as Read"
-msgstr ""
+msgstr "Відзначити як прочитане"
 
 #: flaskbb/templates/forum/forum.html:31
 #: flaskbb/templates/forum/topic_controls.html:116
 msgid "Locked"
-msgstr ""
+msgstr "Заблоковано"
 
 #: flaskbb/templates/forum/forum.html:35
 #: flaskbb/templates/forum/new_topic.html:1
 #: flaskbb/templates/forum/new_topic.html:13
 #: flaskbb/templates/forum/new_topic.html:21
 msgid "New Topic"
-msgstr ""
+msgstr "Нова тема"
 
 #: flaskbb/templates/forum/forum.html:97
 #, python-format
 msgid "Hidden on %(when)s  by %(who)s"
-msgstr ""
+msgstr "Приховано %(when)s %(who)s"
 
 #: flaskbb/templates/forum/forum.html:138
 msgid "Moderation Mode"
-msgstr ""
+msgstr "Режим модерації"
 
 #: flaskbb/templates/forum/index.html:11
 msgid "Board Statistics"
-msgstr ""
+msgstr "Статистика Дошки"
 
 #: flaskbb/templates/forum/index.html:12
 msgid "Who is online?"
-msgstr ""
+msgstr "Хто онлайн?"
 
 #: flaskbb/templates/forum/index.html:17
 msgid "Total number of registered users"
-msgstr ""
+msgstr "Загальна кількість зареєстрованих користувачів"
 
 #: flaskbb/templates/forum/index.html:18
 msgid "Total number of topics"
-msgstr ""
+msgstr "Загальна кількість тем"
 
 #: flaskbb/templates/forum/index.html:19
 msgid "Total number of posts"
-msgstr ""
+msgstr "Загальна кількість постів"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "Newest registered user"
-msgstr ""
+msgstr "Останній зареєстрований користувач"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "No users"
-msgstr ""
+msgstr "Немає користувачів"
 
 #: flaskbb/templates/forum/index.html:23
 msgid "Registered users online"
-msgstr ""
+msgstr "Зареєстровані користувачі онлайн"
 
 #: flaskbb/templates/forum/index.html:25
 msgid "Guests online"
-msgstr ""
+msgstr "Гості онлайн"
 
 #: flaskbb/templates/forum/memberlist.html:48
 #: flaskbb/templates/forum/search_result.html:100
 #: flaskbb/templates/management/banned_users.html:64
 #: flaskbb/templates/management/users.html:63
 msgid "Date registered"
-msgstr ""
+msgstr "Дата реєстрації"
 
 #: flaskbb/templates/forum/memberlist.html:50
 #: flaskbb/templates/forum/search_result.html:101
 #: flaskbb/templates/management/banned_users.html:65
 #: flaskbb/templates/management/users.html:64
 msgid "Group"
-msgstr ""
+msgstr "Група"
 
 #: flaskbb/templates/forum/new_post.html:2
 msgid "Edit Post"
-msgstr ""
+msgstr "Редагувати Пост"
 
 #: flaskbb/templates/forum/new_post.html:4
 msgid "New Post"
-msgstr ""
+msgstr "Нова Пост"
 
 #: flaskbb/templates/forum/online_users.html:1
 #: flaskbb/templates/forum/online_users.html:13
 msgid "Online Users"
-msgstr ""
+msgstr "Користувачі онлайн"
 
 #: flaskbb/templates/forum/report_post.html:1
 #: flaskbb/templates/forum/report_post.html:16
 msgid "Report Post"
-msgstr ""
+msgstr "Підозра на пост"
 
 #: flaskbb/templates/forum/report_post.html:20
 msgid "Report"
-msgstr ""
+msgstr "Підозра"
 
 #: flaskbb/templates/forum/report_post.html:21
 msgid "Close"
-msgstr ""
+msgstr "Закрити"
 
 #: flaskbb/templates/forum/search_result.html:29
 #: flaskbb/templates/forum/topic.html:40
 #: flaskbb/templates/forum/topic_horizontal.html:47
 #: flaskbb/templates/user/profile_layout.html:34
 msgid "online"
-msgstr ""
+msgstr "онлайн"
 
 #: flaskbb/templates/forum/search_result.html:31
 #: flaskbb/templates/forum/topic.html:42
 #: flaskbb/templates/forum/topic_horizontal.html:49
 #: flaskbb/templates/user/profile_layout.html:36
 msgid "offline"
-msgstr ""
+msgstr "офлайн"
 
 #: flaskbb/templates/forum/search_result.html:41
 #: flaskbb/templates/forum/topic.html:52
 #: flaskbb/templates/forum/topic_horizontal.html:59
 msgid "Joined"
-msgstr ""
+msgstr "Приєднався"
 
 #: flaskbb/templates/forum/search_result.html:49
 #: flaskbb/templates/forum/topic.html:60
 msgid "Guest"
-msgstr ""
+msgstr "Гість"
 
 #: flaskbb/templates/forum/search_result.html:64
 #: flaskbb/templates/forum/topic.html:75
@@ -1572,141 +1576,142 @@ msgstr ""
 #, python-format
 msgid "Last modified: %(date)s by <a href=\"%(user_url)s\">%(user)s</a>"
 msgstr ""
+"Востаннє змінено: %(date)s користувачем <a href=\"%(user_url)s\">%(user)s</a>"
 
 #: flaskbb/templates/forum/search_result.html:83
 msgid "No posts found matching your search criteria."
-msgstr ""
+msgstr "Не знайдено дописів, що відповідають вашим критеріям пошуку."
 
 #: flaskbb/templates/forum/search_result.html:113
 #: flaskbb/templates/management/banned_users.html:104
 #: flaskbb/templates/management/users.html:139
 msgid "No users found matching your search criteria."
-msgstr ""
+msgstr "Користувачів, які відповідають вашим критеріям пошуку, не знайдено."
 
 #: flaskbb/templates/forum/search_result.html:191
 msgid "No topics found matching your search criteria."
-msgstr ""
+msgstr "Не знайдено тем, що відповідають вашим критеріям пошуку."
 
 #: flaskbb/templates/forum/search_result.html:202
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/forums.html:9
 msgid "Forums"
-msgstr ""
+msgstr "Форуми"
 
 #: flaskbb/templates/forum/search_result.html:329
 msgid "No forums found matching your search criteria."
-msgstr ""
+msgstr "Не знайдено форумів, які б відповідали вашим критеріям пошуку."
 
 #: flaskbb/templates/forum/topic.html:2
 #: flaskbb/templates/forum/topic_horizontal.html:2
 #, python-format
 msgid "%(title)s - Topic"
-msgstr ""
+msgstr "%(title)s - Тема"
 
 #: flaskbb/templates/forum/topic.html:20
 #: flaskbb/templates/forum/topic_horizontal.html:20
 #, python-format
 msgid "This topic is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Ця тема прихована (%(when)s від %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:90
 #, python-format
 msgid "This post is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Цей допис приховано (%(when)s від %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:118
 #: flaskbb/templates/forum/topic_horizontal.html:107
 msgid "Quote this post"
-msgstr ""
+msgstr "Процитуйте цей пост"
 
 #: flaskbb/templates/forum/topic.html:120
 #: flaskbb/templates/forum/topic_horizontal.html:109
 msgid "Full Reply"
-msgstr ""
+msgstr "Повна відповідь"
 
 #: flaskbb/templates/forum/topic.html:125
 #: flaskbb/templates/forum/topic_horizontal.html:114
 msgid "Edit this post"
-msgstr ""
+msgstr "Відредагуйте цю публікацію"
 
 #: flaskbb/templates/forum/topic.html:131
 #: flaskbb/templates/forum/topic_horizontal.html:120
 msgid "Delete this topic"
-msgstr ""
+msgstr "Видалити цю тему"
 
 #: flaskbb/templates/forum/topic.html:139
 #: flaskbb/templates/forum/topic_horizontal.html:128
 msgid "Delete this post"
-msgstr ""
+msgstr "Видалити цю публікацію"
 
 #: flaskbb/templates/forum/topic.html:147
 #: flaskbb/templates/forum/topic_horizontal.html:136
 msgid "Report this post"
-msgstr ""
+msgstr "Підозра на цей пост"
 
 #: flaskbb/templates/forum/topic.html:155
 #: flaskbb/templates/forum/topic_horizontal.html:144
 msgid "Unhide this topic"
-msgstr ""
+msgstr "Показати цю тему"
 
 #: flaskbb/templates/forum/topic.html:160
 #: flaskbb/templates/forum/topic_horizontal.html:149
 msgid "Hide this topic"
-msgstr ""
+msgstr "Приховати цю тему"
 
 #: flaskbb/templates/forum/topic.html:167
 #: flaskbb/templates/forum/topic_horizontal.html:156
 msgid "Unhide this post"
-msgstr ""
+msgstr "Показати цей пост"
 
 #: flaskbb/templates/forum/topic.html:172
 #: flaskbb/templates/forum/topic_horizontal.html:161
 msgid "Hide this post"
-msgstr ""
+msgstr "Сховати цей пост"
 
 #: flaskbb/templates/forum/topic_controls.html:15
 msgid "Moderate"
-msgstr ""
+msgstr "Модерувати"
 
 #: flaskbb/templates/forum/topic_controls.html:24
 msgid "Delete Topic"
-msgstr ""
+msgstr "Видалити тему"
 
 #: flaskbb/templates/forum/topic_controls.html:36
 msgid "Lock Topic"
-msgstr ""
+msgstr "Заблокувати тему"
 
 #: flaskbb/templates/forum/topic_controls.html:45
 msgid "Unlock Topic"
-msgstr ""
+msgstr "Розблокувати тему"
 
 #: flaskbb/templates/forum/topic_controls.html:56
 msgid "Highlight Topic"
-msgstr ""
+msgstr "Виділіть тему"
 
 #: flaskbb/templates/forum/topic_controls.html:65
 msgid "Trivialize Topic"
-msgstr ""
+msgstr "Тривіалізувати тему"
 
 #: flaskbb/templates/forum/topic_controls.html:77
 msgid "Unhide Topic"
-msgstr ""
+msgstr "Показати тему"
 
 #: flaskbb/templates/forum/topic_controls.html:84
 msgid "Hide Topic"
-msgstr ""
+msgstr "Приховати тему"
 
 #: flaskbb/templates/forum/topic_controls.html:99
 msgid "Untrack Topic"
-msgstr ""
+msgstr "Скасувати відстеження теми"
 
 #: flaskbb/templates/forum/topic_controls.html:106
 msgid "Track Topic"
-msgstr ""
+msgstr "Стежити за темою"
 
 #: flaskbb/templates/forum/topictracker.html:117
 msgid "Untrack Topics"
-msgstr ""
+msgstr "Скасувати відстеження тем"
 
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:21
@@ -1714,7 +1719,7 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:21
 #: flaskbb/templates/management/users.html:20
 msgid "Banned Users"
-msgstr ""
+msgstr "Забанені користувачі"
 
 #: flaskbb/templates/management/banned_users.html:10
 #: flaskbb/templates/management/banned_users.html:20
@@ -1723,77 +1728,77 @@ msgstr ""
 #: flaskbb/templates/management/users.html:9
 #: flaskbb/templates/management/users.html:19
 msgid "Manage Users"
-msgstr ""
+msgstr "Керувати користувачами"
 
 #: flaskbb/templates/management/banned_users.html:70
 #: flaskbb/templates/management/groups.html:39
 #: flaskbb/templates/management/reports.html:45
 #: flaskbb/templates/management/users.html:68
 msgid "Actions"
-msgstr ""
+msgstr "Дії"
 
 #: flaskbb/templates/management/banned_users.html:75
 #: flaskbb/templates/management/users.html:79
 msgid "Unban selected Users"
-msgstr ""
+msgstr "Розблокувати вибраних користувачів"
 
 #: flaskbb/templates/management/category_form.html:20
 #: flaskbb/templates/management/forum_form.html:20
 #: flaskbb/templates/management/forums.html:19
 #: flaskbb/templates/management/forums.html:29
 msgid "Manage Forums"
-msgstr ""
+msgstr "Керуйте форумами"
 
 #: flaskbb/templates/management/forums.html:51
 msgid "Delete Category"
-msgstr ""
+msgstr "Видалити категорію"
 
 #: flaskbb/templates/management/forums.html:62
 msgid "Topics / Posts"
-msgstr ""
+msgstr "Теми / Пости"
 
 #: flaskbb/templates/management/forums.html:99
 msgid "Edit Link"
-msgstr ""
+msgstr "Редагувати посилання"
 
 #: flaskbb/templates/management/forums.html:105
 msgid "Delete Link"
-msgstr ""
+msgstr "Видалити посилання"
 
 #: flaskbb/templates/management/forums.html:161
 msgid "Delete Forum"
-msgstr ""
+msgstr "Видалити форум"
 
 #: flaskbb/templates/management/group_form.html:10
 #: flaskbb/templates/management/group_form.html:20
 #: flaskbb/templates/management/groups.html:9
 #: flaskbb/templates/management/groups.html:19
 msgid "Manage Groups"
-msgstr ""
+msgstr "Керування групами"
 
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:28
 #: flaskbb/templates/management/overview.html:88
 msgid "Groups"
-msgstr ""
+msgstr "Групи"
 
 #: flaskbb/templates/management/groups.html:34
 msgid "Group Name"
-msgstr ""
+msgstr "Назва групи"
 
 #: flaskbb/templates/management/groups.html:44
 msgid "Delete selected Groups"
-msgstr ""
+msgstr "Видалити вибрані групи"
 
 #: flaskbb/templates/management/groups.html:59
 #: flaskbb/templates/management/users.html:102
 #: flaskbb/templates/user/profile_layout.html:16
 msgid "Edit"
-msgstr ""
+msgstr "Редагувати"
 
 #: flaskbb/templates/management/groups.html:74
 msgid "No groups found."
-msgstr ""
+msgstr "Групи не знайдено."
 
 #: flaskbb/templates/management/overview.html:1
 #: flaskbb/templates/management/overview.html:16
@@ -1801,309 +1806,309 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:16
 #: flaskbb/templates/user/profile_layout.html:56
 msgid "Overview"
-msgstr ""
+msgstr "Огляд"
 
 #: flaskbb/templates/management/overview.html:25
 msgid "There is something that wants your attention."
-msgstr ""
+msgstr "Є щось, що потребує вашої уваги."
 
 #: flaskbb/templates/management/overview.html:26
 #, python-format
 msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
-msgstr ""
+msgstr "У вас є <a href=\"%(url)s\">%(unread_reports)s непрочитаних підозр</a>."
 
 #: flaskbb/templates/management/overview.html:30
 msgid "Everything seems alright."
-msgstr ""
+msgstr "Здається, все добре."
 
 #: flaskbb/templates/management/overview.html:31
 msgid "No new notifications."
-msgstr ""
+msgstr "Немає нових сповіщень."
 
 #: flaskbb/templates/management/overview.html:44
 msgid "users"
-msgstr ""
+msgstr "користувачі"
 
 #: flaskbb/templates/management/overview.html:56
 #: flaskbb/templates/user/profile_layout.html:42
 msgid "posts"
-msgstr ""
+msgstr "пости"
 
 #: flaskbb/templates/management/overview.html:68
 msgid "topics"
-msgstr ""
+msgstr "теми"
 
 #: flaskbb/templates/management/overview.html:76
 msgid "Statistics"
-msgstr ""
+msgstr "Статистика"
 
 #: flaskbb/templates/management/overview.html:79
 msgid "Registered users"
-msgstr ""
+msgstr "Зареєстровані користувачі"
 
 #: flaskbb/templates/management/overview.html:82
 msgid "Online users"
-msgstr ""
+msgstr "Онлайн-користувачі"
 
 #: flaskbb/templates/management/overview.html:85
 msgid "Banned users"
-msgstr ""
+msgstr "Забанені користувачі"
 
 #: flaskbb/templates/management/overview.html:97
 #: flaskbb/templates/management/reports.html:1
 #: flaskbb/templates/management/reports.html:10
 #: flaskbb/templates/management/reports.html:31
 msgid "Reports"
-msgstr ""
+msgstr "Підозри"
 
 #: flaskbb/templates/management/overview.html:102
 msgid "Components"
-msgstr ""
+msgstr "Компоненти"
 
 #: flaskbb/templates/management/overview.html:115
 msgid "checking status"
-msgstr ""
+msgstr "перевірка статусу"
 
 #: flaskbb/templates/management/overview.html:128
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
-msgstr ""
+msgstr "Плагіни"
 
 #: flaskbb/templates/management/overview.html:141
 msgid "not enabled"
-msgstr ""
+msgstr "не включено"
 
 #: flaskbb/templates/management/overview.html:144
 msgid "enabled &amp; installed"
-msgstr ""
+msgstr "увімкнено та встановлено"
 
 #: flaskbb/templates/management/overview.html:146
 msgid "enabled"
-msgstr ""
+msgstr "включено"
 
 #: flaskbb/templates/management/overview.html:148
 msgid "not installed"
-msgstr ""
+msgstr "не встановлено"
 
 #: flaskbb/templates/management/overview.html:169
 msgid "There is a problem."
-msgstr ""
+msgstr "Є проблема."
 
 #: flaskbb/templates/management/overview.html:170
 msgid "Celery is <strong>not</strong> running."
-msgstr ""
+msgstr "Celery <strong>не</strong>працює."
 
 #: flaskbb/templates/management/overview.html:171
 msgid "You can start celery with this command:"
-msgstr ""
+msgstr "Ви можете запустити Сelery за допомогою цієї команди:"
 
 #: flaskbb/templates/management/overview.html:188
 msgid "running"
-msgstr ""
+msgstr "працює"
 
 #: flaskbb/templates/management/overview.html:190
 msgid "not running"
-msgstr ""
+msgstr "не працює"
 
 #: flaskbb/templates/management/plugins.html:19
 msgid "Manage Plugins"
-msgstr ""
+msgstr "Керування плагінами"
 
 #: flaskbb/templates/management/plugins.html:25
 msgid "Plugin"
-msgstr ""
+msgstr "Плагін"
 
 #: flaskbb/templates/management/plugins.html:26
 msgid "Information"
-msgstr ""
+msgstr "Інформація"
 
 #: flaskbb/templates/management/plugins.html:27
 msgid "Manage"
-msgstr ""
+msgstr "Керувати"
 
 #: flaskbb/templates/management/plugins.html:44
 msgid "Version"
-msgstr ""
+msgstr "Версія"
 
 #: flaskbb/templates/management/plugins.html:52
 msgid "Enable"
-msgstr ""
+msgstr "Увімкнути"
 
 #: flaskbb/templates/management/plugins.html:57
 msgid "Disable"
-msgstr ""
+msgstr "Вимкнути"
 
 #: flaskbb/templates/management/plugins.html:65
 msgid "Install"
-msgstr ""
+msgstr "Встановити"
 
 #: flaskbb/templates/management/plugins.html:72
 msgid "Uninstall"
-msgstr ""
+msgstr "Видалити"
 
 #: flaskbb/templates/management/reports.html:21
 msgid "Show all Reports"
-msgstr ""
+msgstr "Показати всі підозри"
 
 #: flaskbb/templates/management/reports.html:22
 msgid "Show unread Reports"
-msgstr ""
+msgstr "Показати непрочитані підозри"
 
 #: flaskbb/templates/management/reports.html:37
 msgid "Poster"
-msgstr ""
+msgstr "Публікатор"
 
 #: flaskbb/templates/management/reports.html:40
 msgid "Reporter"
-msgstr ""
+msgstr "Показчик"
 
 #: flaskbb/templates/management/reports.html:41
 msgid "Reported"
-msgstr ""
+msgstr "Повідомлено"
 
 #: flaskbb/templates/management/reports.html:55
 msgid "Delete selected reports"
-msgstr ""
+msgstr "Видалити вибрані підозри"
 
 #: flaskbb/templates/management/reports.html:90
 msgid "No reports."
-msgstr ""
+msgstr "Жодних підозр."
 
 #: flaskbb/templates/management/users.html:73
 msgid "Ban selected Users"
-msgstr ""
+msgstr "Забанити вибраних користувачів"
 
 #: flaskbb/templates/management/users.html:85
 msgid "Delete selected Users"
-msgstr ""
+msgstr "Видалити вибраних користувачів"
 
 #: flaskbb/templates/user/all_posts.html:65
 msgid "The user has not written any posts yet."
-msgstr ""
+msgstr "Користувач ще не написав жодного поста."
 
 #: flaskbb/templates/user/all_topics.html:67
 msgid "The user has not opened any topics yet."
-msgstr ""
+msgstr "Користувач ще не відкрив жодної теми."
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
-msgstr ""
+msgstr "Змінити адресу електронної пошти"
 
 #: flaskbb/templates/user/change_password.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "Змінити пароль"
 
 #: flaskbb/templates/user/change_user_details.html:8
 msgid "Change User Details"
-msgstr ""
+msgstr "Змінити дані користувача"
 
 #: flaskbb/templates/user/general_settings.html:7
 msgid "General Settings"
-msgstr ""
+msgstr "Загальні налаштування"
 
 #: flaskbb/templates/user/profile.html:19
 msgid "Info"
-msgstr ""
+msgstr "Інформація"
 
 #: flaskbb/templates/user/profile.html:30
 msgid "User has not added any notes about him."
-msgstr ""
+msgstr "Користувач не додав жодних приміток про нього."
 
 #: flaskbb/templates/user/profile.html:38
 msgid "Signature"
-msgstr ""
+msgstr "Підпис"
 
 #: flaskbb/templates/user/profile_layout.html:2
 #, python-format
 msgid "%(user)s - User"
-msgstr ""
+msgstr "%(user)s - користувач"
 
 #: flaskbb/templates/user/profile_layout.html:32
 msgid "Never seen"
-msgstr ""
+msgstr "Ніколи не бачив"
 
 #: flaskbb/templates/user/settings_layout.html:2
 #, python-format
 msgid "Settings - %(user)s - User"
-msgstr ""
+msgstr "Налаштування - %(user)s - Користувача"
 
 #: flaskbb/user/forms.py:33
 msgid "Theme"
-msgstr ""
+msgstr "Тема"
 
 #: flaskbb/user/forms.py:39
 msgid "Old email address"
-msgstr ""
+msgstr "Стара електронна адреса"
 
 #: flaskbb/user/forms.py:43
 msgid "New email address"
-msgstr ""
+msgstr "Нова електронна адреса"
 
 #: flaskbb/user/forms.py:45
 msgid "Email addresses must match."
-msgstr ""
+msgstr "Адреси електронної пошти мають збігатися."
 
 #: flaskbb/user/forms.py:48
 msgid "Confirm email address"
-msgstr ""
+msgstr "Підтвердьте електронну адресу"
 
 #: flaskbb/user/forms.py:70
 msgid "New password"
-msgstr ""
+msgstr "Новий пароль"
 
 #: flaskbb/user/forms.py:72
 msgid "New passwords must match."
-msgstr ""
+msgstr "Нові паролі мають збігатися."
 
 #: flaskbb/user/forms.py:75
 msgid "Confirm new password"
-msgstr ""
+msgstr "Підтвердити новий пароль"
 
 #: flaskbb/user/forms.py:81
 msgid "Old password is wrong."
-msgstr ""
+msgstr "Старий пароль неправильний."
 
 #: flaskbb/user/forms.py:102
 msgid "Forum Signature"
-msgstr ""
+msgstr "Підпис форуму"
 
 #: flaskbb/user/views.py:59
 msgid "Settings updated."
-msgstr ""
+msgstr "Налаштування оновлено."
 
 #: flaskbb/user/views.py:80
 msgid "Password updated."
-msgstr ""
+msgstr "Пароль оновлено."
 
 #: flaskbb/user/views.py:99
 msgid "Email address updated."
-msgstr ""
+msgstr "Електронну адресу оновлено."
 
 #: flaskbb/user/views.py:119
 msgid "User details updated."
-msgstr ""
+msgstr "Інформація про користувача оновлена."
 
 #: flaskbb/utils/helpers.py:114
 msgid "You do not have the permissions to execute this action."
-msgstr ""
+msgstr "Ви не маєте прав для виконання цієї дії."
 
 #: flaskbb/utils/helpers.py:132
 msgid "You do not have the permissions to delete these topics."
-msgstr ""
+msgstr "Ви не маєте прав на видалення цих тем."
 
 #: flaskbb/utils/helpers.py:144
 msgid "You do not have the permissions to hide these topics."
-msgstr ""
+msgstr "Ви не маєте прав, щоб приховати ці теми."
 
 #: flaskbb/utils/helpers.py:158
 msgid "You do not have the permissions to unhide these topics."
-msgstr ""
+msgstr "Ви не маєте прав, щоб показати ці теми."
 
 #: flaskbb/utils/helpers.py:798
 msgid "The registration has been disabled."
-msgstr ""
+msgstr "Реєстрацію відключено."
 
 #: flaskbb/utils/helpers.py:810
 msgid "This account is already activated."
-msgstr ""
+msgstr "Цей обліковий запис уже активовано."
