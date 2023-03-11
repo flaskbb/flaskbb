@@ -286,8 +286,9 @@ class DeleteUser(MethodView):
 
     def post(self, user_id=None):
         # ajax request
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
@@ -432,8 +433,9 @@ class BanUser(MethodView):
             return redirect(url_for("management.overview"))
 
         # ajax request
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
@@ -505,8 +507,9 @@ class UnbanUser(MethodView):
             return redirect(url_for("management.overview"))
 
         # ajax request
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
@@ -652,8 +655,9 @@ class DeleteGroup(MethodView):
     ]
 
     def post(self, group_id=None):
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
@@ -1002,8 +1006,9 @@ class MarkReportRead(MethodView):
     def post(self, report_id=None):
 
         # AJAX request
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
@@ -1077,8 +1082,9 @@ class DeleteReport(MethodView):
     ]
 
     def post(self, report_id=None):
-        if request.get_json() is not None:
-            ids = request.get_json().get("ids")
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
             if not ids:
                 return jsonify(
                     message="No ids provided.",
