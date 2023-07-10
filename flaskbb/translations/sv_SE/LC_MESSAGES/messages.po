@@ -10,15 +10,17 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2018-05-03 10:17+0000\n"
-"Last-Translator: Peter Justin\n"
-"Language-Team: Swedish (Sweden) (http://www.transifex.com/flaskbb/flaskbb/language/sv_SE/)\n"
+"PO-Revision-Date: 2023-07-11 05:48+0000\n"
+"Last-Translator: Luna Jernberg <droidbittin@gmail.com>\n"
+"Language-Team: Swedish <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"sv/>\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.0-dev\n"
 "Generated-By: Babel 2.5.3\n"
-"Language: sv_SE\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
@@ -155,7 +157,7 @@ msgstr "Utloggad"
 
 #: flaskbb/auth/views.py:80
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "Oåterställbart fel vid hantering av inloggning"
 
 #: flaskbb/auth/views.py:107
 msgid "Reauthenticated."
@@ -163,11 +165,11 @@ msgstr "Behörighet bekräftad."
 
 #: flaskbb/auth/views.py:112
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "Oåterställbart fel vid hantering av omautentisering"
 
 #: flaskbb/auth/views.py:161
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "Kunde inte behandla registreringen på grund av ett oåterställbart fel"
 
 #: flaskbb/auth/views.py:196
 msgid ""
@@ -181,7 +183,7 @@ msgstr "Vi har skickat dig ett brev."
 
 #: flaskbb/auth/views.py:237
 msgid "Error when resetting password"
-msgstr ""
+msgstr "Fel vid återställning av lösenord"
 
 #: flaskbb/auth/views.py:248
 msgid "Your password has been updated."
@@ -193,25 +195,27 @@ msgstr "Vi har skickat dig en ny aktiveringskod till din e-postadress."
 
 #: flaskbb/auth/views.py:312
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "Kunde inte aktivera kontot på grund av ett oåterställbart fel"
 
 #: flaskbb/auth/views.py:320
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "Ditt konto har aktiverats och du kan nu logga in."
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "Angiven e-postadress existerar inte"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "Kontot är redan aktiverat"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid ""
 "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"Ditt konto är för närvarande låst på grund av för många misslyckade "
+"inloggningsförsök"
 
 #: flaskbb/auth/services/authentication.py:127
 msgid ""
@@ -225,7 +229,7 @@ msgstr "Felaktigt användarnamn eller lösenord."
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "Ogiltig e-postadress"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
@@ -234,34 +238,34 @@ msgstr "Fel lösenord."
 #: flaskbb/auth/services/registration.py:50
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "Användarnamn måste vara mellan %(min)s och %(max)s tecken långt"
 
 #: flaskbb/auth/services/registration.py:61
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s är ett förbjudet användarnamn"
 
 #: flaskbb/auth/services/registration.py:83
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s är redan registrerat"
 
 #: flaskbb/auth/services/registration.py:105
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s är redan registrerad"
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "Token är ogiltig"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "Token har löpt ut"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "Token kan inte bearbetas"
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
@@ -708,7 +712,7 @@ msgstr "Det finns redan en grupp av typen \"gäst\"."
 
 #: flaskbb/management/forms.py:303
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "Kan inte tilldela några behörigheter till den här gruppen."
 
 #: flaskbb/management/forms.py:341
 msgid "Forum title"
@@ -991,7 +995,7 @@ msgstr "Tillägget %(plugin)s aktiverad. Vänligen starta om FlaskBB nu."
 #: flaskbb/management/views.py:980
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "Tillägg %(plugin)s är redan inaktiverat."
 
 #: flaskbb/management/views.py:988
 #, python-format
@@ -1005,7 +1009,7 @@ msgstr "Tillägget är nu avinstallerat."
 #: flaskbb/management/views.py:1017
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
-msgstr ""
+msgstr "Kan inte installera tillägg. Aktivera %(plugin)s tillägg först."
 
 #: flaskbb/management/views.py:1025
 msgid "Plugin has been installed."
@@ -1099,7 +1103,7 @@ msgstr "Begär kontoaktivering"
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Kära %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
