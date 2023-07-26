@@ -102,7 +102,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             try:
                 plugin = ep.load()
             except DistributionNotFound:
-                logger.warn("Could not load plugin {}. Passing."
+                logger.warning("Could not load plugin {}. Passing."
                             .format(ep.name))
                 continue
             except VersionConflict as e:
