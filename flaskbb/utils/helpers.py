@@ -467,7 +467,7 @@ def _format_html_time_tag(datetime, what_to_display):
 
     return Markup(
         '<time datetime="{}" data-what_to_display="{}">{}</time>'.format(
-            isoformat, what_to_display, content, content
+            isoformat, what_to_display, content
         )
     )
 
