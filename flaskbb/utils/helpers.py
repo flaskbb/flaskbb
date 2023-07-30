@@ -539,7 +539,7 @@ def get_image_info(url):
     """
 
     try:
-        r = requests.get(url, stream=True)
+        r = requests.get(url, timeout=(3.05, 27), stream=True)
     except requests.ConnectionError:
         return None
 
