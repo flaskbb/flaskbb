@@ -467,7 +467,7 @@ def _format_html_time_tag(datetime, what_to_display):
 
     return Markup(
         '<time datetime="{}" data-what_to_display="{}">{}</time>'.format(
-            isoformat, what_to_display, content, content
+            isoformat, what_to_display, content
         )
     )
 
@@ -539,7 +539,7 @@ def get_image_info(url):
     """
 
     try:
-        r = requests.get(url, stream=True)
+        r = requests.get(url, timeout=(3.05, 27), stream=True)
     except requests.ConnectionError:
         return None
 

@@ -8,7 +8,7 @@ URL = 'https://unicode.org/Public/emoji/{}/emoji-test.txt'.format(sys.argv[1])
 
 
 def get_annotations():
-    resp = requests.get(URL)
+    resp = requests.get(URL, timeout=(3.05, 27))
     resp.raise_for_status()
     for line in resp.text.split('\n'):
         match = re.match('(.+?); fully-qualified +?# .+? (.+)', line)
