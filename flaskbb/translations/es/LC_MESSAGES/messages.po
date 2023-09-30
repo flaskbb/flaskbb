@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-05-03 12:13+0200\n"
-"PO-Revision-Date: 2022-12-29 14:49+0000\n"
-"Last-Translator: gallegonovato <fran-carro@hotmail.es>\n"
+"PO-Revision-Date: 2023-10-01 23:59+0000\n"
+"Last-Translator: Pedro L P Sanchez <plpsanchez@gmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "es/>\n"
 "Language: es\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15.1-dev\n"
+"X-Generator: Weblate 5.1-dev\n"
 "Generated-By: Babel 2.5.3\n"
 
 #: flaskbb/email.py:31
@@ -506,7 +506,7 @@ msgstr "Publicación mostrada de nuvo"
 
 #: flaskbb/management/forms.py:66 flaskbb/user/forms.py:85
 msgid "Birthday"
-msgstr "Cumpleaños"
+msgstr "Fecha de nacimiento"
 
 #: flaskbb/management/forms.py:69 flaskbb/user/forms.py:88
 msgid "Gender"
@@ -851,7 +851,7 @@ msgstr "No tienes permisos para inhabilitar a este usuario."
 #: flaskbb/templates/management/banned_users.html:95
 #: flaskbb/templates/management/users.html:121
 msgid "Unban"
-msgstr "Habilitar"
+msgstr "Rehabilitar"
 
 #: flaskbb/management/views.py:404
 msgid "A moderator cannot ban an admin user."
@@ -1501,7 +1501,7 @@ msgstr "Seguir tema"
 
 #: flaskbb/templates/forum/topictracker.html:117
 msgid "Untrack Topics"
-msgstr "Dejar de seguir tema"
+msgstr "Dejar de seguir los temas"
 
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:21
