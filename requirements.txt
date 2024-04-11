@@ -31,7 +31,7 @@ flask-whooshee==0.8.2
 Flask-WTF==1.0.1
 flaskbb-plugin-conversations==1.1.1
 flaskbb-plugin-portal==1.2.0
-greenlet==1.1.2
+greenlet==3.0.3
 idna==3.3
 itsdangerous==2.1.2
 Jinja2==3.1.2

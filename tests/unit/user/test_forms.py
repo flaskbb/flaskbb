@@ -132,7 +132,7 @@ class TestChangeUserDetailsForm(object):
         data = MultiDict(
             dict(
                 submit=True,
-                birthday="25 06 2000",
+                birthday="2000-06-25",
                 gender="awesome",
                 location="here",
                 website="http://flaskbb.org",
@@ -172,7 +172,7 @@ class TestChangeUserDetailsForm(object):
     def test_valid_inputs(self, formdata):
         data = dict(
             submit=True,
-            birthday="25 06 2000",
+            birthday="2000-06-25",
             gender="awesome",
             location="here",
             website="http://flaskbb.org",

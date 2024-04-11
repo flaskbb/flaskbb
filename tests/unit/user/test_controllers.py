@@ -277,7 +277,7 @@ class TestChangeUserDetailsView(object):
 
     def test_update_user_details_successfully_updates(self, user, mocker):
         form = self.produce_form(
-            birthday="25 04 2000",
+            birthday="2000-04-25",
             gender="awesome",
             location="here",
             website="http://web.site",
@@ -290,6 +290,9 @@ class TestChangeUserDetailsView(object):
 
         result = view.post()
         flashed = get_flashed_messages(with_categories=True)
+        if form.errors:
+            print("form had errors")
+            print(form.errors)
 
         assert flashed == [("success", "User details updated.")]
         assert result.status_code == 302
@@ -317,7 +320,7 @@ class TestChangeUserDetailsView(object):
         assert form.errors == {"birthday": ["Not a valid date value."]}
 
     def test_update_user_fails_with_stopvalidation(self, mocker):
-        form = self.produce_form(birthday="25 04 2000")
+        form = self.produce_form(birthday="2000-04-25")
         handler = mocker.Mock(spec=ChangeSetHandler)
         handler.apply_changeset.side_effect = StopValidation(
             [("birthday", "I just want you to know that's a great birthday")]
@@ -331,7 +334,7 @@ class TestChangeUserDetailsView(object):
         }
 
     def test_update_user_fails_with_persistence_error(self, mocker):
-        form = self.produce_form(birthday="25 04 2000")
+        form = self.produce_form(birthday="2000-4-25")
         handler = mocker.Mock(spec=ChangeSetHandler)
         handler.apply_changeset.side_effect = PersistenceError("no")
         view = ChangeUserDetails(form=form, details_update_handler=handler)
