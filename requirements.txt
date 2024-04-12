@@ -12,7 +12,7 @@ click-didyoumean==0.3.0
 click-log==0.4.0
 click-plugins==1.1.1
 click-repl==0.2.0
-dnspython==2.2.1
+dnspython==2.6.1
 email-validator==1.2.1
 Flask==2.1.2
 Flask-Alembic==2.0.1
