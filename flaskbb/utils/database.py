@@ -9,9 +9,9 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
+from flask_sqlalchemy.query import Query
 import pytz
 from flask_login import current_user
-from flask_sqlalchemy import BaseQuery
 from sqlalchemy.orm import declarative_mixin, declared_attr
 from flaskbb.extensions import db
 from ..core.exceptions import PersistenceError
@@ -81,7 +81,7 @@ class UTCDateTime(db.TypeDecorator):
         return value
 
 
-class HideableQuery(BaseQuery):
+class HideableQuery(Query):
     _with_hidden = False
 
     def __new__(cls, *args, **kwargs):

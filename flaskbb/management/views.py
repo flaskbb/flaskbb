@@ -153,7 +153,7 @@ class ManageUsers(MethodView):
         form = self.form()
 
         users = User.query.order_by(User.id.asc()).paginate(
-            page, flaskbb_config['USERS_PER_PAGE'], False
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
 
         return render_template(
@@ -165,14 +165,15 @@ class ManageUsers(MethodView):
         form = self.form()
 
         if form.validate():
-            users = form.get_results().\
-                paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+            users = form.get_results().paginate(
+                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            )
             return render_template(
                 'management/users.html', users=users, search_form=form
             )
 
         users = User.query.order_by(User.id.asc()).paginate(
-            page, flaskbb_config['USERS_PER_PAGE'], False
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
 
         return render_template(
@@ -379,7 +380,9 @@ class BannedUsers(MethodView):
 
         users = User.query.filter(
             Group.banned == True, Group.id == User.primary_group_id
-        ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+        ).paginate(
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        )
 
         return render_template(
             'management/banned_users.html',
@@ -393,11 +396,14 @@ class BannedUsers(MethodView):
 
         users = User.query.filter(
             Group.banned == True, Group.id == User.primary_group_id
-        ).paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+        ).paginate(
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        )
 
         if search_form.validate():
-            users = search_form.get_results().\
-                paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+            users = search_form.get_results().paginate(
+                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            )
 
             return render_template(
                 'management/banned_users.html',
@@ -564,9 +570,9 @@ class Groups(MethodView):
 
         page = request.args.get("page", 1, type=int)
 
-        groups = Group.query.\
-            order_by(Group.id.asc()).\
-            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+        groups = Group.query.order_by(Group.id.asc()).paginate(
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        )
 
         return render_template("management/groups.html", groups=groups)
 
@@ -962,9 +968,9 @@ class Reports(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        reports = Report.query.\
-            order_by(Report.id.asc()).\
-            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+        reports = Report.query.order_by(Report.id.asc()).paginate(
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        )
 
         return render_template("management/reports.html", reports=reports)
 
@@ -983,10 +989,13 @@ class UnreadReports(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        reports = Report.query.\
-            filter(Report.zapped == None).\
-            order_by(Report.id.desc()).\
-            paginate(page, flaskbb_config['USERS_PER_PAGE'], False)
+        reports = (
+            Report.query.filter(Report.zapped == None)
+            .order_by(Report.id.desc())
+            .paginate(
+                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            )
+        )
 
         return render_template("management/reports.html", reports=reports)
 

@@ -42,14 +42,10 @@ def current_category():
 
 def _get_item(model, view_arg, name):
     if (
-        has_request_context() and
-        not getattr(_request_ctx_stack.top, name, None) and
-        view_arg in request.view_args
+        has_request_context()
+        and not getattr(g, name, None)
+        and view_arg in request.view_args
     ):
-        setattr(
-            _request_ctx_stack.top,
-            name,
-            model.query.filter_by(id=request.view_args[view_arg]).first()
-        )
+        setattr(g, name, model.query.filter_by(id=request.view_args[view_arg]).first())
 
-    return getattr(_request_ctx_stack.top, name, None)
+    return getattr(g, name, None)

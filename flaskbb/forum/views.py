@@ -195,15 +195,13 @@ class ViewTopic(MethodView):
         topic.update_read(real(current_user), topic.forum, forumsread)
 
         # fetch the posts in the topic
-        posts = Post.query.outerjoin(
-            User, Post.user_id == User.id
-        ).filter(
-            Post.topic_id == topic.id
-        ).add_entity(
-            User
-        ).order_by(
-            Post.id.asc()
-        ).paginate(page, flaskbb_config["POSTS_PER_PAGE"], False)
+        posts = (
+            Post.query.outerjoin(User, Post.user_id == User.id)
+            .filter(Post.topic_id == topic.id)
+            .add_entity(User)
+            .order_by(Post.id.asc())
+            .paginate(page=page, per_page=flaskbb_config["POSTS_PER_PAGE"])
+        )
 
         # Abort if there are no posts on this page
         if len(posts.items) == 0:
@@ -639,7 +637,7 @@ class MemberList(MethodView):
             sort_obj = User.username
 
         users = User.query.order_by(order_func(sort_obj)).paginate(
-            page, flaskbb_config["USERS_PER_PAGE"], False
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
         return render_template(
             "forum/memberlist.html", users=users, search_form=self.form()
@@ -665,18 +663,16 @@ class MemberList(MethodView):
         form = self.form()
         if form.validate():
             users = form.get_results().paginate(
-                page, flaskbb_config["USERS_PER_PAGE"], False
+                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
             )
             return render_template(
                 "forum/memberlist.html", users=users, search_form=form
             )
 
         users = User.query.order_by(order_func(sort_obj)).paginate(
-            page, flaskbb_config["USERS_PER_PAGE"], False
+            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
-        return render_template(
-            "forum/memberlist.html", users=users, search_form=form
-        )
+        return render_template("forum/memberlist.html", users=users, search_form=form)
 
 
 class TopicTracker(MethodView):
@@ -684,26 +680,32 @@ class TopicTracker(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        topics = real(current_user).tracked_topics.\
-            outerjoin(
+        topics = (
+            real(current_user)
+            .tracked_topics.outerjoin(
                 TopicsRead,
                 db.and_(
                     TopicsRead.topic_id == Topic.id,
-                    TopicsRead.user_id == real(current_user).id
-                )).\
-            outerjoin(Post, Topic.last_post_id == Post.id).\
-            outerjoin(Forum, Topic.forum_id == Forum.id).\
-            outerjoin(
+                    TopicsRead.user_id == real(current_user).id,
+                ),
+            )
+            .outerjoin(Post, Topic.last_post_id == Post.id)
+            .outerjoin(Forum, Topic.forum_id == Forum.id)
+            .outerjoin(
                 ForumsRead,
                 db.and_(
                     ForumsRead.forum_id == Forum.id,
-                    ForumsRead.user_id == real(current_user).id
-                )).\
-            add_entity(Post).\
-            add_entity(TopicsRead).\
-            add_entity(ForumsRead).\
-            order_by(Topic.last_updated.desc()).\
-            paginate(page, flaskbb_config["TOPICS_PER_PAGE"], True)
+                    ForumsRead.user_id == real(current_user).id,
+                ),
+            )
+            .add_entity(Post)
+            .add_entity(TopicsRead)
+            .add_entity(ForumsRead)
+            .order_by(Topic.last_updated.desc())
+            .paginate(
+                page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=True
+            )
+        )
 
         return render_template("forum/topictracker.html", topics=topics)
 

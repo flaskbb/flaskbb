@@ -11,7 +11,6 @@
 import logging
 
 import mistune
-from mistune.plugins import plugin_strikethrough, plugin_url
 from flask import url_for
 from markupsafe import Markup
 from pluggy import HookimplMarker
@@ -38,7 +37,20 @@ def plugin_userify(md):
     md.inline.rules.append('flaskbb_user_link')
 
 
-DEFAULT_PLUGINS = [plugin_url, plugin_strikethrough, plugin_userify]
+DEFAULT_PLUGINS = [
+    "url",
+    "strikethrough",
+    "spoiler",
+    "subscript",
+    "superscript",
+    "insert",
+    "mark",
+    "abbr",
+    "def_list",
+    "task_lists",
+    "table",
+    "footnotes",
+]
 
 
 class FlaskBBRenderer(mistune.HTMLRenderer):
@@ -47,17 +59,16 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
     def __init__(self, **kwargs):
         super(FlaskBBRenderer, self).__init__(**kwargs)
 
-    def block_code(self, code, lang=None):
-        if lang:
+    def block_code(self, code, info=None):
+        if info:
             try:
-                lexer = get_lexer_by_name(lang, stripall=True)
+                lexer = get_lexer_by_name(info, stripall=True)
             except ClassNotFound:
                 lexer = None
         else:
             lexer = None
         if not lexer:
-            return '\n<pre><code>%s</code></pre>\n' % \
-                mistune.escape(code)
+            return "\n<pre><code>%s</code></pre>\n" % mistune.escape(code)
         formatter = HtmlFormatter()
         return highlight(code, lexer, formatter)
 

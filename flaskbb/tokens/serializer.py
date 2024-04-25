@@ -7,14 +7,14 @@
     :license: BSD, see LICENSE for more details
 """
 
-from datetime import datetime, timedelta
+import datetime
 
 import jwt
 
 from ..core import tokens
 
 
-_DEFAULT_EXPIRY = timedelta(hours=1)
+_DEFAULT_EXPIRY = datetime.timedelta(hours=1)
 
 
 class FlaskBBTokenSerializer(tokens.TokenSerializer):
@@ -39,9 +39,9 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         self.secret_key = secret_key
         self.algorithm = "HS256"
 
-        if isinstance(expiry, timedelta):
-            self.expiry = datetime.utcnow() + expiry
-        elif isinstance(expiry, datetime):
+        if isinstance(expiry, datetime.timedelta):
+            self.expiry = datetime.datetime.now(datetime.UTC) + expiry
+        elif isinstance(expiry, datetime.datetime):
             self.expiry = expiry
         else:
             raise TypeError("'expiry' must be of type timedelta or datetime")

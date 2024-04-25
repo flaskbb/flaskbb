@@ -19,7 +19,7 @@ from datetime import datetime
 import click
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from flask_alembic import alembic_click
+from flask_alembic.cli import cli as alembic_click
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy_utils.functions import database_exists
 from werkzeug.utils import import_string

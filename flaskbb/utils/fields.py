@@ -12,9 +12,10 @@
 """
 import logging
 import urllib
+from urllib.parse import urlencode
+import json
 
-from flask import request, current_app, json
-from werkzeug.urls import url_encode
+from flask import request, current_app
 from markupsafe import Markup
 from wtforms import ValidationError
 from wtforms.fields import Field
@@ -75,11 +76,9 @@ class RecaptchaValidator(object):
         except KeyError:
             raise RuntimeError("No RECAPTCHA_PRIVATE_KEY config set")
 
-        data = url_encode({
-            'secret': private_key,
-            'remoteip': remote_addr,
-            'response': response
-        })
+        data = urlencode(
+            {"secret": private_key, "remoteip": remote_addr, "response": response}
+        )
 
         http_response = urllib.request.urlopen(RECAPTCHA_VERIFY_SERVER, to_bytes(data))
 
@@ -107,7 +106,7 @@ class RecaptchaWidget(object):
         params = current_app.config.get('RECAPTCHA_PARAMETERS')
         script = RECAPTCHA_SCRIPT
         if params:
-            script += u'?' + url_encode(params)
+            script += "?" + urlencode(params)
 
         attrs = current_app.config.get('RECAPTCHA_DATA_ATTRS', {})
         attrs['sitekey'] = public_key

@@ -300,12 +300,17 @@ class User(db.Model, UserMixin, CRUDMixin):
         :rtype: flask_sqlalchemy.Pagination
         """
         group_ids = [g.id for g in viewer.groups]
-        topics = Topic.query.\
-            filter(Topic.user_id == self.id,
-                   Forum.id == Topic.forum_id,
-                   Forum.groups.any(Group.id.in_(group_ids))).\
-            order_by(Topic.id.desc()).\
-            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+        topics = (
+            Topic.query.filter(
+                Topic.user_id == self.id,
+                Forum.id == Topic.forum_id,
+                Forum.groups.any(Group.id.in_(group_ids)),
+            )
+            .order_by(Topic.id.desc())
+            .paginate(
+                page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
+            )
+        )
         return topics
 
     def all_posts(self, page, viewer):
@@ -317,13 +322,18 @@ class User(db.Model, UserMixin, CRUDMixin):
         :rtype: flask_sqlalchemy.Pagination
         """
         group_ids = [g.id for g in viewer.groups]
-        posts = Post.query.\
-            filter(Post.user_id == self.id,
-                   Post.topic_id == Topic.id,
-                   Topic.forum_id == Forum.id,
-                   Forum.groups.any(Group.id.in_(group_ids))).\
-            order_by(Post.id.desc()).\
-            paginate(page, flaskbb_config['TOPICS_PER_PAGE'], False)
+        posts = (
+            Post.query.filter(
+                Post.user_id == self.id,
+                Post.topic_id == Topic.id,
+                Topic.forum_id == Forum.id,
+                Forum.groups.any(Group.id.in_(group_ids)),
+            )
+            .order_by(Post.id.desc())
+            .paginate(
+                page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=False
+            )
+        )
         return posts
 
     def track_topic(self, topic):
