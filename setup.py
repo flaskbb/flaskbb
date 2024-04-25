@@ -77,5 +77,5 @@ tests_require = ["py", "pytest", "pytest-cov", "cov-core", "coverage"]
 setup(
     install_requires=install_requires,
     extras_require=extras_require,
-    tests_require=tests_require
+    tests_require=tests_require,
 )

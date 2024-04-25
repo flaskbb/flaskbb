@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.plugins
-    ~~~~~~~~~~~~~~~~~~~~
+flaskbb.user.plugins
+~~~~~~~~~~~~~~~~~~~~
 
-    Plugin implementations for the FlaskBB user module.
+Plugin implementations for the FlaskBB user module.
 
-    :copyright: (c) 2018 the FlaskBB Team
-    :license: BSD, see LICENSE for details
+:copyright: (c) 2018 the FlaskBB Team
+:license: BSD, see LICENSE for details
 """
 
 from itertools import chain

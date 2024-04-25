@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.auth.password
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Interfaces and services for auth services
-    related to password.
+flaskbb.core.auth.password
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Interfaces and services for auth services
+related to password.
 
-    :copyright: (c) 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 from abc import ABC, abstractmethod
 
 

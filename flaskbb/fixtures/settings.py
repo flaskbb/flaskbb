@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.fixtures.settings
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.fixtures.settings
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    The fixtures module for our settings.
+The fixtures module for our settings.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 from flaskbb.utils.forms import SettingValueType
 from flaskbb.utils.helpers import get_available_languages as available_languages
 from flaskbb.utils.helpers import get_available_themes as available_themes

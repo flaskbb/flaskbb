@@ -1,12 +1,12 @@
 #  -*- coding: utf-8 -*-
 """
-    flaskbb.auth.services
-    ~~~~~~~~~~~~~~~~~~~~~
+flaskbb.auth.services
+~~~~~~~~~~~~~~~~~~~~~
 
-    Implementation of services found in flaskbb.core.auth.services
+Implementation of services found in flaskbb.core.auth.services
 
-    :copyright: (c) 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
 
 from datetime import datetime
@@ -49,6 +49,7 @@ class UsernameRequirements(object):
     Configuration for username requirements, minimum and maximum length
     and disallowed names.
     """
+
     min = attr.ib()
     max = attr.ib()
     blacklist = attr.ib()
@@ -65,9 +66,7 @@ class UsernameValidator(UserValidator):
 
     def validate(self, user_info):
         if not (
-            self._requirements.min
-            <= len(user_info.username)
-            <= self._requirements.max
+            self._requirements.min <= len(user_info.username) <= self._requirements.max
         ):
             raise ValidationError(
                 "username",
@@ -176,7 +175,7 @@ class AutoActivateUserPostProcessor(RegistrationPostProcessor):
         self.config = config
 
     def post_process(self, user):
-        if not self.config['ACTIVATE_ACCOUNT']:
+        if not self.config["ACTIVATE_ACCOUNT"]:
             user.activated = True
             self.db.session.commit()
 

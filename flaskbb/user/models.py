@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.models
-    ~~~~~~~~~~~~~~~~~~~
+flaskbb.user.models
+~~~~~~~~~~~~~~~~~~~
 
-    This module provides the models for the user.
+This module provides the models for the user.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 from flask import url_for
@@ -26,13 +27,19 @@ logger = logging.getLogger(__name__)
 
 
 groups_users = db.Table(
-    'groups_users',
-    db.Column('user_id', db.Integer,
-              db.ForeignKey('users.id', ondelete="CASCADE"),
-              nullable=False),
-    db.Column('group_id', db.Integer,
-              db.ForeignKey('groups.id', ondelete="CASCADE"),
-              nullable=False)
+    "groups_users",
+    db.Column(
+        "user_id",
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    db.Column(
+        "group_id",
+        db.Integer,
+        db.ForeignKey("groups.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
 )
 
 
@@ -73,9 +80,11 @@ class Group(db.Model, CRUDMixin):
 
     @classmethod
     def selectable_groups_choices(cls):
-        return Group.query.order_by(Group.name.asc()).with_entities(
-            Group.id, Group.name
-        ).all()
+        return (
+            Group.query.order_by(Group.name.asc())
+            .with_entities(Group.id, Group.name)
+            .all()
+        )
 
     @classmethod
     def get_guest_group(cls):
@@ -85,9 +94,13 @@ class Group(db.Model, CRUDMixin):
     def get_member_group(cls):
         """Returns the first member group."""
         # This feels ugly..
-        return cls.query.filter(cls.admin == False, cls.super_mod == False,
-                                cls.mod == False, cls.guest == False,
-                                cls.banned == False).first()
+        return cls.query.filter(
+            cls.admin == False,
+            cls.super_mod == False,
+            cls.mod == False,
+            cls.guest == False,
+            cls.banned == False,
+        ).first()
 
 
 class User(db.Model, UserMixin, CRUDMixin):
@@ -96,11 +109,11 @@ class User(db.Model, UserMixin, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(200), unique=True, nullable=False)
     email = db.Column(db.String(200), unique=True, nullable=False)
-    _password = db.Column('password', db.String(120), nullable=False)
-    date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
-                            nullable=False)
-    lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
-                         nullable=True)
+    _password = db.Column("password", db.String(120), nullable=False)
+    date_joined = db.Column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
+    lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow, nullable=True)
     birthday = db.Column(db.DateTime, nullable=True)
     gender = db.Column(db.String(10), nullable=True)
     website = db.Column(db.String(200), nullable=True)
@@ -118,21 +131,14 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     post_count = db.Column(db.Integer, default=0)
 
-    primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'),
-                                 nullable=False)
+    primary_group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
 
     posts = db.relationship(
-        "Post",
-        backref="user",
-        primaryjoin="User.id == Post.user_id",
-        lazy="dynamic"
+        "Post", backref="user", primaryjoin="User.id == Post.user_id", lazy="dynamic"
     )
 
     topics = db.relationship(
-        "Topic",
-        backref="user",
-        primaryjoin="User.id == Topic.user_id",
-        lazy="dynamic"
+        "Topic", backref="user", primaryjoin="User.id == Topic.user_id", lazy="dynamic"
     )
 
     primary_group = db.relationship(
@@ -140,7 +146,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         backref="user_group",
         uselist=False,
         lazy="joined",
-        foreign_keys=[primary_group_id]
+        foreign_keys=[primary_group_id],
     )
 
     secondary_groups = db.relationship(
@@ -148,7 +154,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         secondary=groups_users,
         primaryjoin=(groups_users.c.user_id == id),
         backref=db.backref("users", lazy="dynamic"),
-        lazy="dynamic"
+        lazy="dynamic",
     )
 
     tracked_topics = db.relationship(
@@ -157,7 +163,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         primaryjoin=(topictracker.c.user_id == id),
         backref=db.backref("topicstracked", lazy="dynamic"),
         lazy="dynamic",
-        single_parent=True
+        single_parent=True,
     )
 
     # Properties
@@ -178,8 +184,11 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def last_post(self):
         """Returns the latest post from the user."""
-        return Post.query.filter(Post.user_id == self.id).\
-            order_by(Post.date_created.desc()).first()
+        return (
+            Post.query.filter(Post.user_id == self.id)
+            .order_by(Post.date_created.desc())
+            .first()
+        )
 
     @property
     def url(self):
@@ -217,9 +226,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def topics_per_day(self):
         """Returns the topics per day count."""
-        return round(
-            (float(self.topic_count) / float(self.days_registered)), 1
-        )
+        return round((float(self.topic_count) / float(self.days_registered)), 1)
 
     # Methods
     def __repr__(self):
@@ -239,9 +246,9 @@ class User(db.Model, UserMixin, CRUDMixin):
         self._password = generate_password_hash(password)
 
     # Hide password encryption by exposing password field only.
-    password = db.synonym('_password',
-                          descriptor=property(_get_password,
-                                              _set_password))
+    password = db.synonym(
+        "_password", descriptor=property(_get_password, _set_password)
+    )
 
     def check_password(self, password):
         """Check passwords. If passwords match it returns true, else false."""
@@ -261,8 +268,9 @@ class User(db.Model, UserMixin, CRUDMixin):
         :param login: This can be either a username or a email address.
         :param password: The password that is connected to username and email.
         """
-        user = cls.query.filter(db.or_(User.username == login,
-                                       User.email == login)).first()
+        user = cls.query.filter(
+            db.or_(User.username == login, User.email == login)
+        ).first()
 
         if user is not None:
             if user.check_password(password):
@@ -360,8 +368,9 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param topic: The topic which should be checked.
         """
-        return self.tracked_topics.filter(
-            topictracker.c.topic_id == topic.id).count() > 0
+        return (
+            self.tracked_topics.filter(topictracker.c.topic_id == topic.id).count() > 0
+        )
 
     def add_to_group(self, group):
         """Adds the user to the `group` if he isn't in it.
@@ -386,8 +395,10 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param group: The group which should be checked.
         """
-        return self.secondary_groups.filter(
-            groups_users.c.group_id == group.id).count() > 0
+        return (
+            self.secondary_groups.filter(groups_users.c.group_id == group.id).count()
+            > 0
+        )
 
     @cache.memoize()
     def get_groups(self):
@@ -401,7 +412,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             exclude = set(exclude)
         else:
             exclude = set()
-        exclude.update(['id', 'name', 'description'])
+        exclude.update(["id", "name", "description"])
 
         perms = {}
         # Get the Guest group
@@ -418,10 +429,8 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def ban(self):
         """Bans the user. Returns True upon success."""
-        if not self.get_permissions()['banned']:
-            banned_group = Group.query.filter(
-                Group.banned == True
-            ).first()
+        if not self.get_permissions()["banned"]:
+            banned_group = Group.query.filter(Group.banned == True).first()
 
             self.primary_group = banned_group
             self.save()
@@ -431,13 +440,13 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
-        if self.get_permissions()['banned']:
+        if self.get_permissions()["banned"]:
             member_group = Group.query.filter(
                 Group.admin == False,
                 Group.super_mod == False,
                 Group.mod == False,
                 Group.guest == False,
-                Group.banned == False
+                Group.banned == False,
             ).first()
 
             self.primary_group = member_group
@@ -500,7 +509,7 @@ class Guest(AnonymousUserMixin):
             exclude = set(exclude)
         else:
             exclude = set()
-        exclude.update(['id', 'name', 'description'])
+        exclude.update(["id", "name", "description"])
 
         perms = {}
         # Get the Guest group

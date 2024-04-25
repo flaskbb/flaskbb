@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.settings
-    ~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.settings
+~~~~~~~~~~~~~~~~~~~~~~
 
-    This module contains the interface for interacting with FlaskBB's
-    configuration.
+This module contains the interface for interacting with FlaskBB's
+configuration.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 from collections.abc import MutableMapping
 

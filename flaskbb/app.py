@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.app
-    ~~~~~~~~~~~
+flaskbb.app
+~~~~~~~~~~~
 
-    manages the app creation and configuration process
+manages the app creation and configuration process
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 import logging.config
 import os
@@ -23,32 +24,71 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 # extensions
-from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, debugtoolbar, limiter, login_manager, mail,
-                                redis_store, themes, whooshee)
+from flaskbb.extensions import (
+    alembic,
+    allows,
+    babel,
+    cache,
+    celery,
+    csrf,
+    db,
+    debugtoolbar,
+    limiter,
+    login_manager,
+    mail,
+    redis_store,
+    themes,
+    whooshee,
+)
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+
 # models
 from flaskbb.user.models import Guest, User
+
 # various helpers
-from flaskbb.utils.helpers import (app_config_from_env, crop_title,
-                                   format_date, format_time, format_datetime,
-                                   forum_is_unread, get_alembic_locations,
-                                   get_flaskbb_config, is_online, mark_online,
-                                   render_template, time_since, time_utcnow,
-                                   topic_is_unread)
+from flaskbb.utils.helpers import (
+    app_config_from_env,
+    crop_title,
+    format_date,
+    format_datetime,
+    format_time,
+    forum_is_unread,
+    get_alembic_locations,
+    get_flaskbb_config,
+    is_online,
+    mark_online,
+    render_template,
+    time_since,
+    time_utcnow,
+    topic_is_unread,
+)
+
 # permission checks (here they are used for the jinja filters)
-from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
-                                        IsAtleastModerator, can_delete_topic,
-                                        can_edit_post, can_moderate,
-                                        can_post_reply, can_post_topic,
-                                        has_permission,
-                                        permission_with_identity)
+from flaskbb.utils.requirements import (
+    CanBanUser,
+    CanEditUser,
+    IsAdmin,
+    IsAtleastModerator,
+    can_delete_topic,
+    can_edit_post,
+    can_moderate,
+    can_post_reply,
+    can_post_topic,
+    has_permission,
+    permission_with_identity,
+)
+
 # whooshees
-from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
-                                  TopicWhoosheer, UserWhoosheer)
+from flaskbb.utils.search import (
+    ForumWhoosheer,
+    PostWhoosheer,
+    TopicWhoosheer,
+    UserWhoosheer,
+)
+
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
@@ -60,7 +100,6 @@ from .display.navigation import NavigationContentType
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
 from .user import views as user_views  # noqa
-
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +121,7 @@ def create_app(config=None, instance_path=None):
                    config named ``flaskbb.cfg`` from the instance path.
     """
 
-    app = Flask(
-        "flaskbb", instance_path=instance_path, instance_relative_config=True
-    )
+    app = Flask("flaskbb", instance_path=instance_path, instance_relative_config=True)
 
     # instance folders are not automatically created by flask
     if not os.path.exists(app.instance_path):
@@ -131,7 +168,7 @@ def configure_app(app, config):
     app_config_from_env(app, prefix="FLASKBB_")
 
     # Migrate Celery 4.x config to Celery 6.x
-    old_celery_config = app.config.get_namespace('CELERY_')
+    old_celery_config = app.config.get_namespace("CELERY_")
     celery_config = {}
     for key, value in old_celery_config.items():
         # config is the new format
@@ -289,8 +326,7 @@ def configure_template_filters(app):
     ]
 
     filters.update(
-        (name, permission_with_identity(perm, name=name))
-        for name, perm in permissions
+        (name, permission_with_identity(perm, name=name)) for name, perm in permissions
     )
 
     filters["can_moderate"] = can_moderate
@@ -385,11 +421,7 @@ def configure_translations(app):
     @babel.localeselector
     def get_locale():
         # if a user is logged in, use the locale from the user settings
-        if (
-            current_user
-            and current_user.is_authenticated
-            and current_user.language
-        ):
+        if current_user and current_user.is_authenticated and current_user.language:
             return current_user.language
         # otherwise we will just fallback to the default language
         return flaskbb_config["DEFAULT_LANGUAGE"]
@@ -432,9 +464,7 @@ def configure_default_logging(app):
 def configure_mail_logs(app, formatter):
     from logging.handlers import SMTPHandler
 
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s %(levelname)-7s %(name)-25s %(message)s")
     mail_handler = SMTPHandler(
         app.config["MAIL_SERVER"],
         app.config["MAIL_DEFAULT_SENDER"],
@@ -457,9 +487,7 @@ def load_plugins(app):
     # we are not interested in duplicated plugins or invalid ones
     # ('None' - appears on py2) and thus using a set
     flaskbb_modules = set(
-        module
-        for name, module in sys.modules.items()
-        if name.startswith("flaskbb")
+        module for name, module in sys.modules.items() if name.startswith("flaskbb")
     )
     for module in flaskbb_modules:
         app.pluggy.register(module, internal=True)
@@ -506,9 +534,7 @@ def load_plugins(app):
     # we need a copy of it because of
     # RuntimeError: dictionary changed size during iteration
     tasks = celery.tasks.copy()
-    disabled_plugins = [
-        p.__package__ for p in app.pluggy.get_disabled_plugins()
-    ]
+    disabled_plugins = [p.__package__ for p in app.pluggy.get_disabled_plugins()]
     for task_name, task in tasks.items():
         if task.__module__.split(".")[0] in disabled_plugins:
             logger.debug("Unregistering task: '{}'".format(task))

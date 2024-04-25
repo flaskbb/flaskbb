@@ -1,15 +1,15 @@
 # -*- utf-8 -*-
 """
-    flaskbb.tokens.verifiers
-    ~~~~~~~~~~~~~~~~~~~~~~~~
-    Token verifier implementations
+flaskbb.tokens.verifiers
+~~~~~~~~~~~~~~~~~~~~~~~~
+Token verifier implementations
 
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
-from ..core.tokens import TokenVerifier
 from ..core.exceptions import ValidationError
+from ..core.tokens import TokenVerifier
 
 
 class EmailMatchesUserToken(TokenVerifier):
@@ -19,6 +19,7 @@ class EmailMatchesUserToken(TokenVerifier):
 
     :param User: User model for querying against
     """
+
     def __init__(self, users):
         self.users = users
 

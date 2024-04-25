@@ -1,6 +1,7 @@
 import pytest
-from flaskbb.plugins.manager import FlaskBBPluginManager
+
 from flaskbb.plugins import spec
+from flaskbb.plugins.manager import FlaskBBPluginManager
 
 
 @pytest.fixture

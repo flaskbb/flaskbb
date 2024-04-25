@@ -1,10 +1,11 @@
 from flask import current_app
+
+from flaskbb.email import send_activation_token, send_reset_token
 from flaskbb.extensions import mail
-from flaskbb.email import send_reset_token, send_activation_token
 
 
 def test_send_reset_token_to_user(default_settings, user):
-    """ Deliver a contact email. """
+    """Deliver a contact email."""
 
     with current_app.test_request_context():
         with mail.record_messages() as outbox:
@@ -17,7 +18,7 @@ def test_send_reset_token_to_user(default_settings, user):
 
 
 def test_send_activation_token_to_user(default_settings, user):
-    """ Deliver a contact email. """
+    """Deliver a contact email."""
 
     with current_app.test_request_context():
         with mail.record_messages() as outbox:

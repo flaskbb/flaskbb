@@ -1,10 +1,10 @@
 # -*- coding: utf -*-
 """
-    flaskbb.tokens.serializer
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.tokens.serializer
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
 
 import datetime
@@ -12,7 +12,6 @@ import datetime
 import jwt
 
 from ..core import tokens
-
 
 _DEFAULT_EXPIRY = datetime.timedelta(hours=1)
 

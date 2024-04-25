@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.plugins.utils
-    ~~~~~~~~~~~~~~~~~~~~~
+flaskbb.plugins.utils
+~~~~~~~~~~~~~~~~~~~~~
 
-    This module provides registration and a basic DB backed key-value
-    store for plugins.
+This module provides registration and a basic DB backed key-value
+store for plugins.
 
-    :copyright: (c) 2017 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2017 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 from flask import current_app, flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
@@ -60,9 +61,7 @@ def remove_zombie_plugins_from_db():
     Returns the names of the deleted plugins.
     """
     d_fs_plugins = [p[0] for p in current_app.pluggy.list_disabled_plugins()]
-    d_db_plugins = [
-        p.name for p in PluginRegistry.query.filter_by(enabled=False).all()
-    ]  # noqa
+    d_db_plugins = [p.name for p in PluginRegistry.query.filter_by(enabled=False).all()]  # noqa
 
     plugin_names = [p.name for p in PluginRegistry.query.all()]
 

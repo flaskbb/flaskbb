@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.forms
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.auth.forms
+~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the auth views.
+It provides the forms that are needed for the auth views.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 from flask_babelplus import lazy_gettext as _
@@ -42,9 +43,7 @@ class LoginForm(FlaskBBForm):
     login = StringField(
         _("Username or Email address"),
         validators=[
-            DataRequired(
-                message=_("Please enter your username or email address.")
-            )
+            DataRequired(message=_("Please enter your username or email address."))
         ],
     )
 
@@ -173,8 +172,6 @@ class RequestActivationForm(FlaskBBForm):
 class AccountActivationForm(FlaskBBForm):
     token = StringField(
         _("Email confirmation token"),
-        validators=[
-            DataRequired(_("Please enter the token we have sent to you."))
-        ],
+        validators=[DataRequired(_("Please enter the token we have sent to you."))],
     )
     submit = SubmitField(_("Confirm Email"))

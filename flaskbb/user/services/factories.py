@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.services.factories
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Factory functions for the various FlaskBB user services.
+flaskbb.user.services.factories
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Factory functions for the various FlaskBB user services.
 
-    These factories are provisional and considered private APIs.
+These factories are provisional and considered private APIs.
 
-    :copyright: 2018, the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: 2018, the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
 
 from itertools import chain

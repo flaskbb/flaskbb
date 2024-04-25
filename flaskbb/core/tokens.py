@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.auth.tokens
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.auth.tokens
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module provides ways of interacting
-    with tokens in FlaskBB
+This module provides ways of interacting
+with tokens in FlaskBB
 
-    :copyright: (c) 2014-2018 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 from abc import ABC, abstractmethod
 
 import attr
@@ -37,7 +38,7 @@ class TokenError(BaseFlaskBBError):
         due to being signed incorrectly, has been tampered with,
         is unparsable or contains an inappropriate action.
         """
-        return cls(_('Token is invalid'))
+        return cls(_("Token is invalid"))
 
     @classmethod
     def expired(cls):
@@ -45,14 +46,14 @@ class TokenError(BaseFlaskBBError):
         Used to raise an exception about a token that has expired and is
         no longer usable.
         """
-        return cls(_('Token is expired'))
+        return cls(_("Token is expired"))
 
     # in theory this would never be raised
     # but it's provided for a generic catchall
     # when processing goes horribly wrong
     @classmethod  # pragma: no cover
     def bad(cls):
-        return cls(_('Token cannot be processed'))
+        return cls(_("Token cannot be processed"))
 
 
 # holder for token actions
@@ -67,8 +68,9 @@ class TokenActions:
         to the ones implemented by FlaskBB itself and block extension of
         tokens by plugins.
     """
-    RESET_PASSWORD = 'reset_password'
-    ACTIVATE_ACCOUNT = 'activate_account'
+
+    RESET_PASSWORD = "reset_password"
+    ACTIVATE_ACCOUNT = "activate_account"
 
 
 @attr.s(frozen=True, eq=True, order=True, hash=True)
@@ -78,14 +80,13 @@ class Token(object):
     :param str operation: An operation taken from
         :class:`TokenActions<flaskbb.core.tokens.TokenActions>`
     """
+
     user_id = attr.ib()
     operation = attr.ib()
 
 
 class TokenSerializer(ABC):
-    """
-
-    """
+    """ """
 
     @abstractmethod
     def dumps(self, token):

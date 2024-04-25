@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.database
-    ~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.database
+~~~~~~~~~~~~~~~~~~~~~~
 
-    Some database helpers such as a CRUD mixin.
+Some database helpers such as a CRUD mixin.
 
-    :copyright: (c) 2015 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2015 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
-from flask_sqlalchemy.query import Query
+
 import pytz
 from flask_login import current_user
+from flask_sqlalchemy.query import Query
 from sqlalchemy.orm import declarative_mixin, declared_attr
-from flaskbb.extensions import db
-from ..core.exceptions import PersistenceError
 
+from flaskbb.extensions import db
+
+from ..core.exceptions import PersistenceError
 
 logger = logging.getLogger(__name__)
 
@@ -111,9 +114,7 @@ class HideableQuery(Query):
 
     def get(self, *args, **kwargs):
         obj = self.with_hidden()._get(*args, **kwargs)
-        return (
-            obj if obj is None or self._with_hidden or not obj.hidden else None
-        )
+        return obj if obj is None or self._with_hidden or not obj.hidden else None
 
 
 @declarative_mixin
@@ -127,17 +128,13 @@ class HideableMixin(object):
     def hidden_by_id(cls):  # noqa: B902
         return db.Column(
             db.Integer,
-            db.ForeignKey(
-                "users.id", name="fk_{}_hidden_by".format(cls.__name__)
-            ),
+            db.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),
             nullable=True,
         )
 
     @declared_attr
     def hidden_by(cls):  # noqa: B902
-        return db.relationship(
-            "User", uselist=False, foreign_keys=[cls.hidden_by_id]
-        )
+        return db.relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
 
     def hide(self, user, *args, **kwargs):
         from flaskbb.utils.helpers import time_utcnow

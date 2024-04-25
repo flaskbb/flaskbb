@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.extensions
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.extensions
+~~~~~~~~~~~~~~~~~~
 
-    The extensions that are used by FlaskBB.
+The extensions that are used by FlaskBB.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
-from celery import Celery
-from sqlalchemy import MetaData
 
+from celery import Celery
 from flask_alembic import Alembic
 from flask_allows import Allows
 from flask_babelplus import Babel
@@ -25,9 +24,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
 from flask_whooshee import Whooshee
 from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import MetaData
 
 from flaskbb.exceptions import AuthorizationRequired
-
 
 # Permissions Manager
 allows = Allows(throws=AuthorizationRequired)

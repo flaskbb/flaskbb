@@ -1,12 +1,13 @@
 """
-    flaskbb.utils.requirements
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.requirements
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Authorization requirements for FlaskBB.
+Authorization requirements for FlaskBB.
 
-    :copyright: (c) 2015 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2015 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 import logging
 
 from flask_allows import And, Or, Permission, Requirement
@@ -19,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class Has(Requirement):
-
     def __init__(self, permission):
         self.permission = permission
 
@@ -31,23 +31,20 @@ class Has(Requirement):
 
 
 class IsAuthed(Requirement):
-
     def fulfill(self, user):
         return user.is_authenticated
 
 
 class IsModeratorInForum(IsAuthed):
-
     def __init__(self, forum=None, forum_id=None):
         self.forum_id = forum_id
         self.forum = forum
 
     def fulfill(self, user):
         moderators = self._get_forum_moderators()
-        return (
-            super(IsModeratorInForum, self).fulfill(user)
-            and self._user_is_forum_moderator(user, moderators)
-        )
+        return super(IsModeratorInForum, self).fulfill(
+            user
+        ) and self._user_is_forum_moderator(user, moderators)
 
     def _user_is_forum_moderator(self, user, moderators):
         return user in moderators
@@ -72,14 +69,12 @@ class IsModeratorInForum(IsAuthed):
 
 
 class IsSameUser(IsAuthed):
-
     def __init__(self, topic_or_post=None):
         self._topic_or_post = topic_or_post
 
     def fulfill(self, user):
         return (
-            super(IsSameUser, self).fulfill(user)
-            and user.id == self._determine_user()
+            super(IsSameUser, self).fulfill(user) and user.id == self._determine_user()
         )
 
     def _determine_user(self):
@@ -97,7 +92,6 @@ class IsSameUser(IsAuthed):
 
 
 class TopicNotLocked(Requirement):
-
     def __init__(self, topic=None, topic_id=None, post_id=None, post=None):
         self._topic = topic
         self._topic_id = topic_id
@@ -122,11 +116,10 @@ class TopicNotLocked(Requirement):
             return self._post.topic.locked, self._post.topic.forum.locked
         elif self._topic_id is not None:
             return (
-                Topic.query.join(Forum, Forum.id == Topic.forum_id).filter(
-                    Topic.id == self._topic_id
-                ).with_entities(
-                    Topic.locked, Forum.locked
-                ).first()
+                Topic.query.join(Forum, Forum.id == Topic.forum_id)
+                .filter(Topic.id == self._topic_id)
+                .with_entities(Topic.locked, Forum.locked)
+                .first()
             )
         else:
             return self._get_topic_from_request()
@@ -139,7 +132,6 @@ class TopicNotLocked(Requirement):
 
 
 class ForumNotLocked(Requirement):
-
     def __init__(self, forum=None, forum_id=None):
         self._forum = forum
         self._forum_id = forum_id
@@ -166,7 +158,6 @@ class ForumNotLocked(Requirement):
 
 
 class CanAccessForum(Requirement):
-
     def fulfill(self, user):
         if not current_forum:
             raise FlaskBBError("Could not load forum data")
@@ -241,7 +232,6 @@ def permission_with_identity(requirement, name=None):
 
 
 def has_permission(permission):
-
     def _(user):
         return Permission(Has(permission), identity=user)
 

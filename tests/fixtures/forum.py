@@ -1,9 +1,10 @@
 """Fixtures for the forum models."""
+
 import datetime
+
 import pytest
 
-from flaskbb.forum.models import Forum, Category, Topic, Post, ForumsRead, \
-    TopicsRead
+from flaskbb.forum.models import Category, Forum, ForumsRead, Post, Topic, TopicsRead
 
 
 @pytest.fixture

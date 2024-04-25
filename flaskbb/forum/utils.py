@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.forum.utils
-    ~~~~~~~~~~~~~~~~~~~
+flaskbb.forum.utils
+~~~~~~~~~~~~~~~~~~~
 
-    Utilities specific to the FlaskBB forums module
+Utilities specific to the FlaskBB forums module
 
-    :copyright: (c) 2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 from flask import current_app

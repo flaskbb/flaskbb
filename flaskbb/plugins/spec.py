@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.plugins.spec
-    ~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.plugins.spec
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module provides the core FlaskBB plugin hook definitions
+This module provides the core FlaskBB plugin hook definitions
 
-    :copyright: (c) 2017 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2017 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 from pluggy import HookspecMarker

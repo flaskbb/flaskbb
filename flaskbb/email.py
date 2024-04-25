@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.email
-    ~~~~~~~~~~~~~
+flaskbb.email
+~~~~~~~~~~~~~
 
-    This module adds the functionality to send emails
+This module adds the functionality to send emails
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
+
 from flask import render_template
-from flask_mail import Message
 from flask_babelplus import lazy_gettext as _
+from flask_mail import Message
 
-from flaskbb.extensions import mail, celery
-
+from flaskbb.extensions import celery, mail
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +32,11 @@ def send_reset_token(token, username, email):
         subject=_("Password Recovery Confirmation"),
         recipients=[email],
         text_body=render_template(
-            "email/reset_password.txt",
-            username=username,
-            token=token
+            "email/reset_password.txt", username=username, token=token
         ),
         html_body=render_template(
-            "email/reset_password.html",
-            username=username,
-            token=token
-        )
+            "email/reset_password.html", username=username, token=token
+        ),
     )
 
 
@@ -55,15 +52,11 @@ def send_activation_token(token, username, email):
         subject=_("Account Activation"),
         recipients=[email],
         text_body=render_template(
-            "email/activate_account.txt",
-            username=username,
-            token=token
+            "email/activate_account.txt", username=username, token=token
         ),
         html_body=render_template(
-            "email/activate_account.html",
-            username=username,
-            token=token
-        )
+            "email/activate_account.html", username=username, token=token
+        ),
     )
 
 

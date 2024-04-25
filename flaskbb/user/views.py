@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.views
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.user.views
+~~~~~~~~~~~~~~~~~~
 
-    The user view handles the user profile
-    and the user settings from a signed in user.
+The user view handles the user profile
+and the user settings from a signed in user.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 import attr
@@ -151,7 +152,6 @@ class ChangeUserDetails(MethodView):
         return self.render()
 
     def post(self):
-
         if self.form.validate_on_submit():
             try:
                 self.details_update_handler.apply_changeset(

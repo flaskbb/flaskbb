@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.exceptions
-    ~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.exceptions
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    Exceptions raised by flaskbb.core,
-    forms the root of all exceptions in
-    FlaskBB.
+Exceptions raised by flaskbb.core,
+forms the root of all exceptions in
+FlaskBB.
 
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 

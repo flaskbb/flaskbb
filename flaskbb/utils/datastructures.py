@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.datastructures
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.datastructures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    A few helpers that are used by flaskbb
+A few helpers that are used by flaskbb
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 

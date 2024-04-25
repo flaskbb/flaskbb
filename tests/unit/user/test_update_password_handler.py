@@ -4,8 +4,7 @@ import pytest
 from pluggy import HookimplMarker
 
 from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
-from flaskbb.core.exceptions import (PersistenceError, StopValidation,
-                                     ValidationError)
+from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
 from flaskbb.core.user.update import PasswordUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultPasswordUpdateHandler
@@ -28,14 +27,10 @@ class TestDefaultPasswordUpdateHandler(object):
 
         with pytest.raises(StopValidation) as excinfo:
             handler.apply_changeset(user, password_change)
-        assert excinfo.value.reasons == [
-            ("new_password", "Don't use that password")
-        ]
+        assert excinfo.value.reasons == [("new_password", "Don't use that password")]
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_raises_persistence_error_if_save_fails(
-        self, mocker, user, plugin_manager
-    ):
+    def test_raises_persistence_error_if_save_fails(self, mocker, user, plugin_manager):
         password_change = PasswordUpdate(str(uuid4()), str(uuid4()))
         db = mocker.Mock()
         db.session.commit.side_effect = Exception("no")
@@ -51,9 +46,7 @@ class TestDefaultPasswordUpdateHandler(object):
         assert "Could not update password" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_password(
-        self, user, database, plugin_manager, mocker
-    ):
+    def test_actually_updates_password(self, user, database, plugin_manager, mocker):
         new_password = str(uuid4())
         password_change = PasswordUpdate("test", new_password)
         hook_impl = mocker.MagicMock(spec=ChangeSetPostProcessor)

@@ -5,7 +5,7 @@ from flaskbb.core.tokens import Token, TokenActions
 from flaskbb.tokens import verifiers
 from flaskbb.user.models import User
 
-pytestmark = pytest.mark.usefixtures('default_settings')
+pytestmark = pytest.mark.usefixtures("default_settings")
 
 
 def test_raises_if_email_doesnt_match_token_user(Fred):

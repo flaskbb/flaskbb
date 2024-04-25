@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.forum.forms
-    ~~~~~~~~~~~~~~~~~~~
+flaskbb.forum.forms
+~~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the forum views.
+It provides the forms that are needed for the forum views.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 from flask import current_app
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, SelectMultipleField, StringField,
-                     SubmitField, TextAreaField)
+from wtforms import (
+    BooleanField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import DataRequired, Length, Optional
 
 from flaskbb.forum.models import Forum, Post, Report, Topic
@@ -66,18 +72,14 @@ class ReplyForm(PostForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_post_save(
-            form=self, post=self.post
-        )
+        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=self.post)
         return self.post.save(user=user, topic=topic)
 
 
 class TopicForm(FlaskForm):
     title = StringField(
         _("Topic title"),
-        validators=[
-            DataRequired(message=_("Please choose a title for your topic."))
-        ],
+        validators=[DataRequired(message=_("Please choose a title for your topic."))],
     )
 
     content = TextAreaField(
@@ -110,7 +112,6 @@ class NewTopicForm(TopicForm):
 
 
 class EditTopicForm(TopicForm):
-
     submit = SubmitField(_("Save topic"))
 
     def __init__(self, *args, **kwargs):
@@ -141,9 +142,7 @@ class EditTopicForm(TopicForm):
         self.topic.first_post.date_modified = time_utcnow()
         self.topic.first_post.modified_by = user.username
 
-        current_app.pluggy.hook.flaskbb_form_topic_save(
-            form=self, topic=self.topic
-        )
+        current_app.pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
         return self.topic.save(user=user, forum=forum)
 
 
@@ -151,9 +150,7 @@ class ReportForm(FlaskForm):
     reason = TextAreaField(
         _("Reason"),
         validators=[
-            DataRequired(
-                message=_("What is the reason for reporting this post?")
-            )
+            DataRequired(message=_("What is the reason for reporting this post?"))
         ],
     )
 

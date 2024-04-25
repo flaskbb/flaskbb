@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.helpers
-    ~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.helpers
+~~~~~~~~~~~~~~~~~~~~~
 
-    A few helpers that are used by flaskbb
+A few helpers that are used by flaskbb
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import ast
 import itertools
 import logging
@@ -25,8 +26,8 @@ import unidecode
 from babel.core import get_locale_identifier
 from babel.dates import format_date as babel_format_date
 from babel.dates import format_datetime as babel_format_datetime
-from babel.dates import format_timedelta as babel_format_timedelta
 from babel.dates import format_time as babel_format_time
+from babel.dates import format_timedelta as babel_format_timedelta
 from flask import current_app, flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
@@ -41,7 +42,6 @@ from werkzeug.utils import ImportStringError, import_string
 from flaskbb.extensions import babel, redis_store
 from flaskbb.utils.http import is_safe_url
 from flaskbb.utils.settings import flaskbb_config
-
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ def to_unicode(input_bytes, encoding="utf-8"):
     return input_bytes
 
 
-def slugify(text, delim=u"-"):
+def slugify(text, delim="-"):
     """Generates an slightly worse ASCII-only slug.
      Taken from the Flask Snippets page.
 
@@ -127,9 +127,9 @@ def do_topic_action(topics, user, action, reverse):  # noqa: C901
         return False
 
     from flaskbb.utils.requirements import (
-        IsAtleastModeratorInForum,
         CanDeleteTopic,
         Has,
+        IsAtleastModeratorInForum,
     )
 
     if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
@@ -277,9 +277,7 @@ def forum_is_unread(forum, forumsread, user):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = time_utcnow() - timedelta(
-        days=flaskbb_config["TRACKER_LENGTH"]
-    )
+    read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if TRACKER_LENGTH is set to 0
     if flaskbb_config["TRACKER_LENGTH"] == 0:
@@ -329,9 +327,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     if not user.is_authenticated:
         return False
 
-    read_cutoff = time_utcnow() - timedelta(
-        days=flaskbb_config["TRACKER_LENGTH"]
-    )
+    read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
     # disable tracker if read_cutoff is set to 0
     if flaskbb_config["TRACKER_LENGTH"] == 0:
@@ -395,9 +391,7 @@ def get_online_users(guest=False):  # pragma: no cover
             ["online-guests/%d" % (current - x) for x in minutes]
         )
     else:
-        users = redis_store.sunion(
-            ["online-users/%d" % (current - x) for x in minutes]
-        )
+        users = redis_store.sunion(["online-users/%d" % (current - x) for x in minutes])
 
     return [to_unicode(u) for u in users]
 
@@ -447,16 +441,15 @@ def _get_user_locale():
         locale = current_user.language
     return locale
 
-#http://babel.pocoo.org/en/latest/api/dates.html#babel.dates.format_time
+
+# http://babel.pocoo.org/en/latest/api/dates.html#babel.dates.format_time
 def _format_html_time_tag(datetime, what_to_display):
     if what_to_display == "date-only":
         content = babel_format_date(datetime, locale=_get_user_locale())
     elif what_to_display == "time-only":
         content = babel_format_time(datetime, format="short", locale=_get_user_locale())
     elif what_to_display == "date-and-time":
-        content = babel_format_datetime(
-            datetime, tzinfo=UTC, locale=_get_user_locale()
-        )
+        content = babel_format_datetime(datetime, tzinfo=UTC, locale=_get_user_locale())
         # While this could be done with a format string, that would
         # hinder internationalization and honestly why bother.
         content += " UTC"
@@ -524,7 +517,7 @@ def format_quote(username, content):
     """
     profile_url = url_for("user.profile", username=username)
     content = "\n> ".join(content.strip().split("\n"))
-    quote = u"**[{username}]({profile_url}) wrote:**\n> {content}\n".format(
+    quote = "**[{username}]({profile_url}) wrote:**\n> {content}\n".format(
         username=username, profile_url=profile_url, content=content
     )
 
@@ -700,13 +693,15 @@ def get_flaskbb_config(app, config_file):
             return config_file
 
         # config is a file
+        # -> check if it exists in the instance folder
         if os.path.exists(os.path.join(app.instance_path, config_file)):
             return os.path.join(app.instance_path, config_file)
 
+        # -> check if its an absolute path
         if os.path.exists(os.path.abspath(config_file)):
             return os.path.join(os.path.abspath(config_file))
 
-        # conifg is an importable string
+        # config is an importable string
         try:
             return import_string(config_file)
         except ImportStringError:
@@ -715,9 +710,7 @@ def get_flaskbb_config(app, config_file):
         # this would be so much nicer and cleaner if we wouldn't
         # support the root/project dir.
         # this walks back to flaskbb/ from flaskbb/flaskbb/cli/main.py
-        project_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(__file__))
-        )
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         project_config = os.path.join(project_dir, "flaskbb.cfg")
 
         # instance config doesn't exist

@@ -19,7 +19,6 @@ pytestmark = pytest.mark.usefixtures("default_settings")
 
 
 class RaisingValidator(UserValidator):
-
     def validate(self, user_info):
         raise ValidationError("username", "nope")
 
@@ -33,9 +32,7 @@ class TestRegistrationService(object):
         group=4,
     )
 
-    def test_raises_stop_validation_if_validators_fail(
-        self, plugin_manager, database
-    ):
+    def test_raises_stop_validation_if_validators_fail(self, plugin_manager, database):
         service = self._get_service(plugin_manager, database)
         plugin_manager.register(self.impls(validator=RaisingValidator()))
 
@@ -58,9 +55,7 @@ class TestRegistrationService(object):
 
         failure.assert_called_once_with(self.fred, excinfo.value.reasons)
 
-    def test_registers_user_if_everything_is_good(
-        self, database, plugin_manager
-    ):
+    def test_registers_user_if_everything_is_good(self, database, plugin_manager):
         service = self._get_service(plugin_manager, database)
 
         service.register(self.fred)
@@ -106,9 +101,7 @@ class TestRegistrationService(object):
             if failure is not None:
 
                 @impl
-                def flaskbb_registration_failure_handler(
-                    self, user_info, failures
-                ):
+                def flaskbb_registration_failure_handler(self, user_info, failures):
                     failure(user_info, failures)
 
             if post_process is not None:

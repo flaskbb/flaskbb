@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.populate
-    ~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.populate
+~~~~~~~~~~~~~~~~~~~~~~
 
-    A module that makes creating data more easily
+A module that makes creating data more easily
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 from __future__ import unicode_literals
 
 import collections
 import logging
 import os
 
+from alembic.util.exc import CommandError
 from flask import current_app
 from sqlalchemy_utils.functions import create_database, database_exists
-from alembic.util.exc import CommandError
 
 from flaskbb.extensions import alembic, db
 from flaskbb.forum.models import Category, Forum, Post, Topic
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import Group, User
-
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ def create_settings_from_fixture(fixture):
         group = SettingsGroup(
             key=settingsgroup[0],
             name=settingsgroup[1]["name"],
-            description=settingsgroup[1]["description"]
+            description=settingsgroup[1]["description"],
         )
         group.save()
         created_settings[group] = []
@@ -73,9 +73,8 @@ def create_settings_from_fixture(fixture):
                 value_type=settings[1]["value_type"],
                 name=settings[1]["name"],
                 description=settings[1]["description"],
-                extra=settings[1].get("extra", ""),     # Optional field
-
-                settingsgroup=group.key
+                extra=settings[1].get("extra", ""),  # Optional field
+                settingsgroup=group.key,
             )
             if setting:
                 setting.save()
@@ -84,8 +83,9 @@ def create_settings_from_fixture(fixture):
     return created_settings
 
 
-def update_settings_from_fixture(fixture, overwrite_group=False,
-                                 overwrite_setting=False):
+def update_settings_from_fixture(
+    fixture, overwrite_group=False, overwrite_setting=False
+):
     """Updates the database settings from a fixture.
     Returns the updated groups and settings.
 
@@ -100,11 +100,9 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
     updated_settings = collections.defaultdict(list)
 
     for settingsgroup in fixture:
-
         group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
 
         if (group is not None and overwrite_group) or group is None:
-
             if group is not None:
                 group.name = settingsgroup[1]["name"]
                 group.description = settingsgroup[1]["description"]
@@ -112,13 +110,12 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                 group = SettingsGroup(
                     key=settingsgroup[0],
                     name=settingsgroup[1]["name"],
-                    description=settingsgroup[1]["description"]
+                    description=settingsgroup[1]["description"],
                 )
 
             group.save()
 
         for settings in settingsgroup[1]["settings"]:
-
             setting = Setting.query.filter_by(key=settings[0]).first()
 
             if setting is not None:
@@ -132,9 +129,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                 )
 
             if (
-                setting is not None and
-                overwrite_setting and
-                setting_is_different
+                setting is not None and overwrite_setting and setting_is_different
             ) or setting is None:
                 if setting is not None:
                     setting.value = settings[1]["value"]
@@ -151,7 +146,7 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
                         name=settings[1]["name"],
                         description=settings[1]["description"],
                         extra=settings[1].get("extra", ""),
-                        settingsgroup=group.key
+                        settingsgroup=group.key,
                     )
 
                 setting.save()
@@ -162,12 +157,14 @@ def update_settings_from_fixture(fixture, overwrite_group=False,
 def create_default_settings():
     """Creates the default settings."""
     from flaskbb.fixtures.settings import fixture
+
     create_settings_from_fixture(fixture)
 
 
 def create_default_groups():
     """This will create the 5 default groups."""
     from flaskbb.fixtures.groups import fixture
+
     result = []
     for key, value in fixture.items():
         group = Group(name=key)
@@ -195,8 +192,13 @@ def create_user(username, password, email, groupname):
     else:
         group = Group.query.filter(getattr(Group, groupname) == True).first()
 
-    user = User.create(username=username, password=password, email=email,
-                       primary_group_id=group.id, activated=True)
+    user = User.create(
+        username=username,
+        password=password,
+        email=email,
+        primary_group_id=group.id,
+        activated=True,
+    )
     return user
 
 
@@ -237,8 +239,9 @@ def create_welcome_forum():
     category = Category(title="My Category", position=1)
     category.save()
 
-    forum = Forum(title="Welcome", description="Your first forum",
-                  category_id=category.id)
+    forum = Forum(
+        title="Welcome", description="Your first forum", category_id=category.id
+    )
     forum.save()
 
     topic = Topic(title="Welcome!")
@@ -263,8 +266,7 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
     create_default_groups()
     create_default_settings()
 
-    data_created = {'users': 0, 'categories': 0, 'forums': 0,
-                    'topics': 0, 'posts': 0}
+    data_created = {"users": 0, "categories": 0, "forums": 0, "topics": 0, "posts": 0}
 
     # create 5 users
     for u in range(1, users + 1):
@@ -274,7 +276,7 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
         user.primary_group_id = u
         user.activated = True
         user.save()
-        data_created['users'] += 1
+        data_created["users"] += 1
 
     user1 = User.query.filter_by(id=1).first()
     user2 = User.query.filter_by(id=2).first()
@@ -283,10 +285,9 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
     with db.session.no_autoflush:
         for i in range(1, categories + 1):
             category_title = "Test Category %s" % i
-            category = Category(title=category_title,
-                                description="Test Description")
+            category = Category(title=category_title, description="Test Description")
             category.save()
-            data_created['categories'] += 1
+            data_created["categories"] += 1
 
             # create 2 forums in each category
             for j in range(1, forums + 1):
@@ -294,24 +295,25 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
                     j += 2
 
                 forum_title = "Test Forum %s %s" % (j, i)
-                forum = Forum(title=forum_title, description="Test Description",
-                              category_id=i)
+                forum = Forum(
+                    title=forum_title, description="Test Description", category_id=i
+                )
                 forum.save()
-                data_created['forums'] += 1
+                data_created["forums"] += 1
 
                 for _ in range(1, topics + 1):
                     # create a topic
                     topic = Topic(title="Test Title %s" % j)
                     post = Post(content="Test Content")
                     topic.save(post=post, user=user1, forum=forum)
-                    data_created['topics'] += 1
+                    data_created["topics"] += 1
 
                     for _ in range(1, posts + 1):
                         # create a second post in the forum
                         post = Post(content="Test Post")
-                        #db.session.add_all([post, user2, topic])
+                        # db.session.add_all([post, user2, topic])
                         post.save(user=user2, topic=topic)
-                        data_created['posts'] += 1
+                        data_created["posts"] += 1
 
     return data_created
 
@@ -409,6 +411,8 @@ def run_plugin_migrations(plugins=None):
         try:
             alembic.upgrade(target="{}@head".format(plugin_name))
         except CommandError as exc:
-            logger.debug("Couldn't run migrations for plugin {} because of "
-                         "following exception: ".format(plugin_name),
-                         exc_info=exc)
+            logger.debug(
+                "Couldn't run migrations for plugin {} because of "
+                "following exception: ".format(plugin_name),
+                exc_info=exc,
+            )

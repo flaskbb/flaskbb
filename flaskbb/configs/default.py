@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.configs.default
-    ~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.configs.default
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    This is the default configuration for FlaskBB that every site should have.
-    You can override these configuration variables in another class.
+This is the default configuration for FlaskBB that every site should have.
+You can override these configuration variables in another class.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
+import datetime
 import os
 import sys
-import datetime
 
 
 class DefaultConfig(object):
-
     # Get the app root path
     #            <_basedir>
     # ../../ -->  flaskbb/flaskbb/configs/base.py
-    basedir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(
-                           os.path.dirname(__file__)))))
+    basedir = os.path.join(
+        os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    )
 
     # Python version
-    py_version = '{0.major}{0.minor}'.format(sys.version_info)
+    py_version = "{0.major}{0.minor}".format(sys.version_info)
 
     # Flask Settings
     # ------------------------------
@@ -40,7 +41,7 @@ class DefaultConfig(object):
     # Note that localhost does not support subdomains so setting this to
     # “localhost” does not help.
     # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.org"
-    #SERVER_NAME =
+    # SERVER_NAME =
 
     # The preferred url scheme. In a productive environment it is highly
     # recommended to use 'https'.
@@ -72,69 +73,65 @@ class DefaultConfig(object):
     # If None this defaults to flaskbb/logs
     #
     # If set to a file path, this should be an absolute path
-    LOG_PATH = os.path.join(basedir, 'logs')
+    LOG_PATH = os.path.join(basedir, "logs")
 
     LOG_DEFAULT_CONF = {
-        'version': 1,
-        'disable_existing_loggers': False,
-
-        'formatters': {
-            'standard': {
-                'format': '%(asctime)s %(levelname)-7s %(name)-25s %(message)s'
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
             },
-            'advanced': {
-                'format': '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-            }
+            "advanced": {
+                "format": "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
+            },
         },
-
-        'handlers': {
-            'console': {
-                'level': 'NOTSET',
-                'formatter': 'standard',
-                'class': 'logging.StreamHandler',
+        "handlers": {
+            "console": {
+                "level": "NOTSET",
+                "formatter": "standard",
+                "class": "logging.StreamHandler",
             },
-            'flaskbb': {
-                'level': 'DEBUG',
-                'formatter': 'standard',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': os.path.join(LOG_PATH, 'flaskbb.log'),
-                'mode': 'a',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
+            "flaskbb": {
+                "level": "DEBUG",
+                "formatter": "standard",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": os.path.join(LOG_PATH, "flaskbb.log"),
+                "mode": "a",
+                "maxBytes": 10485760,  # 10MB
+                "backupCount": 5,
             },
-
-            'infolog': {
-                'level': 'INFO',
-                'formatter': 'standard',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': os.path.join(LOG_PATH, 'info.log'),
-                'mode': 'a',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
+            "infolog": {
+                "level": "INFO",
+                "formatter": "standard",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": os.path.join(LOG_PATH, "info.log"),
+                "mode": "a",
+                "maxBytes": 10485760,  # 10MB
+                "backupCount": 5,
             },
-            'errorlog': {
-                'level': 'ERROR',
-                'formatter': 'standard',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': os.path.join(LOG_PATH, 'error.log'),
-                'mode': 'a',
-                'maxBytes': 10485760,  # 10MB
-                'backupCount': 5,
-            }
+            "errorlog": {
+                "level": "ERROR",
+                "formatter": "standard",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": os.path.join(LOG_PATH, "error.log"),
+                "mode": "a",
+                "maxBytes": 10485760,  # 10MB
+                "backupCount": 5,
+            },
         },
-
-        'loggers': {
-            'flask.app': {
-                'handlers': ['infolog', 'errorlog'],
-                'level': 'INFO',
-                'propagate': True
+        "loggers": {
+            "flask.app": {
+                "handlers": ["infolog", "errorlog"],
+                "level": "INFO",
+                "propagate": True,
             },
-            'flaskbb': {
-                'handlers': ['console', 'flaskbb'],
-                'level': 'WARNING',
-                'propagate': True
+            "flaskbb": {
+                "handlers": ["console", "flaskbb"],
+                "level": "WARNING",
+                "propagate": True,
             },
-        }
+        },
     }
 
     # When set to True this will enable the default
@@ -149,12 +146,11 @@ class DefaultConfig(object):
     # Database
     # ------------------------------
     # For MySQL:
-    #SQLALCHEMY_DATABASE_URI="mysql+pymysql://flaskbb:password@localhost:3306/flaskbb"
+    # SQLALCHEMY_DATABASE_URI="mysql+pymysql://flaskbb:password@localhost:3306/flaskbb"
     # For PostgresSQL:
-    #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
+    # SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
     # For SQLite:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + basedir + '/' + \
-                              'flaskbb.sqlite'
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + basedir + "/" + "flaskbb.sqlite"
 
     # This option will be removed as soon as Flask-SQLAlchemy removes it.
     # At the moment it is just used to suppress the super annoying warning
@@ -163,19 +159,17 @@ class DefaultConfig(object):
     SQLALCHEMY_ECHO = False
 
     ALEMBIC = {
-        'script_location': os.path.join(basedir, "flaskbb/migrations"),
-        'version_locations': '',
-        'file_template': '%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s'
+        "script_location": os.path.join(basedir, "flaskbb/migrations"),
+        "version_locations": "",
+        "file_template": "%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s",
     }
-    ALEMBIC_CONTEXT = {
-        'render_as_batch': True
-    }
+    ALEMBIC_CONTEXT = {"render_as_batch": True}
 
     # Security
     # ------------------------------
     # This is the secret key that is used for session signing.
     # You can generate a secure key with os.urandom(24)
-    SECRET_KEY = 'secret key'
+    SECRET_KEY = "secret key"
 
     # You can generate the WTF_CSRF_SECRET_KEY the same way as you have
     # generated the SECRET_KEY. If no WTF_CSRF_SECRET_KEY is provided, it will
@@ -228,7 +222,7 @@ class DefaultConfig(object):
     # Using the redis storage requires the installation of the redis package,
     # which will be installed if you enable REDIS_ENABLE while memcached
     # relies on the pymemcache package.
-    #RATELIMIT_STORAGE_URL = "redis://localhost:6379"
+    # RATELIMIT_STORAGE_URL = "redis://localhost:6379"
 
     # Caching
     # ------------------------------
@@ -236,18 +230,18 @@ class DefaultConfig(object):
     # https://pythonhosted.org/Flask-Caching/#configuring-flask-caching
     CACHE_TYPE = "SimpleCache"
     # For redis:
-    #CACHE_TYPE = "redis"
+    # CACHE_TYPE = "redis"
     CACHE_DEFAULT_TIMEOUT = 60
 
     # Mail
     # ------------------------------
     # Google Mail Example
-    #MAIL_SERVER = "smtp.gmail.com"
-    #MAIL_PORT = 465
-    #MAIL_USE_SSL = True
-    #MAIL_USERNAME = "your_username@gmail.com"
-    #MAIL_PASSWORD = "your_password"
-    #MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
+    # MAIL_SERVER = "smtp.gmail.com"
+    # MAIL_PORT = 465
+    # MAIL_USE_SSL = True
+    # MAIL_USERNAME = "your_username@gmail.com"
+    # MAIL_PASSWORD = "your_password"
+    # MAIL_DEFAULT_SENDER = ("Your Name", "your_username@gmail.com")
 
     # Local SMTP Server
     MAIL_SERVER = "localhost"
@@ -272,9 +266,9 @@ class DefaultConfig(object):
 
     # Celery
     CELERY_CONFIG = {
-        "broker_url": 'redis://localhost:6379',
-        "result_backend": 'redis://localhost:6379',
-        "broker_transport_options": {'max_retries': 1},
+        "broker_url": "redis://localhost:6379",
+        "result_backend": "redis://localhost:6379",
+        "broker_transport_options": {"max_retries": 1},
     }
 
     # FlaskBB Settings
@@ -285,7 +279,6 @@ class DefaultConfig(object):
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
-
 
     # Remove dead plugins - useful if you want to migrate your instance
     # somewhere else and forgot to reinstall the plugins.

@@ -18,9 +18,9 @@ from flaskbb.utils.settings import flaskbb_config
 
 def test_slugify():
     """Test the slugify helper method."""
-    assert slugify(u"Hello world") == u"hello-world"
+    assert slugify("Hello world") == "hello-world"
 
-    assert slugify(u"¿Cómo está?") == u"como-esta"
+    assert slugify("¿Cómo está?") == "como-esta"
 
 
 def test_forum_is_unread(guest, user, forum, topic, forumsread):

@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.translations
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module contains the translation Domain used by FlaskBB.
+This module contains the translation Domain used by FlaskBB.
 
-    :copyright: (c) 2016 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2016 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 import os
 import subprocess
 
 import babel
 from flask import current_app
-
 from flask_babelplus import Domain, get_locale
 from flask_babelplus.utils import get_state
-
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +28,7 @@ class FlaskBBDomain(Domain):
 
         # Plugin translations
         with self.app.app_context():
-            self.plugin_translations = \
-                self.app.pluggy.hook.flaskbb_load_translations()
+            self.plugin_translations = self.app.pluggy.hook.flaskbb_load_translations()
 
     def get_translations(self):
         """Returns the correct gettext translations that should be used for
@@ -51,18 +49,13 @@ class FlaskBBDomain(Domain):
         if translations is None:
             dirname = self.get_translations_path(state.app)
             translations = babel.support.Translations.load(
-                dirname,
-                locale,
-                domain=self.domain
+                dirname, locale, domain=self.domain
             )
             # now load and add the plugin translations
             for plugin in self.plugin_translations:
-                logger.debug("Loading plugin translation from: "
-                             "{}".format(plugin))
+                logger.debug("Loading plugin translation from: " "{}".format(plugin))
                 plugin_translation = babel.support.Translations.load(
-                    dirname=plugin,
-                    locales=locale,
-                    domain="messages"
+                    dirname=plugin, locales=locale, domain="messages"
                 )
 
                 if type(plugin_translation) is not babel.support.NullTranslations:
@@ -82,10 +75,20 @@ def update_translations(include_plugins=False):
     translations_folder = os.path.join(current_app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
-    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", source_file, "."])
-    subprocess.call(["pybabel", "update", "-i", source_file,
-                     "-d", translations_folder])
+    subprocess.call(
+        [
+            "pybabel",
+            "extract",
+            "-F",
+            "babel.cfg",
+            "-k",
+            "lazy_gettext",
+            "-o",
+            source_file,
+            ".",
+        ]
+    )
+    subprocess.call(["pybabel", "update", "-i", source_file, "-d", translations_folder])
 
     if include_plugins:
         for plugin in current_app.pluggy.list_name():
@@ -101,10 +104,31 @@ def add_translations(translation):
     translations_folder = os.path.join(current_app.root_path, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
-    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", source_file, "."])
-    subprocess.call(["pybabel", "init", "-i", source_file,
-                     "-d", translations_folder, "-l", translation])
+    subprocess.call(
+        [
+            "pybabel",
+            "extract",
+            "-F",
+            "babel.cfg",
+            "-k",
+            "lazy_gettext",
+            "-o",
+            source_file,
+            ".",
+        ]
+    )
+    subprocess.call(
+        [
+            "pybabel",
+            "init",
+            "-i",
+            source_file,
+            "-d",
+            translations_folder,
+            "-l",
+            translation,
+        ]
+    )
 
 
 def compile_translations(include_plugins=False):
@@ -132,11 +156,31 @@ def add_plugin_translations(plugin, translation):
     translations_folder = os.path.join(plugin_folder, "translations")
     source_file = os.path.join(translations_folder, "messages.pot")
 
-    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", source_file,
-                     plugin_folder])
-    subprocess.call(["pybabel", "init", "-i", source_file,
-                     "-d", translations_folder, "-l", translation])
+    subprocess.call(
+        [
+            "pybabel",
+            "extract",
+            "-F",
+            "babel.cfg",
+            "-k",
+            "lazy_gettext",
+            "-o",
+            source_file,
+            plugin_folder,
+        ]
+    )
+    subprocess.call(
+        [
+            "pybabel",
+            "init",
+            "-i",
+            source_file,
+            "-d",
+            translations_folder,
+            "-l",
+            translation,
+        ]
+    )
 
 
 def update_plugin_translations(plugin):
@@ -152,11 +196,20 @@ def update_plugin_translations(plugin):
     if not os.path.exists(source_file):
         return False
 
-    subprocess.call(["pybabel", "extract", "-F", "babel.cfg",
-                     "-k", "lazy_gettext", "-o", source_file,
-                     plugin_folder])
-    subprocess.call(["pybabel", "update", "-i", source_file,
-                     "-d", translations_folder])
+    subprocess.call(
+        [
+            "pybabel",
+            "extract",
+            "-F",
+            "babel.cfg",
+            "-k",
+            "lazy_gettext",
+            "-o",
+            source_file,
+            plugin_folder,
+        ]
+    )
+    subprocess.call(["pybabel", "update", "-i", source_file, "-d", translations_folder])
 
 
 def compile_plugin_translations(plugin):

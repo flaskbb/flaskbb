@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.auth.authentication
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+flaskbb.core.auth.authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 from abc import ABC, abstractmethod

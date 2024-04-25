@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.cli.commands
-    ~~~~~~~~~~~~~~~~~~~~
+flaskbb.cli.commands
+~~~~~~~~~~~~~~~~~~~~
 
-    This module contains the main commands.
+This module contains the main commands.
 
-    :copyright: (c) 2016 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2016 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import binascii
 import logging
 import os
@@ -17,6 +18,7 @@ import traceback
 from datetime import datetime
 
 import click
+import flask
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from flask_alembic.cli import cli as alembic_click
@@ -45,7 +47,6 @@ from flaskbb.utils.populate import (
     update_settings_from_fixture,
 )
 from flaskbb.utils.translations import compile_translations
-
 
 logger = logging.getLogger(__name__)
 
@@ -272,8 +273,9 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
             rv = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
         click.secho(
-            "[+] It took {:.2f} seconds to create {} topics and {} "
-            "posts.".format(elapsed, rv[0], rv[1]),
+            "[+] It took {:.2f} seconds to create {} topics and {} " "posts.".format(
+                elapsed, rv[0], rv[1]
+            ),
             fg="cyan",
         )
 
@@ -330,8 +332,7 @@ def upgrade(all_latest, fixture, force):
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
         click.secho(
-            "[+] {settings} settings in {groups} setting groups "
-            "updated.".format(
+            "[+] {settings} settings in {groups} setting groups " "updated.".format(
                 groups=len(count),
                 settings=sum(len(settings) for settings in count.values()),
             ),

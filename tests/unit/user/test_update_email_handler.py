@@ -4,8 +4,7 @@ import pytest
 from pluggy import HookimplMarker
 
 from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
-from flaskbb.core.exceptions import (PersistenceError, StopValidation,
-                                     ValidationError)
+from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
 from flaskbb.core.user.update import EmailUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultEmailUpdateHandler
@@ -36,9 +35,7 @@ class TestDefaultEmailUpdateHandler(object):
         assert excinfo.value.reasons == [("new_email", "That's not even valid")]
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_raises_persistence_error_if_save_fails(
-        self, mocker, user, plugin_manager
-    ):
+    def test_raises_persistence_error_if_save_fails(self, mocker, user, plugin_manager):
         email_change = EmailUpdate(user.email, random_email())
         db = mocker.Mock()
         db.session.commit.side_effect = Exception("no")
@@ -54,9 +51,7 @@ class TestDefaultEmailUpdateHandler(object):
         assert "Could not update email" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_email(
-        self, user, database, mocker, plugin_manager
-    ):
+    def test_actually_updates_email(self, user, database, mocker, plugin_manager):
         new_email = random_email()
         email_change = EmailUpdate("test", new_email)
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)

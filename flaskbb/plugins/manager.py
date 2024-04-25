@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.plugins.manager
-    ~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.plugins.manager
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    Plugin Manager for FlaskBB
+Plugin Manager for FlaskBB
 
-    :copyright: 2017, the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: 2017, the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
+
 import logging
 
 import pluggy
-from pkg_resources import (DistributionNotFound, VersionConflict,
-                           iter_entry_points)
+from pkg_resources import DistributionNotFound, VersionConflict, iter_entry_points
 
 from flaskbb.utils.helpers import parse_pkg_metadata
 
@@ -25,9 +25,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     """
 
     def __init__(self, project_name):
-        super(FlaskBBPluginManager, self).__init__(
-            project_name=project_name
-        )
+        super(FlaskBBPluginManager, self).__init__(project_name=project_name)
         self._plugin_metadata = {}
         self._disabled_plugins = {}
 
@@ -51,9 +49,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Unregister a plugin object and all its contained hook implementations
         from internal data structures.
         """
-        plugin = super(FlaskBBPluginManager, self).unregister(
-            plugin=plugin, name=name
-        )
+        plugin = super(FlaskBBPluginManager, self).unregister(plugin=plugin, name=name)
 
         name = self.get_name(plugin)
         if self._internal_name2plugin.get(name):
@@ -72,11 +68,14 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Return True if the name blockss registering plugins of that name."""
         blocked = super(FlaskBBPluginManager, self).is_blocked(name)
 
-        return blocked or name in self._internal_name2plugin and \
-            self._internal_name2plugin[name] is None
+        return (
+            blocked
+            or name in self._internal_name2plugin
+            and self._internal_name2plugin[name] is None
+        )
 
     def get_plugin(self, name):
-        """Return a plugin or None for the given name. """
+        """Return a plugin or None for the given name."""
         plugin = super(FlaskBBPluginManager, self).get_plugin(name)
         return self._internal_name2plugin.get(name, plugin)
 
@@ -92,9 +91,8 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
     def load_setuptools_entrypoints(self, entrypoint_name):
         """Load modules from querying the specified setuptools entrypoint name.
-        Return the number of loaded plugins. """
-        logger.info("Loading plugins under entrypoint {}"
-                    .format(entrypoint_name))
+        Return the number of loaded plugins."""
+        logger.info("Loading plugins under entrypoint {}".format(entrypoint_name))
         for ep in iter_entry_points(entrypoint_name):
             if self.get_plugin(ep.name):
                 continue
@@ -102,8 +100,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             try:
                 plugin = ep.load()
             except DistributionNotFound:
-                logger.warning("Could not load plugin {}. Passing."
-                            .format(ep.name))
+                logger.warning("Could not load plugin {}. Passing.".format(ep.name))
                 continue
             except VersionConflict as e:
                 raise pluggy.PluginValidationError(
@@ -112,18 +109,18 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
             if self.is_blocked(ep.name):
                 self._disabled_plugins[plugin] = (ep.name, ep.dist)
-                self._plugin_metadata[ep.name] = \
-                    parse_pkg_metadata(ep.dist.key)
+                self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
                 continue
 
             self.register(plugin, name=ep.name)
             self._plugin_distinfo.append((plugin, ep.dist))
             self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
             logger.info("Loaded plugin: {}".format(ep.name))
-        logger.info("Loaded {} plugins for entrypoint {}".format(
-            len(self._plugin_distinfo),
-            entrypoint_name
-        ))
+        logger.info(
+            "Loaded {} plugins for entrypoint {}".format(
+                len(self._plugin_distinfo), entrypoint_name
+            )
+        )
         return len(self._plugin_distinfo)
 
     def get_metadata(self, name):

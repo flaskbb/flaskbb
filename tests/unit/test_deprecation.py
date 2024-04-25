@@ -22,7 +22,6 @@ def default_deprecation():
 
 
 class TestDeprecation(object):
-
     def test_emits_default_deprecation_warning(self, recwarn):
         warnings.simplefilter("default", RemovedInFlaskBB3)
         default_deprecation()

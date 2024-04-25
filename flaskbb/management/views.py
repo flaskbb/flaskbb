@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.management.views
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.management.views
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module handles the management views.
+This module handles the management views.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 import sys
 
 from celery import __version__ as celery_version
+from flask import Blueprint, current_app, flash, jsonify, redirect, request, url_for
 from flask import __version__ as flask_version
-from flask import (Blueprint, current_app, flash, jsonify, redirect, request,
-                   url_for)
 from flask.views import MethodView
 from flask_allows import Not, Permission
 from flask_babelplus import gettext as _
@@ -25,23 +25,39 @@ from flaskbb import __version__ as flaskbb_version
 from flaskbb.extensions import allows, celery, db
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Category, Forum, Post, Report, Topic
-from flaskbb.management.forms import (AddForumForm, AddGroupForm, AddUserForm,
-                                      CategoryForm, EditForumForm,
-                                      EditGroupForm, EditUserForm)
+from flaskbb.management.forms import (
+    AddForumForm,
+    AddGroupForm,
+    AddUserForm,
+    CategoryForm,
+    EditForumForm,
+    EditGroupForm,
+    EditUserForm,
+)
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.plugins.utils import validate_plugin
 from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
-from flaskbb.utils.helpers import (get_online_users, register_view,
-                                   render_template, redirect_or_next,
-                                   time_diff, time_utcnow, FlashAndRedirect)
-from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
-                                        IsAtleastModerator,
-                                        IsAtleastSuperModerator)
+from flaskbb.utils.helpers import (
+    FlashAndRedirect,
+    get_online_users,
+    redirect_or_next,
+    register_view,
+    render_template,
+    time_diff,
+    time_utcnow,
+)
+from flaskbb.utils.requirements import (
+    CanBanUser,
+    CanEditUser,
+    IsAdmin,
+    IsAtleastModerator,
+    IsAtleastSuperModerator,
+)
 from flaskbb.utils.settings import flaskbb_config
 
-impl = HookimplMarker('flaskbb')
+impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
@@ -53,8 +69,8 @@ class ManagementSettings(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access the management settings"),  # noqa
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -64,39 +80,35 @@ class ManagementSettings(MethodView):
             ``form``, ``old_settings``, ``plugin_obj``, ``active_nav``
         """
         # Any ideas how to do this better?
-        slug = slug if slug else 'general'
+        slug = slug if slug else "general"
         active_nav = {}  # used to build the navigation
         plugin_obj = None
         if plugin is not None:
-            plugin_obj = PluginRegistry.query.filter_by(name=plugin
-                                                        ).first_or_404()
+            plugin_obj = PluginRegistry.query.filter_by(name=plugin).first_or_404()
             active_nav.update(
-                {
-                    'key': plugin_obj.name,
-                    'title': plugin_obj.name.title()
-                }
+                {"key": plugin_obj.name, "title": plugin_obj.name.title()}
             )
             form = plugin_obj.get_settings_form()
             old_settings = plugin_obj.settings
 
         elif slug is not None:
             group_obj = SettingsGroup.query.filter_by(key=slug).first_or_404()
-            active_nav.update({'key': group_obj.key, 'title': group_obj.name})
+            active_nav.update({"key": group_obj.key, "title": group_obj.name})
             form = Setting.get_form(group_obj)()
             old_settings = Setting.get_settings(group_obj)
 
         return form, old_settings, plugin_obj, active_nav
 
     def get(self, slug=None, plugin=None):
-        form, old_settings, plugin_obj, active_nav = \
-            self._determine_active_settings(slug, plugin)
+        form, old_settings, plugin_obj, active_nav = self._determine_active_settings(
+            slug, plugin
+        )
 
         # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(db.and_(
-            PluginRegistry.values != None,
-            PluginRegistry.enabled == True
-        )).all()
+        all_plugins = PluginRegistry.query.filter(
+            db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
+        ).all()
         form = populate_settings_form(form, old_settings)
 
         return render_template(
@@ -104,17 +116,17 @@ class ManagementSettings(MethodView):
             form=form,
             all_groups=all_groups,
             all_plugins=all_plugins,
-            active_nav=active_nav
+            active_nav=active_nav,
         )
 
     def post(self, slug=None, plugin=None):
-        form, old_settings, plugin_obj, active_nav = \
-            self._determine_active_settings(slug, plugin)
+        form, old_settings, plugin_obj, active_nav = self._determine_active_settings(
+            slug, plugin
+        )
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(db.and_(
-            PluginRegistry.values != None,
-            PluginRegistry.enabled == True
-        )).all()
+        all_plugins = PluginRegistry.query.filter(
+            db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
+        ).all()
 
         if form.validate_on_submit():
             new_settings = populate_settings_dict(form, old_settings)
@@ -131,7 +143,7 @@ class ManagementSettings(MethodView):
             form=form,
             all_groups=all_groups,
             all_plugins=all_plugins,
-            active_nav=active_nav
+            active_nav=active_nav,
         )
 
 
@@ -142,26 +154,24 @@ class ManageUsers(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = UserSearchForm
 
     def get(self):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         form = self.form()
 
         users = User.query.order_by(User.id.asc()).paginate(
             page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
 
-        return render_template(
-            'management/users.html', users=users, search_form=form
-        )
+        return render_template("management/users.html", users=users, search_form=form)
 
     def post(self):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         form = self.form()
 
         if form.validate():
@@ -169,28 +179,26 @@ class ManageUsers(MethodView):
                 page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
             )
             return render_template(
-                'management/users.html', users=users, search_form=form
+                "management/users.html", users=users, search_form=form
             )
 
         users = User.query.order_by(User.id.asc()).paginate(
             page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
         )
 
-        return render_template(
-            'management/users.html', users=users, search_form=form
-        )
+        return render_template("management/users.html", users=users, search_form=form)
 
 
 class EditUser(MethodView):
     decorators = [
         allows.requires(
-            IsAtleastModerator, CanEditUser,
+            IsAtleastModerator,
+            CanEditUser,
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
-
+                endpoint="management.overview",
+            ),
         )
     ]
     form = EditUserForm
@@ -199,15 +207,13 @@ class EditUser(MethodView):
         user = User.query.filter_by(id=user_id).first_or_404()
         form = self.form(user)
         member_group = db.and_(
-            * [
+            *[
                 db.not_(getattr(Group, p))
-                for p in ['admin', 'mod', 'super_mod', 'banned', 'guest']
+                for p in ["admin", "mod", "super_mod", "banned", "guest"]
             ]
         )
 
-        filt = db.or_(
-            Group.id.in_(g.id for g in current_user.groups), member_group
-        )
+        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
 
         if Permission(IsAtleastSuperModerator, identity=current_user):
             filt = db.or_(filt, Group.mod)
@@ -224,22 +230,20 @@ class EditUser(MethodView):
         form.secondary_groups.query = group_query
 
         return render_template(
-            'management/user_form.html', form=form, title=_('Edit User')
+            "management/user_form.html", form=form, title=_("Edit User")
         )
 
     def post(self, user_id):
         user = User.query.filter_by(id=user_id).first_or_404()
 
         member_group = db.and_(
-            * [
+            *[
                 db.not_(getattr(Group, p))
-                for p in ['admin', 'mod', 'super_mod', 'banned', 'guest']
+                for p in ["admin", "mod", "super_mod", "banned", "guest"]
             ]
         )
 
-        filt = db.or_(
-            Group.id.in_(g.id for g in current_user.groups), member_group
-        )
+        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
 
         if Permission(IsAtleastSuperModerator, identity=current_user):
             filt = db.or_(filt, Group.mod)
@@ -265,11 +269,11 @@ class EditUser(MethodView):
 
             user.save(groups=form.secondary_groups.data)
 
-            flash(_('User updated.'), 'success')
-            return redirect(url_for('management.edit_user', user_id=user.id))
+            flash(_("User updated."), "success")
+            return redirect(url_for("management.edit_user", user_id=user.id))
 
         return render_template(
-            'management/user_form.html', form=form, title=_('Edit User')
+            "management/user_form.html", form=form, title=_("Edit User")
         )
 
 
@@ -280,8 +284,8 @@ class DeleteUser(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -291,11 +295,7 @@ class DeleteUser(MethodView):
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
             data = []
             for user in User.query.filter(User.id.in_(ids)).all():
                 # do not delete current user
@@ -309,7 +309,7 @@ class DeleteUser(MethodView):
                             "type": "delete",
                             "reverse": False,
                             "reverse_name": None,
-                            "reverse_url": None
+                            "reverse_url": None,
                         }
                     )
 
@@ -317,7 +317,7 @@ class DeleteUser(MethodView):
                 message=f"{len(data)} users deleted.",
                 category="success",
                 data=data,
-                status=200
+                status=200,
             )
 
         user = User.query.filter_by(id=user_id).first_or_404()
@@ -338,26 +338,26 @@ class AddUser(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = AddUserForm
 
     def get(self):
         return render_template(
-            'management/user_form.html', form=self.form(), title=_('Add User')
+            "management/user_form.html", form=self.form(), title=_("Add User")
         )
 
     def post(self):
         form = self.form()
         if form.validate_on_submit():
             form.save()
-            flash(_('User added.'), 'success')
-            return redirect(url_for('management.users'))
+            flash(_("User added."), "success")
+            return redirect(url_for("management.users"))
 
         return render_template(
-            'management/user_form.html', form=form, title=_('Add User')
+            "management/user_form.html", form=form, title=_("Add User")
         )
 
 
@@ -368,14 +368,14 @@ class BannedUsers(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = UserSearchForm
 
     def get(self):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         search_form = self.form()
 
         users = User.query.filter(
@@ -385,13 +385,11 @@ class BannedUsers(MethodView):
         )
 
         return render_template(
-            'management/banned_users.html',
-            users=users,
-            search_form=search_form
+            "management/banned_users.html", users=users, search_form=search_form
         )
 
     def post(self):
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get("page", 1, type=int)
         search_form = self.form()
 
         users = User.query.filter(
@@ -406,15 +404,11 @@ class BannedUsers(MethodView):
             )
 
             return render_template(
-                'management/banned_users.html',
-                users=users,
-                search_form=search_form
+                "management/banned_users.html", users=users, search_form=search_form
             )
 
         return render_template(
-            'management/banned_users.html',
-            users=users,
-            search_form=search_form
+            "management/banned_users.html", users=users, search_form=search_form
         )
 
 
@@ -425,17 +419,14 @@ class BanUser(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
     def post(self, user_id=None):
         if not Permission(CanBanUser, identity=current_user):
-            flash(
-                _("You do not have the permissions to ban this user."),
-                "danger"
-            )
+            flash(_("You do not have the permissions to ban this user."), "danger")
             return redirect(url_for("management.overview"))
 
         # ajax request
@@ -443,42 +434,45 @@ class BanUser(MethodView):
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
             users = User.query.filter(User.id.in_(ids)).all()
             for user in users:
                 # don't let a user ban himself and do not allow a moderator
                 # to ban a admin user
-                if (current_user.id == user.id or
-                        Permission(IsAdmin, identity=user) and
-                        Permission(Not(IsAdmin), current_user)):
+                if (
+                    current_user.id == user.id
+                    or Permission(IsAdmin, identity=user)
+                    and Permission(Not(IsAdmin), current_user)
+                ):
                     continue
 
                 elif user.ban():
-                    data.append({
-                        "id": user.id,
-                        "type": "ban",
-                        "reverse": "unban",
-                        "reverse_name": _("Unban"),
-                        "reverse_url": url_for("management.unban_user", user_id=user.id)
-                    })
+                    data.append(
+                        {
+                            "id": user.id,
+                            "type": "ban",
+                            "reverse": "unban",
+                            "reverse_name": _("Unban"),
+                            "reverse_url": url_for(
+                                "management.unban_user", user_id=user.id
+                            ),
+                        }
+                    )
 
             return jsonify(
                 message="{} users banned.".format(len(data)),
                 category="success",
                 data=data,
-                status=200
+                status=200,
             )
 
         user = User.query.filter_by(id=user_id).first_or_404()
         # Do not allow moderators to ban admins
         if Permission(IsAdmin, identity=user) and Permission(
-                Not(IsAdmin), identity=current_user):
+            Not(IsAdmin), identity=current_user
+        ):
             flash(_("A moderator cannot ban an admin user."), "danger")
             return redirect(url_for("management.overview"))
 
@@ -497,19 +491,14 @@ class UnbanUser(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage users"),
                 level="danger",
-                endpoint="management.overview"
-            )
-
+                endpoint="management.overview",
+            ),
         )
     ]
 
     def post(self, user_id=None):
-
         if not Permission(CanBanUser, identity=current_user):
-            flash(
-                _("You do not have the permissions to unban this user."),
-                "danger"
-            )
+            flash(_("You do not have the permissions to unban this user."), "danger")
             return redirect(url_for("management.overview"))
 
         # ajax request
@@ -517,11 +506,7 @@ class UnbanUser(MethodView):
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
             for user in User.query.filter(User.id.in_(ids)).all():
@@ -532,8 +517,9 @@ class UnbanUser(MethodView):
                             "type": "ban",
                             "reverse": "ban",
                             "reverse_name": _("Ban"),
-                            "reverse_url": url_for("management.ban_user",
-                                                   user_id=user.id)
+                            "reverse_url": url_for(
+                                "management.ban_user", user_id=user.id
+                            ),
                         }
                     )
 
@@ -541,7 +527,7 @@ class UnbanUser(MethodView):
                 message=f"{len(data)} users unbanned.",
                 category="success",
                 data=data,
-                status=200
+                status=200,
             )
 
         user = User.query.filter_by(id=user_id).first_or_404()
@@ -561,13 +547,12 @@ class Groups(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify groups."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
     def get(self):
-
         page = request.args.get("page", 1, type=int)
 
         groups = Group.query.order_by(Group.id.asc()).paginate(
@@ -584,28 +569,26 @@ class AddGroup(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify groups."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = AddGroupForm
 
     def get(self):
         return render_template(
-            'management/group_form.html',
-            form=self.form(),
-            title=_('Add Group')
+            "management/group_form.html", form=self.form(), title=_("Add Group")
         )
 
     def post(self):
         form = AddGroupForm()
         if form.validate_on_submit():
             form.save()
-            flash(_('Group added.'), 'success')
-            return redirect(url_for('management.groups'))
+            flash(_("Group added."), "success")
+            return redirect(url_for("management.groups"))
 
         return render_template(
-            'management/group_form.html', form=form, title=_('Add Group')
+            "management/group_form.html", form=form, title=_("Add Group")
         )
 
 
@@ -616,8 +599,8 @@ class EditGroup(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify groups."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = EditGroupForm
@@ -626,7 +609,7 @@ class EditGroup(MethodView):
         group = Group.query.filter_by(id=group_id).first_or_404()
         form = self.form(group)
         return render_template(
-            'management/group_form.html', form=form, title=_('Edit Group')
+            "management/group_form.html", form=form, title=_("Edit Group")
         )
 
     def post(self, group_id):
@@ -640,11 +623,11 @@ class EditGroup(MethodView):
             if group.guest:
                 Guest.invalidate_cache()
 
-            flash(_('Group updated.'), 'success')
-            return redirect(url_for('management.groups', group_id=group.id))
+            flash(_("Group updated."), "success")
+            return redirect(url_for("management.groups", group_id=group.id))
 
         return render_template(
-            'management/group_form.html', form=form, title=_('Edit Group')
+            "management/group_form.html", form=form, title=_("Edit Group")
         )
 
 
@@ -655,8 +638,8 @@ class DeleteGroup(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify groups."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -665,11 +648,7 @@ class DeleteGroup(MethodView):
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
 
             # TODO: Get rid of magic numbers
             if not (set(ids) & set(["1", "2", "3", "4", "5", "6"])):
@@ -682,7 +661,7 @@ class DeleteGroup(MethodView):
                             "type": "delete",
                             "reverse": False,
                             "reverse_name": None,
-                            "reverse_url": None
+                            "reverse_url": None,
                         }
                     )
 
@@ -690,13 +669,13 @@ class DeleteGroup(MethodView):
                     message="{} groups deleted.".format(len(data)),
                     category="success",
                     data=data,
-                    status=200
+                    status=200,
                 )
             return jsonify(
                 message=_("You cannot delete one of the standard groups."),
                 category="danger",
                 data=None,
-                status=404
+                status=404,
             )
 
         if group_id is not None:
@@ -704,7 +683,8 @@ class DeleteGroup(MethodView):
                 flash(
                     _(
                         "You cannot delete the standard groups. "
-                        "Try renaming it instead.", "danger"
+                        "Try renaming it instead.",
+                        "danger",
                     )
                 )
                 return redirect(url_for("management.groups"))
@@ -725,8 +705,8 @@ class Forums(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify forums."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -742,8 +722,8 @@ class EditForum(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify forums."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = EditForumForm
@@ -754,14 +734,14 @@ class EditForum(MethodView):
         form = self.form(forum)
 
         if forum.moderators:
-            form.moderators.data = ','.join(
+            form.moderators.data = ",".join(
                 [user.username for user in forum.moderators]
             )
         else:
             form.moderators.data = None
 
         return render_template(
-            'management/forum_form.html', form=form, title=_('Edit Forum')
+            "management/forum_form.html", form=form, title=_("Edit Forum")
         )
 
     def post(self, forum_id):
@@ -770,19 +750,18 @@ class EditForum(MethodView):
         form = self.form(forum)
         if form.validate_on_submit():
             form.save()
-            flash(_('Forum updated.'), 'success')
-            return redirect(url_for('management.edit_forum',
-                                    forum_id=forum.id))
+            flash(_("Forum updated."), "success")
+            return redirect(url_for("management.edit_forum", forum_id=forum.id))
         else:
             if forum.moderators:
-                form.moderators.data = ','.join(
+                form.moderators.data = ",".join(
                     [user.username for user in forum.moderators]
                 )
             else:
                 form.moderators.data = None
 
         return render_template(
-            'management/forum_form.html', form=form, title=_('Edit Forum')
+            "management/forum_form.html", form=form, title=_("Edit Forum")
         )
 
 
@@ -793,8 +772,8 @@ class AddForum(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify forums."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = AddForumForm
@@ -809,7 +788,7 @@ class AddForum(MethodView):
             form.category.data = category
 
         return render_template(
-            'management/forum_form.html', form=form, title=_('Add Forum')
+            "management/forum_form.html", form=form, title=_("Add Forum")
         )
 
     def post(self, category_id=None):
@@ -817,8 +796,8 @@ class AddForum(MethodView):
 
         if form.validate_on_submit():
             form.save()
-            flash(_('Forum added.'), 'success')
-            return redirect(url_for('management.forums'))
+            flash(_("Forum added."), "success")
+            return redirect(url_for("management.forums"))
         else:
             form.groups.data = Group.query.order_by(Group.id.asc()).all()
             if category_id:
@@ -826,7 +805,7 @@ class AddForum(MethodView):
                 form.category.data = category
 
         return render_template(
-            'management/forum_form.html', form=form, title=_('Add Forum')
+            "management/forum_form.html", form=form, title=_("Add Forum")
         )
 
 
@@ -837,8 +816,8 @@ class DeleteForum(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify forums"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -862,17 +841,15 @@ class AddCategory(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify categories"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = CategoryForm
 
     def get(self):
         return render_template(
-            'management/category_form.html',
-            form=self.form(),
-            title=_('Add Category')
+            "management/category_form.html", form=self.form(), title=_("Add Category")
         )
 
     def post(self):
@@ -880,11 +857,11 @@ class AddCategory(MethodView):
 
         if form.validate_on_submit():
             form.save()
-            flash(_('Category added.'), 'success')
-            return redirect(url_for('management.forums'))
+            flash(_("Category added."), "success")
+            return redirect(url_for("management.forums"))
 
         return render_template(
-            'management/category_form.html', form=form, title=_('Add Category')
+            "management/category_form.html", form=form, title=_("Add Category")
         )
 
 
@@ -895,8 +872,8 @@ class EditCategory(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify categories"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
     form = CategoryForm
@@ -907,9 +884,7 @@ class EditCategory(MethodView):
         form = self.form(obj=category)
 
         return render_template(
-            'management/category_form.html',
-            form=form,
-            title=_('Edit Category')
+            "management/category_form.html", form=form, title=_("Edit Category")
         )
 
     def post(self, category_id):
@@ -919,13 +894,11 @@ class EditCategory(MethodView):
 
         if form.validate_on_submit():
             form.populate_obj(category)
-            flash(_('Category updated.'), 'success')
+            flash(_("Category updated."), "success")
             category.save()
 
         return render_template(
-            'management/category_form.html',
-            form=form,
-            title=_('Edit Category')
+            "management/category_form.html", form=form, title=_("Edit Category")
         )
 
 
@@ -936,8 +909,8 @@ class DeleteCategory(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify categories"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -945,8 +918,9 @@ class DeleteCategory(MethodView):
         category = Category.query.filter_by(id=category_id).first_or_404()
 
         involved_users = User.query.filter(
-            Forum.category_id == category.id, Topic.forum_id == Forum.id,
-            Post.user_id == User.id
+            Forum.category_id == category.id,
+            Topic.forum_id == Forum.id,
+            Post.user_id == User.id,
         ).all()
 
         category.delete(involved_users)
@@ -961,8 +935,8 @@ class Reports(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to view reports."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -982,8 +956,8 @@ class UnreadReports(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to view reports."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1007,23 +981,18 @@ class MarkReportRead(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to view reports."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
     def post(self, report_id=None):
-
         # AJAX request
         json = request.get_json(silent=True)
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
             data = []
 
             for report in Report.query.filter(Report.id.in_(ids)).all():
@@ -1036,7 +1005,7 @@ class MarkReportRead(MethodView):
                         "type": "read",
                         "reverse": False,
                         "reverse_name": None,
-                        "reverse_url": None
+                        "reverse_url": None,
                     }
                 )
 
@@ -1044,7 +1013,7 @@ class MarkReportRead(MethodView):
                 message="{} reports marked as read.".format(len(data)),
                 category="success",
                 data=data,
-                status=200
+                status=200,
             )
 
         # mark single report as read
@@ -1053,7 +1022,7 @@ class MarkReportRead(MethodView):
             if report.zapped:
                 flash(
                     _("Report %(id)s is already marked as read.", id=report.id),
-                    "success"
+                    "success",
                 )
                 return redirect_or_next(url_for("management.reports"))
 
@@ -1085,8 +1054,8 @@ class DeleteReport(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to view reports."),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1095,11 +1064,7 @@ class DeleteReport(MethodView):
         if json is not None:
             ids = json.get("ids")
             if not ids:
-                return jsonify(
-                    message="No ids provided.",
-                    category="error",
-                    status=404
-                )
+                return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
             for report in Report.query.filter(Report.id.in_(ids)).all():
@@ -1110,7 +1075,7 @@ class DeleteReport(MethodView):
                             "type": "delete",
                             "reverse": False,
                             "reverse_name": None,
-                            "reverse_url": None
+                            "reverse_url": None,
                         }
                     )
 
@@ -1118,7 +1083,7 @@ class DeleteReport(MethodView):
                 message="{} reports deleted.".format(len(data)),
                 category="success",
                 data=data,
-                status=200
+                status=200,
             )
 
         report = Report.query.filter_by(id=report_id).first_or_404()
@@ -1134,8 +1099,8 @@ class CeleryStatus(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access the management settings"),  # noqa
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1159,8 +1124,8 @@ class ManagementOverview(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access the management panel"),
                 level="danger",
-                endpoint="forum.index"
-            )
+                endpoint="forum.index",
+            ),
         )
     ]
 
@@ -1170,15 +1135,15 @@ class ManagementOverview(MethodView):
             Group.banned == True, Group.id == User.primary_group_id
         ).count()
         if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.query.filter(User.lastseen >= time_diff()
-                                             ).count()
+            online_users = User.query.filter(User.lastseen >= time_diff()).count()
         else:
             online_users = len(get_online_users())
 
-        unread_reports = Report.query.\
-            filter(Report.zapped == None).\
-            order_by(Report.id.desc()).\
-            count()
+        unread_reports = (
+            Report.query.filter(Report.zapped == None)
+            .order_by(Report.id.desc())
+            .count()
+        )
 
         python_version = "{}.{}.{}".format(
             sys.version_info[0], sys.version_info[1], sys.version_info[2]
@@ -1201,7 +1166,7 @@ class ManagementOverview(MethodView):
             "flask_version": flask_version,
             "flaskbb_version": flaskbb_version,
             # plugins
-            "plugins": PluginRegistry.query.all()
+            "plugins": PluginRegistry.query.all(),
         }
 
         return render_template("management/overview.html", **stats)
@@ -1214,8 +1179,8 @@ class PluginsView(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify plugins"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1231,8 +1196,8 @@ class EnablePlugin(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify plugins"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1242,8 +1207,7 @@ class EnablePlugin(MethodView):
 
         if plugin.enabled:
             flash(
-                _("Plugin %(plugin)s is already enabled.", plugin=plugin.name),
-                "info"
+                _("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info"
             )
             return redirect(url_for("management.plugins"))
 
@@ -1253,8 +1217,9 @@ class EnablePlugin(MethodView):
         flash(
             _(
                 "Plugin %(plugin)s enabled. Please restart FlaskBB now.",
-                plugin=plugin.name
-            ), "success"
+                plugin=plugin.name,
+            ),
+            "success",
         )
         return redirect(url_for("management.plugins"))
 
@@ -1266,8 +1231,8 @@ class DisablePlugin(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify plugins"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1277,8 +1242,7 @@ class DisablePlugin(MethodView):
 
         if not plugin.enabled:
             flash(
-                _("Plugin %(plugin)s is already disabled.", plugin=plugin.name),
-                "info"
+                _("Plugin %(plugin)s is already disabled.", plugin=plugin.name), "info"
             )
             return redirect(url_for("management.plugins"))
 
@@ -1287,8 +1251,9 @@ class DisablePlugin(MethodView):
         flash(
             _(
                 "Plugin %(plugin)s disabled. Please restart FlaskBB now.",
-                plugin=plugin.name
-            ), "success"
+                plugin=plugin.name,
+            ),
+            "success",
         )
         return redirect(url_for("management.plugins"))
 
@@ -1300,8 +1265,8 @@ class UninstallPlugin(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify plugins"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1321,8 +1286,8 @@ class InstallPlugin(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to modify plugins"),
                 level="danger",
-                endpoint="management.overview"
-            )
+                endpoint="management.overview",
+            ),
         )
     ]
 
@@ -1334,8 +1299,9 @@ class InstallPlugin(MethodView):
             flash(
                 _(
                     "Can't install plugin. Enable '%(plugin)s' plugin first.",
-                    plugin=plugin.name
-                ), "danger"
+                    plugin=plugin.name,
+                ),
+                "danger",
             )
             return redirect(url_for("management.plugins"))
 
@@ -1358,162 +1324,141 @@ def flaskbb_load_blueprints(app):
     # Categories
     register_view(
         management,
-        routes=['/category/add'],
-        view_func=AddCategory.as_view('add_category')
+        routes=["/category/add"],
+        view_func=AddCategory.as_view("add_category"),
     )
     register_view(
         management,
         routes=["/category/<int:category_id>/delete"],
-        view_func=DeleteCategory.as_view('delete_category')
+        view_func=DeleteCategory.as_view("delete_category"),
     )
     register_view(
         management,
-        routes=['/category/<int:category_id>/edit'],
-        view_func=EditCategory.as_view('edit_category')
+        routes=["/category/<int:category_id>/edit"],
+        view_func=EditCategory.as_view("edit_category"),
     )
 
     # Forums
     register_view(
         management,
-        routes=['/forums/add', '/forums/<int:category_id>/add'],
-        view_func=AddForum.as_view('add_forum')
+        routes=["/forums/add", "/forums/<int:category_id>/add"],
+        view_func=AddForum.as_view("add_forum"),
     )
     register_view(
         management,
-        routes=['/forums/<int:forum_id>/delete'],
-        view_func=DeleteForum.as_view('delete_forum')
+        routes=["/forums/<int:forum_id>/delete"],
+        view_func=DeleteForum.as_view("delete_forum"),
     )
     register_view(
         management,
-        routes=['/forums/<int:forum_id>/edit'],
-        view_func=EditForum.as_view('edit_forum')
+        routes=["/forums/<int:forum_id>/edit"],
+        view_func=EditForum.as_view("edit_forum"),
     )
-    register_view(
-        management, routes=['/forums'], view_func=Forums.as_view('forums')
-    )
+    register_view(management, routes=["/forums"], view_func=Forums.as_view("forums"))
 
     # Groups
     register_view(
-        management,
-        routes=['/groups/add'],
-        view_func=AddGroup.as_view('add_group')
+        management, routes=["/groups/add"], view_func=AddGroup.as_view("add_group")
     )
     register_view(
         management,
-        routes=['/groups/<int:group_id>/delete', '/groups/delete'],
-        view_func=DeleteGroup.as_view('delete_group')
+        routes=["/groups/<int:group_id>/delete", "/groups/delete"],
+        view_func=DeleteGroup.as_view("delete_group"),
     )
     register_view(
         management,
-        routes=['/groups/<int:group_id>/edit'],
-        view_func=EditGroup.as_view('edit_group')
+        routes=["/groups/<int:group_id>/edit"],
+        view_func=EditGroup.as_view("edit_group"),
     )
-    register_view(
-        management, routes=['/groups'], view_func=Groups.as_view('groups')
-    )
+    register_view(management, routes=["/groups"], view_func=Groups.as_view("groups"))
 
     # Plugins
     register_view(
         management,
-        routes=['/plugins/<path:name>/disable'],
-        view_func=DisablePlugin.as_view('disable_plugin')
+        routes=["/plugins/<path:name>/disable"],
+        view_func=DisablePlugin.as_view("disable_plugin"),
     )
     register_view(
         management,
-        routes=['/plugins/<path:name>/enable'],
-        view_func=EnablePlugin.as_view('enable_plugin')
+        routes=["/plugins/<path:name>/enable"],
+        view_func=EnablePlugin.as_view("enable_plugin"),
     )
     register_view(
         management,
-        routes=['/plugins/<path:name>/install'],
-        view_func=InstallPlugin.as_view('install_plugin')
+        routes=["/plugins/<path:name>/install"],
+        view_func=InstallPlugin.as_view("install_plugin"),
     )
     register_view(
         management,
-        routes=['/plugins/<path:name>/uninstall'],
-        view_func=UninstallPlugin.as_view('uninstall_plugin')
+        routes=["/plugins/<path:name>/uninstall"],
+        view_func=UninstallPlugin.as_view("uninstall_plugin"),
     )
     register_view(
-        management,
-        routes=['/plugins'],
-        view_func=PluginsView.as_view('plugins')
+        management, routes=["/plugins"], view_func=PluginsView.as_view("plugins")
     )
 
     # Reports
     register_view(
         management,
-        routes=['/reports/<int:report_id>/delete', '/reports/delete'],
-        view_func=DeleteReport.as_view('delete_report')
+        routes=["/reports/<int:report_id>/delete", "/reports/delete"],
+        view_func=DeleteReport.as_view("delete_report"),
     )
     register_view(
         management,
-        routes=['/reports/<int:report_id>/markread', '/reports/markread'],
-        view_func=MarkReportRead.as_view('report_markread')
+        routes=["/reports/<int:report_id>/markread", "/reports/markread"],
+        view_func=MarkReportRead.as_view("report_markread"),
     )
     register_view(
         management,
-        routes=['/reports/unread'],
-        view_func=UnreadReports.as_view('unread_reports')
+        routes=["/reports/unread"],
+        view_func=UnreadReports.as_view("unread_reports"),
     )
-    register_view(
-        management, routes=['/reports'], view_func=Reports.as_view('reports')
-    )
+    register_view(management, routes=["/reports"], view_func=Reports.as_view("reports"))
 
     # Settings
     register_view(
         management,
-        routes=[
-            '/settings', '/settings/<path:slug>',
-            '/settings/plugin/<path:plugin>'
-        ],
-        view_func=ManagementSettings.as_view('settings')
+        routes=["/settings", "/settings/<path:slug>", "/settings/plugin/<path:plugin>"],
+        view_func=ManagementSettings.as_view("settings"),
     )
 
     # Users
     register_view(
-        management,
-        routes=['/users/add'],
-        view_func=AddUser.as_view('add_user')
+        management, routes=["/users/add"], view_func=AddUser.as_view("add_user")
     )
     register_view(
         management,
-        routes=['/users/banned'],
-        view_func=BannedUsers.as_view('banned_users')
+        routes=["/users/banned"],
+        view_func=BannedUsers.as_view("banned_users"),
     )
     register_view(
         management,
-        routes=['/users/ban', '/users/<int:user_id>/ban'],
-        view_func=BanUser.as_view('ban_user')
+        routes=["/users/ban", "/users/<int:user_id>/ban"],
+        view_func=BanUser.as_view("ban_user"),
     )
     register_view(
         management,
-        routes=['/users/delete', '/users/<int:user_id>/delete'],
-        view_func=DeleteUser.as_view('delete_user')
+        routes=["/users/delete", "/users/<int:user_id>/delete"],
+        view_func=DeleteUser.as_view("delete_user"),
     )
     register_view(
         management,
-        routes=['/users/<int:user_id>/edit'],
-        view_func=EditUser.as_view('edit_user')
+        routes=["/users/<int:user_id>/edit"],
+        view_func=EditUser.as_view("edit_user"),
     )
     register_view(
         management,
-        routes=['/users/unban', '/users/<int:user_id>/unban'],
-        view_func=UnbanUser.as_view('unban_user')
+        routes=["/users/unban", "/users/<int:user_id>/unban"],
+        view_func=UnbanUser.as_view("unban_user"),
     )
-    register_view(
-        management, routes=['/users'], view_func=ManageUsers.as_view('users')
-    )
+    register_view(management, routes=["/users"], view_func=ManageUsers.as_view("users"))
     register_view(
         management,
-        routes=['/celerystatus'],
-        view_func=CeleryStatus.as_view('celery_status')
+        routes=["/celerystatus"],
+        view_func=CeleryStatus.as_view("celery_status"),
     )
     register_view(
-        management,
-        routes=['/'],
-        view_func=ManagementOverview.as_view('overview')
+        management, routes=["/"], view_func=ManagementOverview.as_view("overview")
     )
 
-    app.register_blueprint(
-        management, url_prefix=app.config["ADMIN_URL_PREFIX"]
-    )
+    app.register_blueprint(management, url_prefix=app.config["ADMIN_URL_PREFIX"])

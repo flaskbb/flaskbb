@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.changesets
-    ~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.changesets
+~~~~~~~~~~~~~~~~~~~~~
 
-    Core interfaces for handlers, services, etc.
+Core interfaces for handlers, services, etc.
 
-    :copyright: (c) 2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 from abc import ABC, abstractmethod
 from inspect import isclass
-
 
 empty = None
 

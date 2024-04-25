@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.management.models
-    ~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.management.models
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This module contains all management related models.
+This module contains all management related models.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 from flaskbb.extensions import cache, db
@@ -23,8 +24,9 @@ class SettingsGroup(db.Model, CRUDMixin):
     key = db.Column(db.String(255), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    settings = db.relationship("Setting", lazy="dynamic", backref="group",
-                               cascade="all, delete-orphan")
+    settings = db.relationship(
+        "Setting", lazy="dynamic", backref="group", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.key)
@@ -35,10 +37,11 @@ class Setting(db.Model, CRUDMixin):
 
     key = db.Column(db.String(255), primary_key=True)
     value = db.Column(db.PickleType, nullable=False)
-    settingsgroup = db.Column(db.String(255),
-                              db.ForeignKey('settingsgroup.key',
-                                            ondelete="CASCADE"),
-                              nullable=False)
+    settingsgroup = db.Column(
+        db.String(255),
+        db.ForeignKey("settingsgroup.key", ondelete="CASCADE"),
+        nullable=False,
+    )
 
     # The name (displayed in the form)
     name = db.Column(db.String(200), nullable=False)
@@ -118,8 +121,7 @@ class Setting(db.Model, CRUDMixin):
         settings = {}
         result = None
         if from_group is not None:
-            result = SettingsGroup.query.filter_by(key=from_group).\
-                first_or_404()
+            result = SettingsGroup.query.filter_by(key=from_group).first_or_404()
             result = result.settings
         else:
             result = cls.query.all()

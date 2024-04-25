@@ -1,11 +1,11 @@
 """
-    flaskbb.auth.password
-    ~~~~~~~~~~~~~~~~~~~~~
+flaskbb.auth.password
+~~~~~~~~~~~~~~~~~~~~~
 
-    Password reset manager
+Password reset manager
 
-    :copyright: (c) 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
 
 from flask_babelplus import gettext as _
@@ -28,22 +28,18 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
-
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
-            raise ValidationError('email', _('Invalid email'))
+            raise ValidationError("email", _("Invalid email"))
 
         token = self.token_serializer.dumps(
             Token(user_id=user.id, operation=TokenActions.RESET_PASSWORD)
         )
 
-        send_reset_token.delay(
-            token=token, username=user.username, email=user.email
-        )
+        send_reset_token.delay(token=token, username=user.username, email=user.email)
 
     def reset_password(self, token, email, new_password):
-
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.RESET_PASSWORD:
             raise TokenError.invalid()

@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.plugins
-    ~~~~~~~~~~~~~~~~~~~~
-    Plugin implementations for FlaskBB auth hooks
+flaskbb.auth.plugins
+~~~~~~~~~~~~~~~~~~~~
+Plugin implementations for FlaskBB auth hooks
 
-    :copyright: (c) 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 from flask import flash, redirect, url_for
 from flask_login import current_user, logout_user
 
-from . import impl
 from ..core.auth.authentication import ForceLogout
 from ..extensions import db
 from ..user.models import User
 from ..utils.settings import flaskbb_config
+from . import impl
 from .services.authentication import (
     BlockUnactivatedUser,
     ClearFailedLogins,
@@ -76,7 +77,6 @@ def flaskbb_post_reauth(user):
 
 @impl
 def flaskbb_errorhandlers(app):
-
     @app.errorhandler(ForceLogout)
     def handle_force_logout(error):
         if current_user:
@@ -110,9 +110,7 @@ def flaskbb_registration_post_processor(user):
     handlers = []
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
-        handlers.append(
-            SendActivationPostProcessor(account_activator_factory())
-        )
+        handlers.append(SendActivationPostProcessor(account_activator_factory()))
     else:
         handlers.append(AutologinPostProcessor())
         handlers.append(AutoActivateUserPostProcessor(db, flaskbb_config))

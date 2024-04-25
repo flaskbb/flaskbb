@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.http
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.utils.http
+~~~~~~~~~~~~~~~~~~
 
-    Provides a utility function that attempts to validate an URL against
-    a set of valid hosts.
+Provides a utility function that attempts to validate an URL against
+a set of valid hosts.
 
-    See https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet
-    for more information about this topic.
+See https://www.owasp.org/index.php/Unvalidated_Redirects_and_Forwards_Cheat_Sheet
+for more information about this topic.
 
-    Note: Most of this code has been taken from Django 3.2.0.alpha0.
+Note: Most of this code has been taken from Django 3.2.0.alpha0.
 """
+
 import unicodedata
 from urllib.parse import (
     ParseResult,
@@ -21,6 +22,7 @@ from urllib.parse import (
     scheme_chars,
     uses_params,
 )
+
 
 # Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
 def _urlparse(url, scheme="", allow_fragments=True):

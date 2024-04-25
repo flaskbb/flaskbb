@@ -11,7 +11,6 @@ from flaskbb.utils.settings import flaskbb_config
 
 
 class TestAutoActivateUserPostProcessor(object):
-
     def test_activates_when_user_activation_isnt_required(
         self, unactivated_user, database
     ):
@@ -32,10 +31,7 @@ class TestAutoActivateUserPostProcessor(object):
 
 
 class TestAutologinPostProcessor(object):
-
-    def test_sets_user_as_current_user(
-        self, Fred, request_context, default_settings
-    ):
+    def test_sets_user_as_current_user(self, Fred, request_context, default_settings):
         flaskbb_config["ACTIVATE_ACCOUNT"] = False
         processor = AutologinPostProcessor()
 
@@ -44,15 +40,11 @@ class TestAutologinPostProcessor(object):
         expected_message = ("success", "Thanks for registering.")
 
         assert current_user.username == Fred.username
-        assert (
-            get_flashed_messages(with_categories=True)[0] == expected_message
-        )
+        assert get_flashed_messages(with_categories=True)[0] == expected_message
 
 
 class TestSendActivationPostProcessor(object):
-
     class SpyingActivator(AccountActivator):
-
         def __init__(self):
             self.called = False
             self.user = None
@@ -78,6 +70,4 @@ class TestSendActivationPostProcessor(object):
         )
         assert activator.called
         assert activator.user == unactivated_user.email
-        assert (
-            get_flashed_messages(with_categories=True)[0] == expected_message
-        )
+        assert get_flashed_messages(with_categories=True)[0] == expected_message

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.user.update
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.user.update
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This modules provides services used in updating user details
-    across FlaskBB.
+This modules provides services used in updating user details
+across FlaskBB.
 
-    :copyright: (c) 2014-2018 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014-2018 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 from abc import ABC, abstractmethod
@@ -36,7 +36,7 @@ class UserDetailsChange(object):
     notes = attr.ib(default=empty)
 
     def assign_to_user(self, user):
-        for (name, value) in attr.asdict(self).items():
+        for name, value in attr.asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
 
@@ -72,7 +72,7 @@ class SettingsUpdate(object):
     theme = attr.ib()
 
     def assign_to_user(self, user):
-        for (name, value) in attr.asdict(self).items():
+        for name, value in attr.asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
 

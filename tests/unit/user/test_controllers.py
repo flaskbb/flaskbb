@@ -7,12 +7,24 @@ from werkzeug.datastructures import MultiDict
 
 from flaskbb.core.changesets import ChangeSetHandler
 from flaskbb.core.exceptions import PersistenceError, StopValidation
-from flaskbb.core.user.update import (EmailUpdate, PasswordUpdate,
-                                      SettingsUpdate, UserDetailsChange)
-from flaskbb.user.forms import (ChangeEmailForm, ChangePasswordForm,
-                                ChangeUserDetailsForm, GeneralSettingsForm)
-from flaskbb.user.views import (ChangeEmail, ChangePassword, ChangeUserDetails,
-                                UserSettings)
+from flaskbb.core.user.update import (
+    EmailUpdate,
+    PasswordUpdate,
+    SettingsUpdate,
+    UserDetailsChange,
+)
+from flaskbb.user.forms import (
+    ChangeEmailForm,
+    ChangePasswordForm,
+    ChangeUserDetailsForm,
+    GeneralSettingsForm,
+)
+from flaskbb.user.views import (
+    ChangeEmail,
+    ChangePassword,
+    ChangeUserDetails,
+    UserSettings,
+)
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -29,9 +41,7 @@ class TestUserSettingsView(object):
         handler.get()
 
     def test_update_user_settings_successfully(self, user, mocker):
-        form = self.produce_form(
-            data={"language": "python", "theme": "solarized"}
-        )
+        form = self.produce_form(data={"language": "python", "theme": "solarized"})
         handler = mocker.Mock(spec=ChangeSetHandler)
         view = UserSettings(form=form, settings_update_handler=handler)
 
@@ -47,9 +57,7 @@ class TestUserSettingsView(object):
         )
 
     def test_update_user_settings_fail_with_not_valid(self, mocker):
-        form = self.produce_form(
-            data={"language": "ruby", "theme": "solarized"}
-        )
+        form = self.produce_form(data={"language": "ruby", "theme": "solarized"})
         handler = mocker.Mock(spec=ChangeSetHandler)
         view = UserSettings(form=form, settings_update_handler=handler)
 
@@ -61,9 +69,7 @@ class TestUserSettingsView(object):
         assert form.errors
 
     def test_update_user_settings_fail_with_stopvalidation_error(self, mocker):
-        form = self.produce_form(
-            data={"language": "python", "theme": "molokai"}
-        )
+        form = self.produce_form(data={"language": "python", "theme": "molokai"})
         handler = mocker.Mock(spec=ChangeSetHandler)
         handler.apply_changeset.side_effect = StopValidation(
             [("theme", "Solarized is better")]
@@ -77,9 +83,7 @@ class TestUserSettingsView(object):
         assert form.errors["theme"] == ["Solarized is better"]
 
     def test_update_user_settings_fails_with_persistence_error(self, mocker):
-        form = self.produce_form(
-            data={"language": "python", "theme": "molokai"}
-        )
+        form = self.produce_form(data={"language": "python", "theme": "molokai"})
         handler = mocker.Mock(spec=ChangeSetHandler)
         handler.apply_changeset.side_effect = PersistenceError("Nope")
         view = UserSettings(form=form, settings_update_handler=handler)
@@ -93,9 +97,7 @@ class TestUserSettingsView(object):
         assert result.headers["Location"] == url_for("user.settings")
 
     def produce_form(self, data):
-        form = GeneralSettingsForm(
-            formdata=MultiDict(data), meta={"csrf": False}
-        )
+        form = GeneralSettingsForm(formdata=MultiDict(data), meta={"csrf": False})
         form.language.choices = [
             ("python", "python"),
             ("ecmascript", "ecmascript"),
@@ -164,9 +166,7 @@ class TestChangePasswordView(object):
 
         view.post()
 
-        assert form.errors["new_password"] == [
-            "That's not a very strong password"
-        ]
+        assert form.errors["new_password"] == ["That's not a very strong password"]
 
     def test_update_user_password_fails_with_persistence_error(self, mocker):
         form = self.produce_form(

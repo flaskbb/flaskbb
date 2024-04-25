@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.services.reauthentication
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Tools for handling reauthentication needs inside FlaskBB.
+flaskbb.auth.services.reauthentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tools for handling reauthentication needs inside FlaskBB.
 
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 import logging
@@ -13,11 +13,13 @@ import logging
 from flask_babelplus import gettext as _
 from werkzeug.security import check_password_hash
 
-from ...core.auth.authentication import (PostReauthenticateHandler,
-                                         ReauthenticateFailureHandler,
-                                         ReauthenticateManager,
-                                         ReauthenticateProvider,
-                                         StopAuthentication)
+from ...core.auth.authentication import (
+    PostReauthenticateHandler,
+    ReauthenticateFailureHandler,
+    ReauthenticateManager,
+    ReauthenticateProvider,
+    StopAuthentication,
+)
 from ...utils.helpers import time_utcnow
 
 logger = logging.getLogger(__name__)

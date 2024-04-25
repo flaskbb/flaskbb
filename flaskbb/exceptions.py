@@ -1,13 +1,15 @@
 """
-    flaskbb.exceptions
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.exceptions
+~~~~~~~~~~~~~~~~~~
 
-    Exceptions implemented by FlaskBB.
+Exceptions implemented by FlaskBB.
 
-    :copyright: (c) 2015 by the FlaskBBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2015 by the FlaskBBB Team.
+:license: BSD, see LICENSE for more details
 """
-from werkzeug.exceptions import HTTPException, Forbidden
+
+from werkzeug.exceptions import Forbidden, HTTPException
+
 from .core.exceptions import BaseFlaskBBError
 
 

@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.cli.plugins
-    ~~~~~~~~~~~~~~~~~~~
+flaskbb.cli.plugins
+~~~~~~~~~~~~~~~~~~~
 
-    This module contains all plugin commands.
+This module contains all plugin commands.
 
-    :copyright: (c) 2016 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2016 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
-import sys
+
 import os
+import sys
 
 import click
 from flask import current_app
 from flask.cli import with_appcontext
 
-from flaskbb.extensions import db
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import validate_plugin, get_cookiecutter
+from flaskbb.cli.utils import get_cookiecutter, validate_plugin
+from flaskbb.extensions import db
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
@@ -39,9 +40,13 @@ def list_plugins():
         for plugin in enabled_plugins:
             p_mod = plugin[0]
             p_dist = plugin[1]
-            click.secho("\t- {}\t({}), version {}".format(
-                current_app.pluggy.get_name(p_mod).title(), p_dist.key,
-                p_dist.version), bold=True
+            click.secho(
+                "\t- {}\t({}), version {}".format(
+                    current_app.pluggy.get_name(p_mod).title(),
+                    p_dist.key,
+                    p_dist.version,
+                ),
+                bold=True,
             )
 
     disabled_plugins = current_app.pluggy.list_disabled_plugins()
@@ -50,9 +55,11 @@ def list_plugins():
         for plugin in disabled_plugins:
             p_mod = plugin[0]
             p_dist = plugin[1]
-            click.secho("\t- {}\t({}), version {}".format(
-                p_mod.title(), p_dist.key,
-                p_dist.version), bold=True
+            click.secho(
+                "\t- {}\t({}), version {}".format(
+                    p_mod.title(), p_dist.key, p_dist.version
+                ),
+                bold=True,
             )
 
 
@@ -90,16 +97,21 @@ def disable_plugin(plugin_name):
 
 @plugins.command("install")
 @click.argument("plugin_name")
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Overwrites existing settings")
+@click.option(
+    "--force", "-f", default=False, is_flag=True, help="Overwrites existing settings"
+)
 def install(plugin_name, force):
     """Installs a plugin (no migrations)."""
     validate_plugin(plugin_name)
     plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
 
     if not plugin.enabled:
-        click.secho("[+] Can't install disabled plugin. "
-                    "Enable '{}' Plugin first.".format(plugin.name), fg="red")
+        click.secho(
+            "[+] Can't install disabled plugin. " "Enable '{}' Plugin first.".format(
+                plugin.name
+            ),
+            fg="red",
+        )
         sys.exit(0)
 
     if plugin.is_installable:
@@ -135,21 +147,36 @@ def cleanup():
     """
     deleted_plugins = remove_zombie_plugins_from_db()
     if len(deleted_plugins) > 0:
-        click.secho("[+] Removed following zombie plugins from FlaskBB: ",
-                    fg="green", nl=False)
+        click.secho(
+            "[+] Removed following zombie plugins from FlaskBB: ", fg="green", nl=False
+        )
         click.secho("{}".format(", ".join(deleted_plugins)))
     else:
         click.secho("[+] No zombie plugins found.", fg="green")
 
 
 @plugins.command("new")
-@click.option("--template", "-t", type=click.STRING,
-              default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
-              help="Path to a cookiecutter template or to a valid git repo.")
-@click.option("--out-dir", "-o", type=click.Path(), default=None,
-              help="The location for the new FlaskBB plugin.")
-@click.option("--force", "-f", is_flag=True, default=False,
-              help="Overwrite the contents of output directory if it exists")
+@click.option(
+    "--template",
+    "-t",
+    type=click.STRING,
+    default="https://github.com/sh4nks/cookiecutter-flaskbb-plugin",
+    help="Path to a cookiecutter template or to a valid git repo.",
+)
+@click.option(
+    "--out-dir",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="The location for the new FlaskBB plugin.",
+)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    default=False,
+    help="Overwrite the contents of output directory if it exists",
+)
 def new_plugin(template, out_dir, force):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
@@ -160,9 +187,7 @@ def new_plugin(template, out_dir, force):
     cookiecutter = get_cookiecutter()
 
     if out_dir is None:
-        out_dir = click.prompt("Saving plugin in",
-                               default=os.path.abspath("."))
+        out_dir = click.prompt("Saving plugin in", default=os.path.abspath("."))
 
     r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
-    click.secho("[+] Created new plugin in {}".format(r),
-                fg="green", bold=True)
+    click.secho("[+] Created new plugin in {}".format(r), fg="green", bold=True)

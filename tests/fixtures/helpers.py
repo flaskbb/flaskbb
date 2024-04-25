@@ -2,7 +2,6 @@ from collections import namedtuple
 from os import path
 
 import pytest
-
 from responses import RequestsMock, Response
 
 

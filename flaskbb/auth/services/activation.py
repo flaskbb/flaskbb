@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.services.activation
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Handlers for activating accounts in FlaskBB
+flaskbb.auth.services.activation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Handlers for activating accounts in FlaskBB
 
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
 
 from flask_babelplus import gettext as _
@@ -30,10 +30,10 @@ class AccountActivator(_AccountActivator):
         user = self.users.query.filter_by(email=email).first()
 
         if user is None:
-            raise ValidationError('email', _("Entered email doesn't exist"))
+            raise ValidationError("email", _("Entered email doesn't exist"))
 
         if user.activated:
-            raise ValidationError('email', _('Account is already activated'))
+            raise ValidationError("email", _("Account is already activated"))
 
         token = self.token_serializer.dumps(
             Token(user_id=user.id, operation=TokenActions.ACTIVATE_ACCOUNT)
@@ -49,7 +49,5 @@ class AccountActivator(_AccountActivator):
             raise TokenError.invalid()
         user = self.users.query.get(token.user_id)
         if user.activated:
-            raise ValidationError(
-                'activated', _('Account is already activated')
-            )
+            raise ValidationError("activated", _("Account is already activated"))
         user.activated = True

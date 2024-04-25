@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.auth.activation
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Interfaces for handling account activation
-    in FlaskBB
+flaskbb.core.auth.activation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Interfaces for handling account activation
+in FlaskBB
 
-    :copyright: (c) 2014-2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
+
 from abc import ABC, abstractmethod
 
 

@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.services.authentication
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.auth.services.authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Authentication providers, handlers and post-processors
-    in FlaskBB
+Authentication providers, handlers and post-processors
+in FlaskBB
 
-    :copyright: (c) 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 import logging
 from datetime import datetime
 
-from pytz import UTC
-
 import attr
 from flask_babelplus import gettext as _
+from pytz import UTC
 from werkzeug.security import check_password_hash
 
-from ...core.auth.authentication import (AuthenticationFailureHandler,
-                                         AuthenticationManager,
-                                         AuthenticationProvider,
-                                         PostAuthenticationHandler,
-                                         StopAuthentication)
+from ...core.auth.authentication import (
+    AuthenticationFailureHandler,
+    AuthenticationManager,
+    AuthenticationProvider,
+    PostAuthenticationHandler,
+    StopAuthentication,
+)
 from ...extensions import db
 from ...user.models import User
 from ...utils.helpers import time_utcnow
@@ -37,6 +39,7 @@ class FailedLoginConfiguration(object):
     is temporarily locked out and how long to temporarily lock the account
     out for.
     """
+
     limit = attr.ib()
     lockout_window = attr.ib()
 
@@ -57,9 +60,7 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
 
         if user is not None:
             attempts = user.login_attempts
-            last_attempt = user.last_failed_login or datetime.min.replace(
-                tzinfo=UTC
-            )
+            last_attempt = user.last_failed_login or datetime.min.replace(tzinfo=UTC)
             reached_attempt_limit = attempts >= self.configuration.limit
             inside_lockout = (
                 last_attempt + self.configuration.lockout_window

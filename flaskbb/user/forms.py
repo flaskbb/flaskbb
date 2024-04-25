@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.forms
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.user.forms
+~~~~~~~~~~~~~~~~~~
 
-    It provides the forms that are needed for the user views.
+It provides the forms that are needed for the user views.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 from flask_babelplus import lazy_gettext as _
 from wtforms import (
+    DateField,
     PasswordField,
     SelectField,
     StringField,
     SubmitField,
     TextAreaField,
-    DateField,
 )
 from wtforms.validators import (
     URL,

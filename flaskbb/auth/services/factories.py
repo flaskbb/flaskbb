@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.services.factories
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Factory functions for various FlaskBB auth services
+flaskbb.auth.services.factories
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Factory functions for various FlaskBB auth services
 
-    These factories are provisional.
+These factories are provisional.
 
-    :copyright: 2014-2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: 2014-2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
+
 from datetime import timedelta
 
 from flask import current_app
@@ -30,17 +31,15 @@ def registration_service_factory():
 
 def reset_service_factory():
     token_serializer = FlaskBBTokenSerializer(
-        current_app.config['SECRET_KEY'], expiry=timedelta(hours=1)
+        current_app.config["SECRET_KEY"], expiry=timedelta(hours=1)
     )
     verifiers = [EmailMatchesUserToken(User)]
-    return ResetPasswordService(
-        token_serializer, User, token_verifiers=verifiers
-    )
+    return ResetPasswordService(token_serializer, User, token_verifiers=verifiers)
 
 
 def account_activator_factory():
     token_serializer = FlaskBBTokenSerializer(
-        current_app.config['SECRET_KEY'], expiry=timedelta(hours=1)
+        current_app.config["SECRET_KEY"], expiry=timedelta(hours=1)
     )
     return AccountActivator(token_serializer, User)
 

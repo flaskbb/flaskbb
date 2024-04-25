@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.core.auth.services
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.auth.services
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    This modules provides services used in authentication and authorization
-    across FlaskBB.
+This modules provides services used in authentication and authorization
+across FlaskBB.
 
-    :copyright: (c) 2014-2018 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014-2018 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 from abc import ABC, abstractmethod
 
 import attr
@@ -20,6 +21,7 @@ class UserRegistrationInfo(object):
     User registration object, contains all relevant information for validating
     and creating a new user.
     """
+
     username = attr.ib()
     password = attr.ib(repr=False)
     email = attr.ib()

@@ -4,8 +4,7 @@ import pytest
 from requests.exceptions import RequestException
 
 from flaskbb.core.exceptions import StopValidation, ValidationError
-from flaskbb.core.user.update import (EmailUpdate, PasswordUpdate,
-                                      UserDetailsChange)
+from flaskbb.core.user.update import EmailUpdate, PasswordUpdate, UserDetailsChange
 from flaskbb.user.models import User
 from flaskbb.user.services import validators
 
@@ -58,16 +57,12 @@ class TestCantShareEmailValidator(object):
 
 class TestOldEmailMustMatchValidator(object):
     def test_raises_if_old_email_doesnt_match(self, Fred):
-        change = EmailUpdate(
-            "not@the.same.one.bit", "probably@real.email.provider"
-        )
+        change = EmailUpdate("not@the.same.one.bit", "probably@real.email.provider")
 
         with pytest.raises(StopValidation) as excinfo:
             validators.OldEmailMustMatch().validate(Fred, change)
 
-        assert [
-            ("old_email", "Old email does not match")
-        ] == excinfo.value.reasons
+        assert [("old_email", "Old email does not match")] == excinfo.value.reasons
 
     def test_doesnt_raise_if_old_email_matches(self, Fred):
         change = EmailUpdate(Fred.email, "probably@real.email.provider")
@@ -82,9 +77,7 @@ class TestOldPasswordMustMatchValidator(object):
         with pytest.raises(StopValidation) as excinfo:
             validators.OldPasswordMustMatch().validate(Fred, change)
 
-        assert [
-            ("old_password", "Old password is wrong")
-        ] == excinfo.value.reasons
+        assert [("old_password", "Old password is wrong")] == excinfo.value.reasons
 
     def test_doesnt_raise_if_old_passwords_match(self, Fred):
         change = PasswordUpdate("fred", str(uuid4()))
@@ -107,9 +100,7 @@ class TestValidateAvatarURL(object):
         assert excinfo.value.attribute == "avatar"
         assert excinfo.value.reason == "Could not retrieve avatar"
 
-    def test_raises_if_image_doesnt_pass_checks(
-        self, image_too_tall, Fred, responses
-    ):
+    def test_raises_if_image_doesnt_pass_checks(self, image_too_tall, Fred, responses):
         change = UserDetailsChange(avatar=image_too_tall.url)
         responses.add(image_too_tall)
 
@@ -118,9 +109,7 @@ class TestValidateAvatarURL(object):
 
         assert "too high" in excinfo.value.reason
 
-    def tests_passes_if_image_is_just_right(
-        self, image_just_right, Fred, responses
-    ):
+    def tests_passes_if_image_is_just_right(self, image_just_right, Fred, responses):
         change = UserDetailsChange(avatar=image_just_right.url)
         responses.add(image_just_right)
         validators.ValidateAvatarURL().validate(Fred, change)

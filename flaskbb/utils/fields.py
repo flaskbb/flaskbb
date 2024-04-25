@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.fields
-    ~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.fields
+~~~~~~~~~~~~~~~~~~~~
 
-    Additional fields and widgets for wtforms.
-    The reCAPTCHA Field was taken from Flask-WTF and modified
-    to use our own settings system.
+Additional fields and widgets for wtforms.
+The reCAPTCHA Field was taken from Flask-WTF and modified
+to use our own settings system.
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
+import json
 import logging
 import urllib
 from urllib.parse import urlencode
-import json
 
-from flask import request, current_app
+from flask import current_app, request
 from markupsafe import Markup
 from wtforms import ValidationError
 from wtforms.fields import Field
@@ -23,24 +24,23 @@ from wtforms.fields import Field
 from flaskbb.utils.helpers import to_bytes, to_unicode
 from flaskbb.utils.settings import flaskbb_config
 
-
 logger = logging.getLogger(__name__)
 
 
 JSONEncoder = json.JSONEncoder
 
-RECAPTCHA_SCRIPT = u'https://www.google.com/recaptcha/api.js'
-RECAPTCHA_TEMPLATE = u'''
+RECAPTCHA_SCRIPT = "https://www.google.com/recaptcha/api.js"
+RECAPTCHA_TEMPLATE = """
 <script src='%s' async defer></script>
 <div class="g-recaptcha" %s></div>
-'''
+"""
 
-RECAPTCHA_VERIFY_SERVER = 'https://www.google.com/recaptcha/api/siteverify'
+RECAPTCHA_VERIFY_SERVER = "https://www.google.com/recaptcha/api/siteverify"
 RECAPTCHA_ERROR_CODES = {
-    'missing-input-secret': 'The secret parameter is missing.',
-    'invalid-input-secret': 'The secret parameter is invalid or malformed.',
-    'missing-input-response': 'The response parameter is missing.',
-    'invalid-input-response': 'The response parameter is invalid or malformed.'
+    "missing-input-secret": "The secret parameter is missing.",
+    "invalid-input-secret": "The secret parameter is invalid or malformed.",
+    "missing-input-response": "The response parameter is missing.",
+    "invalid-input-response": "The response parameter is invalid or malformed.",
 }
 
 
@@ -49,7 +49,7 @@ class RecaptchaValidator(object):
 
     def __init__(self, message=None):
         if message is None:
-            message = RECAPTCHA_ERROR_CODES['missing-input-response']
+            message = RECAPTCHA_ERROR_CODES["missing-input-response"]
         self.message = message
 
     def __call__(self, form, field):
@@ -57,22 +57,22 @@ class RecaptchaValidator(object):
             return True
 
         if request.json:
-            response = request.json.get('g-recaptcha-response', '')
+            response = request.json.get("g-recaptcha-response", "")
         else:
-            response = request.form.get('g-recaptcha-response', '')
+            response = request.form.get("g-recaptcha-response", "")
         remote_ip = request.remote_addr
 
         if not response:
             raise ValidationError(field.gettext(self.message))
 
         if not self._validate_recaptcha(response, remote_ip):
-            field.recaptcha_error = 'incorrect-captcha-sol'
+            field.recaptcha_error = "incorrect-captcha-sol"
             raise ValidationError(field.gettext(self.message))
 
     def _validate_recaptcha(self, response, remote_addr):
         """Performs the actual validation."""
         try:
-            private_key = flaskbb_config['RECAPTCHA_PRIVATE_KEY']
+            private_key = flaskbb_config["RECAPTCHA_PRIVATE_KEY"]
         except KeyError:
             raise RuntimeError("No RECAPTCHA_PRIVATE_KEY config set")
 
@@ -98,19 +98,18 @@ class RecaptchaValidator(object):
 
 
 class RecaptchaWidget(object):
-
     def recaptcha_html(self, public_key):
-        html = current_app.config.get('RECAPTCHA_HTML')
+        html = current_app.config.get("RECAPTCHA_HTML")
         if html:
             return Markup(html)
-        params = current_app.config.get('RECAPTCHA_PARAMETERS')
+        params = current_app.config.get("RECAPTCHA_PARAMETERS")
         script = RECAPTCHA_SCRIPT
         if params:
             script += "?" + urlencode(params)
 
-        attrs = current_app.config.get('RECAPTCHA_DATA_ATTRS', {})
-        attrs['sitekey'] = public_key
-        snippet = u' '.join([u'data-%s="%s"' % (k, attrs[k]) for k in attrs])
+        attrs = current_app.config.get("RECAPTCHA_DATA_ATTRS", {})
+        attrs["sitekey"] = public_key
+        snippet = " ".join(['data-%s="%s"' % (k, attrs[k]) for k in attrs])
         return Markup(RECAPTCHA_TEMPLATE % (script, snippet))
 
     def __call__(self, field, error=None, **kwargs):
@@ -120,7 +119,7 @@ class RecaptchaWidget(object):
             return
 
         try:
-            public_key = flaskbb_config['RECAPTCHA_PUBLIC_KEY']
+            public_key = flaskbb_config["RECAPTCHA_PUBLIC_KEY"]
         except KeyError:
             raise RuntimeError("RECAPTCHA_PUBLIC_KEY config not set")
 
@@ -133,6 +132,6 @@ class RecaptchaField(Field):
     # error message if recaptcha validation fails
     recaptcha_error = None
 
-    def __init__(self, label='', validators=None, **kwargs):
+    def __init__(self, label="", validators=None, **kwargs):
         validators = validators or [RecaptchaValidator()]
         super(RecaptchaField, self).__init__(label, validators, **kwargs)

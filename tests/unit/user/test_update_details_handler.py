@@ -4,8 +4,7 @@ import pytest
 from pluggy import HookimplMarker
 
 from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
-from flaskbb.core.exceptions import (PersistenceError, StopValidation,
-                                     ValidationError)
+from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
 from flaskbb.core.user.update import UserDetailsChange
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultDetailsUpdateHandler
@@ -33,9 +32,7 @@ class TestDefaultDetailsUpdateHandler(object):
         assert excinfo.value.reasons == [("location", "Dont be from there")]
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_raises_persistence_error_if_save_fails(
-        self, mocker, user, plugin_manager
-    ):
+    def test_raises_persistence_error_if_save_fails(self, mocker, user, plugin_manager):
         details = UserDetailsChange()
         db = mocker.Mock()
         db.session.commit.side_effect = Exception("no")

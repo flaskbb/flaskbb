@@ -17,9 +17,9 @@ sys.path.insert(0, os.path.abspath("_themes"))
 
 
 # -- Project information -----------------------------------------------------
-project = u'FlaskBB'
-copyright = u'2021, Peter Justin'
-author = u'Peter Justin'
+project = "FlaskBB"
+copyright = "2021, Peter Justin"
+author = "Peter Justin"
 
 
 # -- General configuration ---------------------------------------------------
@@ -50,21 +50,22 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "alabaster"
 
 html_theme_options = {
-    'logo': 'logo-full.png',
-    'github_banner': True,
-    'github_user': 'sh4nks',
-    'github_repo': 'flaskbb',
-    'github_type': 'star',
-    'description': ("FlaskBB is a simple and extensible forum software "
-                    "for building communities."),
-    'fixed_sidebar': True,
-    'show_related': True
+    "logo": "logo-full.png",
+    "github_banner": True,
+    "github_user": "sh4nks",
+    "github_repo": "flaskbb",
+    "github_type": "star",
+    "description": (
+        "FlaskBB is a simple and extensible forum software " "for building communities."
+    ),
+    "fixed_sidebar": True,
+    "show_related": True,
 }
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-html_title = u'FlaskBB Documentation'
+html_title = "FlaskBB Documentation"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -73,32 +74,27 @@ html_static_path = ["_static"]
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    'index': [
-        'about.html',
-        'sidebarintro.html',
-        'sourcelink.html',
-        'searchbox.html'
+    "index": ["about.html", "sidebarintro.html", "sourcelink.html", "searchbox.html"],
+    "**": [
+        "about.html",
+        "localtoc.html",
+        "relations.html",
+        "sourcelink.html",
+        "searchbox.html",
     ],
-    '**': [
-        'about.html',
-        'localtoc.html',
-        'relations.html',
-        'sourcelink.html',
-        'searchbox.html'
-    ]
 }
 html_show_sourcelink = False
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'flask': ('https://flask.palletsprojects.com/en/latest/', None),
-    'werkzeug': ('https://werkzeug.palletsprojects.com/en/latest/', None),
-    'click': ('https://click.palletsprojects.com/en/latest/', None),
-    'jinja': ('https://jinja.palletsprojects.com/en/latest/', None),
-    'wtforms': ('https://wtforms.readthedocs.io/en/master/', None),
+    "python": ("https://docs.python.org/3/", None),
+    "flask": ("https://flask.palletsprojects.com/en/latest/", None),
+    "werkzeug": ("https://werkzeug.palletsprojects.com/en/latest/", None),
+    "click": ("https://click.palletsprojects.com/en/latest/", None),
+    "jinja": ("https://jinja.palletsprojects.com/en/latest/", None),
+    "wtforms": ("https://wtforms.readthedocs.io/en/master/", None),
 }
 
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 
 # due to rtd using sphinx < 2
-root_doc = master_doc = 'index'
+root_doc = master_doc = "index"

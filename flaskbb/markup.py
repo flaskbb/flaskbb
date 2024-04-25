@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.markup
-    ~~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.markup
+~~~~~~~~~~~~~~~~~~~~
 
-    A module for all markup related stuff.
+A module for all markup related stuff.
 
-    :copyright: (c) 2016 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2016 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 
 import mistune
@@ -19,22 +20,22 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
-impl = HookimplMarker('flaskbb')
+impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
-_re_user = r'(?i)@(\w+)'
+_re_user = r"(?i)@(\w+)"
 
 
 def parse_user_link(inline, match, state):
     url = url_for("user.profile", username=match.group(1), _external=False)
-    return 'link', url, match.group(0)
+    return "link", url, match.group(0)
 
 
 def plugin_userify(md):
     """Mistune plugin that transforms @username references to links."""
-    md.inline.register_rule('flaskbb_user_link', _re_user, parse_user_link)
-    md.inline.rules.append('flaskbb_user_link')
+    md.inline.register_rule("flaskbb_user_link", _re_user, parse_user_link)
+    md.inline.rules.append("flaskbb_user_link")
 
 
 DEFAULT_PLUGINS = [
@@ -87,33 +88,21 @@ def flaskbb_load_nonpost_markdown_class():
 def flaskbb_jinja_directives(app):
     render_classes = app.pluggy.hook.flaskbb_load_post_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
-    app.pluggy.hook.flaskbb_load_post_markdown_plugins(
-        plugins=plugins,
-        app=app
-    )
-    app.jinja_env.filters['markup'] = make_renderer(render_classes, plugins)
+    app.pluggy.hook.flaskbb_load_post_markdown_plugins(plugins=plugins, app=app)
+    app.jinja_env.filters["markup"] = make_renderer(render_classes, plugins)
 
-    render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(
-        app=app
-    )
+    render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
     plugins = app.pluggy.hook.flaskbb_load_nonpost_markdown_plugins(
-        plugins=plugins,
-        app=app
+        plugins=plugins, app=app
     )
-    app.jinja_env.filters['nonpost_markup'] = make_renderer(
-        render_classes,
-        plugins
-    )
+    app.jinja_env.filters["nonpost_markup"] = make_renderer(render_classes, plugins)
 
 
 def make_renderer(classes, plugins):
-    RenderCls = type('FlaskBBRenderer', tuple(classes), {})
+    RenderCls = type("FlaskBBRenderer", tuple(classes), {})
 
     markup = mistune.create_markdown(
-        renderer=RenderCls(),
-        plugins=plugins,
-        escape=True,
-        hard_wrap=True
+        renderer=RenderCls(), plugins=plugins, escape=True, hard_wrap=True
     )
     return lambda text: Markup(markup(text))

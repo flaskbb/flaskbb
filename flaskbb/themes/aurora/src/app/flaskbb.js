@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
             event.preventDefault();
             const post_id = event.target.dataset.postId;
             const urlprefix =
-                typeof FORUM_URL_PREFIX !== typeof undefined
+                typeof FORUM_URL_PREFIX !== 'undefined'
                     ? FORUM_URL_PREFIX
                     : "";
             const url = `${urlprefix}/post/${post_id}/raw`;

@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.auth.views
-    ~~~~~~~~~~~~~~~~~~
+flaskbb.auth.views
+~~~~~~~~~~~~~~~~~~
 
-    This view provides user authentication, registration and a view for
-    resetting the password of a user if he has lost his password
+This view provides user authentication, registration and a view for
+resetting the password of a user if he has lost his password
 
-    :copyright: (c) 2014 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
+
 import logging
 from datetime import datetime
 
@@ -120,7 +121,6 @@ class Reauth(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-
             reauth_manager = self.reauthentication_factory()
             try:
                 reauth_manager.reauthenticate(
@@ -149,7 +149,7 @@ class Register(MethodView):
         form = RegisterForm()
 
         form.language.choices = get_available_languages()
-        form.language.default = flaskbb_config['DEFAULT_LANGUAGE']
+        form.language.default = flaskbb_config["DEFAULT_LANGUAGE"]
         form.process(request.form)  # needed because a default is overriden
         return form
 
@@ -164,7 +164,7 @@ class Register(MethodView):
                 password=form.password.data,
                 group=4,
                 email=form.email.data,
-                language=form.language.data
+                language=form.language.data,
             )
 
             service = self.registration_service_factory()
@@ -174,20 +174,18 @@ class Register(MethodView):
                 form.populate_errors(e.reasons)
                 return render_template("auth/register.html", form=form)
             except PersistenceError:
-                    logger.exception("Database error while persisting user")
-                    flash(
-                        _(
-                            "Could not process registration due"
-                            "to an unrecoverable error"
-                        ), "danger"
-                    )
+                logger.exception("Database error while persisting user")
+                flash(
+                    _("Could not process registration due" "to an unrecoverable error"),
+                    "danger",
+                )
 
-                    return render_template("auth/register.html", form=form)
+                return render_template("auth/register.html", form=form)
 
             current_app.pluggy.hook.flaskbb_event_user_registered(
                 username=registration_info.username
             )
-            return redirect_or_next(url_for('forum.index'))
+            return redirect_or_next(url_for("forum.index"))
 
         return render_template("auth/register.html", form=form)
 
@@ -205,7 +203,6 @@ class ForgotPassword(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-
             try:
                 service = self.password_reset_service_factory()
                 service.initiate_password_reset(form.email.data)
@@ -214,7 +211,8 @@ class ForgotPassword(MethodView):
                     _(
                         "You have entered an username or email address that "
                         "is not linked with your account."
-                    ), "danger"
+                    ),
+                    "danger",
                 )
             else:
                 flash(_("Email sent! Please check your inbox."), "info")
@@ -240,20 +238,18 @@ class ResetPassword(MethodView):
         if form.validate_on_submit():
             try:
                 service = self.password_reset_service_factory()
-                service.reset_password(
-                    token, form.email.data, form.password.data
-                )
+                service.reset_password(token, form.email.data, form.password.data)
             except TokenError as e:
-                flash(e.reason, 'danger')
-                return redirect(url_for('auth.forgot_password'))
+                flash(e.reason, "danger")
+                return redirect(url_for("auth.forgot_password"))
             except StopValidation as e:
                 form.populate_errors(e.reasons)
                 form.token.data = token
                 return render_template("auth/reset_password.html", form=form)
             except Exception:
                 logger.exception("Error when resetting password")
-                flash(_('Error when resetting password'))
-                return redirect(url_for('auth.forgot_password'))
+                flash(_("Error when resetting password"))
+                return redirect(url_for("auth.forgot_password"))
             finally:
                 try:
                     db.session.commit()
@@ -278,9 +274,7 @@ class RequestActivationToken(MethodView):
         self.account_activator_factory = account_activator_factory
 
     def get(self):
-        return render_template(
-            "auth/request_account_activation.html", form=self.form()
-        )
+        return render_template("auth/request_account_activation.html", form=self.form())
 
     def post(self):
         form = self.form()
@@ -295,13 +289,12 @@ class RequestActivationToken(MethodView):
                     _(
                         "A new account activation token has been sent to "
                         "your email address."
-                    ), "success"
+                    ),
+                    "success",
                 )
-                return redirect(url_for('forum.index'))
+                return redirect(url_for("forum.index"))
 
-        return render_template(
-            "auth/request_account_activation.html", form=form
-        )
+        return render_template("auth/request_account_activation.html", form=form)
 
 
 class AutoActivateAccount(MethodView):
@@ -316,10 +309,10 @@ class AutoActivateAccount(MethodView):
         try:
             activator.activate_account(token)
         except TokenError as e:
-            flash(e.reason, 'danger')
+            flash(e.reason, "danger")
         except ValidationError as e:
-            flash(e.reason, 'danger')
-            return redirect(url_for('forum.index'))
+            flash(e.reason, "danger")
+            return redirect(url_for("forum.index"))
 
         else:
             try:
@@ -330,18 +323,18 @@ class AutoActivateAccount(MethodView):
                 flash(
                     _(
                         "Could not activate account due to an unrecoverable error"  # noqa
-                    ), "danger"
+                    ),
+                    "danger",
                 )
 
-                return redirect(url_for('auth.request_activation_token'))
+                return redirect(url_for("auth.request_activation_token"))
 
             flash(
-                _("Your account has been activated and you can now login."),
-                "success"
+                _("Your account has been activated and you can now login."), "success"
             )
             return redirect(url_for("forum.index"))
 
-        return redirect(url_for('auth.activate_account'))
+        return redirect(url_for("auth.activate_account"))
 
 
 class ActivateAccount(MethodView):
@@ -352,10 +345,7 @@ class ActivateAccount(MethodView):
         self.account_activator_factory = account_activator_factory
 
     def get(self):
-        return render_template(
-            "auth/account_activation.html",
-            form=self.form()
-        )
+        return render_template("auth/account_activation.html", form=self.form())
 
     def post(self):
         form = self.form()
@@ -365,10 +355,10 @@ class ActivateAccount(MethodView):
             try:
                 activator.activate_account(token)
             except TokenError as e:
-                form.populate_errors([('token', e.reason)])
+                form.populate_errors([("token", e.reason)])
             except ValidationError as e:
-                flash(e.reason, 'danger')
-                return redirect(url_for('forum.index'))
+                flash(e.reason, "danger")
+                return redirect(url_for("forum.index"))
 
             else:
                 try:
@@ -379,14 +369,15 @@ class ActivateAccount(MethodView):
                     flash(
                         _(
                             "Could not activate account due to an unrecoverable error"  # noqa
-                        ), "danger"
+                        ),
+                        "danger",
                     )
 
-                    return redirect(url_for('auth.request_activation_token'))
+                    return redirect(url_for("auth.request_activation_token"))
 
                 flash(
                     _("Your account has been activated and you can now login."),
-                    "success"
+                    "success",
                 )
                 return redirect(url_for("forum.index"))
 
@@ -402,13 +393,13 @@ def flaskbb_load_blueprints(app):
         # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
         return "{count}/{timeout}minutes".format(
             count=flaskbb_config["AUTH_REQUESTS"],
-            timeout=flaskbb_config["AUTH_TIMEOUT"]
+            timeout=flaskbb_config["AUTH_TIMEOUT"],
         )
 
     def login_rate_limit_message():
         """Display the amount of time left until the user can access the requested
         resource again."""
-        current_limit = getattr(g, 'view_rate_limit', None)
+        current_limit = getattr(g, "view_rate_limit", None)
         if current_limit is not None:
             window_stats = limiter.limiter.get_window_stats(*current_limit)
             reset_time = datetime.utcfromtimestamp(window_stats[0])
@@ -426,83 +417,72 @@ def flaskbb_load_blueprints(app):
     def login_rate_limit_error(error):
         """Register a custom error handler for a 'Too Many Requests'
         (HTTP CODE 429) error."""
-        return render_template(
-            "errors/too_many_logins.html", timeout=error.description
-        )
+        return render_template("errors/too_many_logins.html", timeout=error.description)
 
     # Activate rate limiting on the whole blueprint
-    limiter.limit(
-        login_rate_limit, error_message=login_rate_limit_message
-    )(auth)
+    limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
 
-    register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
+    register_view(auth, routes=["/logout"], view_func=Logout.as_view("logout"))
     register_view(
         auth,
-        routes=['/login'],
+        routes=["/login"],
         view_func=Login.as_view(
-            'login',
-            authentication_manager_factory=authentication_manager_factory
-        )
+            "login", authentication_manager_factory=authentication_manager_factory
+        ),
     )
     register_view(
         auth,
-        routes=['/reauth'],
+        routes=["/reauth"],
         view_func=Reauth.as_view(
-            'reauth',
-            reauthentication_factory=reauthentication_manager_factory
-        )
+            "reauth", reauthentication_factory=reauthentication_manager_factory
+        ),
     )
     register_view(
         auth,
-        routes=['/register'],
+        routes=["/register"],
         view_func=Register.as_view(
-            'register',
-            registration_service_factory=registration_service_factory
-        )
+            "register", registration_service_factory=registration_service_factory
+        ),
     )
 
     register_view(
         auth,
-        routes=['/reset-password'],
+        routes=["/reset-password"],
         view_func=ForgotPassword.as_view(
-            'forgot_password',
-            password_reset_service_factory=reset_service_factory
-        )
+            "forgot_password", password_reset_service_factory=reset_service_factory
+        ),
     )
 
     register_view(
         auth,
-        routes=['/reset-password/<token>'],
+        routes=["/reset-password/<token>"],
         view_func=ResetPassword.as_view(
-            'reset_password',
-            password_reset_service_factory=reset_service_factory
-        )
+            "reset_password", password_reset_service_factory=reset_service_factory
+        ),
     )
 
     register_view(
         auth,
-        routes=['/activate'],
+        routes=["/activate"],
         view_func=RequestActivationToken.as_view(
-            'request_activation_token',
-            account_activator_factory=account_activator_factory
-        )
+            "request_activation_token",
+            account_activator_factory=account_activator_factory,
+        ),
     )
     register_view(
         auth,
-        routes=['/activate/confirm'],
+        routes=["/activate/confirm"],
         view_func=ActivateAccount.as_view(
-            'activate_account',
-            account_activator_factory=account_activator_factory
-        )
+            "activate_account", account_activator_factory=account_activator_factory
+        ),
     )
 
     register_view(
         auth,
-        routes=['/activate/confirm/<token>'],
+        routes=["/activate/confirm/<token>"],
         view_func=AutoActivateAccount.as_view(
-            'autoactivate_account',
-            account_activator_factory=account_activator_factory
-        )
+            "autoactivate_account", account_activator_factory=account_activator_factory
+        ),
     )
 
-    app.register_blueprint(auth, url_prefix=app.config['AUTH_URL_PREFIX'])
+    app.register_blueprint(auth, url_prefix=app.config["AUTH_URL_PREFIX"])

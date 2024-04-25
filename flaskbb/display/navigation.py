@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.display.navigation
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.display.navigation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Helpers to create navigation elements in FlaskBB Templates
+Helpers to create navigation elements in FlaskBB Templates
 
-    :copyright: (c) 2018 the FlaskBB Team
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2018 the FlaskBB Team
+:license: BSD, see LICENSE for more details
 """
+
 from abc import ABC, abstractproperty
 from enum import Enum
 
 import attr
-
 
 __all__ = (
     "NavigationContentType",
@@ -39,6 +39,7 @@ class NavigationItem(ABC):
     Abstract NavigationItem class. Not meant for use but provides the common
     interface for navigation items.
     """
+
     content_type = abstractproperty(lambda: None)
 
 
@@ -75,6 +76,7 @@ class NavigationExternalLink(NavigationItem):
             icon="fa fa-at"
         )
     """
+
     uri = attr.ib()
     name = attr.ib()
     icon = attr.ib(default="")

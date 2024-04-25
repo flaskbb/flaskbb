@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.user.services.update
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.user.services.update
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    User update services.
+User update services.
 
-    :copyright: (c) 2018 the FlaskBB Team.
-    :license: BSD, see LICENSE for more details
+:copyright: (c) 2018 the FlaskBB Team.
+:license: BSD, see LICENSE for more details
 """
 
 import attr
 
-from ...core.exceptions import accumulate_errors
 from ...core.changesets import ChangeSetHandler
+from ...core.exceptions import accumulate_errors
 from ...utils.database import try_commit
 
 
@@ -27,9 +27,7 @@ class DefaultDetailsUpdateHandler(ChangeSetHandler):
     validators = attr.ib(factory=list)
 
     def apply_changeset(self, model, changeset):
-        accumulate_errors(
-            lambda v: v.validate(model, changeset), self.validators
-        )
+        accumulate_errors(lambda v: v.validate(model, changeset), self.validators)
         changeset.assign_to_user(model)
         try_commit(self.db.session, "Could not update details")
         self.plugin_manager.hook.flaskbb_details_updated(
@@ -48,9 +46,7 @@ class DefaultPasswordUpdateHandler(ChangeSetHandler):
     validators = attr.ib(factory=list)
 
     def apply_changeset(self, model, changeset):
-        accumulate_errors(
-            lambda v: v.validate(model, changeset), self.validators
-        )
+        accumulate_errors(lambda v: v.validate(model, changeset), self.validators)
         model.password = changeset.new_password
         try_commit(self.db.session, "Could not update password")
         self.plugin_manager.hook.flaskbb_password_updated(user=model)

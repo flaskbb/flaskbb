@@ -1,22 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-    flaskbb.utils.forms
-    ~~~~~~~~~~~~~~~~~~~
+flaskbb.utils.forms
+~~~~~~~~~~~~~~~~~~~
 
-    This module contains stuff for forms.
+This module contains stuff for forms.
 
-    :copyright: (c) 2017 by the FlaskBB Team.
-    :license: BSD, see LICENSE for more details.
+:copyright: (c) 2017 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
-from wtforms import (StringField, IntegerField, FloatField, BooleanField,
-                     SelectField, SelectMultipleField, validators)
-from flask_wtf import FlaskForm
+
 from enum import Enum
+
+from flask_wtf import FlaskForm
+from wtforms import (
+    BooleanField,
+    FloatField,
+    IntegerField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    validators,
+)
 
 
 class FlaskBBForm(FlaskForm):
     def populate_errors(self, errors):
-        for (attribute, reason) in errors:
+        for attribute, reason in errors:
             self.errors.setdefault(attribute, []).append(reason)
             field = getattr(self, attribute, None)
             if field:
@@ -61,6 +70,7 @@ def populate_settings_form(form, settings):
 def generate_settings_form(settings):  # noqa: C901
     """Generates a settings form which includes field validation
     based on our Setting Schema."""
+
     class SettingsForm(FlaskBBForm):
         pass
 
@@ -68,8 +78,7 @@ def generate_settings_form(settings):  # noqa: C901
     for setting in settings:
         field_validators = []
 
-        if setting.value_type in {SettingValueType.integer,
-                                  SettingValueType.float}:
+        if setting.value_type in {SettingValueType.integer, SettingValueType.float}:
             validator_class = validators.NumberRange
         elif setting.value_type == SettingValueType.string:
             validator_class = validators.Length
@@ -77,80 +86,92 @@ def generate_settings_form(settings):  # noqa: C901
         # generate the validators
         if "min" in setting.extra:
             # Min number validator
-            field_validators.append(
-                validator_class(min=setting.extra["min"])
-            )
+            field_validators.append(validator_class(min=setting.extra["min"]))
 
         if "max" in setting.extra:
             # Max number validator
-            field_validators.append(
-                validator_class(max=setting.extra["max"])
-            )
+            field_validators.append(validator_class(max=setting.extra["max"]))
 
         # Generate the fields based on value_type
         # IntegerField
         if setting.value_type == SettingValueType.integer:
             setattr(
-                SettingsForm, setting.key,
-                IntegerField(setting.name, validators=field_validators,
-                             description=setting.description)
+                SettingsForm,
+                setting.key,
+                IntegerField(
+                    setting.name,
+                    validators=field_validators,
+                    description=setting.description,
+                ),
             )
         # FloatField
         elif setting.value_type == SettingValueType.float:
             setattr(
-                SettingsForm, setting.key,
-                FloatField(setting.name, validators=field_validators,
-                           description=setting.description)
+                SettingsForm,
+                setting.key,
+                FloatField(
+                    setting.name,
+                    validators=field_validators,
+                    description=setting.description,
+                ),
             )
 
         # StringField
         elif setting.value_type == SettingValueType.string:
             setattr(
-                SettingsForm, setting.key,
-                StringField(setting.name, validators=field_validators,
-                          description=setting.description)
+                SettingsForm,
+                setting.key,
+                StringField(
+                    setting.name,
+                    validators=field_validators,
+                    description=setting.description,
+                ),
             )
 
         # SelectMultipleField
         elif setting.value_type == SettingValueType.selectmultiple:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
-                coerce_to = setting.extra['coerce']
+                coerce_to = setting.extra["coerce"]
             else:
                 coerce_to = str
 
             setattr(
-                SettingsForm, setting.key,
+                SettingsForm,
+                setting.key,
                 SelectMultipleField(
                     setting.name,
-                    choices=setting.extra['choices'](),
+                    choices=setting.extra["choices"](),
                     coerce=coerce_to,
-                    description=setting.description
-                )
+                    description=setting.description,
+                ),
             )
 
         # SelectField
         elif setting.value_type == SettingValueType.select:
             # if no coerce is found, it will fallback to unicode
             if "coerce" in setting.extra:
-                coerce_to = setting.extra['coerce']
+                coerce_to = setting.extra["coerce"]
             else:
                 coerce_to = str
 
             setattr(
-                SettingsForm, setting.key,
+                SettingsForm,
+                setting.key,
                 SelectField(
                     setting.name,
                     coerce=coerce_to,
-                    choices=setting.extra['choices'](),
-                    description=setting.description)
+                    choices=setting.extra["choices"](),
+                    description=setting.description,
+                ),
             )
 
         # BooleanField
         elif setting.value_type == SettingValueType.boolean:
             setattr(
-                SettingsForm, setting.key,
-                BooleanField(setting.name, description=setting.description)
+                SettingsForm,
+                setting.key,
+                BooleanField(setting.name, description=setting.description),
             )
 
     return SettingsForm
