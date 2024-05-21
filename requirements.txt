@@ -54,7 +54,7 @@ python-dateutil==2.9.0.post0
 python-editor==1.0.4
 pytz==2024.1
 redis==5.0.3
-requests==2.31.0
+requests==2.32.0
 rich==13.7.1
 six==1.16.0
 SQLAlchemy==2.0.29
