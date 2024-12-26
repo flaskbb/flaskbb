@@ -8,63 +8,66 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-07-28 11:36+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2024-12-27 13:00+0000\n"
+"Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
+"Language-Team: Tamil <https://hosted.weblate.org/projects/flaskbb/flaskbb/ta/"
+">\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10-dev\n"
 "Generated-By: Babel 2.6.0\n"
 
 #: flaskbb/deprecation.py:70
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr ""
+msgstr "%(name)s நீக்கப்பட்டு, பதிப்பு %(version)s அகற்றப்படும்."
 
 #: flaskbb/email.py:31
 msgid "Password Recovery Confirmation"
-msgstr ""
+msgstr "கடவுச்சொல் மீட்பு உறுதிப்படுத்தல்"
 
 #: flaskbb/email.py:55 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
-msgstr ""
+msgstr "கணக்கு செயல்படுத்தல்"
 
 #: flaskbb/auth/forms.py:37 flaskbb/management/forms.py:35
 msgid "You can only use letters, numbers or dashes."
-msgstr ""
+msgstr "நீங்கள் கடிதங்கள், எண்கள் அல்லது கோடுகளை மட்டுமே பயன்படுத்த முடியும்."
 
 #: flaskbb/auth/forms.py:43
 msgid "Username or Email address"
-msgstr ""
+msgstr "பயனர்பெயர் அல்லது மின்னஞ்சல் முகவரி"
 
 #: flaskbb/auth/forms.py:46
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "உங்கள் பயனர்பெயர் அல்லது மின்னஞ்சல் முகவரியை உள்ளிடவும்."
 
 #: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:84 flaskbb/auth/forms.py:108
 #: flaskbb/auth/forms.py:141 flaskbb/user/forms.py:67
 msgid "Password"
-msgstr ""
+msgstr "கடவுச்சொல்"
 
 #: flaskbb/auth/forms.py:53 flaskbb/auth/forms.py:109 flaskbb/user/forms.py:68
 msgid "Please enter your password."
-msgstr ""
+msgstr "உங்கள் கடவுச்சொல்லை உள்ளிடவும்."
 
 #: flaskbb/auth/forms.py:56
 msgid "Remember me"
-msgstr ""
+msgstr "என்னை நினைவில் கொள்ளுங்கள்"
 
 #: flaskbb/auth/forms.py:58 flaskbb/templates/auth/login.html:1
 #: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:118
 msgid "Login"
-msgstr ""
+msgstr "புகுபதிவு"
 
 #: flaskbb/auth/forms.py:59 flaskbb/auth/forms.py:63 flaskbb/auth/forms.py:93
 #: flaskbb/auth/forms.py:124
 msgid "Captcha"
-msgstr ""
+msgstr "கேப்ட்சா"
 
 #: flaskbb/auth/forms.py:68 flaskbb/auth/forms.py:155
 #: flaskbb/management/forms.py:55 flaskbb/templates/forum/memberlist.html:45
@@ -72,255 +75,261 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:62
 #: flaskbb/templates/management/users.html:61
 msgid "Username"
-msgstr ""
+msgstr "பயனர்பெயர்"
 
 #: flaskbb/auth/forms.py:70
 msgid "A valid username is required"
-msgstr ""
+msgstr "செல்லுபடியாகும் பயனர்பெயர் தேவை"
 
 #: flaskbb/auth/forms.py:76 flaskbb/auth/forms.py:117 flaskbb/auth/forms.py:133
 #: flaskbb/auth/forms.py:163 flaskbb/management/forms.py:59
 msgid "Email address"
-msgstr ""
+msgstr "மின்னஞ்சல் முகவரி"
 
 #: flaskbb/auth/forms.py:78 flaskbb/auth/forms.py:119 flaskbb/auth/forms.py:135
 #: flaskbb/auth/forms.py:165 flaskbb/management/forms.py:60
 #: flaskbb/user/forms.py:40
 msgid "A valid email address is required."
-msgstr ""
+msgstr "சரியான மின்னஞ்சல் முகவரி தேவை."
 
 #: flaskbb/auth/forms.py:79 flaskbb/auth/forms.py:166
 #: flaskbb/management/forms.py:61 flaskbb/user/forms.py:41
 #: flaskbb/user/forms.py:46 flaskbb/user/forms.py:49
 msgid "Invalid email address."
-msgstr ""
+msgstr "தவறான மின்னஞ்சல் முகவரி."
 
 #: flaskbb/auth/forms.py:87 flaskbb/auth/forms.py:144
 msgid "Passwords must match."
-msgstr ""
+msgstr "கடவுச்சொற்கள் பொருந்த வேண்டும்."
 
 #: flaskbb/auth/forms.py:91 flaskbb/auth/forms.py:148
 msgid "Confirm password"
-msgstr ""
+msgstr "கடவுச்சொல்லை உறுதிப்படுத்தவும்"
 
 #: flaskbb/auth/forms.py:95 flaskbb/user/forms.py:32
 msgid "Language"
-msgstr ""
+msgstr "மொழி"
 
 #: flaskbb/auth/forms.py:98
 msgid "I accept the Terms of Service"
-msgstr ""
+msgstr "பணி விதிமுறைகளை நான் ஏற்றுக்கொள்கிறேன்"
 
 #: flaskbb/auth/forms.py:99
 msgid "Please accept the TOS."
-msgstr ""
+msgstr "தயவுசெய்து TOS ஐ ஏற்றுக்கொள்ளுங்கள்."
 
 #: flaskbb/auth/forms.py:103 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:124
 msgid "Register"
-msgstr ""
+msgstr "பதிவு செய்யுங்கள்"
 
 #: flaskbb/auth/forms.py:112 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:10
 msgid "Refresh Login"
-msgstr ""
+msgstr "உள்நுழைவைப் புதுப்பிக்கவும்"
 
 #: flaskbb/auth/forms.py:126
 msgid "Request Password"
-msgstr ""
+msgstr "கடவுச்சொல்லைக் கோருங்கள்"
 
 #: flaskbb/auth/forms.py:150
 msgid "Reset password"
-msgstr ""
+msgstr "கடவுச்சொல்லை மீட்டமைக்கவும்"
 
 #: flaskbb/auth/forms.py:157 flaskbb/management/forms.py:56
 msgid "A valid username is required."
-msgstr ""
+msgstr "செல்லுபடியாகும் பயனர்பெயர் தேவை."
 
 #: flaskbb/auth/forms.py:170
 msgid "Send Confirmation Mail"
-msgstr ""
+msgstr "உறுதிப்படுத்தல் அஞ்சல் அனுப்பவும்"
 
 #: flaskbb/auth/forms.py:175
 msgid "Email confirmation token"
-msgstr ""
+msgstr "மின்னஞ்சல் உறுதிப்படுத்தல் கிள்ளாக்கு"
 
 #: flaskbb/auth/forms.py:177
 msgid "Please enter the token we have sent to you."
-msgstr ""
+msgstr "நாங்கள் உங்களுக்கு அனுப்பிய கிள்ளாக்கை உள்ளிடவும்."
 
 #: flaskbb/auth/forms.py:180
 msgid "Confirm Email"
-msgstr ""
+msgstr "மின்னஞ்சலை உறுதிப்படுத்தவும்"
 
 #: flaskbb/auth/views.py:72
 msgid "Logged out"
-msgstr ""
+msgstr "வெளியேறியது"
 
 #: flaskbb/auth/views.py:103
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "உள்நுழைவைக் கையாளும் போது மீட்டெடுக்க முடியாத பிழை"
 
 #: flaskbb/auth/views.py:130
 msgid "Reauthenticated."
-msgstr ""
+msgstr "மறு ஏற்பு."
 
 #: flaskbb/auth/views.py:135
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "மறு அங்கீகாரத்தைக் கையாளும் போது மீட்டெடுக்க முடியாத பிழை"
 
 #: flaskbb/auth/views.py:179
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "பதிவுசெய்ய முடியாத பிழையை பதிவுசெய்த டூய்டோவை செயலாக்க முடியவில்லை"
 
 #: flaskbb/auth/views.py:214
 msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
+"உங்கள் கணக்குடன் இணைக்கப்படாத பயனர்பெயர் அல்லது மின்னஞ்சல் முகவரியை உள்ளிட்டுள்ளீர்கள்."
 
 #: flaskbb/auth/views.py:220
 msgid "Email sent! Please check your inbox."
-msgstr ""
+msgstr "மின்னஞ்சல் அனுப்பப்பட்டது! உங்கள் இன்பாக்சை சரிபார்க்கவும்."
 
 #: flaskbb/auth/views.py:255
 msgid "Error when resetting password"
-msgstr ""
+msgstr "கடவுச்சொல்லை மீட்டமைக்கும்போது பிழை"
 
 #: flaskbb/auth/views.py:266
 msgid "Your password has been updated."
-msgstr ""
+msgstr "உங்கள் கடவுச்சொல் புதுப்பிக்கப்பட்டுள்ளது."
 
 #: flaskbb/auth/views.py:295
 msgid "A new account activation token has been sent to your email address."
 msgstr ""
+"உங்கள் மின்னஞ்சல் முகவரிக்கு ஒரு புதிய கணக்கு செயல்படுத்தல் கிள்ளாக்கு அனுப்பப்பட்டுள்ளது."
 
 #: flaskbb/auth/views.py:331 flaskbb/auth/views.py:380
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "மீட்டெடுக்க முடியாத பிழை காரணமாக கணக்கை செயல்படுத்த முடியவில்லை"
 
 #: flaskbb/auth/views.py:339 flaskbb/auth/views.py:388
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "உங்கள் கணக்கு செயல்படுத்தப்பட்டுள்ளது, இப்போது நீங்கள் உள்நுழையலாம்."
 
 #: flaskbb/auth/services/activation.py:33
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "உள்ளிட்ட மின்னஞ்சல் இல்லை"
 
 #: flaskbb/auth/services/activation.py:36
 #: flaskbb/auth/services/activation.py:53
 msgid "Account is already activated"
-msgstr ""
+msgstr "கணக்கு ஏற்கனவே செயல்படுத்தப்பட்டுள்ளது"
 
 #: flaskbb/auth/services/authentication.py:70
 msgid "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"தோல்வியுற்ற உள்நுழைவு முயற்சிகள் காரணமாக உங்கள் கணக்கு தற்போது பூட்டப்பட்டுள்ளது"
 
 #: flaskbb/auth/services/authentication.py:127
 msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
+"உங்கள் கணக்கைப் பயன்படுத்த உங்கள் மின்னஞ்சல் முகவரிக்கு நாங்கள் அனுப்பிய இணைப்பின் மூலம் அதை "
+"செயல்படுத்த வேண்டும்."
 
 #: flaskbb/auth/services/authentication.py:161
 msgid "Wrong username or password."
-msgstr ""
+msgstr "தவறான பயனர்பெயர் அல்லது கடவுச்சொல்."
 
 #: flaskbb/auth/services/password.py:35
 msgid "Invalid email"
-msgstr ""
+msgstr "தவறான மின்னஞ்சல்"
 
 #: flaskbb/auth/services/reauthentication.py:74
 msgid "Wrong password."
-msgstr ""
+msgstr "தவறான கடவுச்சொல்."
 
 #: flaskbb/auth/services/registration.py:74
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
 msgstr ""
+"பயனர்பெயர் %(நிமிடம் மற்றும் %(min)sழுத்துக்குறி நீளத்திற்கு இடையில் இருக்க வேண்டும்"
 
 #: flaskbb/auth/services/registration.py:85
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s தடைசெய்யப்பட்ட பயனர்பெயர்"
 
 #: flaskbb/auth/services/registration.py:107
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s ஏற்கனவே பதிவு செய்யப்பட்டுள்ளன"
 
 #: flaskbb/auth/services/registration.py:129
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s ஏற்கனவே பதிவு செய்யப்பட்டுள்ளன"
 
 #: flaskbb/auth/services/registration.py:147
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
-msgstr ""
+msgstr "ஒரு கணக்கு செயல்படுத்தும் மின்னஞ்சல் %(email)s அனுப்பப்பட்டுள்ளது"
 
 #: flaskbb/auth/services/registration.py:162
 msgid "Thanks for registering."
-msgstr ""
+msgstr "பதிவு செய்ததற்கு நன்றி."
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "கிள்ளாக்கு தவறானது"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "கிள்ளாக்கு காலாவதியானது"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "கிள்ளாக்கை செயலாக்க முடியாது"
 
 #: flaskbb/forum/forms.py:28
 msgid "Quick reply"
-msgstr ""
+msgstr "விரைவான பதில்"
 
 #: flaskbb/forum/forms.py:29 flaskbb/forum/forms.py:40
 #: flaskbb/forum/forms.py:62
 msgid "You cannot post a reply without content."
-msgstr ""
+msgstr "உள்ளடக்கம் இல்லாமல் நீங்கள் பதிலை இடுகையிட முடியாது."
 
 #: flaskbb/forum/forms.py:31 flaskbb/forum/forms.py:45
 #: flaskbb/templates/forum/topic_controls.html:113
 msgid "Reply"
-msgstr ""
+msgstr "பதில்"
 
 #: flaskbb/forum/forms.py:39 flaskbb/forum/forms.py:61
 #: flaskbb/forum/forms.py:109
 msgid "Content"
-msgstr ""
+msgstr "உள்ளடக்கம்"
 
 #: flaskbb/forum/forms.py:42 flaskbb/forum/forms.py:64
 msgid "Track this topic"
-msgstr ""
+msgstr "இந்த தலைப்பைக் கண்காணிக்கவும்"
 
 #: flaskbb/forum/forms.py:58
 msgid "Topic title"
-msgstr ""
+msgstr "தலைப்பு தலைப்பு"
 
 #: flaskbb/forum/forms.py:59
 msgid "Please choose a title for your topic."
-msgstr ""
+msgstr "உங்கள் தலைப்புக்கு ஒரு தலைப்பைத் தேர்வுசெய்க."
 
 #: flaskbb/forum/forms.py:67
 msgid "Post Topic"
-msgstr ""
+msgstr "இடுகை தலைப்பு"
 
 #: flaskbb/forum/forms.py:82 flaskbb/templates/management/reports.html:39
 msgid "Reason"
-msgstr ""
+msgstr "காரணம்"
 
 #: flaskbb/forum/forms.py:83
 msgid "What is the reason for reporting this post?"
-msgstr ""
+msgstr "இந்த இடுகையைப் புகாரளிப்பதற்கான காரணம் என்ன?"
 
 #: flaskbb/forum/forms.py:86
 msgid "Report post"
-msgstr ""
+msgstr "அறிக்கை இடுகை"
 
 #: flaskbb/forum/forms.py:94 flaskbb/forum/forms.py:98
 #: flaskbb/forum/forms.py:113 flaskbb/templates/forum/memberlist.html:29
@@ -333,15 +342,15 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:39
 #: flaskbb/templates/management/users.html:38
 msgid "Search"
-msgstr ""
+msgstr "தேடல்"
 
 #: flaskbb/forum/forms.py:106
 msgid "Criteria"
-msgstr ""
+msgstr "அளவுகோல்கள்"
 
 #: flaskbb/forum/forms.py:110
 msgid "Post"
-msgstr ""
+msgstr "இடுகை"
 
 #: flaskbb/forum/forms.py:110 flaskbb/templates/forum/edit_forum.html:31
 #: flaskbb/templates/forum/forum.html:49
@@ -349,7 +358,7 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:31
 #: flaskbb/templates/management/reports.html:38
 msgid "Topic"
-msgstr ""
+msgstr "தலைப்பு"
 
 #: flaskbb/forum/forms.py:111 flaskbb/templates/forum/category.html:9
 #: flaskbb/templates/forum/category_layout.html:8
@@ -383,625 +392,640 @@ msgstr ""
 #: flaskbb/templates/user/profile.html:5
 #: flaskbb/templates/user/settings_layout.html:8
 msgid "Forum"
-msgstr ""
+msgstr "மன்றம்"
 
 #: flaskbb/forum/forms.py:111 flaskbb/templates/forum/search_result.html:93
 #: flaskbb/templates/management/users.html:1
 #: flaskbb/templates/management/users.html:33
 msgid "Users"
-msgstr ""
+msgstr "பயனர்கள்"
 
 #: flaskbb/forum/views.py:100 flaskbb/forum/views.py:826
 #: flaskbb/forum/views.py:844 flaskbb/forum/views.py:922
 #: flaskbb/forum/views.py:942
 msgid "You are not allowed to access that forum"
-msgstr ""
+msgstr "அந்த மன்றத்தை அணுக உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:135 flaskbb/forum/views.py:166
 msgid "You are not allowed to access that topic"
-msgstr ""
+msgstr "அந்த தலைப்பை அணுக உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:217
 msgid "You are not allowed to post a reply to this topic."
-msgstr ""
+msgstr "இந்த தலைப்புக்கு பதிலை இடுகையிட உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/forum/views.py:230
 msgid "Cannot post reply"
-msgstr ""
+msgstr "பதிலை இடுகையிட முடியாது"
 
 #: flaskbb/forum/views.py:256
 msgid "You are not allowed to post a topic here"
-msgstr ""
+msgstr "ஒரு தலைப்பை இங்கே இடுகையிட உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:291
 msgid "You are not allowed to manage this forum"
-msgstr ""
+msgstr "இந்த மன்றத்தை நிர்வகிக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:345
 msgid "In order to perform this action you have to select at least one topic."
 msgstr ""
+"இந்த செயலைச் செய்ய நீங்கள் குறைந்தது ஒரு தலைப்பையாவது தேர்ந்தெடுக்க வேண்டும்."
 
 #: flaskbb/forum/views.py:361
 #, python-format
 msgid "%(count)s topics locked."
-msgstr ""
+msgstr "%(எண்ணிக்கை) தலைப்புகள் பூட்டப்பட்டுள்ளன."
 
 #: flaskbb/forum/views.py:371
 #, python-format
 msgid "%(count)s topics unlocked."
-msgstr ""
+msgstr "%(எண்ணிக்கை) தலைப்புகள் திறக்கப்பட்டன."
 
 #: flaskbb/forum/views.py:382
 #, python-format
 msgid "%(count)s topics highlighted."
-msgstr ""
+msgstr "%(எண்ணிக்கை) தலைப்புகள் சிறப்பிக்கப்பட்டுள்ளன."
 
 #: flaskbb/forum/views.py:392
 #, python-format
 msgid "%(count)s topics trivialized."
-msgstr ""
+msgstr "%(count)s தலைப்புகள் அற்பமானவை."
 
 #: flaskbb/forum/views.py:403
 #, python-format
 msgid "%(count)s topics deleted."
-msgstr ""
+msgstr "%(count)s தலைப்புகள் நீக்கப்பட்டன."
 
 #: flaskbb/forum/views.py:411
 msgid "Please choose a new forum for the topics."
-msgstr ""
+msgstr "தலைப்புகளுக்கு புதிய மன்றத்தைத் தேர்வுசெய்க."
 
 #: flaskbb/forum/views.py:421
 msgid "You do not have the permissions to move this topic."
-msgstr ""
+msgstr "இந்த தலைப்பை நகர்த்துவதற்கான அனுமதிகள் உங்களிடம் இல்லை."
 
 #: flaskbb/forum/views.py:427
 msgid "Topics moved."
-msgstr ""
+msgstr "தலைப்புகள் நகர்ந்தன."
 
 #: flaskbb/forum/views.py:429
 msgid "Failed to move topics."
-msgstr ""
+msgstr "தலைப்புகளை நகர்த்துவதில் தோல்வி."
 
 #: flaskbb/forum/views.py:441
 #, python-format
 msgid "%(count)s topics hidden."
-msgstr ""
+msgstr "%(எண்ணிக்கை) தலைப்புகள் மறைக்கப்பட்டுள்ளன."
 
 #: flaskbb/forum/views.py:451
 #, python-format
 msgid "%(count)s topics unhidden."
-msgstr ""
+msgstr "%(எண்ணிக்கை) தலைப்புகள் மறைக்கப்படவில்லை."
 
 #: flaskbb/forum/views.py:455
 msgid "Unknown action requested"
-msgstr ""
+msgstr "அறியப்படாத நடவடிக்கை கோரப்பட்டது"
 
 #: flaskbb/forum/views.py:465
 msgid "You are not allowed to post a reply"
-msgstr ""
+msgstr "பதிலை இடுகையிட உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:511
 msgid "You are not allowed to edit that post"
-msgstr ""
+msgstr "அந்த இடுகையைத் திருத்த உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:559
 msgid "Thanks for reporting."
-msgstr ""
+msgstr "புகாரளித்ததற்கு நன்றி."
 
 #: flaskbb/forum/views.py:663
 #, python-format
 msgid "%(topic_count)s topics untracked."
-msgstr ""
+msgstr "%(topic_count)s தலைப்புகள் கட்டுப்படுத்தப்படாதவை."
 
 #: flaskbb/forum/views.py:692
 msgid "You are not allowed to delete this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை நீக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:715
 msgid "You are not allowed to lock this topic"
-msgstr ""
+msgstr "இந்த தலைப்பைப் பூட்ட உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:736
 msgid "You are not allowed to unlock this topic"
-msgstr ""
+msgstr "இந்த தலைப்பைத் திறக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:757
 msgid "You are not allowed to highlight this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை முன்னிலைப்படுத்த உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:778
 msgid "You are not allowed to trivialize this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை அற்பமாக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:799
 msgid "You are not allowed to delete this post"
-msgstr ""
+msgstr "இந்த இடுகையை நீக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:874
 #, python-format
 msgid "Forum %(forum)s marked as read."
-msgstr ""
+msgstr "மன்றம் %(forum)s வாசிக்கப்படுவதாக குறிக்கப்பட்டுள்ளன."
 
 #: flaskbb/forum/views.py:899
 msgid "All forums marked as read."
-msgstr ""
+msgstr "அனைத்து மன்றங்களும் வாசிக்கப்படுவதாக குறிக்கப்பட்டன."
 
 #: flaskbb/forum/views.py:963
 msgid "You do not have permission to hide this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை மறைக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:981
 msgid "You do not have permission to unhide this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை மறைக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:997
 msgid "You do not have permission to hide this post"
-msgstr ""
+msgstr "இந்த இடுகையை மறைக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:1001
 msgid "Post is already hidden"
-msgstr ""
+msgstr "இடுகை ஏற்கனவே மறைக்கப்பட்டுள்ளது"
 
 #: flaskbb/forum/views.py:1010
 msgid "Topic hidden"
-msgstr ""
+msgstr "தலைப்பு மறைக்கப்பட்டுள்ளது"
 
 #: flaskbb/forum/views.py:1012
 msgid "Post hidden"
-msgstr ""
+msgstr "இடுகை மறைக்கப்பட்டுள்ளது"
 
 #: flaskbb/forum/views.py:1027
 msgid "You do not have permission to unhide this post"
-msgstr ""
+msgstr "இந்த இடுகையை மறைக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/forum/views.py:1031
 msgid "Post is already unhidden"
-msgstr ""
+msgstr "இடுகை ஏற்கனவே மறைக்கப்படவில்லை"
 
 #: flaskbb/forum/views.py:1036
 msgid "Post unhidden"
-msgstr ""
+msgstr "மறைக்கப்படாத இடுகை"
 
 #: flaskbb/management/forms.py:66 flaskbb/user/forms.py:85
 msgid "Birthday"
-msgstr ""
+msgstr "பிறந்த நாள்"
 
 #: flaskbb/management/forms.py:69 flaskbb/user/forms.py:88
 msgid "Gender"
-msgstr ""
+msgstr "பாலினம்"
 
 #: flaskbb/management/forms.py:71 flaskbb/user/forms.py:90
 msgid "Male"
-msgstr ""
+msgstr "ஆண்"
 
 #: flaskbb/management/forms.py:72 flaskbb/user/forms.py:91
 msgid "Female"
-msgstr ""
+msgstr "பெண்"
 
 #: flaskbb/management/forms.py:74 flaskbb/user/forms.py:93
 msgid "Location"
-msgstr ""
+msgstr "இடம்"
 
 #: flaskbb/management/forms.py:77 flaskbb/user/forms.py:96
 msgid "Website"
-msgstr ""
+msgstr "வலைத்தளம்"
 
 #: flaskbb/management/forms.py:80 flaskbb/user/forms.py:99
 msgid "Avatar"
-msgstr ""
+msgstr "அவதார்"
 
 #: flaskbb/management/forms.py:83
 msgid "Forum signature"
-msgstr ""
+msgstr "மன்ற கையொப்பம்"
 
 #: flaskbb/management/forms.py:86 flaskbb/user/forms.py:105
 msgid "Notes"
-msgstr ""
+msgstr "குறிப்புகள்"
 
 #: flaskbb/management/forms.py:89
 msgid "Is active?"
-msgstr ""
+msgstr "செயலில் உள்ளதா?"
 
 #: flaskbb/management/forms.py:93
 msgid "Primary group"
-msgstr ""
+msgstr "முதன்மை குழு"
 
 #: flaskbb/management/forms.py:98
 msgid "Secondary groups"
-msgstr ""
+msgstr "இரண்டாம் நிலை குழுக்கள்"
 
 #: flaskbb/management/forms.py:104 flaskbb/management/forms.py:235
 #: flaskbb/management/forms.py:395 flaskbb/management/forms.py:477
 #: flaskbb/templates/management/settings.html:70 flaskbb/user/forms.py:35
 #: flaskbb/user/forms.py:51 flaskbb/user/forms.py:77 flaskbb/user/forms.py:108
 msgid "Save"
-msgstr ""
+msgstr "சேமி"
 
 #: flaskbb/management/forms.py:120
 msgid "This username is already taken."
-msgstr ""
+msgstr "இந்த பயனர்பெயர் ஏற்கனவே எடுக்கப்பட்டுள்ளது."
 
 #: flaskbb/management/forms.py:136 flaskbb/user/forms.py:63
 msgid "This email address is already taken."
-msgstr ""
+msgstr "இந்த மின்னஞ்சல் முகவரி ஏற்கனவே எடுக்கப்பட்டுள்ளது."
 
 #: flaskbb/management/forms.py:160
 msgid "Group name"
-msgstr ""
+msgstr "குழு பெயர்"
 
 #: flaskbb/management/forms.py:161
 msgid "Please enter a name for the group."
-msgstr ""
+msgstr "குழுவிற்கு ஒரு பெயரை உள்ளிடவும்."
 
 #: flaskbb/management/forms.py:163 flaskbb/management/forms.py:346
 #: flaskbb/management/forms.py:465 flaskbb/templates/management/groups.html:35
 msgid "Description"
-msgstr ""
+msgstr "விவரம்"
 
 #: flaskbb/management/forms.py:167
 msgid "Is 'Admin' group?"
-msgstr ""
+msgstr "'நிர்வாகி' குழு?"
 
 #: flaskbb/management/forms.py:168
 msgid "With this option the group has access to the admin panel."
-msgstr ""
+msgstr "இந்த விருப்பத்துடன் குழு நிர்வாக குழுவுக்கு அணுகல் உள்ளது."
 
 #: flaskbb/management/forms.py:172
 msgid "Is 'Super Moderator' group?"
-msgstr ""
+msgstr "'சூப்பர் மதிப்பீட்டாளர்' குழு?"
 
 #: flaskbb/management/forms.py:173
 msgid ""
 "Check this, if the users in this group are allowed to moderate every "
 "forum."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் ஒவ்வொரு மன்றத்தையும் மிதப்படுத்த "
+"அனுமதிக்கப்பட்டால்."
 
 #: flaskbb/management/forms.py:177
 msgid "Is 'Moderator' group?"
-msgstr ""
+msgstr "'மதிப்பீட்டாளர்' குழு?"
 
 #: flaskbb/management/forms.py:178
 msgid ""
 "Check this, if the users in this group are allowed to moderate specified "
 "forums."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் குறிப்பிட்ட மன்றங்களை மிதப்படுத்த "
+"அனுமதித்தால்."
 
 #: flaskbb/management/forms.py:182
 msgid "Is 'Banned' group?"
-msgstr ""
+msgstr "'தடை' குழு?"
 
 #: flaskbb/management/forms.py:183
 msgid "Only one group of type 'Banned' is allowed."
-msgstr ""
+msgstr "'தடைசெய்யப்பட்ட' வகை ஒரு குழு மட்டுமே அனுமதிக்கப்படுகிறது."
 
 #: flaskbb/management/forms.py:186
 msgid "Is 'Guest' group?"
-msgstr ""
+msgstr "'விருந்தினர்' குழு?"
 
 #: flaskbb/management/forms.py:187
 msgid "Only one group of type 'Guest' is allowed."
-msgstr ""
+msgstr "'விருந்தினர்' வகை ஒரு குழு மட்டுமே அனுமதிக்கப்படுகிறது."
 
 #: flaskbb/management/forms.py:190
 msgid "Can edit posts"
-msgstr ""
+msgstr "இடுகைகளைத் திருத்த முடியும்"
 
 #: flaskbb/management/forms.py:191
 msgid "Check this, if the users in this group can edit posts."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் இடுகைகளைத் திருத்த முடியுமா?"
 
 #: flaskbb/management/forms.py:194
 msgid "Can delete posts"
-msgstr ""
+msgstr "இடுகைகளை நீக்க முடியும்"
 
 #: flaskbb/management/forms.py:195
 msgid "Check this, if the users in this group can delete posts."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் இடுகைகளை நீக்க முடியுமா?"
 
 #: flaskbb/management/forms.py:199
 msgid "Can delete topics"
-msgstr ""
+msgstr "தலைப்புகளை நீக்க முடியும்"
 
 #: flaskbb/management/forms.py:200
 msgid "Check this, if the users in this group can delete topics."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் தலைப்புகளை நீக்க முடியுமா?"
 
 #: flaskbb/management/forms.py:204
 msgid "Can create topics"
-msgstr ""
+msgstr "தலைப்புகளை உருவாக்க முடியும்"
 
 #: flaskbb/management/forms.py:205
 msgid "Check this, if the users in this group can create topics."
 msgstr ""
+"இதைச் சரிபார்க்கவும், இந்த குழுவில் உள்ள பயனர்கள் தலைப்புகளை உருவாக்க முடிந்தால்."
 
 #: flaskbb/management/forms.py:209
 msgid "Can post replies"
-msgstr ""
+msgstr "பதில்களை இடுகையிடலாம்"
 
 #: flaskbb/management/forms.py:210
 msgid "Check this, if the users in this group can post replies."
 msgstr ""
+"இந்த குழுவில் உள்ள பயனர்கள் பதில்களை இடுகையிட முடிந்தால் இதைச் சரிபார்க்கவும்."
 
 #: flaskbb/management/forms.py:215
 msgid "Moderators can edit user profiles"
-msgstr ""
+msgstr "மதிப்பீட்டாளர்கள் பயனர் சுயவிவரங்களைத் திருத்தலாம்"
 
 #: flaskbb/management/forms.py:216
 msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
+"கடவுச்சொல் மற்றும் மின்னஞ்சல் மாற்றங்கள் உள்ளிட்ட மற்றொரு பயனரின் சுயவிவரத்தைத் திருத்த "
+"மதிப்பீட்டாளர்களை அனுமதிக்கவும்."
 
 #: flaskbb/management/forms.py:221
 msgid "Moderators can ban users"
-msgstr ""
+msgstr "மதிப்பீட்டாளர்கள் பயனர்களை தடை செய்யலாம்"
 
 #: flaskbb/management/forms.py:222
 msgid "Allow moderators to ban other users."
-msgstr ""
+msgstr "பிற பயனர்களை தடை செய்ய மதிப்பீட்டாளர்களை அனுமதிக்கவும்."
 
 #: flaskbb/management/forms.py:226
 msgid "Can view hidden posts and topics"
-msgstr ""
+msgstr "மறைக்கப்பட்ட இடுகைகள் மற்றும் தலைப்புகளைக் காணலாம்"
 
 #: flaskbb/management/forms.py:227
 msgid "Allows a user to view hidden posts and topics"
-msgstr ""
+msgstr "மறைக்கப்பட்ட இடுகைகள் மற்றும் தலைப்புகளைக் காண ஒரு பயனரை அனுமதிக்கிறது"
 
 #: flaskbb/management/forms.py:231
 msgid "Can hide posts and topics"
-msgstr ""
+msgstr "இடுகைகள் மற்றும் தலைப்புகளை மறைக்க முடியும்"
 
 #: flaskbb/management/forms.py:232
 msgid "Allows a user to hide posts and topics"
-msgstr ""
+msgstr "இடுகைகள் மற்றும் தலைப்புகளை மறைக்க ஒரு பயனரை அனுமதிக்கிறது"
 
 #: flaskbb/management/forms.py:251
 msgid "This group name is already taken."
-msgstr ""
+msgstr "இந்த குழு பெயர் ஏற்கனவே எடுக்கப்பட்டுள்ளது."
 
 #: flaskbb/management/forms.py:265
 msgid "There is already a group of type 'Banned'."
-msgstr ""
+msgstr "'தடைசெய்யப்பட்ட' வகை ஏற்கனவே ஒரு குழு உள்ளது."
 
 #: flaskbb/management/forms.py:280
 msgid "There is already a group of type 'Guest'."
-msgstr ""
+msgstr "ஏற்கனவே 'விருந்தினர்' வகை குழு உள்ளது."
 
 #: flaskbb/management/forms.py:303
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "இந்த குழுவிற்கு எந்த அனுமதிகளையும் ஒதுக்க முடியாது."
 
 #: flaskbb/management/forms.py:341
 msgid "Forum title"
-msgstr ""
+msgstr "மன்ற தலைப்பு"
 
 #: flaskbb/management/forms.py:342
 msgid "Please enter a forum title."
-msgstr ""
+msgstr "தயவுசெய்து ஒரு மன்ற தலைப்பை உள்ளிடவும்."
 
 #: flaskbb/management/forms.py:348 flaskbb/management/forms.py:467
 msgid "You can format your description with Markdown."
-msgstr ""
+msgstr "உங்கள் விளக்கத்தை மார்க் பேரூர் மூலம் வடிவமைக்கலாம்."
 
 #: flaskbb/management/forms.py:352 flaskbb/management/forms.py:471
 msgid "Position"
-msgstr ""
+msgstr "நிலை"
 
 #: flaskbb/management/forms.py:354
 msgid "Please enter a position for theforum."
-msgstr ""
+msgstr "தயவுசெய்து ஒரு நிலையை உள்ளிடவும்."
 
 #: flaskbb/management/forms.py:359
 msgid "Category"
-msgstr ""
+msgstr "வகை"
 
 #: flaskbb/management/forms.py:363
 msgid "The category that contains this forum."
-msgstr ""
+msgstr "இந்த மன்றத்தைக் கொண்ட வகை."
 
 #: flaskbb/management/forms.py:367
 msgid "External link"
-msgstr ""
+msgstr "வெளிப்புற இணைப்பு"
 
 #: flaskbb/management/forms.py:369
 msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr ""
+msgstr "ஒரு வலைத்தளத்திற்கான இணைப்பு அதாவது 'http://flaskbb.org'."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
 #: flaskbb/templates/forum/search_result.html:277
 #: flaskbb/templates/management/forums.html:136
 msgid "Moderators"
-msgstr ""
+msgstr "மதிப்பீட்டாளர்கள்"
 
 #: flaskbb/management/forms.py:374
 msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
+"கமா பயனர்பெயர்களைப் பிரித்தது. நீங்கள் எந்த மதிப்பீட்டாளர்களையும் அமைக்க விரும்பவில்லை என்றால் "
+"அதை காலியாக விடுங்கள்."
 
 #: flaskbb/management/forms.py:379
 msgid "Show moderators"
-msgstr ""
+msgstr "மதிப்பீட்டாளர்களைக் காட்டு"
 
 #: flaskbb/management/forms.py:380
 msgid "Do you want to show the moderators on the index page?"
-msgstr ""
+msgstr "குறியீட்டு பக்கத்தில் மதிப்பீட்டாளர்களைக் காட்ட விரும்புகிறீர்களா?"
 
 #: flaskbb/management/forms.py:384
 msgid "Locked?"
-msgstr ""
+msgstr "பூட்டப்பட்டதா?"
 
 #: flaskbb/management/forms.py:385
 msgid "Disable new posts and topics in this forum."
-msgstr ""
+msgstr "இந்த மன்றத்தில் புதிய இடுகைகள் மற்றும் தலைப்புகளை முடக்கு."
 
 #: flaskbb/management/forms.py:389
 msgid "Group access"
-msgstr ""
+msgstr "குழு அணுகல்"
 
 #: flaskbb/management/forms.py:392
 msgid "Select the groups that can access this forum."
-msgstr ""
+msgstr "இந்த மன்றத்தை அணுகக்கூடிய குழுக்களைத் தேர்ந்தெடுக்கவும்."
 
 #: flaskbb/management/forms.py:400
 msgid "You cannot convert a forum that contains topics into an external link."
-msgstr ""
+msgstr "தலைப்புகளைக் கொண்ட ஒரு மன்றத்தை வெளிப்புற இணைப்பாக மாற்ற முடியாது."
 
 #: flaskbb/management/forms.py:406
 msgid "You also need to specify some moderators."
-msgstr ""
+msgstr "நீங்கள் சில மதிப்பீட்டாளர்களையும் குறிப்பிட வேண்டும்."
 
 #: flaskbb/management/forms.py:418
 #, python-format
 msgid "%(user)s is not in a moderators group."
-msgstr ""
+msgstr "%(user)s ஒரு மதிப்பீட்டாளர்கள் குழுவில் இல்லை."
 
 #: flaskbb/management/forms.py:461
 msgid "Category title"
-msgstr ""
+msgstr "வகை தலைப்பு"
 
 #: flaskbb/management/forms.py:462
 msgid "Please enter a category title."
-msgstr ""
+msgstr "தயவுசெய்து ஒரு வகை தலைப்பை உள்ளிடவும்."
 
 #: flaskbb/management/forms.py:473
 msgid "Please enter a position for the category."
-msgstr ""
+msgstr "வகைக்கு ஒரு நிலையை உள்ளிடவும்."
 
 #: flaskbb/management/views.py:54 flaskbb/management/views.py:1091
 msgid "You are not allowed to access the management settings"
-msgstr ""
+msgstr "மேலாண்மை அமைப்புகளை அணுக உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:127
 msgid "Settings saved."
-msgstr ""
+msgstr "அமைப்புகள் சேமிக்கப்பட்டன."
 
 #: flaskbb/management/views.py:143 flaskbb/management/views.py:188
 #: flaskbb/management/views.py:280 flaskbb/management/views.py:332
 #: flaskbb/management/views.py:362 flaskbb/management/views.py:414
 #: flaskbb/management/views.py:485
 msgid "You are not allowed to manage users"
-msgstr ""
+msgstr "பயனர்களை நிர்வகிக்க உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:226 flaskbb/management/views.py:271
 msgid "Edit User"
-msgstr ""
+msgstr "பயனரைத் திருத்து"
 
 #: flaskbb/management/views.py:267
 msgid "User updated."
-msgstr ""
+msgstr "பயனர் புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/management/views.py:319
 msgid "You cannot delete yourself."
-msgstr ""
+msgstr "உங்களை நீங்களே நீக்க முடியாது."
 
 #: flaskbb/management/views.py:323
 msgid "User deleted."
-msgstr ""
+msgstr "பயனர் நீக்கப்பட்டார்."
 
 #: flaskbb/management/views.py:342 flaskbb/management/views.py:353
 #: flaskbb/templates/management/banned_users.html:24
 #: flaskbb/templates/management/user_form.html:24
 #: flaskbb/templates/management/users.html:23
 msgid "Add User"
-msgstr ""
+msgstr "பயனரைச் சேர்க்கவும்"
 
 #: flaskbb/management/views.py:349
 msgid "User added."
-msgstr ""
+msgstr "பயனர் சேர்க்கப்பட்டது."
 
 #: flaskbb/management/views.py:424
 msgid "You do not have the permissions to ban this user."
-msgstr ""
+msgstr "இந்த பயனரை தடை செய்வதற்கான அனுமதிகள் உங்களிடம் இல்லை."
 
 #: flaskbb/management/views.py:453
 #: flaskbb/templates/management/banned_users.html:95
 #: flaskbb/templates/management/users.html:121
 msgid "Unban"
-msgstr ""
+msgstr "முணுமுணுப்பு"
 
 #: flaskbb/management/views.py:470
 msgid "A moderator cannot ban an admin user."
-msgstr ""
+msgstr "ஒரு மதிப்பீட்டாளர் ஒரு நிர்வாக பயனரை தடை செய்ய முடியாது."
 
 #: flaskbb/management/views.py:474
 msgid "User is now banned."
-msgstr ""
+msgstr "பயனர் இப்போது தடை செய்யப்பட்டுள்ளார்."
 
 #: flaskbb/management/views.py:476
 msgid "Could not ban user."
-msgstr ""
+msgstr "பயனரை தடை செய்ய முடியவில்லை."
 
 #: flaskbb/management/views.py:497
 msgid "You do not have the permissions to unban this user."
-msgstr ""
+msgstr "இந்த பயனரைத் தடைசெய்ய உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/management/views.py:514 flaskbb/templates/management/users.html:110
 msgid "Ban"
-msgstr ""
+msgstr "தடை"
 
 #: flaskbb/management/views.py:530
 msgid "User is now unbanned."
-msgstr ""
+msgstr "பயனர் இப்போது தடைசெய்யப்படவில்லை."
 
 #: flaskbb/management/views.py:532
 msgid "Could not unban user."
-msgstr ""
+msgstr "பயனற்ற பயனரால் முடியவில்லை."
 
 #: flaskbb/management/views.py:542 flaskbb/management/views.py:565
 #: flaskbb/management/views.py:597 flaskbb/management/views.py:636
 msgid "You are not allowed to modify groups."
-msgstr ""
+msgstr "குழுக்களை மாற்ற உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/management/views.py:577 flaskbb/management/views.py:588
 #: flaskbb/templates/management/group_form.html:21
 #: flaskbb/templates/management/groups.html:20
 msgid "Add Group"
-msgstr ""
+msgstr "குழுவைச் சேர்க்கவும்"
 
 #: flaskbb/management/views.py:584
 msgid "Group added."
-msgstr ""
+msgstr "குழு சேர்க்கப்பட்டது."
 
 #: flaskbb/management/views.py:609 flaskbb/management/views.py:627
 msgid "Edit Group"
-msgstr ""
+msgstr "குழு திருத்து"
 
 #: flaskbb/management/views.py:623
 msgid "Group updated."
-msgstr ""
+msgstr "குழு புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/management/views.py:668
 msgid "You cannot delete one of the standard groups."
-msgstr ""
+msgstr "நிலையான குழுக்களில் ஒன்றை நீங்கள் நீக்க முடியாது."
 
 #: flaskbb/management/views.py:677
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr ""
+"நீங்கள் நிலையான குழுக்களை நீக்க முடியாது. அதற்கு பதிலாக மறுபெயரிட முயற்சிக்கவும்."
 
 #: flaskbb/management/views.py:686
 msgid "Group deleted."
-msgstr ""
+msgstr "குழு நீக்கப்பட்டது."
 
 #: flaskbb/management/views.py:689
 msgid "No group chosen."
-msgstr ""
+msgstr "எந்த குழுவும் தேர்வு செய்யப்படவில்லை."
 
 #: flaskbb/management/views.py:698 flaskbb/management/views.py:715
 #: flaskbb/management/views.py:766
 msgid "You are not allowed to modify forums."
-msgstr ""
+msgstr "மன்றங்களை மாற்ற உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/management/views.py:736 flaskbb/management/views.py:757
 #: flaskbb/templates/management/forums.html:155
 msgid "Edit Forum"
-msgstr ""
+msgstr "திருத்து மன்றம்"
 
 #: flaskbb/management/views.py:745
 msgid "Forum updated."
-msgstr ""
+msgstr "மன்றம் புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/management/views.py:784 flaskbb/management/views.py:801
 #: flaskbb/templates/management/category_form.html:21
@@ -1009,150 +1033,156 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:20
 #: flaskbb/templates/management/forums.html:43
 msgid "Add Forum"
-msgstr ""
+msgstr "மன்றத்தைச் சேர்க்கவும்"
 
 #: flaskbb/management/views.py:792
 msgid "Forum added."
-msgstr ""
+msgstr "மன்றம் சேர்க்கப்பட்டது."
 
 #: flaskbb/management/views.py:810
 msgid "You are not allowed to modify forums"
-msgstr ""
+msgstr "மன்றங்களை மாற்ற உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:826
 msgid "Forum deleted."
-msgstr ""
+msgstr "மன்றம் நீக்கப்பட்டது."
 
 #: flaskbb/management/views.py:835 flaskbb/management/views.py:868
 #: flaskbb/management/views.py:909
 msgid "You are not allowed to modify categories"
-msgstr ""
+msgstr "வகைகளை மாற்ற உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:847 flaskbb/management/views.py:859
 #: flaskbb/templates/management/category_form.html:22
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 msgid "Add Category"
-msgstr ""
+msgstr "வகையைச் சேர்க்கவும்"
 
 #: flaskbb/management/views.py:855
 msgid "Category added."
-msgstr ""
+msgstr "வகை சேர்க்கப்பட்டது."
 
 #: flaskbb/management/views.py:884 flaskbb/management/views.py:900
 #: flaskbb/templates/management/forums.html:46
 msgid "Edit Category"
-msgstr ""
+msgstr "வகைத் திருத்து"
 
 #: flaskbb/management/views.py:894
 msgid "Category updated."
-msgstr ""
+msgstr "வகை புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/management/views.py:925
 msgid "Category with all associated forums deleted."
-msgstr ""
+msgstr "தொடர்புடைய அனைத்து மன்றங்களுடனும் வகை நீக்கப்பட்டது."
 
 #: flaskbb/management/views.py:934 flaskbb/management/views.py:955
 #: flaskbb/management/views.py:977 flaskbb/management/views.py:1048
 msgid "You are not allowed to view reports."
-msgstr ""
+msgstr "அறிக்கைகளைக் காண உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/management/views.py:1017
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "அறிக்கை %(id)s ஏற்கனவே வாசிப்பு என குறிக்கப்பட்டுள்ளன."
 
 #: flaskbb/management/views.py:1025
 #, python-format
 msgid "Report %(id)s marked as read."
-msgstr ""
+msgstr "அறிக்கை %(id)s வாசிக்கப்படுவதாக குறிக்கப்பட்டுள்ளன."
 
 #: flaskbb/management/views.py:1039
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "அனைத்து அறிக்கைகளும் வாசிப்பு என குறிக்கப்பட்டன."
 
 #: flaskbb/management/views.py:1082
 msgid "Report deleted."
-msgstr ""
+msgstr "அறிக்கை நீக்கப்பட்டது."
 
 #: flaskbb/management/views.py:1116
 msgid "You are not allowed to access the management panel"
-msgstr ""
+msgstr "மேலாண்மை குழுவை அணுக உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:1171 flaskbb/management/views.py:1188
 #: flaskbb/management/views.py:1223 flaskbb/management/views.py:1257
 #: flaskbb/management/views.py:1278
 msgid "You are not allowed to modify plugins"
-msgstr ""
+msgstr "செருகுநிரல்களை மாற்ற உங்களுக்கு இசைவு இல்லை"
 
 #: flaskbb/management/views.py:1201
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
-msgstr ""
+msgstr "சொருகி %(plugin)s ஏற்கனவே இயக்கப்பட்டுள்ளன."
 
 #: flaskbb/management/views.py:1210
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
 msgstr ""
+"சொருகி %(plugin)s இயக்கப்பட்டன. தயவுசெய்து இப்போது flaskbb ஐ மறுதொடக்கம் செய்யுங்கள்."
 
 #: flaskbb/management/views.py:1236
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "சொருகி %(plugin)s ஏற்கனவே முடக்கப்பட்டுள்ளன."
 
 #: flaskbb/management/views.py:1244
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
 msgstr ""
+"செருகுநிரல்கள் %(சொருகி) முடக்கப்பட்டுள்ளது. தயவுசெய்து இப்போது பிளாச்க் பிபி மறுதொடக்கம்"
+" செய்யுங்கள்."
 
 #: flaskbb/management/views.py:1269
 msgid "Plugin has been uninstalled."
-msgstr ""
+msgstr "சொருகி நிறுவல் நீக்கப்பட்டது."
 
 #: flaskbb/management/views.py:1291
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
 msgstr ""
+"செருகுநிரல்களை நிறுவ முடியாது. '%ஐ இயக்கவும் (செருகுநிரல்கள்' சொருகி முதலில்."
 
 #: flaskbb/management/views.py:1299
 msgid "Plugin has been installed."
-msgstr ""
+msgstr "சொருகி நிறுவப்பட்டுள்ளது."
 
 #: flaskbb/templates/confirm_dialog.html:6
 msgid "Are you sure?"
-msgstr ""
+msgstr "நீங்கள் உறுதியாக இருக்கிறீர்களா?"
 
 #: flaskbb/templates/confirm_dialog.html:9
 msgid ""
 "Are you sure that you want to perform this action? This action is "
 "irreversible."
 msgstr ""
+"இந்த செயலைச் செய்ய விரும்புகிறீர்கள் என்பதில் உறுதியாக இருக்கிறீர்களா? இந்த நடவடிக்கை மாற்ற "
+"முடியாதது."
 
 #: flaskbb/templates/confirm_dialog.html:12
 msgid "Cancel"
-msgstr ""
+msgstr "ரத்துசெய்"
 
 #: flaskbb/templates/confirm_dialog.html:13
 msgid "Yes"
-msgstr ""
+msgstr "ஆம்"
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:13
 #: flaskbb/templates/forum/memberlist.html:39 flaskbb/templates/layout.html:78
 msgid "Memberlist"
-msgstr ""
+msgstr "உறுப்பினர் பட்டியல்"
 
 #: flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:15
 #: flaskbb/templates/forum/topictracker.html:26
 #: flaskbb/templates/layout.html:97
 msgid "Topic Tracker"
-msgstr ""
+msgstr "தலைப்பு டிராக்கர்"
 
 #: flaskbb/templates/layout.html:100
 #: flaskbb/templates/user/settings_layout.html:10
 msgid "Settings"
-msgstr ""
+msgstr "அமைப்புகள்"
 
 #: flaskbb/templates/layout.html:102
 #: flaskbb/templates/management/banned_users.html:9
@@ -1168,122 +1198,124 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:9
 #: flaskbb/templates/management/users.html:8
 msgid "Management"
-msgstr ""
+msgstr "மேலாண்மை"
 
 #: flaskbb/templates/layout.html:106
 msgid "Logout"
-msgstr ""
+msgstr "வெளியேற்றம்"
 
 #: flaskbb/templates/auth/reset_password.html:1
 #: flaskbb/templates/auth/reset_password.html:10
 #: flaskbb/templates/layout.html:126
 msgid "Reset Password"
-msgstr ""
+msgstr "கடவுச்சொல்லை மீட்டமைக்கவும்"
 
 #: flaskbb/templates/layout.html:128
 msgid "Activate Account"
-msgstr ""
+msgstr "கணக்கைச் செயல்படுத்தவும்"
 
 #: flaskbb/templates/macros.html:327
 msgid "Pages"
-msgstr ""
+msgstr "பக்கங்கள்"
 
 #: flaskbb/templates/auth/forgot_password.html:1
 #: flaskbb/templates/auth/forgot_password.html:10
 msgid "Forgot Password"
-msgstr ""
+msgstr "கடவுச்சொல்லை மறந்துவிட்டேன்"
 
 #: flaskbb/templates/auth/login.html:27
 msgid "Not a member yet?"
-msgstr ""
+msgstr "இன்னும் உறுப்பினர் இல்லையா?"
 
 #: flaskbb/templates/auth/login.html:28
 msgid "Forgot your Password?"
-msgstr ""
+msgstr "உங்கள் கடவுச்சொல்லை மறந்துவிட்டீர்களா?"
 
 #: flaskbb/templates/auth/request_account_activation.html:1
 #: flaskbb/templates/auth/request_account_activation.html:10
 msgid "Request Account Activation"
-msgstr ""
+msgstr "கணக்கு செயல்படுத்தலைக் கோருங்கள்"
 
 #: flaskbb/templates/email/activate_account.html:3
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "அன்புள்ள %(பயனர்பெயர்கள்,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
-msgstr ""
+msgstr "உங்கள் கணக்கை செயல்படுத்த கீழே உள்ள இணைப்பைக் சொடுக்கு செய்க:"
 
 #: flaskbb/templates/email/activate_account.html:9
 #: flaskbb/templates/email/reset_password.html:8
 msgid "Sincerely,"
-msgstr ""
+msgstr "உண்மையுள்ள,"
 
 #: flaskbb/templates/email/activate_account.html:10
 #: flaskbb/templates/email/reset_password.html:9
 msgid "The Administration"
-msgstr ""
+msgstr "நிர்வாகம்"
 
 #: flaskbb/templates/email/reset_password.html:4
 msgid "Click the link below to reset your password:"
-msgstr ""
+msgstr "உங்கள் கடவுச்சொல்லை மீட்டமைக்க கீழே உள்ள இணைப்பைக் சொடுக்கு செய்க:"
 
 #: flaskbb/templates/errors/forbidden_page.html:1
 msgid "Forbidden"
-msgstr ""
+msgstr "தடைசெய்யப்பட்டுள்ளது"
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 msgid "403 - Forbidden Page"
-msgstr ""
+msgstr "403 - தடைசெய்யப்பட்ட பக்கம்"
 
 #: flaskbb/templates/errors/forbidden_page.html:10
 msgid "You do not have the permission to view this page."
-msgstr ""
+msgstr "இந்த பக்கத்தைக் காண உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/templates/errors/forbidden_page.html:11
 #: flaskbb/templates/errors/page_not_found.html:11
 msgid "Back to the Forums"
-msgstr ""
+msgstr "மன்றங்களுக்குத் திரும்பு"
 
 #: flaskbb/templates/errors/page_not_found.html:1
 msgid "Page not found"
-msgstr ""
+msgstr "பக்கம் கிடைக்கவில்லை"
 
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "404 - Page not found!"
-msgstr ""
+msgstr "404 - பக்கம் கிடைக்கவில்லை!"
 
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "The page you were looking for does not exist."
-msgstr ""
+msgstr "நீங்கள் தேடிக்கொண்டிருந்த பக்கம் இல்லை."
 
 #: flaskbb/templates/errors/server_error.html:1
 msgid "Server Error"
-msgstr ""
+msgstr "சேவையக பிழை"
 
 #: flaskbb/templates/errors/server_error.html:9
 msgid "500 - Server Error"
-msgstr ""
+msgstr "500 - சேவையக பிழை"
 
 #: flaskbb/templates/errors/server_error.html:10
 msgid "Something went wrong!"
-msgstr ""
+msgstr "ஏதோ தவறு நடந்தது!"
 
 #: flaskbb/templates/errors/too_many_logins.html:1
 msgid "Too Many Requests"
-msgstr ""
+msgstr "பல கோரிக்கைகள்"
 
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid "429 - Too Many Requests"
-msgstr ""
+msgstr "429 - பல கோரிக்கைகள்"
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
+"கணக்குகள் மீது முரட்டுத்தனமான தாக்குதல்களைத் தடுப்பதற்காக, இந்த வழியில் கோரிக்கைகளின் அளவை "
+"நாங்கள் மட்டுப்படுத்தியுள்ளோம்."
 
 #: flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/forum/search_result.html:123
@@ -1294,7 +1326,7 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:28
 #: flaskbb/templates/user/profile_layout.html:68
 msgid "Topics"
-msgstr ""
+msgstr "தலைப்புகள்"
 
 #: flaskbb/templates/forum/category_layout.html:10
 #: flaskbb/templates/forum/edit_forum.html:32
@@ -1316,7 +1348,7 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:34
 #: flaskbb/templates/user/profile_layout.html:74
 msgid "Posts"
-msgstr ""
+msgstr "இடுகைகள்"
 
 #: flaskbb/templates/forum/category_layout.html:11
 #: flaskbb/templates/forum/edit_forum.html:34
@@ -1325,13 +1357,13 @@ msgstr ""
 #: flaskbb/templates/forum/search_result.html:210
 #: flaskbb/templates/forum/topictracker.html:34
 msgid "Last Post"
-msgstr ""
+msgstr "கடைசி இடுகை"
 
 #: flaskbb/templates/forum/category_layout.html:27
 #: flaskbb/templates/forum/search_result.html:226
 #: flaskbb/templates/management/forums.html:79
 msgid "Link to"
-msgstr ""
+msgstr "இணைப்பு"
 
 #: flaskbb/templates/forum/category_layout.html:114
 #: flaskbb/templates/forum/edit_forum.html:68
@@ -1344,206 +1376,206 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:91
 #: flaskbb/templates/management/plugins.html:46
 msgid "by"
-msgstr ""
+msgstr "மூலம்"
 
 #: flaskbb/templates/forum/category_layout.html:123
 #: flaskbb/templates/forum/search_result.html:320
 msgid "No posts."
-msgstr ""
+msgstr "பதிவுகள் இல்லை."
 
 #: flaskbb/templates/forum/edit_forum.html:33
 #: flaskbb/templates/forum/forum.html:51
 #: flaskbb/templates/forum/search_result.html:130
 #: flaskbb/templates/forum/topictracker.html:33
 msgid "Views"
-msgstr ""
+msgstr "காட்சிகள்"
 
 #: flaskbb/templates/forum/edit_forum.html:35
 #: flaskbb/templates/forum/topictracker.html:35
 msgid "Select all"
-msgstr ""
+msgstr "அனைத்தையும் தெரிவுசெய்"
 
 #: flaskbb/templates/forum/edit_forum.html:101
 #: flaskbb/templates/forum/topictracker.html:101
 msgid "Select topic"
-msgstr ""
+msgstr "தலைப்பைத் தேர்ந்தெடுக்கவும்"
 
 #: flaskbb/templates/forum/edit_forum.html:107
 #: flaskbb/templates/forum/forum.html:128
 #: flaskbb/templates/forum/topictracker.html:107
 msgid "No Topics."
-msgstr ""
+msgstr "தலைப்புகள் இல்லை."
 
 #: flaskbb/templates/forum/edit_forum.html:117
 msgid "Back"
-msgstr ""
+msgstr "பின்"
 
 #: flaskbb/templates/forum/edit_forum.html:128
 msgid "Lock"
-msgstr ""
+msgstr "பூட்டு"
 
 #: flaskbb/templates/forum/edit_forum.html:131
 msgid "Unlock"
-msgstr ""
+msgstr "திறக்க"
 
 #: flaskbb/templates/forum/edit_forum.html:137
 msgid "Highlight"
-msgstr ""
+msgstr "சிறப்பம்சமாக"
 
 #: flaskbb/templates/forum/edit_forum.html:140
 msgid "Trivialize"
-msgstr ""
+msgstr "கீழான"
 
 #: flaskbb/templates/forum/edit_forum.html:145
 #: flaskbb/templates/management/groups.html:65
 #: flaskbb/templates/management/reports.html:82
 #: flaskbb/templates/management/users.html:130
 msgid "Delete"
-msgstr ""
+msgstr "நீக்கு"
 
 #: flaskbb/templates/forum/edit_forum.html:151
 msgid "Hide"
-msgstr ""
+msgstr "மறை"
 
 #: flaskbb/templates/forum/edit_forum.html:154
 msgid "Unhide"
-msgstr ""
+msgstr "இரக்கமற்றது"
 
 #: flaskbb/templates/forum/edit_forum.html:169
 msgid "Move to..."
-msgstr ""
+msgstr "செல்லுங்கள் ..."
 
 #: flaskbb/templates/forum/edit_forum.html:176
 msgid "Move"
-msgstr ""
+msgstr "நகர்த்தவும்"
 
 #: flaskbb/templates/forum/forum.html:25
 #: flaskbb/templates/management/reports.html:50
 #: flaskbb/templates/management/reports.html:74
 msgid "Mark as Read"
-msgstr ""
+msgstr "படித்தபடி குறி"
 
 #: flaskbb/templates/forum/forum.html:31
 #: flaskbb/templates/forum/topic_controls.html:116
 msgid "Locked"
-msgstr ""
+msgstr "பூட்டப்பட்டுள்ளது"
 
 #: flaskbb/templates/forum/forum.html:35
 #: flaskbb/templates/forum/new_topic.html:1
 #: flaskbb/templates/forum/new_topic.html:13
 #: flaskbb/templates/forum/new_topic.html:21
 msgid "New Topic"
-msgstr ""
+msgstr "புதிய தலைப்பு"
 
 #: flaskbb/templates/forum/forum.html:97
 #, python-format
 msgid "Hidden on %(when)s  by %(who)s"
-msgstr ""
+msgstr "%(when)s ஆல் (WHO) கள் மறைக்கப்படுகின்றன"
 
 #: flaskbb/templates/forum/forum.html:138
 msgid "Moderation Mode"
-msgstr ""
+msgstr "மிதமான முறை"
 
 #: flaskbb/templates/forum/index.html:11
 msgid "Board Statistics"
-msgstr ""
+msgstr "வாரிய புள்ளிவிவரங்கள்"
 
 #: flaskbb/templates/forum/index.html:12
 msgid "Who is online?"
-msgstr ""
+msgstr "ஆன்லைனில் யார்?"
 
 #: flaskbb/templates/forum/index.html:17
 msgid "Total number of registered users"
-msgstr ""
+msgstr "பதிவுசெய்யப்பட்ட பயனர்களின் மொத்த எண்ணிக்கை"
 
 #: flaskbb/templates/forum/index.html:18
 msgid "Total number of topics"
-msgstr ""
+msgstr "தலைப்புகளின் மொத்த எண்ணிக்கை"
 
 #: flaskbb/templates/forum/index.html:19
 msgid "Total number of posts"
-msgstr ""
+msgstr "இடுகைகளின் மொத்த எண்ணிக்கை"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "Newest registered user"
-msgstr ""
+msgstr "புதிய பதிவு செய்யப்பட்ட பயனர்"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "No users"
-msgstr ""
+msgstr "பயனர்கள் இல்லை"
 
 #: flaskbb/templates/forum/index.html:23
 msgid "Registered users online"
-msgstr ""
+msgstr "பதிவுசெய்யப்பட்ட பயனர்கள் ஆன்லைனில்"
 
 #: flaskbb/templates/forum/index.html:25
 msgid "Guests online"
-msgstr ""
+msgstr "விருந்தினர்கள் ஆன்லைனில்"
 
 #: flaskbb/templates/forum/memberlist.html:48
 #: flaskbb/templates/forum/search_result.html:100
 #: flaskbb/templates/management/banned_users.html:64
 #: flaskbb/templates/management/users.html:63
 msgid "Date registered"
-msgstr ""
+msgstr "பதிவு செய்யப்பட்ட தேதி"
 
 #: flaskbb/templates/forum/memberlist.html:50
 #: flaskbb/templates/forum/search_result.html:101
 #: flaskbb/templates/management/banned_users.html:65
 #: flaskbb/templates/management/users.html:64
 msgid "Group"
-msgstr ""
+msgstr "குழு"
 
 #: flaskbb/templates/forum/new_post.html:2
 msgid "Edit Post"
-msgstr ""
+msgstr "இடுகையைத் திருத்து"
 
 #: flaskbb/templates/forum/new_post.html:4
 msgid "New Post"
-msgstr ""
+msgstr "புதிய இடுகை"
 
 #: flaskbb/templates/forum/online_users.html:1
 #: flaskbb/templates/forum/online_users.html:13
 msgid "Online Users"
-msgstr ""
+msgstr "நிகழ்நிலை பயனர்கள்"
 
 #: flaskbb/templates/forum/report_post.html:1
 #: flaskbb/templates/forum/report_post.html:16
 msgid "Report Post"
-msgstr ""
+msgstr "அறிக்கை இடுகை"
 
 #: flaskbb/templates/forum/report_post.html:20
 msgid "Report"
-msgstr ""
+msgstr "அறிக்கை"
 
 #: flaskbb/templates/forum/report_post.html:21
 msgid "Close"
-msgstr ""
+msgstr "மூடு"
 
 #: flaskbb/templates/forum/search_result.html:29
 #: flaskbb/templates/forum/topic.html:40
 #: flaskbb/templates/forum/topic_horizontal.html:47
 #: flaskbb/templates/user/profile_layout.html:34
 msgid "online"
-msgstr ""
+msgstr "ஆன்லைனில்"
 
 #: flaskbb/templates/forum/search_result.html:31
 #: flaskbb/templates/forum/topic.html:42
 #: flaskbb/templates/forum/topic_horizontal.html:49
 #: flaskbb/templates/user/profile_layout.html:36
 msgid "offline"
-msgstr ""
+msgstr "இணையமில்லாமல்"
 
 #: flaskbb/templates/forum/search_result.html:41
 #: flaskbb/templates/forum/topic.html:52
 #: flaskbb/templates/forum/topic_horizontal.html:59
 msgid "Joined"
-msgstr ""
+msgstr "இணைந்தது"
 
 #: flaskbb/templates/forum/search_result.html:49
 #: flaskbb/templates/forum/topic.html:60
 msgid "Guest"
-msgstr ""
+msgstr "விருந்தினர்"
 
 #: flaskbb/templates/forum/search_result.html:64
 #: flaskbb/templates/forum/topic.html:75
@@ -1551,141 +1583,145 @@ msgstr ""
 #, python-format
 msgid "Last modified: %(date)s by <a href=\"%(user_url)s\">%(user)s</a>"
 msgstr ""
+"கடைசியாக மாற்றியமைக்கப்பட்ட:%(date)s <a href = \"%(user_url)s\">%(user)s </a>"
 
 #: flaskbb/templates/forum/search_result.html:83
 msgid "No posts found matching your search criteria."
 msgstr ""
+"உங்கள் தேடல் அளவுகோல்களுடன் பொருந்தக்கூடிய இடுகைகள் எதுவும் காணப்படவில்லை."
 
 #: flaskbb/templates/forum/search_result.html:113
 #: flaskbb/templates/management/banned_users.html:104
 #: flaskbb/templates/management/users.html:139
 msgid "No users found matching your search criteria."
-msgstr ""
+msgstr "உங்கள் தேடல் அளவுகோல்களுடன் பயனர்கள் யாரும் இல்லை."
 
 #: flaskbb/templates/forum/search_result.html:191
 msgid "No topics found matching your search criteria."
 msgstr ""
+"உங்கள் தேடல் அளவுகோல்களுடன் பொருந்தக்கூடிய தலைப்புகள் எதுவும் காணப்படவில்லை."
 
 #: flaskbb/templates/forum/search_result.html:202
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/forums.html:9
 msgid "Forums"
-msgstr ""
+msgstr "மன்றங்கள்"
 
 #: flaskbb/templates/forum/search_result.html:329
 msgid "No forums found matching your search criteria."
 msgstr ""
+"உங்கள் தேடல் அளவுகோல்களுடன் பொருந்தக்கூடிய மன்றங்கள் எதுவும் காணப்படவில்லை."
 
 #: flaskbb/templates/forum/topic.html:2
 #: flaskbb/templates/forum/topic_horizontal.html:2
 #, python-format
 msgid "%(title)s - Topic"
-msgstr ""
+msgstr "%(title)s - தலைப்பு"
 
 #: flaskbb/templates/forum/topic.html:20
 #: flaskbb/templates/forum/topic_horizontal.html:20
 #, python-format
 msgid "This topic is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "இந்த தலைப்பு மறைக்கப்பட்டுள்ளது ( %(when)s %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:90
 #, python-format
 msgid "This post is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "இந்த இடுகை மறைக்கப்பட்டுள்ளது ( %(when)s %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:118
 #: flaskbb/templates/forum/topic_horizontal.html:107
 msgid "Quote this post"
-msgstr ""
+msgstr "இந்த இடுகையை மேற்கோள் காட்டுங்கள்"
 
 #: flaskbb/templates/forum/topic.html:120
 #: flaskbb/templates/forum/topic_horizontal.html:109
 msgid "Full Reply"
-msgstr ""
+msgstr "முழு பதில்"
 
 #: flaskbb/templates/forum/topic.html:125
 #: flaskbb/templates/forum/topic_horizontal.html:114
 msgid "Edit this post"
-msgstr ""
+msgstr "இந்த இடுகையைத் திருத்தவும்"
 
 #: flaskbb/templates/forum/topic.html:131
 #: flaskbb/templates/forum/topic_horizontal.html:120
 msgid "Delete this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை நீக்கு"
 
 #: flaskbb/templates/forum/topic.html:139
 #: flaskbb/templates/forum/topic_horizontal.html:128
 msgid "Delete this post"
-msgstr ""
+msgstr "இந்த இடுகையை நீக்கு"
 
 #: flaskbb/templates/forum/topic.html:147
 #: flaskbb/templates/forum/topic_horizontal.html:136
 msgid "Report this post"
-msgstr ""
+msgstr "இந்த இடுகையைப் புகாரளிக்கவும்"
 
 #: flaskbb/templates/forum/topic.html:155
 #: flaskbb/templates/forum/topic_horizontal.html:144
 msgid "Unhide this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை மறைக்கவும்"
 
 #: flaskbb/templates/forum/topic.html:160
 #: flaskbb/templates/forum/topic_horizontal.html:149
 msgid "Hide this topic"
-msgstr ""
+msgstr "இந்த தலைப்பை மறைக்கவும்"
 
 #: flaskbb/templates/forum/topic.html:167
 #: flaskbb/templates/forum/topic_horizontal.html:156
 msgid "Unhide this post"
-msgstr ""
+msgstr "இந்த இடுகையை மறைக்கவும்"
 
 #: flaskbb/templates/forum/topic.html:172
 #: flaskbb/templates/forum/topic_horizontal.html:161
 msgid "Hide this post"
-msgstr ""
+msgstr "இந்த இடுகையை மறைக்கவும்"
 
 #: flaskbb/templates/forum/topic_controls.html:15
 msgid "Moderate"
-msgstr ""
+msgstr "மிதமான"
 
 #: flaskbb/templates/forum/topic_controls.html:24
 msgid "Delete Topic"
-msgstr ""
+msgstr "தலைப்பை நீக்கு"
 
 #: flaskbb/templates/forum/topic_controls.html:36
 msgid "Lock Topic"
-msgstr ""
+msgstr "பூட்டு தலைப்பு"
 
 #: flaskbb/templates/forum/topic_controls.html:45
 msgid "Unlock Topic"
-msgstr ""
+msgstr "தலைப்பைத் திறக்கவும்"
 
 #: flaskbb/templates/forum/topic_controls.html:56
 msgid "Highlight Topic"
-msgstr ""
+msgstr "தலைப்பை முன்னிலைப்படுத்தவும்"
 
 #: flaskbb/templates/forum/topic_controls.html:65
 msgid "Trivialize Topic"
-msgstr ""
+msgstr "தலைப்பு அற்பமானது"
 
 #: flaskbb/templates/forum/topic_controls.html:77
 msgid "Unhide Topic"
-msgstr ""
+msgstr "அதே தலைப்பு"
 
 #: flaskbb/templates/forum/topic_controls.html:84
 msgid "Hide Topic"
-msgstr ""
+msgstr "தலைப்பை மறைக்கவும்"
 
 #: flaskbb/templates/forum/topic_controls.html:99
 msgid "Untrack Topic"
-msgstr ""
+msgstr "Untrack தலைப்பு"
 
 #: flaskbb/templates/forum/topic_controls.html:106
 msgid "Track Topic"
-msgstr ""
+msgstr "தலைப்பு தலைப்பு"
 
 #: flaskbb/templates/forum/topictracker.html:117
 msgid "Untrack Topics"
-msgstr ""
+msgstr "Untrack தலைப்புகள்"
 
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:21
@@ -1693,7 +1729,7 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:21
 #: flaskbb/templates/management/users.html:20
 msgid "Banned Users"
-msgstr ""
+msgstr "தடைசெய்யப்பட்ட பயனர்கள்"
 
 #: flaskbb/templates/management/banned_users.html:10
 #: flaskbb/templates/management/banned_users.html:20
@@ -1702,77 +1738,77 @@ msgstr ""
 #: flaskbb/templates/management/users.html:9
 #: flaskbb/templates/management/users.html:19
 msgid "Manage Users"
-msgstr ""
+msgstr "பயனர்களை நிர்வகிக்கவும்"
 
 #: flaskbb/templates/management/banned_users.html:70
 #: flaskbb/templates/management/groups.html:39
 #: flaskbb/templates/management/reports.html:45
 #: flaskbb/templates/management/users.html:68
 msgid "Actions"
-msgstr ""
+msgstr "செயல்கள்"
 
 #: flaskbb/templates/management/banned_users.html:75
 #: flaskbb/templates/management/users.html:79
 msgid "Unban selected Users"
-msgstr ""
+msgstr "தடையற்ற தேர்ந்தெடுக்கப்பட்ட பயனர்கள்"
 
 #: flaskbb/templates/management/category_form.html:20
 #: flaskbb/templates/management/forum_form.html:20
 #: flaskbb/templates/management/forums.html:19
 #: flaskbb/templates/management/forums.html:29
 msgid "Manage Forums"
-msgstr ""
+msgstr "மன்றங்களை நிர்வகிக்கவும்"
 
 #: flaskbb/templates/management/forums.html:51
 msgid "Delete Category"
-msgstr ""
+msgstr "வகையை நீக்கு"
 
 #: flaskbb/templates/management/forums.html:62
 msgid "Topics / Posts"
-msgstr ""
+msgstr "தலைப்புகள் / பதிவுகள்"
 
 #: flaskbb/templates/management/forums.html:99
 msgid "Edit Link"
-msgstr ""
+msgstr "இணைப்பைத் திருத்து"
 
 #: flaskbb/templates/management/forums.html:105
 msgid "Delete Link"
-msgstr ""
+msgstr "இணைப்பை நீக்கு"
 
 #: flaskbb/templates/management/forums.html:161
 msgid "Delete Forum"
-msgstr ""
+msgstr "மன்றத்தை நீக்கு"
 
 #: flaskbb/templates/management/group_form.html:10
 #: flaskbb/templates/management/group_form.html:20
 #: flaskbb/templates/management/groups.html:9
 #: flaskbb/templates/management/groups.html:19
 msgid "Manage Groups"
-msgstr ""
+msgstr "குழுக்களை நிர்வகிக்கவும்"
 
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:28
 #: flaskbb/templates/management/overview.html:88
 msgid "Groups"
-msgstr ""
+msgstr "குழுக்கள்"
 
 #: flaskbb/templates/management/groups.html:34
 msgid "Group Name"
-msgstr ""
+msgstr "குழு பெயர்"
 
 #: flaskbb/templates/management/groups.html:44
 msgid "Delete selected Groups"
-msgstr ""
+msgstr "தேர்ந்தெடுக்கப்பட்ட குழுக்களை நீக்கு"
 
 #: flaskbb/templates/management/groups.html:59
 #: flaskbb/templates/management/users.html:102
 #: flaskbb/templates/user/profile_layout.html:16
 msgid "Edit"
-msgstr ""
+msgstr "தொகு"
 
 #: flaskbb/templates/management/groups.html:74
 msgid "No groups found."
-msgstr ""
+msgstr "குழுக்கள் எதுவும் கிடைக்கவில்லை."
 
 #: flaskbb/templates/management/overview.html:1
 #: flaskbb/templates/management/overview.html:16
@@ -1780,309 +1816,310 @@ msgstr ""
 #: flaskbb/templates/user/all_topics.html:16
 #: flaskbb/templates/user/profile_layout.html:56
 msgid "Overview"
-msgstr ""
+msgstr "கண்ணோட்டம்"
 
 #: flaskbb/templates/management/overview.html:25
 msgid "There is something that wants your attention."
-msgstr ""
+msgstr "உங்கள் கவனத்தை விரும்பும் ஒன்று உள்ளது."
 
 #: flaskbb/templates/management/overview.html:26
 #, python-format
 msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
 msgstr ""
+"உங்களிடம் <a href = \"%(URL) உள்ளது\">%(படிக்காத அறிக்கைகள் படிக்காத அறிக்கைகள் </a>."
 
 #: flaskbb/templates/management/overview.html:30
 msgid "Everything seems alright."
-msgstr ""
+msgstr "எல்லாம் சரியாகத் தெரிகிறது."
 
 #: flaskbb/templates/management/overview.html:31
 msgid "No new notifications."
-msgstr ""
+msgstr "புதிய அறிவிப்புகள் இல்லை."
 
 #: flaskbb/templates/management/overview.html:44
 msgid "users"
-msgstr ""
+msgstr "பயனர்கள்"
 
 #: flaskbb/templates/management/overview.html:56
 #: flaskbb/templates/user/profile_layout.html:42
 msgid "posts"
-msgstr ""
+msgstr "இடுகைகள்"
 
 #: flaskbb/templates/management/overview.html:68
 msgid "topics"
-msgstr ""
+msgstr "தலைப்புகள்"
 
 #: flaskbb/templates/management/overview.html:76
 msgid "Statistics"
-msgstr ""
+msgstr "புள்ளிவிவரங்கள்"
 
 #: flaskbb/templates/management/overview.html:79
 msgid "Registered users"
-msgstr ""
+msgstr "பதிவுசெய்யப்பட்ட பயனர்கள்"
 
 #: flaskbb/templates/management/overview.html:82
 msgid "Online users"
-msgstr ""
+msgstr "நிகழ்நிலை பயனர்கள்"
 
 #: flaskbb/templates/management/overview.html:85
 msgid "Banned users"
-msgstr ""
+msgstr "தடைசெய்யப்பட்ட பயனர்கள்"
 
 #: flaskbb/templates/management/overview.html:97
 #: flaskbb/templates/management/reports.html:1
 #: flaskbb/templates/management/reports.html:10
 #: flaskbb/templates/management/reports.html:31
 msgid "Reports"
-msgstr ""
+msgstr "அறிக்கைகள்"
 
 #: flaskbb/templates/management/overview.html:102
 msgid "Components"
-msgstr ""
+msgstr "கூறுகள்"
 
 #: flaskbb/templates/management/overview.html:115
 msgid "checking status"
-msgstr ""
+msgstr "நிலை சரிபார்க்கிறது"
 
 #: flaskbb/templates/management/overview.html:128
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
-msgstr ""
+msgstr "செருகுநிரல்கள்"
 
 #: flaskbb/templates/management/overview.html:141
 msgid "not enabled"
-msgstr ""
+msgstr "இயக்கப்படவில்லை"
 
 #: flaskbb/templates/management/overview.html:144
 msgid "enabled &amp; installed"
-msgstr ""
+msgstr "இயக்கப்பட்டது & ஆம்ப்; நிறுவப்பட்டது"
 
 #: flaskbb/templates/management/overview.html:146
 msgid "enabled"
-msgstr ""
+msgstr "இயக்கப்பட்டது"
 
 #: flaskbb/templates/management/overview.html:148
 msgid "not installed"
-msgstr ""
+msgstr "நிறுவப்படவில்லை"
 
 #: flaskbb/templates/management/overview.html:169
 msgid "There is a problem."
-msgstr ""
+msgstr "ஒரு சிக்கல் உள்ளது."
 
 #: flaskbb/templates/management/overview.html:170
 msgid "Celery is <strong>not</strong> running."
-msgstr ""
+msgstr "செலரி <strong> இல்லை </strong> இயங்கும்."
 
 #: flaskbb/templates/management/overview.html:171
 msgid "You can start celery with this command:"
-msgstr ""
+msgstr "இந்த கட்டளையுடன் நீங்கள் செலரியைத் தொடங்கலாம்:"
 
 #: flaskbb/templates/management/overview.html:188
 msgid "running"
-msgstr ""
+msgstr "இயங்கும்"
 
 #: flaskbb/templates/management/overview.html:190
 msgid "not running"
-msgstr ""
+msgstr "ஓடவில்லை"
 
 #: flaskbb/templates/management/plugins.html:19
 msgid "Manage Plugins"
-msgstr ""
+msgstr "செருகுநிரல்களை நிர்வகிக்கவும்"
 
 #: flaskbb/templates/management/plugins.html:25
 msgid "Plugin"
-msgstr ""
+msgstr "சொருகு"
 
 #: flaskbb/templates/management/plugins.html:26
 msgid "Information"
-msgstr ""
+msgstr "தகவல்"
 
 #: flaskbb/templates/management/plugins.html:27
 msgid "Manage"
-msgstr ""
+msgstr "நிர்வகிக்கவும்"
 
 #: flaskbb/templates/management/plugins.html:44
 msgid "Version"
-msgstr ""
+msgstr "பதிப்பு"
 
 #: flaskbb/templates/management/plugins.html:52
 msgid "Enable"
-msgstr ""
+msgstr "இயக்கு"
 
 #: flaskbb/templates/management/plugins.html:57
 msgid "Disable"
-msgstr ""
+msgstr "முடக்கு"
 
 #: flaskbb/templates/management/plugins.html:65
 msgid "Install"
-msgstr ""
+msgstr "நிறுவவும்"
 
 #: flaskbb/templates/management/plugins.html:72
 msgid "Uninstall"
-msgstr ""
+msgstr "நிறுவல் நீக்க"
 
 #: flaskbb/templates/management/reports.html:21
 msgid "Show all Reports"
-msgstr ""
+msgstr "எல்லா அறிக்கைகளையும் காட்டு"
 
 #: flaskbb/templates/management/reports.html:22
 msgid "Show unread Reports"
-msgstr ""
+msgstr "படிக்காத அறிக்கைகளைக் காட்டு"
 
 #: flaskbb/templates/management/reports.html:37
 msgid "Poster"
-msgstr ""
+msgstr "சுவரொட்டி"
 
 #: flaskbb/templates/management/reports.html:40
 msgid "Reporter"
-msgstr ""
+msgstr "நிருபர்"
 
 #: flaskbb/templates/management/reports.html:41
 msgid "Reported"
-msgstr ""
+msgstr "அறிக்கை"
 
 #: flaskbb/templates/management/reports.html:55
 msgid "Delete selected reports"
-msgstr ""
+msgstr "தேர்ந்தெடுக்கப்பட்ட அறிக்கைகளை நீக்கு"
 
 #: flaskbb/templates/management/reports.html:90
 msgid "No reports."
-msgstr ""
+msgstr "அறிக்கைகள் இல்லை."
 
 #: flaskbb/templates/management/users.html:73
 msgid "Ban selected Users"
-msgstr ""
+msgstr "தேர்ந்தெடுக்கப்பட்ட பயனர்களை தடை செய்யுங்கள்"
 
 #: flaskbb/templates/management/users.html:85
 msgid "Delete selected Users"
-msgstr ""
+msgstr "தேர்ந்தெடுக்கப்பட்ட பயனர்களை நீக்கு"
 
 #: flaskbb/templates/user/all_posts.html:65
 msgid "The user has not written any posts yet."
-msgstr ""
+msgstr "பயனர் இதுவரை எந்த இடுகைகளையும் எழுதவில்லை."
 
 #: flaskbb/templates/user/all_topics.html:67
 msgid "The user has not opened any topics yet."
-msgstr ""
+msgstr "பயனர் இதுவரை எந்த தலைப்புகளையும் திறக்கவில்லை."
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
-msgstr ""
+msgstr "மின்னஞ்சல் முகவரியை மாற்றவும்"
 
 #: flaskbb/templates/user/change_password.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "கடவுச்சொல்லை மாற்றவும்"
 
 #: flaskbb/templates/user/change_user_details.html:8
 msgid "Change User Details"
-msgstr ""
+msgstr "பயனர் விவரங்களை மாற்றவும்"
 
 #: flaskbb/templates/user/general_settings.html:7
 msgid "General Settings"
-msgstr ""
+msgstr "பொது அமைப்புகள்"
 
 #: flaskbb/templates/user/profile.html:19
 msgid "Info"
-msgstr ""
+msgstr "தகவல்"
 
 #: flaskbb/templates/user/profile.html:30
 msgid "User has not added any notes about him."
-msgstr ""
+msgstr "பயனர் அவரைப் பற்றி எந்த குறிப்புகளையும் சேர்க்கவில்லை."
 
 #: flaskbb/templates/user/profile.html:38
 msgid "Signature"
-msgstr ""
+msgstr "கையொப்பம்"
 
 #: flaskbb/templates/user/profile_layout.html:2
 #, python-format
 msgid "%(user)s - User"
-msgstr ""
+msgstr "%(user)s - பயனர்"
 
 #: flaskbb/templates/user/profile_layout.html:32
 msgid "Never seen"
-msgstr ""
+msgstr "பார்த்ததில்லை"
 
 #: flaskbb/templates/user/settings_layout.html:2
 #, python-format
 msgid "Settings - %(user)s - User"
-msgstr ""
+msgstr "அமைப்புகள் - %(user)s - பயனர்"
 
 #: flaskbb/user/forms.py:33
 msgid "Theme"
-msgstr ""
+msgstr "கருப்பொருள்"
 
 #: flaskbb/user/forms.py:39
 msgid "Old email address"
-msgstr ""
+msgstr "பழைய மின்னஞ்சல் முகவரி"
 
 #: flaskbb/user/forms.py:43
 msgid "New email address"
-msgstr ""
+msgstr "புதிய மின்னஞ்சல் முகவரி"
 
 #: flaskbb/user/forms.py:45
 msgid "Email addresses must match."
-msgstr ""
+msgstr "மின்னஞ்சல் முகவரிகள் பொருந்த வேண்டும்."
 
 #: flaskbb/user/forms.py:48
 msgid "Confirm email address"
-msgstr ""
+msgstr "மின்னஞ்சல் முகவரியை உறுதிப்படுத்தவும்"
 
 #: flaskbb/user/forms.py:70
 msgid "New password"
-msgstr ""
+msgstr "புதிய கடவுச்சொல்"
 
 #: flaskbb/user/forms.py:72
 msgid "New passwords must match."
-msgstr ""
+msgstr "புதிய கடவுச்சொற்கள் பொருந்த வேண்டும்."
 
 #: flaskbb/user/forms.py:75
 msgid "Confirm new password"
-msgstr ""
+msgstr "புதிய கடவுச்சொல்லை உறுதிப்படுத்தவும்"
 
 #: flaskbb/user/forms.py:81
 msgid "Old password is wrong."
-msgstr ""
+msgstr "பழைய கடவுச்சொல் தவறு."
 
 #: flaskbb/user/forms.py:102
 msgid "Forum Signature"
-msgstr ""
+msgstr "மன்ற கையொப்பம்"
 
 #: flaskbb/user/views.py:59
 msgid "Settings updated."
-msgstr ""
+msgstr "அமைப்புகள் புதுப்பிக்கப்பட்டன."
 
 #: flaskbb/user/views.py:80
 msgid "Password updated."
-msgstr ""
+msgstr "கடவுச்சொல் புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/user/views.py:99
 msgid "Email address updated."
-msgstr ""
+msgstr "மின்னஞ்சல் முகவரி புதுப்பிக்கப்பட்டது."
 
 #: flaskbb/user/views.py:119
 msgid "User details updated."
-msgstr ""
+msgstr "பயனர் விவரங்கள் புதுப்பிக்கப்பட்டன."
 
 #: flaskbb/utils/helpers.py:114
 msgid "You do not have the permissions to execute this action."
-msgstr ""
+msgstr "இந்த செயலைச் செய்ய உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/utils/helpers.py:132
 msgid "You do not have the permissions to delete these topics."
-msgstr ""
+msgstr "இந்த தலைப்புகளை நீக்க உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/utils/helpers.py:144
 msgid "You do not have the permissions to hide these topics."
-msgstr ""
+msgstr "இந்த தலைப்புகளை மறைக்க உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/utils/helpers.py:158
 msgid "You do not have the permissions to unhide these topics."
-msgstr ""
+msgstr "இந்த தலைப்புகளை மறைக்க உங்களுக்கு இசைவு இல்லை."
 
 #: flaskbb/utils/helpers.py:798
 msgid "The registration has been disabled."
-msgstr ""
+msgstr "பதிவு முடக்கப்பட்டுள்ளது."
 
 #: flaskbb/utils/helpers.py:810
 msgid "This account is already activated."
-msgstr ""
+msgstr "இந்த கணக்கு ஏற்கனவே செயல்படுத்தப்பட்டுள்ளது."
