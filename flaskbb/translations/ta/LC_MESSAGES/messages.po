@@ -1824,7 +1824,8 @@ msgstr "உங்கள் கவனத்தை விரும்பும் 
 #: flaskbb/templates/management/overview.html:26
 #, python-format
 msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
-msgstr "உங்களிடம் %(unread_reports)s படிக்காத அறிக்கைகள் உள்ளது</a>."
+msgstr ""
+"உங்களிடம் <a href=\"%(url)s\">%(unread_reports)s படிக்காத அறிக்கைகள் உள்ளது</a>."
 
 #: flaskbb/templates/management/overview.html:30
 msgid "Everything seems alright."
