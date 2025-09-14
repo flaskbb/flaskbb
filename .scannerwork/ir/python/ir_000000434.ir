@@ -1,0 +1,20 @@
+
+–Œ"A simple check to see if the user was online within a specified
+    time range
+
+    :param user: The user who needs to be checked
+    "struser
+Ÿ Ÿ("£+
+)
+
+¥ ¥("#get-field# lastseen:4
+2
+
+¥ ¥('""
+flaskbb.utils.helpers	time_diff,
+*
+
+¥ ¥('"
+#binop >=#2>=:Bbool
+
+¥ ¥('*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

@@ -1,0 +1,12 @@
+
+("Returns the url for the user."str
+"user.profile"strself
+Â Â("e+
+)
+
+Ä0 Ä(="#get-field# username:$
+"
+
+Ä Ä(>"	url_for:Bstr
+
+Ä Ä(>*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py

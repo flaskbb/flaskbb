@@ -1,0 +1,11 @@
+
+À¶"Returns a tuple with (branchname, plugin_dir) combinations.
+    The branchname is the name of plugin directory which should also be
+    the unique identifier of the plugin.
+    "strplugin_dirs
+ê ê(%"P<
+:
+
+ï ñ(branches_dirs"?python-unknown?:Blist
+
+ó ó(*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

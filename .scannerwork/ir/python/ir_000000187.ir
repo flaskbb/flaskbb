@@ -1,0 +1,15 @@
+self (args ($kwargs& (."dict"Š#
+!
+ ($"#unaryop *#2*:%
+#
+& (."#unaryop **#2**:3
+1
+ (/
+view_model"?python-unknown?:)
+'
+ (,"#get-field# template:%
+#
+. (:"#unaryop **#2**:%
+#
+ (;	"render_template:
+ (;	*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\views.py

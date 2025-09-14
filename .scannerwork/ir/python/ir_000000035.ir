@@ -1,0 +1,16 @@
+self
+„ „(year
+„ „(month
+„! „(+day
+„- „(5hour
+„7 „(@minute
+„B „(Msecond
+„O „(Zmicrosecond
+„\ „(l	tzinfo
+„n „(y
+fold„~ „(„datetime.datetime"J6
+4
+
+… …($"#unknown-value#Bdatetime.datetime
+
+… …($*datetime.py

@@ -1,0 +1,14 @@
+
+"date-only"str
+ª "Format the datetime for usage in templates, keeping only the date.
+
+    :param value: The datetime object that should be formatted
+    :rtype: Markup
+    "strdatetime
+Ý Ý("XD
+B
+
+ã ã(7".
+flaskbb.utils.helpers_format_html_time_tag:
+
+ã ã(7*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

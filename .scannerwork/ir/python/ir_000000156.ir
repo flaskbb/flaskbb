@@ -1,0 +1,401 @@
+
+NoneNoneType
+	"flaskbb"str
+Ÿœ"
+flaskbb.plugins.spec
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This module provides the core FlaskBB plugin hook definitions
+
+:copyright: (c) 2017 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
+"str"ﬁ=0
+.
+ (!HookspecMarker"?python-unknown?*
+(
+ ( spec"#unknown-value#:$
+"
+ %closure"#new-object#"
+ 
+ "#set-field# spec:'
+%
+ "?python-partial-apply?:$
+"
+ %closure"#new-object#"
+ 
+ 	"#set-field# spec:'
+%
+ 
+"?python-partial-apply?:$
+"
+ !%closure"#new-object#"
+ 
+ !"#set-field# spec:'
+%
+ !"?python-partial-apply?:$
+"
+! )%closure"#new-object#"
+ 
+! )"#set-field# spec:'
+%
+! )"?python-partial-apply?:$
+"
+) 1%closure"#new-object#"
+ 
+) 1"#set-field# spec:'
+%
+) 1"?python-partial-apply?:$
+"
+1 9%closure"#new-object#"
+ 
+1 9"#set-field# spec:'
+%
+1 9"?python-partial-apply?:$
+"
+9 A%closure"#new-object#"
+ 
+9 A"#set-field# spec:'
+%
+9 A"?python-partial-apply?:$
+"
+A Q%closure"#new-object#"
+ 
+A Q"#set-field# spec:'
+%
+A Q"?python-partial-apply?:$
+"
+Q l%closure"#new-object#"
+ 
+Q l"#set-field# spec:'
+%
+Q l"?python-partial-apply?:%
+#
+l à %closure"#new-object##
+!
+l à!"#set-field# spec: (
+&
+l à""?python-partial-apply?: &
+$
+à π#%closure"#new-object#$
+"
+à π$"#set-field# spec:#)
+'
+à π%"?python-partial-apply?:#&
+$
+π …&%closure"#new-object#$
+"
+π …'"#set-field# spec:&)
+'
+π …("?python-partial-apply?:&&
+$
+… ‹)%closure"#new-object#$
+"
+… ‹*"#set-field# spec:))
+'
+… ‹+"?python-partial-apply?:)&
+$
+‹ Â,%closure"#new-object#$
+"
+‹ Â-"#set-field# spec:,)
+'
+‹ Â."?python-partial-apply?:,&
+$
+Â Ì/%closure"#new-object#$
+"
+Â Ì0"#set-field# spec:/)
+'
+Â Ì1"?python-partial-apply?:/&
+$
+Ì ˆ2%closure"#new-object#$
+"
+Ì ˆ3"#set-field# spec:2)
+'
+Ì ˆ4"?python-partial-apply?:2&
+$
+ˆ ˇ5%closure"#new-object#$
+"
+ˆ ˇ6"#set-field# spec:5)
+'
+ˆ ˇ7"?python-partial-apply?:5&
+$
+ˇ ä8%closure"#new-object#$
+"
+ˇ ä9"#set-field# spec:8)
+'
+ˇ ä:"?python-partial-apply?:8&
+$
+ä ó;%closure"#new-object#$
+"
+ä ó<"#set-field# spec:;)
+'
+ä ó="?python-partial-apply?:;&
+$
+ó µ>%closure"#new-object#$
+"
+ó µ?"#set-field# spec:>)
+'
+ó µ@"?python-partial-apply?:>&
+$
+µ ’A%closure"#new-object#$
+"
+µ ’B"#set-field# spec:A)
+'
+µ ’C"?python-partial-apply?:A&
+$
+’ ÈD%closure"#new-object#$
+"
+’ ÈE"#set-field# spec:D)
+'
+’ ÈF"?python-partial-apply?:D&
+$
+È ßG%closure"#new-object#$
+"
+È ßH"#set-field# spec:G)
+'
+È ßI"?python-partial-apply?:G&
+$
+ß ≈J%closure"#new-object#$
+"
+ß ≈K"#set-field# spec:J)
+'
+ß ≈L"?python-partial-apply?:J&
+$
+≈ „M%closure"#new-object#$
+"
+≈ „N"#set-field# spec:M)
+'
+≈ „O"?python-partial-apply?:M&
+$
+„ àP%closure"#new-object#$
+"
+„ àQ"#set-field# spec:P)
+'
+„ àR"?python-partial-apply?:P&
+$
+à óS%closure"#new-object#$
+"
+à óT"#set-field# spec:S)
+'
+à óU"?python-partial-apply?:S&
+$
+ó ©V%closure"#new-object#$
+"
+ó ©W"#set-field# spec:V)
+'
+ó ©X"?python-partial-apply?:V&
+$
+© πY%closure"#new-object#$
+"
+© πZ"#set-field# spec:Y)
+'
+© π["?python-partial-apply?:Y&
+$
+π ∆\%closure"#new-object#$
+"
+π ∆]"#set-field# spec:\)
+'
+π ∆^"?python-partial-apply?:\&
+$
+∆ ÷_%closure"#new-object#$
+"
+∆ ÷`"#set-field# spec:_)
+'
+∆ ÷a"?python-partial-apply?:_&
+$
+÷ „b%closure"#new-object#$
+"
+÷ „c"#set-field# spec:b)
+'
+÷ „d"?python-partial-apply?:b&
+$
+„ Ïe%closure"#new-object#$
+"
+„ Ïf"#set-field# spec:e)
+'
+„ Ïg"?python-partial-apply?:e&
+$
+Ï àh%closure"#new-object#$
+"
+Ï ài"#set-field# spec:h)
+'
+Ï àj"?python-partial-apply?:h&
+$
+à £k%closure"#new-object#$
+"
+à £l"#set-field# spec:k)
+'
+à £m"?python-partial-apply?:k&
+$
+£ ºn%closure"#new-object#$
+"
+£ ºo"#set-field# spec:n)
+'
+£ ºp"?python-partial-apply?:n&
+$
+º …q%closure"#new-object#$
+"
+º …r"#set-field# spec:q)
+'
+º …s"?python-partial-apply?:q&
+$
+… ‡t%closure"#new-object#$
+"
+… ‡u"#set-field# spec:t)
+'
+… ‡v"?python-partial-apply?:t&
+$
+‡ ˜w%closure"#new-object#$
+"
+‡ ˜x"#set-field# spec:w)
+'
+‡ ˜y"?python-partial-apply?:w&
+$
+˜ Öz%closure"#new-object#$
+"
+˜ Ö{"#set-field# spec:z)
+'
+˜ Ö|"?python-partial-apply?:z&
+$
+Ö ç}%closure"#new-object#$
+"
+Ö ç~"#set-field# spec:})
+'
+Ö ç"?python-partial-apply?:}'
+%
+ç ïÄ%closure"#new-object#&
+$
+ç ïÅ"#set-field# spec:Ä+
+)
+ç ïÇ"?python-partial-apply?:Ä'
+%
+ï ûÉ%closure"#new-object#&
+$
+ï ûÑ"#set-field# spec:É+
+)
+ï ûÖ"?python-partial-apply?:É'
+%
+û ßÜ%closure"#new-object#&
+$
+û ßá"#set-field# spec:Ü+
+)
+û ßà"?python-partial-apply?:Ü'
+%
+ß ≤â%closure"#new-object#&
+$
+ß ≤ä"#set-field# spec:â+
+)
+ß ≤ã"?python-partial-apply?:â'
+%
+≤ Ωå%closure"#new-object#&
+$
+≤ Ωç"#set-field# spec:å+
+)
+≤ Ωé"?python-partial-apply?:å'
+%
+Ω »è%closure"#new-object#&
+$
+Ω »ê"#set-field# spec:è+
+)
+Ω »ë"?python-partial-apply?:è'
+%
+» ”í%closure"#new-object#&
+$
+» ”ì"#set-field# spec:í+
+)
+» ”î"?python-partial-apply?:í'
+%
+” ˜ï%closure"#new-object#&
+$
+” ˜ñ"#set-field# spec:ï+
+)
+” ˜ó"?python-partial-apply?:ï'
+%
+˜ †ò%closure"#new-object#&
+$
+˜ †ô"#set-field# spec:ò+
+)
+˜ †ö"?python-partial-apply?:ò'
+%
+† Ωõ%closure"#new-object#&
+$
+† Ωú"#set-field# spec:õ+
+)
+† Ωù"?python-partial-apply?:õ'
+%
+Ω ⁄û%closure"#new-object#&
+$
+Ω ⁄ü"#set-field# spec:û+
+)
+Ω ⁄†"?python-partial-apply?:û'
+%
+⁄ Ê°%closure"#new-object#&
+$
+⁄ Ê¢"#set-field# spec:°+
+)
+⁄ Ê£"?python-partial-apply?:°'
+%
+Ê Ú§%closure"#new-object#&
+$
+Ê Ú•"#set-field# spec:§+
+)
+Ê Ú¶"?python-partial-apply?:§'
+%
+Ú ˛ß%closure"#new-object#&
+$
+Ú ˛®"#set-field# spec:ß+
+)
+Ú ˛©"?python-partial-apply?:ß'
+%
+˛ à™%closure"#new-object#&
+$
+˛ à´"#set-field# spec:™+
+)
+˛ à¨"?python-partial-apply?:™'
+%
+à í≠%closure"#new-object#&
+$
+à íÆ"#set-field# spec:≠+
+)
+à íØ"?python-partial-apply?:≠'
+%
+í ú∞%closure"#new-object#&
+$
+í ú±"#set-field# spec:∞+
+)
+í ú≤"?python-partial-apply?:∞'
+%
+ú ¶≥%closure"#new-object#&
+$
+ú ¶¥"#set-field# spec:≥+
+)
+ú ¶µ"?python-partial-apply?:≥'
+%
+¶ ∞∂%closure"#new-object#&
+$
+¶ ∞∑"#set-field# spec:∂+
+)
+¶ ∞∏"?python-partial-apply?:∂'
+%
+∞ œπ%closure"#new-object#&
+$
+∞ œ∫"#set-field# spec:π+
+)
+∞ œª"?python-partial-apply?:π'
+%
+œ ⁄º%closure"#new-object#&
+$
+œ ⁄Ω"#set-field# spec:º+
+)
+œ ⁄æ"?python-partial-apply?:º'
+%
+⁄ Âø%closure"#new-object#&
+$
+⁄ Â¿"#set-field# spec:ø+
+)
+⁄ Â¡"?python-partial-apply?:ø'
+%
+Â Ì¬%closure"#new-object#&
+$
+Â Ì√"#set-field# spec:¬+
+)
+Â Ìƒ"?python-partial-apply?:¬ *@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\plugins\spec.py

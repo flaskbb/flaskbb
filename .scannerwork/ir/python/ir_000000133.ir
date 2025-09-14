@@ -1,0 +1,46 @@
+
+"division by zero"bool
+
+"S3518"bool
+"a"bool
++""Returns the posts per day count."str
+
+	0int
+
+1intself
+Þ Þ("¼-
++
+
+à à(+"#get-field# post_count:0
+.
+
+à à(,"
+builtinsfloat*:Bfloat2
+0
+
+à5 à(I"#get-field# days_registered:.
+,
+
+à5 à(I"?python-partial-apply?:0
+.
+
+à/ à(J"
+builtinsfloat*:Bfloat,
+*
+
+à à(J"
+#binop !=#2!=:	Bbool"
+ 
+
+à à(J"
+#assert#:
+3
+1
+
+à à(J"#dependent-value#*:Bfloat*
+(
+
+à à(O"
+builtinsround*:
+
+à à(O*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py

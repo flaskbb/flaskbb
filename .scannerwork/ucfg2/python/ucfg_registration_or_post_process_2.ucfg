@@ -1,0 +1,60 @@
+
+Mflaskbb.auth.services.registration.AutoActivateUserPostProcessor.post_processZ
+ND:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\auth\services\registration.py± ±("2*£
+2
+² ²(.‰
+†
+
+² ²(
+%4"__id*l
+
+__unknown_file (P*NB
+@flaskbb.auth.services.registration.AutoActivateUserPostProcessor"
+config*
+3
+4*5
+3
+registration.py"
+· ·
+implicit return*þ
+4
+³ ³(!Q
+O
+
+³ ³(!
+
+user"
+	activated"__id*$
+
+__unknown_file (
+
+True…
+‚
+
+´ ´(
+%1"__id*h
+
+__unknown_file (L*JB
+@flaskbb.auth.services.registration.AutoActivateUserPostProcessor"
+dbK
+I
+
+´ ´(
+%2"__id*/
+
+__unknown_file (*
+
+%1"	
+session@>
+
+´ ´($
+%3*"
+
+__unknown_file (
+
+%22commit*
+3:
+
+± ±(
+userBDB
+@flaskbb.auth.services.registration.AutoActivateUserPostProcessorH

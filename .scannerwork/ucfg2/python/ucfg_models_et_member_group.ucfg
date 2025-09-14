@@ -1,0 +1,152 @@
+
+*flaskbb.user.models.Group.get_member_groupI
+?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py^ ^("2*Ò
+2_ _(-^
+\
+a a(
+%1"__id*D
+
+__unknown_file ((*&
+flaskbb.user.models.Group"
+query^
+\
+b b(
+%2"__id*D
+
+__unknown_file ((*&
+flaskbb.user.models.Group"
+adminç
+ä
+b b(
+%3"	__compare*"
+
+__unknown_file (
+==*"
+
+__unknown_file (
+
+%2*%
+
+__unknown_file (	
+
+Falseb
+`
+c c(
+%4"__id*H
+
+__unknown_file (,**
+flaskbb.user.models.Group"
+	super_modç
+ä
+c c("
+%5"	__compare*"
+
+__unknown_file (
+==*"
+
+__unknown_file (
+
+%4*%
+
+__unknown_file (	
+
+False\
+Z
+d d(
+%6"__id*B
+
+__unknown_file (&*$
+flaskbb.user.models.Group"
+modç
+ä
+d d(
+%7"	__compare*"
+
+__unknown_file (
+==*"
+
+__unknown_file (
+
+%6*%
+
+__unknown_file (	
+
+False^
+\
+e e(
+%8"__id*D
+
+__unknown_file ((*&
+flaskbb.user.models.Group"
+guestç
+ä
+e e(
+%9"	__compare*"
+
+__unknown_file (
+==*"
+
+__unknown_file (
+
+%8*%
+
+__unknown_file (	
+
+False`
+^
+f f(
+%10"__id*E
+
+__unknown_file ()*'
+flaskbb.user.models.Group"
+bannedè
+å
+f f(
+%11"	__compare*"
+
+__unknown_file (
+==*#
+
+__unknown_file (
+
+%10*%
+
+__unknown_file (	
+
+FalseıÚ
+a g(	
+%12*"
+
+__unknown_file (
+
+%1*"
+
+__unknown_file (
+
+%3*"
+
+__unknown_file (
+
+%5*"
+
+__unknown_file (
+
+%7*"
+
+__unknown_file (
+
+%9*#
+
+__unknown_file (
+
+%112filter?=
+a g(
+%13*#
+
+__unknown_file (
+
+%122first"
+a g(
+
+%13B
+flaskbb.user.models.GroupH

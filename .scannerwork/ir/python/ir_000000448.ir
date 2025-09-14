@@ -1,0 +1,13 @@
+
+°¦"Returns a list that contains all available languages. The items in the
+    list are tuples where the first item of the tuple is the locale
+    identifier (i.e. de_AT) and the second one the display name of the locale.
+    For example::
+
+        [('de_AT', 'Deutsch (Ã–sterreich)')]
+    "str">*
+(
+
+‰ Œ("?python-unknown?Blist
+
+‰ Œ(*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

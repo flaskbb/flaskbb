@@ -1,0 +1,26 @@
+
+
+0intself! !(	tuple"€!
+
+" "("#unknown-value##
+!
+" "(!"#get-field# id:(
+&
+" "(""#unknown-value#Btuple&
+$
+" "(""
+#is-exact#:Bbool
+
+" "(""
+#assume#:8
+6
+" "("	"#set-field# __collection_size:Bint&
+$
+" "("
+"#array-add-last#:&
+$
+" "(""#array-add-last#:+
+)
+" "(#"
+builtinshash*:Bint
+" "(#*BD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\database.py

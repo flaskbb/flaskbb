@@ -1,0 +1,19 @@
+
+pg"Checks if the post is the first post in the topic.
+
+        :param post: The post object.
+        "strself
+è è(post
+è è( "ô0
+.
+
+î î(!"#get-field# first_post_id:%
+#
+
+î% î(,"#get-field# id:,
+*
+
+î î(,"
+#binop ==#2==:Bbool
+
+î î(,*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

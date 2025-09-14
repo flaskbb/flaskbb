@@ -1,0 +1,20 @@
+
+ôê"
+    Flags a function or method as deprecated, should not be used on
+    classes as it will break inheritance and introspection.
+
+    :param message: Optional message to display along with deprecation warning.
+    :param category: Warning category to use, defaults to RemovedInFlaskBB3,
+        if provided must be a subclass of FlaskBBDeprecation.
+    "strmessage3 3(category3 3(5"á!
+
+e e( "#unknown-value#(
+&
+= e(%closure"#new-object#*
+(
+= e("#set-field# category:)
+'
+= e("#set-field# message:+
+)
+= e("?python-partial-apply?:
+e e( *?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\deprecation.py

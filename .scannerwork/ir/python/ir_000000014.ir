@@ -1,0 +1,14 @@
+
+!"__remaining_iterations"str
+
+0intiterator
+¨ ¨(int"€>
+<
+
+© ©(A"$"#get-field# __remaining_iterations:Bint,
+*
+
+© ©(F"
+#binop !=#2!=:Bbool
+
+© ©(F*builtins.py

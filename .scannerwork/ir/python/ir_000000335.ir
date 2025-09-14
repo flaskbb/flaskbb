@@ -1,0 +1,12 @@
+
+"forum.view_post"str
+90"Returns the url for the last post in the forum"strself
+Æ Æ("i/
+-
+
+È2 È(C"#get-field# last_post_id:$
+"
+
+È È(D"	url_for:Bstr
+
+È È(D*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

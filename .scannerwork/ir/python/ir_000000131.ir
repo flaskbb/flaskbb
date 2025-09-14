@@ -1,0 +1,33 @@
+
+
+	1int
+=4"Returns the amount of days the user is registered."strself
+Ñ Ñ("Ç6
+4
+
+Ó Ó(("$
+flaskbb.utils.helperstime_utcnow.
+,
+
+Ó+ Ó(;"#get-field# date_joined:'
+%
+
+Ó Ó(;"	#binop -#*2-:8
+6
+
+Ó Ó(Adays_registered"#get-field# days:+
+)
+
+Ô Ô("
+__bool__*:BboolH+
+)
+
+Ô Ô("#unaryop !#2!:Bbool "
+
+Ô Ô( *
+Ô Ô(
+"
+
+Õ Õ(	"
+
+Ö Ö(*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py

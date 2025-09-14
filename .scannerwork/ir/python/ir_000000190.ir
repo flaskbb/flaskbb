@@ -1,0 +1,1575 @@
+
+"login_recaptcha"str
+D10int
+&Ú"me,administrator,moderator"str
+%í"Enable Auth Rate Limiting"str
+H"extra"str
+€ïv"Enable rate limiting on 'auth' routes. This will limit the amount of requests per minute to a given amount and time."str
+÷"auth_requests"str
+.P%"Number of posts displayed per page."str
+	"FlaskBB"str
+“"Auth Timeout"str
+
+"settings"str
+$Å"auth_username_max_length"str
+#»"Username Minimum Length"str
+
+"description"str
+`"Topics per page"str
+¬·¡"Helps to prevent bots from creating accounts. For more information visit this link: <a href=http://www.google.com/recaptcha>http://www.google.com/recaptcha</a>"str
+"è"auth_ratelimit_enabled"str
+2"project_copyright"str
+ë"Misc Settings"str
+#Ø"auth_username_blacklist"str
+ Ó"reCAPTCHA Secret Key"str
+B"posts_per_page"str
+"project_title"str
+!Î"recaptcha_private_key"str
+"auth"str
+3ú)"The amount of messages a user can have."str
+ñ50int
+‚"online_last_minutes"str
+È¾"
+flaskbb.fixtures.settings
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The fixtures module for our settings.
+
+:copyright: (c) 2014 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
+"str
+»"default_theme"str
+ï"message_quota"str
+·"Appearance Settings"str
+"name"str
+"General Settings"str
+!ø"Private Message Quota"str
+("Project subtitle"str
+"value"str
+Ç20int
+/b&"Number of topics displayed per page."str
+Ô"Avatar Width"str
+Ş"avatar_size"str
+.t%"Number of users displayed per page."str
+¨7int
+µ"Enable reCAPTCHA"str
+µ"appearance"str
+7Û-"Change the default language for your forum."str
+?Õ5"The private key ('Secret key'). Keep this a secret!"str
+.*%"A short description of the project."str
+aĞW"The Maximum length of the username. Changing this will only affect new registrations."str
+Ù"Default Language"str
+Â"Avatar Height"str
+"signature_enabled"str
+•truebool
+¦"tracker_length"str
+€"Auth Requests"str
+Œ15int
+ó"PNG"str
+J"min"str
+4Ç*"Change the default theme for your forum."str
+Å"Default Theme"str
+L§B"Use a CAPTCHA after a specified amount of failed login attempts."str
+ “"registration_enabled"str
+à200int
+Ï"default_language"str
+ô"JPEG"str
+8"Project Copyright"str
+$²"auth_username_min_length"str
+ñ"avatar_types"str
+é"misc"str
+5Ö+"The allowed width of an avatar in pixels."str
+#Î"Username Maximum Length"str
+™"Enable Registration"str
+<à2"A comma seperated list with forbidden usernames."str
+Š"Online last minutes"str
+>‘4"Configurations for the Login and Register process."str
+eª["Enable to let the user activate their account by sending a email with an activation link."str
+—"Enable Signatures"str
+9¹/"Change the theme and language for your forum."str
+£"activate_account"str
+3Æ)"Your public recaptcha key ('Site key')."str
+X"topics_per_page"str
+¯"Tracker length"str
+ç"Avatar Size"str
+†"Avatar Types"str
+Ì"avatar_width"str
+½"aurora"str
+0$'"A lightweight forum software in Flask"str
+""project_subtitle"str
+n•d"The timeout for how long the user has to wait until he can access the resource again (in minutes)."str
+#í"Miscellaneous settings."str
+Eˆ;"The allowed types of an avatar. Such as JPEG, GIF or PNG."str
+8é."The allowed size of the avatar in kilobytes."str
+‡‚}"Number of requests on each 'auth' route before the user has to wait a given timeout until he can access the resource again."str
+\±R"The days for how long the forum should deal with unread topics. 0 to disable it."str
+
+K5int
+.›$"Enable or disable the registration"str
+»150int
+Ä"reCAPTCHA Site Key"str
+r"Users per page"str
+=3"The length of the topic title shown on the index."str
+j"users_per_page"str
+%¨"Enable Account Activation"str
+¥"Login reCAPTCHA"str
+N"Posts per page"str
+ ¿"recaptcha_public_key"str
+]:T"Copyright notice of the Project like '&copy; 2018 FlaskBB'. Leave blank to ignore."str
+"value_type"str
+1("How many items per page are displayed."str
+Ş"Username Blacklist"str
+NoneNoneType
+a½W"The minimum length of the username. Changing this will only affect new registrations."str
+õ"GIF"str
+$"The title of the project."str
+\ŒR"How long a user can be inactive before he is marked as offline. 0 to disable it."str
+Š"auth_timeout"str
+´3int
+”"title_length"str
+‚	"choices"str
+'™"Enable signatures in posts."str
+#"Authentication Settings"str
+ı1int
+¯"recaptcha_enabled"str
+
+0int
+œ"Topic title length"str
+	"general"str
+"Project title"str
+Ñ"en"str
+4""str
+±falsebool
+¹"avatar_height"str
+6Ä,"The allowed height of an avatar in pixels."str	÷list	tuple"¤$
+"
+
+Î- Î(@Ö"#unknown-value#$
+"
+
+Ä- Ä(=Â"#unknown-value#$
+"
+
+§- §(Cƒ"#unknown-value#2
+0
+ (0SettingValueType"?python-unknown?9
+7
+ (Pget_available_languages"?python-unknown?6
+4
+ (Jget_available_themes"?python-unknown?$
+"
+ W(	"#new-object#Bdict 
+
+ (&	"	#map-set#: 
+
+ (C"	#map-set#:
+$
+"
+ $("#new-object#Bdict 
+
+   (*"	#map-set#:'
+%
+!& !(="#get-field# string: 
+
+! !(="	#map-set#: 
+
+" "(/"	#map-set#: 
+
+# #(B"	#map-set#:
+(
+&
+ %("#unknown-value#Btuple&
+$
+ %("
+#is-exact#:Bbool
+
+ %("
+#assume#:8
+6
+ %("#set-field# __collection_size:Bint&
+$
+ %( "#array-add-last#:&
+$
+ %(!"#array-add-last#:$
+"
+( -(#"#new-object#Bdict 
+
+) )(H%"	#map-set#:#$'
+%
+*& *(=&"#get-field# string: 
+
+* *(='"	#map-set#:#& 
+
++ +(2)"	#map-set#:#( 
+
+, ,(L+"	#map-set#:#
+*(
+&
+& .(,"#unknown-value#Btuple&
+$
+& .(-"
+#is-exact#:,Bbool
+
+& .(."
+#assume#:-8
+6
+& .(/"#set-field# __collection_size:,Bint&
+$
+& .(0"#array-add-last#:,"&
+$
+& .(1"#array-add-last#:,#$
+"
+1 6(3"#new-object#Bdict 
+
+2 2(#5"	#map-set#:34'
+%
+3& 3(=6"#get-field# string: 
+
+3 3(=7"	#map-set#:36 
+
+4 4(39"	#map-set#:38 
+
+5 5({;"	#map-set#:3
+:(
+&
+/ 7(<"#unknown-value#Btuple&
+$
+/ 7(="
+#is-exact#:<Bbool
+
+/ 7(>"
+#assume#:=8
+6
+/ 7(?"#set-field# __collection_size:<Bint&
+$
+/ 7(@"#array-add-last#:<2&
+$
+/ 7(A"#array-add-last#:<3$
+"
+: @(C"#new-object#Bdict 
+
+; ;(#E"	#map-set#:CD(
+&
+<& <(>F"#get-field# integer: 
+
+< <(>G"	#map-set#:CF$
+"
+=! =(+I"#new-object#Bdict 
+
+=" =(*L"	#map-set#:IJK 
+
+= =(+M"	#map-set#:CHI 
+
+> >(0O"	#map-set#:CN 
+
+? ?(LQ"	#map-set#:C
+P(
+&
+8 A(R"#unknown-value#Btuple&
+$
+8 A(S"
+#is-exact#:RBbool
+
+8 A(T"
+#assume#:S8
+6
+8 A(U"#set-field# __collection_size:RBint&
+$
+8 A(V"#array-add-last#:RB&
+$
+8 A(W"#array-add-last#:RC$
+"
+D J(Y"#new-object#Bdict 
+
+E E(#Z"	#map-set#:YD(
+&
+F& F(>["#get-field# integer: 
+
+F F(>\"	#map-set#:Y[$
+"
+G! G(+]"#new-object#Bdict 
+
+G" G(*^"	#map-set#:]JK 
+
+G G(+_"	#map-set#:YH] 
+
+H H(1a"	#map-set#:Y` 
+
+I I(Mc"	#map-set#:Y
+b(
+&
+B K(d"#unknown-value#Btuple&
+$
+B K(e"
+#is-exact#:dBbool
+
+B K(f"
+#assume#:e8
+6
+B K(g"#set-field# __collection_size:dBint&
+$
+B K(h"#array-add-last#:dX&
+$
+B K(i"#array-add-last#:dY$
+"
+N T(k"#new-object#Bdict 
+
+O O(#l"	#map-set#:kD(
+&
+P& P(>m"#get-field# integer: 
+
+P P(>n"	#map-set#:km$
+"
+Q! Q(+o"#new-object#Bdict 
+
+Q" Q(*p"	#map-set#:oJK 
+
+Q Q(+q"	#map-set#:kHo 
+
+R R(0s"	#map-set#:kr 
+
+S S(Lu"	#map-set#:k
+t(
+&
+L U(v"#unknown-value#Btuple&
+$
+L U(w"
+#is-exact#:vBbool
+
+L U(x"
+#assume#:w8
+6
+L U(y"#set-field# __collection_size:vBint&
+$
+L U(z"#array-add-last#:vj&
+$
+L U({"#array-add-last#:vk(
+&
+ V(|"#unknown-value#Btuple&
+$
+ V(}"
+#is-exact#:|Bbool
+
+ V(~"
+#assume#:}8
+6
+ V("#set-field# __collection_size:|Bint'
+%
+ V(€"#array-add-last#:|'
+%
+ V("#array-add-last#:|,'
+%
+ V(‚"#array-add-last#:|<'
+%
+ V(ƒ"#array-add-last#:|R'
+%
+ V(„"#array-add-last#:|d'
+%
+ V(…"#array-add-last#:|v!
+
+ V(†"	#map-set#:|)
+'
+ X(‡"#unknown-value#Btuple(
+&
+ X(ˆ"
+#is-exact#:‡Bbool
+
+ X(‰"
+#assume#:ˆ:
+8
+ X(Š"#set-field# __collection_size:‡Bint(
+&
+ X(‹"#array-add-last#:‡(
+&
+ X(Œ"#array-add-last#:‡&
+$
+	[ Ô(	"#new-object#Bdict#
+!
+\ \(-"	#map-set#:#
+!
+] ](O’"	#map-set#:
+‘%
+#
+a f(”"#new-object#Bdict#
+!
+b b(%–"	#map-set#:”•)
+'
+c& c(>—"#get-field# boolean:#
+!
+c c(>˜"	#map-set#:”—#
+!
+d d(5š"	#map-set#:”™#
+!
+e e(Kœ"	#map-set#:”
+›)
+'
+_ g("#unknown-value#Btuple(
+&
+_ g("
+#is-exact#:Bbool
+
+_ g(Ÿ"
+#assume#::
+8
+_ g( "#set-field# __collection_size:Bint)
+'
+_ g(¡"#array-add-last#:“)
+'
+_ g(¢"#array-add-last#:”%
+#
+j o(¤"#new-object#Bdict#
+!
+k k(%¥"	#map-set#:¤•)
+'
+l& l(>¦"#get-field# boolean:#
+!
+l l(>§"	#map-set#:¤¦#
+!
+m m(;©"	#map-set#:¤¨$
+"
+	n n(‚«"	#map-set#:¤
+ª)
+'
+h p(¬"#unknown-value#Btuple(
+&
+h p(­"
+#is-exact#:¬Bbool
+
+h p(®"
+#assume#:­:
+8
+h p(¯"#set-field# __collection_size:¬Bint)
+'
+h p(°"#array-add-last#:¬£)
+'
+h p(±"#array-add-last#:¬¤%
+#
+s y(³"#new-object#Bdict#
+!
+t t("µ"	#map-set#:³´)
+'
+u& u(>¶"#get-field# integer:#
+!
+u u(>·"	#map-set#:³¶%
+#
+v! v(+¸"#new-object#Bdict"
+ 
+v" v(*¹"	#map-set#:¸J#
+!
+v v(+º"	#map-set#:³H¸#
+!
+w w(9¼"	#map-set#:³»#
+!
+x x(~¾"	#map-set#:³
+½)
+'
+q z(¿"#unknown-value#Btuple(
+&
+q z(À"
+#is-exact#:¿Bbool
+
+q z(Á"
+#assume#:À:
+8
+q z(Â"#set-field# __collection_size:¿Bint)
+'
+q z(Ã"#array-add-last#:¿²)
+'
+q z(Ä"#array-add-last#:¿³&
+$
+	} ƒ(Æ"#new-object#Bdict#
+!
+~ ~(#È"	#map-set#:ÆÇ)
+'
+& (>É"#get-field# integer:#
+!
+ (>Ê"	#map-set#:ÆÉ'
+%
+
+€! €(+Ë"#new-object#Bdict$
+"
+
+€" €(*Ì"	#map-set#:ËJ%
+#
+
+€ €(+Í"	#map-set#:ÆHË%
+#
+
+ (9Ï"	#map-set#:ÆÎ%
+#
+
+‚ ‚(~Ñ"	#map-set#:Æ
+Ğ*
+(
+	{ „(Ò"#unknown-value#Btuple)
+'
+	{ „(Ó"
+#is-exact#:ÒBbool 
+
+	{ „(Ô"
+#assume#:Ó;
+9
+	{ „(Õ"#set-field# __collection_size:ÒBint*
+(
+	{ „(Ö"#array-add-last#:ÒÅ*
+(
+	{ „(×"#array-add-last#:ÒÆ'
+%
+
+‡ Œ(Ù"#new-object#Bdict%
+#
+
+ˆ ˆ(=Û"	#map-set#:ÙÚ*
+(
+
+‰& ‰(=Ü"#get-field# string:%
+#
+
+‰ ‰(=İ"	#map-set#:ÙÜ%
+#
+
+Š Š(4ß"	#map-set#:ÙŞ%
+#
+
+‹ ‹(Yá"	#map-set#:Ù
+à+
+)
+
+… (â"#unknown-value#Btuple*
+(
+
+… (ã"
+#is-exact#:âBbool!
+
+
+… (ä"
+#assume#:ã<
+:
+
+… (å"#set-field# __collection_size:âBint+
+)
+
+… (æ"#array-add-last#:âØ+
+)
+
+… (ç"#array-add-last#:âÙ'
+%
+
+ •(é"#new-object#Bdict%
+#
+
+‘ ‘(%ê"	#map-set#:é•+
+)
+
+’& ’(>ë"#get-field# boolean:%
+#
+
+’ ’(>ì"	#map-set#:éë%
+#
+
+“ “(;î"	#map-set#:éí&
+$
+” ”(ğ"	#map-set#:é
+ï+
+)
+
+ –(ñ"#unknown-value#Btuple*
+(
+
+ –(ò"
+#is-exact#:ñBbool!
+
+
+ –(ó"
+#assume#:ò<
+:
+
+ –(ô"#set-field# __collection_size:ñBint+
+)
+
+ –(õ"#array-add-last#:ñè+
+)
+
+ –(ö"#array-add-last#:ñé'
+%
+
+™ Ÿ(ø"#new-object#Bdict%
+#
+
+š š(#ù"	#map-set#:øÇ+
+)
+
+›& ›(>ú"#get-field# integer:%
+#
+
+› ›(>û"	#map-set#:øú'
+%
+
+œ! œ(+ü"#new-object#Bdict%
+#
+
+œ" œ(*ş"	#map-set#:üJı%
+#
+
+œ œ(+ÿ"	#map-set#:øHü%
+#
+
+ (/"	#map-set#:ø€&
+$
+ (¤ƒ"	#map-set#:ø
+‚+
+)
+
+—  („"#unknown-value#Btuple*
+(
+
+—  (…"
+#is-exact#:„Bbool!
+
+
+—  (†"
+#assume#:…<
+:
+
+—  (‡"#set-field# __collection_size:„Bint+
+)
+
+—  (ˆ"#array-add-last#:„÷+
+)
+
+—  (‰"#array-add-last#:„ø'
+%
+
+£ ©(‹"#new-object#Bdict%
+#
+
+¤ ¤(#"	#map-set#:‹Œ+
+)
+
+¥& ¥(>"#get-field# integer:%
+#
+
+¥ ¥(>"	#map-set#:‹'
+%
+
+¦! ¦(+"#new-object#Bdict$
+"
+
+¦" ¦(*‘"	#map-set#:J%
+#
+
+¦ ¦(+’"	#map-set#:‹H%
+#
+
+§ §(.”"	#map-set#:‹“&
+$
+¨ ¨(‹–"	#map-set#:‹
+•+
+)
+
+¡ ª(—"#unknown-value#Btuple*
+(
+
+¡ ª(˜"
+#is-exact#:—Bbool!
+
+
+¡ ª(™"
+#assume#:˜<
+:
+
+¡ ª(š"#set-field# __collection_size:—Bint+
+)
+
+¡ ª(›"#array-add-last#:—Š+
+)
+
+¡ ª(œ"#array-add-last#:—‹'
+%
+
+­ ³("#new-object#Bdict$
+"
+
+® ®("Ÿ"	#map-set#:K+
+)
+
+¯& ¯(> "#get-field# integer:%
+#
+
+¯ ¯(>¡"	#map-set#: '
+%
+
+°! °(+¢"#new-object#Bdict$
+"
+
+°" °(*£"	#map-set#:¢J%
+#
+
+° °(+¤"	#map-set#:H¢%
+#
+
+± ±(1¦"	#map-set#:¥%
+#
+
+² ²(i¨"	#map-set#:
+§+
+)
+
+« ´(©"#unknown-value#Btuple*
+(
+
+« ´(ª"
+#is-exact#:©Bbool!
+
+
+« ´(«"
+#assume#:ª<
+:
+
+« ´(¬"#set-field# __collection_size:©Bint+
+)
+
+« ´(­"#array-add-last#:©+
+)
+
+« ´(®"#array-add-last#:©'
+%
+
+· ¿(°"#new-object#Bdict%
+#
+
+¸ ¸(&²"	#map-set#:°±+
+)
+
+¹& ¹(>³"#get-field# boolean:%
+#
+
+¹ ¹(>´"	#map-set#:°³%
+#
+
+º º(2¶"	#map-set#:°µ%
+#
+
+» ¾(¸"	#map-set#:°
+·+
+)
+
+µ À(¹"#unknown-value#Btuple*
+(
+
+µ À(º"
+#is-exact#:¹Bbool!
+
+
+µ À(»"
+#assume#:º<
+:
+
+µ À(¼"#set-field# __collection_size:¹Bint+
+)
+
+µ À(½"#array-add-last#:¹¯+
+)
+
+µ À(¾"#array-add-last#:¹°'
+%
+
+Ã È(À"#new-object#Bdict$
+"
+
+Ä Ä(#Á"	#map-set#:À4*
+(
+
+Å& Å(=Â"#get-field# string:%
+#
+
+Å Å(=Ã"	#map-set#:ÀÂ%
+#
+
+Æ Æ(4Å"	#map-set#:ÀÄ%
+#
+
+Ç Ç(PÇ"	#map-set#:À
+Æ+
+)
+
+Á É(È"#unknown-value#Btuple*
+(
+
+Á É(É"
+#is-exact#:ÈBbool!
+
+
+Á É(Ê"
+#assume#:É<
+:
+
+Á É(Ë"#set-field# __collection_size:ÈBint+
+)
+
+Á É(Ì"#array-add-last#:È¿+
+)
+
+Á É(Í"#array-add-last#:ÈÀ'
+%
+
+Ì Ñ(Ï"#new-object#Bdict$
+"
+
+Í Í(#Ğ"	#map-set#:Ï4*
+(
+
+Î& Î(=Ñ"#get-field# string:%
+#
+
+Î Î(=Ò"	#map-set#:ÏÑ%
+#
+
+Ï Ï(6Ô"	#map-set#:ÏÓ%
+#
+
+Ğ Ğ(\Ö"	#map-set#:Ï
+Õ+
+)
+
+Ê Ò(×"#unknown-value#Btuple*
+(
+
+Ê Ò(Ø"
+#is-exact#:×Bbool!
+
+
+Ê Ò(Ù"
+#assume#:Ø<
+:
+
+Ê Ò(Ú"#set-field# __collection_size:×Bint+
+)
+
+Ê Ò(Û"#array-add-last#:×Î+
+)
+
+Ê Ò(Ü"#array-add-last#:×Ï*
+(
+	^ Ó(İ"#unknown-value#Btuple)
+'
+	^ Ó(Ş"
+#is-exact#:İBbool 
+
+	^ Ó(ß"
+#assume#:Ş;
+9
+	^ Ó(à"#set-field# __collection_size:İBint.
+,
+	^ Ó(á"?python-unknown?*Btuple$
+"
+	^ Ó(â"	#map-set#:á*
+(
+	Y Õ(ã"#unknown-value#Btuple)
+'
+	Y Õ(ä"
+#is-exact#:ãBbool 
+
+	Y Õ(å"
+#assume#:ä;
+9
+	Y Õ(æ"#set-field# __collection_size:ãBint*
+(
+	Y Õ(ç"#array-add-last#:ã*
+(
+	Y Õ(è"#array-add-last#:ã'
+%
+
+Ø ·(	ê"#new-object#Bdict%
+#
+
+Ù Ù(#ì"	#map-set#:êë%
+#
+
+Ú Ú(4î"	#map-set#:ê
+í'
+%
+
+Ş ä(ğ"#new-object#Bdict%
+#
+
+ß ß(#ò"	#map-set#:ğñ+
+)
+
+à& à(>ó"#get-field# integer:%
+#
+
+à à(>ô"	#map-set#:ğó'
+%
+
+á! á(+õ"#new-object#Bdict$
+"
+
+á" á(*ö"	#map-set#:õJ%
+#
+
+á á(+÷"	#map-set#:ğHõ%
+#
+
+â â(7ù"	#map-set#:ğø%
+#
+
+ã ã(Pû"	#map-set#:ğ
+ú+
+)
+
+Ü å(ü"#unknown-value#Btuple*
+(
+
+Ü å(ı"
+#is-exact#:üBbool!
+
+
+Ü å(ş"
+#assume#:ı<
+:
+
+Ü å(ÿ"#set-field# __collection_size:üBint+
+)
+
+Ü å(€"#array-add-last#:üï+
+)
+
+Ü å("#array-add-last#:üğ'
+%
+
+è î(ƒ"#new-object#Bdict%
+#
+
+é é(#„"	#map-set#:ƒŒ+
+)
+
+ê& ê(>…"#get-field# integer:%
+#
+
+ê ê(>†"	#map-set#:ƒ…'
+%
+
+ë! ë(+‡"#new-object#Bdict$
+"
+
+ë" ë(*ˆ"	#map-set#:‡J%
+#
+
+ë ë(+‰"	#map-set#:ƒH‡%
+#
+
+ì ì(5‹"	#map-set#:ƒŠ%
+#
+
+í í(y"	#map-set#:ƒ
+Œ+
+)
+
+æ ï("#unknown-value#Btuple*
+(
+
+æ ï("
+#is-exact#:Bbool!
+
+
+æ ï("
+#assume#:<
+:
+
+æ ï(‘"#set-field# __collection_size:Bint+
+)
+
+æ ï(’"#array-add-last#:‚+
+)
+
+æ ï(“"#array-add-last#:ƒ'
+%
+
+ò ø(•"#new-object#Bdict%
+#
+
+ó ó(#–"	#map-set#:•Œ+
+)
+
+ô& ô(>—"#get-field# integer:%
+#
+
+ô ô(>˜"	#map-set#:•—'
+%
+
+õ! õ(+™"#new-object#Bdict$
+"
+
+õ" õ(*š"	#map-set#:™J%
+#
+
+õ õ(+›"	#map-set#:•H™%
+#
+
+ö ö(4"	#map-set#:•œ%
+#
+
+÷ ÷(ZŸ"	#map-set#:•
++
+)
+
+ğ ù( "#unknown-value#Btuple*
+(
+
+ğ ù(¡"
+#is-exact#: Bbool!
+
+
+ğ ù(¢"
+#assume#:¡<
+:
+
+ğ ù(£"#set-field# __collection_size: Bint+
+)
+
+ğ ù(¤"#array-add-last#: ”+
+)
+
+ğ ù(¥"#array-add-last#: •'
+%
+
+ü ‚(§"#new-object#Bdict%
+#
+
+ı ı("©"	#map-set#:§¨+
+)
+
+ş& ş(>ª"#get-field# integer:%
+#
+
+ş ş(>«"	#map-set#:§ª'
+%
+
+ÿ! ÿ(+¬"#new-object#Bdict$
+"
+
+ÿ" ÿ(*­"	#map-set#:¬J%
+#
+
+ÿ ÿ(+®"	#map-set#:§H¬%
+#
+
+€ €(0°"	#map-set#:§¯%
+#
+
+ (y²"	#map-set#:§
+±+
+)
+
+ú ƒ(³"#unknown-value#Btuple*
+(
+
+ú ƒ(´"
+#is-exact#:³Bbool!
+
+
+ú ƒ(µ"
+#assume#:´<
+:
+
+ú ƒ(¶"#set-field# __collection_size:³Bint+
+)
+
+ú ƒ(·"#array-add-last#:³¦+
+)
+
+ú ƒ(¸"#array-add-last#:³§'
+%
+
+† Œ(º"#new-object#Bdict%
+#
+
+‡ ‡($¼"	#map-set#:º»+
+)
+
+ˆ& ˆ(>½"#get-field# integer:%
+#
+
+ˆ ˆ(>¾"	#map-set#:º½'
+%
+
+‰! ‰(+¿"#new-object#Bdict$
+"
+
+‰" ‰(*À"	#map-set#:¿J%
+#
+
+‰ ‰(+Á"	#map-set#:ºH¿%
+#
+
+Š Š(/Ã"	#map-set#:ºÂ%
+#
+
+‹ ‹(SÅ"	#map-set#:º
+Ä+
+)
+
+„ (Æ"#unknown-value#Btuple*
+(
+
+„ (Ç"
+#is-exact#:ÆBbool!
+
+
+„ (È"
+#assume#:Ç<
+:
+
+„ (É"#set-field# __collection_size:ÆBint+
+)
+
+„ (Ê"#array-add-last#:Æ¹+
+)
+
+„ (Ë"#array-add-last#:Æº'
+%
+
+ –(Í"#new-object#Bdict%
+#
+
+‘ ‘($Î"	#map-set#:Í»+
+)
+
+’& ’(>Ï"#get-field# integer:%
+#
+
+’ ’(>Ğ"	#map-set#:ÍÏ'
+%
+
+“! “(+Ñ"#new-object#Bdict$
+"
+
+“" “(*Ò"	#map-set#:ÑJ%
+#
+
+“ “(+Ó"	#map-set#:ÍHÑ%
+#
+
+” ”(.Õ"	#map-set#:ÍÔ%
+#
+
+• •(R×"	#map-set#:Í
+Ö+
+)
+
+ —(Ø"#unknown-value#Btuple*
+(
+
+ —(Ù"
+#is-exact#:ØBbool!
+
+
+ —(Ú"
+#assume#:Ù<
+:
+
+ —(Û"#set-field# __collection_size:ØBint+
+)
+
+ —(Ü"#array-add-last#:ØÌ+
+)
+
+ —(İ"#array-add-last#:ØÍ'
+%
+
+š  (ß"#new-object#Bdict%
+#
+
+› ›($á"	#map-set#:ßà+
+)
+
+œ& œ(>â"#get-field# integer:%
+#
+
+œ œ(>ã"	#map-set#:ßâ'
+%
+
+! (+ä"#new-object#Bdict$
+"
+
+" (*å"	#map-set#:äJ%
+#
+
+ (+æ"	#map-set#:ßHä%
+#
+
+ (-è"	#map-set#:ßç%
+#
+
+Ÿ Ÿ(Uê"	#map-set#:ß
+é+
+)
+
+˜ ¡(ë"#unknown-value#Btuple*
+(
+
+˜ ¡(ì"
+#is-exact#:ëBbool!
+
+
+˜ ¡(í"
+#assume#:ì<
+:
+
+˜ ¡(î"#set-field# __collection_size:ëBint+
+)
+
+˜ ¡(ï"#array-add-last#:ëŞ+
+)
+
+˜ ¡(ğ"#array-add-last#:ëß'
+%
+
+¤ ª(ò"#new-object#Bdict*
+(
+
+¥! ¥(7ö"#unknown-value#Blist+
+)
+
+¥! ¥(7ø"
+#is-exact#:ö÷Bbool!
+
+
+¥! ¥(7ù"
+#assume#:ø<
+:
+
+¥! ¥(7ú"#set-field# __collection_size:öBint+
+)
+
+¥! ¥(7û"#array-add-last#:öó+
+)
+
+¥! ¥(7ü"#array-add-last#:öô+
+)
+
+¥! ¥(7ı"#array-add-last#:öõ%
+#
+
+¥ ¥(7ş"	#map-set#:òö2
+0
+
+¦& ¦(Eÿ"#get-field# selectmultiple:%
+#
+
+¦ ¦(E€"	#map-set#:òÿ'
+%
+
+§! §(D"#new-object#Bdict&
+$
+
+§" §(C„"	#map-set#:‚ƒ%
+#
+
+§ §(D…"	#map-set#:òH%
+#
+
+¨ ¨(.‡"	#map-set#:ò†%
+#
+
+© ©(b‰"	#map-set#:ò
+ˆ+
+)
+
+¢ «(Š"#unknown-value#Btuple*
+(
+
+¢ «(‹"
+#is-exact#:ŠBbool!
+
+
+¢ «(Œ"
+#assume#:‹<
+:
+
+¢ «("#set-field# __collection_size:ŠBint+
+)
+
+¢ «("#array-add-last#:Šñ+
+)
+
+¢ «("#array-add-last#:Šò'
+%
+
+® ´(‘"#new-object#Bdict%
+#
+
+¯ ¯(%’"	#map-set#:‘•+
+)
+
+°& °(>“"#get-field# boolean:%
+#
+
+° °(>”"	#map-set#:‘“'
+%
+
+±! ±(#•"#new-object#Bdict%
+#
+
+± ±(#–"	#map-set#:‘H•%
+#
+
+² ²(3˜"	#map-set#:‘—%
+#
+
+³ ³(Dš"	#map-set#:‘
+™+
+)
+
+¬ µ(›"#unknown-value#Btuple*
+(
+
+¬ µ(œ"
+#is-exact#:›Bbool!
+
+
+¬ µ("
+#assume#:œ<
+:
+
+¬ µ("#set-field# __collection_size:›Bint+
+)
+
+¬ µ(Ÿ"#array-add-last#:›+
+)
+
+¬ µ( "#array-add-last#:›‘+
+)
+
+Û ¶(¡"#unknown-value#Btuple*
+(
+
+Û ¶(¢"
+#is-exact#:¡Bbool!
+
+
+Û ¶(£"
+#assume#:¢<
+:
+
+Û ¶(¤"#set-field# __collection_size:¡Bint+
+)
+
+Û ¶(¥"#array-add-last#:¡ü+
+)
+
+Û ¶(¦"#array-add-last#:¡+
+)
+
+Û ¶(§"#array-add-last#:¡ +
+)
+
+Û ¶(¨"#array-add-last#:¡³+
+)
+
+Û ¶(©"#array-add-last#:¡Æ+
+)
+
+Û ¶(ª"#array-add-last#:¡Ø+
+)
+
+Û ¶(«"#array-add-last#:¡ë+
+)
+
+Û ¶(¬"#array-add-last#:¡Š+
+)
+
+Û ¶(­"#array-add-last#:¡›%
+#
+
+Û ¶(®"	#map-set#:ê¡+
+)
+
+Ö ¸(¯"#unknown-value#Btuple*
+(
+
+Ö ¸(°"
+#is-exact#:¯Bbool!
+
+
+Ö ¸(±"
+#assume#:°<
+:
+
+Ö ¸(²"#set-field# __collection_size:¯Bint+
+)
+
+Ö ¸(³"#array-add-last#:¯é+
+)
+
+Ö ¸(´"#array-add-last#:¯ê'
+%
+
+» Ô(	¶"#new-object#Bdict%
+#
+
+¼ ¼()¸"	#map-set#:¶·%
+#
+
+½ ½(Jº"	#map-set#:¶
+¹'
+%
+
+Á Ç(¼"#new-object#Bdict%
+#
+
+Â Â()¾"	#map-set#:¼½*
+(
+
+Ã& Ã(=¿"#get-field# select:%
+#
+
+Ã Ã(=À"	#map-set#:¼¿'
+%
+
+Ä! Ä(>Á"#new-object#Bdict&
+$
+
+Ä" Ä(=Ã"	#map-set#:Á‚Â%
+#
+
+Ä Ä(>Ä"	#map-set#:¼HÁ%
+#
+
+Å Å(/Æ"	#map-set#:¼Å%
+#
+
+Æ Æ(QÈ"	#map-set#:¼
+Ç+
+)
+
+¿ È(É"#unknown-value#Btuple*
+(
+
+¿ È(Ê"
+#is-exact#:ÉBbool!
+
+
+¿ È(Ë"
+#assume#:Ê<
+:
+
+¿ È(Ì"#set-field# __collection_size:ÉBint+
+)
+
+¿ È(Í"#array-add-last#:É»+
+)
+
+¿ È(Î"#array-add-last#:É¼'
+%
+
+Ë Ñ(Ğ"#new-object#Bdict%
+#
+
+Ì Ì(%Ò"	#map-set#:ĞÑ*
+(
+
+Í& Í(=Ó"#get-field# select:%
+#
+
+Í Í(=Ô"	#map-set#:ĞÓ'
+%
+
+Î! Î(AÕ"#new-object#Bdict&
+$
+
+Î" Î(@×"	#map-set#:Õ‚Ö%
+#
+
+Î Î(AØ"	#map-set#:ĞHÕ%
+#
+
+Ï Ï(2Ú"	#map-set#:ĞÙ%
+#
+
+Ğ Ğ(TÜ"	#map-set#:Ğ
+Û+
+)
+
+É Ò(İ"#unknown-value#Btuple*
+(
+
+É Ò(Ş"
+#is-exact#:İBbool!
+
+
+É Ò(ß"
+#assume#:Ş<
+:
+
+É Ò(à"#set-field# __collection_size:İBint+
+)
+
+É Ò(á"#array-add-last#:İÏ+
+)
+
+É Ò(â"#array-add-last#:İĞ+
+)
+
+¾ Ó(ã"#unknown-value#Btuple*
+(
+
+¾ Ó(ä"
+#is-exact#:ãBbool!
+
+
+¾ Ó(å"
+#assume#:ä<
+:
+
+¾ Ó(æ"#set-field# __collection_size:ãBint+
+)
+
+¾ Ó(ç"#array-add-last#:ãÉ+
+)
+
+¾ Ó(è"#array-add-last#:ãİ%
+#
+
+¾ Ó(é"	#map-set#:¶ã+
+)
+
+¹ Õ(ê"#unknown-value#Btuple*
+(
+
+¹ Õ(ë"
+#is-exact#:êBbool!
+
+
+¹ Õ(ì"
+#assume#:ë<
+:
+
+¹ Õ(í"#set-field# __collection_size:êBint+
+)
+
+¹ Õ(î"#array-add-last#:êµ+
+)
+
+¹ Õ(ï"#array-add-last#:ê¶'
+%
+ (ğ"#unknown-value#Btuple&
+$
+ (ñ"
+#is-exact#:ğBbool
+
+ (ò"
+#assume#:ñ8
+6
+ (ó"#set-field# __collection_size:ğBint'
+%
+ (ô"#array-add-last#:ğ‡'
+%
+ (õ"#array-add-last#:ğã'
+%
+ (ö"#array-add-last#:ğ¯'
+%
+ (÷"#array-add-last#:ğê*
+(
+ Ö(øfixture"#id#:ğBtuple *ED:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\fixtures\settings.py

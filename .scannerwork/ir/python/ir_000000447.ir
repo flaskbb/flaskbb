@@ -1,0 +1,13 @@
+
+Š€"Returns a list that contains all available themes. The items in the
+    list are tuples where the first item of the tuple is the identifier and
+    the second one the name of the theme.
+    For example::
+
+        [('aurora_mod', 'Aurora Mod')]
+    "str">*
+(
+
+þ þ(J"?python-unknown?Blist
+
+þ þ(J*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

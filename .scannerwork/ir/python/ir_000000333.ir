@@ -1,0 +1,15 @@
+
+;2"Returns a slugified version from the forum title"strself
+º º("™(
+&
+
+¼ ¼(!"#get-field# title:#
+!
+
+¼ ¼(""#unknown-value#6
+4
+
+¼ ¼("" 
+flaskbb.utils.helpersslugify:
+
+¼ ¼("*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

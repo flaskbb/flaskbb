@@ -1,0 +1,13 @@
+
+
+0int
+"__collection_size"strs. .(	int"œ?
+=
+0 0(7result"#get-field# __collection_size:Bint*
+(
+1 1("
+#binop >=#2>=:Bbool
+
+1 1("
+#assume#:
+2 2(*builtins.py

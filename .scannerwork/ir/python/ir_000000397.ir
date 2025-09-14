@@ -1,0 +1,41 @@
+
+
+"forum_id"str
+
+"forum"struser
+ò ò(forum
+ò ò(intflaskbb.forum.models.Forum"‹.
+,
+
+ó ó(kwargs"#new-object#Bdict+
+)
+
+õ õ("#is-instance#:Bbool,"*
+
+õ õ( *
+õ õ(2
+÷ ÷("0&
+$
+
+ö ö(""#array-write#:"Q+
+)
+
+÷	 ÷(!	"#is-instance#:Bbool "
+
+÷	 ÷(!	 *
+÷ ÷("0&
+$
+
+ø ø("#array-write#:
+"˜'
+%
+
+ú0 ú(8"#unaryop **#2**:0
+.
+
+ú ú(9"IsAtleastModeratorInForum:'
+%
+
+ú ú(I"#unknown-value#:
+
+ú ú(I*FD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\requirements.py

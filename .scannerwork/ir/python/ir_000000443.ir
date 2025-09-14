@@ -1,0 +1,20 @@
+
+‚y"Returns a string representing time since e.g.
+    3 days ago, 5 hours ago.
+
+    :param time: A datetime object
+    "str
+truebooltime
+ö ö("¤6
+4
+
+ü ü( "$
+flaskbb.utils.helperstime_utcnow.
+,
+
+ü ü( delta"	#binop -#*2-:(
+&
+
+ý ý(6"format_timedelta:
+
+ý ý(6*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

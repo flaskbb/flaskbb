@@ -1,0 +1,68 @@
+
+
+"JPEG"str
+"JPG"str
+"PNG"str
+
+0int
+"GIF"str	tuplelist"£(
+&
+ ("#unknown-value#Btuple&
+$
+ ("
+#is-exact#:Bbool
+
+ ("
+#assume#:8
+6
+ ("#set-field# __collection_size:Bint&
+$
+ ("#array-add-last#:&
+$
+ (	"#array-add-last#:(
+&
+ (+"#unknown-value#Btuple&
+$
+ (+"
+#is-exact#:Bbool
+
+ (+"
+#assume#:8
+6
+ (+"#set-field# __collection_size:Bint&
+$
+ (+"#array-add-last#:
+&
+$
+ (+"#array-add-last#:(
+&
+- (;"#unknown-value#Btuple&
+$
+- (;"
+#is-exact#:Bbool
+
+- (;"
+#assume#:8
+6
+- (;"#set-field# __collection_size:Bint&
+$
+- (;"#array-add-last#:&
+$
+- (;"#array-add-last#:'
+%
+ (<"#unknown-value#Blist&
+$
+ (<"
+#is-exact#:Bbool
+
+ (<"
+#assume#:8
+6
+ (<"#set-field# __collection_size:Bint&
+$
+ (<"#array-add-last#:&
+$
+ (<"#array-add-last#:&
+$
+ (< "#array-add-last#:
+ (<*ED:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\fixtures\settings.py

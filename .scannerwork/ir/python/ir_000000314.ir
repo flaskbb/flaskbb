@@ -1,0 +1,45 @@
+
+3*"Returns the slugified url for the topic."str
+"forum.view_topic"strself
+î î("Õ'
+%
+
+ð ð("#get-field# slug:.
+,
+
+ð ð("?python-partial-apply?:+
+)
+
+ð ð("
+__bool__*:BboolH+
+)
+
+ð ð("#unaryop !#2!:Bbool "
+
+ð ð( *
+ð ð(
+"a%
+#
+
+ñ8 ñ(?"#get-field# id:$
+"
+
+ñ ñ(@	"	url_for:Bstr
+
+ñ ñ(@	"»%
+#
+
+ò4 ò(;
+"#get-field# id:'
+%
+
+òB ò(K"#get-field# slug:.
+,
+
+òB ò(K"?python-partial-apply?:%
+#
+
+ò ò(L"	url_for:
+Bstr
+
+ò ò(L*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

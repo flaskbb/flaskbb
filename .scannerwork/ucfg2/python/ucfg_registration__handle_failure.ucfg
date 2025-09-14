@@ -1,0 +1,49 @@
+
+Fflaskbb.auth.services.registration.RegistrationService._handle_failureZ
+ND:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\auth\services\registration.pyà à("2*÷
+2
+á ã(	
+}
+
+á á(
+%1"__id*c
+
+__unknown_file (G*E8
+6flaskbb.auth.services.registration.RegistrationService"	
+pluginsH
+F
+
+á á(
+%2"__id*,
+
+__unknown_file (*
+
+%1"
+hook•’
+
+á ã(	
+%3*"
+
+__unknown_file (
+
+%22$flaskbb_registration_failure_handler:
+	user_info
+
+	user_info:
+failures
+
+
+failures*
+3*7
+3
+registration.py"
+å å(
+implicit return:
+
+à à('
+	user_info:
+
+à) à(1
+
+failuresB:8
+6flaskbb.auth.services.registration.RegistrationServiceH

@@ -1,0 +1,12 @@
+
+ßÕ"Returns a Form for all settings found in :class:`SettingsGroup`.
+
+        :param group: The settingsgroup name. It is used to get the settings
+                      which are in the specified group.
+        "strcls< <(group< <("})
+'
+B/ B(="#get-field# settings:@
+>
+B B(>"-
+flaskbb.utils.formsgenerate_settings_form:
+B B(>*ED:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\management\models.py

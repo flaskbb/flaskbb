@@ -1,0 +1,42 @@
+
+"ACTIVATE_ACCOUNT"str
+	truebool
+–Œ"Returns the state of the account.
+        If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always
+        return ``True``. Is the option activated, it will, depending on the
+        state of the account, either return ``True`` or ``False``.
+        "str
+
+falseboolself
+« «("š#
+!
+
+± ±("#unknown-value#$
+"
+
+± ±(-"#array-read#:+
+)
+
+± ±(-"
+__bool__*:BboolH "
+
+± ±(- *
+± ±(
+",
+*
+
+² ²("#get-field# activated:+
+)
+
+² ²("
+__bool__*:BboolH "
+
+² ²( *
+² ²("
+
+¶ ¶(	"
+
+³ ³(	"
+
+´ ´(
+*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py

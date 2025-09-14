@@ -1,0 +1,30 @@
+
+"forum.view_category"str
+5,"Returns the slugified url for the category"strself
+€
+ €
+("¹%
+#
+
+‚
+: ‚
+(A"#get-field# id:'
+%
+
+‚
+H ‚
+(Q"#get-field# slug:.
+,
+
+‚
+H ‚
+(Q"?python-partial-apply?:%
+#
+
+‚
+ ‚
+(R"	url_for:Bstr
+
+‚
+ ‚
+(R*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

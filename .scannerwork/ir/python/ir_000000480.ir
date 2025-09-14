@@ -1,0 +1,12 @@
+
+ÖÌ"
+        Used to raise an exception about a token that is invalid
+        due to being signed incorrectly, has been tampered with,
+        is unparsable or contains an inappropriate action.
+        "str
+"Token is invalid"strcls# #("Q$
+"
+) )(("#unknown-value#:
+
+) )()"cls:
+) )()*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\core\tokens.py

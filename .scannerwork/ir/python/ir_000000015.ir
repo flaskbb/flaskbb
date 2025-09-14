@@ -1,0 +1,45 @@
+
+!"__remaining_iterations"str
+
+1intiterator
+¯	 ¯(default
+¯ ¯(int	builtins._RangeIterator"ô>
+<
+
+°& °(\"$"#get-field# __remaining_iterations:Bint'
+%
+
+°& °(`"	#binop -#*2-::
+8
+
+° °(#"$"#set-field# __remaining_iterations:+
+)
+
+± ±(+
+"#is-instance#:	Bbool "
+
+± ±(+
+ *
+± ±("û4
+2
+
+² ²(#result"#get-field# __current:)
+'
+
+³ ³(-"#get-field# __step:,
+*
+
+³ ³("#get-field# __current:'
+%
+
+³ ³(-"	#binop +#*2+:-
++
+
+³ ³(-"#set-field# __current:
+
+´ ´("9#
+!
+
+µ µ("#unknown-value#
+
+µ µ(*builtins.py

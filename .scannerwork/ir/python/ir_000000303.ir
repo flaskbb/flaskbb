@@ -1,0 +1,12 @@
+
+"forum.view_post"str
+("Returns the url for the post."strself
+Æ Æ("_%
+#
+
+È2 È(9"#get-field# id:$
+"
+
+È È(:"	url_for:Bstr
+
+È È(:*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

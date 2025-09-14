@@ -1,0 +1,28 @@
+cls ("õ!
+
+& &("#unknown-value#!
+
+% %(
+"#unknown-value#!
+
+$ $("#unknown-value#(
+&
+ (%closure"#new-object#%
+#
+ ("#set-field# cls:+
+)
+ ("?python-partial-apply?:(
+&
+! $(%closure"#new-object#%
+#
+! $("#set-field# cls:+
+)
+! $("?python-partial-apply?:(
+&
+$ $(	"#set-field# __eq__:(
+&
+% %("#set-field# __ne__:
+*
+(
+& &("#set-field# __hash__:
+' '(*BD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\database.py

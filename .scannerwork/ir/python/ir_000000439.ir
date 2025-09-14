@@ -1,0 +1,14 @@
+
+“‰"Format the datetime for usage in templates.
+
+    :param value: The datetime object that should be formatted
+    :rtype: Markup
+    "str
+"date-and-time"strdatetime
+Ô Ô("XD
+B
+
+Ú Ú(;".
+flaskbb.utils.helpers_format_html_time_tag:
+
+Ú Ú(;*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py

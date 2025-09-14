@@ -1,0 +1,49 @@
+
+"division by zero"bool
+"S3518"bool
+,#"Returns the topics per day count."str
+"a"bool
+
+
+0int
+
+1intself
+ã ã("í.
+,
+
+å å(,"#get-field# topic_count:.
+,
+
+å å(,"?python-partial-apply?:0
+.
+
+å å(-"
+builtinsfloat*:Bfloat2
+0
+
+å6 å(J"#get-field# days_registered:.
+,
+
+å6 å(J"?python-partial-apply?:0
+.
+
+å0 å(K"
+builtinsfloat*:Bfloat,
+*
+
+å å(K	"
+#binop !=#2!=:
+Bbool"
+ 
+
+å å(K"
+#assert#:	3
+1
+
+å å(K"#dependent-value#*:Bfloat*
+(
+
+å å(P"
+builtinsround*:
+
+å å(P*?D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\user\models.py

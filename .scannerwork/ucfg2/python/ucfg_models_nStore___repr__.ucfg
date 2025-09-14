@@ -1,0 +1,55 @@
+
++flaskbb.plugins.models.PluginStore.__repr__L
+BD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\plugins\models.py) )("2*„
+2* ,(	h
+f
++ +(
+%1"__id*N
+
+__unknown_file (2*0$
+"flaskbb.plugins.models.PluginStore"
+pluginF
+D
++ +(
+%2"__id*,
+
+__unknown_file (*
+
+%1"
+namee
+c
++ +(&
+%3"__id*K
+
+__unknown_file (/*-$
+"flaskbb.plugins.models.PluginStore"
+keyg
+e
++( +(2
+%4"__id*M
+
+__unknown_file (1*/$
+"flaskbb.plugins.models.PluginStore"
+valueÞÛ
+* ,(	
+%5"
+str.format*I
+
+__unknown_file (-+
+)<PluginSetting plugin={} key={} value={}>*"
+
+__unknown_file (
+
+%2*"
+
+__unknown_file (
+
+%3*"
+
+__unknown_file (
+
+%42format"
+* ,(	
+
+%5B&$
+"flaskbb.plugins.models.PluginStoreH

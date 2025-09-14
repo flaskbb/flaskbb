@@ -1,0 +1,36 @@
+
+"forum.view_forum"str
+2)"Returns the slugified url for the forum"strself
+¿ ¿("|+
+)
+
+Á Á("#get-field# external:+
+)
+
+Á Á("
+__bool__*:BboolH "
+
+Á Á( *
+Á Á(
+"A+
+)
+
+Â Â( "#get-field# external:
+
+Â Â( "»%
+#
+
+Ã4 Ã(;"#get-field# id:'
+%
+
+ÃB Ã(K"#get-field# slug:.
+,
+
+ÃB Ã(K	"?python-partial-apply?:%
+#
+
+Ã Ã(L
+"	url_for:	Bstr
+
+Ã Ã(L
+*@D:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\forum\models.py

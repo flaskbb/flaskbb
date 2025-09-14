@@ -1,0 +1,18 @@
+
+]T"Wrapper around babel's format_timedelta to make it user language
+    aware.
+    "strdelta
+ï ï(kwargs
+ï ï($"dict"®;
+9
+
+ó0 ó(B")
+flaskbb.utils.helpers_get_user_locale'
+%
+
+óD ó(L"#unaryop **#2**:4
+2
+
+ó ó(M"babel_format_timedelta:Bstr
+
+ó ó(M*AD:\Bachelors\Sem7\SoftwareRe-Eng\flaskbb\flaskbb\utils\helpers.py
