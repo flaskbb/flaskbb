@@ -3,5 +3,5 @@ projectKey=AhMaD-TaShFeEn_flaskbb
 serverUrl=https://sonarcloud.io
 serverVersion=8.0.0.67173
 dashboardUrl=https://sonarcloud.io/dashboard?id=AhMaD-TaShFeEn_flaskbb
-ceTaskId=AZlHVY-3XQNpmMsQYrp4
-ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZlHVY-3XQNpmMsQYrp4
+ceTaskId=AZlHYnZGUroKsKjspI_E
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZlHYnZGUroKsKjspI_E
