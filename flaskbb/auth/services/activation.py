@@ -47,7 +47,7 @@ class AccountActivator(_AccountActivator):
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.ACTIVATE_ACCOUNT:
             raise TokenError.invalid()
-        user = self.users.query.get(token.user_id)
+        user = self.users.query.filter_by(id=token.user_id).first()
         if user.activated:
             raise ValidationError("activated", _("Account is already activated"))
         user.activated = True

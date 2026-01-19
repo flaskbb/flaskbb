@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "esnext",
+    "target": "ES2022",
     // disallow features that require cross-file information for emit
     "isolatedModules": true,
 

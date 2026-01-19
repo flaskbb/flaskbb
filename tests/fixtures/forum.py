@@ -69,7 +69,7 @@ def topic_in_locked_forum(forum_locked, user):
 @pytest.fixture
 def last_read():
     """The datetime of the formsread last_read."""
-    return datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+    return datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1)
 
 
 @pytest.fixture

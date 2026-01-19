@@ -163,6 +163,7 @@ def test_create_default_groups(database):
 def test_migrations_upgrade():
     with pytest.raises(OperationalError):
         User.query.all()
+        # db.session.rollback()
 
     # ensure that the database is created
     create_database(db.engine.url)

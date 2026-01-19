@@ -1,0 +1,120 @@
+[project]
+name = "flaskbb"
+version = "2.1.0"
+dependencies = [
+  "alembic>=1.18.1",
+  "attrs>=25.4.0",
+  "Babel>=2.17.0",
+  "blinker>=1.9",
+  "celery>=5.6.2",
+  "click>=8.3.1",
+  "click-log>=0.4.0",
+  "click-plugins>=1.1.1.2",
+  "click-repl>=0.3.0",
+  "Flask>=3.1.2",
+  "Flask-Alembic>=3.2.0",
+  "flask-allows @ git+https://github.com/flaskbb/flask-allows.git@master#egg=flask-allows",
+  "Flask-BabelPlus>=2.2.0",
+  "Flask-Caching>=2.3.1",
+  "Flask-DebugToolbar>=0.16.0",
+  "flask-debugtoolbar-warnings>=0.1.0",
+  "Flask-Limiter>=4.1.1",
+  "Flask-Login>=0.6.3",
+  "Flask-Mail>=0.10.0",
+  "flask-redis>=0.4.0",
+  "Flask-SQLAlchemy>=3.1.1",
+  "Flask-Themes2>=1.0.1",
+  "flask-whooshee>=0.9.1",
+  "Flask-WTF>=1.2.2",
+  "flaskbb-plugin-conversations>=1.1.0",
+  "flaskbb-plugin-portal>=1.2.0",
+  "Jinja2>=3.1.6",
+  "MarkupSafe>=2.0.3",
+  "mistune>=3.2.0",
+  "Pillow>=12.1.0",
+  "pluggy>=1.6.0",
+  "Pygments>=2.19.2",
+  "PyJWT>=2.10.1",
+  "pytz>=2025.2",
+  "SQLAlchemy>=2.0.45",
+  "SQLAlchemy-Utils>=0.42.1",
+  "Unidecode>=1.4.0",
+  "Werkzeug>=3.1.5",
+  "Whoosh>=2.7.4",
+  "WTForms>=3.2.1",
+  "WTForms-SQLAlchemy>=0.4.2",
+]
+requires-python = ">=3.12"
+authors = [
+  {name = "Peter Justin", email = "peter.justin@outlook.com"},
+]
+maintainers = [
+  {name = "Peter Justin", email = "peter.justin@outlook.com"}
+]
+description = "A classic Forum Software in Python using Flask."
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICEN[CS]E"]
+keywords = ["d2r", "qt", "diablo", "loader"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Flask",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+[project.urls]
+Homepage = "https://github.com/flaskbb/flaskbb"
+Documentation = "https://flaskbb.readthedocs.io/en/latest/"
+Repository = "https://github.com/flaskbb/flaskbb"
+Issues = "https://github.com/flaskbb/flaskbb"
+Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES"
+
+[project.scripts]
+flaskbb = "flaskbb.cli.main:flaskbb"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.basedpyright]
+include = ["flaskbb"]
+exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs", "**/whoosh_index"]
+defineConstant = { DEBUG = true }
+reportIgnoreCommentWithoutRule = false
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+reportUnusedCallResult = false
+reportAny = false
+reportExplicitAny = false
+
+[tool.pytest]
+minversion = "9.0"
+addopts = [
+    "-vvl",
+    "--strict-markers",
+    "--capture fd",
+    "--tb short",
+    "--pythonwarnings error::flaskbb.deprecation.FlaskBBDeprecation",
+    "--cov flaskbb",
+    "--cov-config setup.cfg",
+    "--cov-append",
+    "--numprocesses auto",
+    "--dist load"
+]
+norecursedirs = "node_modules"
+testpaths = [
+    "tests",
+]

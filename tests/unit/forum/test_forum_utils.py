@@ -1,4 +1,4 @@
-from flask import _request_ctx_stack, url_for
+from flask import g, url_for
 
 from flaskbb.forum import utils
 from flaskbb.forum.models import Forum
@@ -29,9 +29,9 @@ class TestForceLoginHelpers(object):
             forum.groups = Group.query.filter(Group.guest == False).all()
             forum.save()
         # sets current_forum
-        _request_ctx_stack.top.forum = forum
+        g.forum = forum
 
-        result = utils.force_login_if_needed()
-
-        # use in rather than == because it can contain query params as well
-        assert url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]
+        with application.app_context():
+            result = utils.force_login_if_needed()
+            # use in rather than == because it can contain query params as well
+            assert url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]

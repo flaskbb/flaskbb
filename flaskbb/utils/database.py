@@ -15,7 +15,7 @@ import pytz
 from flask_login import current_user
 from flask_sqlalchemy.query import Query
 from sqlalchemy.orm import declarative_mixin, declared_attr
-
+import sqlalchemy as sa
 from flaskbb.extensions import db
 
 from ..core.exceptions import PersistenceError
@@ -110,10 +110,10 @@ class HideableQuery(Query):
         )
 
     def _get(self, *args, **kwargs):
-        return super(HideableQuery, self).get(*args, **kwargs)
+        return super(HideableQuery, self).filter(*args, **kwargs)
 
     def get(self, *args, **kwargs):
-        obj = self.with_hidden()._get(*args, **kwargs)
+        obj = self.with_hidden()._get(*args, **kwargs).first()
         return obj if obj is None or self._with_hidden or not obj.hidden else None
 
 

@@ -12,6 +12,15 @@ A module for all markup related stuff.
 import logging
 
 import mistune
+from mistune.plugins.speedup import speedup
+from mistune.plugins.url import url
+from mistune.plugins.formatting import strikethrough, subscript, superscript, insert, mark
+from mistune.plugins.abbr import abbr
+from mistune.plugins.def_list import def_list
+from mistune.plugins.task_lists import task_lists
+from mistune.plugins.table import table
+from mistune.plugins.footnotes import footnotes
+from mistune.plugins.spoiler import spoiler
 from flask import url_for
 from markupsafe import Markup
 from pluggy import HookimplMarker
@@ -19,38 +28,49 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
+import re
 
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
-_re_user = r"(?i)@(\w+)"
+USER_TAG_PATTERN = r"@(\w+)"
 
 
-def parse_user_link(inline, match, state):
-    url = url_for("user.profile", username=match.group(1), _external=False)
-    return "link", url, match.group(0)
+def parse_user_link(inline, m, state):
+    url = url_for("user.profile", username=m.group(0).replace("@", ""), _external=False)
+    text = m.group(0)
+    state.append_token(
+        {
+            "type": "link",
+            "children": [{"type": "text", "raw": text}],
+            "attrs": {"url": url},
+        }
+    )
+
+    return m.end()
 
 
-def plugin_userify(md):
+def flaskbb_userify(md):
     """Mistune plugin that transforms @username references to links."""
-    md.inline.register_rule("flaskbb_user_link", _re_user, parse_user_link)
-    md.inline.rules.append("flaskbb_user_link")
+    md.inline.register("flaskbb_user_link", USER_TAG_PATTERN, parse_user_link, before="link")
 
 
 DEFAULT_PLUGINS = [
-    "url",
-    "strikethrough",
-    "spoiler",
-    "subscript",
-    "superscript",
-    "insert",
-    "mark",
-    "abbr",
-    "def_list",
-    "task_lists",
-    "table",
-    "footnotes",
+    url,
+    strikethrough,
+    spoiler,
+    subscript,
+    superscript,
+    insert,
+    mark,
+    abbr,
+    def_list,
+    task_lists,
+    table,
+    footnotes,
+    speedup,
+    flaskbb_userify
 ]
 
 

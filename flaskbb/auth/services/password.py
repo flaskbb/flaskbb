@@ -44,7 +44,7 @@ class ResetPasswordService(_ResetPasswordService):
         if token.operation != TokenActions.RESET_PASSWORD:
             raise TokenError.invalid()
         self._verify_token(token, email)
-        user = self.users.query.get(token.user_id)
+        user = self.users.query.filter_by(id=token.user_id).first()
         user.password = new_password
 
     def _verify_token(self, token, email):

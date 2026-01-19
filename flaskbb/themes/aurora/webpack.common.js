@@ -75,8 +75,8 @@ module.exports = {
                         ],
                         plugins: [
                             "@babel/plugin-syntax-dynamic-import",
-                            "@babel/proposal-class-properties",
-                            "@babel/proposal-object-rest-spread",
+                            "@babel/plugin-transform-class-properties",
+                            "@babel/plugin-transform-object-rest-spread",
                         ],
                     },
                 },

@@ -1,12 +1,12 @@
 import pytest
-from flask import _request_ctx_stack, request
+from flask import g, request
 
 from flaskbb.utils import requirements as r
 
 
 def push_onto_request_context(**kw):
     for name, value in kw.items():
-        setattr(_request_ctx_stack.top, name, value)
+        setattr(g, name, value)
 
 
 @pytest.fixture

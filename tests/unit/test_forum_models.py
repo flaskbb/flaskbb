@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
@@ -14,6 +14,7 @@ from flaskbb.forum.models import (
 )
 from flaskbb.user.models import User
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.extensions import db
 
 
 def test_category_save(database):
@@ -199,7 +200,7 @@ def test_forum_update_read(database, user, topic):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # hence, we also need to create a new forumsread entry
@@ -216,7 +217,7 @@ def test_forum_update_read(database, user, topic):
         post.save(user=user, topic=topic)
 
         # Updating the topicsread tracker
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # now the forumsread tracker should also need a update
@@ -246,7 +247,7 @@ def test_forum_update_read_two_topics(database, user, topic, topic_moderator):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # will not create a entry because there is still one unread topic
@@ -388,13 +389,13 @@ def test_topic_tracker_needs_update(database, user, topic):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         forumsread = ForumsRead()
         forumsread.user_id = user.id
         forumsread.forum_id = topic.forum_id
-        forumsread.last_read = datetime.utcnow()
+        forumsread.last_read = datetime.now(UTC)
         forumsread.save()
 
         # Now the topic should be read
@@ -442,8 +443,8 @@ def test_topic_tracker_needs_update_cleared(database, user, topic):
         forumsread = ForumsRead()
         forumsread.user_id = user.id
         forumsread.forum_id = topic.forum_id
-        forumsread.last_read = datetime.utcnow()
-        forumsread.cleared = datetime.utcnow()
+        forumsread.last_read = datetime.now(UTC)
+        forumsread.cleared = datetime.now(UTC)
         forumsread.save()
 
         # Now the topic should be read
@@ -572,7 +573,7 @@ def test_forumsread(topic, user):
     forumsread = ForumsRead()
     forumsread.user_id = user.id
     forumsread.forum_id = topic.forum_id
-    forumsread.last_read = datetime.utcnow()
+    forumsread.last_read = datetime.now(UTC)
     forumsread.save()
     assert forumsread is not None
 
@@ -588,7 +589,7 @@ def test_topicsread(topic, user):
     topicsread.user_id = user.id
     topicsread.topic_id = topic.id
     topicsread.forum_id = topic.forum_id
-    topicsread.last_read = datetime.utcnow()
+    topicsread.last_read = datetime.now(UTC)
     topicsread.save()
     assert topicsread is not None
 

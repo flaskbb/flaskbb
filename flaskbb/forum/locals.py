@@ -42,10 +42,9 @@ def current_category():
 
 def _get_item(model, view_arg, name):
     if (
-        has_request_context()
+        g
         and not getattr(g, name, None)
         and view_arg in request.view_args
     ):
         setattr(g, name, model.query.filter_by(id=request.view_args[view_arg]).first())
-
     return getattr(g, name, None)

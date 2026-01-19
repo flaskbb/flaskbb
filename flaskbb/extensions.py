@@ -61,7 +61,7 @@ redis_store = FlaskRedis()
 debugtoolbar = DebugToolbarExtension()
 
 # Migrations
-alembic = Alembic()
+alembic = Alembic(command_name="db")
 
 # Themes
 themes = Themes()
@@ -73,7 +73,7 @@ babel = Babel()
 csrf = CSRFProtect()
 
 # Rate Limiting
-limiter = Limiter(auto_check=False, key_func=get_remote_address)
+limiter = Limiter(get_remote_address)
 
 # Celery
 celery = Celery("flaskbb")

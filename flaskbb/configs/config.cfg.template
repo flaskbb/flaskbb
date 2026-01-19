@@ -247,7 +247,7 @@ LOG_DEFAULT_CONF = {
         },
         'flaskbb': {
             'handlers': ['console', 'flaskbb'],
-            'level': 'WARNING',
+            'level': '{% if is_debug %}DEBUG{% else %}WARNING{% endif %}',
             'propagate': True
         },
     }

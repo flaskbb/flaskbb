@@ -17,10 +17,9 @@ import os
 import re
 import time
 from datetime import datetime, timedelta
-from email import message_from_string
 from functools import wraps
 
-import pkg_resources
+from importlib.metadata import Distribution
 import requests
 import unidecode
 from babel.core import get_locale_identifier
@@ -788,20 +787,10 @@ def real(obj):
     return obj
 
 
-def parse_pkg_metadata(dist_name):
-    try:
-        raw_metadata = pkg_resources.get_distribution(dist_name).get_metadata(
-            "METADATA"
-        )
-    except FileNotFoundError:
-        raw_metadata = pkg_resources.get_distribution(dist_name).get_metadata(
-            "PKG-INFO"
-        )
-
-    metadata = {}
-
+def parse_pkg_metadata(dist: Distribution):
     # lets use the Parser from email to parse our metadata :)
-    for key, value in message_from_string(raw_metadata).items():
+    metadata = {}
+    for key, value in dist.metadata.items():
         metadata[key.replace("-", "_").lower()] = value
 
     return metadata

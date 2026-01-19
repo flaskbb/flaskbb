@@ -15,7 +15,7 @@ import os
 import sys
 import time
 import warnings
-from datetime import datetime
+from datetime import datetime, UTC
 
 from flask import Flask, request
 from flask_login import current_user
@@ -130,6 +130,7 @@ def create_app(config=None, instance_path=None):
     configure_app(app, config)
     configure_celery_app(app, celery)
     configure_extensions(app)
+
     load_plugins(app)
     configure_blueprints(app)
     configure_template_filters(app)
@@ -201,6 +202,18 @@ def configure_app(app, config):
     if not app.testing:  # pragma: no branch
         warnings.simplefilter(deprecation_level, FlaskBBDeprecation)
 
+    # Filter Flask-Limiter in-memory warnings when running in debug mode oder test mode
+    if app.debug or app.testing:
+        warnings.filterwarnings(
+            action="ignore",
+            message=".*Using the in-memory storage for tracking rate limits.*",
+        )
+
+    warnings.filterwarnings(
+        action="ignore",
+        message=".*The Query.get()*",
+    )
+
     debug_panels = app.config.setdefault(
         "DEBUG_TB_PANELS",
         [
@@ -254,7 +267,7 @@ def configure_extensions(app):
     db.init_app(app)
 
     # Flask-Alembic
-    alembic.init_app(app, command_name="db")
+    alembic.init_app(app)
 
     # Flask-Mail
     mail.init_app(app)
@@ -358,7 +371,7 @@ def configure_context_processors(app):
     @app.context_processor
     def inject_now():
         """Injects the current time."""
-        return dict(now=datetime.utcnow())
+        return dict(now=datetime.now(UTC))
 
 
 def configure_before_handlers(app):
@@ -498,7 +511,7 @@ def load_plugins(app):
 
     except (OperationalError, ProgrammingError) as exc:
         logger.debug(
-            "Database is not setup correctly or has not been " "setup yet.",
+            "Database is not setup correctly or has not been setup yet.",
             exc_info=exc,
         )
         # load plugins even though the database isn't setup correctly

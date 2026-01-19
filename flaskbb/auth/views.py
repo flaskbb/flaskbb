@@ -411,7 +411,8 @@ def flaskbb_load_blueprints(app):
         """Check the the rate limits for each request for this blueprint."""
         if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
             return None
-        return limiter.check()
+        # TODO: Figure this out
+        #return limiter.check()
 
     @auth.errorhandler(429)
     def login_rate_limit_error(error):

@@ -31,7 +31,6 @@ def _get_image_resp(which, mime):
         body=raw,
         url="http://example/{}".format(which),
         headers={"Content-Type": mime, "Content-Length": str(len(raw))},
-        stream=True,
     )
 
 

@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta
+import datetime
 
 import pytest
 from freezegun import freeze_time
 from pluggy import HookimplMarker
-from pytz import UTC
 
 from flaskbb.auth.services import authentication as auth
 from flaskbb.core.auth.authentication import (
@@ -18,14 +17,14 @@ pytestmark = pytest.mark.usefixtures("default_settings")
 
 class TestBlockTooManyFailedLogins(object):
     provider = auth.BlockTooManyFailedLogins(
-        auth.FailedLoginConfiguration(limit=1, lockout_window=timedelta(hours=1))
+        auth.FailedLoginConfiguration(limit=1, lockout_window=datetime.timedelta(hours=1))
     )
 
-    @freeze_time(datetime(2018, 1, 1, 13, 30))
+    @freeze_time(datetime.datetime(2018, 1, 1, 13, 30))
     def test_raises_StopAuthentication_if_user_is_at_limit_and_inside_window(
         self, Fred
     ):
-        Fred.last_failed_login = datetime(2018, 1, 1, 14, tzinfo=UTC)
+        Fred.last_failed_login = datetime.datetime(2018, 1, 1, 14, tzinfo=datetime.UTC)
         Fred.login_attempts = 1
 
         with pytest.raises(StopAuthentication) as excinfo:
@@ -33,15 +32,15 @@ class TestBlockTooManyFailedLogins(object):
 
         assert "too many failed login attempts" in excinfo.value.reason
 
-    @freeze_time(datetime(2018, 1, 1, 14))
+    @freeze_time(datetime.datetime(2018, 1, 1, 14))
     def test_doesnt_raise_if_user_is_at_limit_but_outside_window(self, Fred):
-        Fred.last_failed_login = datetime(2018, 1, 1, 12, tzinfo=UTC)
+        Fred.last_failed_login = datetime.datetime(2018, 1, 1, 12, tzinfo=datetime.UTC)
         Fred.login_attempts = 1
 
         self.provider.authenticate(Fred.email, "not considered")
 
     def test_doesnt_raise_if_user_is_below_limit_but_inside_window(self, Fred):
-        Fred.last_failed_login = datetime(2018, 1, 1, 12, tzinfo=UTC)
+        Fred.last_failed_login = datetime.datetime(2018, 1, 1, 12, tzinfo=datetime.UTC)
         Fred.login_attempts = 0
         self.provider.authenticate(Fred.email, "not considered")
 
@@ -77,13 +76,13 @@ class TestDefaultFlaskBBAuthProvider(object):
 class TestMarkFailedLoginAttempt(object):
     handler = auth.MarkFailedLogin()
 
-    @freeze_time(datetime(2018, 1, 1, 12))
+    @freeze_time(datetime.datetime(2018, 1, 1, 12))
     def test_increments_users_failed_logins_and_sets_last_fail_date(self, Fred):
         Fred.login_attempts = 0
-        Fred.last_failed_login = datetime.min.replace(tzinfo=UTC)
+        Fred.last_failed_login = datetime.datetime.min.replace(tzinfo=datetime.UTC)
         self.handler.handle_authentication_failure(Fred.email)
         assert Fred.login_attempts == 1
-        assert Fred.last_failed_login == datetime.now(UTC)
+        assert Fred.last_failed_login == datetime.datetime.now(datetime.UTC)
 
     def test_handles_if_user_doesnt_exist(self, Fred):
         self.handler.handle_authentication_failure("completely@made.up")

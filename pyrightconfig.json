@@ -1,0 +1,13 @@
+{
+    "venvPath": ".",
+    "venv": ".venv",
+    "include": ["flaskbb"],
+    "exclude": ["**/node_modules", "**/resources", "**/__pycache__"],
+    "defineConstant": { "DEBUG": true },
+    "reportIgnoreCommentWithoutRule": false,
+    "reportMissingImports": "error",
+    "reportMissingTypeStubs": false,
+    "reportUnusedCallResult": false,
+    "reportAny": false,
+    "reportExplicitAny": false
+}

@@ -11,10 +11,10 @@ This module handles the management views.
 
 import logging
 import sys
+import importlib
 
 from celery import __version__ as celery_version
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, url_for
-from flask import __version__ as flask_version
 from flask.views import MethodView
 from flask_allows import Not, Permission
 from flask_babelplus import gettext as _
@@ -1163,7 +1163,7 @@ class ManagementOverview(MethodView):
             # components
             "python_version": python_version,
             "celery_version": celery_version,
-            "flask_version": flask_version,
+            "flask_version": importlib.metadata.version("flask"),
             "flaskbb_version": flaskbb_version,
             # plugins
             "plugins": PluginRegistry.query.all(),

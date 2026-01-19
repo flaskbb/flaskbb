@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 import pytest
 from freezegun import freeze_time
 from pluggy import HookimplMarker
-from pytz import UTC
 
 from flaskbb.auth.services import reauthentication as reauth
 from flaskbb.core.auth.authentication import (

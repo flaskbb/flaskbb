@@ -6,11 +6,13 @@ from flaskbb.extensions import db
 from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="package", autouse=True)
 def application():
     """application with context."""
     app = create_app(Config)
-
+    app.config.update({
+        "TESTING": True,
+    })
     ctx = app.app_context()
     ctx.push()
 
@@ -51,3 +53,4 @@ def database():
     yield db
 
     db.drop_all()
+    db.session.close()

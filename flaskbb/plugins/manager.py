@@ -12,7 +12,7 @@ Plugin Manager for FlaskBB
 import logging
 
 import pluggy
-from pkg_resources import DistributionNotFound, VersionConflict, iter_entry_points
+from importlib.metadata import entry_points
 
 from flaskbb.utils.helpers import parse_pkg_metadata
 
@@ -42,7 +42,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         if not internal:
             return name
 
-        self._internal_name2plugin[name] = self._name2plugin.pop(name)
+        self._internal_name2plugin[name] = self._name2plugin[name]
         return name
 
     def unregister(self, plugin=None, name=None):
@@ -93,29 +93,22 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Load modules from querying the specified setuptools entrypoint name.
         Return the number of loaded plugins."""
         logger.info("Loading plugins under entrypoint {}".format(entrypoint_name))
-        for ep in iter_entry_points(entrypoint_name):
+        for ep in entry_points(group=entrypoint_name):
             if self.get_plugin(ep.name):
                 continue
 
-            try:
-                plugin = ep.load()
-            except DistributionNotFound:
-                logger.warning("Could not load plugin {}. Passing.".format(ep.name))
-                continue
-            except VersionConflict as e:
-                raise pluggy.PluginValidationError(
-                    "Plugin %r could not be loaded: %s!" % (ep.name, e)
-                )
+            plugin = ep.load()
 
             if self.is_blocked(ep.name):
                 self._disabled_plugins[plugin] = (ep.name, ep.dist)
-                self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
+                self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist)
                 continue
 
             self.register(plugin, name=ep.name)
             self._plugin_distinfo.append((plugin, ep.dist))
-            self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist.key)
+            self._plugin_metadata[ep.name] = parse_pkg_metadata(ep.dist)
             logger.info("Loaded plugin: {}".format(ep.name))
+
         logger.info(
             "Loaded {} plugins for entrypoint {}".format(
                 len(self._plugin_distinfo), entrypoint_name
