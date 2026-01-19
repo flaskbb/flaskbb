@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/flaskbb/flaskbb/actions/workflows/tests.yml/badge.svg)](https://github.com/flaskbb/flaskbb/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/flaskbb/flaskbb/branch/master/graph/badge.svg)](https://codecov.io/gh/flaskbb/flaskbb)
 [![requires](https://requires.io/github/flaskbb/flaskbb/requirements.svg?branch=master)](https://requires.io/github/flaskbb/flaskbb/requirements/?branch=master)
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://flaskbb.org)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://https://github.com/flaskbb/flaskbb)
 [![#flaskbb:matrix.org](https://img.shields.io/badge/[matrix]-%23flaskbb%3Amatrix.org-blue)](https://matrix.to/#/#flaskbb:matrix.org)
 [![#flaskbb@libera.chat](https://img.shields.io/badge/irc.libera.chat-%23flaskbb-blue.svg)](https://web.libera.chat/?channel=#flaskbb)
 
@@ -21,10 +21,6 @@ Currently, following features are implemented:
 * Completely Themeable
 * Plugin System
 * Command Line Interface
-
-
-The official forums which are powered by FlaskBB can be reached via
-[forums.flaskbb.org](https://forums.flaskbb.org).
 
 
 ## Quickstart
@@ -51,6 +47,6 @@ FlaskBB is licensed under the [BSD License](https://github.com/flaskbb/flaskbb/b
 
 # Links
 
-* [Project Website](https://flaskbb.org)
+* [Project Website](https://github.com/flaskbb/flaskbb)
 * [Documentation](https://flaskbb.readthedocs.io)
 * [Source Code](https://github.com/flaskbb/flaskbb)
