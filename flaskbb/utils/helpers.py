@@ -587,25 +587,25 @@ def check_image(url):
         error = "Couldn't get image info. Try a different hoster and/or image."
         return error, False
 
-    if img_info["size"] > flaskbb_config["AVATAR_SIZE"]:
+    if flaskbb_config["AVATAR_SIZE"] and img_info["size"] > flaskbb_config["AVATAR_SIZE"]:
         error = "Image is too big! {}kb are allowed.".format(
             flaskbb_config["AVATAR_SIZE"]
         )
         return error, False
 
-    if not img_info["content_type"] in flaskbb_config["AVATAR_TYPES"]:
+    if flaskbb_config["AVATAR_TYPES"] and not img_info["content_type"] in flaskbb_config["AVATAR_TYPES"]:
         error = "Image type {} is not allowed. Allowed types are: {}".format(
             img_info["content_type"], ", ".join(flaskbb_config["AVATAR_TYPES"])
         )
         return error, False
 
-    if img_info["width"] > flaskbb_config["AVATAR_WIDTH"]:
+    if flaskbb_config["AVATAR_WIDTH"] and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]:
         error = "Image is too wide! {}px width is allowed.".format(
             flaskbb_config["AVATAR_WIDTH"]
         )
         return error, False
 
-    if img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]:
+    if flaskbb_config["AVATAR_HEIGHT"] and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]:
         error = "Image is too high! {}px height is allowed.".format(
             flaskbb_config["AVATAR_HEIGHT"]
         )
