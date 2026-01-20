@@ -647,6 +647,7 @@ dev = [
     { name = "alabaster" },
     { name = "cov-core" },
     { name = "coverage" },
+    { name = "freezegun" },
     { name = "pre-commit" },
     { name = "py" },
     { name = "pytest" },
@@ -709,6 +710,7 @@ dev = [
     { name = "alabaster", specifier = ">=1.0.0" },
     { name = "cov-core", specifier = ">=1.15.0" },
     { name = "coverage", specifier = ">=7.13.1" },
+    { name = "freezegun", specifier = ">=1.5.5" },
     { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "py", specifier = ">=1.11.0" },
     { name = "pytest", specifier = ">=9.0.2" },
@@ -742,6 +744,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/09/08/4e353adb3a60aa36c9f943acc303d9d098f35cb360e3f02a66013b2a5047/flaskbb-plugin-portal-1.2.0.tar.gz", hash = "sha256:a3b57f90be4ef7d7b55ecf45d0f6a810edb5ea38eb82d348fc8deea76b23ad76", size = 7283, upload-time = "2021-09-09T20:34:05.712Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/0a/e64854f2dff81e6d6d2a0d76a20bb6831fd5c1c364f1145e12673bb6f888/flaskbb_plugin_portal-1.2.0-py3-none-any.whl", hash = "sha256:9932e588b7603d675158238a35e0efada8869dd5b8e20a558d66e007562a3181", size = 10182, upload-time = "2021-09-09T20:34:04.462Z" },
+]
+
+[[package]]
+name = "freezegun"
+version = "1.5.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/95/dd/23e2f4e357f8fd3bdff613c1fe4466d21bfb00a6177f238079b17f7b1c84/freezegun-1.5.5.tar.gz", hash = "sha256:ac7742a6cc6c25a2c35e9292dfd554b897b517d2dec26891a2e8debf205cb94a", size = 35914, upload-time = "2025-08-09T10:39:08.338Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5e/2e/b41d8a1a917d6581fc27a35d05561037b048e47df50f27f8ac9c7e27a710/freezegun-1.5.5-py3-none-any.whl", hash = "sha256:cd557f4a75cf074e84bc374249b9dd491eaeacd61376b9eb3c423282211619d2", size = 19266, upload-time = "2025-08-09T10:39:06.636Z" },
 ]
 
 [[package]]
