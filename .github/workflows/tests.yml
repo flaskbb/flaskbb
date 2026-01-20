@@ -50,4 +50,4 @@ jobs:
 
     - name: Test with pytest
       run: |
-        uv run pytest --cov=./ --cov-report=xml
+        uv run pytest
