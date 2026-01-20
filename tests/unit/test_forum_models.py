@@ -646,8 +646,8 @@ def test_retrieving_hidden_posts(topic, user):
     new_post.save(user, topic)
     new_post.hide(user)
 
-    assert Post.query.get(new_post.id) is None
-    assert Post.query.with_hidden().get(new_post.id) == new_post
+    assert Post.query.filter(Post.id == new_post.id).first() is None
+    assert Post.query.with_hidden().filter(Post.id == new_post.id).first() == new_post
     assert Post.query.filter(Post.id == new_post.id).first() is None
     hidden_post = Post.query.with_hidden().filter(Post.id == new_post.id).first()
     assert hidden_post == new_post
@@ -656,8 +656,8 @@ def test_retrieving_hidden_posts(topic, user):
 def test_retrieving_hidden_topics(topic, user):
     topic.hide(user)
 
-    assert Topic.query.get(topic.id) is None
-    assert Topic.query.with_hidden().get(topic.id) == topic
+    assert Topic.query.filter(Topic.id == topic.id).first() is None
+    assert Topic.query.with_hidden().filter(Topic.id == topic.id).first() == topic
     assert Topic.query.filter(Topic.id == topic.id).first() is None
     hidden_topic = Topic.query.with_hidden().filter(Topic.id == topic.id).first()
     assert hidden_topic == topic

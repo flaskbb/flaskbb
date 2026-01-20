@@ -11,6 +11,7 @@ dependencies = [
   "click-log>=0.4.0",
   "click-plugins>=1.1.1.2",
   "click-repl>=0.3.0",
+  "email-validator>=2.3.0",
   "Flask>=3.1.2",
   "Flask-Alembic>=3.2.0",
   "flask-allows @ git+https://github.com/flaskbb/flask-allows.git@master#egg=flask-allows",
@@ -83,6 +84,18 @@ flaskbb = "flaskbb.cli.main:flaskbb"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[dependency-groups]
+dev = [
+    "alabaster>=1.0.0",
+    "cov-core>=1.15.0",
+    "coverage>=7.13.1",
+    "py>=1.11.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "sphinx>=9.1.0",
+]
+
 [tool.uv]
 package = true
 
@@ -105,16 +118,12 @@ minversion = "9.0"
 addopts = [
     "-vvl",
     "--strict-markers",
-    "--capture fd",
-    "--tb short",
-    "--pythonwarnings error::flaskbb.deprecation.FlaskBBDeprecation",
-    "--cov flaskbb",
-    "--cov-config setup.cfg",
-    "--cov-append",
-    "--numprocesses auto",
-    "--dist load"
+    "--capture", "fd",
+    "--tb", "short",
+    "--pythonwarnings",  "error::flaskbb.deprecation.FlaskBBDeprecation",
+    "--numprocesses", "auto",
+    "--dist", "load"
 ]
-norecursedirs = "node_modules"
 testpaths = [
     "tests",
 ]

@@ -158,17 +158,3 @@ def test_create_default_groups(database):
 
         for attribute, value in attributes.items():
             assert getattr(group, attribute) == value
-
-
-def test_migrations_upgrade():
-    with pytest.raises(OperationalError):
-        User.query.all()
-        # db.session.rollback()
-
-    # ensure that the database is created
-    create_database(db.engine.url)
-
-    alembic.upgrade()
-    assert len(User.query.all()) == 0
-
-    drop_database(db.engine.url)

@@ -1,4 +1,5 @@
 from flask import g, url_for
+from flask_login import FlaskLoginClient
 
 from flaskbb.forum import utils
 from flaskbb.forum.models import Forum
@@ -31,7 +32,9 @@ class TestForceLoginHelpers(object):
         # sets current_forum
         g.forum = forum
 
-        with application.app_context():
-            result = utils.force_login_if_needed()
+        application.test_client_class = FlaskLoginClient
+
+        with application.test_client(user=None) as client:
+            result = utils.force_login_if_needed()  # pyright: ignore[reportUnknownVariableType]
             # use in rather than == because it can contain query params as well
             assert url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]
