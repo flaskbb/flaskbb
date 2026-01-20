@@ -15,4 +15,3 @@ psutil
 responses
 ruff
 pre-commit
-tox>=3.0.0
