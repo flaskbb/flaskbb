@@ -34,26 +34,41 @@ impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
-USER_TAG_PATTERN = r"@(\w+)"
+MENTION_PATTERN = r'@(\w+)'
 
-
-def parse_user_link(inline, m, state):
-    url = url_for("user.profile", username=m.group(0).replace("@", ""), _external=False)
-    text = m.group(0)
-    state.append_token(
-        {
-            "type": "link",
-            "children": [{"type": "text", "raw": text}],
-            "attrs": {"url": url},
-        }
-    )
-
+def parse_mention(inline: mistune.InlineParser, m: re.Match[str], state: mistune.InlineState) -> int:
+    """Parse @username mention and return token"""
+    username = m.group(1)
+    state.append_token({'type': 'mention', 'raw': username})
     return m.end()
 
 
-def flaskbb_userify(md):
-    """Mistune plugin that transforms @username references to links."""
-    md.inline.register("flaskbb_user_link", USER_TAG_PATTERN, parse_user_link, before="link")
+def render_html_mention(renderer: mistune.HTMLRenderer, text: str):
+    """Render mention token as HTML link"""
+    url = url_for("user.profile", username=text, _external=False)
+    return f'<a href="{url}">@{text}</a>'
+
+
+def plugin_mention(md: mistune.Markdown):
+    """
+    Mistune v3 plugin to parse @username mentions and convert them to links.
+
+    Usage:
+        import mistune
+        from mention_plugin import plugin_mention
+
+        md = mistune.create_markdown(plugins=[plugin_mention])
+        html = md("Hello @john, how are you?")
+    """
+
+    # Pattern to match @username (alphanumeric and underscores)
+
+    # Register the inline rule
+    md.inline.register('mention', MENTION_PATTERN, parse_mention, before="link")
+
+    # Register the HTML renderer
+    if md.renderer and md.renderer.NAME == 'html':
+        md.renderer.register('mention', render_html_mention)
 
 
 DEFAULT_PLUGINS = [
@@ -70,7 +85,7 @@ DEFAULT_PLUGINS = [
     table,
     footnotes,
     speedup,
-    flaskbb_userify
+    plugin_mention
 ]
 
 
@@ -80,7 +95,7 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
     def __init__(self, **kwargs):
         super(FlaskBBRenderer, self).__init__(**kwargs)
 
-    def block_code(self, code, info=None):
+    def block_code(self, code: str, info: str | None=None):
         if info:
             try:
                 lexer = get_lexer_by_name(info, stripall=True)
