@@ -10,6 +10,10 @@ This module contains all management related models.
 """
 
 import logging
+from typing import override
+
+from sqlalchemy import Enum, ForeignKey, PickleType, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
@@ -21,13 +25,14 @@ logger = logging.getLogger(__name__)
 class SettingsGroup(db.Model, CRUDMixin):
     __tablename__ = "settingsgroup"
 
-    key = db.Column(db.String(255), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    settings = db.relationship(
-        "Setting", lazy="dynamic", backref="group", cascade="all, delete-orphan"
+    key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(Text(), nullable=False)
+    settings: Mapped[list["Setting"]] = relationship(
+        lazy="dynamic", backref="group", cascade="all, delete-orphan"
     )
 
+    @override
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.key)
 
@@ -35,29 +40,29 @@ class SettingsGroup(db.Model, CRUDMixin):
 class Setting(db.Model, CRUDMixin):
     __tablename__ = "settings"
 
-    key = db.Column(db.String(255), primary_key=True)
-    value = db.Column(db.PickleType, nullable=False)
-    settingsgroup = db.Column(
-        db.String(255),
-        db.ForeignKey("settingsgroup.key", ondelete="CASCADE"),
+    key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    value: Mapped[PickleType] = mapped_column(PickleType, nullable=False)
+    settingsgroup: Mapped[str] = mapped_column(
+        String(255),
+        ForeignKey("settingsgroup.key", ondelete="CASCADE"),
         nullable=False,
     )
 
     # The name (displayed in the form)
-    name = db.Column(db.String(200), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
 
     # The description (displayed in the form)
-    description = db.Column(db.Text, nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.Enum(SettingValueType), nullable=False)
+    value_type: Mapped[SettingValueType] = mapped_column(Enum(SettingValueType), nullable=False)
 
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
-    extra = db.Column(db.PickleType)
+    extra: Mapped[PickleType] = mapped_column(PickleType)
 
     @classmethod
-    def get_form(cls, group):
+    def get_form(cls, group: SettingsGroup):
         """Returns a Form for all settings found in :class:`SettingsGroup`.
 
         :param group: The settingsgroup name. It is used to get the settings
@@ -66,7 +71,7 @@ class Setting(db.Model, CRUDMixin):
         return generate_settings_form(settings=group.settings)
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls) -> list["Setting"]:
         return cls.query.all()
 
     @classmethod
@@ -88,7 +93,7 @@ class Setting(db.Model, CRUDMixin):
         cls.invalidate_cache()
 
     @classmethod
-    def get_settings(cls, from_group=None):
+    def get_settings(cls, from_group=None) -> dict[str, PickleType]:
         """This will return all settings with the key as the key for the dict
         and the values are packed again in a dict which contains
         the remaining attributes.

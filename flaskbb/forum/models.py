@@ -11,11 +11,15 @@ It provides the models for the forum
 
 import logging
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 from flask import abort, current_app, url_for
-from sqlalchemy.orm import aliased
+from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy.orm import Mapped, aliased, mapped_column, relationship
 
 from flaskbb.extensions import db
+if TYPE_CHECKING:
+    from flaskbb.user.models import User, Group
 from flaskbb.utils.database import (
     CRUDMixin,
     HideableCRUDMixin,
@@ -88,19 +92,18 @@ forumgroups = db.Table(
 class TopicsRead(db.Model, CRUDMixin):
     __tablename__ = "topicsread"
 
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    user = db.relationship("User", uselist=False, foreign_keys=[user_id])
-    topic_id = db.Column(
-        db.Integer, db.ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True
+    user: Mapped["User"] = relationship("User", uselist=False, foreign_keys=[user_id])
+    topic_id: Mapped[int] = mapped_column(
+        ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True
     )
-    topic = db.relationship("Topic", uselist=False, foreign_keys=[topic_id])
-    forum_id = db.Column(
-        db.Integer, db.ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
+    topic: Mapped["Topic"] = relationship(uselist=False, foreign_keys=[topic_id])
+    forum_id: Mapped[int] = mapped_column(ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
     )
-    forum = db.relationship("Forum", uselist=False, foreign_keys=[forum_id])
-    last_read = db.Column(
+    forum: Mapped["Forum"] = relationship("Forum", uselist=False, foreign_keys=[forum_id])
+    last_read: Mapped["UTCDateTime"] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
 
@@ -108,18 +111,18 @@ class TopicsRead(db.Model, CRUDMixin):
 class ForumsRead(db.Model, CRUDMixin):
     __tablename__ = "forumsread"
 
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    user = db.relationship("User", uselist=False, foreign_keys=[user_id])
-    forum_id = db.Column(
-        db.Integer, db.ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
+    user: Mapped["User"] = relationship("User", uselist=False, foreign_keys=[user_id])
+    forum_id: Mapped[int] = mapped_column(
+        ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
     )
-    forum = db.relationship("Forum", uselist=False, foreign_keys=[forum_id])
-    last_read = db.Column(
+    forum: Mapped["Forum"] = relationship("Forum", uselist=False, foreign_keys=[forum_id])
+    last_read: Mapped["UTCDateTime"] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    cleared = db.Column(UTCDateTime(timezone=True), nullable=True)
+    cleared: Mapped["UTCDateTime"] = mapped_column(UTCDateTime(timezone=True), nullable=True)
 
 
 @make_comparable
@@ -130,23 +133,23 @@ class Report(db.Model, CRUDMixin):
     # as well. So that in case a user or post gets deleted, we can
     # still view the report
 
-    id = db.Column(db.Integer, primary_key=True)
-    reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    reported = db.Column(
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reporter_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    reported: Mapped[UTCDateTime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=True)
-    zapped = db.Column(UTCDateTime(timezone=True), nullable=True)
-    zapped_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    reason = db.Column(db.Text, nullable=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    zapped: Mapped[UTCDateTime] = mapped_column(UTCDateTime(timezone=True), nullable=True)
+    zapped_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    reason: Mapped[str] = mapped_column(Text, nullable=True)
 
-    post = db.relationship(
+    post: Mapped["Post"] = relationship(
         "Post",
         lazy="joined",
         backref=db.backref("report", cascade="all, delete-orphan"),
     )
-    reporter = db.relationship("User", lazy="joined", foreign_keys=[reporter_id])
-    zapper = db.relationship("User", lazy="joined", foreign_keys=[zapped_by])
+    reporter: Mapped["User"] = relationship("User", lazy="joined", foreign_keys=[reporter_id])
+    zapper: Mapped["User"] = relationship("User", lazy="joined", foreign_keys=[zapped_by])
 
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.id)
@@ -178,20 +181,19 @@ class Report(db.Model, CRUDMixin):
 class Post(HideableCRUDMixin, db.Model):
     __tablename__ = "posts"
 
-    id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(
-        db.Integer,
-        db.ForeignKey("topics.id", ondelete="CASCADE", use_alter=True),
+    id: Mapped[int] = mapped_column(primary_key=True)
+    topic_id: Mapped[int] = mapped_column(
+        ForeignKey("topics.id", ondelete="CASCADE", use_alter=True),
         nullable=True,
     )
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    username = db.Column(db.String(200), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    date_created = db.Column(
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    username: Mapped[str] = mapped_column(String(200), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    date_created: Mapped[UTCDateTime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    date_modified = db.Column(UTCDateTime(timezone=True), nullable=True)
-    modified_by = db.Column(db.String(200), nullable=True)
+    date_modified: Mapped[UTCDateTime] = mapped_column(UTCDateTime(timezone=True), nullable=True)
+    modified_by: Mapped[str] = mapped_column(String(200), nullable=True)
 
     # Properties
     @property
@@ -434,41 +436,41 @@ class Post(HideableCRUDMixin, db.Model):
 class Topic(HideableCRUDMixin, db.Model):
     __tablename__ = "topics"
 
-    id = db.Column(db.Integer, primary_key=True)
-    forum_id = db.Column(
-        db.Integer, db.ForeignKey("forums.id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(primary_key=True)
+    forum_id: Mapped[int] = mapped_column(
+        ForeignKey("forums.id", ondelete="CASCADE"), nullable=False
     )
-    title = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    username = db.Column(db.String(200), nullable=False)
-    date_created = db.Column(
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    username: Mapped[str] = mapped_column(String(200), nullable=False)
+    date_created: Mapped[UTCDateTime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    last_updated = db.Column(
+    last_updated: Mapped[UTCDateTime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    locked = db.Column(db.Boolean, default=False, nullable=False)
-    important = db.Column(db.Boolean, default=False, nullable=False)
-    views = db.Column(db.Integer, default=0, nullable=False)
-    post_count = db.Column(db.Integer, default=0, nullable=False)
+    locked: Mapped[bool] = mapped_column(default=False, nullable=False)
+    important: Mapped[bool] = mapped_column(default=False, nullable=False)
+    views: Mapped[int] = mapped_column(default=0, nullable=False)
+    post_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
     # One-to-one (uselist=False) relationship between first_post and topic
-    first_post_id = db.Column(
-        db.Integer, db.ForeignKey("posts.id", ondelete="CASCADE"), nullable=True
+    first_post_id: Mapped[int] = mapped_column(
+        ForeignKey("posts.id", ondelete="CASCADE"), nullable=True
     )
-    first_post = db.relationship(
+    first_post: Mapped["Post"] = relationship(
         "Post", backref="first_post", uselist=False, foreign_keys=[first_post_id]
     )
 
     # One-to-one
-    last_post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), nullable=True)
+    last_post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=True)
 
-    last_post = db.relationship(
+    last_post: Mapped["Post"] = relationship(
         "Post", backref="last_post", uselist=False, foreign_keys=[last_post_id]
     )
 
     # One-to-many
-    posts = db.relationship(
+    posts: Mapped[list["Post"]] = relationship(
         "Post",
         backref="topic",
         lazy="dynamic",
@@ -889,59 +891,59 @@ class Topic(HideableCRUDMixin, db.Model):
 class Forum(db.Model, CRUDMixin):
     __tablename__ = "forums"
 
-    id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(
-        db.Integer, db.ForeignKey("categories.id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(primary_key=True)
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("categories.id", ondelete="CASCADE"), nullable=False
     )
-    title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    position = db.Column(db.Integer, default=1, nullable=False)
-    locked = db.Column(db.Boolean, default=False, nullable=False)
-    show_moderators = db.Column(db.Boolean, default=False, nullable=False)
-    external = db.Column(db.String(200), nullable=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    position: Mapped[int] = mapped_column(default=1, nullable=False)
+    locked: Mapped[bool] = mapped_column(default=False, nullable=False)
+    show_moderators: Mapped[bool] = mapped_column(default=False, nullable=False)
+    external: Mapped[str] = mapped_column(String(200), nullable=True)
 
-    post_count = db.Column(db.Integer, default=0, nullable=False)
-    topic_count = db.Column(db.Integer, default=0, nullable=False)
+    post_count: Mapped[int] = mapped_column(default=0, nullable=False)
+    topic_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
     # One-to-one
-    last_post_id = db.Column(
-        db.Integer, db.ForeignKey("posts.id"), nullable=True
+    last_post_id: Mapped[int] = mapped_column(
+        ForeignKey("posts.id"), nullable=True
     )  # we handle this case ourselfs
-    last_post = db.relationship(
+    last_post: Mapped["Post"] = relationship(
         "Post", backref="last_post_forum", uselist=False, foreign_keys=[last_post_id]
     )
 
     # set to null if the user got deleted
-    last_post_user_id = db.Column(
-        db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    last_post_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
 
-    last_post_user = db.relationship(
+    last_post_user: Mapped["User"] = relationship(
         "User", uselist=False, foreign_keys=[last_post_user_id]
     )
 
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
-    last_post_title = db.Column(db.String(255), nullable=True)
-    last_post_username = db.Column(db.String(255), nullable=True)
-    last_post_created = db.Column(
+    last_post_title: Mapped[str] = mapped_column(String(255), nullable=True)
+    last_post_username: Mapped[str] = mapped_column(String(255), nullable=True)
+    last_post_created: Mapped[UTCDateTime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=True
     )
 
     # One-to-many
-    topics = db.relationship(
+    topics: Mapped[list[Topic]] = relationship(
         "Topic", backref="forum", lazy="dynamic", cascade="all, delete-orphan"
     )
 
     # Many-to-many
-    moderators = db.relationship(
+    moderators: Mapped[list[User]] = relationship(
         "User",
         secondary=moderators,
         primaryjoin=(moderators.c.forum_id == id),
         backref=db.backref("forummoderator", lazy="dynamic"),
         lazy="joined",
     )
-    groups = db.relationship(
+    groups: Mapped[list[Group]] = relationship(
         "Group",
         secondary=forumgroups,
         primaryjoin=(forumgroups.c.forum_id == id),
@@ -1255,13 +1257,13 @@ class Forum(db.Model, CRUDMixin):
 class Category(db.Model, CRUDMixin):
     __tablename__ = "categories"
 
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    position = db.Column(db.Integer, default=1, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    position: Mapped[int] = mapped_column(default=1, nullable=False)
 
     # One-to-many
-    forums = db.relationship(
+    forums: Mapped[list[Forum]] = relationship(
         "Forum",
         backref="category",
         lazy="dynamic",
