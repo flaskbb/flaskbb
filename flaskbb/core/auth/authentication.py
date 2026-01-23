@@ -75,11 +75,11 @@ class AuthenticationProvider(ABC):
                 user_dn = "uid={},ou=flaskbb,ou=org".format(identifier)
                 try:
                     self.ldap_client.bind_user(user_dn, secret)
-                    return User.query.join(
-                            UserLDAP
-                        ).filter(
-                            UserLDAP.dn==user_dn
-                        ).with_entities(User).one()
+                    return db.session.execute(
+                        db.select(User)
+                        .join(UserLDAP)
+                        .filter(UserLDAP.dn == user_dn)
+                    ).scalar_one()
                 except Exception:
                     return None
 

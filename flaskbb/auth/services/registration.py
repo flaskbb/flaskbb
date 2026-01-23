@@ -18,6 +18,7 @@ from flask_babelplus import gettext as _
 from flask_login import login_user
 from pytz import UTC
 from sqlalchemy import func
+from ...extensions import db
 
 from ...core.auth.registration import (
     RegistrationPostProcessor,
@@ -97,9 +98,11 @@ class UsernameUniquenessValidator(UserValidator):
         self.users = users
 
     def validate(self, user_info):
-        count = self.users.query.filter(
-            func.lower(self.users.username) == user_info.username
-        ).count()
+        count = db.session.execute(
+            db.select(func.count(self.users.id)).filter(
+                func.lower(self.users.username) == user_info.username
+            )
+        ).scalar_one()
         if count != 0:  # pragma: no branch
             raise ValidationError(
                 "username",
@@ -119,9 +122,11 @@ class EmailUniquenessValidator(UserValidator):
         self.users = users
 
     def validate(self, user_info):
-        count = self.users.query.filter(
-            func.lower(self.users.email) == user_info.email
-        ).count()
+        count = db.session.execute(
+            db.select(func.count(self.users.id)).filter(
+                func.lower(self.users.email) == user_info.email
+            )
+        ).scalar_one()
         if count != 0:  # pragma: no branch
             raise ValidationError(
                 "email",

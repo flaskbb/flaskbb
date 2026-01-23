@@ -10,43 +10,52 @@ A module for all markup related stuff.
 """
 
 import logging
+import re
 
 import mistune
-from mistune.plugins.speedup import speedup
-from mistune.plugins.url import url
-from mistune.plugins.formatting import strikethrough, subscript, superscript, insert, mark
-from mistune.plugins.abbr import abbr
-from mistune.plugins.def_list import def_list
-from mistune.plugins.task_lists import task_lists
-from mistune.plugins.table import table
-from mistune.plugins.footnotes import footnotes
-from mistune.plugins.spoiler import spoiler
 from flask import url_for
 from markupsafe import Markup
+from mistune.plugins.abbr import abbr
+from mistune.plugins.def_list import def_list
+from mistune.plugins.footnotes import footnotes
+from mistune.plugins.formatting import (
+    insert,
+    mark,
+    strikethrough,
+    subscript,
+    superscript,
+)
+from mistune.plugins.speedup import speedup
+from mistune.plugins.spoiler import spoiler
+from mistune.plugins.table import table
+from mistune.plugins.task_lists import task_lists
+from mistune.plugins.url import url
 from pluggy import HookimplMarker
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
-import re
 
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
 
-MENTION_PATTERN = r'@(\w+)'
+MENTION_PATTERN = r"@(\w+)"
 
-def parse_mention(inline: mistune.InlineParser, m: re.Match[str], state: mistune.InlineState) -> int:
+
+def parse_mention(
+    inline: mistune.InlineParser, m: re.Match[str], state: mistune.InlineState
+) -> int:
     """Parse @username mention and return token"""
-    username = m.group(1)
-    state.append_token({'type': 'mention', 'raw': username})
+    username = m.group(0)
+    state.append_token({"type": "mention", "raw": username})
     return m.end()
 
 
 def render_html_mention(renderer: mistune.HTMLRenderer, text: str):
     """Render mention token as HTML link"""
     url = url_for("user.profile", username=text, _external=False)
-    return f'<a href="{url}">@{text}</a>'
+    return f'<a href="{url.replace("@", "")}">{text}</a>'
 
 
 def plugin_mention(md: mistune.Markdown):
@@ -64,11 +73,11 @@ def plugin_mention(md: mistune.Markdown):
     # Pattern to match @username (alphanumeric and underscores)
 
     # Register the inline rule
-    md.inline.register('mention', MENTION_PATTERN, parse_mention, before="link")
+    md.inline.register("mention", MENTION_PATTERN, parse_mention, before="link")
 
     # Register the HTML renderer
-    if md.renderer and md.renderer.NAME == 'html':
-        md.renderer.register('mention', render_html_mention)
+    if md.renderer and md.renderer.NAME == "html":
+        md.renderer.register("mention", render_html_mention)
 
 
 DEFAULT_PLUGINS = [
@@ -85,7 +94,7 @@ DEFAULT_PLUGINS = [
     table,
     footnotes,
     speedup,
-    plugin_mention
+    plugin_mention,
 ]
 
 
@@ -95,7 +104,7 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
     def __init__(self, **kwargs):
         super(FlaskBBRenderer, self).__init__(**kwargs)
 
-    def block_code(self, code: str, info: str | None=None):
+    def block_code(self, code: str, info: str | None = None):
         if info:
             try:
                 lexer = get_lexer_by_name(info, stripall=True)

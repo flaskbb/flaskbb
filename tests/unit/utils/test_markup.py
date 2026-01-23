@@ -1,3 +1,5 @@
+from flask import current_app
+
 from flaskbb.markup import DEFAULT_PLUGINS, FlaskBBRenderer, make_renderer
 
 markdown = make_renderer([FlaskBBRenderer], DEFAULT_PLUGINS)
@@ -5,7 +7,8 @@ markdown = make_renderer([FlaskBBRenderer], DEFAULT_PLUGINS)
 
 def test_userify():
     # user link rendering plugin
-    result = markdown("@sh4nks is developing flaskbb.")
+    with current_app.test_request_context():
+        result = markdown("@sh4nks is developing flaskbb.")
     assert all(substring in result for substring in ("/user/sh4nks", "<a href="))
 
 

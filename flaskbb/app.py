@@ -15,7 +15,7 @@ import os
 import sys
 import time
 import warnings
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from flask import Flask, request
 from flask_login import current_user
@@ -308,11 +308,9 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(user_id):
         """Loads the user. Required by the `login` extension."""
-        user_instance = User.query.filter_by(id=user_id).first()
-        if user_instance:
-            return user_instance
-        else:
-            return None
+        return db.session.execute(
+            db.select(User).filter_by(id=user_id)
+        ).scalar_one_or_none()
 
     login_manager.init_app(app)
 
@@ -507,7 +505,7 @@ def load_plugins(app):
 
     try:
         with app.app_context():
-            plugins = PluginRegistry.query.all()
+            plugins = db.session.execute(db.select(PluginRegistry)).scalars().all()
 
     except (OperationalError, ProgrammingError) as exc:
         logger.debug(

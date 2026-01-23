@@ -14,6 +14,7 @@ from ...core.auth.password import ResetPasswordService as _ResetPasswordService
 from ...core.exceptions import StopValidation, ValidationError
 from ...core.tokens import Token, TokenActions, TokenError
 from ...email import send_reset_token
+from ...extensions import db
 
 
 class ResetPasswordService(_ResetPasswordService):
@@ -28,7 +29,9 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
-        user = self.users.query.filter_by(email=email).first()
+        user = db.session.execute(
+            db.select(self.users).filter_by(email=email)
+        ).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Invalid email"))
@@ -44,7 +47,11 @@ class ResetPasswordService(_ResetPasswordService):
         if token.operation != TokenActions.RESET_PASSWORD:
             raise TokenError.invalid()
         self._verify_token(token, email)
-        user = self.users.query.filter_by(id=token.user_id).first()
+        user = db.session.execute(
+            db.select(self.users).filter_by(id=token.user_id)
+        ).scalar_one_or_none()
+        if user is None:
+            raise TokenError.invalid()
         user.password = new_password
 
     def _verify_token(self, token, email):

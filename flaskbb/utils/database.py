@@ -61,8 +61,8 @@ class CRUDMixin(object):
         return self
 
 
-class UTCDateTime(db.TypeDecorator):
-    impl = db.DateTime
+class UTCDateTime(sa.TypeDecorator):
+    impl = sa.DateTime
     cache_ok = True
 
     def process_bind_param(self, value, dialect):
