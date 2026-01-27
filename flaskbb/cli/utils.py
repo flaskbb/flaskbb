@@ -20,6 +20,7 @@ from flask import current_app
 from flask_themes2 import get_theme
 
 from flaskbb import __version__
+from flaskbb.extensions import pluggy
 from flaskbb.utils.populate import create_user, update_user
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
@@ -69,7 +70,7 @@ def validate_plugin(plugin):
     """
     # list_name holds all plugin names, also the disabled ones (they won't do
     # anything as they are set as 'blocked' on pluggy)
-    if plugin not in current_app.pluggy.list_name():
+    if plugin not in pluggy.list_name():
         raise FlaskBBCLIError("Plugin {} not found.".format(plugin), fg="red")
     return True
 
@@ -104,8 +105,7 @@ def get_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     message = (
-        "FlaskBB %(version)s using Flask %(flask_version)s on "
-        "Python %(python_version)s"
+        "FlaskBB %(version)s using Flask %(flask_version)s on Python %(python_version)s"
     )
     click.echo(
         message

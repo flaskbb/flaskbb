@@ -18,7 +18,7 @@ from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import get_cookiecutter, validate_plugin
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.plugins.models import PluginRegistry, PluginStore
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
@@ -34,7 +34,7 @@ def plugins():
 @with_appcontext
 def list_plugins():
     """Lists all installed plugins."""
-    enabled_plugins = current_app.pluggy.list_plugin_distinfo()
+    enabled_plugins = pluggy.list_plugin_distinfo()
     if len(enabled_plugins) > 0:
         click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
         for plugin in enabled_plugins:
@@ -42,14 +42,14 @@ def list_plugins():
             p_dist = plugin[1]
             click.secho(
                 "\t- {}\t({}), version {}".format(
-                    current_app.pluggy.get_name(p_mod).title(),
+                    pluggy.get_name(p_mod).title(),
                     p_dist.key,
                     p_dist.version,
                 ),
                 bold=True,
             )
 
-    disabled_plugins = current_app.pluggy.list_disabled_plugins()
+    disabled_plugins = pluggy.list_disabled_plugins()
     if len(disabled_plugins) > 0:
         click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
         for plugin in disabled_plugins:
@@ -69,7 +69,11 @@ def list_plugins():
 def enable_plugin(plugin_name):
     """Enables a plugin."""
     validate_plugin(plugin_name)
-    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+    plugin = db.session.execute(
+        db.select(PluginRegistry).filter_by(name=plugin_name)
+    ).scalar_one_or_none()
+    if plugin is None:
+        raise click.Abort()
 
     if plugin.enabled:
         click.secho("Plugin '{}' is already enabled.".format(plugin.name))
@@ -85,7 +89,11 @@ def enable_plugin(plugin_name):
 def disable_plugin(plugin_name):
     """Disables a plugin."""
     validate_plugin(plugin_name)
-    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+    plugin = db.session.execute(
+        db.select(PluginRegistry).filter_by(name=plugin_name)
+    ).scalar_one_or_none()
+    if plugin is None:
+        raise click.Abort()
 
     if not plugin.enabled:
         click.secho("Plugin '{}' is already disabled.".format(plugin.name))
@@ -103,11 +111,15 @@ def disable_plugin(plugin_name):
 def install(plugin_name, force):
     """Installs a plugin (no migrations)."""
     validate_plugin(plugin_name)
-    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+    plugin = db.session.execute(
+        db.select(PluginRegistry).filter_by(name=plugin_name)
+    ).scalar_one_or_none()
+    if plugin is None:
+        raise click.Abort()
 
     if not plugin.enabled:
         click.secho(
-            "[+] Can't install disabled plugin. " "Enable '{}' Plugin first.".format(
+            "[+] Can't install disabled plugin. Enable '{}' Plugin first.".format(
                 plugin.name
             ),
             fg="red",
@@ -115,7 +127,7 @@ def install(plugin_name, force):
         sys.exit(0)
 
     if plugin.is_installable:
-        plugin_module = current_app.pluggy.get_plugin(plugin.name)
+        plugin_module = pluggy.get_plugin(plugin.name)
         plugin.add_settings(plugin_module.SETTINGS, force)
         click.secho("[+] Plugin has been installed.", fg="green")
     else:
@@ -127,10 +139,14 @@ def install(plugin_name, force):
 def uninstall(plugin_name):
     """Uninstalls a plugin (no migrations)."""
     validate_plugin(plugin_name)
-    plugin = PluginRegistry.query.filter_by(name=plugin_name).first_or_404()
+    plugin = db.session.execute(
+        db.select(PluginRegistry).filter_by(name=plugin_name)
+    ).scalar_one_or_none()
+    if plugin is None:
+        raise click.Abort()
 
     if plugin.is_installed:
-        PluginStore.query.filter_by(plugin_id=plugin.id).delete()
+        db.session.execute(db.delete(PluginStore).filter_by(plugin_id=plugin.id))
         db.session.commit()
         click.secho("[+] Plugin has been uninstalled.", fg="green")
     else:

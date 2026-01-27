@@ -89,7 +89,7 @@ class TokenSerializer(ABC):
     """ """
 
     @abstractmethod
-    def dumps(self, token):
+    def dumps(self, token) -> str:
         """
         This method is abstract.
 
@@ -102,7 +102,7 @@ class TokenSerializer(ABC):
         pass
 
     @abstractmethod
-    def loads(self, raw_token):
+    def loads(self, raw_token) -> "Token":
         """
         This method is abstract
 

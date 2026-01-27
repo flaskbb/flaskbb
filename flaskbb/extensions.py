@@ -27,6 +27,10 @@ from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
 
 from flaskbb.exceptions import AuthorizationRequired
+from flaskbb.plugins.manager import FlaskBBPluginManager
+
+# PluginManager
+pluggy = FlaskBBPluginManager("flaskbb")
 
 # Permissions Manager
 allows = Allows(throws=AuthorizationRequired)

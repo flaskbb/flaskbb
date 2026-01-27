@@ -18,8 +18,8 @@ import re
 import time
 from datetime import datetime, timedelta
 from functools import wraps
+from typing import TYPE_CHECKING
 
-from importlib.metadata import Distribution
 import requests
 import unidecode
 from babel.core import get_locale_identifier
@@ -39,6 +39,10 @@ from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
 
 from flaskbb.extensions import babel, redis_store
+
+if TYPE_CHECKING:
+    from flaskbb.user.models import User
+
 from flaskbb.utils.http import is_safe_url
 from flaskbb.utils.settings import flaskbb_config
 
@@ -411,7 +415,7 @@ def crop_title(title, length=None, suffix="..."):
     return title[:length].rsplit(" ", 1)[0] + suffix
 
 
-def is_online(user):
+def is_online(user: User):
     """A simple check to see if the user was online within a specified
     time range
 
@@ -587,25 +591,37 @@ def check_image(url):
         error = "Couldn't get image info. Try a different hoster and/or image."
         return error, False
 
-    if flaskbb_config["AVATAR_SIZE"] and img_info["size"] > flaskbb_config["AVATAR_SIZE"]:
+    if (
+        flaskbb_config["AVATAR_SIZE"]
+        and img_info["size"] > flaskbb_config["AVATAR_SIZE"]
+    ):
         error = "Image is too big! {}kb are allowed.".format(
             flaskbb_config["AVATAR_SIZE"]
         )
         return error, False
 
-    if flaskbb_config["AVATAR_TYPES"] and not img_info["content_type"] in flaskbb_config["AVATAR_TYPES"]:
+    if (
+        flaskbb_config["AVATAR_TYPES"]
+        and not img_info["content_type"] in flaskbb_config["AVATAR_TYPES"]
+    ):
         error = "Image type {} is not allowed. Allowed types are: {}".format(
             img_info["content_type"], ", ".join(flaskbb_config["AVATAR_TYPES"])
         )
         return error, False
 
-    if flaskbb_config["AVATAR_WIDTH"] and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]:
+    if (
+        flaskbb_config["AVATAR_WIDTH"]
+        and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]
+    ):
         error = "Image is too wide! {}px width is allowed.".format(
             flaskbb_config["AVATAR_WIDTH"]
         )
         return error, False
 
-    if flaskbb_config["AVATAR_HEIGHT"] and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]:
+    if (
+        flaskbb_config["AVATAR_HEIGHT"]
+        and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]
+    ):
         error = "Image is too high! {}px height is allowed.".format(
             flaskbb_config["AVATAR_HEIGHT"]
         )
@@ -785,15 +801,6 @@ def real(obj):
     if isinstance(obj, LocalProxy):
         return obj._get_current_object()
     return obj
-
-
-def parse_pkg_metadata(dist: Distribution):
-    # lets use the Parser from email to parse our metadata :)
-    metadata = {}
-    for key, value in dist.metadata.items():
-        metadata[key.replace("-", "_").lower()] = value
-
-    return metadata
 
 
 def anonymous_required(f):

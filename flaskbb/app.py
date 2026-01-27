@@ -17,6 +17,7 @@ import time
 import warnings
 from datetime import UTC, datetime
 
+from celery import Celery
 from flask import Flask, request
 from flask_login import current_user
 from sqlalchemy import event
@@ -36,6 +37,7 @@ from flaskbb.extensions import (
     limiter,
     login_manager,
     mail,
+    pluggy,
     redis_store,
     themes,
     whooshee,
@@ -139,7 +141,7 @@ def create_app(config=None, instance_path=None):
     configure_errorhandlers(app)
     configure_migrations(app)
     configure_translations(app)
-    app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
+    pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 
     return app
 
@@ -209,11 +211,6 @@ def configure_app(app, config):
             message=".*Using the in-memory storage for tracking rate limits.*",
         )
 
-    warnings.filterwarnings(
-        action="ignore",
-        message=".*The Query.get()*",
-    )
-
     debug_panels = app.config.setdefault(
         "DEBUG_TB_PANELS",
         [
@@ -233,10 +230,8 @@ def configure_app(app, config):
     if all("WarningsPanel" not in p for p in debug_panels):
         debug_panels.append("flask_debugtoolbar_warnings.WarningsPanel")
 
-    app.pluggy = FlaskBBPluginManager("flaskbb")
 
-
-def configure_celery_app(app, celery):
+def configure_celery_app(app: Flask, celery: Celery):
     """Configures the celery app."""
     celery.conf.update(app.config.get("CELERY_CONFIG"))
 
@@ -250,11 +245,11 @@ def configure_celery_app(app, celery):
     celery.Task = ContextTask
 
 
-def configure_blueprints(app):
-    app.pluggy.hook.flaskbb_load_blueprints(app=app)
+def configure_blueprints(app: Flask):
+    pluggy.hook.flaskbb_load_blueprints(app=app)
 
 
-def configure_extensions(app):
+def configure_extensions(app: Flask):
     """Configures the extensions."""
     # Flask-Allows
     allows.init_app(app)
@@ -315,7 +310,7 @@ def configure_extensions(app):
     login_manager.init_app(app)
 
 
-def configure_template_filters(app):
+def configure_template_filters(app: Flask):
     """Configures the template filters."""
     filters = {}
 
@@ -353,10 +348,10 @@ def configure_template_filters(app):
     app.jinja_env.globals["run_hook"] = template_hook
     app.jinja_env.globals["NavigationContentType"] = NavigationContentType
 
-    app.pluggy.hook.flaskbb_jinja_directives(app=app)
+    pluggy.hook.flaskbb_jinja_directives(app=app)
 
 
-def configure_context_processors(app):
+def configure_context_processors(app: Flask):
     """Configures the context processors."""
 
     @app.context_processor
@@ -372,7 +367,7 @@ def configure_context_processors(app):
         return dict(now=datetime.now(UTC))
 
 
-def configure_before_handlers(app):
+def configure_before_handlers(app: Flask):
     """Configures the before request handlers."""
 
     @app.before_request
@@ -393,10 +388,10 @@ def configure_before_handlers(app):
             else:
                 mark_online(request.remote_addr, guest=True)
 
-    app.pluggy.hook.flaskbb_request_processors(app=app)
+    pluggy.hook.flaskbb_request_processors(app=app)
 
 
-def configure_errorhandlers(app):
+def configure_errorhandlers(app: Flask):
     """Configures the error handlers."""
 
     @app.errorhandler(403)
@@ -411,18 +406,18 @@ def configure_errorhandlers(app):
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
 
-    app.pluggy.hook.flaskbb_errorhandlers(app=app)
+    pluggy.hook.flaskbb_errorhandlers(app=app)
 
 
-def configure_migrations(app):
+def configure_migrations(app: Flask):
     """Configure migrations."""
-    plugin_dirs = app.pluggy.hook.flaskbb_load_migrations()
+    plugin_dirs = pluggy.hook.flaskbb_load_migrations()
     version_locations = get_alembic_locations(plugin_dirs)
 
     app.config["ALEMBIC"]["version_locations"] = version_locations
 
 
-def configure_translations(app):
+def configure_translations(app: Flask):
     """Configure translations."""
 
     # we have to initialize the extension after we have loaded the plugins
@@ -438,7 +433,7 @@ def configure_translations(app):
         return flaskbb_config["DEFAULT_LANGUAGE"]
 
 
-def configure_logging(app):
+def configure_logging(app: Flask):
     """Configures logging."""
     if app.config.get("USE_DEFAULT_LOGGING"):
         configure_default_logging(app)
@@ -464,7 +459,7 @@ def configure_logging(app):
             app.logger.debug("Total Time: %f", total)
 
 
-def configure_default_logging(app):
+def configure_default_logging(app: Flask):
     # Load default logging config
     logging.config.dictConfig(app.config["LOG_DEFAULT_CONF"])
 
@@ -472,10 +467,13 @@ def configure_default_logging(app):
         configure_mail_logs(app)
 
 
-def configure_mail_logs(app, formatter):
+def configure_mail_logs(app: Flask, formatter: logging.Formatter | None = None):
     from logging.handlers import SMTPHandler
 
-    formatter = logging.Formatter("%(asctime)s %(levelname)-7s %(name)-25s %(message)s")
+    if formatter is None:
+        formatter = logging.Formatter(
+            "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
+        )
     mail_handler = SMTPHandler(
         app.config["MAIL_SERVER"],
         app.config["MAIL_DEFAULT_SENDER"],
@@ -489,8 +487,8 @@ def configure_mail_logs(app, formatter):
     app.logger.addHandler(mail_handler)
 
 
-def load_plugins(app):
-    app.pluggy.add_hookspecs(spec)
+def load_plugins(app: Flask):
+    pluggy.add_hookspecs(spec)
 
     # have to find all the flaskbb modules that are loaded this way
     # otherwise sys.modules might change while we're iterating it
@@ -501,7 +499,7 @@ def load_plugins(app):
         module for name, module in sys.modules.items() if name.startswith("flaskbb")
     )
     for module in flaskbb_modules:
-        app.pluggy.register(module, internal=True)
+        pluggy.register(module, internal=True)
 
     try:
         with app.app_context():
@@ -515,18 +513,18 @@ def load_plugins(app):
         # load plugins even though the database isn't setup correctly
         # i.e. when creating the initial database and wanting to install
         # the plugins migration as well
-        app.pluggy.load_setuptools_entrypoints("flaskbb_plugins")
+        pluggy.load_setuptools_entrypoints("flaskbb_plugins")
         return
 
     for plugin in plugins:
         if not plugin.enabled:
-            app.pluggy.set_blocked(plugin.name)
+            pluggy.set_blocked(plugin.name)
 
-    app.pluggy.load_setuptools_entrypoints("flaskbb_plugins")
-    app.pluggy.hook.flaskbb_extensions(app=app)
+    pluggy.load_setuptools_entrypoints("flaskbb_plugins")
+    pluggy.hook.flaskbb_extensions(app=app)
 
-    loaded_names = set([p[0] for p in app.pluggy.list_name_plugin()])
-    registered_names = set([p.name for p in plugins])
+    loaded_names = set([p[0] for p in pluggy.list_name_plugin()])
+    registered_names: set[str] = set([p.name for p in plugins])
     unregistered = [
         PluginRegistry(name=name)
         for name in loaded_names - registered_names
@@ -545,7 +543,7 @@ def load_plugins(app):
     # we need a copy of it because of
     # RuntimeError: dictionary changed size during iteration
     tasks = celery.tasks.copy()
-    disabled_plugins = [p.__package__ for p in app.pluggy.get_disabled_plugins()]
+    disabled_plugins = [p.__package__ for p in pluggy.get_disabled_plugins()]
     for task_name, task in tasks.items():
         if task.__module__.split(".")[0] in disabled_plugins:
             logger.debug("Unregistering task: '{}'".format(task))

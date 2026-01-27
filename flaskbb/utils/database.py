@@ -9,13 +9,17 @@ Some database helpers such as a CRUD mixin.
 :license: BSD, see LICENSE for more details.
 """
 
+import datetime
 import logging
+import typing as t
 
 import pytz
+import sqlalchemy as sa
+import sqlalchemy.types as types
 from flask_login import current_user
 from flask_sqlalchemy.query import Query
 from sqlalchemy.orm import declarative_mixin, declared_attr
-import sqlalchemy as sa
+
 from flaskbb.extensions import db
 
 from ..core.exceptions import PersistenceError
@@ -61,35 +65,37 @@ class CRUDMixin(object):
         return self
 
 
-class UTCDateTime(sa.TypeDecorator):
-    impl = sa.DateTime
+class UTCDateTime(types.TypeDecorator):
+    impl = types.DateTime
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
+    @t.override
+    def process_bind_param(
+        self, value: datetime.datetime | None, dialect: sa.Dialect
+    ) -> datetime.datetime | None:
         """Way into the database."""
         if value is not None:
-            # store naive datetime for sqlite and mysql
-            if dialect.name in ("sqlite", "mysql"):
-                return value.replace(tzinfo=None)
+            if not value.tzinfo or value.tzinfo.utcoffset(value) is None:
+                raise TypeError("tzinfo is required")
+            value = value.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        return value
 
-            return value.astimezone(pytz.UTC)
-
-    def process_result_value(self, value, dialect):
+    @t.override
+    def process_result_value(
+        self, value: t.Any | None, dialect: sa.Dialect
+    ) -> datetime.datetime | None:
         """Way out of the database."""
-        # convert naive datetime to non naive datetime
-        if dialect.name in ("sqlite", "mysql") and value is not None:
-            return value.replace(tzinfo=pytz.UTC)
-
-        # other dialects are already non-naive
+        if value is not None:
+            value = value.replace(tzinfo=datetime.timezone.utc)
         return value
 
 
 class HideableQuery(Query):
-    _with_hidden = False
+    _with_hidden: bool = False
 
     def __new__(cls, *args, **kwargs):
         obj = super(HideableQuery, cls).__new__(cls)
-        include_hidden = kwargs.pop("_with_hidden", False)
+        include_hidden: bool = kwargs.pop("_with_hidden", False)
         has_view_hidden = current_user and current_user.permissions.get(
             "viewhidden", False
         )

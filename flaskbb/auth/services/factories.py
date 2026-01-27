@@ -14,7 +14,7 @@ from datetime import timedelta
 
 from flask import current_app
 
-from ...extensions import db
+from ...extensions import db, pluggy
 from ...tokens import FlaskBBTokenSerializer
 from ...tokens.verifiers import EmailMatchesUserToken
 from ...user.models import User
@@ -26,7 +26,7 @@ from .registration import RegistrationService
 
 
 def registration_service_factory():
-    return RegistrationService(current_app.pluggy, User, db)
+    return RegistrationService(pluggy, User, db)
 
 
 def reset_service_factory():
@@ -45,8 +45,8 @@ def account_activator_factory():
 
 
 def authentication_manager_factory():
-    return PluginAuthenticationManager(current_app.pluggy, db.session)
+    return PluginAuthenticationManager(pluggy, db.session)
 
 
 def reauthentication_manager_factory():
-    return PluginReauthenticationManager(current_app.pluggy, db.session)
+    return PluginReauthenticationManager(pluggy, db.session)

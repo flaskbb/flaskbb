@@ -19,7 +19,7 @@ from alembic.util.exc import CommandError
 from flask import current_app
 from sqlalchemy_utils.functions import create_database, database_exists
 
-from flaskbb.extensions import alembic, db
+from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.forum.models import Category, Forum, Post, Topic
 from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import Group, User
@@ -36,11 +36,15 @@ def delete_settings_from_fixture(fixture):
     deleted_settings = {}
 
     for settingsgroup in fixture:
-        group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
+        group = db.session.execute(
+            db.select(SettingsGroup).filter_by(key=settingsgroup[0])
+        ).scalar_one_or_none()
         deleted_settings[group] = []
 
         for settings in settingsgroup[1]["settings"]:
-            setting = Setting.query.filter_by(key=settings[0]).first()
+            setting = db.session.execute(
+                db.select(Setting).filter_by(key=settings[0])
+            ).scalar_one_or_none()
             if setting:
                 deleted_settings[group].append(setting)
                 setting.delete()
@@ -100,7 +104,9 @@ def update_settings_from_fixture(
     updated_settings = collections.defaultdict(list)
 
     for settingsgroup in fixture:
-        group = SettingsGroup.query.filter_by(key=settingsgroup[0]).first()
+        group = db.session.execute(
+            db.select(SettingsGroup).filter_by(key=settingsgroup[0])
+        ).scalar_one_or_none()
 
         if (group is not None and overwrite_group) or group is None:
             if group is not None:
@@ -116,7 +122,9 @@ def update_settings_from_fixture(
             group.save()
 
         for settings in settingsgroup[1]["settings"]:
-            setting = Setting.query.filter_by(key=settings[0]).first()
+            setting = db.session.execute(
+                db.select(Setting).filter_by(key=settings[0])
+            ).scalar_one_or_none()
 
             if setting is not None:
                 setting_is_different = (
@@ -190,7 +198,9 @@ def create_user(username, password, email, groupname):
     if groupname == "member":
         group = Group.get_member_group()
     else:
-        group = Group.query.filter(getattr(Group, groupname) == True).first()
+        group = db.session.execute(
+            db.select(Group).filter(getattr(Group, groupname).is_(True))
+        ).scalar_one_or_none()
 
     user = User.create(
         username=username,
@@ -212,14 +222,18 @@ def update_user(username, password, email, groupname):
     :param groupname: The name of the group to which the user
                       should belong to.
     """
-    user = User.query.filter_by(username=username).first()
+    user = db.session.execute(
+        db.select(User).filter_by(username=username)
+    ).scalar_one_or_none()
     if user is None:
         return None
 
     if groupname == "member":
         group = Group.get_member_group()
     else:
-        group = Group.query.filter(getattr(Group, groupname) == True).first()
+        group = db.session.execute(
+            db.select(Group).filter(getattr(Group, groupname).is_(True))
+        ).scalar_one_or_none()
 
     user.password = password
     user.email = email
@@ -231,10 +245,13 @@ def create_welcome_forum():
     """This will create the `welcome forum` with a welcome topic.
     Returns True if it's created successfully.
     """
-    if User.query.count() < 1:
+    user_count = db.session.execute(
+        db.select(db.func.count()).select_from(User)
+    ).scalar_one()
+    if user_count < 1:
         return False
 
-    user = User.query.filter_by(id=1).first()
+    user = db.session.execute(db.select(User).filter_by(id=1)).scalar_one_or_none()
 
     category = Category(title="My Category", position=1)
     category.save()
@@ -278,8 +295,8 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
         user.save()
         data_created["users"] += 1
 
-    user1 = User.query.filter_by(id=1).first()
-    user2 = User.query.filter_by(id=2).first()
+    user1 = db.session.execute(db.select(User).filter_by(id=1)).scalar_one_or_none()
+    user2 = db.session.execute(db.select(User).filter_by(id=2)).scalar_one_or_none()
 
     # create 2 categories
     with db.session.no_autoflush:
@@ -326,11 +343,13 @@ def insert_bulk_data(topic_count=10, post_count=100):
     :param topics: The amount of topics in the forum.
     :param posts: The number of posts in each topic.
     """
-    user1 = User.query.filter_by(id=1).first()
-    user2 = User.query.filter_by(id=2).first()
-    forum = Forum.query.filter_by(id=1).first()
+    user1 = db.session.execute(db.select(User).filter_by(id=1)).scalar_one_or_none()
+    user2 = db.session.execute(db.select(User).filter_by(id=2)).scalar_one_or_none()
+    forum = db.session.execute(db.select(Forum).filter_by(id=1)).scalar_one_or_none()
 
-    last_post = Post.query.order_by(Post.id.desc()).first()
+    last_post = db.session.execute(
+        db.select(Post).order_by(Post.id.desc())
+    ).scalar_one_or_none()
     last_post_id = 1 if last_post is None else last_post.id
 
     created_posts = 0
@@ -399,10 +418,10 @@ def run_plugin_migrations(plugins=None):
                     to ``None``, all external plugin migrations will be run.
     """
     if plugins is None:
-        plugins = current_app.pluggy.get_external_plugins()
+        plugins = pluggy.get_external_plugins()
 
     for plugin in plugins:
-        plugin_name = current_app.pluggy.get_name(plugin)
+        plugin_name = pluggy.get_name(plugin)
 
         if not has_migrations(plugin):
             logger.debug("No migrations found for plugin %s" % plugin_name)

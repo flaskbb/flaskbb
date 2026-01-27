@@ -15,7 +15,7 @@ from itertools import chain
 from flask import current_app
 from flask_login import current_user
 
-from ...extensions import db
+from ...extensions import db, pluggy
 from ...utils.helpers import get_available_languages, get_available_themes
 from ..forms import (
     ChangeEmailForm,
@@ -34,36 +34,34 @@ from .update import (
 def details_update_factory():
     validators = list(
         chain.from_iterable(
-            current_app.pluggy.hook.flaskbb_gather_details_update_validators(
-                app=current_app
-            )
+            pluggy.hook.flaskbb_gather_details_update_validators(app=current_app)
         )
     )
-    return DefaultDetailsUpdateHandler(db, current_app.pluggy, validators)
+    return DefaultDetailsUpdateHandler(db, pluggy, validators)
 
 
 def password_update_handler():
     validators = list(
         chain.from_iterable(
-            current_app.pluggy.hook.flaskbb_gather_password_validators(app=current_app)
+            pluggy.hook.flaskbb_gather_password_validators(app=current_app)
         )
     )
 
-    return DefaultPasswordUpdateHandler(db, current_app.pluggy, validators)
+    return DefaultPasswordUpdateHandler(db, pluggy, validators)
 
 
 def email_update_handler():
     validators = list(
         chain.from_iterable(
-            current_app.pluggy.hook.flaskbb_gather_email_validators(app=current_app)
+            pluggy.hook.flaskbb_gather_email_validators(app=current_app)
         )
     )
 
-    return DefaultEmailUpdateHandler(db, current_app.pluggy, validators)
+    return DefaultEmailUpdateHandler(db, pluggy, validators)
 
 
 def settings_update_handler():
-    return DefaultSettingsUpdateHandler(db, current_app.pluggy)
+    return DefaultSettingsUpdateHandler(db, pluggy)
 
 
 def settings_form_factory():

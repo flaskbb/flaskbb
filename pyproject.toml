@@ -90,6 +90,7 @@ dev = [
     "cov-core>=1.15.0",
     "coverage>=7.13.1",
     "freezegun>=1.5.5",
+    "ipython>=9.9.0",
     "pre-commit>=4.5.1",
     "py>=1.11.0",
     "pytest>=9.0.2",

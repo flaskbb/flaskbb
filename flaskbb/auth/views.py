@@ -13,7 +13,7 @@ resetting the password of a user if he has lost his password
 import logging
 from datetime import datetime
 
-from flask import Blueprint, current_app, flash, g, redirect, request, url_for
+from flask import Blueprint, flash, g, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (
@@ -35,7 +35,7 @@ from flaskbb.auth.forms import (
     RequestActivationForm,
     ResetPasswordForm,
 )
-from flaskbb.extensions import db, limiter
+from flaskbb.extensions import db, limiter, pluggy
 from flaskbb.utils.helpers import (
     anonymous_required,
     enforce_recaptcha,
@@ -145,7 +145,7 @@ class Register(MethodView):
         self.registration_service_factory = registration_service_factory
 
     def form(self):
-        current_app.pluggy.hook.flaskbb_form_registration(form=RegisterForm)
+        pluggy.hook.flaskbb_form_registration(form=RegisterForm)
         form = RegisterForm()
 
         form.language.choices = get_available_languages()
@@ -176,13 +176,13 @@ class Register(MethodView):
             except PersistenceError:
                 logger.exception("Database error while persisting user")
                 flash(
-                    _("Could not process registration due" "to an unrecoverable error"),
+                    _("Could not process registration dueto an unrecoverable error"),
                     "danger",
                 )
 
                 return render_template("auth/register.html", form=form)
 
-            current_app.pluggy.hook.flaskbb_event_user_registered(
+            pluggy.hook.flaskbb_event_user_registered(
                 username=registration_info.username
             )
             return redirect_or_next(url_for("forum.index"))
@@ -412,7 +412,7 @@ def flaskbb_load_blueprints(app):
         if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
             return None
         # TODO: Figure this out
-        #return limiter.check()
+        # return limiter.check()
 
     @auth.errorhandler(429)
     def login_rate_limit_error(error):

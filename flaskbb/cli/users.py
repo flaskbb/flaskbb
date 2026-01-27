@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import EmailType, FlaskBBCLIError, prompt_save_user
+from flaskbb.extensions import db
 from flaskbb.user.models import User
 
 
@@ -95,7 +96,9 @@ def delete_user(username, force):
             default=os.environ.get("USER", ""),
         )
 
-    user = User.query.filter_by(username=username).first()
+    user = db.session.execute(
+        db.select(User).filter_by(username=username)
+    ).scalar_one_or_none()
     if user is None:
         raise FlaskBBCLIError(
             "The user with username {} does not exist.".format(username), fg="red"

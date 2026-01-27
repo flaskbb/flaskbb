@@ -14,7 +14,7 @@ from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import SettingValueType, generate_settings_form
 
@@ -74,12 +74,12 @@ class PluginRegistry(CRUDMixin, db.Model):
     @property
     def info(self):
         """Returns some information about the plugin."""
-        return current_app.pluggy.list_plugin_metadata().get(self.name, {})
+        return pluggy.list_plugin_metadata().get(self.name, {})
 
     @property
     def is_installable(self):
         """Returns True if the plugin has settings that can be installed."""
-        plugin_module = current_app.pluggy.get_plugin(self.name)
+        plugin_module = pluggy.get_plugin(self.name)
         return True if plugin_module.SETTINGS else False
 
     @property

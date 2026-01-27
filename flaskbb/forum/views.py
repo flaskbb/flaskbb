@@ -12,6 +12,7 @@ topics and posts.
 
 import logging
 import math
+import select
 
 from flask import Blueprint, abort, current_app, flash, redirect, request, url_for
 from flask.views import MethodView
@@ -21,7 +22,7 @@ from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
-from flaskbb.extensions import allows, db
+from flaskbb.extensions import allows, db, pluggy
 from flaskbb.forum.forms import (
     EditTopicForm,
     NewTopicForm,
@@ -31,7 +32,15 @@ from flaskbb.forum.forms import (
     SearchPageForm,
     UserSearchForm,
 )
-from flaskbb.forum.models import Category, Forum, ForumsRead, Post, Topic, TopicsRead
+from flaskbb.forum.models import (
+    Category,
+    Forum,
+    ForumsRead,
+    Post,
+    Topic,
+    TopicsRead,
+    topictracker,
+)
 from flaskbb.markup import make_renderer
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
@@ -45,6 +54,7 @@ from flaskbb.utils.helpers import (
     time_diff,
     time_utcnow,
 )
+from flaskbb.utils.pagination import paginate
 from flaskbb.utils.requirements import (
     CanAccessForum,
     CanDeletePost,
@@ -301,7 +311,7 @@ class NewTopic(MethodView):
         )
 
     def form(self):
-        current_app.pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
+        pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
         return NewTopicForm()
 
 
@@ -344,7 +354,7 @@ class EditTopic(MethodView):
         )
 
     def form(self, **kwargs):
-        current_app.pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
+        pluggy.hook.flaskbb_form_topic(form=NewTopicForm)
         return EditTopicForm(**kwargs)
 
 
@@ -560,7 +570,7 @@ class NewPost(MethodView):
         return render_template("forum/new_post.html", topic=topic, form=form)
 
     def form(self):
-        current_app.pluggy.hook.flaskbb_form_post(form=ReplyForm)
+        pluggy.hook.flaskbb_form_post(form=ReplyForm)
         return ReplyForm()
 
 
@@ -604,7 +614,7 @@ class EditPost(MethodView):
         )
 
     def form(self, **kwargs):
-        current_app.pluggy.hook.flaskbb_form_post(form=ReplyForm)
+        pluggy.hook.flaskbb_form_post(form=ReplyForm)
         return ReplyForm(**kwargs)
 
 
@@ -689,13 +699,19 @@ class TopicTracker(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        topics = (
-            real(current_user)
-            .tracked_topics.outerjoin(
+        stmt = (
+            db.select(Topic, Post, TopicsRead, ForumsRead)
+            .where(
+                db.and_(
+                    topictracker.c.topic_id == Topic.id,
+                    topictracker.c.user_id == current_user.id,
+                )
+            )
+            .outerjoin(
                 TopicsRead,
                 db.and_(
                     TopicsRead.topic_id == Topic.id,
-                    TopicsRead.user_id == real(current_user).id,
+                    TopicsRead.user_id == current_user.id,
                 ),
             )
             .outerjoin(Post, Topic.last_post_id == Post.id)
@@ -704,23 +720,24 @@ class TopicTracker(MethodView):
                 ForumsRead,
                 db.and_(
                     ForumsRead.forum_id == Forum.id,
-                    ForumsRead.user_id == real(current_user).id,
+                    ForumsRead.user_id == current_user.id,
                 ),
             )
-            .add_entity(Post)
-            .add_entity(TopicsRead)
-            .add_entity(ForumsRead)
+            .where()
             .order_by(Topic.last_updated.desc())
-            .paginate(
-                page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"], error_out=True
-            )
         )
+
+        topics = paginate(stmt, page=page)
 
         return render_template("forum/topictracker.html", topics=topics)
 
     def post(self):
         topic_ids = request.form.getlist("rowid")
-        tmp_topics = Topic.query.filter(Topic.id.in_(topic_ids)).all()
+        tmp_topics = (
+            db.session.execute(db.select(Topic).filter(Topic.id.in_(topic_ids)))
+            .scalars()
+            .all()
+        )
 
         for topic in tmp_topics:
             real(current_user).untrack_topic(topic)
@@ -1102,13 +1119,11 @@ class MarkdownPreview(MethodView):
         text = request.data.decode("utf-8")
 
         if mode == "nonpost":
-            render_classes = (
-                current_app.pluggy.hook.flaskbb_load_nonpost_markdown_class(
-                    app=current_app
-                )
+            render_classes = pluggy.hook.flaskbb_load_nonpost_markdown_class(
+                app=current_app
             )
         else:
-            render_classes = current_app.pluggy.hook.flaskbb_load_post_markdown_class(
+            render_classes = pluggy.hook.flaskbb_load_post_markdown_class(
                 app=current_app
             )
 

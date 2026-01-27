@@ -36,6 +36,8 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
+from flaskbb.extensions import pluggy
+
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
@@ -130,14 +132,14 @@ def flaskbb_load_nonpost_markdown_class():
 
 @impl
 def flaskbb_jinja_directives(app):
-    render_classes = app.pluggy.hook.flaskbb_load_post_markdown_class(app=app)
+    render_classes = pluggy.hook.flaskbb_load_post_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
-    app.pluggy.hook.flaskbb_load_post_markdown_plugins(plugins=plugins, app=app)
+    pluggy.hook.flaskbb_load_post_markdown_plugins(plugins=plugins, app=app)
     app.jinja_env.filters["markup"] = make_renderer(render_classes, plugins)
 
-    render_classes = app.pluggy.hook.flaskbb_load_nonpost_markdown_class(app=app)
+    render_classes = pluggy.hook.flaskbb_load_nonpost_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
-    plugins = app.pluggy.hook.flaskbb_load_nonpost_markdown_plugins(
+    plugins = pluggy.hook.flaskbb_load_nonpost_markdown_plugins(
         plugins=plugins, app=app
     )
     app.jinja_env.filters["nonpost_markup"] = make_renderer(render_classes, plugins)

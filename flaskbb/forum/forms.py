@@ -23,6 +23,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Optional
 
+from flaskbb.extensions import pluggy
 from flaskbb.forum.models import Forum, Post, Report, Topic
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
@@ -42,7 +43,7 @@ class PostForm(FlaskForm):
 
     def save(self, user, topic):
         post = Post(content=self.content.data)
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=post)
+        pluggy.hook.flaskbb_form_post_save(form=self, post=post)
         return post.save(user=user, topic=topic)
 
 
@@ -72,7 +73,7 @@ class ReplyForm(PostForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=self.post)
+        pluggy.hook.flaskbb_form_post_save(form=self, post=self.post)
         return self.post.save(user=user, topic=topic)
 
 
@@ -103,7 +104,7 @@ class TopicForm(FlaskForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
+        pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
         return topic.save(user=user, forum=forum)
 
 
@@ -142,7 +143,7 @@ class EditTopicForm(TopicForm):
         self.topic.first_post.date_modified = time_utcnow()
         self.topic.first_post.modified_by = user.username
 
-        current_app.pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
+        pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
         return self.topic.save(user=user, forum=forum)
 
 

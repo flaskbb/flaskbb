@@ -34,9 +34,13 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
     :timedelta expiry: Expiration of tokens
     """
 
-    def __init__(self, secret_key, expiry=_DEFAULT_EXPIRY):
-        self.secret_key = secret_key
-        self.algorithm = "HS256"
+    def __init__(
+        self,
+        secret_key: str,
+        expiry: datetime.timedelta | datetime.datetime = _DEFAULT_EXPIRY,
+    ):
+        self.secret_key: str = secret_key
+        self.algorithm: str = "HS256"
 
         if isinstance(expiry, datetime.timedelta):
             self.expiry = datetime.datetime.now(datetime.UTC) + expiry

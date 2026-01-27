@@ -14,7 +14,7 @@ from flask import current_app, flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
 
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.datastructures import TemplateEventResult
 
@@ -31,7 +31,7 @@ def template_hook(name, silent=True, is_markup=True, **kwargs):
     :param kwargs: Additional kwargs that should be passed to the hook.
     """
     try:
-        hook = getattr(current_app.pluggy.hook, name)
+        hook = getattr(pluggy.hook, name)
         result = TemplateEventResult(hook(**kwargs))
     except AttributeError:  # raised if hook doesn't exist
         if silent:
@@ -48,7 +48,7 @@ def validate_plugin(name):
     """Tries to look up the plugin by name. Upon failure it will flash
     a message and abort. Returns the plugin module on success.
     """
-    plugin_module = current_app.pluggy.get_plugin(name)
+    plugin_module = pluggy.get_plugin(name)
     if plugin_module is None:
         flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
         return redirect(url_for("management.plugins"))
@@ -60,19 +60,23 @@ def remove_zombie_plugins_from_db():
     which exists in the database but isn't installed in the env anymore.
     Returns the names of the deleted plugins.
     """
-    d_fs_plugins = [p[0] for p in current_app.pluggy.list_disabled_plugins()]
-    d_db_plugins = [p.name for p in PluginRegistry.query.filter_by(enabled=False).all()]  # noqa
+    d_fs_plugins: list[str] = [p[0] for p in pluggy.list_disabled_plugins()]
+    d_db_plugins = (
+        db.session.execute(db.select(PluginRegistry.name).filter_by(enabled=False))
+        .scalars()
+        .all()
+    )
 
-    plugin_names = [p.name for p in PluginRegistry.query.all()]
+    plugin_names = db.session.execute(db.select(PluginRegistry.name)).scalars().all()
 
-    remove_me = []
+    remove_me: list[str] = []
     for p in plugin_names:
         if p in d_db_plugins and p not in d_fs_plugins:
             remove_me.append(p)
 
     if len(remove_me) > 0:
-        PluginRegistry.query.filter(PluginRegistry.name.in_(remove_me)).delete(
-            synchronize_session="fetch"
+        db.session.execute(
+            db.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me))
         )
         db.session.commit()
     return remove_me
