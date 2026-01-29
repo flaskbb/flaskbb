@@ -13,14 +13,22 @@ import datetime
 import logging
 import typing as t
 
-import pytz
 import sqlalchemy as sa
 import sqlalchemy.types as types
 from flask_login import current_user
 from flask_sqlalchemy.query import Query
-from sqlalchemy.orm import declarative_mixin, declared_attr
+from sqlalchemy.orm import (
+    Mapped,
+    declarative_mixin,
+    declared_attr,
+    mapped_column,
+    relationship,
+)
 
 from flaskbb.extensions import db
+
+if t.TYPE_CHECKING:
+    from flaskbb.user.models import User
 
 from ..core.exceptions import PersistenceError
 
@@ -52,13 +60,13 @@ class CRUDMixin(object):
         instance = cls(**kwargs)
         return instance.save()
 
-    def save(self):
+    def save(self) -> t.Self | None:
         """Saves the object to the database."""
         db.session.add(self)
         db.session.commit()
         return self
 
-    def delete(self):
+    def delete(self) -> t.Self | None:
         """Delete the object from the database."""
         db.session.delete(self)
         db.session.commit()
@@ -118,7 +126,8 @@ class HideableQuery(Query):
     def _get(self, *args, **kwargs):
         return super(HideableQuery, self).filter(*args, **kwargs)
 
-    def get(self, *args, **kwargs):
+    @t.override
+    def get(self, *args, **kwargs) -> t.Self | None:
         obj = self.with_hidden()._get(*args, **kwargs).first()
         return obj if obj is None or self._with_hidden or not obj.hidden else None
 
@@ -127,22 +136,23 @@ class HideableQuery(Query):
 class HideableMixin(object):
     query_class = HideableQuery
 
-    hidden = db.Column(db.Boolean, default=False, nullable=True)
-    hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
+    hidden: Mapped[bool] = mapped_column(default=False, nullable=False)
+    hidden_at: Mapped[datetime.datetime | None] = mapped_column(
+        UTCDateTime(timezone=True), nullable=True
+    )
 
     @declared_attr
-    def hidden_by_id(cls):  # noqa: B902
-        return db.Column(
-            db.Integer,
-            db.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),
+    def hidden_by_id(cls) -> Mapped[int | None]:
+        return mapped_column(
+            sa.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),
             nullable=True,
         )
 
     @declared_attr
-    def hidden_by(cls):  # noqa: B902
-        return db.relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
+    def hidden_by(cls) -> Mapped["User"]:
+        return relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
 
-    def hide(self, user, *args, **kwargs):
+    def hide(self, user: "User", *args, **kwargs) -> t.Self | None:
         from flaskbb.utils.helpers import time_utcnow
 
         self.hidden_by = user
@@ -150,7 +160,7 @@ class HideableMixin(object):
         self.hidden_at = time_utcnow()
         return self
 
-    def unhide(self, *args, **kwargs):
+    def unhide(self, *args, **kwargs) -> t.Self | None:
         self.hidden_by = None
         self.hidden = False
         self.hidden_at = None

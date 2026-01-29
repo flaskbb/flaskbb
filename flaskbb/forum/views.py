@@ -1077,17 +1077,15 @@ class HidePost(MethodView):
             flash(_("Post is already hidden"), "warning")
             return redirect(post.topic.url)
 
-        first_post = post.first_post
-
         post.hide(current_user)
         post.save()
 
-        if first_post:
+        if post.is_first_post():
             flash(_("Topic hidden"), "success")
         else:
             flash(_("Post hidden"), "success")
 
-        if post.first_post and not Permission(Has("viewhidden")):
+        if post.is_first_post() and not Permission(Has("viewhidden")):
             return redirect(post.topic.forum.url)
         return redirect(post.topic.url)
 

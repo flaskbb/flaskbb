@@ -19,7 +19,7 @@ test: ## Runs the testsuite
 	uv run pytest
 
 run: ## Runs the development server with the development config
-	uv run flaskbb run --debugger --reload --debug
+	WERKZEUG_DEBUG_PIN=off uv run flaskbb run --debugger --reload --debug
 
 frontend: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
 	cd flaskbb/themes/aurora && npm run watch

@@ -10,11 +10,11 @@ It provides the models for the forum
 """
 
 import logging
-from datetime import timedelta
-from typing import TYPE_CHECKING
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, override
 
-from flask import abort, current_app, url_for
-from sqlalchemy import ForeignKey, String, Text
+from flask import abort, url_for
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text, distinct, or_
 from sqlalchemy.orm import Mapped, aliased, mapped_column, relationship
 
 from flaskbb.extensions import db, pluggy
@@ -40,52 +40,55 @@ from flaskbb.utils.settings import flaskbb_config
 logger = logging.getLogger(__name__)
 
 
-moderators = db.Table(
+moderators = Table(
     "moderators",
-    db.Column(
+    db.metadata,
+    Column(
         "user_id",
-        db.Integer(),
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    db.Column(
+    Column(
         "forum_id",
-        db.Integer(),
-        db.ForeignKey("forums.id", ondelete="CASCADE"),
+        Integer,
+        ForeignKey("forums.id", ondelete="CASCADE"),
         nullable=False,
     ),
 )
 
 
-topictracker = db.Table(
+topictracker = Table(
     "topictracker",
-    db.Column(
+    db.metadata,
+    Column(
         "user_id",
-        db.Integer(),
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    db.Column(
+    Column(
         "topic_id",
-        db.Integer(),
-        db.ForeignKey("topics.id", ondelete="CASCADE"),
+        Integer,
+        ForeignKey("topics.id", ondelete="CASCADE"),
         nullable=False,
     ),
 )
 
 
-forumgroups = db.Table(
+forumgroups = Table(
     "forumgroups",
-    db.Column(
+    db.metadata,
+    Column(
         "group_id",
-        db.Integer(),
-        db.ForeignKey("groups.id", ondelete="CASCADE"),
+        Integer,
+        ForeignKey("groups.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    db.Column(
+    Column(
         "forum_id",
-        db.Integer(),
-        db.ForeignKey("forums.id", ondelete="CASCADE"),
+        Integer(),
+        ForeignKey("forums.id", ondelete="CASCADE"),
         nullable=False,
     ),
 )
@@ -108,7 +111,7 @@ class TopicsRead(db.Model, CRUDMixin):
     forum: Mapped["Forum"] = relationship(
         "Forum", uselist=False, foreign_keys=[forum_id]
     )
-    last_read: Mapped["UTCDateTime"] = mapped_column(
+    last_read: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
 
@@ -126,10 +129,10 @@ class ForumsRead(db.Model, CRUDMixin):
     forum: Mapped["Forum"] = relationship(
         "Forum", uselist=False, foreign_keys=[forum_id]
     )
-    last_read: Mapped["UTCDateTime"] = mapped_column(
+    last_read: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    cleared: Mapped["UTCDateTime"] = mapped_column(
+    cleared: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
     )
 
@@ -143,16 +146,18 @@ class Report(db.Model, CRUDMixin):
     # still view the report
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    reporter_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
-    reported: Mapped[UTCDateTime] = mapped_column(
+    reporter_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True
+    )
+    reported: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=True)
-    zapped: Mapped[UTCDateTime] = mapped_column(
+    post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    zapped: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
     )
-    zapped_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
-    reason: Mapped[str] = mapped_column(Text, nullable=True)
+    zapped_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     post: Mapped["Post"] = relationship(
         "Post",
@@ -166,10 +171,12 @@ class Report(db.Model, CRUDMixin):
         "User", lazy="joined", foreign_keys=[zapped_by]
     )
 
+    @override
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def save(self, post=None, user=None):
+    @override
+    def save(self, post: "Post | None" = None, user: "User | None" = None):
         """Saves a report.
 
         :param post: The post that should be reported
@@ -192,26 +199,30 @@ class Post(HideableCRUDMixin, db.Model):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    topic_id: Mapped[int] = mapped_column(
+    topic_id: Mapped[int | None] = mapped_column(
         ForeignKey("topics.id", ondelete="CASCADE", use_alter=True),
-        nullable=True,
+        nullable=True,  # we sure this should be nullable?
     )
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    date_created: Mapped[UTCDateTime] = mapped_column(
+    date_created: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    date_modified: Mapped[UTCDateTime] = mapped_column(
+    date_modified: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
     )
-    modified_by: Mapped[str] = mapped_column(String(200), nullable=True)
+    modified_by: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
     user: Mapped[User] = relationship(
         "User",
         back_populates="posts",
         foreign_keys=[user_id],
         lazy="joined",
+    )
+
+    topic: Mapped["Topic"] = relationship(
+        "Topic", foreign_keys=[topic_id], back_populates="posts"
     )
 
     # Properties
@@ -221,7 +232,12 @@ class Post(HideableCRUDMixin, db.Model):
         return url_for("forum.view_post", post_id=self.id)
 
     # Methods
-    def __init__(self, content=None, user=None, topic=None):
+    def __init__(
+        self,
+        content: str | None = None,
+        user: "User | None" = None,
+        topic: "Topic | None" = None,
+    ):
         """Creates a post object with some initial values.
 
         :param content: The content of the post.
@@ -242,6 +258,7 @@ class Post(HideableCRUDMixin, db.Model):
 
         self.date_created = time_utcnow()
 
+    @override
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
@@ -252,7 +269,8 @@ class Post(HideableCRUDMixin, db.Model):
         """Checks whether this post is the first post in the topic or not."""
         return self.topic.is_first_post(self)
 
-    def save(self, user=None, topic=None):
+    @override
+    def save(self, user: "User | None" = None, topic: "Topic | None" = None):
         """Saves a new post. If no parameters are passed we assume that
         you will just update an existing post. It returns the object after the
         operation was successful.
@@ -300,6 +318,7 @@ class Post(HideableCRUDMixin, db.Model):
             pluggy.hook.flaskbb_event_post_save_after(post=self, is_new=True)
             return self
 
+    @override
     def delete(self):
         """Deletes a post and returns self."""
         # This will delete the whole topic
@@ -315,7 +334,8 @@ class Post(HideableCRUDMixin, db.Model):
         db.session.commit()
         return self
 
-    def hide(self, user):
+    @override
+    def hide(self, user: "User"):
         if self.hidden:
             return
 
@@ -329,6 +349,7 @@ class Post(HideableCRUDMixin, db.Model):
         db.session.commit()
         return self
 
+    @override
     def unhide(self):
         if not self.hidden:
             return
@@ -398,13 +419,15 @@ class Post(HideableCRUDMixin, db.Model):
             Topic.hidden.is_(False),
         ]
 
+        stmt = (
+            db.select(db.func.count(Post.id))
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(*user_post_clauses)
+        )
+        user_post_count = db.session.execute(stmt).scalar_one()
+
         # Update the post counts
-        self.user.post_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Post)
-            .join(Topic)
-            .filter(*user_post_clauses)
-        ).scalar_one()
+        self.user.post_count = user_post_count
 
         if self.topic.hidden:
             self.topic.post_count = 0
@@ -412,21 +435,25 @@ class Post(HideableCRUDMixin, db.Model):
             topic_post_clauses = clauses + [
                 Post.topic_id == self.topic.id,
             ]
-            self.topic.post_count = db.session.execute(
-                db.select(db.func.count()).select_from(Post).filter(*topic_post_clauses)
-            ).scalar_one()
+            stmt = (
+                db.select(db.func.count(Post.id))
+                .join(Topic, Post.topic_id == Topic.id)
+                .where(*topic_post_clauses)
+            )
+            topic_post_count = db.session.execute(stmt).scalar_one()
+            self.topic.post_count = topic_post_count
 
         forum_post_clauses = clauses + [
             Topic.forum_id == self.topic.forum.id,
             Topic.hidden.is_(False),
         ]
-
-        self.topic.forum.post_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Post)
-            .join(Topic)
-            .filter(*forum_post_clauses)
-        ).scalar_one()
+        stmt = (
+            db.select(db.func.count(Post.id))
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(*forum_post_clauses)
+        )
+        forum_post_count = db.session.execute(stmt).scalar_one()
+        self.topic.forum.post_count = forum_post_count
 
     def _restore_post_to_topic(self):
         last_unhidden_post = db.session.execute(
@@ -466,12 +493,12 @@ class Topic(HideableCRUDMixin, db.Model):
         ForeignKey("forums.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
-    date_created: Mapped[UTCDateTime] = mapped_column(
+    date_created: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    last_updated: Mapped[UTCDateTime] = mapped_column(
+    last_updated: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
     locked: Mapped[bool] = mapped_column(default=False, nullable=False)
@@ -479,22 +506,34 @@ class Topic(HideableCRUDMixin, db.Model):
     views: Mapped[int] = mapped_column(default=0, nullable=False)
     post_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
+    forum: Mapped["Forum"] = relationship(
+        "Forum", back_populates="topics", foreign_keys=[forum_id]
+    )
+
     # One-to-one (uselist=False) relationship between first_post and topic
-    first_post_id: Mapped[int] = mapped_column(
+    first_post_id: Mapped[int | None] = mapped_column(
         ForeignKey("posts.id", ondelete="CASCADE"), nullable=True
     )
-    first_post: Mapped["Post"] = relationship(
-        "Post", backref="first_post", uselist=False, foreign_keys=[first_post_id]
+    first_post: Mapped["Post | None"] = relationship(
+        "Post",
+        uselist=False,
+        foreign_keys=[first_post_id],
+        post_update=True,
     )
 
     # One-to-one
-    last_post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), nullable=True)
-
-    last_post: Mapped["Post"] = relationship(
-        "Post", backref="last_post", uselist=False, foreign_keys=[last_post_id]
+    last_post_id: Mapped[int | None] = mapped_column(
+        ForeignKey("posts.id"), nullable=True
     )
 
-    user: Mapped[User] = relationship(
+    last_post: Mapped["Post | None"] = relationship(
+        "Post",
+        uselist=False,
+        foreign_keys=[last_post_id],
+        post_update=True,
+    )
+
+    user: Mapped[User | None] = relationship(
         "User",
         back_populates="topics",
         foreign_keys=[user_id],
@@ -504,7 +543,7 @@ class Topic(HideableCRUDMixin, db.Model):
     # One-to-many
     posts: Mapped[list["Post"]] = relationship(
         "Post",
-        backref="topic",
+        back_populates="topic",
         lazy="dynamic",
         primaryjoin="Post.topic_id == Topic.id",
         cascade="all, delete-orphan",
@@ -539,7 +578,12 @@ class Topic(HideableCRUDMixin, db.Model):
             return url_for("forum.view_topic", topic_id=self.id)
         return url_for("forum.view_topic", topic_id=self.id, slug=self.slug)
 
-    def __init__(self, title=None, user=None, content=None):
+    def __init__(
+        self,
+        title: str | None = None,
+        user: "User | None" = None,
+        content: str | None = None,
+    ):
         """Creates a topic object with some initial values.
 
         :param title: The title of the topic.
@@ -556,24 +600,30 @@ class Topic(HideableCRUDMixin, db.Model):
             self.username = user.username
 
         if content:
-            self._post = Post(content=content)
+            self._post: Post = Post(content=content)
 
         self.date_created = self.last_updated = time_utcnow()
 
+    @override
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def is_first_post(self, post):
+    def is_first_post(self, post: Post):
         """Checks if the post is the first post in the topic.
 
         :param post: The post object.
         """
         return self.first_post_id == post.id
 
-    def first_unread(self, topicsread, user, forumsread=None):
+    def first_unread(
+        self,
+        topicsread: "TopicsRead | None",
+        user: "User",
+        forumsread: ForumsRead | None = None,
+    ):
         """Returns the url to the first unread post. If no unread posts exist
         it will return the url to the topic.
 
@@ -597,7 +647,7 @@ class Topic(HideableCRUDMixin, db.Model):
         return self.url
 
     @classmethod
-    def get_topic(cls, topic_id, user):
+    def get_topic(cls, topic_id: int, user: "User"):
         topic = db.session.execute(
             db.select(cls).filter_by(id=topic_id)
         ).scalar_one_or_none()
@@ -605,7 +655,9 @@ class Topic(HideableCRUDMixin, db.Model):
             abort(404)
         return topic
 
-    def tracker_needs_update(self, forumsread, topicsread):
+    def tracker_needs_update(
+        self, forumsread: "ForumsRead | None", topicsread: "TopicsRead | None"
+    ):
         """Returns True if the topicsread tracker needs an update.
         Also, if the ``TRACKER_LENGTH`` is configured, it will just recognize
         topics that are newer than the ``TRACKER_LENGTH`` (in days) as unread.
@@ -623,7 +675,7 @@ class Topic(HideableCRUDMixin, db.Model):
             )
 
         # The tracker is disabled - abort
-        if read_cutoff is None:
+        if read_cutoff is None or self.last_post is None:
             logger.debug("Readtracker is disabled.")
             return False
 
@@ -649,7 +701,7 @@ class Topic(HideableCRUDMixin, db.Model):
         logger.debug("Topic is unread.")
         return True
 
-    def update_read(self, user, forum, forumsread):
+    def update_read(self, user: "User", forum: "Forum", forumsread: "ForumsRead"):
         """Updates the topicsread and forumsread tracker for a specified user,
         if the topic contains new posts or the user hasn't read the topic.
         Returns True if the tracker has been updated.
@@ -713,7 +765,7 @@ class Topic(HideableCRUDMixin, db.Model):
         self.save()
         return self
 
-    def move(self, new_forum):
+    def move(self, new_forum: "Forum"):
         """Moves a topic to the given forum.
         Returns True if it could successfully move the topic to forum.
 
@@ -741,7 +793,13 @@ class Topic(HideableCRUDMixin, db.Model):
 
         return True
 
-    def save(self, user=None, forum=None, post=None):
+    @override
+    def save(
+        self,
+        user: "User | None" = None,
+        forum: "Forum | None" = None,
+        post: Post | None = None,
+    ):
         """Saves a topic and returns the topic object. If no parameters are
         given, it will only update the topic.
 
@@ -757,6 +815,10 @@ class Topic(HideableCRUDMixin, db.Model):
             db.session.commit()
             pluggy.hook.flaskbb_event_topic_save_after(topic=self, is_new=False)
             return self
+
+        if forum is None or user is None:
+            logger.error("Cant create a topic without a user or forum")
+            return
 
         with db.session.no_autoflush:
             # Set the forum and user id
@@ -787,12 +849,13 @@ class Topic(HideableCRUDMixin, db.Model):
         pluggy.hook.flaskbb_event_topic_save_after(topic=self, is_new=True)
         return self
 
+    @override
     def delete(self):
         """Deletes a topic with the corresponding posts."""
 
         forum = self.forum
         # get the users before deleting the topic
-        invovled_users = self.involved_users().all()
+        invovled_users = self.involved_users()
 
         db.session.delete(self)
         self._fix_user_post_counts(invovled_users)
@@ -805,7 +868,8 @@ class Topic(HideableCRUDMixin, db.Model):
         db.session.commit()
         return self
 
-    def hide(self, user):
+    @override
+    def hide(self, user: "User"):
         """Soft deletes a topic from a forum
 
         :param user: The user who hid the topic.
@@ -813,7 +877,7 @@ class Topic(HideableCRUDMixin, db.Model):
         if self.hidden:
             return
 
-        involved_users = self.involved_users().all()
+        involved_users = self.involved_users()
         self._remove_topic_from_forum()
         super(Topic, self).hide(user)
         self._handle_first_post()
@@ -827,7 +891,7 @@ class Topic(HideableCRUDMixin, db.Model):
         if not self.hidden:
             return
 
-        involved_users = self.involved_users().all()
+        involved_users = self.involved_users()
         super(Topic, self).unhide()
         self._handle_first_post()
         self._restore_topic_to_forum()
@@ -865,57 +929,46 @@ class Topic(HideableCRUDMixin, db.Model):
             self.forum.last_post_username = None
             self.forum.last_post_created = None
 
-    def _fix_user_post_counts(self, users=None):
+    def _fix_user_post_counts(self, users: list[User] | None = None):
         # Update the post counts
         if users:
             for user in users:
-                user.post_count = db.session.execute(
-                    db.select(db.func.count())
-                    .select_from(Post)
-                    .join(Topic)
-                    .filter(
+                stmt = (
+                    db.select(db.func.count(Post.id))
+                    .join(Topic, Post.topic_id == Topic.id)
+                    .where(
                         Post.user_id == user.id,
                         Topic.hidden.is_(False),
                         Post.hidden.is_(False),
                     )
-                ).scalar_one()
+                )
+                user.post_count = db.session.scalar(stmt)
 
-    def _fix_post_counts(self, forum):
-        clauses = [Topic.forum_id == forum.id]
+    def _fix_post_counts(self, forum: "Forum"):
+        stmt = db.select(db.func.count(Topic.id)).where(Topic.forum_id == forum.id)
         if self.hidden:
-            clauses.extend(
-                [
-                    Topic.id != self.id,
-                    Topic.hidden.is_(False),
-                ]
-            )
+            stmt_topic_count = stmt.where(Topic.id != self.id, Topic.hidden.is_(False))
         else:
-            clauses.append(db.or_(Topic.id == self.id, Topic.hidden.is_(False)))
-
-        forum.topic_count = db.session.execute(
-            db.select(db.func.count()).select_from(Topic).filter(*clauses)
-        ).scalar_one()
-
-        post_count_clauses = clauses.copy()
-
-        if self.hidden:
-            post_count_clauses.append(Post.hidden.is_(False))
-        else:
-            post_count_clauses.append(
-                db.or_(Post.hidden.is_(False), Post.id == self.first_post.id)
+            stmt_topic_count = stmt.where(
+                or_(Topic.id == self.id, Topic.hidden.is_(False))
             )
 
-        forum.post_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Post)
-            .join(Topic)
-            .filter(*post_count_clauses)
-        ).scalar_one()
+        forum.topic_count = db.session.scalar(stmt_topic_count)
+
+        if self.hidden:
+            stmt_post_count = stmt.where(Post.hidden.is_(False))
+        else:
+            stmt_post_count = stmt.where(
+                or_(Post.hidden.is_(False), Post.id == self.first_post_id)
+            )
+
+        forum.post_count = db.session.scalar(stmt_post_count)
 
     def _restore_topic_to_forum(self):
         if (
             self.forum.last_post is None
-            or self.forum.last_post_created < self.last_updated
+            or self.forum.last_post_created
+            and self.forum.last_post_created < self.last_updated
         ):
             self.forum.last_post = self.last_post
             self.forum.last_post_title = self.title
@@ -925,20 +978,27 @@ class Topic(HideableCRUDMixin, db.Model):
 
     def _handle_first_post(self):
         # have to do this specially because otherwise we start recurisve calls
-        self.first_post.hidden = self.hidden
-        self.first_post.hidden_by = self.hidden_by
-        self.first_post.hidden_at = self.hidden_at
+        if self.first_post:
+            self.first_post.hidden = self.hidden
+            self.first_post.hidden_by = self.hidden_by
+            self.first_post.hidden_at = self.hidden_at
+        else:
+            logger.error("first post is None!")
 
     def involved_users(self):
         """
-        Returns a query of all users involved in the topic
+        Returns all users involved in the topic
         """
         # todo: Find circular import and break it
         from flaskbb.user.models import User
 
-        return User.query.distinct().filter(
-            Post.topic_id == self.id, User.id == Post.user_id
+        stmt = (
+            db.select(User)
+            .join(Post, User.id == Post.user_id)
+            .where(Post.topic_id == self.id)
+            .distinct()
         )
+        return db.session.execute(stmt).scalars().all()
 
 
 @make_comparable
@@ -950,43 +1010,47 @@ class Forum(db.Model, CRUDMixin):
         ForeignKey("categories.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    description: Mapped[Text | None] = mapped_column(Text, nullable=True)
     position: Mapped[int] = mapped_column(default=1, nullable=False)
     locked: Mapped[bool] = mapped_column(default=False, nullable=False)
     show_moderators: Mapped[bool] = mapped_column(default=False, nullable=False)
-    external: Mapped[str] = mapped_column(String(200), nullable=True)
+    external: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
     post_count: Mapped[int] = mapped_column(default=0, nullable=False)
     topic_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
+    category: Mapped["Category"] = relationship(
+        "Category", back_populates="forums", foreign_keys=[category_id]
+    )
+
     # One-to-one
-    last_post_id: Mapped[int] = mapped_column(
+    last_post_id: Mapped[int | None] = mapped_column(
         ForeignKey("posts.id"), nullable=True
     )  # we handle this case ourselfs
-    last_post: Mapped["Post"] = relationship(
-        "Post", backref="last_post_forum", uselist=False, foreign_keys=[last_post_id]
+    last_post: Mapped["Post | None"] = relationship(
+        "Post", uselist=False, foreign_keys=[last_post_id], post_update=True
     )
 
     # set to null if the user got deleted
-    last_post_user_id: Mapped[int] = mapped_column(
+    last_post_user_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
 
-    last_post_user: Mapped["User"] = relationship(
+    last_post_user: Mapped["User | None"] = relationship(
         "User", uselist=False, foreign_keys=[last_post_user_id]
     )
 
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
-    last_post_title: Mapped[str] = mapped_column(String(255), nullable=True)
-    last_post_username: Mapped[str] = mapped_column(String(255), nullable=True)
-    last_post_created: Mapped[UTCDateTime] = mapped_column(
+    last_post_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    last_post_username: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    last_post_created: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=True
     )
 
     # One-to-many
     topics: Mapped[list[Topic]] = relationship(
-        "Topic", backref="forum", lazy="dynamic", cascade="all, delete-orphan"
+        "Topic", lazy="dynamic", cascade="all, delete-orphan"
     )
 
     # Many-to-many
@@ -1023,14 +1087,14 @@ class Forum(db.Model, CRUDMixin):
         """Returns the url for the last post in the forum"""
         return url_for("forum.view_post", post_id=self.last_post_id)
 
-    # Methods
+    @override
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def update_last_post(self, commit=True):
+    def update_last_post(self, commit: bool = True):
         """Updates the last post in the forum."""
         last_post = db.session.execute(
             db.select(Post)
@@ -1126,8 +1190,7 @@ class Forum(db.Model, CRUDMixin):
 
             if forumsread and forumsread.last_read > topicsread.last_read:
                 logger.debug(
-                    "forumsread.last_read is newer than "
-                    "topicsread.last_read. Everything is read."
+                    "forumsread.last_read is newer than topicsread.last_read. Everything is read."
                 )
                 return False
 
@@ -1191,6 +1254,7 @@ class Forum(db.Model, CRUDMixin):
         self.save()
         return self
 
+    @override
     def save(self, groups: Group | None = None):
         """Saves a forum
 
@@ -1212,6 +1276,7 @@ class Forum(db.Model, CRUDMixin):
         db.session.commit()
         return self
 
+    @override
     def delete(self, users: list[User] | None = None):
         """Deletes forum. If a list with involved user objects is passed,
         it will also update their post counts
@@ -1330,13 +1395,13 @@ class Category(db.Model, CRUDMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    description: Mapped[Text | None] = mapped_column(Text, nullable=True)
     position: Mapped[int] = mapped_column(default=1, nullable=False)
 
     # One-to-many
     forums: Mapped[list[Forum]] = relationship(
         "Forum",
-        backref="category",
+        back_populates="category",
         lazy="dynamic",
         primaryjoin="Forum.category_id == Category.id",
         order_by="asc(Forum.position)",
@@ -1355,13 +1420,15 @@ class Category(db.Model, CRUDMixin):
         return url_for("forum.view_category", category_id=self.id, slug=self.slug)
 
     # Methods
+    @override
     def __repr__(self):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
         return "<{} {}>".format(self.__class__.__name__, self.id)
 
-    def delete(self, users=None):
+    @override
+    def delete(self, users: list["User"] | None = None):
         """Deletes a category. If a list with involved user objects is passed,
         it will also update their post counts
 
@@ -1382,7 +1449,7 @@ class Category(db.Model, CRUDMixin):
 
     # Classmethods
     @classmethod
-    def get_all(cls, user):
+    def get_all(cls, user: "User"):
         """Get all categories with all associated forums.
         It returns a list with tuples. Those tuples are containing the category
         and their associated forums (whose are stored in a list).
@@ -1451,7 +1518,7 @@ class Category(db.Model, CRUDMixin):
         return get_categories_and_forums(forums, user)
 
     @classmethod
-    def get_forums(cls, category_id, user):
+    def get_forums(cls, category_id: int, user: "User"):
         """Get the forums for the category.
         It returns a tuple with the category and the forums with their
         forumsread object are stored in a list.

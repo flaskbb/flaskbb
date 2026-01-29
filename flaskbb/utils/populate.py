@@ -268,7 +268,7 @@ def create_welcome_forum():
     return True
 
 
-def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
+def create_test_data(users=1, categories=1, forums=1, topics=1, posts=1):
     """Creates 5 users, 2 categories and 2 forums in each category.
     It also creates a new topic topic in each forum with a post.
     Returns the amount of created users, categories, forums, topics and posts
@@ -322,7 +322,7 @@ def create_test_data(users=5, categories=2, forums=2, topics=1, posts=1):
                     # create a topic
                     topic = Topic(title="Test Title %s" % j)
                     post = Post(content="Test Content")
-                    topic.save(post=post, user=user1, forum=forum)
+                    topic.save(user=user1, forum=forum, post=post)
                     data_created["topics"] += 1
 
                     for _ in range(1, posts + 1):

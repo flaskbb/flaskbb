@@ -502,12 +502,14 @@ def format_timedelta(delta, **kwargs):
     return babel_format_timedelta(delta, locale=_get_user_locale(), **kwargs)
 
 
-def time_since(time):  # pragma: no cover
+def time_since(time: datetime | None):  # pragma: no cover
     """Returns a string representing time since e.g.
     3 days ago, 5 hours ago.
 
     :param time: A datetime object
     """
+    if not time:
+        return ""
     delta = time - time_utcnow()
     return format_timedelta(delta, add_direction=True)
 
