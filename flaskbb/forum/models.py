@@ -557,14 +557,6 @@ class Topic(HideableCRUDMixin, db.Model):
             return self.posts[-2].id
         except IndexError:
             return None
-        # post = db.session.execute(
-        #    db.select(Post.id)
-        #    .filter_by(topic_id=self.id)
-        #    .order_by(Post.id.desc())
-        #    .limit(1)
-        #    .offset(1)
-        # ).scalar_one_or_none()
-        # return post
 
     @property
     def slug(self):
@@ -929,20 +921,31 @@ class Topic(HideableCRUDMixin, db.Model):
             self.forum.last_post_username = None
             self.forum.last_post_created = None
 
-    def _fix_user_post_counts(self, users: list[User] | None = None):
-        # Update the post counts
-        if users:
-            for user in users:
-                stmt = (
-                    db.select(db.func.count(Post.id))
-                    .join(Topic, Post.topic_id == Topic.id)
-                    .where(
-                        Post.user_id == user.id,
-                        Topic.hidden.is_(False),
-                        Post.hidden.is_(False),
-                    )
-                )
-                user.post_count = db.session.scalar(stmt)
+    def _fix_user_post_counts(self, users: list["User"] | None = None):
+        from flaskbb.user.models import User
+
+        if not users:
+            return
+
+        user_ids = [user.id for user in users]
+
+        post_count_subquery = (
+            db.select(db.func.count(Post.id))
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(
+                Post.user_id == User.id,
+                Topic.hidden.is_(False),
+                Post.hidden.is_(False),
+            )
+            .scalar_subquery()
+        )
+
+        stmt = (
+            db.update(User)
+            .where(User.id.in_(user_ids))
+            .values(post_count=post_count_subquery)
+        )
+        db.session.execute(stmt)
 
     def _fix_post_counts(self, forum: "Forum"):
         stmt = db.select(db.func.count(Topic.id)).where(Topic.forum_id == forum.id)
@@ -1230,23 +1233,22 @@ class Forum(db.Model, CRUDMixin):
         :param last_post: If set to ``True`` it will also try to update
                           the last post columns in the forum.
         """
-        topic_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Topic)
-            .filter(Topic.forum_id == self.id, Topic.hidden.is_(False))
-        ).scalar_one()
-        post_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Post)
-            .join(Topic)
-            .filter(
+        topic_count_stmt = db.select(db.func.count(Topic.id)).where(
+            Topic.forum_id == self.id, Topic.hidden.is_(False)
+        )
+
+        post_count_stmt = (
+            db.select(db.func.count(Post.id))
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(
                 Topic.forum_id == self.id,
                 Post.hidden.is_(False),
                 Topic.hidden.is_(False),
             )
-        ).scalar_one()
-        self.topic_count = topic_count
-        self.post_count = post_count
+        )
+
+        self.topic_count = db.session.scalar(topic_count_stmt)
+        self.post_count = db.session.scalar(post_count_stmt)
 
         if last_post:
             self.update_last_post()
