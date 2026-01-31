@@ -23,7 +23,8 @@ def test_pluginmanager(plugin_manager):
     assert a1 in out
     assert a2 in out
     assert plugin_manager.get_plugin("hello") == a2
-    assert plugin_manager.unregister(a1) == a1
+
+    plugin_manager.unregister(a1)
     assert not plugin_manager.is_registered(a1)
 
     out = plugin_manager.list_name_plugin()

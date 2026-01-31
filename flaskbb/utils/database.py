@@ -15,8 +15,6 @@ import typing as t
 
 import sqlalchemy as sa
 import sqlalchemy.types as types
-from flask_login import current_user
-from flask_sqlalchemy.model import Model
 from sqlalchemy.orm import (
     Mapped,
     declarative_mixin,

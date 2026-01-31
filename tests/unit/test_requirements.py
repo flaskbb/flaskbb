@@ -1,5 +1,5 @@
 import pytest
-from flask import g, request
+from flask import g
 
 from flaskbb.utils import requirements as r
 

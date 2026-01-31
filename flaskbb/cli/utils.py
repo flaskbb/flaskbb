@@ -16,7 +16,6 @@ import sys
 
 import click
 from flask import __version__ as flask_version
-from flask import current_app
 from flask_themes2 import get_theme
 
 from flaskbb import __version__

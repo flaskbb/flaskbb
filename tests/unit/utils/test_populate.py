@@ -1,8 +1,4 @@
-import pytest
-from sqlalchemy.exc import OperationalError
-from sqlalchemy_utils.functions import create_database, drop_database
 
-from flaskbb.extensions import alembic, db
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.fixtures.settings import fixture as settings_fixture
 from flaskbb.forum.models import Category, Post, Topic

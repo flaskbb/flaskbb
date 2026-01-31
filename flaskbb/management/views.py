@@ -9,9 +9,9 @@ This module handles the management views.
 :license: BSD, see LICENSE for more details.
 """
 
+import importlib
 import logging
 import sys
-import importlib
 
 from celery import __version__ as celery_version
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, url_for

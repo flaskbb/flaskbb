@@ -18,7 +18,6 @@ import traceback
 from datetime import datetime
 
 import click
-import flask
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from flask_alembic.cli import cli as alembic_click

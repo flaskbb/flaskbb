@@ -11,7 +11,6 @@ It provides the forms that are needed for the forum views.
 
 import logging
 
-from flask import current_app
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (

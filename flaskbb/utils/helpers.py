@@ -18,7 +18,7 @@ import re
 import time
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import TYPE_CHECKING, TypeVar, Union, overload
+from typing import TYPE_CHECKING, TypeVar, overload
 
 import requests
 import unidecode
@@ -43,7 +43,7 @@ from flaskbb.extensions import babel, redis_store
 
 if TYPE_CHECKING:
     from flaskbb.forum.models import Category, Forum, ForumsRead
-    from flaskbb.user.models import Guest, User
+    from flaskbb.user.models import User
 
 from flaskbb.utils.http import is_safe_url
 from flaskbb.utils.settings import flaskbb_config
@@ -424,7 +424,7 @@ def crop_title(title, length=None, suffix="..."):
     """
     length = flaskbb_config["TITLE_LENGTH"] if length is None else length
 
-    if len(title) <= length:
+    if not length or len(title) <= length:
         return title
 
     return title[:length].rsplit(" ", 1)[0] + suffix
@@ -619,7 +619,7 @@ def check_image(url):
 
     if (
         flaskbb_config["AVATAR_TYPES"]
-        and not img_info["content_type"] in flaskbb_config["AVATAR_TYPES"]
+        and img_info["content_type"] not in flaskbb_config["AVATAR_TYPES"]
     ):
         error = "Image type {} is not allowed. Allowed types are: {}".format(
             img_info["content_type"], ", ".join(flaskbb_config["AVATAR_TYPES"])

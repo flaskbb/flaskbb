@@ -8,6 +8,11 @@ Token verifier implementations
 :license: BSD, see LICENSE for more details
 """
 
+from sqlalchemy import select
+
+from flaskbb.extensions import db
+from flaskbb.user.models import User
+
 from ..core.exceptions import ValidationError
 from ..core.tokens import TokenVerifier
 
@@ -24,6 +29,6 @@ class EmailMatchesUserToken(TokenVerifier):
         self.users = users
 
     def verify_token(self, token, email, **kwargs):
-        user = self.users.query.get(token.user_id)
+        user = db.session.execute(select(User).where(User.id == token.user_id)).scalar()
         if user.email.lower() != email.lower():
             raise ValidationError("email", "Wrong email")

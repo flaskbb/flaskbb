@@ -133,3 +133,5 @@ addopts = [
 testpaths = [
     "tests",
 ]
+[tool.ruff.lint]
+ignore = ["E711", "E712"]

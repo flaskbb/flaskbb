@@ -40,3 +40,10 @@ lint: ## Checks the source for style errors
 isort:  ## Sorts the python imports
 	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
 	isort --order-by-type -rc -up
+
+format: ## Sorts the imports and reformats the code
+	# sort imports / remove unused
+	uv run ruff check --fix --select I
+	uv run ruff check --fix
+	# reformat
+	uv run ruff format

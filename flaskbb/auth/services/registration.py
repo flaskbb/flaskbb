@@ -18,7 +18,6 @@ from flask_babelplus import gettext as _
 from flask_login import login_user
 from pytz import UTC
 from sqlalchemy import func
-from ...extensions import db
 
 from ...core.auth.registration import (
     RegistrationPostProcessor,
@@ -30,6 +29,7 @@ from ...core.exceptions import (
     StopValidation,
     ValidationError,
 )
+from ...extensions import db
 from ...user.models import User
 
 __all__ = (

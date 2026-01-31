@@ -1,11 +1,33 @@
+# -*- coding: utf-8 -*-
+"""
+flaskbb.utils.database
+~~~~~~~~~~~~~~~~~~~~~~
+
+Some database helpers such as a CRUD mixin.
+
+:copyright: (c) 2015 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
+"""
+
 from __future__ import annotations
 
 import typing as t
 
 import sqlalchemy as sa
+from flask import abort
+from flask_login import current_user
+
+from flaskbb.extensions import db
+from flaskbb.utils.database import HideableMixin
+
+if t.TYPE_CHECKING:
+    pass
+
+import typing as t
+
 import sqlalchemy.orm as sa_orm
 from flask_sqlalchemy.pagination import Pagination
-from flaskbb.extensions import db
+
 
 class SelectAllPagination(Pagination):
     """Returned by :meth:`.SQLAlchemy.paginate`. Takes ``select`` and ``session``
@@ -73,3 +95,59 @@ def paginate(
         error_out=error_out,
         count=count,
     )
+
+
+def hidden(
+    stmt: sa.Select[t.Any], hidden: bool | None = None, *entities: type[HideableMixin]
+):
+    """Applies filtering for hidden items to a select statement.
+
+    :param stmt: The SQLAlchemy select statement.
+    :param hidden:
+        - True: Return only hidden items.
+        - False: Return only non-hidden items.
+        - None (default): Return non-hidden items, unless the current
+          user has permission to view hidden items, in which case
+          return both.
+    """
+    # Find all HideableMixin entities in the statement
+    hideable_entities: list[type[HideableMixin]] = []
+    for desc in stmt.column_descriptions:
+        entity = desc.get("entity")
+        if (
+            entity is not None
+            and issubclass(entity, HideableMixin)
+            and (not entities or entity in entities)
+        ):
+            hideable_entities.append(entity)
+
+    if not hideable_entities:
+        return stmt
+    if hidden is not None:  # Explicitly filter for hidden or not hidden
+        for entity in hideable_entities:
+            stmt = stmt.where(entity.hidden == hidden)
+        return stmt
+
+    # hidden is None, use permissions
+    has_view_hidden = current_user and current_user.permissions.get("viewhidden", False)
+
+    if not has_view_hidden:
+        for entity in hideable_entities:
+            stmt = stmt.where(entity.hidden == False)
+
+    return stmt
+
+
+def first_or_404(
+    stmt: sa.Select[t.Any],
+    hidden_check: bool | None = None,
+    description: str | None = None,
+):
+    if hidden_check is not None:
+        stmt = hidden(stmt)
+    value = db.session.execute(stmt).scalar()
+
+    if value is None:
+        abort(404, description=description)
+
+    return value

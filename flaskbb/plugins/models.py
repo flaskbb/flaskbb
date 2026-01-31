@@ -10,7 +10,6 @@ store for plugins.
 :license: BSD, see LICENSE for more details.
 """
 
-from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 

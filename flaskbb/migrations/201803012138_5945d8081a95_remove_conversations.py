@@ -6,11 +6,7 @@ Create Date: 2018-03-01 21:38:34
 
 """
 
-import sqlalchemy as sa
-import sqlalchemy_utils
-from alembic import op
 
-import flaskbb
 
 # revision identifiers, used by Alembic.
 revision = "5945d8081a95"

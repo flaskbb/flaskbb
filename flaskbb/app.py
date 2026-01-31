@@ -43,7 +43,6 @@ from flaskbb.extensions import (
     whooshee,
 )
 from flaskbb.plugins import spec
-from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
 

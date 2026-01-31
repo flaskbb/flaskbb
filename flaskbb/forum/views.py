@@ -28,7 +28,7 @@ from flask_allows import And, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
-from sqlalchemy import asc, desc, select
+from sqlalchemy import asc, desc
 
 from flaskbb.extensions import allows, db, pluggy
 from flaskbb.forum.forms import (
@@ -914,15 +914,14 @@ class DeletePost(MethodView):
     ]
 
     def post(self, post_id: int):
-        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
-        first_post = post.first_post
+        post: Post = first_or_404(db.select(Post).where(Post.id == post_id), True)
         topic_url = post.topic.url
         forum_url = post.topic.forum.url
 
         post.delete()
 
         # If the post was the first post in the topic, redirect to the forums
-        if first_post:
+        if post.is_first_post():
             return redirect(forum_url)
         return redirect(topic_url)
 

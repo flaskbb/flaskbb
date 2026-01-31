@@ -1,8 +1,10 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
+from sqlalchemy import select
 
+from flaskbb.extensions import db
 from flaskbb.forum.models import (
     Category,
     Forum,
@@ -13,8 +15,8 @@ from flaskbb.forum.models import (
     TopicsRead,
 )
 from flaskbb.user.models import User
+from flaskbb.utils.queries import hidden
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.extensions import db
 
 
 def test_category_save(database):
@@ -646,18 +648,37 @@ def test_retrieving_hidden_posts(topic, user):
     new_post.save(user, topic)
     new_post.hide(user)
 
-    assert Post.query.filter(Post.id == new_post.id).first() is None
-    assert Post.query.with_hidden().filter(Post.id == new_post.id).first() == new_post
-    assert Post.query.filter(Post.id == new_post.id).first() is None
-    hidden_post = Post.query.with_hidden().filter(Post.id == new_post.id).first()
+    assert (
+        db.session.scalars(hidden(select(Post).where(Post.id == new_post.id))).first()
+        is None
+    )
+    assert (
+        db.session.scalars(
+            hidden(select(Post).where(Post.id == new_post.id), True)
+        ).first()
+        == new_post
+    )
+    hidden_post = db.session.scalars(
+        hidden(select(Post).where(Post.id == new_post.id), True)
+    ).first()
     assert hidden_post == new_post
 
 
 def test_retrieving_hidden_topics(topic, user):
     topic.hide(user)
 
-    assert Topic.query.filter(Topic.id == topic.id).first() is None
-    assert Topic.query.with_hidden().filter(Topic.id == topic.id).first() == topic
-    assert Topic.query.filter(Topic.id == topic.id).first() is None
-    hidden_topic = Topic.query.with_hidden().filter(Topic.id == topic.id).first()
+    assert (
+        db.session.scalars(hidden(select(Topic).where(Topic.id == topic.id))).first()
+        is None
+    )
+    assert (
+        db.session.scalars(
+            hidden(select(Topic).where(Topic.id == topic.id), True)
+        ).first()
+        == topic
+    )
+
+    hidden_topic = db.session.scalars(
+        hidden(select(Topic).where(Topic.id == topic.id), True)
+    ).first()
     assert hidden_topic == topic

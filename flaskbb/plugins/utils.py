@@ -10,7 +10,7 @@ store for plugins.
 :license: BSD, see LICENSE for more details.
 """
 
-from flask import current_app, flash, redirect, url_for
+from flask import flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
 

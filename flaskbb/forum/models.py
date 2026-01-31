@@ -222,7 +222,7 @@ class Post(HideableCRUDMixin, db.Model):
     )
 
     topic: Mapped["Topic"] = relationship(
-        "Topic", foreign_keys=[topic_id], back_populates="posts"
+        "Topic", foreign_keys=[topic_id], back_populates="posts", lazy="joined"
     )
 
     # Properties
@@ -372,7 +372,7 @@ class Post(HideableCRUDMixin, db.Model):
                 # because the last post will be deleted
                 second_last_post = db.session.execute(
                     db.select(Post)
-                    .join(Topic)
+                    .join(Topic, Topic.id == Post.topic_id)
                     .filter(
                         Topic.forum_id == self.topic.forum.id,
                         Post.hidden.is_(False),
@@ -960,9 +960,11 @@ class Topic(HideableCRUDMixin, db.Model):
         forum.topic_count = db.session.scalar(stmt_topic_count)
 
         if self.hidden:
-            stmt_post_count = stmt.where(Post.hidden.is_(False))
+            stmt_post_count = stmt.join(Post, Post.topic_id == Topic.id).where(
+                Post.hidden.is_(False)
+            )
         else:
-            stmt_post_count = stmt.where(
+            stmt_post_count = stmt.join(Post, Post.topic_id == Topic.id).where(
                 or_(Post.hidden.is_(False), Post.id == self.first_post_id)
             )
 

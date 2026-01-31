@@ -16,7 +16,6 @@ import logging
 import os
 
 from alembic.util.exc import CommandError
-from flask import current_app
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from flaskbb.extensions import alembic, db, pluggy
@@ -268,7 +267,7 @@ def create_welcome_forum():
     return True
 
 
-def create_test_data(users=1, categories=1, forums=1, topics=1, posts=1):
+def create_test_data(users=2, categories=1, forums=1, topics=1, posts=1):
     """Creates 5 users, 2 categories and 2 forums in each category.
     It also creates a new topic topic in each forum with a post.
     Returns the amount of created users, categories, forums, topics and posts
@@ -343,13 +342,11 @@ def insert_bulk_data(topic_count=10, post_count=100):
     :param topics: The amount of topics in the forum.
     :param posts: The number of posts in each topic.
     """
-    user1 = db.session.execute(db.select(User).filter_by(id=1)).scalar_one_or_none()
-    user2 = db.session.execute(db.select(User).filter_by(id=2)).scalar_one_or_none()
-    forum = db.session.execute(db.select(Forum).filter_by(id=1)).scalar_one_or_none()
+    user1 = db.session.execute(db.select(User).where(User.id == 1)).scalar()
+    user2 = db.session.execute(db.select(User).where(User.id == 2)).scalar()
+    forum = db.session.execute(db.select(Forum).where(Forum.id == 1)).scalar()
 
-    last_post = db.session.execute(
-        db.select(Post).order_by(Post.id.desc())
-    ).scalar_one_or_none()
+    last_post = db.session.execute(db.select(Post).order_by(Post.id.desc())).scalar()
     last_post_id = 1 if last_post is None else last_post.id
 
     created_posts = 0

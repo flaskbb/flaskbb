@@ -13,7 +13,6 @@ import os
 import sys
 
 import click
-from flask import current_app
 from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb

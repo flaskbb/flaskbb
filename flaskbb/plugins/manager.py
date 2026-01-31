@@ -61,7 +61,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
             logger.error("Couldn't register plugin {}".format(plugin))
             return None
 
-        self._internal_name2plugin[name] = self._name2plugin.pop(name)
+        self._internal_name2plugin[name] = self._name2plugin[name]
         return name
 
     @override

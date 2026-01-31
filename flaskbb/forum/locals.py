@@ -8,7 +8,7 @@ Thread local helpers for FlaskBB
 :license: BSD, see license for more details
 """
 
-from flask import g, has_request_context, request
+from flask import g, request
 from werkzeug.local import LocalProxy
 
 from .models import Category, Forum, Post, Topic
