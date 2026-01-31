@@ -18,6 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flaskbb.extensions import cache, db
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import SettingValueType, generate_settings_form
+from flaskbb.utils.queries import first_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,9 @@ class Setting(db.Model, CRUDMixin):
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type: Mapped[SettingValueType] = mapped_column(Enum(SettingValueType), nullable=False)
+    value_type: Mapped[SettingValueType] = mapped_column(
+        Enum(SettingValueType), nullable=False
+    )
 
     # Extra attributes like, validation things (min, max length...)
     # For Select*Fields required: choices
@@ -83,7 +86,9 @@ class Setting(db.Model, CRUDMixin):
         """
         # update the database
         for key, value in settings.items():
-            setting = cls.query.filter(Setting.key == key.lower()).first()
+            setting = db.session.execute(
+                db.select(cls).where(Setting.key == key.lower())
+            ).scalar()
 
             setting.value = value
 
@@ -126,7 +131,9 @@ class Setting(db.Model, CRUDMixin):
         settings = {}
         result = None
         if from_group is not None:
-            result = SettingsGroup.query.filter_by(key=from_group).first_or_404()
+            result = first_or_404(
+                db.select(SettingsGroup).where(SettingsGroup.key == from_group)
+            )
             result = result.settings
         else:
             result = cls.query.all()

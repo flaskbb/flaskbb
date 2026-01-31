@@ -18,7 +18,7 @@ import re
 import time
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar, Union, overload
 
 import requests
 import unidecode
@@ -35,18 +35,23 @@ from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from PIL import ImageFile
 from pytz import UTC
+from typing_extensions import Iterable
 from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
 
 from flaskbb.extensions import babel, redis_store
 
 if TYPE_CHECKING:
-    from flaskbb.user.models import User
+    from flaskbb.forum.models import Category, Forum, ForumsRead
+    from flaskbb.user.models import Guest, User
 
 from flaskbb.utils.http import is_safe_url
 from flaskbb.utils.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
+
+
+T = TypeVar("T")
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -195,7 +200,10 @@ def do_topic_action(topics, user, action, reverse):  # noqa: C901
     return modified_topics
 
 
-def get_categories_and_forums(query_result, user):
+def get_categories_and_forums(
+    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    user: "User",
+):
     """Returns a list with categories. Every category has a list for all
      their associated forums.
 
@@ -228,7 +236,7 @@ def get_categories_and_forums(query_result, user):
     """
     it = itertools.groupby(query_result, operator.itemgetter(0))
 
-    forums = []
+    forums: list[tuple["Category", list[tuple["Forum", "ForumsRead | None"]]]] = []
 
     if user.is_authenticated:
         for key, value in it:
@@ -240,7 +248,10 @@ def get_categories_and_forums(query_result, user):
     return forums
 
 
-def get_forums(query_result, user):
+def get_forums(
+    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    user: "User",
+):
     """Returns a tuple which contains the category and the forums as list.
     This is the counterpart for get_categories_and_forums and especially
     usefull when you just need the forums for one category.
@@ -256,7 +267,9 @@ def get_forums(query_result, user):
                  have the ForumsRead relation joined.
     """
     it = itertools.groupby(query_result, operator.itemgetter(0))
-
+    forums: (
+        tuple["Category", list[tuple["Forum", "ForumsRead | None"]]] | tuple[None, None]
+    ) = None, None
     if user.is_authenticated:
         for key, value in it:
             forums = key, [(item[1], item[2]) for item in value]
@@ -267,7 +280,9 @@ def get_forums(query_result, user):
     return forums
 
 
-def forum_is_unread(forum, forumsread, user):
+def forum_is_unread(
+    forum: "Forum | None", forumsread: "ForumsRead | None", user: "User"
+):
     """Checks if a forum is unread
 
     :param forum: The forum that should be checked if it is unread
@@ -794,6 +809,14 @@ class ReverseProxyPathFix(object):
             environ["wsgi.url_scheme"] = "https"
 
         return self.app(environ, start_response)
+
+
+@overload
+def real(obj: LocalProxy[T]) -> User: ...
+
+
+@overload
+def real(obj: T) -> T: ...
 
 
 def real(obj):

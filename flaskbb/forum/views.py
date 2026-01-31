@@ -12,15 +12,23 @@ topics and posts.
 
 import logging
 import math
-import select
 
-from flask import Blueprint, abort, current_app, flash, redirect, request, url_for
+from flask import (
+    Blueprint,
+    Flask,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    request,
+    url_for,
+)
 from flask.views import MethodView
 from flask_allows import And, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, select
 
 from flaskbb.extensions import allows, db, pluggy
 from flaskbb.forum.forms import (
@@ -54,7 +62,7 @@ from flaskbb.utils.helpers import (
     time_diff,
     time_utcnow,
 )
-from flaskbb.utils.pagination import paginate
+from flaskbb.utils.queries import first_or_404, hidden, paginate
 from flaskbb.utils.requirements import (
     CanAccessForum,
     CanDeletePost,
@@ -80,14 +88,16 @@ class ForumIndex(MethodView):
         categories = Category.get_all(user=real(current_user))
 
         # Fetch a few stats about the forum
-        user_count = User.query.count()
-        topic_count = Topic.query.count()
-        post_count = Post.query.count()
-        newest_user = User.query.order_by(User.id.desc()).first()
+        user_count = db.session.scalar(db.select(db.func.count(User.id)))
+        topic_count = db.session.scalar(db.select(db.func.count(Topic.id)))
+        post_count = db.session.scalar(db.select(db.func.count(Post.id)))
+        newest_user = db.session.scalar(db.select(User).order_by(User.id.desc()))
 
         # Check if we use redis or not
         if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.query.filter(User.lastseen >= time_diff()).count()
+            online_users = db.session.scalar(
+                db.select(db.func.count(User.id)).where(User.lastseen >= time_diff())
+            )
 
             # Because we do not have server side sessions,
             # we cannot check if there are online guests
@@ -109,7 +119,7 @@ class ForumIndex(MethodView):
 
 
 class ViewCategory(MethodView):
-    def get(self, category_id, slug=None):
+    def get(self, category_id: int, slug: str | None = None):
         category, forums = Category.get_forums(
             category_id=category_id, user=real(current_user)
         )
@@ -129,7 +139,7 @@ class ViewForum(MethodView):
         )
     ]
 
-    def get(self, forum_id, slug=None):
+    def get(self, forum_id: int, slug: str | None = None):
         page = request.args.get("page", 1, type=int)
 
         forum_instance, forumsread = Forum.get_forum(
@@ -166,13 +176,13 @@ class ViewPost(MethodView):
         )
     ]
 
-    def get(self, post_id):
+    def get(self, post_id: int):
         """Redirects to a post in a topic."""
-        post = Post.query.filter_by(id=post_id).first_or_404()
-        post_in_topic = (
-            Post.query.filter(Post.topic_id == post.topic_id, Post.id <= post_id)
-            .order_by(Post.id.asc())
-            .count()
+        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
+        post_in_topic = db.session.scalar(
+            db.select(db.func.count(Post.id)).where(
+                Post.topic_id == post.topic_id, Post.id <= post_id
+            )
         )
         page = int(math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"])))
 
@@ -199,7 +209,7 @@ class ViewTopic(MethodView):
         )
     ]
 
-    def get(self, topic_id, slug=None):
+    def get(self, topic_id: int, slug: str | None = None):
         page = request.args.get("page", 1, type=int)
 
         # Fetch some information about the topic
@@ -212,19 +222,24 @@ class ViewTopic(MethodView):
         # Update the topicsread status if the user hasn't read it
         forumsread = None
         if current_user.is_authenticated:
-            forumsread = ForumsRead.query.filter_by(
-                user_id=current_user.id, forum_id=topic.forum_id
-            ).first()
+            forumsread = db.session.execute(
+                db.select(ForumsRead).where(
+                    ForumsRead.user_id == current_user.id,
+                    ForumsRead.forum_id == topic.forum_id,
+                )
+            ).scalar()
 
         topic.update_read(real(current_user), topic.forum, forumsread)
 
         # fetch the posts in the topic
-        posts = (
-            Post.query.outerjoin(User, Post.user_id == User.id)
-            .filter(Post.topic_id == topic.id)
-            .add_entity(User)
+        stmt = (
+            db.select(Post, User)
+            .options(db.joinedload(Post.user))
+            .where(Post.topic_id == topic.id)
             .order_by(Post.id.asc())
-            .paginate(page=page, per_page=flaskbb_config["POSTS_PER_PAGE"])
+        )
+        posts = paginate(
+            hidden(stmt), page=page, per_page=flaskbb_config["POSTS_PER_PAGE"]
         )
 
         # Abort if there are no posts on this page
@@ -250,7 +265,7 @@ class ViewTopic(MethodView):
             ),
         ),
     )
-    def post(self, topic_id, slug=None):
+    def post(self, topic_id: int, slug: str | None = None):
         topic = Topic.get_topic(topic_id=topic_id, user=real(current_user))
         form = self.form()
 
@@ -287,8 +302,8 @@ class NewTopic(MethodView):
         ),
     ]
 
-    def get(self, forum_id, slug=None):
-        forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
+    def get(self, forum_id: int, slug: str | None = None):
+        forum_instance = first_or_404(db.select(Forum).where(Forum.id == forum_id))
         return render_template(
             "forum/new_topic.html",
             forum=forum_instance,
@@ -296,8 +311,8 @@ class NewTopic(MethodView):
             edit_mode=False,
         )
 
-    def post(self, forum_id, slug=None):
-        forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
+    def post(self, forum_id: int, slug: str | None = None):
+        forum_instance = first_or_404(db.select(Forum).where(Forum.id == forum_id))
         form = self.form()
         if form.validate_on_submit():
             topic = form.save(real(current_user), forum_instance)
@@ -329,8 +344,8 @@ class EditTopic(MethodView):
         ),
     ]
 
-    def get(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def get(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         form = self.form(obj=topic.first_post, title=topic.title)
         form.track_topic.data = current_user.is_tracking_topic(topic)
 
@@ -338,8 +353,8 @@ class EditTopic(MethodView):
             "forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True
         )
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         post = topic.first_post
         form = self.form(obj=post, title=topic.title)
 
@@ -374,7 +389,7 @@ class ManageForum(MethodView):
         ),
     ]
 
-    def get(self, forum_id, slug=None):
+    def get(self, forum_id: int, slug: str | None = None):
         forum_instance, forumsread = Forum.get_forum(
             forum_id=forum_id, user=real(current_user)
         )
@@ -383,8 +398,13 @@ class ManageForum(MethodView):
             return redirect(forum_instance.external)
 
         # remove the current forum from the select field (move).
-        available_forums = Forum.query.order_by(Forum.position).all()
-        available_forums.remove(forum_instance)
+        available_forums = (
+            db.session.execute(db.select(Forum).order_by(Forum.position))
+            .unique()
+            .scalars()
+            .all()
+        )
+        available_forums.remove(forum_instance)  # pyright: ignore
         page = request.args.get("page", 1, type=int)
         topics = Forum.get_topics(
             forum_id=forum_instance.id,
@@ -402,14 +422,18 @@ class ManageForum(MethodView):
         )
 
     # TODO(anr): Clean this up. @_@
-    def post(self, forum_id, slug=None):  # noqa: C901
+    def post(self, forum_id: int, slug: str | None = None):  # noqa: C901
         forum_instance, __ = Forum.get_forum(forum_id=forum_id, user=real(current_user))
         mod_forum_url = url_for(
             "forum.manage_forum", forum_id=forum_instance.id, slug=forum_instance.slug
         )
 
         ids = request.form.getlist("rowid")
-        tmp_topics = Topic.query.filter(Topic.id.in_(ids)).all()
+        tmp_topics = (
+            db.session.execute(db.select(Topic).where(Topic.id.in_(ids)))
+            .scalars()
+            .all()
+        )
 
         if not len(tmp_topics) > 0:
             flash(
@@ -483,9 +507,9 @@ class ManageForum(MethodView):
                 flash(_("Please choose a new forum for the topics."), "info")
                 return redirect(mod_forum_url)
 
-            new_forum = Forum.query.filter_by(id=new_forum_id).first_or_404()
-            # check the permission in the current forum and in the new forum
+            new_forum = first_or_404(db.select(Forum).where(Forum.id == new_forum_id))
 
+            # check the permission in the current forum and in the new forum
             if not Permission(
                 And(
                     IsAtleastModeratorInForum(forum_id=new_forum_id),
@@ -544,24 +568,24 @@ class NewPost(MethodView):
         ),
     ]
 
-    def get(self, topic_id, slug=None, post_id=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def get(self, topic_id: int, slug: str | None = None, post_id: int | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         form = self.form()
         form.track_topic.data = current_user.is_tracking_topic(topic)
 
         if post_id is not None:
-            post = Post.query.filter_by(id=post_id).first_or_404()
+            post = first_or_404(db.select(Post).where(Post.id == post_id), True)
             form.content.data = format_quote(post.username, post.content)
 
         return render_template("forum/new_post.html", topic=topic, form=form)
 
-    def post(self, topic_id, slug=None, post_id=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None, post_id: int | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         form = self.form()
 
         # check if topic exists
         if post_id is not None:
-            post = Post.query.filter_by(id=post_id).first_or_404()
+            post = first_or_404(db.select(Post).where(Post.id == post_id), True)
 
         if form.validate_on_submit():
             post = form.save(real(current_user), topic)
@@ -587,8 +611,8 @@ class EditPost(MethodView):
         login_required,
     ]
 
-    def get(self, post_id):
-        post = Post.query.filter_by(id=post_id).first_or_404()
+    def get(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
 
         if post.is_first_post():
             return redirect(url_for("forum.edit_topic", topic_id=post.topic_id))
@@ -600,8 +624,8 @@ class EditPost(MethodView):
             "forum/new_post.html", topic=post.topic, form=form, edit_mode=True
         )
 
-    def post(self, post_id):
-        post = Post.query.filter_by(id=post_id).first_or_404()
+    def post(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
         form = self.form(obj=post)
 
         if form.validate_on_submit():
@@ -622,13 +646,13 @@ class ReportView(MethodView):
     decorators = [login_required]
     form = ReportForm
 
-    def get(self, post_id):
+    def get(self, post_id: int):
         return render_template("forum/report_post.html", form=self.form())
 
-    def post(self, post_id):
+    def post(self, post_id: int):
         form = self.form()
         if form.validate_on_submit():
-            post = Post.query.filter_by(id=post_id).first_or_404()
+            post = first_or_404(db.select(Post).where(Post.id == post_id), True)
             form.save(real(current_user), post)
             flash(_("Thanks for reporting."), "success")
 
@@ -655,8 +679,11 @@ class MemberList(MethodView):
         else:
             sort_obj = User.username
 
-        users = User.query.order_by(order_func(sort_obj)).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = paginate(
+            db.select(User).order_by(order_func(sort_obj)),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
         return render_template(
             "forum/memberlist.html", users=users, search_form=self.form()
@@ -688,8 +715,11 @@ class MemberList(MethodView):
                 "forum/memberlist.html", users=users, search_form=form
             )
 
-        users = User.query.order_by(order_func(sort_obj)).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = paginate(
+            db.select(User).order_by(order_func(sort_obj)),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
         return render_template("forum/memberlist.html", users=users, search_form=form)
 
@@ -780,8 +810,8 @@ class DeleteTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         topic.delete()
         return redirect(url_for("forum.view_forum", forum_id=topic.forum_id))
 
@@ -800,8 +830,8 @@ class LockTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         topic.locked = True
         topic.save()
         return redirect(topic.url)
@@ -821,8 +851,8 @@ class UnlockTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         topic.locked = False
         topic.save()
         return redirect(topic.url)
@@ -842,8 +872,8 @@ class HighlightTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         topic.important = True
         topic.save()
         return redirect(topic.url)
@@ -863,8 +893,8 @@ class TrivializeTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id=None, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int | None = None, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         topic.important = False
         topic.save()
         return redirect(topic.url)
@@ -883,8 +913,8 @@ class DeletePost(MethodView):
         ),
     ]
 
-    def post(self, post_id):
-        post = Post.query.filter_by(id=post_id).first_or_404()
+    def post(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
         first_post = post.first_post
         topic_url = post.topic.url
         forum_url = post.topic.forum.url
@@ -910,8 +940,8 @@ class RawPost(MethodView):
         ),
     ]
 
-    def get(self, post_id):
-        post = Post.query.filter_by(id=post_id).first_or_404()
+    def get(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id), True)
         return format_quote(username=post.username, content=post.content)
 
 
@@ -928,16 +958,23 @@ class MarkRead(MethodView):
         ),
     ]
 
-    def post(self, forum_id=None, slug=None):
+    def post(self, forum_id: int | None = None, slug: str | None = None):
         # Mark a single forum as read
         if forum_id is not None:
-            forum_instance = Forum.query.filter_by(id=forum_id).first_or_404()
-            forumsread = ForumsRead.query.filter_by(
-                user_id=real(current_user).id, forum_id=forum_instance.id
-            ).first()
-            TopicsRead.query.filter_by(
-                user_id=real(current_user).id, forum_id=forum_instance.id
-            ).delete()
+            forum_instance = first_or_404(db.select(Forum).where(Forum.id == forum_id))
+            forumsread = db.session.execute(
+                db.select(ForumsRead).where(
+                    ForumsRead.user_id == real(current_user).id,
+                    ForumsRead.forum_id == forum_instance.id,
+                )
+            ).scalar()
+
+            db.session.execute(
+                db.delete(TopicsRead).where(
+                    TopicsRead.user_id == real(current_user).id,
+                    TopicsRead.forum_id == forum_instance.id,
+                )
+            )
 
             if not forumsread:
                 forumsread = ForumsRead()
@@ -958,10 +995,15 @@ class MarkRead(MethodView):
             return redirect(forum_instance.url)
 
         # Mark all forums as read
-        ForumsRead.query.filter_by(user_id=real(current_user).id).delete()
-        TopicsRead.query.filter_by(user_id=real(current_user).id).delete()
 
-        forums = Forum.query.all()
+        db.session.execute(
+            db.delete(ForumsRead).where(ForumsRead.user_id == real(current_user).id)
+        )
+        db.session.execute(
+            db.delete(TopicsRead).where(TopicsRead.user_id == real(current_user).id)
+        )
+
+        forums = db.session.execute(db.select(Forum)).scalars()
         forumsread_list = []
         for forum_instance in forums:
             forumsread = ForumsRead()
@@ -984,7 +1026,9 @@ class WhoIsOnline(MethodView):
         if current_app.config["REDIS_ENABLED"]:
             online_users = get_online_users()
         else:
-            online_users = User.query.filter(User.lastseen >= time_diff()).all()
+            online_users = db.session.scalars(
+                db.select(User).where(User.lastseen >= time_diff())
+            )
         return render_template("forum/online_users.html", online_users=online_users)
 
 
@@ -1001,8 +1045,8 @@ class TrackTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         real(current_user).track_topic(topic)
         real(current_user).save()
         return redirect(topic.url)
@@ -1021,8 +1065,8 @@ class UntrackTopic(MethodView):
         ),
     ]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         real(current_user).untrack_topic(topic)
         real(current_user).save()
         return redirect(topic.url)
@@ -1031,8 +1075,9 @@ class UntrackTopic(MethodView):
 class HideTopic(MethodView):
     decorators = [login_required]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.with_hidden().filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id))
+
         if not Permission(
             Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)
         ):
@@ -1049,8 +1094,8 @@ class HideTopic(MethodView):
 class UnhideTopic(MethodView):
     decorators = [login_required]
 
-    def post(self, topic_id, slug=None):
-        topic = Topic.query.filter_by(id=topic_id).first_or_404()
+    def post(self, topic_id: int, slug: str | None = None):
+        topic = first_or_404(db.select(Topic).where(Topic.id == topic_id), True)
         if not Permission(
             Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)
         ):
@@ -1064,8 +1109,8 @@ class UnhideTopic(MethodView):
 class HidePost(MethodView):
     decorators = [login_required]
 
-    def post(self, post_id):
-        post = Post.query.filter(Post.id == post_id).first_or_404()
+    def post(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id))
 
         if not Permission(
             Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)
@@ -1093,8 +1138,8 @@ class HidePost(MethodView):
 class UnhidePost(MethodView):
     decorators = [login_required]
 
-    def post(self, post_id):
-        post = Post.query.filter(Post.id == post_id).first_or_404()
+    def post(self, post_id: int):
+        post = first_or_404(db.select(Post).where(Post.id == post_id))
 
         if not Permission(
             Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)
@@ -1113,7 +1158,7 @@ class UnhidePost(MethodView):
 
 
 class MarkdownPreview(MethodView):
-    def post(self, mode=None):
+    def post(self, mode: str | None = None):
         text = request.data.decode("utf-8")
 
         if mode == "nonpost":
@@ -1131,7 +1176,7 @@ class MarkdownPreview(MethodView):
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app):
+def flaskbb_load_blueprints(app: Flask):
     forum = Blueprint("forum", __name__)
     register_view(
         forum,

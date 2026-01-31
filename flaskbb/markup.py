@@ -11,10 +11,12 @@ A module for all markup related stuff.
 
 import logging
 import re
+from typing import Callable
 
 import mistune
-from flask import url_for
+from flask import Flask, url_for
 from markupsafe import Markup
+from mistune.plugins import PluginRef
 from mistune.plugins.abbr import abbr
 from mistune.plugins.def_list import def_list
 from mistune.plugins.footnotes import footnotes
@@ -35,6 +37,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
+from typing_extensions import Iterable
 
 from flaskbb.extensions import pluggy
 
@@ -131,7 +134,7 @@ def flaskbb_load_nonpost_markdown_class():
 
 
 @impl
-def flaskbb_jinja_directives(app):
+def flaskbb_jinja_directives(app: Flask):
     render_classes = pluggy.hook.flaskbb_load_post_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
     pluggy.hook.flaskbb_load_post_markdown_plugins(plugins=plugins, app=app)
@@ -145,10 +148,15 @@ def flaskbb_jinja_directives(app):
     app.jinja_env.filters["nonpost_markup"] = make_renderer(render_classes, plugins)
 
 
-def make_renderer(classes, plugins):
+def make_renderer(
+    classes: tuple[type], plugins: Iterable[PluginRef] | None = None
+) -> Callable[[str], Markup]:
     RenderCls = type("FlaskBBRenderer", tuple(classes), {})
 
     markup = mistune.create_markdown(
-        renderer=RenderCls(), plugins=plugins, escape=True, hard_wrap=True
+        renderer=RenderCls(),  # pyright: ignore
+        plugins=plugins,
+        escape=True,
+        hard_wrap=True,
     )
     return lambda text: Markup(markup(text))

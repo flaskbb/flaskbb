@@ -14,11 +14,11 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, override
 
 from flask import abort, url_for
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text, distinct, or_
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text, or_
 from sqlalchemy.orm import Mapped, aliased, mapped_column, relationship
 
 from flaskbb.extensions import db, pluggy
-from flaskbb.utils.pagination import paginate
+from flaskbb.utils.queries import hidden, paginate
 
 if TYPE_CHECKING:
     from flaskbb.user.models import Group, User
@@ -849,12 +849,13 @@ class Topic(HideableCRUDMixin, db.Model):
         # get the users before deleting the topic
         invovled_users = self.involved_users()
 
+        topic_last_post_id = self.last_post_id
         db.session.delete(self)
         self._fix_user_post_counts(invovled_users)
         self._fix_post_counts(forum)
 
         # forum.last_post_id shouldn't usually be none
-        if forum.last_post_id is None or self.last_post_id == forum.last_post_id:
+        if forum.last_post_id is None or topic_last_post_id == forum.last_post_id:
             forum.update_last_post(commit=False)
 
         db.session.commit()
@@ -988,7 +989,7 @@ class Topic(HideableCRUDMixin, db.Model):
         else:
             logger.error("first post is None!")
 
-    def involved_users(self):
+    def involved_users(self) -> list[User]:
         """
         Returns all users involved in the topic
         """
@@ -1101,11 +1102,11 @@ class Forum(db.Model, CRUDMixin):
         """Updates the last post in the forum."""
         last_post = db.session.execute(
             db.select(Post)
-            .join(Topic)
-            .filter(Topic.forum_id == self.id)
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(Topic.forum_id == self.id)
             .order_by(Post.date_created.desc())
             .limit(1)
-        ).scalar_one_or_none()
+        ).scalar()
 
         # Last post is none when there are no topics in the forum
         if last_post is not None:
@@ -1272,7 +1273,11 @@ class Forum(db.Model, CRUDMixin):
                     # importing here because of circular dependencies
                     from flaskbb.user.models import Group
 
-                    self.groups = Group.query.order_by(Group.name.asc()).all()
+                    self.groups = (
+                        db.session.execute(db.select(Group).order_by(Group.name.asc()))
+                        .scalars()
+                        .all()
+                    )
                 db.session.add(self)
 
         db.session.commit()
@@ -1379,6 +1384,7 @@ class Forum(db.Model, CRUDMixin):
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
+            hidden(stmt)
             topics = paginate(stmt, page=page, per_page=per_page)
         else:
             stmt = (
@@ -1387,7 +1393,11 @@ class Forum(db.Model, CRUDMixin):
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
+            stmt = hidden(stmt)
             topics = paginate(stmt, page=page, per_page=per_page)
+            topics.items = [
+                (topic, last_post, None) for topic, last_post in topics.items
+            ]
         return topics
 
 

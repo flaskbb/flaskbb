@@ -28,7 +28,7 @@ class FlaskBBConfig(MutableMapping[str, Any | None]):
         self.update(dict(*args, **kwargs))
 
     @override
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> Any:
         try:
             return Setting.as_dict()[key]
         except KeyError:

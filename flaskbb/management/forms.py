@@ -14,6 +14,7 @@ import logging
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
+from sqlalchemy import select
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from wtforms import (
     BooleanField,
@@ -60,7 +61,7 @@ def selectable_categories():
 
 
 def selectable_groups():
-    return Group.query.order_by(Group.id.asc()).all()
+    return db.session.execute(select(Group).order_by(Group.id.asc())).scalars().all()
 
 
 def select_primary_group():
@@ -182,7 +183,7 @@ class GroupForm(FlaskForm):
 
     admin = BooleanField(
         _("Is 'Admin' group?"),
-        description=_("With this option the group has access to " "the admin panel."),
+        description=_("With this option the group has access to the admin panel."),
     )
     super_mod = BooleanField(
         _("Is 'Super Moderator' group?"),
@@ -212,19 +213,19 @@ class GroupForm(FlaskForm):
     )
     deletepost = BooleanField(
         _("Can delete posts"),
-        description=_("Check this, if the users in this group can delete " "posts."),
+        description=_("Check this, if the users in this group can delete posts."),
     )
     deletetopic = BooleanField(
         _("Can delete topics"),
-        description=_("Check this, if the users in this group can delete " "topics."),
+        description=_("Check this, if the users in this group can delete topics."),
     )
     posttopic = BooleanField(
         _("Can create topics"),
-        description=_("Check this, if the users in this group can create " "topics."),
+        description=_("Check this, if the users in this group can create topics."),
     )
     postreply = BooleanField(
         _("Can post replies"),
-        description=_("Check this, if the users in this group can post " "replies."),
+        description=_("Check this, if the users in this group can post replies."),
     )
 
     mod_edituser = BooleanField(
@@ -275,7 +276,7 @@ class GroupForm(FlaskForm):
             group = Group.query.filter_by(banned=True).count()
 
         if field.data and group > 0:
-            raise ValidationError(_("There is already a group of type " "'Banned'."))
+            raise ValidationError(_("There is already a group of type 'Banned'."))
 
     def validate_guest(self, field):
         if hasattr(self, "group"):
@@ -286,7 +287,7 @@ class GroupForm(FlaskForm):
             group = Group.query.filter_by(guest=True).count()
 
         if field.data and group > 0:
-            raise ValidationError(_("There is already a group of type " "'Guest'."))
+            raise ValidationError(_("There is already a group of type 'Guest'."))
 
     def validate(self):
         if not super(GroupForm, self).validate():
@@ -361,9 +362,7 @@ class ForumForm(FlaskForm):
     position = IntegerField(
         _("Position"),
         default=1,
-        validators=[
-            DataRequired(message=_("Please enter a position for the" "forum."))
-        ],
+        validators=[DataRequired(message=_("Please enter a position for theforum."))],
     )
 
     category = QuerySelectField(
@@ -419,7 +418,7 @@ class ForumForm(FlaskForm):
 
     def validate_show_moderators(self, field):
         if field.data and not self.moderators.data:
-            raise ValidationError(_("You also need to specify some " "moderators."))
+            raise ValidationError(_("You also need to specify some moderators."))
 
     def validate_moderators(self, field):
         approved_moderators = []
@@ -486,7 +485,7 @@ class CategoryForm(FlaskForm):
         _("Position"),
         default=1,
         validators=[
-            DataRequired(message=_("Please enter a position for the " "category."))
+            DataRequired(message=_("Please enter a position for the category."))
         ],
     )
 

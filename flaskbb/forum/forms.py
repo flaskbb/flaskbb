@@ -41,7 +41,7 @@ class PostForm(FlaskForm):
 
     submit = SubmitField(_("Reply"))
 
-    def save(self, user, topic):
+    def save(self, user: User, topic: Topic):
         post = Post(content=self.content.data)
         pluggy.hook.flaskbb_form_post_save(form=self, post=post)
         return post.save(user=user, topic=topic)
@@ -60,7 +60,7 @@ class ReplyForm(PostForm):
         self.post = kwargs.get("obj", None)
         PostForm.__init__(self, *args, **kwargs)
 
-    def save(self, user, topic):
+    def save(self, user: User, topic: Topic):
         # new post
         if self.post is None:
             self.post = Post(content=self.content.data)

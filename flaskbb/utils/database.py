@@ -16,7 +16,7 @@ import typing as t
 import sqlalchemy as sa
 import sqlalchemy.types as types
 from flask_login import current_user
-from flask_sqlalchemy.query import Query
+from flask_sqlalchemy.model import Model
 from sqlalchemy.orm import (
     Mapped,
     declarative_mixin,
@@ -98,44 +98,8 @@ class UTCDateTime(types.TypeDecorator):
         return value
 
 
-class HideableQuery(Query):
-    _with_hidden: bool = False
-
-    def __new__(cls, *args, **kwargs):
-        obj = super(HideableQuery, cls).__new__(cls)
-        include_hidden: bool = kwargs.pop("_with_hidden", False)
-        has_view_hidden = current_user and current_user.permissions.get(
-            "viewhidden", False
-        )
-        obj._with_hidden = include_hidden or has_view_hidden
-        if args or kwargs:
-            super(HideableQuery, obj).__init__(*args, **kwargs)
-            return obj.filter_by(hidden=False) if not obj._with_hidden else obj
-        return obj
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def with_hidden(self):
-        return self.__class__(
-            self._only_full_mapper_zero("get"),
-            session=db.session(),
-            _with_hidden=True,
-        )
-
-    def _get(self, *args, **kwargs):
-        return super(HideableQuery, self).filter(*args, **kwargs)
-
-    @t.override
-    def get(self, *args, **kwargs) -> t.Self | None:
-        obj = self.with_hidden()._get(*args, **kwargs).first()
-        return obj if obj is None or self._with_hidden or not obj.hidden else None
-
-
 @declarative_mixin
 class HideableMixin(object):
-    query_class = HideableQuery
-
     hidden: Mapped[bool] = mapped_column(default=False, nullable=False)
     hidden_at: Mapped[datetime.datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
