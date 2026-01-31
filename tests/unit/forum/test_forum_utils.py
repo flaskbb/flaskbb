@@ -33,8 +33,11 @@ class TestForceLoginHelpers(object):
         g.forum = forum
 
         application.test_client_class = FlaskLoginClient
-
-        with application.test_client(user=None):
-            result = utils.force_login_if_needed()  # pyright: ignore[reportUnknownVariableType]
-            # use in rather than == because it can contain query params as well
-            assert url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]
+        with application.test_request_context():
+            with application.test_client(user=None):
+                result = utils.force_login_if_needed()  # pyright: ignore[reportUnknownVariableType]
+                # use in rather than == because it can contain query params as well
+                assert (
+                    url_for(application.config["LOGIN_VIEW"])
+                    in result.headers["Location"]
+                )
