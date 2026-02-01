@@ -119,28 +119,28 @@ class UserForm(FlaskForm):
 
     def validate_username(self, field):
         if hasattr(self, "user"):
-            user = User.query.filter(
+            user = User.get(
                 db.and_(
                     User.username.like(field.data.lower()),
                     db.not_(User.id == self.user.id),
                 )
-            ).first()
+            )
         else:
-            user = User.query.filter(User.username.like(field.data.lower())).first()
+            user = User.get(User.username.like(field.data.lower()))
 
         if user:
             raise ValidationError(_("This username is already taken."))
 
     def validate_email(self, field):
         if hasattr(self, "user"):
-            user = User.query.filter(
+            user = User.get(
                 db.and_(
                     User.email.like(field.data.lower()),
                     db.not_(User.id == self.user.id),
                 )
-            ).first()
+            )
         else:
-            user = User.query.filter(User.email.like(field.data.lower())).first()
+            user = User.get(User.email.like(field.data.lower()))
 
         if user:
             raise ValidationError(_("This email address is already taken."))
@@ -255,14 +255,14 @@ class GroupForm(FlaskForm):
 
     def validate_name(self, field):
         if hasattr(self, "group"):
-            group = Group.query.filter(
+            group = Group.get(
                 db.and_(
                     Group.name.like(field.data.lower()),
                     db.not_(Group.id == self.group.id),
                 )
-            ).first()
+            )
         else:
-            group = Group.query.filter(Group.name.like(field.data.lower())).first()
+            group = Group.get(Group.name.like(field.data.lower()))
 
         if group:
             raise ValidationError(_("This group name is already taken."))
@@ -425,7 +425,7 @@ class ForumForm(FlaskForm):
 
         if field.data:
             moderators = [mod.strip() for mod in field.data.split(",")]
-            users = User.query.filter(User.username.in_(moderators))
+            users = User.get_all(User.username.in_(moderators))
             for user in users:
                 if not Permission(IsAtleastModerator, identity=user):
                     raise ValidationError(

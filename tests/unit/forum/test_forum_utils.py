@@ -19,7 +19,7 @@ class TestForceLoginHelpers(object):
     ):
         with database.session.no_autoflush:
             forum = Forum(title="no guest", category=category)
-            forum.groups = Group.query.filter(Group.guest == False).all()
+            forum.groups = Group.get_all(Group.guest == False)
             forum.save()
         assert utils.should_force_login(guest, forum)
 
@@ -28,7 +28,7 @@ class TestForceLoginHelpers(object):
     ):
         with database.session.no_autoflush:
             forum = Forum(title="no guest", category=category)
-            forum.groups = Group.query.filter(Group.guest == False).all()
+            forum.groups = Group.get_all(Group.guest == False)
             forum.save()
         # sets current_forum
         g.forum = forum

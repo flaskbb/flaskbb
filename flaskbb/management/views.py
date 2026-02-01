@@ -84,7 +84,7 @@ class ManagementSettings(MethodView):
         active_nav = {}  # used to build the navigation
         plugin_obj = None
         if plugin is not None:
-            plugin_obj = PluginRegistry.query.filter_by(name=plugin).first_or_404()
+            plugin_obj = PluginRegistry.get_by_or_404(name=plugin)
             active_nav.update(
                 {"key": plugin_obj.name, "title": plugin_obj.name.title()}
             )
@@ -92,7 +92,7 @@ class ManagementSettings(MethodView):
             old_settings = plugin_obj.settings
 
         elif slug is not None:
-            group_obj = SettingsGroup.query.filter_by(key=slug).first_or_404()
+            group_obj = SettingsGroup.get_by_or_404(key=slug)
             active_nav.update({"key": group_obj.key, "title": group_obj.name})
             form = Setting.get_form(group_obj)()
             old_settings = Setting.get_settings(group_obj)
@@ -106,9 +106,9 @@ class ManagementSettings(MethodView):
 
         # get all groups and plugins - used to build the navigation
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(
+        all_plugins = PluginRegistry.get_all(
             db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
-        ).all()
+        )
         form = populate_settings_form(form, old_settings)
 
         return render_template(
@@ -124,9 +124,9 @@ class ManagementSettings(MethodView):
             slug, plugin
         )
         all_groups = SettingsGroup.query.all()
-        all_plugins = PluginRegistry.query.filter(
+        all_plugins = PluginRegistry.get_all(
             db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
-        ).all()
+        )
 
         if form.validate_on_submit():
             new_settings = populate_settings_dict(form, old_settings)
@@ -204,7 +204,7 @@ class EditUser(MethodView):
     form = EditUserForm
 
     def get(self, user_id):
-        user = User.query.filter_by(id=user_id).first_or_404()
+        user = User.get_by_or_404(id=user_id)
         form = self.form(user)
         member_group = db.and_(
             *[
@@ -234,7 +234,7 @@ class EditUser(MethodView):
         )
 
     def post(self, user_id):
-        user = User.query.filter_by(id=user_id).first_or_404()
+        user = User.get_by_or_404(id=user_id)
 
         member_group = db.and_(
             *[
@@ -297,7 +297,7 @@ class DeleteUser(MethodView):
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
             data = []
-            for user in User.query.filter(User.id.in_(ids)).all():
+            for user in User.get_all(User.id.in_(ids)):
                 # do not delete current user
                 if current_user.id == user.id:
                     continue
@@ -320,7 +320,7 @@ class DeleteUser(MethodView):
                 status=200,
             )
 
-        user = User.query.filter_by(id=user_id).first_or_404()
+        user = User.get_by_or_404(id=user_id)
 
         if current_user.id == user.id:
             flash(_("You cannot delete yourself.", "danger"))
@@ -437,7 +437,7 @@ class BanUser(MethodView):
                 return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
-            users = User.query.filter(User.id.in_(ids)).all()
+            users = User.get_all(User.id.in_(ids))
             for user in users:
                 # don't let a user ban himself and do not allow a moderator
                 # to ban a admin user
@@ -468,7 +468,7 @@ class BanUser(MethodView):
                 status=200,
             )
 
-        user = User.query.filter_by(id=user_id).first_or_404()
+        user = User.get_by_or_404(id=user_id)
         # Do not allow moderators to ban admins
         if Permission(IsAdmin, identity=user) and Permission(
             Not(IsAdmin), identity=current_user
@@ -509,7 +509,7 @@ class UnbanUser(MethodView):
                 return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
-            for user in User.query.filter(User.id.in_(ids)).all():
+            for user in User.get_all(User.id.in_(ids)):
                 if user.unban():
                     data.append(
                         {
@@ -530,7 +530,7 @@ class UnbanUser(MethodView):
                 status=200,
             )
 
-        user = User.query.filter_by(id=user_id).first_or_404()
+        user = User.get_by_or_404(id=user_id)
 
         if user.unban():
             flash(_("User is now unbanned."), "success")
@@ -606,14 +606,14 @@ class EditGroup(MethodView):
     form = EditGroupForm
 
     def get(self, group_id):
-        group = Group.query.filter_by(id=group_id).first_or_404()
+        group = Group.get_by_or_404(id=group_id)
         form = self.form(group)
         return render_template(
             "management/group_form.html", form=form, title=_("Edit Group")
         )
 
     def post(self, group_id):
-        group = Group.query.filter_by(id=group_id).first_or_404()
+        group = Group.get_by_or_404(id=group_id)
         form = EditGroupForm(group)
 
         if form.validate_on_submit():
@@ -653,7 +653,7 @@ class DeleteGroup(MethodView):
             # TODO: Get rid of magic numbers
             if not (set(ids) & set(["1", "2", "3", "4", "5", "6"])):
                 data = []
-                for group in Group.query.filter(Group.id.in_(ids)).all():
+                for group in Group.get_all(Group.id.in_(ids)):
                     group.delete()
                     data.append(
                         {
@@ -689,7 +689,7 @@ class DeleteGroup(MethodView):
                 )
                 return redirect(url_for("management.groups"))
 
-            group = Group.query.filter_by(id=group_id).first_or_404()
+            group = Group.get_by_or_404(id=group_id)
             group.delete()
             flash(_("Group deleted."), "success")
             return redirect(url_for("management.groups"))
@@ -729,7 +729,7 @@ class EditForum(MethodView):
     form = EditForumForm
 
     def get(self, forum_id):
-        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+        forum = Forum.get_by_or_404(id=forum_id)
 
         form = self.form(forum)
 
@@ -745,7 +745,7 @@ class EditForum(MethodView):
         )
 
     def post(self, forum_id):
-        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+        forum = Forum.get_by_or_404(id=forum_id)
 
         form = self.form(forum)
         if form.validate_on_submit():
@@ -784,7 +784,7 @@ class AddForum(MethodView):
         form.groups.data = Group.query.order_by(Group.id.asc()).all()
 
         if category_id:
-            category = Category.query.filter_by(id=category_id).first()
+            category = Category.get_by(id=category_id)
             form.category.data = category
 
         return render_template(
@@ -801,7 +801,7 @@ class AddForum(MethodView):
         else:
             form.groups.data = Group.query.order_by(Group.id.asc()).all()
             if category_id:
-                category = Category.query.filter_by(id=category_id).first()
+                category = Category.get_by(id=category_id)
                 form.category.data = category
 
         return render_template(
@@ -822,11 +822,11 @@ class DeleteForum(MethodView):
     ]
 
     def post(self, forum_id):
-        forum = Forum.query.filter_by(id=forum_id).first_or_404()
+        forum = Forum.get_by_or_404(id=forum_id)
 
-        involved_users = User.query.filter(
+        involved_users = User.get_all(
             Topic.forum_id == forum.id, Post.user_id == User.id
-        ).all()
+        )
 
         forum.delete(involved_users)
 
@@ -879,7 +879,7 @@ class EditCategory(MethodView):
     form = CategoryForm
 
     def get(self, category_id):
-        category = Category.query.filter_by(id=category_id).first_or_404()
+        category = Category.get_by_or_404(id=category_id)
 
         form = self.form(obj=category)
 
@@ -888,7 +888,7 @@ class EditCategory(MethodView):
         )
 
     def post(self, category_id):
-        category = Category.query.filter_by(id=category_id).first_or_404()
+        category = Category.get_by_or_404(id=category_id)
 
         form = self.form(obj=category)
 
@@ -915,7 +915,7 @@ class DeleteCategory(MethodView):
     ]
 
     def post(self, category_id):
-        category = Category.query.filter_by(id=category_id).first_or_404()
+        category = Category.get_by_or_404(id=category_id)
 
         involved_users = User.query.filter(
             Forum.category_id == category.id,
@@ -995,7 +995,7 @@ class MarkReportRead(MethodView):
                 return jsonify(message="No ids provided.", category="error", status=404)
             data = []
 
-            for report in Report.query.filter(Report.id.in_(ids)).all():
+            for report in Report.get_all(Report.id.in_(ids)):
                 report.zapped_by = current_user.id
                 report.zapped = time_utcnow()
                 report.save()
@@ -1018,7 +1018,7 @@ class MarkReportRead(MethodView):
 
         # mark single report as read
         if report_id:
-            report = Report.query.filter_by(id=report_id).first_or_404()
+            report = Report.get_by_or_404(id=report_id)
             if report.zapped:
                 flash(
                     _("Report %(id)s is already marked as read.", id=report.id),
@@ -1033,7 +1033,7 @@ class MarkReportRead(MethodView):
             return redirect_or_next(url_for("management.reports"))
 
         # mark all as read
-        reports = Report.query.filter(Report.zapped == None).all()
+        reports = Report.get_all(Report.zapped == None)
         report_list = []
         for report in reports:
             report.zapped_by = current_user.id
@@ -1067,7 +1067,7 @@ class DeleteReport(MethodView):
                 return jsonify(message="No ids provided.", category="error", status=404)
 
             data = []
-            for report in Report.query.filter(Report.id.in_(ids)).all():
+            for report in Report.get_all(Report.id.in_(ids)):
                 if report.delete():
                     data.append(
                         {
@@ -1086,7 +1086,7 @@ class DeleteReport(MethodView):
                 status=200,
             )
 
-        report = Report.query.filter_by(id=report_id).first_or_404()
+        report = Report.get_by_or_404(id=report_id)
         report.delete()
         flash(_("Report deleted."), "success")
         return redirect_or_next(url_for("management.reports"))
@@ -1203,7 +1203,7 @@ class EnablePlugin(MethodView):
 
     def post(self, name):
         validate_plugin(name)
-        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+        plugin = PluginRegistry.get_by_or_404(name=name)
 
         if plugin.enabled:
             flash(
@@ -1238,7 +1238,7 @@ class DisablePlugin(MethodView):
 
     def post(self, name):
         validate_plugin(name)
-        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+        plugin = PluginRegistry.get_by_or_404(name=name)
 
         if not plugin.enabled:
             flash(
@@ -1272,7 +1272,7 @@ class UninstallPlugin(MethodView):
 
     def post(self, name):
         validate_plugin(name)
-        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+        plugin = PluginRegistry.get_by_or_404(name=name)
         PluginStore.query.filter_by(plugin_id=plugin.id).delete()
         db.session.commit()
         flash(_("Plugin has been uninstalled."), "success")
@@ -1293,7 +1293,7 @@ class InstallPlugin(MethodView):
 
     def post(self, name):
         plugin_module = validate_plugin(name)
-        plugin = PluginRegistry.query.filter_by(name=name).first_or_404()
+        plugin = PluginRegistry.get_by_or_404(name=name)
 
         if not plugin.enabled:
             flash(

@@ -179,7 +179,7 @@ class ChangeUserDetails(MethodView):
 class AllUserTopics(MethodView):  # pragma: no cover
     def get(self, username):
         page = request.args.get("page", 1, type=int)
-        user = User.query.filter_by(username=username).first_or_404()
+        user = User.get_by_or_404(username=username)
         topics = user.all_topics(page, current_user)
         return render_template("user/all_topics.html", user=user, topics=topics)
 
@@ -187,14 +187,14 @@ class AllUserTopics(MethodView):  # pragma: no cover
 class AllUserPosts(MethodView):  # pragma: no cover
     def get(self, username):
         page = request.args.get("page", 1, type=int)
-        user = User.query.filter_by(username=username).first_or_404()
+        user = User.get_by_or_404(username=username)
         posts = user.all_posts(page, current_user)
         return render_template("user/all_posts.html", user=user, posts=posts)
 
 
 class UserProfile(MethodView):  # pragma: no cover
     def get(self, username):
-        user = User.query.filter_by(username=username).first_or_404()
+        user = User.get_by_or_404(username=username)
         return render_template("user/profile.html", user=user)
 
 

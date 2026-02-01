@@ -61,7 +61,7 @@ class TestDefaultEmailUpdateHandler(object):
         )
 
         handler.apply_changeset(user, email_change)
-        same_user = User.query.filter_by(id=user.id).first()
+        same_user = User.get_by(id=user.id)
         assert same_user.email == new_email
         hook_impl.post_process_changeset.assert_called_once_with(
             user=user, email_update=email_change

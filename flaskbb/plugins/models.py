@@ -47,7 +47,7 @@ class PluginStore(CRUDMixin, db.Model):
         """Returns the PluginStore object or an empty one.
         The created object still needs to be added to the database session
         """
-        obj = cls.query.filter_by(plugin_id=plugin_id, key=key).first()
+        obj = cls.get_by(plugin_id=plugin_id, key=key)
 
         if obj is not None:
             return obj
@@ -97,9 +97,9 @@ class PluginRegistry(CRUDMixin, db.Model):
 
         :param settings: A dictionary containing setting items.
         """
-        pluginstore = PluginStore.query.filter(
+        pluginstore = PluginStore.get_all(
             PluginStore.plugin_id == self.id, PluginStore.key.in_(settings.keys())
-        ).all()
+        )
 
         setting_list = []
         for pluginsetting in pluginstore:

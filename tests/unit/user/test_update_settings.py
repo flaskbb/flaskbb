@@ -23,7 +23,9 @@ class TestDefaultSettingsUpdateHandler(object):
         assert "Could not update settings" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_password(self, user, database, mocker, plugin_manager):
+    def test_actually_updates_password(
+        self, user: User, database, mocker, plugin_manager
+    ):
         settings_update = SettingsUpdate(language="python", theme="molokai")
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
@@ -32,7 +34,7 @@ class TestDefaultSettingsUpdateHandler(object):
         )
 
         handler.apply_changeset(user, settings_update)
-        same_user = User.get(user.id)
+        same_user = User.get_by(id=user.id)
 
         assert same_user.theme == "molokai"
         assert same_user.language == "python"

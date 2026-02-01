@@ -23,6 +23,7 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
+from sqlalchemy.sql.expression import ColumnElement, Tuple
 
 from flaskbb.extensions import db
 
@@ -55,17 +56,32 @@ class CRUDMixin(object):
         return "<{}>".format(self.__class__.__name__)
 
     @classmethod
-    def get(cls, id: int | None, include_none: bool = True):
-        if not include_none and not id:
-            abort(404)
-        elif not id:
-            return None
-
-        result = db.session.execute(sa.select(cls).where(cls.id == id)).scalar()
-        if not result and not include_none:
-            abort(404)
+    def get(cls, *clause: t.Any):
+        result = db.session.execute(sa.select(cls).where(*clause)).scalar()
 
         return result
+
+    @classmethod
+    def get_or_404(cls, *clause: t.Any):
+        result = cls.get(clause)
+        if not result:
+            abort(404)
+        return result
+
+    @classmethod
+    def get_by(cls, **kwargs: t.Any):
+        return db.session.execute(sa.select(cls).filter_by(**kwargs)).scalar()
+
+    @classmethod
+    def get_by_or_404(cls, **kwargs: t.Any):
+        result = cls.get_by(**kwargs)
+        if not result:
+            abort(404)
+        return result
+
+    @classmethod
+    def get_all(cls, *clause: sa.ColumnExpressionArgument[bool]) -> list[t.Self]:
+        return list(db.session.execute(sa.select(cls).where(*clause)).scalars())
 
     @classmethod
     def create(cls, **kwargs):

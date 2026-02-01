@@ -16,7 +16,7 @@ the plugins metadata and stores its settings.
 
 You can query it like any SQLAlchemy Model::
 
-    plugin = PluginRegistry.query.filter_by(name="portal").first()
+    plugin = PluginRegistry.get_by(name="portal")
 
 
 .. autoclass:: flaskbb.plugins.models.PluginRegistry

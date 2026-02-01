@@ -58,7 +58,7 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
 
     # no topics in this forum
     topic.delete()
-    forum = Forum.query.filter_by(id=forum.id).first()
+    forum = Forum.get_by(id=forum.id)
     flaskbb_config["TRACKER_LENGTH"] = 1  # activate the tracker again
     assert forum.topic_count == 0
     assert not forum_is_unread(forum, None, user)
