@@ -9,7 +9,10 @@ Thread local helpers for FlaskBB
 """
 
 from flask import g, request
+from sqlalchemy import select
 from werkzeug.local import LocalProxy
+
+from flaskbb.extensions import db
 
 from .models import Category, Forum, Post, Topic
 
@@ -41,10 +44,9 @@ def current_category():
 
 
 def _get_item(model, view_arg, name):
-    if (
-        g
-        and not getattr(g, name, None)
-        and view_arg in request.view_args
-    ):
-        setattr(g, name, model.query.filter_by(id=request.view_args[view_arg]).first())
+    if g and not getattr(g, name, None) and view_arg in request.view_args:
+        result = db.session.execute(
+            select(model).filter_by(id=request.view_args[view_arg])
+        ).scalar()
+        setattr(g, name, result)
     return getattr(g, name, None)

@@ -11,7 +11,7 @@ FlaskBB is being distributed under the BSD 3-Clause License.
 Links
 -----
 
-`website <https://flaskbb.org>`_ |
+`website <https://flaskbb.com>`_ |
 `documentation <https://flaskbb.readthedocs.org/en/latest/index.html>`_ |
 `source code <https://github.com/sh4nks/flaskbb>`_
 

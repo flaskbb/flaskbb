@@ -32,7 +32,7 @@ class TestDefaultSettingsUpdateHandler(object):
         )
 
         handler.apply_changeset(user, settings_update)
-        same_user = User.query.filter_by(id=user.id).first()
+        same_user = User.get(user.id)
 
         assert same_user.theme == "molokai"
         assert same_user.language == "python"

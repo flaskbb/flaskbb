@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# 
+#
 # Translators:
 # Xender <ixendr@itogi.re>, 2015
 # Krzysztof Rygwelski <mr.rygwelski@gmail.com>, 2017
@@ -746,8 +746,8 @@ msgid "External link"
 msgstr "Link zewnętrzny"
 
 #: flaskbb/management/forms.py:369
-msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "Link do strony WWW, np. 'http://flaskbb.org'."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
+msgstr "Link do strony WWW, np. 'http://flaskbb.com'."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80

@@ -15,7 +15,7 @@ from typing import override
 from flask import url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, select
 from sqlalchemy.orm import (
     Mapped,
     WriteOnlyMapped,

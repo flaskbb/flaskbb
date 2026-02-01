@@ -15,6 +15,7 @@ import typing as t
 
 import sqlalchemy as sa
 import sqlalchemy.types as types
+from flask import abort
 from sqlalchemy.orm import (
     Mapped,
     declarative_mixin,
@@ -52,6 +53,19 @@ def make_comparable(cls):
 class CRUDMixin(object):
     def __repr__(self):
         return "<{}>".format(self.__class__.__name__)
+
+    @classmethod
+    def get(cls, id: int | None, include_none: bool = True):
+        if not include_none and not id:
+            abort(404)
+        elif not id:
+            return None
+
+        result = db.session.execute(sa.select(cls).where(cls.id == id)).scalar()
+        if not result and not include_none:
+            abort(404)
+
+        return result
 
     @classmethod
     def create(cls, **kwargs):

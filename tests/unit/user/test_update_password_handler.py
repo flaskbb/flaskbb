@@ -56,7 +56,7 @@ class TestDefaultPasswordUpdateHandler(object):
         )
 
         handler.apply_changeset(user, password_change)
-        same_user = User.query.filter_by(id=user.id).first()
+        same_user = User.get(user.id)
 
         assert same_user.check_password(new_password)
         hook_impl.post_process_changeset.assert_called_once_with(user=user)

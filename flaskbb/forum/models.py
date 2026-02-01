@@ -1448,17 +1448,34 @@ class Category(db.Model, CRUDMixin):
 
         :param users: A list with user objects
         """
+        from flaskbb.user.models import User
 
         # and finally delete the category itself
         db.session.delete(self)
         db.session.commit()
 
-        # Update the users post count
-        if users:
-            for user in users:
-                user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
+        if not users:
+            return
 
+        user_ids = [user.id for user in users]
+
+        post_count_subquery = (
+            db.select(db.func.count(Post.id))
+            .join(Topic, Post.topic_id == Topic.id)
+            .where(
+                Post.user_id == User.id,
+                Topic.hidden.is_(False),
+                Post.hidden.is_(False),
+            )
+            .scalar_subquery()
+        )
+
+        stmt = (
+            db.update(User)
+            .where(User.id.in_(user_ids))
+            .values(post_count=post_count_subquery)
+        )
+        db.session.execute(stmt)
         return self
 
     # Classmethods

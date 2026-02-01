@@ -376,7 +376,7 @@ class ForumForm(FlaskForm):
     external = StringField(
         _("External link"),
         validators=[Optional(), URL()],
-        description=_("A link to a website i.e. 'http://flaskbb.org'."),
+        description=_("A link to a website i.e. 'http://flaskbb.com'."),
     )
 
     moderators = StringField(
