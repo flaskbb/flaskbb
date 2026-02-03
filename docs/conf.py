@@ -91,7 +91,8 @@ intersphinx_mapping = {
     "werkzeug": ("https://werkzeug.palletsprojects.com/en/latest/", None),
     "click": ("https://click.palletsprojects.com/en/latest/", None),
     "jinja": ("https://jinja.palletsprojects.com/en/latest/", None),
-    "wtforms": ("https://wtforms.readthedocs.io/en/master/", None),
+    "wtforms": ("https://wtforms.readthedocs.io/en/main/", None),
+    "pluggy": ("https://pluggy.readthedocs.io/en/latest/", None),
 }
 
 autodoc_member_order = "bysource"
