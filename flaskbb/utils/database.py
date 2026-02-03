@@ -17,13 +17,13 @@ import sqlalchemy as sa
 import sqlalchemy.types as types
 from flask import abort
 from sqlalchemy.orm import (
+    InstrumentedAttribute,
     Mapped,
     declarative_mixin,
     declared_attr,
     mapped_column,
     relationship,
 )
-from sqlalchemy.sql.expression import ColumnElement, Tuple
 
 from flaskbb.extensions import db
 
@@ -82,6 +82,24 @@ class CRUDMixin(object):
     @classmethod
     def get_all(cls, *clause: sa.ColumnExpressionArgument[bool]) -> list[t.Self]:
         return list(db.session.execute(sa.select(cls).where(*clause)).scalars())
+
+    @classmethod
+    def count(
+        cls,
+        clause: list[sa.ColumnExpressionArgument[bool]]
+        | sa.ColumnExpressionArgument[bool]
+        | None = None,
+        column: InstrumentedAttribute[t.Any] | None = None,
+    ) -> int:
+        if column is None:
+            column = cls.id
+
+        stmt = db.select(db.func.count(column))
+        if clause is not None:
+            if not isinstance(clause, list):
+                clause = [clause]
+            stmt = stmt.where(*clause)
+        return db.session.execute(stmt).scalar_one()
 
     @classmethod
     def create(cls, **kwargs):

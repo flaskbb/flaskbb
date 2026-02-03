@@ -10,12 +10,13 @@ This module provides the models for the user.
 """
 
 import logging
+from datetime import datetime
 from typing import override
 
 from flask import url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
     Mapped,
     WriteOnlyMapped,
@@ -120,28 +121,30 @@ class User(db.Model, UserMixin, CRUDMixin):
     username: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     _password: Mapped[str] = mapped_column("password", String(120), nullable=False)
-    date_joined: Mapped[UTCDateTime] = mapped_column(
+    date_joined: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    lastseen: Mapped[UTCDateTime] = mapped_column(
+    lastseen: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=True
     )
-    birthday: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
-    gender: Mapped[str] = mapped_column(String(10), nullable=True)
-    website: Mapped[str] = mapped_column(String(200), nullable=True)
-    location: Mapped[str] = mapped_column(String(100), nullable=True)
-    signature: Mapped[Text] = mapped_column(Text, nullable=True)
-    avatar: Mapped[str] = mapped_column(String(200), nullable=True)
-    notes: Mapped[Text] = mapped_column(Text, nullable=True)
+    birthday: Mapped[DateTime | None] = mapped_column(DateTime, nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    website: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    location: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    signature: Mapped[Text | None] = mapped_column(Text, nullable=True)
+    avatar: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    notes: Mapped[Text | None] = mapped_column(Text, nullable=True)
 
-    last_failed_login: Mapped[UTCDateTime] = mapped_column(
+    last_failed_login: Mapped[datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
     )
     login_attempts: Mapped[int] = mapped_column(default=0, nullable=False)
     activated: Mapped[bool] = mapped_column(default=False, nullable=False)
 
-    theme: Mapped[str] = mapped_column(String(15), nullable=True)
-    language: Mapped[str] = mapped_column(String(15), default="en", nullable=True)
+    theme: Mapped[str | None] = mapped_column(String(15), nullable=True)
+    language: Mapped[str | None] = mapped_column(
+        String(15), default="en", nullable=True
+    )
 
     post_count: Mapped[int] = mapped_column(default=0)
 
@@ -184,6 +187,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     # Properties
     @property
+    @override
     def is_active(self):
         """Returns the state of the account.
         If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always

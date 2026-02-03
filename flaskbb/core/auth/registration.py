@@ -10,23 +10,26 @@ across FlaskBB.
 :license: BSD, see LICENSE for more details.
 """
 
+import typing as t
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 
-import attr
+if t.TYPE_CHECKING:
+    from flaskbb.user.models import User
 
 
-@attr.s(hash=True, eq=False, order=False, repr=True, frozen=True)
-class UserRegistrationInfo(object):
+@dataclass(init=True, eq=False, order=False, repr=True, frozen=True)
+class UserRegistrationInfo:
     """
     User registration object, contains all relevant information for validating
     and creating a new user.
     """
 
-    username = attr.ib()
-    password = attr.ib(repr=False)
-    email = attr.ib()
-    language = attr.ib()
-    group = attr.ib()
+    username: str
+    password: str = field(repr=False)
+    email: str
+    language: str
+    group: str
 
 
 class UserValidator(ABC):
@@ -36,7 +39,7 @@ class UserValidator(ABC):
     """
 
     @abstractmethod
-    def validate(self, user_info):
+    def validate(self, user_info: UserRegistrationInfo):
         """
         This method is abstract.
 
@@ -44,7 +47,7 @@ class UserValidator(ABC):
         :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
         """  # noqa
 
-    def __call__(self, user_info):
+    def __call__(self, user_info: UserRegistrationInfo):
         return self.validate(user_info)
 
 
@@ -54,7 +57,9 @@ class RegistrationFailureHandler(ABC):
     """
 
     @abstractmethod
-    def handle_failure(self, user_info, failures):
+    def handle_failure(
+        self, user_info: UserRegistrationInfo, failures: tuple[str, str]
+    ):
         """
         This method is abstract.
 
@@ -64,7 +69,7 @@ class RegistrationFailureHandler(ABC):
         """  # noqa
         pass
 
-    def __call__(self, user_info, failures):
+    def __call__(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
         self.handle_failure(user_info, failures)
 
 
@@ -76,7 +81,7 @@ class RegistrationPostProcessor(ABC):
     """
 
     @abstractmethod
-    def post_process(self, user):
+    def post_process(self, user: User):
         """
         This method is abstract.
 
@@ -85,7 +90,7 @@ class RegistrationPostProcessor(ABC):
         """
         pass
 
-    def __call__(self, user):
+    def __call__(self, user: User):
         self.post_process(user)
 
 
@@ -97,7 +102,7 @@ class UserRegistrationService(ABC):
     """
 
     @abstractmethod
-    def register(self, user_info):
+    def register(self, user_info: UserRegistrationInfo) -> "User":
         """
         This method is abstract.
 

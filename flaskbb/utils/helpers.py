@@ -16,9 +16,10 @@ import operator
 import os
 import re
 import time
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import TYPE_CHECKING, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import requests
 import unidecode
@@ -27,7 +28,7 @@ from babel.dates import format_date as babel_format_date
 from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_time as babel_format_time
 from babel.dates import format_timedelta as babel_format_timedelta
-from flask import current_app, flash, g, redirect, request, session, url_for
+from flask import Flask, current_app, flash, g, redirect, request, session, url_for
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
@@ -35,14 +36,13 @@ from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from PIL import ImageFile
 from pytz import UTC
-from typing_extensions import Iterable
 from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
 
 from flaskbb.extensions import babel, redis_store
 
 if TYPE_CHECKING:
-    from flaskbb.forum.models import Category, Forum, ForumsRead
+    from flaskbb.forum.models import Category, Forum, ForumsRead, Topic, TopicsRead
     from flaskbb.user.models import User
 
 from flaskbb.utils.http import is_safe_url
@@ -56,21 +56,21 @@ T = TypeVar("T")
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 
-def to_bytes(text, encoding="utf-8"):
+def to_bytes(text: str | bytes, encoding: str = "utf-8"):
     """Transform string to bytes."""
     if isinstance(text, str):
         text = text.encode(encoding)
     return text
 
 
-def to_unicode(input_bytes, encoding="utf-8"):
+def to_unicode(input_bytes: str | bytes, encoding: str = "utf-8"):
     """Decodes input_bytes to text if needed."""
     if not isinstance(input_bytes, str):
         input_bytes = input_bytes.decode(encoding)
     return input_bytes
 
 
-def slugify(text, delim="-"):
+def slugify(text: str, delim: str = "-"):
     """Generates an slightly worse ASCII-only slug.
      Taken from the Flask Snippets page.
 
@@ -78,17 +78,17 @@ def slugify(text, delim="-"):
     :param delim: Default "-". The delimeter for whitespace
     """
     text = unidecode.unidecode(text)
-    result = []
+    result: list[str] = []
     for word in _punct_re.split(text.lower()):
         if word:
             result.append(word)
     return str(delim.join(result))
 
 
-def redirect_url(endpoint, use_referrer=True):
+def redirect_url(endpoint: str | None, use_referrer: bool = True):
     """Generates a redirect url based on the referrer or endpoint."""
     targets = [endpoint]
-    allowed_hosts = current_app.config["ALLOWED_HOSTS"]
+    allowed_hosts: list[str] = current_app.config["ALLOWED_HOSTS"]
     if use_referrer:
         targets.insert(0, request.referrer)
     for target in targets:
@@ -96,7 +96,7 @@ def redirect_url(endpoint, use_referrer=True):
             return target
 
 
-def redirect_or_next(endpoint, use_referrer=True):
+def redirect_or_next(endpoint: str, use_referrer: bool = True):
     """Redirects the user back to the page they were viewing or to a specified
     endpoint. Wraps Flasks :func:`Flask.redirect` function.
 
@@ -108,7 +108,7 @@ def redirect_or_next(endpoint, use_referrer=True):
     )
 
 
-def render_template(template, **context):  # pragma: no cover
+def render_template(template: str, **context: Any):  # pragma: no cover
     """A helper function that uses the `render_theme_template` function
     without needing to edit all the views
     """
@@ -120,7 +120,9 @@ def render_template(template, **context):  # pragma: no cover
 
 
 # TODO(anr): clean this up
-def do_topic_action(topics, user, action, reverse):  # noqa: C901
+def do_topic_action(
+    topics: Sequence["Topic"], user: "User", action: str, reverse: bool
+):  # noqa: C901
     """Executes a specific action for topics. Returns a list with the modified
     topic objects.
 
@@ -292,7 +294,7 @@ def forum_is_unread(
     :param user: The user who should be checked if he has read the forum
     """
     # If the user is not signed in, every forum is marked as read
-    if not user.is_authenticated:
+    if not user.is_authenticated or not forum:
         return False
 
     read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
@@ -302,32 +304,36 @@ def forum_is_unread(
         return False
 
     # If there are no topics in the forum, mark it as read
-    if forum and forum.topic_count == 0:
+    if forum.topic_count == 0:
         return False
 
     # check if the last post is newer than the tracker length
-    if forum.last_post_id is None or forum.last_post_created < read_cutoff:
+    if (
+        forum.last_post_id is None
+        or forum.last_post_created is None
+        or forum.last_post_created < read_cutoff
+    ):
         return False
 
     # If the user hasn't visited a topic in the forum - therefore,
     # forumsread is None and we need to check if it is still unread
-    if forum and not forumsread:
+    if forumsread is None or forumsread.cleared is None:
         return forum.last_post_created > read_cutoff
 
-    try:
-        # check if the forum has been cleared and if there is a new post
-        # since it have been cleared
-        if forum.last_post_created > forumsread.cleared:
-            if forum.last_post_created < forumsread.last_read:
-                return False
-    except TypeError:
-        pass
+    if forum.last_post_created > forumsread.cleared:
+        if forum.last_post_created < forumsread.last_read:
+            return False
 
     # else just check if the user has read the last post
     return forum.last_post_created > forumsread.last_read
 
 
-def topic_is_unread(topic, topicsread, user, forumsread=None):
+def topic_is_unread(
+    topic: "Topic",
+    topicsread: "TopicsRead | None",
+    user: "User",
+    forumsread: "ForumsRead | None" = None,
+):
     """Checks if a topic is unread.
 
     :param topic: The topic that should be checked if it is unread
@@ -370,7 +376,7 @@ def topic_is_unread(topic, topicsread, user, forumsread=None):
     return topicsread.last_read < topic.last_updated
 
 
-def mark_online(user_id, guest=False):  # pragma: no cover
+def mark_online(user_id: str, guest=False):  # pragma: no cover
     """Marks a user as online
 
     :param user_id: The id from the user who should be marked as online
@@ -647,7 +653,7 @@ def check_image(url):
     return error, True
 
 
-def get_alembic_locations(plugin_dirs):
+def get_alembic_locations(plugin_dirs) -> list[tuple[str, str]]:
     """Returns a tuple with (branchname, plugin_dir) combinations.
     The branchname is the name of plugin directory which should also be
     the unique identifier of the plugin.
@@ -659,7 +665,7 @@ def get_alembic_locations(plugin_dirs):
     return branches_dirs
 
 
-def get_available_themes():
+def get_available_themes() -> list[tuple[str, str]]:
     """Returns a list that contains all available themes. The items in the
     list are tuples where the first item of the tuple is the identifier and
     the second one the name of the theme.
@@ -670,7 +676,7 @@ def get_available_themes():
     return [(theme.identifier, theme.name) for theme in get_themes_list()]
 
 
-def get_available_languages():
+def get_available_languages() -> list[tuple[str, str]]:
     """Returns a list that contains all available languages. The items in the
     list are tuples where the first item of the tuple is the locale
     identifier (i.e. de_AT) and the second one the display name of the locale.
@@ -679,12 +685,12 @@ def get_available_languages():
         [('de_AT', 'Deutsch (Österreich)')]
     """
     return [
-        (get_locale_identifier((l.language, l.territory)), l.display_name)
-        for l in babel.list_translations()
+        (get_locale_identifier((trans.language, trans.territory)), trans.display_name)
+        for trans in babel.list_translations()
     ]
 
 
-def app_config_from_env(app, prefix="FLASKBB_"):
+def app_config_from_env(app: Flask, prefix="FLASKBB_"):
     """Retrieves the configuration variables from the environment.
     Set your environment variables like this::
 
@@ -707,7 +713,7 @@ def app_config_from_env(app, prefix="FLASKBB_"):
     return app
 
 
-def get_flaskbb_config(app, config_file):
+def get_flaskbb_config(app: Flask, config_file: str | object):
     """Returns ``None`` or the config which is either the path to a config file
     or an object. They can be used by ``app.config.from_pyfile`` or
     by ``app.config.from_object``.

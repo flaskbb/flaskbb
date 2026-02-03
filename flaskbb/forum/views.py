@@ -679,7 +679,7 @@ class MemberList(MethodView):
         else:
             sort_obj = User.username
 
-        users = paginate(
+        users = db.paginate(
             db.select(User).order_by(order_func(sort_obj)),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
@@ -715,7 +715,7 @@ class MemberList(MethodView):
                 "forum/memberlist.html", users=users, search_form=form
             )
 
-        users = paginate(
+        users = db.paginate(
             db.select(User).order_by(order_func(sort_obj)),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],

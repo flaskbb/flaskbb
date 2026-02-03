@@ -218,11 +218,10 @@ class Post(HideableCRUDMixin, db.Model):
         "User",
         back_populates="posts",
         foreign_keys=[user_id],
-        lazy="joined",
     )
 
     topic: Mapped["Topic"] = relationship(
-        "Topic", foreign_keys=[topic_id], back_populates="posts", lazy="joined"
+        "Topic", foreign_keys=[topic_id], back_populates="posts"
     )
 
     # Properties

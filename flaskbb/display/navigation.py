@@ -9,10 +9,9 @@ Helpers to create navigation elements in FlaskBB Templates
 :license: BSD, see LICENSE for more details
 """
 
-from abc import ABC, abstractproperty
+from dataclasses import dataclass, field
 from enum import Enum
-
-import attr
+from typing import Any
 
 __all__ = (
     "NavigationContentType",
@@ -34,16 +33,16 @@ class NavigationContentType(Enum):
     divider = 3
 
 
-class NavigationItem(ABC):
+class NavigationItem:
     """
     Abstract NavigationItem class. Not meant for use but provides the common
     interface for navigation items.
     """
 
-    content_type = abstractproperty(lambda: None)
+    content_type: NavigationContentType | None = None
 
 
-@attr.s(eq=True, order=True, hash=True, repr=True, frozen=True, slots=True)
+@dataclass(eq=True, order=True, repr=True, frozen=True, slots=True)
 class NavigationLink(NavigationItem):
     """
     Representation of an internal FlaskBB navigation link::
@@ -57,15 +56,15 @@ class NavigationLink(NavigationItem):
         )
     """
 
-    endpoint = attr.ib()
-    name = attr.ib()
-    icon = attr.ib(default="")
-    active = attr.ib(default=False)
-    urlforkwargs = attr.ib(factory=dict)
+    endpoint: str
+    name: str
+    icon: str = ""
+    active: bool = False
+    urlforkwargs: dict[str, Any] = field(default_factory=dict)
     content_type = NavigationContentType.link
 
 
-@attr.s(eq=True, order=True, hash=True, repr=True, frozen=True, slots=True)
+@dataclass(eq=True, order=True, repr=True, frozen=True, slots=True)
 class NavigationExternalLink(NavigationItem):
     """
     Representation of an external navigation link::
@@ -77,13 +76,13 @@ class NavigationExternalLink(NavigationItem):
         )
     """
 
-    uri = attr.ib()
-    name = attr.ib()
-    icon = attr.ib(default="")
+    uri: str
+    name: str
+    icon: str = ""
     content_type = NavigationContentType.external_link
 
 
-@attr.s(eq=True, order=True, hash=True, repr=True, frozen=True, slots=True)
+@dataclass(eq=True, order=True, repr=True, frozen=True, slots=True)
 class NavigationHeader(NavigationItem):
     """
     Representation of header text shown in a navigation bar::
@@ -94,12 +93,12 @@ class NavigationHeader(NavigationItem):
         )
     """
 
-    text = attr.ib()
-    icon = attr.ib(default="")
+    text: str
+    icon: str = ""
     content_type = NavigationContentType.header
 
 
-@attr.s(eq=True, order=True, hash=True, repr=True, frozen=True, slots=True)
+@dataclass(eq=True, order=True, repr=True, frozen=True, slots=True)
 class NavigationDivider(NavigationItem):
     """
     Representation of a divider in a navigation bar::

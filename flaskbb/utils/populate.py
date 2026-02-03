@@ -35,9 +35,9 @@ def delete_settings_from_fixture(fixture):
     deleted_settings = {}
 
     for settingsgroup in fixture:
-        group = db.session.execute(
+        group: SettingsGroup = db.session.execute(
             db.select(SettingsGroup).filter_by(key=settingsgroup[0])
-        ).scalar_one_or_none()
+        ).scalar_one()
         deleted_settings[group] = []
 
         for settings in settingsgroup[1]["settings"]:

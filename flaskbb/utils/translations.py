@@ -14,7 +14,7 @@ import os
 import subprocess
 
 import babel
-from flask import current_app
+from flask import Flask, current_app
 from flask_babelplus import Domain, get_locale
 from flask_babelplus.utils import get_state
 
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class FlaskBBDomain(Domain):
-    def __init__(self, app):
+    def __init__(self, app: Flask):
         self.app = app
         super(FlaskBBDomain, self).__init__()
 

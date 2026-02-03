@@ -23,7 +23,6 @@ from flaskbb.utils.database import HideableMixin
 if t.TYPE_CHECKING:
     pass
 
-import typing as t
 
 import sqlalchemy.orm as sa_orm
 from flask_sqlalchemy.pagination import Pagination

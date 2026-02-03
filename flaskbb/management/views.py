@@ -20,6 +20,7 @@ from flask_allows import Not, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
 from pluggy import HookimplMarker
+from sqlalchemy import select
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.extensions import allows, celery, db
@@ -164,8 +165,11 @@ class ManageUsers(MethodView):
         page = request.args.get("page", 1, type=int)
         form = self.form()
 
-        users = User.query.order_by(User.id.asc()).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = db.paginate(
+            select(User).order_by(User.id.asc()),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
 
         return render_template("management/users.html", users=users, search_form=form)
@@ -182,10 +186,12 @@ class ManageUsers(MethodView):
                 "management/users.html", users=users, search_form=form
             )
 
-        users = User.query.order_by(User.id.asc()).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = db.paginate(
+            select(User).order_by(User.id.asc()),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
-
         return render_template("management/users.html", users=users, search_form=form)
 
 
@@ -378,10 +384,13 @@ class BannedUsers(MethodView):
         page = request.args.get("page", 1, type=int)
         search_form = self.form()
 
-        users = User.query.filter(
-            Group.banned == True, Group.id == User.primary_group_id
-        ).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = db.paginate(
+            select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
 
         return render_template(
@@ -392,10 +401,13 @@ class BannedUsers(MethodView):
         page = request.args.get("page", 1, type=int)
         search_form = self.form()
 
-        users = User.query.filter(
-            Group.banned == True, Group.id == User.primary_group_id
-        ).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        users = db.paginate(
+            select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
 
         if search_form.validate():
@@ -555,10 +567,12 @@ class Groups(MethodView):
     def get(self):
         page = request.args.get("page", 1, type=int)
 
-        groups = Group.query.order_by(Group.id.asc()).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        groups = db.paginate(
+            select(Group).order_by(Group.id.asc()),
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
         )
-
         return render_template("management/groups.html", groups=groups)
 
 
@@ -711,7 +725,9 @@ class Forums(MethodView):
     ]
 
     def get(self):
-        categories = Category.query.order_by(Category.position.asc()).all()
+        categories = db.session.execute(
+            select(Category).order_by(Category.position.asc())
+        ).scalars()
         return render_template("management/forums.html", categories=categories)
 
 
@@ -781,7 +797,9 @@ class AddForum(MethodView):
     def get(self, category_id=None):
         form = self.form()
 
-        form.groups.data = Group.query.order_by(Group.id.asc()).all()
+        form.groups.data = db.session.execute(
+            select(Group).order_by(Group.id.asc())
+        ).scalars()
 
         if category_id:
             category = Category.get_by(id=category_id)
@@ -799,7 +817,9 @@ class AddForum(MethodView):
             flash(_("Forum added."), "success")
             return redirect(url_for("management.forums"))
         else:
-            form.groups.data = Group.query.order_by(Group.id.asc()).all()
+            form.groups.data = db.session.execute(
+                select(Group).order_by(Group.id.asc())
+            ).scalars()
             if category_id:
                 category = Category.get_by(id=category_id)
                 form.category.data = category
@@ -1131,19 +1151,15 @@ class ManagementOverview(MethodView):
 
     def get(self):
         # user and group stats
-        banned_users = User.query.filter(
-            Group.banned == True, Group.id == User.primary_group_id
-        ).count()
+        banned_users = User.count(
+            clause=[Group.banned == True, Group.id == User.primary_group_id]
+        )
         if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.query.filter(User.lastseen >= time_diff()).count()
+            online_users = User.count(User.lastseen >= time_diff())
         else:
             online_users = len(get_online_users())
 
-        unread_reports = (
-            Report.query.filter(Report.zapped == None)
-            .order_by(Report.id.desc())
-            .count()
-        )
+        unread_reports = Report.count(Report.zapped == None)
 
         python_version = "{}.{}.{}".format(
             sys.version_info[0], sys.version_info[1], sys.version_info[2]
@@ -1153,7 +1169,7 @@ class ManagementOverview(MethodView):
             "current_app": current_app,
             "unread_reports": unread_reports,
             # stats stats
-            "all_users": User.query.count(),
+            "all_users": User.count(),
             "banned_users": banned_users,
             "online_users": online_users,
             "all_groups": Group.query.count(),

@@ -13,14 +13,14 @@ and the user settings from a signed in user.
 import logging
 
 import attr
-from flask import Blueprint, flash, redirect, request, url_for
+from flask import Blueprint, Flask, flash, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 
 from flaskbb.user.models import User
-from flaskbb.utils.helpers import register_view, render_template
+from flaskbb.utils.helpers import real, register_view, render_template
 
 from ..core.exceptions import PersistenceError, StopValidation
 from .services.factories import (
@@ -177,29 +177,29 @@ class ChangeUserDetails(MethodView):
 
 
 class AllUserTopics(MethodView):  # pragma: no cover
-    def get(self, username):
+    def get(self, username: str):
         page = request.args.get("page", 1, type=int)
         user = User.get_by_or_404(username=username)
-        topics = user.all_topics(page, current_user)
+        topics = user.all_topics(page, real(current_user))
         return render_template("user/all_topics.html", user=user, topics=topics)
 
 
 class AllUserPosts(MethodView):  # pragma: no cover
-    def get(self, username):
+    def get(self, username: str):
         page = request.args.get("page", 1, type=int)
         user = User.get_by_or_404(username=username)
-        posts = user.all_posts(page, current_user)
+        posts = user.all_posts(page, real(current_user))
         return render_template("user/all_posts.html", user=user, posts=posts)
 
 
 class UserProfile(MethodView):  # pragma: no cover
-    def get(self, username):
+    def get(self, username: str):
         user = User.get_by_or_404(username=username)
         return render_template("user/profile.html", user=user)
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app):
+def flaskbb_load_blueprints(app: Flask):
     user = Blueprint("user", __name__)
     register_view(
         user, routes=["/settings/email"], view_func=ChangeEmail.as_view("change_email")

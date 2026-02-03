@@ -9,18 +9,24 @@ Implementation of services found in flaskbb.core.auth.services
 :license: BSD, see LICENSE for more details
 """
 
+import typing as t
+from dataclasses import dataclass
 from datetime import datetime
 from itertools import chain
 
-import attr
 from flask import flash
 from flask_babelplus import gettext as _
 from flask_login import login_user
+from flask_sqlalchemy import SQLAlchemy
 from pytz import UTC
 from sqlalchemy import func
 
+if t.TYPE_CHECKING:
+    from flaskbb.plugins.manager import FlaskBBPluginManager
+
 from ...core.auth.registration import (
     RegistrationPostProcessor,
+    UserRegistrationInfo,
     UserRegistrationService,
     UserValidator,
 )
@@ -44,16 +50,16 @@ __all__ = (
 )
 
 
-@attr.s(hash=False, repr=True, frozen=True, eq=False, order=False)
-class UsernameRequirements(object):
+@dataclass(init=True, repr=True, frozen=True, eq=False, order=False)
+class UsernameRequirements:
     """
     Configuration for username requirements, minimum and maximum length
     and disallowed names.
     """
 
-    min = attr.ib()
-    max = attr.ib()
-    blacklist = attr.ib()
+    min: int
+    max: int
+    blacklist: list[str]
 
 
 class UsernameValidator(UserValidator):
@@ -62,10 +68,10 @@ class UsernameValidator(UserValidator):
     requirements (appropriate length, not a forbidden name).
     """
 
-    def __init__(self, requirements):
+    def __init__(self, requirements: UsernameRequirements):
         self._requirements = requirements
 
-    def validate(self, user_info):
+    def validate(self, user_info: "User"):
         if not (
             self._requirements.min <= len(user_info.username) <= self._requirements.max
         ):
@@ -97,7 +103,7 @@ class UsernameUniquenessValidator(UserValidator):
     def __init__(self, users):
         self.users = users
 
-    def validate(self, user_info):
+    def validate(self, user_info: User):
         count = db.session.execute(
             db.select(func.count(self.users.id)).filter(
                 func.lower(self.users.username) == user_info.username
@@ -121,7 +127,7 @@ class EmailUniquenessValidator(UserValidator):
     def __init__(self, users):
         self.users = users
 
-    def validate(self, user_info):
+    def validate(self, user_info: User):
         count = db.session.execute(
             db.select(func.count(self.users.id)).filter(
                 func.lower(self.users.email) == user_info.email
@@ -198,12 +204,13 @@ class RegistrationService(UserRegistrationService):
     reasons why the registration was prevented.
     """
 
-    def __init__(self, plugins, users, db):
+    def __init__(self, plugins: FlaskBBPluginManager, users: User, db: SQLAlchemy):
         self.plugins = plugins
         self.users = users
         self.db = db
 
-    def register(self, user_info):
+    @t.override
+    def register(self, user_info: UserRegistrationInfo):
         try:
             self._validate_registration(user_info)
         except StopValidation as e:
@@ -214,8 +221,8 @@ class RegistrationService(UserRegistrationService):
         self._post_process(user)
         return user
 
-    def _validate_registration(self, user_info):
-        failures = []
+    def _validate_registration(self, user_info: UserRegistrationInfo):
+        failures: list[tuple[str, str]] = []
         validators = self.plugins.hook.flaskbb_gather_registration_validators()
 
         for v in chain.from_iterable(validators):
@@ -226,12 +233,14 @@ class RegistrationService(UserRegistrationService):
         if failures:
             raise StopValidation(failures)
 
-    def _handle_failure(self, user_info, failures):
+    def _handle_failure(
+        self, user_info: UserRegistrationInfo, failures: tuple[str, str]
+    ):
         self.plugins.hook.flaskbb_registration_failure_handler(
             user_info=user_info, failures=failures
         )
 
-    def _store_user(self, user_info):
+    def _store_user(self, user_info: UserRegistrationInfo):
         try:
             user = User(
                 username=user_info.username,
@@ -248,5 +257,5 @@ class RegistrationService(UserRegistrationService):
             self.db.session.rollback()
             raise PersistenceError("Could not persist user")
 
-    def _post_process(self, user):
+    def _post_process(self, user: User):
         self.plugins.hook.flaskbb_registration_post_processor(user=user)

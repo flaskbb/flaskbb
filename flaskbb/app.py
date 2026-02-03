@@ -16,6 +16,7 @@ import sys
 import time
 import warnings
 from datetime import UTC, datetime
+from typing import Any
 
 from celery import Celery
 from flask import Flask, request
@@ -105,7 +106,7 @@ from .user import views as user_views  # noqa
 logger = logging.getLogger(__name__)
 
 
-def create_app(config=None, instance_path=None):
+def create_app(config: object | None = None, instance_path: str | None = None):
     """Creates the app.
 
     :param instance_path: An alternative instance path for the application.
@@ -145,7 +146,7 @@ def create_app(config=None, instance_path=None):
     return app
 
 
-def configure_app(app, config):
+def configure_app(app: Flask, config: Any):
     """Configures FlaskBB."""
     # Use the default config and override it afterwards
     app.config.from_object("flaskbb.configs.default.DefaultConfig")
@@ -300,7 +301,7 @@ def configure_extensions(app: Flask):
     login_manager.anonymous_user = Guest
 
     @login_manager.user_loader
-    def load_user(user_id):
+    def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
         return db.session.execute(
             db.select(User).filter_by(id=user_id)

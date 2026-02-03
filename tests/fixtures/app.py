@@ -10,9 +10,11 @@ from flaskbb.utils.populate import create_default_groups, create_default_setting
 def application():
     """application with context."""
     app = create_app(Config)
-    app.config.update({
-        "TESTING": True,
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+        }
+    )
     ctx = app.app_context()
     ctx.push()
 

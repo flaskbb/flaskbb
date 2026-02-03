@@ -17,7 +17,9 @@ pytestmark = pytest.mark.usefixtures("default_settings")
 
 class TestBlockTooManyFailedLogins(object):
     provider = auth.BlockTooManyFailedLogins(
-        auth.FailedLoginConfiguration(limit=1, lockout_window=datetime.timedelta(hours=1))
+        auth.FailedLoginConfiguration(
+            limit=1, lockout_window=datetime.timedelta(hours=1)
+        )
     )
 
     @freeze_time(datetime.datetime(2018, 1, 1, 13, 30))

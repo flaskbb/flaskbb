@@ -10,6 +10,8 @@ It provides the forms that are needed for the management views.
 """
 
 import logging
+from collections.abc import Mapping, Sequence
+from typing import Any, override
 
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
@@ -19,6 +21,7 @@ from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from wtforms import (
     BooleanField,
     DateField,
+    Field,
     HiddenField,
     IntegerField,
     PasswordField,
@@ -53,11 +56,13 @@ is_username = regexp(
 
 
 def selectable_forums():
-    return Forum.query.order_by(Forum.position)
+    return db.session.execute(select(Forum).order_by(Forum.position)).scalars().all()
 
 
 def selectable_categories():
-    return Category.query.order_by(Category.position)
+    return (
+        db.session.execute(select(Category).order_by(Category.position)).scalars().all()
+    )
 
 
 def selectable_groups():
@@ -65,10 +70,16 @@ def selectable_groups():
 
 
 def select_primary_group():
-    return Group.query.filter(Group.guest != True).order_by(Group.id)
+    return (
+        db.session.execute(select(Group).where(Group.guest != True).order_by(Group.id))
+        .scalars()
+        .all()
+    )
 
 
 class UserForm(FlaskForm):
+    user: User | None = None
+
     username = StringField(
         _("Username"),
         validators=[
@@ -117,8 +128,8 @@ class UserForm(FlaskForm):
 
     submit = SubmitField(_("Save"))
 
-    def validate_username(self, field):
-        if hasattr(self, "user"):
+    def validate_username(self, field: Field):
+        if self.user is not None:
             user = User.get(
                 db.and_(
                     User.username.like(field.data.lower()),
@@ -131,7 +142,7 @@ class UserForm(FlaskForm):
         if user:
             raise ValidationError(_("This username is already taken."))
 
-    def validate_email(self, field):
+    def validate_email(self, field: Field):
         if hasattr(self, "user"):
             user = User.get(
                 db.and_(
@@ -145,7 +156,7 @@ class UserForm(FlaskForm):
         if user:
             raise ValidationError(_("This email address is already taken."))
 
-    def validate_avatar(self, field):
+    def validate_avatar(self, field: Field):
         if field.data is not None:
             error, status = check_image(field.data)
             if error is not None:
@@ -167,13 +178,15 @@ class AddUserForm(UserForm):
 class EditUserForm(UserForm):
     password = PasswordField("Password", validators=[Optional()])
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user: User, *args: Any, **kwargs: Any):
         self.user = user
         kwargs["obj"] = self.user
         UserForm.__init__(self, *args, **kwargs)
 
 
 class GroupForm(FlaskForm):
+    group: Group | None = None
+
     name = StringField(
         _("Group name"),
         validators=[DataRequired(message=_("Please enter a name for the group."))],
@@ -253,8 +266,8 @@ class GroupForm(FlaskForm):
 
     submit = SubmitField(_("Save"))
 
-    def validate_name(self, field):
-        if hasattr(self, "group"):
+    def validate_name(self, field: Field):
+        if self.group is not None:
             group = Group.get(
                 db.and_(
                     Group.name.like(field.data.lower()),
@@ -267,29 +280,30 @@ class GroupForm(FlaskForm):
         if group:
             raise ValidationError(_("This group name is already taken."))
 
-    def validate_banned(self, field):
-        if hasattr(self, "group"):
-            group = Group.query.filter(
+    def validate_banned(self, field: Field):
+        if self.group is not None:
+            group = Group.count(
                 db.and_(Group.banned, db.not_(Group.id == self.group.id))
-            ).count()
+            )
         else:
-            group = Group.query.filter_by(banned=True).count()
+            group = Group.count(Group.banned == True)
 
         if field.data and group > 0:
             raise ValidationError(_("There is already a group of type 'Banned'."))
 
-    def validate_guest(self, field):
-        if hasattr(self, "group"):
-            group = Group.query.filter(
+    def validate_guest(self, field: Field):
+        if self.group is not None:
+            group = Group.count(
                 db.and_(Group.guest, db.not_(Group.id == self.group.id))
-            ).count()
+            )
         else:
-            group = Group.query.filter_by(guest=True).count()
+            group = Group.count(Group.guest == True)
 
         if field.data and group > 0:
             raise ValidationError(_("There is already a group of type 'Guest'."))
 
-    def validate(self):
+    @override
+    def validate(self, extra_validators: Mapping[str, Sequence[Any]] | None = None):
         if not super(GroupForm, self).validate():
             return False
 
@@ -348,6 +362,8 @@ class AddGroupForm(GroupForm):
 
 
 class ForumForm(FlaskForm):
+    forum: Forum | None = None
+
     title = StringField(
         _("Forum title"),
         validators=[DataRequired(message=_("Please enter a forum title."))],
@@ -405,23 +421,22 @@ class ForumForm(FlaskForm):
 
     submit = SubmitField(_("Save"))
 
-    def validate_external(self, field):
-        if hasattr(self, "forum"):
-            if self.forum.topics.count() > 0:
+    def validate_external(self, field: Field):
+        if self.forum is not None:
+            if len(self.forum.topics) > 0:
                 raise ValidationError(
                     _(
-                        "You cannot convert a forum that "
-                        "contains topics into an "
+                        "You cannot convert a forum that contains topics into an "
                         "external link."
                     )
                 )
 
-    def validate_show_moderators(self, field):
+    def validate_show_moderators(self, field: Field):
         if field.data and not self.moderators.data:
             raise ValidationError(_("You also need to specify some moderators."))
 
-    def validate_moderators(self, field):
-        approved_moderators = []
+    def validate_moderators(self, field: Field):
+        approved_moderators: list[User] = []
 
         if field.data:
             moderators = [mod.strip() for mod in field.data.split(",")]
@@ -447,11 +462,12 @@ class ForumForm(FlaskForm):
 class EditForumForm(ForumForm):
     id = HiddenField()
 
-    def __init__(self, forum, *args, **kwargs):
+    def __init__(self, forum: Forum, *args: Any, **kwargs: Any):
         self.forum = forum
         kwargs["obj"] = self.forum
         ForumForm.__init__(self, *args, **kwargs)
 
+    @override
     def save(self):
         data = self.data
         # delete submit and csrf_token from data
