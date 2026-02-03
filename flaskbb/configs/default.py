@@ -40,7 +40,7 @@ class DefaultConfig(object):
     # which we need in order to generate URLs (with the celery application)
     # Note that localhost does not support subdomains so setting this to
     # “localhost” does not help.
-    # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.org"
+    # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.com"
     # SERVER_NAME =
 
     # The preferred url scheme. In a productive environment it is highly

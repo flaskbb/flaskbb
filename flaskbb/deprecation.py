@@ -11,7 +11,7 @@ Module used for deprecation handling in FlaskBB
 
 import inspect
 import warnings
-from abc import ABC, abstractproperty
+from abc import ABC
 from functools import wraps
 
 from flask_babelplus import gettext as _
@@ -37,7 +37,7 @@ class FlaskBBDeprecation(DeprecationWarning, FlaskBBWarning, ABC):
             version = (3, 0, 0)
     """
 
-    version = abstractproperty(lambda self: None)
+    version = property(lambda self: None)
 
 
 class RemovedInFlaskBB3(FlaskBBDeprecation):

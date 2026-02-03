@@ -131,7 +131,7 @@ The setup wizard can be started with::
     flaskbb makeconfig
 
 
-To be able to run FlaskBB in production, the only settings 
+To be able to run FlaskBB in production, the only settings
 that you need to modify are the following:
 
 - ``SERVER_NAME = "example.org"``
@@ -260,7 +260,7 @@ or::
 
     flaskbb install
 
-During the installation process, you will be asked to provide a username, email address 
+During the installation process, you will be asked to provide a username, email address
 and password for your administrator user. Using the
 ``make install`` command is recommended as it checks that the dependencies
 are also installed.
@@ -328,7 +328,7 @@ This can be done with::
 For the configuration, you need to create a file in the
 ``/etc/uwsgi/apps-available`` directory. In this example, I will call the
 file ``flaskbb.ini``. After that, you can start with configuring it.
-My config looks like this for `flaskbb.org` (see below). As you might have noticed, I'm
+My config looks like this for `flaskbb.com` (see below). As you might have noticed, I'm
 using a own user for my apps whose home directory is located at `/var/apps/`.
 All my flask apps live in this directory.
 
@@ -403,7 +403,7 @@ adjust the paths in the ``alias`` es, as well as the socket address in ``uwsgi_p
 
     server {
         listen 80;
-        server_name forums.flaskbb.org;
+        server_name forums.flaskbb.com;
 
         access_log /var/log/nginx/access.forums.flaskbb.log;
         error_log /var/log/nginx/error.forums.flaskbb.log;

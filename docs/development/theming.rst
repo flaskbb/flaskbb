@@ -80,7 +80,7 @@ aurora theme looks like this:
         "name": "Aurora",
         "author": "Peter Justin",
         "license": "BSD 3-Clause",
-        "website": "https://flaskbb.org",
+        "website": "https://flaskbb.com",
         "description": "The default theme for FlaskBB.",
         "preview": "preview.png",
         "version": "1.0.0"
@@ -203,7 +203,7 @@ create a ``layout.html`` file. It's probably the easiest to just copy the
 ``layout.html`` from FlaskBB's ``templates/`` folder into your themes
 ``templates/`` folder.
 
-For example, the `forums <https://forums.flaskbb.org>`_ on FlaskBB are using
+For example, the `forums <https://forums.flaskbb.com>`_ on FlaskBB are using
 a slightly modified version of the Aurora theme. It is available on GitHub
 here: `Aurora Mod <https://github.com/sh4nks/flaskbb-theme-aurora-mod>`_.
 The modified version just adds a top navigation and uses a different footer.

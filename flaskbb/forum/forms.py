@@ -11,7 +11,6 @@ It provides the forms that are needed for the forum views.
 
 import logging
 
-from flask import current_app
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -23,6 +22,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Optional
 
+from flaskbb.extensions import pluggy
 from flaskbb.forum.models import Forum, Post, Report, Topic
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
@@ -40,9 +40,9 @@ class PostForm(FlaskForm):
 
     submit = SubmitField(_("Reply"))
 
-    def save(self, user, topic):
+    def save(self, user: User, topic: Topic):
         post = Post(content=self.content.data)
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=post)
+        pluggy.hook.flaskbb_form_post_save(form=self, post=post)
         return post.save(user=user, topic=topic)
 
 
@@ -59,7 +59,7 @@ class ReplyForm(PostForm):
         self.post = kwargs.get("obj", None)
         PostForm.__init__(self, *args, **kwargs)
 
-    def save(self, user, topic):
+    def save(self, user: User, topic: Topic):
         # new post
         if self.post is None:
             self.post = Post(content=self.content.data)
@@ -72,7 +72,7 @@ class ReplyForm(PostForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_post_save(form=self, post=self.post)
+        pluggy.hook.flaskbb_form_post_save(form=self, post=self.post)
         return self.post.save(user=user, topic=topic)
 
 
@@ -103,7 +103,7 @@ class TopicForm(FlaskForm):
         else:
             user.untrack_topic(topic)
 
-        current_app.pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
+        pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
         return topic.save(user=user, forum=forum)
 
 
@@ -142,7 +142,7 @@ class EditTopicForm(TopicForm):
         self.topic.first_post.date_modified = time_utcnow()
         self.topic.first_post.modified_by = user.username
 
-        current_app.pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
+        pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
         return self.topic.save(user=user, forum=forum)
 
 

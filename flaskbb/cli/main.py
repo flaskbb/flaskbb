@@ -18,7 +18,6 @@ import traceback
 from datetime import datetime
 
 import click
-import flask
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from flask_alembic.cli import cli as alembic_click
@@ -35,7 +34,7 @@ from flaskbb.cli.utils import (
     prompt_save_user,
     write_config,
 )
-from flaskbb.extensions import alembic, celery, db, whooshee
+from flaskbb.extensions import alembic, celery, db, pluggy, whooshee
 from flaskbb.utils.populate import (
     create_default_groups,
     create_default_settings,
@@ -62,14 +61,14 @@ class FlaskBBGroup(FlaskGroup):
 
         try:
             app = ctx.ensure_object(ScriptInfo).load_app()
-            app.pluggy.hook.flaskbb_cli(cli=self, app=app)
+            pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception:
             logger.error(
                 "Error while loading CLI Plugins", exc_info=traceback.format_exc()
             )
         else:
-            shell_context_processors = app.pluggy.hook.flaskbb_shell_context()
+            shell_context_processors = pluggy.hook.flaskbb_shell_context()
             for p in shell_context_processors:
                 app.shell_context_processor(p)
 
@@ -273,7 +272,7 @@ def populate(bulk_data, test_data, posts, topics, force, initdb):
             rv = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
         click.secho(
-            "[+] It took {:.2f} seconds to create {} topics and {} " "posts.".format(
+            "[+] It took {:.2f} seconds to create {} topics and {} posts.".format(
                 elapsed, rv[0], rv[1]
             ),
             fg="cyan",
@@ -332,7 +331,7 @@ def upgrade(all_latest, fixture, force):
             fixture=settings, overwrite_group=force, overwrite_setting=force
         )
         click.secho(
-            "[+] {settings} settings in {groups} setting groups " "updated.".format(
+            "[+] {settings} settings in {groups} setting groups updated.".format(
                 groups=len(count),
                 settings=sum(len(settings) for settings in count.values()),
             ),

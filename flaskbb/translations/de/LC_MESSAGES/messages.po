@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# 
+#
 # Translators:
 # Peter Justin, 2015
 # Toshiki Wulf <webmedia@toshiki.de>, 2017
@@ -752,8 +752,8 @@ msgid "External link"
 msgstr ""
 
 #: flaskbb/management/forms.py:369
-msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "Ein Link zu einer Website wie z.B. 'http://flaskbb.org'."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
+msgstr "Ein Link zu einer Website wie z.B. 'http://flaskbb.com'."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80

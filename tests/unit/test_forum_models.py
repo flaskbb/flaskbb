@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
+from sqlalchemy import select
 
+from flaskbb.extensions import db
 from flaskbb.forum.models import (
     Category,
     Forum,
@@ -13,6 +15,7 @@ from flaskbb.forum.models import (
     TopicsRead,
 )
 from flaskbb.user.models import User
+from flaskbb.utils.queries import hidden
 from flaskbb.utils.settings import flaskbb_config
 
 
@@ -28,7 +31,7 @@ def test_category_delete(category):
     """Test the delete category method."""
     category.delete()
 
-    category = Category.query.filter_by(id=category.id).first()
+    category = Category.get_by(id=category.id)
 
     assert category is None
 
@@ -49,8 +52,8 @@ def test_category_delete_with_user(topic):
 
     assert user.post_count == 0
 
-    category = Category.query.filter_by(id=category.id).first()
-    topic = Topic.query.filter_by(id=topic.id).first()
+    category = Category.get_by(id=category.id)
+    topic = Topic.get_by(id=topic.id)
 
     assert category is None
     # The topic should also be deleted
@@ -64,8 +67,8 @@ def test_category_delete_with_forum(forum):
     assert forum is not None
     assert forum.category is not None
 
-    category = Category.query.filter_by(id=forum.category.id).first()
-    forum = Forum.query.filter_by(id=forum.id).first()
+    category = Category.get_by(id=forum.category.id)
+    forum = Forum.get_by(id=forum.id)
 
     assert forum is None
     assert category is None
@@ -143,7 +146,7 @@ def test_forum_delete(forum):
     """Test the delete forum method."""
     forum.delete()
 
-    forum = Forum.query.filter_by(id=forum.id).first()
+    forum = Forum.get_by(id=forum.id)
 
     assert forum is None
 
@@ -154,7 +157,7 @@ def test_forum_delete_with_user_and_topic(topic, user):
 
     topic.forum.delete([user])
 
-    forum = Forum.query.filter_by(id=topic.forum_id).first()
+    forum = Forum.get_by(id=topic.forum_id)
 
     assert forum is None
 
@@ -177,13 +180,13 @@ def test_forum_update_last_post(topic, user):
 
 def test_forum_update_read(database, user, topic):
     """Test the update read method."""
-    forumsread = ForumsRead.query.filter(
+    forumsread = ForumsRead.get(
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-    ).first()
+    )
 
-    topicsread = TopicsRead.query.filter(
+    topicsread = TopicsRead.get(
         TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    ).first()
+    )
 
     forum = topic.forum
 
@@ -199,15 +202,15 @@ def test_forum_update_read(database, user, topic):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # hence, we also need to create a new forumsread entry
         assert forum.update_read(current_user, forumsread, topicsread)
 
-        forumsread = ForumsRead.query.filter(
+        forumsread = ForumsRead.get(
             ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-        ).first()
+        )
 
         # everything should be up-to-date now
         assert not forum.update_read(current_user, forumsread, topicsread)
@@ -216,7 +219,7 @@ def test_forum_update_read(database, user, topic):
         post.save(user=user, topic=topic)
 
         # Updating the topicsread tracker
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # now the forumsread tracker should also need a update
@@ -231,9 +234,9 @@ def test_forum_update_read_two_topics(database, user, topic, topic_moderator):
     """Test if the ForumsRead tracker will be updated if there are two topics
     and where one is unread and the other is read.
     """
-    forumsread = ForumsRead.query.filter(
+    forumsread = ForumsRead.get(
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-    ).first()
+    )
 
     forum = topic.forum
 
@@ -246,7 +249,7 @@ def test_forum_update_read_two_topics(database, user, topic, topic_moderator):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         # will not create a entry because there is still one unread topic
@@ -332,9 +335,9 @@ def test_topic_delete(topic):
 
     topic.delete()
 
-    forum = Forum.query.filter_by(id=topic.forum_id).first()
-    user = User.query.filter_by(id=topic.user_id).first()
-    topic = Topic.query.filter_by(id=topic.id).first()
+    forum = Forum.get_by(id=topic.forum_id)
+    user = User.get_by(id=topic.user_id)
+    topic = Topic.get_by(id=topic.id)
 
     assert topic is None
     assert user.post_count == 0
@@ -348,7 +351,7 @@ def test_topic_move(topic):
     forum_other = Forum(title="Test Forum 2", category_id=1)
     forum_other.save()
 
-    forum_old = Forum.query.filter_by(id=topic.forum_id).first()
+    forum_old = Forum.get_by(id=topic.forum_id)
 
     assert topic.move(forum_other)
 
@@ -372,13 +375,13 @@ def test_topic_tracker_needs_update(database, user, topic):
     """Tests if the topicsread tracker needs an update if a new post has been
     submitted.
     """
-    forumsread = ForumsRead.query.filter(
+    forumsread = ForumsRead.get(
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-    ).first()
+    )
 
-    topicsread = TopicsRead.query.filter(
+    topicsread = TopicsRead.get(
         TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    ).first()
+    )
 
     with current_app.test_request_context():
         assert topic.tracker_needs_update(forumsread, topicsread)
@@ -388,13 +391,13 @@ def test_topic_tracker_needs_update(database, user, topic):
         topicsread.user_id = user.id
         topicsread.topic_id = topic.id
         topicsread.forum_id = topic.forum_id
-        topicsread.last_read = datetime.utcnow()
+        topicsread.last_read = datetime.now(UTC)
         topicsread.save()
 
         forumsread = ForumsRead()
         forumsread.user_id = user.id
         forumsread.forum_id = topic.forum_id
-        forumsread.last_read = datetime.utcnow()
+        forumsread.last_read = datetime.now(UTC)
         forumsread.save()
 
         # Now the topic should be read
@@ -420,20 +423,20 @@ def test_untracking_topic_does_not_delete_it(database, user, topic):
     # topictracker, when it clearly shouldn't be.
     user.save()
 
-    assert Topic.query.filter(Topic.id == topic.id).first()
+    assert Topic.get(Topic.id == topic.id)
 
 
 def test_topic_tracker_needs_update_cleared(database, user, topic):
     """Tests if the topicsread needs an update if the forum has been marked
     as cleared.
     """
-    forumsread = ForumsRead.query.filter(
+    forumsread = ForumsRead.get(
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-    ).first()
+    )
 
-    topicsread = TopicsRead.query.filter(
+    topicsread = TopicsRead.get(
         TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    ).first()
+    )
 
     with current_app.test_request_context():
         assert topic.tracker_needs_update(forumsread, topicsread)
@@ -442,8 +445,8 @@ def test_topic_tracker_needs_update_cleared(database, user, topic):
         forumsread = ForumsRead()
         forumsread.user_id = user.id
         forumsread.forum_id = topic.forum_id
-        forumsread.last_read = datetime.utcnow()
-        forumsread.cleared = datetime.utcnow()
+        forumsread.last_read = datetime.now(UTC)
+        forumsread.cleared = datetime.now(UTC)
         forumsread.save()
 
         # Now the topic should be read
@@ -452,9 +455,9 @@ def test_topic_tracker_needs_update_cleared(database, user, topic):
 
 def test_topic_update_read(database, user, topic):
     """Tests the update read method if the topic is unread/read."""
-    forumsread = ForumsRead.query.filter(
+    forumsread = ForumsRead.get(
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-    ).first()
+    )
 
     with current_app.test_request_context():
         # Test with logged in user
@@ -471,9 +474,9 @@ def test_topic_update_read(database, user, topic):
         post = Post(content="Test Content")
         post.save(topic=topic, user=user)
 
-        forumsread = ForumsRead.query.filter(
+        forumsread = ForumsRead.get(
             ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
-        ).first()
+        )
 
         # Test tracker length
         flaskbb_config["TRACKER_LENGTH"] = 0
@@ -562,7 +565,7 @@ def test_report(topic, user):
     assert report.reason == "Test Report Edited"
 
     report.delete()
-    report = Report.query.filter_by(id=report.id).first()
+    report = Report.get_by(id=report.id)
     assert report is None
 
 
@@ -572,12 +575,12 @@ def test_forumsread(topic, user):
     forumsread = ForumsRead()
     forumsread.user_id = user.id
     forumsread.forum_id = topic.forum_id
-    forumsread.last_read = datetime.utcnow()
+    forumsread.last_read = datetime.now(UTC)
     forumsread.save()
     assert forumsread is not None
 
     forumsread.delete()
-    forumsread = ForumsRead.query.filter_by(forum_id=forumsread.forum_id).first()
+    forumsread = ForumsRead.get_by(forum_id=forumsread.forum_id)
     assert forumsread is None
 
 
@@ -588,12 +591,12 @@ def test_topicsread(topic, user):
     topicsread.user_id = user.id
     topicsread.topic_id = topic.id
     topicsread.forum_id = topic.forum_id
-    topicsread.last_read = datetime.utcnow()
+    topicsread.last_read = datetime.now(UTC)
     topicsread.save()
     assert topicsread is not None
 
     topicsread.delete()
-    topicsread = TopicsRead.query.filter_by(topic_id=topicsread.topic_id).first()
+    topicsread = TopicsRead.get_by(topic_id=topicsread.topic_id)
     assert topicsread is None
 
 
@@ -645,18 +648,37 @@ def test_retrieving_hidden_posts(topic, user):
     new_post.save(user, topic)
     new_post.hide(user)
 
-    assert Post.query.get(new_post.id) is None
-    assert Post.query.with_hidden().get(new_post.id) == new_post
-    assert Post.query.filter(Post.id == new_post.id).first() is None
-    hidden_post = Post.query.with_hidden().filter(Post.id == new_post.id).first()
+    assert (
+        db.session.scalars(hidden(select(Post).where(Post.id == new_post.id))).first()
+        is None
+    )
+    assert (
+        db.session.scalars(
+            hidden(select(Post).where(Post.id == new_post.id), True)
+        ).first()
+        == new_post
+    )
+    hidden_post = db.session.scalars(
+        hidden(select(Post).where(Post.id == new_post.id), True)
+    ).first()
     assert hidden_post == new_post
 
 
 def test_retrieving_hidden_topics(topic, user):
     topic.hide(user)
 
-    assert Topic.query.get(topic.id) is None
-    assert Topic.query.with_hidden().get(topic.id) == topic
-    assert Topic.query.filter(Topic.id == topic.id).first() is None
-    hidden_topic = Topic.query.with_hidden().filter(Topic.id == topic.id).first()
+    assert (
+        db.session.scalars(hidden(select(Topic).where(Topic.id == topic.id))).first()
+        is None
+    )
+    assert (
+        db.session.scalars(
+            hidden(select(Topic).where(Topic.id == topic.id), True)
+        ).first()
+        == topic
+    )
+
+    hidden_topic = db.session.scalars(
+        hidden(select(Topic).where(Topic.id == topic.id), True)
+    ).first()
     assert hidden_topic == topic

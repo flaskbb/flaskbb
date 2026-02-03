@@ -16,19 +16,19 @@ clean: ## Remove unwanted stuff such as __pycache__, etc...
 	find . -name '__pycache__' -exec rm -rf {} +
 
 test: ## Runs the testsuite
-	tox
+	uv run pytest
 
 run: ## Runs the development server with the development config
-	flaskbb run --debugger --reload
+	WERKZEUG_DEBUG_PIN=off uv run flaskbb run --debugger --reload --debug
 
 frontend: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
 	cd flaskbb/themes/aurora && npm run watch
 
 devconfig:dependencies ## Generates a development config
-	flaskbb makeconfig -d
+	uv run flaskbb makeconfig -d
 
 install:dependencies ## Installs the dependencies and FlaskBB
-	flaskbb install
+	uv run flaskbb install
 
 docs: ## Builds the Sphinx docs
 	$(MAKE) -C docs html
@@ -41,8 +41,9 @@ isort:  ## Sorts the python imports
 	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
 	isort --order-by-type -rc -up
 
-dist: ## Creates distribution packages (bdist_wheel, sdist)
-	python setup.py sdist bdist_wheel
-
-upload:dist ## Uploads a new version of FlaskBB to PyPI
-	twine upload --skip-existing dist/*
+format: ## Sorts the imports and reformats the code
+	# sort imports / remove unused
+	uv run ruff check --fix --select I
+	uv run ruff check --fix
+	# reformat
+	uv run ruff format

@@ -1,122 +1,147 @@
-{% extends 'basic/layout.html' %}
-
-{%- block extrahead %}
-  {{ super() }}
-  <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" />
-  {% if theme_touch_icon %}
-    <link rel="apple-touch-icon" href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}" />
-  {% endif %}
-  {% if theme_canonical_url %}
-    <link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html"/>
-  {% endif %}
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-{% endblock %}
-
-{# Disable base theme's top+bottom related navs; we have our own in sidebar #}
-{%- block relbar1 %}{% endblock %}
-{%- block relbar2 %}{% endblock %}
-
-{# Nav should appear before content, not after #}
-{%- block content %}
-<nav class="navbar fixed-top navbar-expand-md navbar-light bg-light border-bottom flaskbb-navbar" role="navigation">
+{% extends 'basic/layout.html' %} {%- block extrahead %} {{ super() }}
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/custom.css', 1) }}"
+    type="text/css"
+/>
+{% if theme_touch_icon %}
+<link
+    rel="apple-touch-icon"
+    href="{{ pathto('_static/' ~ theme_touch_icon, 1) }}"
+/>
+{% endif %} {% if theme_canonical_url %}
+<link rel="canonical" href="{{ theme_canonical_url }}{{ pagename }}.html" />
+{% endif %}
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+/>
+{% endblock %} {# Disable base theme's top+bottom related navs; we have our own
+in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
+%} {# Nav should appear before content, not after #} {%- block content %}
+<nav
+    class="navbar fixed-top navbar-expand-md navbar-light bg-light border-bottom flaskbb-navbar"
+    role="navigation"
+>
     <div class="container">
-        <a class="navbar-brand" href="https://flaskbb.org">FlaskBB</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topnav-collapse" aria-controls="topnav-collapse" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="https://flaskbb.com">FlaskBB</a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#topnav-collapse"
+            aria-controls="topnav-collapse"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="topnav-collapse">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="https://flaskbb.org">Home</a>
+                    <a class="nav-link" href="https://flaskbb.com">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="https://flaskbb.org/about">About</a>
+                    <a class="nav-link" href="https://flaskbb.com/about"
+                        >About</a
+                    >
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="https://forums.flaskbb.org">Community</a>
+                    <a class="nav-link" href="https://forums.flaskbb.com"
+                        >Community</a
+                    >
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="https://flaskbb.readthedocs.io">Documentation</a>
+                    <a
+                        class="nav-link active"
+                        href="https://flaskbb.readthedocs.io"
+                        >Documentation</a
+                    >
                 </li>
             </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container -->
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
 </nav>
 
-{%- macro sidebar() %}
-  {%- if render_sidebar %}
-  <div class="page-sidebar" role="navigation" aria-label="main navigation">
+{%- macro sidebar() %} {%- if render_sidebar %}
+<div class="page-sidebar" role="navigation" aria-label="main navigation">
     <div class="page-sidebarwrapper">
-      {%- block sidebarlogo %}
-      {%- if logo %}
+        {%- block sidebarlogo %} {%- if logo %}
         <p class="logo">
-          <a href="{{ pathto(master_doc) }}"><img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="Logo"/></a>
+            <a href="{{ pathto(master_doc) }}"
+                ><img
+                    class="logo"
+                    src="{{ pathto('_static/' + logo, 1) }}"
+                    alt="Logo"
+            /></a>
         </p>
-      {%- endif %}
-      {%- endblock %}
-      {%- if sidebars != None %}
-        {#- new style sidebar: explicitly include/exclude templates #}
-        {%- for sidebartemplate in sidebars %}
-        {%- include sidebartemplate %}
-        {%- endfor %}
-      {%- endif %}
+        {%- endif %} {%- endblock %} {%- if sidebars != None %} {#- new style
+        sidebar: explicitly include/exclude templates #} {%- for sidebartemplate
+        in sidebars %} {%- include sidebartemplate %} {%- endfor %} {%- endif %}
     </div>
-  </div>
-  {%- endif %}
-{%- endmacro %}
+</div>
+{%- endif %} {%- endmacro %}
 
 <main role="main" class="flex-shrink-0">
     <div class="container">
-{%- if theme_fixed_sidebar|lower == 'true' %}
-  <div class="row">
-    {% if render_sidebar %}
-        <div class="col-12 col-sm-4 col-md-4 col-lg-3">
-            {{ sidebar() }}
-        </div>
-    {% endif %}
+        {%- if theme_fixed_sidebar|lower == 'true' %}
+        <div class="row">
+            {% if render_sidebar %}
+            <div class="col-12 col-sm-4 col-md-4 col-lg-3">{{ sidebar() }}</div>
+            {% endif %} {%- block document %}
 
-    {%- block document %}
-
-          <div class="col-12 col-sm-8 col-md-8 col-lg-9 page-content" role="main">
-            <div class="paper">
-            {% block body %} {% endblock %}
+            <div
+                class="col-12 col-sm-8 col-md-8 col-lg-9 page-content"
+                role="main"
+            >
+                <div class="paper">{% block body %} {% endblock %}</div>
             </div>
-          </div>
 
-    {%- endblock %}
+            {%- endblock %}
 
-    <div class="clearer"></div>
-  </div>
-{%- else %}
-{{ super() }}
-{%- endif %}
+            <div class="clearer"></div>
+        </div>
+        {%- else %} {{ super() }} {%- endif %}
     </div>
 </main>
-{%- endblock %}
-
-{%- block footer %}
+{%- endblock %} {%- block footer %}
 <footer class="footer mt-auto py-3">
     <div class="container">
         <div class="row justify-content-between align-items-center">
             <div class="col-4">
-                <p class="copyright text-muted small text-start mt-auto mb-auto">
-                    &copy; 2013 - <script type="text/javascript">document.write(new Date().getFullYear());</script> <a href="https://flaskbb.org">FlaskBB Team</a>
+                <p
+                    class="copyright text-muted small text-start mt-auto mb-auto"
+                >
+                    &copy; 2013 -
+                    <script type="text/javascript">
+                        document.write(new Date().getFullYear());
+                    </script>
+                    <a href="https://flaskbb.com">FlaskBB Team</a>
                 </p>
             </div>
             <div class="col-4">
                 <p class="made-in text-muted small text-center mt-auto mb-auto">
                     <i style="color: white" class="fas fa-fw fa-code"></i> with
-                    <i style="color: red" class="fas fa-fw fa-heart"></i> on Earth
+                    <i style="color: red" class="fas fa-fw fa-heart"></i> on
+                    Earth
                 </p>
             </div>
             <div class="col-4">
                 <p class="powered-by text-muted small text-end mt-auto mb-auto">
-                    Powered by <a href="https://www.sphinx-doc.org/">Sphinx {{ sphinx_version }}</a>
-                    {%- if show_source and has_source and sourcename %}
-                    {% if show_copyright or theme_show_powered_by %}|{% endif %}
-                    <a href="{{ pathto('_sources/' + sourcename, true)|e }}"
-                        rel="nofollow">{{ _('Page source') }}</a>
+                    Powered by
+                    <a href="https://www.sphinx-doc.org/"
+                        >Sphinx {{ sphinx_version }}</a
+                    >
+                    {%- if show_source and has_source and sourcename %} {% if
+                    show_copyright or theme_show_powered_by %}|{% endif %}
+                    <a
+                        href="{{ pathto('_sources/' + sourcename, true)|e }}"
+                        rel="nofollow"
+                        >{{ _('Page source') }}</a
+                    >
                     {%- endif %}
                 </p>
             </div>
@@ -124,5 +149,9 @@
     </div>
 </footer>
 <!-- Latest compiled and minified JavaScript -->
-<link rel="stylesheet" href="{{ pathto('_static/main.js', 1) }}" type="text/css" />
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/main.js', 1) }}"
+    type="text/css"
+/>
 {%- endblock %}

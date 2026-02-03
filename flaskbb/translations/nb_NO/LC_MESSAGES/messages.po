@@ -849,8 +849,8 @@ msgstr "Ekstern lenke"
 
 #: flaskbb/management/forms.py:369
 #, fuzzy
-msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "En lenke til en nettside. f.eks. 'https://flaskbb.org'."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
+msgstr "En lenke til en nettside. f.eks. 'https://flaskbb.com'."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80

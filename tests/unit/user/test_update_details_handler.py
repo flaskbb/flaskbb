@@ -61,7 +61,7 @@ class TestDefaultDetailsUpdateHandler(object):
         )
 
         handler.apply_changeset(user, details)
-        same_user = User.query.get(user.id)
+        same_user = User.get_by(id=user.id)
 
         assert same_user.location == location
         hook_impl.post_process_changeset.assert_called_once_with(

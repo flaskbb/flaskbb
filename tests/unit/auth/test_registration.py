@@ -60,7 +60,7 @@ class TestRegistrationService(object):
 
         service.register(self.fred)
 
-        actual_fred = User.query.filter(User.username == "Fred").one()
+        actual_fred = User.get(User.username == "Fred")
 
         assert actual_fred.id is not None
 

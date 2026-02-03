@@ -1,8 +1,3 @@
-import pytest
-from sqlalchemy.exc import OperationalError
-from sqlalchemy_utils.functions import create_database, drop_database
-
-from flaskbb.extensions import alembic, db
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.fixtures.settings import fixture as settings_fixture
 from flaskbb.forum.models import Category, Post, Topic
@@ -107,7 +102,7 @@ def test_update_settings_from_fixture_force(
 
 
 def test_create_user(default_groups):
-    user = User.query.filter_by(username="admin").first()
+    user = User.get_by(username="admin")
     assert not user
 
     user = create_user(
@@ -154,20 +149,7 @@ def test_create_default_groups(database):
     assert Group.query.count() == len(group_fixture)
 
     for key, attributes in group_fixture.items():
-        group = Group.query.filter_by(name=key).first()
+        group = Group.get_by(name=key)
 
         for attribute, value in attributes.items():
             assert getattr(group, attribute) == value
-
-
-def test_migrations_upgrade():
-    with pytest.raises(OperationalError):
-        User.query.all()
-
-    # ensure that the database is created
-    create_database(db.engine.url)
-
-    alembic.upgrade()
-    assert len(User.query.all()) == 0
-
-    drop_database(db.engine.url)

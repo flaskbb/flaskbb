@@ -39,9 +39,9 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
     # but before we have to add an read entry in forumsread and topicsread
     topic.update_read(user, topic.forum, forumsread)
 
-    time_read = dt.datetime.utcnow() - dt.timedelta(hours=1)
+    time_read = dt.datetime.now(dt.UTC) - dt.timedelta(hours=1)
     forumsread.cleared = time_read  # lets cheat here a bit :P
-    forumsread.last_read = dt.datetime.utcnow()
+    forumsread.last_read = dt.datetime.now(dt.UTC)
     forumsread.save()
     assert not forum_is_unread(forum, forumsread, user)
 
@@ -58,7 +58,7 @@ def test_forum_is_unread(guest, user, forum, topic, forumsread):
 
     # no topics in this forum
     topic.delete()
-    forum = Forum.query.filter_by(id=forum.id).first()
+    forum = Forum.get_by(id=forum.id)
     flaskbb_config["TRACKER_LENGTH"] = 1  # activate the tracker again
     assert forum.topic_count == 0
     assert not forum_is_unread(forum, None, user)
@@ -154,12 +154,16 @@ def test_check_image_too_big(image_too_big, default_settings, responses):
 def test_check_image_too_tall(image_too_tall, default_settings, responses):
     responses.add(image_too_tall)
 
+    flaskbb_config["AVATAR_WIDTH"] = 200
+    flaskbb_config["AVATAR_HEIGHT"] = 90
     assert_bad_image_check(check_image(image_too_tall.url), "high")
 
 
 def test_check_image_too_wide(image_too_wide, default_settings, responses):
     responses.add(image_too_wide)
 
+    flaskbb_config["AVATAR_WIDTH"] = 90
+    flaskbb_config["AVATAR_HEIGHT"] = 200
     assert_bad_image_check(check_image(image_too_wide.url), "wide")
 
 
@@ -172,5 +176,7 @@ def test_check_image_wrong_mime(image_wrong_mime, default_settings, responses):
 def test_check_image_just_right(image_just_right, default_settings, responses):
     responses.add(image_just_right)
 
+    flaskbb_config["AVATAR_WIDTH"] = 100
+    flaskbb_config["AVATAR_HEIGHT"] = 100
     result = check_image(image_just_right.url)
     assert result[1]

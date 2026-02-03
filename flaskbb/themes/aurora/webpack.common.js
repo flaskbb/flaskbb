@@ -66,7 +66,6 @@ module.exports = {
                             [
                                 "@babel/preset-env",
                                 {
-                                    targets: { ie: "11" },
                                     useBuiltIns: "entry",
                                     corejs: 3,
                                 },
@@ -74,9 +73,9 @@ module.exports = {
                             "@babel/preset-typescript",
                         ],
                         plugins: [
-                            "@babel/plugin-syntax-dynamic-import",
-                            "@babel/proposal-class-properties",
-                            "@babel/proposal-object-rest-spread",
+                            // "@babel/plugin-syntax-dynamic-import",
+                            "@babel/plugin-transform-class-properties",
+                            "@babel/plugin-transform-object-rest-spread",
                         ],
                     },
                 },

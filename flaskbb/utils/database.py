@@ -9,14 +9,26 @@ Some database helpers such as a CRUD mixin.
 :license: BSD, see LICENSE for more details.
 """
 
+import datetime
 import logging
+import typing as t
 
-import pytz
-from flask_login import current_user
-from flask_sqlalchemy.query import Query
-from sqlalchemy.orm import declarative_mixin, declared_attr
+import sqlalchemy as sa
+import sqlalchemy.types as types
+from flask import abort
+from sqlalchemy.orm import (
+    InstrumentedAttribute,
+    Mapped,
+    declarative_mixin,
+    declared_attr,
+    mapped_column,
+    relationship,
+)
 
 from flaskbb.extensions import db
+
+if t.TYPE_CHECKING:
+    from flaskbb.user.models import User
 
 from ..core.exceptions import PersistenceError
 
@@ -44,99 +56,113 @@ class CRUDMixin(object):
         return "<{}>".format(self.__class__.__name__)
 
     @classmethod
+    def get(cls, *clause: t.Any):
+        result = db.session.execute(sa.select(cls).where(*clause)).scalar()
+
+        return result
+
+    @classmethod
+    def get_or_404(cls, *clause: t.Any):
+        result = cls.get(clause)
+        if not result:
+            abort(404)
+        return result
+
+    @classmethod
+    def get_by(cls, **kwargs: t.Any):
+        return db.session.execute(sa.select(cls).filter_by(**kwargs)).scalar()
+
+    @classmethod
+    def get_by_or_404(cls, **kwargs: t.Any):
+        result = cls.get_by(**kwargs)
+        if not result:
+            abort(404)
+        return result
+
+    @classmethod
+    def get_all(cls, *clause: sa.ColumnExpressionArgument[bool]) -> list[t.Self]:
+        return list(db.session.execute(sa.select(cls).where(*clause)).scalars())
+
+    @classmethod
+    def count(
+        cls,
+        clause: list[sa.ColumnExpressionArgument[bool]]
+        | sa.ColumnExpressionArgument[bool]
+        | None = None,
+        column: InstrumentedAttribute[t.Any] | None = None,
+    ) -> int:
+        if column is None:
+            column = cls.id
+
+        stmt = db.select(db.func.count(column))
+        if clause is not None:
+            if not isinstance(clause, list):
+                clause = [clause]
+            stmt = stmt.where(*clause)
+        return db.session.execute(stmt).scalar_one()
+
+    @classmethod
     def create(cls, **kwargs):
         instance = cls(**kwargs)
         return instance.save()
 
-    def save(self):
+    def save(self) -> t.Self | None:
         """Saves the object to the database."""
         db.session.add(self)
         db.session.commit()
         return self
 
-    def delete(self):
+    def delete(self) -> t.Self | None:
         """Delete the object from the database."""
         db.session.delete(self)
         db.session.commit()
         return self
 
 
-class UTCDateTime(db.TypeDecorator):
-    impl = db.DateTime
+class UTCDateTime(types.TypeDecorator):
+    impl = types.DateTime
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
+    @t.override
+    def process_bind_param(
+        self, value: datetime.datetime | None, dialect: sa.Dialect
+    ) -> datetime.datetime | None:
         """Way into the database."""
         if value is not None:
-            # store naive datetime for sqlite and mysql
-            if dialect.name in ("sqlite", "mysql"):
-                return value.replace(tzinfo=None)
-
-            return value.astimezone(pytz.UTC)
-
-    def process_result_value(self, value, dialect):
-        """Way out of the database."""
-        # convert naive datetime to non naive datetime
-        if dialect.name in ("sqlite", "mysql") and value is not None:
-            return value.replace(tzinfo=pytz.UTC)
-
-        # other dialects are already non-naive
+            if not value.tzinfo or value.tzinfo.utcoffset(value) is None:
+                raise TypeError("tzinfo is required")
+            value = value.astimezone(datetime.timezone.utc).replace(tzinfo=None)
         return value
 
-
-class HideableQuery(Query):
-    _with_hidden = False
-
-    def __new__(cls, *args, **kwargs):
-        obj = super(HideableQuery, cls).__new__(cls)
-        include_hidden = kwargs.pop("_with_hidden", False)
-        has_view_hidden = current_user and current_user.permissions.get(
-            "viewhidden", False
-        )
-        obj._with_hidden = include_hidden or has_view_hidden
-        if args or kwargs:
-            super(HideableQuery, obj).__init__(*args, **kwargs)
-            return obj.filter_by(hidden=False) if not obj._with_hidden else obj
-        return obj
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def with_hidden(self):
-        return self.__class__(
-            self._only_full_mapper_zero("get"),
-            session=db.session(),
-            _with_hidden=True,
-        )
-
-    def _get(self, *args, **kwargs):
-        return super(HideableQuery, self).get(*args, **kwargs)
-
-    def get(self, *args, **kwargs):
-        obj = self.with_hidden()._get(*args, **kwargs)
-        return obj if obj is None or self._with_hidden or not obj.hidden else None
+    @t.override
+    def process_result_value(
+        self, value: t.Any | None, dialect: sa.Dialect
+    ) -> datetime.datetime | None:
+        """Way out of the database."""
+        if value is not None:
+            value = value.replace(tzinfo=datetime.timezone.utc)
+        return value
 
 
 @declarative_mixin
 class HideableMixin(object):
-    query_class = HideableQuery
-
-    hidden = db.Column(db.Boolean, default=False, nullable=True)
-    hidden_at = db.Column(UTCDateTime(timezone=True), nullable=True)
+    hidden: Mapped[bool] = mapped_column(default=False, nullable=False)
+    hidden_at: Mapped[datetime.datetime | None] = mapped_column(
+        UTCDateTime(timezone=True), nullable=True
+    )
 
     @declared_attr
-    def hidden_by_id(cls):  # noqa: B902
-        return db.Column(
-            db.Integer,
-            db.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),
+    def hidden_by_id(cls) -> Mapped[int | None]:
+        return mapped_column(
+            sa.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),
             nullable=True,
         )
 
     @declared_attr
-    def hidden_by(cls):  # noqa: B902
-        return db.relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
+    def hidden_by(cls) -> Mapped["User"]:
+        return relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
 
-    def hide(self, user, *args, **kwargs):
+    def hide(self, user: "User", *args, **kwargs) -> t.Self | None:
         from flaskbb.utils.helpers import time_utcnow
 
         self.hidden_by = user
@@ -144,7 +170,7 @@ class HideableMixin(object):
         self.hidden_at = time_utcnow()
         return self
 
-    def unhide(self, *args, **kwargs):
+    def unhide(self, *args, **kwargs) -> t.Self | None:
         self.hidden_by = None
         self.hidden = False
         self.hidden_at = None

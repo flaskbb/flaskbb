@@ -399,12 +399,12 @@ def flaskbb_authenticate(identifier, secret):
     Example of ending authentication::
 
         def prevent_login_with_too_many_failed_attempts(identifier):
-            user = User.query.filter(
+            user = User.get(
                 db.or_(
                     User.username == identifier,
                     User.email == identifier
                 )
-            ).first()
+            )
 
             if user is not None:
                 if has_too_many_failed_logins(user):
@@ -464,12 +464,12 @@ def flaskbb_authentication_failed(identifier):
     Example::
 
         def mark_failed_logins(identifier):
-            user = User.query.filter(
+            user = User.get(
                 db.or_(
                     User.username == identifier,
                     User.email == identifier
                 )
-            ).first()
+            )
 
             if user is not None:
                 if user.login_attempts is None:

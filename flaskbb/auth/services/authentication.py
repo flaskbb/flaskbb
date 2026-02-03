@@ -54,9 +54,11 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
         self.configuration = configuration
 
     def authenticate(self, identifier, secret):
-        user = User.query.filter(
-            db.or_(User.username == identifier, User.email == identifier)
-        ).first()
+        user = db.session.execute(
+            db.select(User).filter(
+                db.or_(User.username == identifier, User.email == identifier)
+            )
+        ).scalar_one_or_none()
 
         if user is not None:
             attempts = user.login_attempts
@@ -87,9 +89,11 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
     """
 
     def authenticate(self, identifier, secret):
-        user = User.query.filter(
-            db.or_(User.username == identifier, User.email == identifier)
-        ).first()
+        user = db.session.execute(
+            db.select(User).filter(
+                db.or_(User.username == identifier, User.email == identifier)
+            )
+        ).scalar_one_or_none()
 
         if user is not None:
             if check_password_hash(user.password, secret):
@@ -107,9 +111,11 @@ class MarkFailedLogin(AuthenticationFailureHandler):
     """
 
     def handle_authentication_failure(self, identifier):
-        user = User.query.filter(
-            db.or_(User.username == identifier, User.email == identifier)
-        ).first()
+        user = db.session.execute(
+            db.select(User).filter(
+                db.or_(User.username == identifier, User.email == identifier)
+            )
+        ).scalar_one_or_none()
 
         if user is not None:
             user.login_attempts += 1

@@ -56,7 +56,7 @@ html_theme_options = {
     "github_repo": "flaskbb",
     "github_type": "star",
     "description": (
-        "FlaskBB is a simple and extensible forum software " "for building communities."
+        "FlaskBB is a simple and extensible forum software for building communities."
     ),
     "fixed_sidebar": True,
     "show_related": True,

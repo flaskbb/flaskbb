@@ -30,7 +30,7 @@ class ValidationError(BaseFlaskBBError):
         is invalid.
     """
 
-    def __init__(self, attribute, reason):
+    def __init__(self, attribute: str, reason: list[tuple[str, str]]):
         self.attribute = attribute
         self.reason = reason
         super(ValidationError, self).__init__((attribute, reason))
@@ -49,7 +49,7 @@ class StopValidation(BaseFlaskBBError):
         why the object is invalid.
     """
 
-    def __init__(self, reasons):
+    def __init__(self, reasons: list[tuple[str, str]]):
         self.reasons = reasons
         super(StopValidation, self).__init__(reasons)
 
@@ -68,8 +68,8 @@ class PersistenceError(BaseFlaskBBError):
     """
 
 
-def accumulate_errors(caller, validators, throw=True):
-    errors = []
+def accumulate_errors(caller, validators, throw: bool = True) -> list[tuple[str, str]]:
+    errors: list[tuple[str, str]] = []
 
     for validator in validators:
         try:

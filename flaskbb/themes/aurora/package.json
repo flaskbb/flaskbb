@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "BSD-3-Clause",
   "author": "Peter Justin <peter.justin@outlook.com>",
-  "url": "https://flaskbb.org",
+  "url": "https://flaskbb.com",
   "private": true,
   "main": "src/app.js",
   "repository": {
@@ -23,32 +23,38 @@
     "watch": "npx webpack --config webpack.dev.js --watch"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.4",
-    "@github/markdown-toolbar-element": "^2.1.1",
-    "@popperjs/core": "^2.11.5",
-    "@textcomplete/core": "^0.1.11",
-    "@textcomplete/textarea": "^0.1.11",
-    "bootstrap": "^5.1.3",
-    "dompurify": "^2.3.8",
-    "marked": "^4.0.16",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@github/markdown-toolbar-element": "^2.2.3",
+    "@popperjs/core": "^2.11.8",
+    "@textcomplete/core": "^0.1.13",
+    "@textcomplete/textarea": "^0.1.13",
+    "bootstrap": "^5.3.8",
+    "dompurify": "^3.3.1",
+    "marked": "^17.0.1",
     "twemoji": "^14.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.2",
-    "@babel/preset-env": "^7.18.2",
-    "@babel/preset-typescript": "^7.17.12",
-    "autoprefixer": "^10.4.7",
-    "babel-loader": "^8.2.5",
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.28.6",
+    "@babel/plugin-transform-class-properties": "^7.28.6",
+    "@babel/plugin-transform-object-rest-spread": "^7.28.6",
+    "@babel/preset-env": "^7.28.6",
+    "@babel/preset-typescript": "^7.28.5",
+    "autoprefixer": "^10.4.23",
+    "babel-loader": "^10.0.0",
     "clean-webpack-plugin": "^4.0.0",
-    "css-loader": "^6.7.1",
-    "expose-loader": "^4.0.0",
-    "mini-css-extract-plugin": "^2.6.0",
-    "postcss-loader": "^7.0.0",
-    "sass": "^1.52.2",
-    "sass-loader": "^13.0.0",
-    "typescript": "^4.7.3",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.9.2"
-  }
+    "css-loader": "^7.1.2",
+    "expose-loader": "^5.0.1",
+    "mini-css-extract-plugin": "^2.10.0",
+    "postcss-loader": "^8.2.0",
+    "sass": "1.77.0",
+    "sass-loader": "^14.2.1",
+    "typescript": "^5.9.3",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "browserslist": [
+    "> 0.25%",
+    "not dead"
+  ]
 }

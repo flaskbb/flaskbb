@@ -11,46 +11,51 @@ Authorization requirements for FlaskBB.
 import logging
 
 from flask_allows import And, Or, Permission, Requirement
+from sqlalchemy import select
 
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.locals import current_forum, current_post, current_topic
 from flaskbb.forum.models import Forum, Post, Topic
+from flaskbb.user.models import User
 
 logger = logging.getLogger(__name__)
 
 
 class Has(Requirement):
-    def __init__(self, permission):
+    def __init__(self, permission: str):
         self.permission = permission
 
     def __repr__(self):
         return "<Has({!s})>".format(self.permission)
 
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         return user.permissions.get(self.permission, False)
 
 
 class IsAuthed(Requirement):
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         return user.is_authenticated
 
 
 class IsModeratorInForum(IsAuthed):
-    def __init__(self, forum=None, forum_id=None):
+    def __init__(self, forum: Forum | None = None, forum_id: int | None = None):
         self.forum_id = forum_id
         self.forum = forum
 
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         moderators = self._get_forum_moderators()
         return super(IsModeratorInForum, self).fulfill(
             user
         ) and self._user_is_forum_moderator(user, moderators)
 
-    def _user_is_forum_moderator(self, user, moderators):
+    def _user_is_forum_moderator(self, user: User, moderators: list[User]):
         return user in moderators
 
-    def _get_forum_moderators(self):
-        return self._get_forum().moderators
+    def _get_forum_moderators(self) -> list[User]:
+        forum = self._get_forum()
+        if forum is not None:
+            return forum.moderators
+        return []
 
     def _get_forum(self):
         if self.forum is not None:
@@ -60,7 +65,7 @@ class IsModeratorInForum(IsAuthed):
         return self._get_forum_from_request()
 
     def _get_forum_from_id(self):
-        return Forum.query.get(self.forum_id)
+        return Forum.get_by(id=self.forum_id)
 
     def _get_forum_from_request(self):
         if not current_forum:
@@ -69,18 +74,18 @@ class IsModeratorInForum(IsAuthed):
 
 
 class IsSameUser(IsAuthed):
-    def __init__(self, topic_or_post=None):
+    def __init__(self, topic_or_post: Post | Topic | int | None = None):
         self._topic_or_post = topic_or_post
 
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         return (
             super(IsSameUser, self).fulfill(user) and user.id == self._determine_user()
         )
 
     def _determine_user(self):
-        if self._topic_or_post is not None:
-            return self._topic_or_post.user_id
-        return self._get_user_id_from_post()
+        if isinstance(self._topic_or_post, int) or self._topic_or_post is None:
+            return self._get_user_id_from_post()
+        return self._topic_or_post.user_id
 
     def _get_user_id_from_post(self):
         if current_post:
@@ -92,13 +97,19 @@ class IsSameUser(IsAuthed):
 
 
 class TopicNotLocked(Requirement):
-    def __init__(self, topic=None, topic_id=None, post_id=None, post=None):
+    def __init__(
+        self,
+        topic: Topic | None = None,
+        topic_id: int | None = None,
+        post_id: int | None = None,
+        post: Post | None = None,
+    ):
         self._topic = topic
         self._topic_id = topic_id
         self._post = post
         self._post_id = post_id
 
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         return not any(self._determine_locked())
 
     def _determine_locked(self):
@@ -115,12 +126,16 @@ class TopicNotLocked(Requirement):
         elif self._post is not None:
             return self._post.topic.locked, self._post.topic.forum.locked
         elif self._topic_id is not None:
-            return (
-                Topic.query.join(Forum, Forum.id == Topic.forum_id)
-                .filter(Topic.id == self._topic_id)
-                .with_entities(Topic.locked, Forum.locked)
-                .first()
-            )
+            from flaskbb.extensions import db
+
+            result = db.session.execute(
+                select(Topic.locked, Forum.locked)
+                .join(Forum, Forum.id == Topic.forum_id)
+                .where(Topic.id == current_topic.id)
+            ).first()
+            if not result:
+                return False, False
+            return result.t
         else:
             return self._get_topic_from_request()
 
@@ -132,22 +147,22 @@ class TopicNotLocked(Requirement):
 
 
 class ForumNotLocked(Requirement):
-    def __init__(self, forum=None, forum_id=None):
+    def __init__(self, forum: Forum | None = None, forum_id: int | None = None):
         self._forum = forum
         self._forum_id = forum_id
 
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         return self._is_forum_locked()
 
     def _is_forum_locked(self):
         forum = self._determine_forum()
-        return not forum.locked
+        return forum and not forum.locked
 
     def _determine_forum(self):
         if self._forum is not None:
             return self._forum
         elif self._forum_id is not None:
-            return Forum.query.get(self._forum_id)
+            return Forum.get_by(id=self._forum_id)
         else:
             return self._get_forum_from_request()
 
@@ -158,7 +173,7 @@ class ForumNotLocked(Requirement):
 
 
 class CanAccessForum(Requirement):
-    def fulfill(self, user):
+    def fulfill(self, user: User):
         if not current_forum:
             raise FlaskBBError("Could not load forum data")
 
@@ -167,7 +182,7 @@ class CanAccessForum(Requirement):
         return bool(forum_groups & user_groups)
 
 
-def IsAtleastModeratorInForum(forum_id=None, forum=None):
+def IsAtleastModeratorInForum(forum_id: int | None = None, forum: Forum | None = None):
     return Or(
         IsAtleastSuperModerator,
         IsModeratorInForum(forum_id=forum_id, forum=forum),
@@ -213,13 +228,13 @@ CanDeleteTopic = Or(
 )
 
 
-def permission_with_identity(requirement, name=None):
+def permission_with_identity(requirement: Requirement, name: str | None = None):
     """
     Permission instance factory that can set a user at construction time
     can optionally name the closure for nicer debugging
     """
 
-    def _(user):
+    def _(user: User):
         return Permission(requirement, identity=user)
 
     if name is not None:
@@ -231,15 +246,15 @@ def permission_with_identity(requirement, name=None):
 # Template Requirements
 
 
-def has_permission(permission):
-    def _(user):
+def has_permission(permission: str):
+    def _(user: User):
         return Permission(Has(permission), identity=user)
 
     _.__name__ = "Has_{}".format(permission)
     return _
 
 
-def can_moderate(user, forum):
+def can_moderate(user: User, forum: Forum | int | None):
     kwargs = {}
 
     if isinstance(forum, int):
@@ -250,7 +265,7 @@ def can_moderate(user, forum):
     return Permission(IsAtleastModeratorInForum(**kwargs), identity=user)
 
 
-def can_post_reply(user, topic=None):
+def can_post_reply(user: User, topic: Topic | int | None = None):
     kwargs = {}
 
     if isinstance(topic, int):
@@ -268,7 +283,7 @@ def can_post_reply(user, topic=None):
     )
 
 
-def can_edit_post(user, topic_or_post=None):
+def can_edit_post(user: User, topic_or_post: Topic | Post | int | None = None):
     kwargs = {}
 
     if isinstance(topic_or_post, int):
@@ -292,7 +307,7 @@ def can_edit_post(user, topic_or_post=None):
     )
 
 
-def can_post_topic(user, forum):
+def can_post_topic(user: User, forum: Forum | int | None):
     kwargs = {}
 
     if isinstance(forum, int):
@@ -310,7 +325,7 @@ def can_post_topic(user, forum):
     )
 
 
-def can_delete_topic(user, topic=None):
+def can_delete_topic(user: User, topic: Topic | int | None = None):
     kwargs = {}
 
     if isinstance(topic, int):

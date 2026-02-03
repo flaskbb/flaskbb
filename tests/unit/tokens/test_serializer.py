@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from freezegun import freeze_time
@@ -31,7 +31,7 @@ def test_raises_token_error_with_bad_data():
 
 def test_expired_token_raises():
     serializer = tokens.FlaskBBTokenSerializer(
-        "i am a secret not", expiry=datetime.utcnow() + timedelta(seconds=1)
+        "i am a secret not", expiry=datetime.now(UTC) + timedelta(seconds=1)
     )
     dumped_token = serializer.dumps(
         Token(user_id=1, operation=TokenActions.RESET_PASSWORD)

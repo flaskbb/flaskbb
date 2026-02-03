@@ -1,7 +1,7 @@
 # Translations template for PROJECT.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
@@ -769,8 +769,8 @@ msgid "External link"
 msgstr "Lien externe"
 
 #: flaskbb/management/forms.py:369
-msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "Un lien vers un site web, par exemple : « http://flaskbb.org »."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
+msgstr "Un lien vers un site web, par exemple : « http://flaskbb.com »."
 
 
 #: flaskbb/management/forms.py:373

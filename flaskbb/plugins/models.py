@@ -10,11 +10,10 @@ store for plugins.
 :license: BSD, see LICENSE for more details.
 """
 
-from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.utils.database import CRUDMixin
 from flaskbb.utils.forms import SettingValueType, generate_settings_form
 
@@ -48,7 +47,7 @@ class PluginStore(CRUDMixin, db.Model):
         """Returns the PluginStore object or an empty one.
         The created object still needs to be added to the database session
         """
-        obj = cls.query.filter_by(plugin_id=plugin_id, key=key).first()
+        obj = cls.get_by(plugin_id=plugin_id, key=key)
 
         if obj is not None:
             return obj
@@ -74,12 +73,12 @@ class PluginRegistry(CRUDMixin, db.Model):
     @property
     def info(self):
         """Returns some information about the plugin."""
-        return current_app.pluggy.list_plugin_metadata().get(self.name, {})
+        return pluggy.list_plugin_metadata().get(self.name, {})
 
     @property
     def is_installable(self):
         """Returns True if the plugin has settings that can be installed."""
-        plugin_module = current_app.pluggy.get_plugin(self.name)
+        plugin_module = pluggy.get_plugin(self.name)
         return True if plugin_module.SETTINGS else False
 
     @property
@@ -98,9 +97,9 @@ class PluginRegistry(CRUDMixin, db.Model):
 
         :param settings: A dictionary containing setting items.
         """
-        pluginstore = PluginStore.query.filter(
+        pluginstore = PluginStore.get_all(
             PluginStore.plugin_id == self.id, PluginStore.key.in_(settings.keys())
-        ).all()
+        )
 
         setting_list = []
         for pluginsetting in pluginstore:

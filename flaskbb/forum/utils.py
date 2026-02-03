@@ -20,7 +20,6 @@ def force_login_if_needed():
     Forces a login if the current user is unauthed and the current forum
     doesn't allow guest users.
     """
-
     if current_forum and should_force_login(current_user, current_forum):
         return current_app.login_manager.unauthorized()
 

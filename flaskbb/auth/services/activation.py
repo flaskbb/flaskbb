@@ -14,6 +14,7 @@ from ...core.auth.activation import AccountActivator as _AccountActivator
 from ...core.exceptions import ValidationError
 from ...core.tokens import Token, TokenActions, TokenError
 from ...email import send_activation_token
+from ...extensions import db
 
 
 class AccountActivator(_AccountActivator):
@@ -27,7 +28,9 @@ class AccountActivator(_AccountActivator):
         self.users = users
 
     def initiate_account_activation(self, email):
-        user = self.users.query.filter_by(email=email).first()
+        user = db.session.execute(
+            db.select(self.users).filter_by(email=email)
+        ).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Entered email doesn't exist"))
@@ -47,7 +50,11 @@ class AccountActivator(_AccountActivator):
         token = self.token_serializer.loads(token)
         if token.operation != TokenActions.ACTIVATE_ACCOUNT:
             raise TokenError.invalid()
-        user = self.users.query.get(token.user_id)
+        user = db.session.execute(
+            db.select(self.users).filter_by(id=token.user_id)
+        ).scalar_one_or_none()
+        if user is None:
+            raise TokenError.invalid()
         if user.activated:
             raise ValidationError("activated", _("Account is already activated"))
         user.activated = True

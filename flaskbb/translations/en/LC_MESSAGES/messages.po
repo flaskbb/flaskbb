@@ -715,7 +715,7 @@ msgid "External link"
 msgstr ""
 
 #: flaskbb/management/forms.py:329
-msgid "A link to a website i.e. 'http://flaskbb.org'."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
 msgstr ""
 
 #: flaskbb/management/forms.py:333
@@ -2098,7 +2098,7 @@ msgstr ""
 #~ msgid "This Group name is taken."
 #~ msgstr ""
 
-#~ msgid "A link to a website i.e. 'http://flaskbb.org'"
+#~ msgid "A link to a website i.e. 'http://flaskbb.com'"
 #~ msgstr ""
 
 #~ msgid "You cannot convert a forum that contain topics in a external link"
@@ -2719,4 +2719,3 @@ msgstr ""
 
 #~ msgid "You are not allowed to edit this user."
 #~ msgstr ""
-

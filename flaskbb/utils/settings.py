@@ -12,13 +12,14 @@ configuration.
 
 import logging
 from collections.abc import MutableMapping
+from typing import Any, override
 
 from flaskbb.management.models import Setting
 
 logger = logging.getLogger(__name__)
 
 
-class FlaskBBConfig(MutableMapping):
+class FlaskBBConfig(MutableMapping[str, Any | None]):
     """Provides a dictionary like interface for interacting with FlaskBB's
     Settings cache.
     """
@@ -26,17 +27,19 @@ class FlaskBBConfig(MutableMapping):
     def __init__(self, *args, **kwargs):
         self.update(dict(*args, **kwargs))
 
-    def __getitem__(self, key):
+    @override
+    def __getitem__(self, key: str) -> Any:
         try:
             return Setting.as_dict()[key]
         except KeyError:
             logger.info(f"Couldn't find setting for key ${key}")
             return None
 
-    def __setitem__(self, key, value):
+    @override
+    def __setitem__(self, key: str, value: Any):
         Setting.update({key.lower(): value})
 
-    def __delitem__(self, key):  # pragma: no cover
+    def __delitem__(self, key: str):  # pragma: no cover
         pass
 
     def __iter__(self):

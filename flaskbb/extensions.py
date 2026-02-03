@@ -27,6 +27,10 @@ from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
 
 from flaskbb.exceptions import AuthorizationRequired
+from flaskbb.plugins.manager import FlaskBBPluginManager
+
+# PluginManager
+pluggy = FlaskBBPluginManager("flaskbb")
 
 # Permissions Manager
 allows = Allows(throws=AuthorizationRequired)
@@ -61,7 +65,7 @@ redis_store = FlaskRedis()
 debugtoolbar = DebugToolbarExtension()
 
 # Migrations
-alembic = Alembic()
+alembic = Alembic(command_name="db")
 
 # Themes
 themes = Themes()
@@ -73,7 +77,7 @@ babel = Babel()
 csrf = CSRFProtect()
 
 # Rate Limiting
-limiter = Limiter(auto_check=False, key_func=get_remote_address)
+limiter = Limiter(get_remote_address)
 
 # Celery
 celery = Celery("flaskbb")
