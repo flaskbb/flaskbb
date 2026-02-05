@@ -467,6 +467,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "flask-allows2"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "flask" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b6/36/ad167f7618f71a7aa022f0acbbbf2b0efdae7c41b0ceb7df001973be78f2/flask_allows2-1.0.0.tar.gz", hash = "sha256:df4252d2713e29a45b1e58fb7b45f372fe4556bb4672bbeafb1d8fa3dd99fad6", size = 51346, upload-time = "2026-02-05T20:44:40.396Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/af/14/bec7e91aacf59f2bd34bf01798948e55669c9c471aa9d3ed46fbd361df4e/flask_allows2-1.0.0-py3-none-any.whl", hash = "sha256:13b3610e729be0ed59a7ce3e901b28e9aff68fd3962e10ed004b9226d8523c43", size = 14651, upload-time = "2026-02-05T20:44:37.823Z" },
+]
+
+[[package]]
 name = "flask-babelplus"
 version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -637,7 +649,7 @@ dependencies = [
     { name = "email-validator" },
     { name = "flask" },
     { name = "flask-alembic" },
-    { name = "flask-allows" },
+    { name = "flask-allows2" },
     { name = "flask-babelplus" },
     { name = "flask-caching" },
     { name = "flask-debugtoolbar" },
@@ -701,7 +713,7 @@ requires-dist = [
     { name = "email-validator", specifier = ">=2.3.0" },
     { name = "flask", specifier = ">=3.1.2" },
     { name = "flask-alembic", specifier = ">=3.2.0" },
-    { name = "flask-allows", git = "https://github.com/flaskbb/flask-allows.git?rev=master" },
+    { name = "flask-allows2", specifier = ">=1.0.0" },
     { name = "flask-babelplus", specifier = ">=2.2.0" },
     { name = "flask-caching", specifier = ">=2.3.1" },
     { name = "flask-debugtoolbar", specifier = ">=0.16.0" },
@@ -714,8 +726,8 @@ requires-dist = [
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-whooshee", specifier = ">=0.9.1" },
     { name = "flask-wtf", specifier = ">=1.2.2" },
-    { name = "flaskbb-plugin-conversations", specifier = ">=1.1.0" },
-    { name = "flaskbb-plugin-portal", specifier = ">=1.2.0" },
+    { name = "flaskbb-plugin-conversations", editable = "../flaskbb-plugin-conversations" },
+    { name = "flaskbb-plugin-portal", editable = "../flaskbb-plugin-portal" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=2.0.3" },
     { name = "mistune", specifier = ">=3.2.0" },
@@ -753,27 +765,44 @@ dev = [
 
 [[package]]
 name = "flaskbb-plugin-conversations"
-version = "1.1.1"
-source = { registry = "https://pypi.org/simple" }
+version = "1.1.2"
+source = { editable = "../flaskbb-plugin-conversations" }
 dependencies = [
+    { name = "flask-allows" },
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/38/d8/bccd606b6c99d4c2ea4333fa2028cb108f27685e06495a597f0484294461/flaskbb-plugin-conversations-1.1.1.tar.gz", hash = "sha256:e1522cdca4011816dfc394a7a94cf03dbeff7f9989c645cd1c041110f372bc17", size = 14290, upload-time = "2022-06-07T19:15:57.005Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/a8/8e175f791ed15943bd1c2d5b06fc42bb77925c364c1e8bfb9a54209fc16e/flaskbb_plugin_conversations-1.1.1-py3-none-any.whl", hash = "sha256:ef8efcaccf21ee2d87cba3cb4073080faa8da7b6571b1b9b0c148a5b1c36427e", size = 21175, upload-time = "2022-06-07T19:15:54.657Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "flask-allows", git = "https://github.com/flaskbb/flask-allows.git?rev=master" },
+    { name = "flaskbb", specifier = ">=2.1.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "alabaster" },
+    { name = "babel" },
+    { name = "cov-core" },
+    { name = "coverage" },
+    { name = "freezegun" },
+    { name = "hatch" },
+    { name = "ipython" },
+    { name = "pre-commit" },
+    { name = "py" },
+    { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [[package]]
 name = "flaskbb-plugin-portal"
 version = "1.2.0"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../flaskbb-plugin-portal" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/09/08/4e353adb3a60aa36c9f943acc303d9d098f35cb360e3f02a66013b2a5047/flaskbb-plugin-portal-1.2.0.tar.gz", hash = "sha256:a3b57f90be4ef7d7b55ecf45d0f6a810edb5ea38eb82d348fc8deea76b23ad76", size = 7283, upload-time = "2021-09-09T20:34:05.712Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/0a/e64854f2dff81e6d6d2a0d76a20bb6831fd5c1c364f1145e12673bb6f888/flaskbb_plugin_portal-1.2.0-py3-none-any.whl", hash = "sha256:9932e588b7603d675158238a35e0efada8869dd5b8e20a558d66e007562a3181", size = 10182, upload-time = "2021-09-09T20:34:04.462Z" },
-]
+
+[package.metadata]
+requires-dist = [{ name = "flaskbb", specifier = ">=2.1.0" }]
 
 [[package]]
 name = "freezegun"

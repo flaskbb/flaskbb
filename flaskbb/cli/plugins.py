@@ -37,12 +37,15 @@ def list_plugins():
     if len(enabled_plugins) > 0:
         click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
         for plugin in enabled_plugins:
+            if not plugin:
+                click.secho(f"Plugin not found {plugin}")
+                continue
             p_mod = plugin[0]
             p_dist = plugin[1]
             click.secho(
-                "\t- {}\t({}), version {}".format(
-                    pluggy.get_name(p_mod).title(),
-                    p_dist.key,
+                "\t- {}\t\t({}) \tversion {}".format(
+                    pluggy.get_name(p_mod),
+                    p_dist.project_name,
                     p_dist.version,
                 ),
                 bold=True,
@@ -52,6 +55,9 @@ def list_plugins():
     if len(disabled_plugins) > 0:
         click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
         for plugin in disabled_plugins:
+            if not plugin:
+                click.secho(f"Plugin not found {plugin}")
+                continue
             p_mod = plugin[0]
             p_dist = plugin[1]
             click.secho(
