@@ -16,16 +16,16 @@ import sys
 import time
 import traceback
 from datetime import datetime
+from typing import Any, override
 
 import click
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
-from flask_alembic.cli import cli as alembic_click
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy_utils.functions import database_exists
 from werkzeug.utils import import_string
 
-from flaskbb import create_app
+from flaskbb.app import create_app
 from flaskbb.cli.utils import (
     EmailType,
     FlaskBBCLIError,
@@ -51,11 +51,11 @@ logger = logging.getLogger(__name__)
 
 
 class FlaskBBGroup(FlaskGroup):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         super(FlaskBBGroup, self).__init__(*args, **kwargs)
         self._loaded_flaskbb_plugins = False
 
-    def _load_flaskbb_plugins(self, ctx):
+    def _load_flaskbb_plugins(self, ctx: click.Context):
         if self._loaded_flaskbb_plugins:
             return
 
@@ -72,11 +72,13 @@ class FlaskBBGroup(FlaskGroup):
             for p in shell_context_processors:
                 app.shell_context_processor(p)
 
-    def get_command(self, ctx, name):
+    @override
+    def get_command(self, ctx: click.Context, name: str):
         self._load_flaskbb_plugins(ctx)
         return super(FlaskBBGroup, self).get_command(ctx, name)
 
-    def list_commands(self, ctx):
+    @override
+    def list_commands(self, ctx: click.Context):
         self._load_flaskbb_plugins(ctx)
         return super(FlaskBBGroup, self).list_commands(ctx)
 
@@ -92,12 +94,12 @@ def make_app():
     return create_app(config_file, instance_path)
 
 
-def set_config(ctx, param, value):
+def set_config(ctx: click.Context, param: str, value: str):
     """This will pass the config file to the create_app function."""
     ctx.ensure_object(ScriptInfo).config_file = value
 
 
-def set_instance(ctx, param, value):
+def set_instance(ctx: click.Context, param: str, value: str):
     """This will pass the instance path on the script info which can then
     be used in 'make_app'."""
     ctx.ensure_object(ScriptInfo).instance_path = value
@@ -142,15 +144,12 @@ def set_instance(ctx, param, value):
     help="Show the FlaskBB version.",
 )
 @click.pass_context
-def flaskbb(ctx):
+def flaskbb(ctx: click.Context):
     """This is the commandline interface for flaskbb."""
     if ctx.invoked_subcommand is None:
         # show the help text instead of an error
         # when just '--config' option has been provided
         click.echo(ctx.get_help())
-
-
-flaskbb.add_command(alembic_click, "db")
 
 
 @flaskbb.command()
@@ -171,7 +170,14 @@ flaskbb.add_command(alembic_click, "db")
     help="Don't run the migrations for the default plugins.",
 )
 @with_appcontext
-def install(welcome, force, username, email, password, no_plugins):
+def install(
+    welcome: bool,
+    force: bool,
+    username: str | None,
+    email: str | None,
+    password: str | None,
+    no_plugins: bool,
+):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -244,7 +250,9 @@ def install(welcome, force, username, email, password, no_plugins):
     is_flag=True,
     help="Initializes the database before populating it.",
 )
-def populate(bulk_data, test_data, posts, topics, force, initdb):
+def populate(
+    bulk_data: bool, test_data: bool, posts: int, topics: int, force: bool, initdb: bool
+):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
@@ -311,7 +319,7 @@ def reindex():
 @click.option(
     "--force", default=False, is_flag=True, help="Forcefully upgrades the fixtures."
 )
-def upgrade(all_latest, fixture, force):
+def upgrade(all_latest: bool, fixture: str | None, force: bool):
     """Updates the migrations and fixtures."""
     if all_latest:
         click.secho("[+] Upgrading migrations to the latest version...", fg="cyan")
@@ -346,7 +354,7 @@ def upgrade(all_latest, fixture, force):
 )
 @click.pass_context
 @with_appcontext
-def start_celery(ctx):
+def start_celery(ctx: click.Context):
     """Preconfigured wrapper around the 'celery' command."""
     celery.start(ctx.args)
 
@@ -405,7 +413,7 @@ def shell_command():
     "--methods", "-m", "order_by", flag_value="methods", help="Order by methods"
 )
 @with_appcontext
-def list_urls(order_by):
+def list_urls(order_by: str):
     """Lists all available routes."""
     from flask import current_app
 
@@ -461,7 +469,7 @@ def list_urls(order_by):
     is_flag=True,
     help="Overwrite any existing config file if one exists.",
 )
-def generate_config(development, output, force):
+def generate_config(development: bool, output: str | None, force: bool):
     """Generates a FlaskBB configuration file."""
     config_env = Environment(
         loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))

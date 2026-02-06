@@ -100,7 +100,7 @@ def get_cookiecutter():
     return cookiecutter
 
 
-def get_version(ctx, param, value):
+def get_version(ctx: click.Context, param: str | None, value: str | None) -> None:
     if not value or ctx.resilient_parsing:
         return
     message = (
