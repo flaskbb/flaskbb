@@ -24,7 +24,7 @@ from flask import (
     url_for,
 )
 from flask.views import MethodView
-from flask_allows import And, Permission
+from flask_allows2 import And, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker

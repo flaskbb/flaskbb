@@ -10,7 +10,7 @@ Authorization requirements for FlaskBB.
 
 import logging
 
-from flask_allows import And, Or, Permission, Requirement
+from flask_allows2 import And, Or, Permission, Requirement
 from sqlalchemy import select
 
 from flaskbb.exceptions import FlaskBBError

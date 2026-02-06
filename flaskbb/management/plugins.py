@@ -1,6 +1,6 @@
 from itertools import chain
 
-from flask_allows import Permission
+from flask_allows2 import Permission
 from pluggy import HookimplMarker
 
 impl = HookimplMarker("flaskbb")

@@ -16,7 +16,7 @@ import sys
 from celery import __version__ as celery_version
 from flask import Blueprint, current_app, flash, jsonify, redirect, request, url_for
 from flask.views import MethodView
-from flask_allows import Not, Permission
+from flask_allows2 import Not, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
 from pluggy import HookimplMarker

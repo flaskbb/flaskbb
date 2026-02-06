@@ -13,7 +13,7 @@ import logging
 from collections.abc import Mapping, Sequence
 from typing import Any, override
 
-from flask_allows import Permission
+from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from sqlalchemy import select

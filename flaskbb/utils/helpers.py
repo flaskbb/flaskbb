@@ -29,7 +29,7 @@ from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_time as babel_format_time
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask import Flask, current_app, flash, g, redirect, request, session, url_for
-from flask_allows import Permission
+from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
