@@ -10,8 +10,7 @@ The extensions that are used by FlaskBB.
 """
 
 from celery import Celery
-from flask_alembic import Alembic
-from flask_allows import Allows
+from flask_allows2 import Allows
 from flask_babelplus import Babel
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
@@ -28,6 +27,7 @@ from sqlalchemy import MetaData
 
 from flaskbb.exceptions import AuthorizationRequired
 from flaskbb.plugins.manager import FlaskBBPluginManager
+from flaskbb.utils.alembic import Alembic
 
 # PluginManager
 pluggy = FlaskBBPluginManager("flaskbb")
@@ -65,7 +65,7 @@ redis_store = FlaskRedis()
 debugtoolbar = DebugToolbarExtension()
 
 # Migrations
-alembic = Alembic(command_name="db")
+alembic = Alembic(command_name="", run_mkdir=False)
 
 # Themes
 themes = Themes()
