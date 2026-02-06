@@ -63,6 +63,15 @@ def flaskbb_jinja_directives(app):
 
 
 @spec
+def flaskbb_current_user(app, user):
+    """Hook for registering additional attributes on the current_user, etc.
+
+    :param app: The application object.
+    :param user: The user object.
+    """
+
+
+@spec
 def flaskbb_additional_setup(app, pluggy):
     """Hook for any additional setup a plugin wants to do after all other
     application setup has finished.

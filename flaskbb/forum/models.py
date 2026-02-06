@@ -631,7 +631,7 @@ class Topic(HideableCRUDMixin, db.Model):
             stmt = db.select(Post).filter(Post.topic_id == self.id)
             if topicsread is not None:
                 stmt = stmt.filter(Post.date_created > topicsread.last_read)
-            post = db.session.execute(stmt.order_by(Post.id.asc())).scalar_one_or_none()
+            post = db.session.execute(stmt.order_by(Post.id.asc())).scalar()
             if post is not None:
                 return post.url
 

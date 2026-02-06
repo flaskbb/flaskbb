@@ -303,9 +303,11 @@ def configure_extensions(app: Flask):
     @login_manager.user_loader
     def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
-        return db.session.execute(
+        user = db.session.execute(
             db.select(User).filter_by(id=user_id)
         ).scalar_one_or_none()
+        pluggy.hook.flaskbb_current_user(app=app, user=user)
+        return user
 
     login_manager.init_app(app)
 

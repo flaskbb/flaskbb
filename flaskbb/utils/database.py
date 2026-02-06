@@ -56,14 +56,13 @@ class CRUDMixin(object):
         return "<{}>".format(self.__class__.__name__)
 
     @classmethod
-    def get(cls, *clause: t.Any):
+    def get(cls, *clause: sa.ColumnExpressionArgument[bool]):
         result = db.session.execute(sa.select(cls).where(*clause)).scalar()
-
         return result
 
     @classmethod
-    def get_or_404(cls, *clause: t.Any):
-        result = cls.get(clause)
+    def get_or_404(cls, *clause: sa.ColumnExpressionArgument[bool]):
+        result = cls.get(*clause)
         if not result:
             abort(404)
         return result

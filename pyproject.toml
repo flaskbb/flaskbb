@@ -44,6 +44,7 @@ dependencies = [
   "Whoosh>=2.7.4",
   "WTForms>=3.2.1",
   "WTForms-SQLAlchemy>=0.4.2",
+  "requests>=2.32.5",
 ]
 requires-python = ">=3.12"
 authors = [
