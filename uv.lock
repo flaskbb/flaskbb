@@ -719,7 +719,7 @@ requires-dist = [
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-whooshee", specifier = ">=0.9.1" },
     { name = "flask-wtf", specifier = ">=1.2.2" },
-    { name = "flaskbb-plugin-conversations", specifier = ">=2.0.0" },
+    { name = "flaskbb-plugin-conversations", specifier = ">=2.0.1" },
     { name = "flaskbb-plugin-portal", specifier = ">=2.0.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=2.0.3" },
@@ -759,14 +759,14 @@ dev = [
 
 [[package]]
 name = "flaskbb-plugin-conversations"
-version = "2.0.0"
+version = "2.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/60/94/2a28d1f7eccc01f5051ca070f08eb0fde6bc63ca8bb18376e2b2ee766984/flaskbb_plugin_conversations-2.0.0.tar.gz", hash = "sha256:638aa1d32df8d3d72c77475306493c952ac3828458f6018b246fb5a3051a7216", size = 14511, upload-time = "2026-02-07T08:22:27.623Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/30/98f56e92175076cd5bd492824ad01e92301003f4cd0f04ebbcbe06948a55/flaskbb_plugin_conversations-2.0.1.tar.gz", hash = "sha256:4d5daa8091b946bfdbd8a599c50002a8230a45cd438ad667c54c062129c087e6", size = 14522, upload-time = "2026-02-07T20:27:15.86Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/08/4dfbe50864a60afcaf5b42e5fa2f930547d7c0a2baa71bf2c2a66ae5ec8b/flaskbb_plugin_conversations-2.0.0-py3-none-any.whl", hash = "sha256:ea213b399583c565a8557af1903a870eec38a38007ecf532a968c95b6bc62405", size = 21250, upload-time = "2026-02-07T08:22:26.518Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/84/d9934f810ea61b73065775a061e728fae709827e8b916940431b69be0871/flaskbb_plugin_conversations-2.0.1-py3-none-any.whl", hash = "sha256:3792f3a8c928a3721892a39bcd61eb03ffc1bedee4a12478ddaaf24376979b30", size = 21259, upload-time = "2026-02-07T20:27:14.769Z" },
 ]
 
 [[package]]
