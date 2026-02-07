@@ -719,8 +719,8 @@ requires-dist = [
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-whooshee", specifier = ">=0.9.1" },
     { name = "flask-wtf", specifier = ">=1.2.2" },
-    { name = "flaskbb-plugin-conversations", specifier = ">=1.1.0" },
-    { name = "flaskbb-plugin-portal", specifier = ">=1.2.0" },
+    { name = "flaskbb-plugin-conversations", specifier = ">=2.0.0" },
+    { name = "flaskbb-plugin-portal", specifier = ">=2.0.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=2.0.3" },
     { name = "mistune", specifier = ">=3.2.0" },
@@ -759,26 +759,26 @@ dev = [
 
 [[package]]
 name = "flaskbb-plugin-conversations"
-version = "1.1.1"
+version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/38/d8/bccd606b6c99d4c2ea4333fa2028cb108f27685e06495a597f0484294461/flaskbb-plugin-conversations-1.1.1.tar.gz", hash = "sha256:e1522cdca4011816dfc394a7a94cf03dbeff7f9989c645cd1c041110f372bc17", size = 14290, upload-time = "2022-06-07T19:15:57.005Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/94/2a28d1f7eccc01f5051ca070f08eb0fde6bc63ca8bb18376e2b2ee766984/flaskbb_plugin_conversations-2.0.0.tar.gz", hash = "sha256:638aa1d32df8d3d72c77475306493c952ac3828458f6018b246fb5a3051a7216", size = 14511, upload-time = "2026-02-07T08:22:27.623Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/a8/8e175f791ed15943bd1c2d5b06fc42bb77925c364c1e8bfb9a54209fc16e/flaskbb_plugin_conversations-1.1.1-py3-none-any.whl", hash = "sha256:ef8efcaccf21ee2d87cba3cb4073080faa8da7b6571b1b9b0c148a5b1c36427e", size = 21175, upload-time = "2022-06-07T19:15:54.657Z" },
+    { url = "https://files.pythonhosted.org/packages/96/08/4dfbe50864a60afcaf5b42e5fa2f930547d7c0a2baa71bf2c2a66ae5ec8b/flaskbb_plugin_conversations-2.0.0-py3-none-any.whl", hash = "sha256:ea213b399583c565a8557af1903a870eec38a38007ecf532a968c95b6bc62405", size = 21250, upload-time = "2026-02-07T08:22:26.518Z" },
 ]
 
 [[package]]
 name = "flaskbb-plugin-portal"
-version = "1.2.0"
+version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/09/08/4e353adb3a60aa36c9f943acc303d9d098f35cb360e3f02a66013b2a5047/flaskbb-plugin-portal-1.2.0.tar.gz", hash = "sha256:a3b57f90be4ef7d7b55ecf45d0f6a810edb5ea38eb82d348fc8deea76b23ad76", size = 7283, upload-time = "2021-09-09T20:34:05.712Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/73/b0/73f165dacff0b384ee6e01f70a925dc45b2ea8c88ab426373ad57b945f5c/flaskbb_plugin_portal-2.0.0.tar.gz", hash = "sha256:aa09aca6298b805d2dac9a0b5a7cc6be4b1aae3280eaa9abfa36808a3793b372", size = 6864, upload-time = "2026-02-07T18:53:33.888Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/0a/e64854f2dff81e6d6d2a0d76a20bb6831fd5c1c364f1145e12673bb6f888/flaskbb_plugin_portal-1.2.0-py3-none-any.whl", hash = "sha256:9932e588b7603d675158238a35e0efada8869dd5b8e20a558d66e007562a3181", size = 10182, upload-time = "2021-09-09T20:34:04.462Z" },
+    { url = "https://files.pythonhosted.org/packages/3d/ff/ac973f517275197a06b55f72dd5f44fd1656976eda6d1143ec28dba9bf2d/flaskbb_plugin_portal-2.0.0-py3-none-any.whl", hash = "sha256:94d39f0a78193dfe01211b79bacf6fce000783a774e01f7eb8d81d30d4c5080d", size = 11122, upload-time = "2026-02-07T18:53:32.672Z" },
 ]
 
 [[package]]
@@ -1711,11 +1711,11 @@ wheels = [
 
 [[package]]
 name = "wcwidth"
-version = "0.5.3"
+version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c2/62/a7c072fbfefb2980a00f99ca994279cb9ecf310cb2e6b2a4d2a28fe192b3/wcwidth-0.5.3.tar.gz", hash = "sha256:53123b7af053c74e9fe2e92ac810301f6139e64379031f7124574212fb3b4091", size = 157587, upload-time = "2026-01-31T03:52:10.92Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/a2/8e3becb46433538a38726c948d3399905a4c7cabd0df578ede5dc51f0ec2/wcwidth-0.6.0.tar.gz", hash = "sha256:cdc4e4262d6ef9a1a57e018384cbeb1208d8abbc64176027e2c2455c81313159", size = 159684, upload-time = "2026-02-06T19:19:40.919Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/c1/d73f12f8cdb1891334a2ccf7389eed244d3941e74d80dd220badb937f3fb/wcwidth-0.5.3-py3-none-any.whl", hash = "sha256:d584eff31cd4753e1e5ff6c12e1edfdb324c995713f75d26c29807bb84bf649e", size = 92981, upload-time = "2026-01-31T03:52:09.14Z" },
+    { url = "https://files.pythonhosted.org/packages/68/5a/199c59e0a824a3db2b89c5d2dade7ab5f9624dbf6448dc291b46d5ec94d3/wcwidth-0.6.0-py3-none-any.whl", hash = "sha256:1a3a1e510b553315f8e146c54764f4fb6264ffad731b3d78088cdb1478ffbdad", size = 94189, upload-time = "2026-02-06T19:19:39.646Z" },
 ]
 
 [[package]]
