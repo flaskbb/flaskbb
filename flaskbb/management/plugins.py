@@ -13,7 +13,7 @@ def flaskbb_tpl_admin_settings_menu(user):
     into a single iterable that can be used to populate
     the menu
     """
-    from flaskbb.utils.requirements import IsAdmin  # noqa: circular dependency
+    from flaskbb.utils.requirements import IsAdmin
 
     results = [
         ("management.overview", "Overview", "fa fa-tasks"),

@@ -73,7 +73,7 @@ class PluginRegistry(CRUDMixin, db.Model):
     @property
     def info(self):
         """Returns some information about the plugin."""
-        return pluggy.list_plugin_metadata().get(self.name, {})
+        return pluggy.list_plugin_metadata().get(self.name)
 
     @property
     def is_installable(self):

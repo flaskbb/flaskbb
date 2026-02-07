@@ -10,7 +10,9 @@ Plugin Manager for FlaskBB
 """
 
 import logging
-from typing import TYPE_CHECKING, Any, TypeAlias, override
+import string
+from importlib.metadata import PackageMetadata
+from typing import TYPE_CHECKING, TypeAlias, override
 
 if TYPE_CHECKING:
     from importlib.metadata import Distribution
@@ -23,12 +25,68 @@ logger = logging.getLogger(__name__)
 _Plugin: TypeAlias = object
 
 
-def parse_pkg_metadata(dist: Distribution):
-    metadata = {}
-    for key, value in dist.metadata.items():
-        metadata[key.replace("-", "_").lower()] = value
+class DistMeta:
+    name: str
+    package_name: str
+    url: str | None = None
+    author: str | None = None
+    license: str | None = None
+    summary: str | None
+    version: str
 
-    return metadata
+    def __init__(self, dist: Distribution, name: str) -> None:
+        self.package_name = dist.name
+        self.url = self._get_project_url(dist.metadata)
+        self.author = self._get_author(dist.metadata)
+        self.license = self._get_license(dist.metadata)
+        self.summary = dist.metadata.get("Summary")
+        self.version = dist.version
+        self.name = name
+
+    def _get_license(self, metadata: PackageMetadata):
+        license: str | None = metadata.get("License-Expression")
+        if license is not None:
+            return license
+
+        if license is None and metadata.get("License-File") is not None:
+            return f"See the provided {metadata.get('License-File')}"
+
+        return ""
+
+    def _get_author(self, metadata: PackageMetadata):
+        if metadata.get("Maintainer") is not None:
+            return metadata.get("Maintainer")
+        if metadata.get("Maintainer-Email") is not None:
+            return self._parse_name_with_email(metadata.get_all("Maintainer-Email"))
+        if metadata.get("Author") is not None:
+            return metadata.get("Author")
+        if metadata.get("Author-Email") is not None:
+            return self._parse_name_with_email(metadata.get_all("Author-Email"))
+        return ""
+
+    def _parse_name_with_email(self, mails: list[str] | None):
+        if mails is None:
+            return ""
+        names = [mail.split("<")[0].strip() for mail in mails]
+        return ", ".join(names)
+
+    def _get_project_url(self, metadata: PackageMetadata):
+        # https://packaging.python.org/en/latest/specifications/well-known-project-urls/#well-known-labels
+        names = ["homepage", "source", "sourcecode", "repository"]
+        urls: list[str] | None = metadata.get_all("Project-Url")
+        if not urls:
+            return ""
+        for url in sorted(urls):
+            name, uri = url.split(",")
+            if self._normalize_label(name) in names:
+                return uri
+        # uri not found
+        return ""
+
+    def _normalize_label(self, label: str) -> str:
+        chars_to_remove = string.punctuation + string.whitespace
+        removal_map = str.maketrans("", "", chars_to_remove)
+        return label.translate(removal_map).lower()
 
 
 class FlaskBBPluginManager(pluggy.PluginManager):
@@ -38,7 +96,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
     def __init__(self, project_name: str):
         super(FlaskBBPluginManager, self).__init__(project_name=project_name)
-        self._plugin_metadata: dict[str, dict[Any, Any]] = {}
+        self._plugin_metadata: dict[str, DistMeta] = {}
         self._disabled_plugins: dict[str, _Plugin] = {}
 
         # we maintain a seperate dict for flaskbb.* internal plugins
@@ -136,7 +194,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
 
                 plugin = ep.load()
                 self._plugin_distinfo.append((plugin, DistFacade(dist)))
-                self._plugin_metadata[ep.name] = parse_pkg_metadata(dist)
+                self._plugin_metadata[ep.name] = DistMeta(dist, ep.name)
 
                 if self.is_blocked(ep.name):
                     continue

@@ -33,18 +33,18 @@
                     <div class="col-md-4 col-sm-4 col-4">
                     {{ plugin.name.title() }}
                     (
-                    {%- if plugin.info.get('home_page') -%}
-                        <a href="{{ plugin.info.get('home_page') }}">{{ plugin.info.get("name") }}</a>
+                    {%- if plugin.info.url -%}
+                        <a href="{{ plugin.info.url }}">{{ plugin.info.package_name }}</a>
                     {%- else -%}
-                        {{ plugin.info.get("name") }}
+                        {{ plugin.info.name }}
                     {%- endif -%}
                     )
 
                     </div>
                     <div class="col-md-4 col-sm-4 col-4">
-                        <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugin.info.get('version') }}</div>
-                        <div class="plugin-description">{{ plugin.info.get('summary') }}</div>
-                        <div class="plugin-author">{% trans %}by{% endtrans %} {{ plugin.info.get('author') }}</div>
+                        <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugin.info.version }}</div>
+                        <div class="plugin-description">{{ plugin.info.summary }}</div>
+                        <div class="plugin-author">{% trans %}by{% endtrans %} {{ plugin.info.author }}</div>
                     </div>
                     <div class="col-md-4 col-sm-4 col-4">
                         {% if not plugin.enabled %}
