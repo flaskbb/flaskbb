@@ -740,6 +740,17 @@ def get_flaskbb_config(app: Flask, config_file: str | object):
             return import_string(config_file)
         except ImportStringError:
             return None
+    elif os.environ.get("FLASKBB_SETTINGS", None):
+        config_file = os.environ.get("FLASKBB_SETTINGS", "")
+
+        if os.path.exists(os.path.abspath(config_file)):
+            return os.path.join(os.path.abspath(config_file))
+
+        # config is an importable string
+        try:
+            return import_string(config_file)
+        except ImportStringError:
+            return None
     else:
         # this would be so much nicer and cleaner if we wouldn't
         # support the root/project dir.

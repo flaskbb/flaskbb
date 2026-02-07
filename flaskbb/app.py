@@ -163,9 +163,6 @@ def configure_app(app: Flask, config: Any):
     app.config["CONFIG_PATH"] = config
 
     # Environment
-    # Get config file from envvar
-    app.config.from_envvar("FLASKBB_SETTINGS", silent=True)
-
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object
     app_config_from_env(app, prefix="FLASKBB_")
