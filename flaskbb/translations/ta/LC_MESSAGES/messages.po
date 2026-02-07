@@ -826,8 +826,8 @@ msgid "External link"
 msgstr "வெளிப்புற இணைப்பு"
 
 #: flaskbb/management/forms.py:369
-msgid "A link to a website i.e. 'http://flaskbb.org'."
-msgstr "ஒரு வலைத்தளத்திற்கான இணைப்பு அதாவது 'http://flaskbb.org'."
+msgid "A link to a website i.e. 'http://flaskbb.com'."
+msgstr "ஒரு வலைத்தளத்திற்கான இணைப்பு அதாவது 'http://flaskbb.com'."
 
 #: flaskbb/management/forms.py:373
 #: flaskbb/templates/forum/category_layout.html:80
