@@ -63,17 +63,12 @@ module.exports = {
                     loader: "babel-loader",
                     options: {
                         presets: [
-                            [
-                                "@babel/preset-env",
-                                {
-                                    useBuiltIns: "entry",
-                                    corejs: 3,
-                                },
-                            ],
+                            "@babel/preset-env",
                             "@babel/preset-typescript",
                         ],
                         plugins: [
                             // "@babel/plugin-syntax-dynamic-import",
+                            ["polyfill-corejs3", { "method": "usage-global", "version": require("core-js/package.json").version }],
                             "@babel/plugin-transform-class-properties",
                             "@babel/plugin-transform-object-rest-spread",
                         ],
