@@ -584,7 +584,7 @@ def get_image_info(url: str):
     """
 
     try:
-        r = requests.get(url, timeout=(3.05, 27), stream=True)
+        r = requests.get(url, timeout=(3.05, 27), stream=True, allow_redirects=False)
     except requests.ConnectionError:
         return None
 
