@@ -29,7 +29,7 @@
     "@textcomplete/core": "^0.1.13",
     "@textcomplete/textarea": "^0.1.13",
     "bootstrap": "^5.3.8",
-    "dompurify": "^3.4.3",
+    "dompurify": "^3.4.11",
     "marked": "^18.0.3",
     "twemoji": "^14.0.2"
   },
