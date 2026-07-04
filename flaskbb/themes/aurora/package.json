@@ -34,12 +34,12 @@
     "twemoji": "^14.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
-    "@babel/core": "^7.29.0",
-    "@babel/plugin-transform-class-properties": "^7.28.6",
-    "@babel/plugin-transform-object-rest-spread": "^7.28.6",
-    "@babel/preset-env": "^7.29.5",
-    "@babel/preset-typescript": "^7.28.5",
+    "@babel/cli": "^8.0.0",
+    "@babel/core": "^8.0.0",
+    "@babel/plugin-transform-class-properties": "^8.0.0",
+    "@babel/plugin-transform-object-rest-spread": "^8.0.0",
+    "@babel/preset-env": "^8.0.0",
+    "@babel/preset-typescript": "^8.0.0",
     "autoprefixer": "^10.5.0",
     "babel-loader": "^10.1.1",
     "clean-webpack-plugin": "^4.0.0",
