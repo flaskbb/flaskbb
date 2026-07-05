@@ -37,10 +37,11 @@ def flaskbb_tpl_profile_settings_menu():
     """
     results = [
         (None, "Account Settings"),
-        ("user.settings", "General Settings"),
-        ("user.change_user_details", "Change User Details"),
-        ("user.change_email", "Change E-Mail Address"),
-        ("user.change_password", "Change Password"),
+        ("user.change_user_details", "User Details"),
+        ("user.change_avatar", "Avatar"),
+        ("user.change_email", "E-Mail Address"),
+        ("user.change_password", "Password"),
+        ("user.settings", "Display"),
     ]
     outcome = yield
     outcome.force_result(chain(results, *outcome.get_result()))

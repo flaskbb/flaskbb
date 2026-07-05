@@ -33,6 +33,7 @@ from wtforms.validators import (
 from flaskbb.utils.forms import FlaskBBForm
 
 from ..core.user.update import (
+    AvatarUpdate,
     EmailUpdate,
     PasswordUpdate,
     SettingsUpdate,
@@ -101,7 +102,22 @@ class ChangePasswordForm(FlaskBBForm):
 
     def as_change(self):
         return PasswordUpdate(
-            new_password=self.new_password.data, old_password=self.old_password.data
+            new_password=self.new_password.data,  # pyright: ignore[reportArgumentType]
+            old_password=self.old_password.data,  # pyright: ignore[reportArgumentType]
+        )
+
+
+class ChangeAvatarForm(FlaskBBForm):
+    avatar = StringField(_("Gender"), validators=[Optional()])
+    submit = SubmitField(_("Save"))
+
+    def validate_avatar(self, field):
+        if field.data is None:
+            return True
+
+    def as_change(self):
+        return AvatarUpdate(
+            avatar=self.avatar.data,  # pyright: ignore[reportArgumentType]
         )
 
 
@@ -110,7 +126,6 @@ class ChangeUserDetailsForm(FlaskBBForm):
     gender = StringField(_("Gender"), validators=[Optional()])
     location = StringField(_("Location"), validators=[Optional()])
     website = StringField(_("Website"), validators=[Optional(), URL()])
-    avatar = StringField(_("Avatar"), validators=[Optional(), URL()])
     signature = TextAreaField(_("Forum Signature"), validators=[Optional()])
     notes = TextAreaField(_("Notes"), validators=[Optional(), Length(min=0, max=5000)])
     submit = SubmitField(_("Save"))
@@ -125,7 +140,6 @@ class ChangeUserDetailsForm(FlaskBBForm):
             gender=self.gender.data,
             location=self.location.data,
             website=self.website.data,
-            avatar=self.avatar.data,
             signature=self.signature.data,
             notes=self.notes.data,
         )

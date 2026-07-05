@@ -11,68 +11,79 @@ across FlaskBB.
 """
 
 from abc import ABC, abstractmethod
+from datetime import date
+from typing import Any
 
-import attr
+from attrs import asdict, define, field
 
-from ..changesets import empty, is_empty
+from flaskbb.user.models import User
+
+from ..changesets import EmptyValue, empty, is_empty
 
 
-def _should_assign(current, new):
+def _should_assign(current: Any, new: Any):
     return not is_empty(new) and current != new
 
 
-@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
+@define(hash=True, eq=True, order=True, repr=True, frozen=True)
 class UserDetailsChange(object):
     """
     Object representing a change user details.
     """
 
-    birthday = attr.ib(default=empty)
-    gender = attr.ib(default=empty)
-    location = attr.ib(default=empty)
-    website = attr.ib(default=empty)
-    avatar = attr.ib(default=empty)
-    signature = attr.ib(default=empty)
-    notes = attr.ib(default=empty)
+    birthday: date | None | EmptyValue = field(default=empty)
+    gender: str | None | EmptyValue = field(default=empty)
+    location: str | None | EmptyValue = field(default=empty)
+    website: str | None | EmptyValue = field(default=empty)
+    signature: str | None | EmptyValue = field(default=empty)
+    notes: str | None | EmptyValue = field(default=empty)
 
-    def assign_to_user(self, user):
-        for name, value in attr.asdict(self).items():
+    def assign_to_user(self, user: User):
+        for name, value in asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
 
 
-@attr.s(hash=True, eq=True, order=True, repr=False, frozen=True)
+@define(hash=True, eq=True, order=True, repr=False, frozen=True)
 class PasswordUpdate(object):
     """
     Object representing an update to a user's password.
     """
 
-    old_password = attr.ib()
-    new_password = attr.ib()
+    old_password: str = field()
+    new_password: str = field()
 
 
-@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
+@define(hash=True, eq=True, order=True, repr=True, frozen=True)
 class EmailUpdate(object):
     """
     Object representing a change to a user's email address.
     """
 
-    # TODO(anr): Change to str.lower once Python2 is dropped
-    old_email = attr.ib(converter=lambda x: x.lower())
-    new_email = attr.ib(converter=lambda x: x.lower())
+    old_email: str = field(converter=lambda x: x.lower())
+    new_email: str = field(converter=lambda x: x.lower())
 
 
-@attr.s(hash=True, eq=True, order=True, repr=True, frozen=True)
+@define(hash=True, eq=True, order=True, repr=False, frozen=True)
+class AvatarUpdate(object):
+    """
+    Object representing an update to a user's avatar.
+    """
+
+    avatar: str = field()
+
+
+@define(hash=True, eq=True, order=True, repr=True, frozen=True)
 class SettingsUpdate(object):
     """
     Object representing an update to a user's settings.
     """
 
-    language = attr.ib()
-    theme = attr.ib()
+    language: str = field()
+    theme: str = field()
 
-    def assign_to_user(self, user):
-        for name, value in attr.asdict(self).items():
+    def assign_to_user(self, user: User):
+        for name, value in asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
 
@@ -86,7 +97,7 @@ class UserSettingsUpdatePostProcessor(ABC):
     """
 
     @abstractmethod
-    def post_process_settings_update(self, user, settings_update):
+    def post_process_settings_update(self, user: User, settings_update):
         """
         This method is abstract
         """

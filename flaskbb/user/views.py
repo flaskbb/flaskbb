@@ -12,18 +12,34 @@ and the user settings from a signed in user.
 
 import logging
 
-import attr
+from attrs import define, field
 from flask import Blueprint, Flask, flash, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 
+from flaskbb.user.forms import (
+    ChangeAvatarForm,
+    ChangeEmailForm,
+    ChangePasswordForm,
+    ChangeUserDetailsForm,
+    GeneralSettingsForm,
+)
 from flaskbb.user.models import User
+from flaskbb.user.services.update import (
+    DefaultAvatarUpdateHandler,
+    DefaultDetailsUpdateHandler,
+    DefaultEmailUpdateHandler,
+    DefaultPasswordUpdateHandler,
+    DefaultSettingsUpdateHandler,
+)
 from flaskbb.utils.helpers import real, register_view, render_template
 
 from ..core.exceptions import PersistenceError, StopValidation
 from .services.factories import (
+    avatar_update_handler,
+    change_avatar_form_factory,
     change_details_form_factory,
     change_email_form_factory,
     change_password_form_factory,
@@ -39,10 +55,12 @@ impl = HookimplMarker("flaskbb")
 logger = logging.getLogger(__name__)
 
 
-@attr.s(frozen=True, eq=False, order=False, hash=False, repr=True)
+@define(frozen=True, eq=False, order=False, hash=False, repr=True)
 class UserSettings(MethodView):
-    form = attr.ib(factory=settings_form_factory)
-    settings_update_handler = attr.ib(factory=settings_update_handler)
+    form: GeneralSettingsForm = field(factory=settings_form_factory)
+    settings_update_handler: DefaultSettingsUpdateHandler = field(
+        factory=settings_update_handler
+    )
 
     decorators = [login_required]
 
@@ -53,7 +71,7 @@ class UserSettings(MethodView):
         if self.form.validate_on_submit():
             try:
                 self.settings_update_handler.apply_changeset(
-                    current_user, self.form.as_change()
+                    real(current_user), self.form.as_change()
                 )
             except StopValidation as e:
                 self.form.populate_errors(e.reasons)
@@ -74,10 +92,12 @@ class UserSettings(MethodView):
         return redirect(url_for("user.settings"))
 
 
-@attr.s(frozen=True, hash=False, eq=False, order=False, repr=True)
+@define(frozen=True, hash=False, eq=False, order=False, repr=True)
 class ChangePassword(MethodView):
-    form = attr.ib(factory=change_password_form_factory)
-    password_update_handler = attr.ib(factory=password_update_handler)
+    form: ChangePasswordForm = field(factory=change_password_form_factory)
+    password_update_handler: DefaultPasswordUpdateHandler = field(
+        factory=password_update_handler
+    )
     decorators = [login_required]
 
     def get(self):
@@ -87,7 +107,7 @@ class ChangePassword(MethodView):
         if self.form.validate_on_submit():
             try:
                 self.password_update_handler.apply_changeset(
-                    current_user, self.form.as_change()
+                    real(current_user), self.form.as_change()
                 )
             except StopValidation as e:
                 self.form.populate_errors(e.reasons)
@@ -108,10 +128,12 @@ class ChangePassword(MethodView):
         return redirect(url_for("user.change_password"))
 
 
-@attr.s(frozen=True, eq=False, order=False, hash=False, repr=True)
+@define(frozen=True, eq=False, order=False, hash=False, repr=True)
 class ChangeEmail(MethodView):
-    form = attr.ib(factory=change_email_form_factory)
-    update_email_handler = attr.ib(factory=email_update_handler)
+    form: ChangeEmailForm = field(factory=change_email_form_factory)
+    update_email_handler: DefaultEmailUpdateHandler = field(
+        factory=email_update_handler
+    )
     decorators = [login_required]
 
     def get(self):
@@ -121,7 +143,7 @@ class ChangeEmail(MethodView):
         if self.form.validate_on_submit():
             try:
                 self.update_email_handler.apply_changeset(
-                    current_user, self.form.as_change()
+                    real(current_user), self.form.as_change()
                 )
             except StopValidation as e:
                 self.form.populate_errors(e.reasons)
@@ -142,10 +164,48 @@ class ChangeEmail(MethodView):
         return redirect(url_for("user.change_email"))
 
 
-@attr.s(frozen=True, repr=True, eq=False, order=False, hash=False)
+@define(frozen=True, eq=False, order=False, hash=False, repr=True)
+class ChangeAvatar(MethodView):
+    form: ChangeAvatarForm = field(factory=change_avatar_form_factory)
+    update_avatar_handler: DefaultAvatarUpdateHandler = field(
+        factory=avatar_update_handler
+    )
+    decorators = [login_required]
+
+    def get(self):
+        return self.render()
+
+    def post(self):
+        if self.form.validate_on_submit():
+            try:
+                self.update_avatar_handler.apply_changeset(
+                    real(current_user), self.form.as_change()
+                )
+            except StopValidation as e:
+                self.form.populate_errors(e.reasons)
+                return self.render()
+            except PersistenceError:
+                logger.exception("Error while updating avatar")
+                flash(_("Error while updating avatar"), "danger")
+                return self.redirect()
+
+            flash(_("Avatar updated."), "success")
+            return self.redirect()
+        return self.render()
+
+    def render(self):
+        return render_template("user/change_avatar.html", form=self.form)
+
+    def redirect(self):
+        return redirect(url_for("user.change_avatar"))
+
+
+@define(frozen=True, repr=True, eq=False, order=False, hash=False)
 class ChangeUserDetails(MethodView):
-    form = attr.ib(factory=change_details_form_factory)
-    details_update_handler = attr.ib(factory=details_update_factory)
+    form: ChangeUserDetailsForm = field(factory=change_details_form_factory)
+    details_update_handler: DefaultDetailsUpdateHandler = field(
+        factory=details_update_factory
+    )
     decorators = [login_required]
 
     def get(self):
@@ -155,7 +215,7 @@ class ChangeUserDetails(MethodView):
         if self.form.validate_on_submit():
             try:
                 self.details_update_handler.apply_changeset(
-                    current_user, self.form.as_change()
+                    real(current_user), self.form.as_change()
                 )
             except StopValidation as e:
                 self.form.populate_errors(e.reasons)
@@ -216,6 +276,11 @@ def flaskbb_load_blueprints(app: Flask):
         user,
         routes=["/settings/user-details"],
         view_func=ChangeUserDetails.as_view("change_user_details"),
+    )
+    register_view(
+        user,
+        routes=["/settings/avatar"],
+        view_func=ChangeAvatar.as_view("change_avatar"),
     )
     register_view(
         user,

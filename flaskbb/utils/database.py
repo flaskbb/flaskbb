@@ -24,6 +24,7 @@ from sqlalchemy.orm import (
     declared_attr,
     mapped_column,
     relationship,
+    scoped_session,
 )
 
 from flaskbb.extensions import db
@@ -181,7 +182,9 @@ class HideableCRUDMixin(HideableMixin, CRUDMixin):
     pass
 
 
-def try_commit(session: Session, message: str = "Error while saving"):
+def try_commit(
+    session: Session | scoped_session[Session], message: str = "Error while saving"
+):
     try:
         session.commit()
     except Exception:

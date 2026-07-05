@@ -11,8 +11,15 @@ Core interfaces for handlers, services, etc.
 
 from abc import ABC, abstractmethod
 from inspect import isclass
+from typing import Any, Generic, TypeVar, override
+
+from flask_sqlalchemy.model import Model
 
 empty = None
+
+# Declare two type variables
+M = TypeVar("M", bound=Model)
+C = TypeVar("C")  # Unbound type variable for the attrs class
 
 
 class EmptyValue(object):
@@ -32,7 +39,8 @@ class EmptyValue(object):
             empty = super(EmptyValue, EmptyValue).__new__(cls)
         return empty
 
-    def __eq__(self, other):
+    @override
+    def __eq__(self, other: Any):
         return isinstance(other, EmptyValue) or (
             isclass(other) and issubclass(other, EmptyValue)
         )
@@ -46,20 +54,20 @@ class EmptyValue(object):
 empty = EmptyValue()
 
 
-def is_empty(value, consider_none=False):
+def is_empty(value: Any, consider_none: bool = False):
     """
     Helper to check if an arbitrary value is an EmptyValue
     """
     return empty == value or (consider_none and value is None)
 
 
-class ChangeSetValidator(ABC):
+class ChangeSetValidator(ABC, Generic[M, C]):
     """
     Used to validate a change set is valid to apply against a model
     """
 
     @abstractmethod
-    def validate(self, model, changeset):
+    def validate(self, model: M, changeset: C):
         """
         May raise a :class:`~flaskbb.core.exceptions.ValidationError`
         to signify that the changeset cannot be applied to the model.
@@ -69,13 +77,13 @@ class ChangeSetValidator(ABC):
         pass
 
 
-class ChangeSetHandler(ABC):
+class ChangeSetHandler(ABC, Generic[M, C]):
     """
     Used to apply a changeset to a model.
     """
 
     @abstractmethod
-    def apply_changeset(self, model, changeset):
+    def apply_changeset(self, model: M, changeset: C):
         """
         Receives the current model and the changeset object, apply the
         changeset to the model and persist the model. May raise a
@@ -84,13 +92,13 @@ class ChangeSetHandler(ABC):
         """
 
 
-class ChangeSetPostProcessor(ABC):
+class ChangeSetPostProcessor(ABC, Generic[M, C]):
     """
     Used to handle actions after a change set has been persisted.
     """
 
     @abstractmethod
-    def post_process_changeset(self, model, changeset):
+    def post_process_changeset(self, model: M, changeset: C):
         """
         Used to react to a changeset's application to a model.
         """

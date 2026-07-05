@@ -707,6 +707,16 @@ def flaskbb_gather_details_update_validators(app):
 
 
 @spec
+def flaskbb_gather_avatar_update_validators(app):
+    """
+    Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
+    instances specialized for :class:`~flaskbb.core.user.update.AvatarUpdate`.
+
+    :param app: The current application
+    """
+
+
+@spec
 def flaskbb_details_updated(user, details_update):
     """
     Hook for responding to a user updating their details. This hook is called
@@ -774,7 +784,20 @@ def flaskbb_settings_updated(user, settings_update):
     See also :class:`~flaskbb.core.changesets.ChangeSetPostProcessor`
 
     :param user: The user whose settings have been updated.
-    :param settings: The settings change set applied to the user.
+    :param settings_update: The settings change set applied to the user.
+    """
+
+
+@spec
+def flaskbb_avatar_updated(user, avatar_update):
+    """
+    Hook for responding to a user updating their avatar. This hook is called after
+    the avatar change has been persisted.
+
+    See also :class:`~flaskbb.core.changesets.ChangeSetPostProcessor`
+
+    :param user: The user whose avatar have been updated.
+    :param avatar_update: The avatar change set applied to the user.
     """
 
 
