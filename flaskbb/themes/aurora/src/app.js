@@ -1,14 +1,14 @@
-import { Alert, Tooltip, Dropdown, Modal } from 'bootstrap';
-import '@github/markdown-toolbar-element'
+import '@github/markdown-toolbar-element';
+import { Alert, Dropdown, Modal, Tooltip } from 'bootstrap';
 
-import "./app/emoji.js";
-import "./app/editor.js";
-import "./app/flaskbb.js";
 import "./app/confirm_modal.js";
+import "./app/editor.js";
+import "./app/emoji.js";
+import "./app/flaskbb.js";
 
 
 import "./scss/styles.scss";
-export { BulkActions, show_management_search, check_overview_status } from "./app/flaskbb.js";
+export { Actions, BulkActions, check_overview_status, show_management_search } from "./app/flaskbb.js";
 
 var flaskbbAllowList = Tooltip.Default.allowList
 // allow <time> elements

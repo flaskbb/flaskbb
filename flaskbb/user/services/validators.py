@@ -17,10 +17,10 @@ from sqlalchemy import func
 
 from flaskbb.core.user.update import AvatarUpdate, EmailUpdate, PasswordUpdate
 from flaskbb.user.models import User
+from flaskbb.utils.uploads import validate_image
 
 from ...core.changesets import ChangeSetValidator
 from ...core.exceptions import StopValidation, ValidationError
-from ...utils.helpers import check_image
 
 
 @define(eq=False, order=False, hash=False, frozen=True, repr=True)
@@ -93,7 +93,7 @@ class OldPasswordMustMatch(ChangeSetValidator[User, PasswordUpdate]):
             raise StopValidation([("old_password", _("Old password is wrong"))])
 
 
-class ValidateAvatarURL(ChangeSetValidator[User, AvatarUpdate]):
+class ValidateAvatarImage(ChangeSetValidator[User, AvatarUpdate]):
     """
     Validates that the target avatar url currently meets constraints like
     height and width.
@@ -111,7 +111,7 @@ class ValidateAvatarURL(ChangeSetValidator[User, AvatarUpdate]):
             return
 
         try:
-            error, ignored = check_image(changeset.avatar)
+            error, __ = validate_image(changeset.avatar)
             if error:
                 raise ValidationError("avatar", error)
         except RequestException:

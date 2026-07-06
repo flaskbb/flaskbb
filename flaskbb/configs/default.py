@@ -280,6 +280,7 @@ class DefaultConfig(object):
     # URL Prefixes
     FORUM_URL_PREFIX = ""
     USER_URL_PREFIX = "/user"
+    UPLOAD_URL_PREFIX = "/uploads"
     MESSAGE_URL_PREFIX = "/message"
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
@@ -289,3 +290,7 @@ class DefaultConfig(object):
     # If set to `False` it will NOT remove plugins that are NOT installed on
     # the filesystem (virtualenv, site-packages).
     REMOVE_DEAD_PLUGINS = False
+
+    # Uploads
+    AVATAR_EXTENSIONS = ["jpg", "png", "gif"]
+    AVATAR_UPLOAD_PATH = None  # defaults to static_folder/uploads/avatar

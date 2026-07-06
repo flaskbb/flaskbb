@@ -188,7 +188,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     # Properties
     @property
     @override
-    def is_active(self):
+    def is_active(self):  # pyright: ignore[reportIncompatibleMethodOverride]
         """Returns the state of the account.
         If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always
         return ``True``. Is the option activated, it will, depending on the
@@ -214,6 +214,10 @@ class User(db.Model, UserMixin, CRUDMixin):
     def url(self):
         """Returns the url for the user."""
         return url_for("user.profile", username=self.username)
+
+    @property
+    def avatar_url(self):
+        return url_for("uploads.avatar", avatar=self.avatar)
 
     @property
     def permissions(self):

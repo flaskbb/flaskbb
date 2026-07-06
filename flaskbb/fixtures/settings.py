@@ -271,7 +271,7 @@ fixture = (
                     },
                 ),
                 (
-                    "avatar_types",
+                    "avatar_types",  # DEPRECATED
                     {
                         "value": ["PNG", "JPEG", "GIF"],
                         "value_type": SettingValueType.selectmultiple,

@@ -97,7 +97,7 @@ def change_email_form_factory():
 
 
 def change_avatar_form_factory():
-    return ChangeAvatarForm(user=current_user)
+    return ChangeAvatarForm(obj=current_user)
 
 
 def change_details_form_factory():

@@ -9,6 +9,7 @@ User update services.
 :license: BSD, see LICENSE for more details
 """
 
+import os
 from typing import override
 
 from attrs import define, field
@@ -23,6 +24,7 @@ from flaskbb.core.user.update import (
 )
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.user.models import User
+from flaskbb.utils.uploads import get_avatar_filename, get_avatar_upload_path
 
 from ...core.changesets import ChangeSetHandler, ChangeSetValidator
 from ...core.exceptions import accumulate_errors
@@ -62,7 +64,10 @@ class DefaultAvatarUpdateHandler(ChangeSetHandler[User, AvatarUpdate]):
     @override
     def apply_changeset(self, model: User, changeset: AvatarUpdate):
         accumulate_errors(lambda v: v.validate(model, changeset), self.validators)
-        model.avatar = changeset.avatar
+
+        filename = get_avatar_filename(model.username, changeset.avatar.filename)
+        changeset.avatar.save(os.path.join(get_avatar_upload_path(), filename))
+        model.avatar = filename
         try_commit(self.db.session, "Could not update avatar")
         self.plugin_manager.hook.flaskbb_avatar_updated(user=model)
 

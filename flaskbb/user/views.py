@@ -13,7 +13,7 @@ and the user settings from a signed in user.
 import logging
 
 from attrs import define, field
-from flask import Blueprint, Flask, flash, redirect, request, url_for
+from flask import Blueprint, Flask, flash, jsonify, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
@@ -194,10 +194,43 @@ class ChangeAvatar(MethodView):
         return self.render()
 
     def render(self):
-        return render_template("user/change_avatar.html", form=self.form)
+        return render_template(
+            "user/change_avatar.html", form=self.form, user=current_user
+        )
 
     def redirect(self):
         return redirect(url_for("user.change_avatar"))
+
+
+class DeleteAvatar(MethodView):
+    decorators = [login_required]
+
+    def post(self, user_id: int | None = None):
+        json = request.get_json(silent=True)
+
+        user = None
+        if json is None and user_id is not None:
+            user = User.get_by(id=user_id)
+        elif json is not None:
+            user_id = json.get("user")
+            if user_id:
+                user_id = int(user_id)
+                user = User.get_by(id=user_id)
+
+        if user is None or current_user.id != user.id:
+            return jsonify(
+                message=_("You cannot delete an avatar from someone else."),
+                category="danger",
+                status=403,
+            )
+
+        user.avatar = None
+        user.save()
+        return jsonify(
+            message=_("Avatar deleted."),
+            category="success",
+            status=200,
+        )
 
 
 @define(frozen=True, repr=True, eq=False, order=False, hash=False)
@@ -281,6 +314,11 @@ def flaskbb_load_blueprints(app: Flask):
         user,
         routes=["/settings/avatar"],
         view_func=ChangeAvatar.as_view("change_avatar"),
+    )
+    register_view(
+        user,
+        routes=["/settings/avatar/delete"],
+        view_func=DeleteAvatar.as_view("delete_avatar"),
     )
     register_view(
         user,

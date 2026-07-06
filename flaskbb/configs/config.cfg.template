@@ -278,5 +278,9 @@ ADMIN_URL_PREFIX = "/admin"
 # the filesystem (virtualenv, site-packages).
 REMOVE_DEAD_PLUGINS = False
 
+# Avatar Upload
+AVATAR_EXTENSIONS = ["jpg", "png", "gif"]
+AVATAR_UPLOAD_PATH = None  # defaults to <static_folder>/uploads/avatar
+
 # determines the warning level for FlaskBB Deprecations
 DEPRECATION_LEVEL = "{{ deprecation_level }}"

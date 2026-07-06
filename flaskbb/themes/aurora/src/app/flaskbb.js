@@ -27,12 +27,12 @@ function flash_message(message) {
 
     let flashed_message = `<div class="alert alert-${message.category} alert-dismissible fade show">`;
 
-    if (message.category == "success") {
-        flashed_message += '<span class="fas fa-ok-sign me-2"></span>';
-    } else if (message.category == "error") {
-        flashed_message += '<span class="fas fa-exclamation-sign me-2"></span>';
+    if (message.category === "success") {
+        flashed_message += '<span class="fas fa-check me-2"></span>';
+    } else if (message.category === "danger" || message.category === "error") {
+        flashed_message += '<span class="fas fa-xmark me-2"></span>';
     } else {
-        flashed_message += '<span class="fas fa-info-sign me-2"></span>';
+        flashed_message += '<span class="fas fa-info me-2"></span>';
     }
     flashed_message += `
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -42,89 +42,116 @@ function flash_message(message) {
     container.insertAdjacentHTML("beforeend", flashed_message);
 }
 
-export class BulkActions {
-    execute(endpoint) {
-        let selected = document.querySelectorAll(
-            "input.action-checkbox:checked"
-        );
-        let data = { ids: [] };
+class BaseAction {
+    confirm(endpoint, data, callback = undefined) {
+        const modalEl = document.getElementById("confirmModal");
+        const modal = Modal.getOrCreateInstance(modalEl);
+        modal.show();
 
-        // don't do anything if nothing is selected
-        if (selected.length === 0) {
-            return false;
-        }
+        const confirmBtn = modalEl.querySelector(".confirmBtn");
+        confirmBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.hide();
+            sendData(endpoint, data, callback);
+        }, { once: true });
+    }
+}
 
-        for (let selection of selected) {
-            data.ids.push(selection.value);
+export class Actions {
+    execute(endpoint, data, callback = undefined, showConfirm = false) {
+        if (!data) return false;
+
+        const action = () => sendData(endpoint, data, callback);
+        if (showConfirm) {
+            showConfirmModal(action);
+        } else {
+            action();
         }
-        //send_data(endpoint, data);
-        this.confirm(endpoint, data);
         return false;
     }
+}
 
-    confirm(endpoint, data) {
-        const confirmModalElement = document.getElementById("confirmModal");
-        let confirmModal = Modal.getOrCreateInstance(confirmModalElement);
-        confirmModal.show();
+export class BulkActions {
+    execute(endpoint) {
+        const selected = document.querySelectorAll("input.action-checkbox:checked");
+        if (selected.length === 0) return false;
 
-        // the confirm button of the modal
-        let confirmButton = confirmModalElement.querySelector(".confirmBtn");
-        confirmButton.addEventListener(
-            "click",
-            function (e) {
-                e.preventDefault();
-                confirmModal.hide();
-                send_data(endpoint, data);
-            },
-            {
-                once: true,
-            }
-        );
+        const data = { ids: Array.from(selected, input => input.value) };
+        showConfirmModal(() => sendBulkData(endpoint, data));
+        return false;
     }
 }
 
-export function send_data(endpoint_url, data) {
-    fetch(endpoint_url, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": csrf_token,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            flash_message(data);
-
-            if (data?.data == null) {
-                return;
-            }
-            for (let obj of data.data) {
-                // get the form
-                const form_id = `#${obj.type}-${obj.id}`;
-                let form = document.querySelector(form_id);
-
-                // check if there is something to reverse it, otherwise remove the DOM.
-                if (obj.reverse) {
-                    form.setAttribute("action", obj.reverse_url);
-
-                    let reverse_html = "";
-                    if (obj.reverse == "ban") {
-                        reverse_html = `<span class="fas fa-flag text-success" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
-                    } else if (obj.reverse == "unban") {
-                        reverse_html = `<span class="fas fa-flag text-warning" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
-                    }
-                    form.querySelector("button").innerHTML = reverse_html;
-                } else if (obj.type == "delete") {
-                    form.parentNode.parentNode.remove();
-                }
-            }
-        })
-        .catch((error) => {
-            console.error("error: ", error);
-            flash_message(error);
+async function makeRequest(endpoint, data) {
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrf_token,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
         });
+        const resData = await response.json();
+        flash_message(resData);
+        return resData;
+    } catch (error) {
+        console.error("error: ", error);
+        flash_message(error);
+        return null;
+    }
 }
+
+
+function showConfirmModal(onConfirm) {
+    const modalEl = document.getElementById("confirmModal");
+    const modal = Modal.getOrCreateInstance(modalEl);
+    modal.show();
+
+    const confirmBtn = modalEl.querySelector(".confirmBtn");
+    confirmBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        modal.hide();
+        onConfirm();
+    }, { once: true });
+}
+
+
+export async function sendData(endpoint_url, data, callback) {
+    const resData = await makeRequest(endpoint_url, data);
+    if (resData && typeof callback === 'function') {
+        callback(resData);
+    }
+}
+
+
+export async function sendBulkData(endpoint_url, data) {
+    const resData = await makeRequest(endpoint_url, data);
+    if (!resData?.data) return;
+
+    const iconMap = {
+        ban: { color: "text-success", icon: "fa-flag" },
+        unban: { color: "text-warning", icon: "fa-flag" }
+    };
+
+    for (const obj of resData.data) {
+        const form = document.querySelector(`#${obj.type}-${obj.id}`);
+        if (!form) continue;
+
+        if (obj.reverse) {
+            form.setAttribute("action", obj.reverse_url);
+
+            const config = iconMap[obj.reverse];
+            if (config) {
+                form.querySelector("button").innerHTML =
+                    `<span class="fas ${config.icon} ${config.color}" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
+            }
+        } else if (obj.type === "delete") {
+            form.closest('tr')?.remove() || form.parentNode.parentNode.remove();
+        }
+    }
+}
+
 
 export function parse_emoji(value) {
     // use this instead of twemoji.parse

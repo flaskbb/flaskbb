@@ -3,8 +3,8 @@
     {% set alt = "default profile picture" %}
 
     {% if user and user.avatar %}
-    {% set avatar_url = user.avatar %}
-    {% set alt = user.username ~ "profile picture" %}
+    {% set avatar_url = user.avatar_url %}
+    {% set alt = user.username ~ " profile picture" %}
     {% endif %}
 
     <img src="{{ avatar_url }}" class="{{ class }}" alt="{{ alt }}" width="{{ size }}" height="{{ size }}">

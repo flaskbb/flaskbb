@@ -341,7 +341,7 @@ class DeleteUser(MethodView):
         user = User.get_by_or_404(id=user_id)
 
         if current_user.id == user.id:
-            flash(_("You cannot delete yourself.", "danger"))
+            flash(_("You cannot delete yourself."), "danger")
             return redirect(url_for("management.users"))
 
         user.delete()
@@ -715,10 +715,9 @@ class DeleteGroup(MethodView):
             if group_id <= PROTECTED_GROUP_ID:  # there are 6 standard groups
                 flash(
                     _(
-                        "You cannot delete the standard groups. "
-                        "Try renaming it instead.",
-                        "danger",
-                    )
+                        "You cannot delete the standard groups. Try renaming it instead."
+                    ),
+                    "danger",
                 )
                 return redirect(url_for("management.groups"))
 

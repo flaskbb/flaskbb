@@ -1,7 +1,7 @@
 {%- macro field_label(field) -%}
     {# don't render labels for buttons and radio fields #}
     {% if field.type != "SubmitField" and field.type != "BooleanField" %}
-        {% set css_class = kwargs['class'] if kwargs['class'] else 'form-label' %}
+        {% set css_class = kwargs['class'] if kwargs['class'] else 'col-form-label' %}
         <label class="{{ css_class }}" for="{{ field.id }}">{{ field.label.text }}</label>
     {% endif %}
 {% endmacro %}
@@ -181,7 +181,7 @@
 {%- endmacro -%}
 
 
-{%- macro horizontal_field(field, label_class='col-3 form-label text-end', div_class='col-4') -%}
+{%- macro horizontal_field(field, label_class='col-3 col-form-label text-end', div_class='col-4') -%}
 <div class="row mb-3">
 
     {{ field_label(field, class=label_class) }}

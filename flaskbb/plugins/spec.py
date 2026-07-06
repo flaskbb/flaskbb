@@ -707,7 +707,7 @@ def flaskbb_gather_details_update_validators(app):
 
 
 @spec
-def flaskbb_gather_avatar_update_validators(app):
+def flaskbb_gather_avatar_validators(app):
     """
     Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
     instances specialized for :class:`~flaskbb.core.user.update.AvatarUpdate`.

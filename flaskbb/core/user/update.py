@@ -15,6 +15,7 @@ from datetime import date
 from typing import Any
 
 from attrs import asdict, define, field
+from flask_wtf.file import FileStorage
 
 from flaskbb.user.models import User
 
@@ -70,7 +71,7 @@ class AvatarUpdate(object):
     Object representing an update to a user's avatar.
     """
 
-    avatar: str = field()
+    avatar: FileStorage = field()
 
 
 @define(hash=True, eq=True, order=True, repr=True, frozen=True)

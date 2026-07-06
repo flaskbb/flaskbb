@@ -43,8 +43,8 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import Group, User
-from flaskbb.utils.helpers import check_image
 from flaskbb.utils.requirements import IsAtleastModerator
+from flaskbb.utils.uploads import validate_image
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +158,7 @@ class UserForm(FlaskForm):
 
     def validate_avatar(self, field: Field):
         if field.data is not None:
-            error, status = check_image(field.data)
+            error, status = validate_image(field.data)
             if error is not None:
                 raise ValidationError(error)
             return status

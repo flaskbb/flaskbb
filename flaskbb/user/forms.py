@@ -12,6 +12,7 @@ It provides the forms that are needed for the user views.
 import logging
 
 from flask_babelplus import lazy_gettext as _
+from flask_wtf.file import FileField, FileRequired
 from wtforms import (
     DateField,
     PasswordField,
@@ -31,6 +32,10 @@ from wtforms.validators import (
 )
 
 from flaskbb.utils.forms import FlaskBBForm
+from flaskbb.utils.uploads import (
+    AvatarExtensionValidator,
+    AvatarSizeValidator,
+)
 
 from ..core.user.update import (
     AvatarUpdate,
@@ -108,16 +113,21 @@ class ChangePasswordForm(FlaskBBForm):
 
 
 class ChangeAvatarForm(FlaskBBForm):
-    avatar = StringField(_("Gender"), validators=[Optional()])
+    avatar = FileField(
+        _("New Avatar"),
+        validators=[
+            FileRequired(_("A avatar image must be provided.")),
+            AvatarExtensionValidator(
+                _("This file type is not supported for avatar images")
+            ),
+            AvatarSizeValidator(),
+        ],
+    )
     submit = SubmitField(_("Save"))
-
-    def validate_avatar(self, field):
-        if field.data is None:
-            return True
 
     def as_change(self):
         return AvatarUpdate(
-            avatar=self.avatar.data,  # pyright: ignore[reportArgumentType]
+            avatar=self.avatar.data,
         )
 
 
