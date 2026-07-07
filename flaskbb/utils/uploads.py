@@ -64,6 +64,10 @@ def get_avatar_filename(username: str, filename: str | None) -> str:
     return secure_filename("avatar_" + username)
 
 
+def delete_avatar_file(filename: str):
+    os.remove(filename)
+
+
 def create_upload_directory(app: Flask):
     avatar_upload_path: str | None = app.config["AVATAR_UPLOAD_PATH"]
 

@@ -10,8 +10,9 @@ This module contains stuff for forms.
 """
 
 import functools
+from collections.abc import Iterable
 from enum import Enum
-from typing import Any, TypeVar
+from typing import Any, TypeVar, override
 
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm, RecaptchaField
@@ -56,6 +57,19 @@ def add_recaptcha_field(only_on_ratelimit: bool = False):
 
 
 class FlaskBBForm(FlaskForm):
+    @override
+    def populate_obj(self, obj, exclude: Iterable[str] | None = None):
+        """Populates the attributes of the passed `obj` with data from the
+        form's fields, skipping any field names listed in `exclude`.
+
+        :param obj: The object to populate.
+        :param exclude: An iterable of field names to skip.
+        """
+        exclude = exclude or ()
+        for name, field in self._fields.items():
+            if name not in exclude:
+                field.populate_obj(obj, name)
+
     def populate_errors(self, errors: list[tuple[str, str]]):
         for attribute, reason in errors:
             self.errors.setdefault(attribute, []).append(reason)  # pyright: ignore

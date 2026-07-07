@@ -15,6 +15,7 @@
 {%- from theme('_macros/pagination.html') import render_pagination -%}
 {%- from theme('_macros/navigation.html') import navlink with context -%}
 {%- from theme('_macros/form.html') import horizontal_field -%}
+{%- from theme('_macros/utils.html') import avatar_img -%}
 
 
 <div class="col-md-3 settings-col">
@@ -36,7 +37,7 @@
             <span class="fa fa-user-plus"></span> {{ title }}
         </div>
         <div class="card-body settings-body">
-            <form class="row p-3" role="form" method="post">
+            <form class="row p-3" role="form" method="post" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
 
                 {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
@@ -44,14 +45,33 @@
                 {{ horizontal_field(form.username) }}
                 {{ horizontal_field(form.email) }}
                 {{ horizontal_field(form.password) }}
-                {{ horizontal_field(form.birthday, div_class="row col-5", class="form-select", surrounded_div="col-4") }}
+                {{ horizontal_field(form.birthday) }}
                 {{ horizontal_field(form.gender) }}
                 {{ horizontal_field(form.location) }}
                 {{ horizontal_field(form.website) }}
-                {{ horizontal_field(form.avatar) }}
                 {{ horizontal_field(form.primary_group) }}
                 {{ horizontal_field(form.secondary_groups) }}
                 {{ horizontal_field(form.activated, div_class="offset-3 col-4") }}
+                {{ form.delete_avatar(id="delete_avatar") }}
+                {{ horizontal_field(form.avatar, div_class="col-5") }}
+                <div class="row mb-3">
+                    <div class="offset-3 col-5">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <label>{% trans %}Current Avatar{% endtrans %}</label>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            {{ avatar_img(user, size=150, class="profilepicture rounded") }}
+                        </div>
+                        {% if user.avatar %}
+                        <div class="d-flex justify-content-center align-items-center deleteavatar">
+                            <button type="button" class="btn btn-sm">
+                                <span class="fas fa-fw fa-trash text-danger"></span>
+                                {% trans %}Delete Avatar{% endtrans %}
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
                 {{ horizontal_field(form.signature, rows=4, div_class="col-sm-8") }}
                 {{ horizontal_field(form.notes, rows=8, div_class="col-sm-8") }}
 
@@ -62,4 +82,34 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    const defaultAvatar = "{{ url_for('static', filename='avatar100x100.png') }}"
+
+    const deleteAvatarBtn = document.querySelector(".deleteavatar");
+    deleteAvatarBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const avatarControl = document.getElementById('avatar');
+        avatarControl.value = "";
+
+    setTimeout(() => {
+        const deleteFlag = document.querySelector('input[name="delete_avatar"]');
+        if (deleteFlag) {
+            deleteFlag.setAttribute('value', 'true');
+            deleteFlag.value = "true";
+
+            // Dispatch event to trick tracking libraries into updating their internal state
+            deleteFlag.dispatchEvent(new Event('input', { bubbles: true }));
+            deleteFlag.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+
+        const profilePicutre = document.querySelector(".profilepicture");
+        profilePicutre.setAttribute("src", defaultAvatar);
+        deleteAvatarBtn.remove()
+    }, { once: true });
+</script>
 {% endblock %}

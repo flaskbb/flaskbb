@@ -11,6 +11,7 @@ This module handles the management views.
 
 import importlib.metadata
 import logging
+import os
 import sys
 from typing import Any
 
@@ -29,6 +30,7 @@ from flask.views import MethodView
 from flask_allows2 import Not, Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
+from flask_wtf.file import FileStorage
 from pluggy import HookimplMarker
 from sqlalchemy import select
 
@@ -67,6 +69,7 @@ from flaskbb.utils.requirements import (
     IsAtleastSuperModerator,
 )
 from flaskbb.utils.settings import flaskbb_config
+from flaskbb.utils.uploads import get_avatar_filename, get_avatar_upload_path
 
 impl = HookimplMarker("flaskbb")
 
@@ -248,7 +251,7 @@ class EditUser(MethodView):
         form.secondary_groups.query = group_query
 
         return render_template(
-            "management/user_form.html", form=form, title=_("Edit User")
+            "management/user_form.html", form=form, user=user, title=_("Edit User")
         )
 
     def post(self, user_id: int):
@@ -275,11 +278,20 @@ class EditUser(MethodView):
         group_query = Group.query.filter(filt)
 
         form = EditUserForm(user)
-        form.primary_group.query = group_query
-        form.secondary_groups.query = group_query
+        form.primary_group.query = group_query  # pyright: ignore[reportAttributeAccessIssue]
+        form.secondary_groups.query = group_query  # pyright: ignore[reportAttributeAccessIssue]
         if form.validate_on_submit():
-            form.populate_obj(user)
+            form.populate_obj(user, exclude=("avatar", "secondary_groups"))
             user.primary_group_id = form.primary_group.data.id
+
+            if form.delete_avatar.data:
+                # delete_avatar_file(user.avatar)
+                user.avatar = None
+
+            if form.avatar.data and isinstance(form.avatar.data, FileStorage):
+                filename = get_avatar_filename(user.username, form.avatar.data.filename)
+                form.avatar.data.save(os.path.join(get_avatar_upload_path(), filename))
+                user.avatar = filename
 
             # Don't override the password
             if form.password.data:

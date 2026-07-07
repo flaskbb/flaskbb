@@ -16,6 +16,7 @@ from typing import Any, override
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
 from sqlalchemy import select
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from wtforms import (
@@ -43,8 +44,13 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import Group, User
+from flaskbb.utils.forms import FlaskBBForm
 from flaskbb.utils.requirements import IsAtleastModerator
-from flaskbb.utils.uploads import validate_image
+from flaskbb.utils.uploads import (
+    AvatarExtensionValidator,
+    AvatarSizeValidator,
+    validate_image,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +83,7 @@ def select_primary_group():
     )
 
 
-class UserForm(FlaskForm):
+class UserForm(FlaskBBForm):
     user: User | None = None
 
     username = StringField(
@@ -106,7 +112,12 @@ class UserForm(FlaskForm):
 
     website = StringField(_("Website"), validators=[Optional(), URL()])
 
-    avatar = StringField(_("Avatar"), validators=[Optional(), URL()])
+    delete_avatar = HiddenField(default="false")
+
+    avatar = FileField(
+        _("Avatar"),
+        validators=[Optional(), AvatarExtensionValidator(), AvatarSizeValidator()],
+    )
 
     signature = TextAreaField(_("Forum signature"), validators=[Optional()])
 
@@ -143,7 +154,7 @@ class UserForm(FlaskForm):
             raise ValidationError(_("This username is already taken."))
 
     def validate_email(self, field: Field):
-        if hasattr(self, "user"):
+        if self.user is not None:
             user = User.get(
                 db.and_(
                     User.email.like(field.data.lower()),
