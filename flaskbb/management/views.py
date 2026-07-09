@@ -69,7 +69,11 @@ from flaskbb.utils.requirements import (
     IsAtleastSuperModerator,
 )
 from flaskbb.utils.settings import flaskbb_config
-from flaskbb.utils.uploads import get_avatar_filename, get_avatar_upload_path
+from flaskbb.utils.uploads import (
+    delete_avatar_file,
+    get_avatar_filename,
+    get_avatar_upload_path,
+)
 
 impl = HookimplMarker("flaskbb")
 
@@ -285,7 +289,7 @@ class EditUser(MethodView):
             user.primary_group_id = form.primary_group.data.id
 
             if form.delete_avatar.data:
-                # delete_avatar_file(user.avatar)
+                delete_avatar_file(user.avatar)
                 user.avatar = None
 
             if form.avatar.data and isinstance(form.avatar.data, FileStorage):

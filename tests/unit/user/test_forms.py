@@ -136,7 +136,6 @@ class TestChangeUserDetailsForm(object):
                 gender="awesome",
                 location="here",
                 website="http://flaskbb.com",
-                avatar="https://totally.real/image.img",
                 signature="test often",
                 notes="testy mctest face",
             )
@@ -147,7 +146,6 @@ class TestChangeUserDetailsForm(object):
             gender="awesome",
             location="here",
             website="http://flaskbb.com",
-            avatar="https://totally.real/image.img",
             signature="test often",
             notes="testy mctest face",
         )
@@ -176,7 +174,6 @@ class TestChangeUserDetailsForm(object):
             gender="awesome",
             location="here",
             website="http://flaskbb.com",
-            avatar="https://totally.real/image.img",
             signature="test often",
             notes="testy mctest face",
         )
@@ -199,7 +196,6 @@ class TestChangeUserDetailsForm(object):
             gender="awesome",
             location="here",
             website="http://flaskbb.com",
-            avatar="https://totally.real/image.img",
             signature="test often",
             notes="testy mctest face",
         )

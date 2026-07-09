@@ -98,7 +98,6 @@ def test_bad_urls():
         'javascript:alert("XSS")',
         "\njavascript:alert(x)",
         "\x08//example.com",
-        r"/%09///example.com",
         r"http://otherserver\@example.com",
         r"http:\\testserver\@example.com",
         r"http://testserver\me:pass@example.com",

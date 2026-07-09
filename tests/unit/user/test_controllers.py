@@ -281,7 +281,6 @@ class TestChangeUserDetailsView(object):
             gender="awesome",
             location="here",
             website="http://web.site",
-            avatar="http://web.site/avatar.png",
             signature="use a cursive font",
             notes="got 'em",
         )
@@ -301,7 +300,6 @@ class TestChangeUserDetailsView(object):
                 gender="awesome",
                 location="here",
                 website="http://web.site",
-                avatar="http://web.site/avatar.png",
                 signature="use a cursive font",
                 notes="got 'em",
             ),

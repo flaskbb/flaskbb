@@ -59,7 +59,9 @@ class BaseAction {
 
 export class Actions {
     execute(endpoint, data, callback = undefined, showConfirm = false) {
-        if (!data) return false;
+        if (!data) {
+            return false;
+        }
 
         const action = () => sendData(endpoint, data, callback);
         if (showConfirm) {
@@ -109,11 +111,15 @@ function showConfirmModal(onConfirm) {
     modal.show();
 
     const confirmBtn = modalEl.querySelector(".confirmBtn");
-    confirmBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        modal.hide();
-        onConfirm();
-    }, { once: true });
+    // do not add duplicated eventlisteners
+    if (confirmBtn.getAttribute('confirmListener') !== 'true') {
+        confirmBtn.setAttribute('confirmListener', 'true');
+        confirmBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            modal.hide();
+            onConfirm();
+        }, { once: true });
+    }
 }
 
 

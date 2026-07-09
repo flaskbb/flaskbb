@@ -11,6 +11,7 @@ A few helpers that are used by flaskbb
 
 import logging
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING, override
 
 from flask import Flask, current_app
@@ -52,7 +53,7 @@ class AvatarSizeValidator(FileSize):
 
 
 def get_avatar_upload_path() -> str:
-    if current_app.config.get("AVATAR_UPLOAD_PATH") is None:
+    if current_app.config.get("AVATAR_UPLOAD_PATH", None) is None:
         return os.path.join(current_app.static_folder or "static", "uploads", "avatar")
     return current_app.config["AVATAR_UPLOAD_PATH"]
 
@@ -64,23 +65,31 @@ def get_avatar_filename(username: str, filename: str | None) -> str:
     return secure_filename("avatar_" + username)
 
 
-def delete_avatar_file(filename: str):
-    os.remove(filename)
+def delete_avatar_file(filename: str | None):
+    if not filename:
+        logger.warning("avatar filename not provided - nothing to delete.")
+        return
+
+    file_path = Path(get_avatar_upload_path(), filename)
+    try:
+        file_path.unlink(missing_ok=True)
+    except PermissionError:
+        logger.error(f"You do not have permission to delete this file: {filename}")
+    except IsADirectoryError:
+        logger.error(f"The specified path is a directory, not a file: {filename}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
 
 
 def create_upload_directory(app: Flask):
-    avatar_upload_path: str | None = app.config["AVATAR_UPLOAD_PATH"]
+    with app.app_context():
+        avatar_upload_path = get_avatar_upload_path()
 
-    if not avatar_upload_path:
-        avatar_upload_path = os.path.join(
-            app.static_folder or "static", "uploads", "avatar"
-        )
+        if os.path.exists(avatar_upload_path):
+            return
 
-    if os.path.exists(avatar_upload_path):
-        return
-
-    logger.info(f"Creating avatar upload path: {avatar_upload_path}")
-    os.makedirs(avatar_upload_path, exist_ok=True)
+        logger.info(f"Creating avatar upload path: {avatar_upload_path}")
+        os.makedirs(avatar_upload_path, exist_ok=True)
 
 
 def get_image_info(file: FileStorage):

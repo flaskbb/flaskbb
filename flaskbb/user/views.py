@@ -35,6 +35,7 @@ from flaskbb.user.services.update import (
     DefaultSettingsUpdateHandler,
 )
 from flaskbb.utils.helpers import real, register_view, render_template
+from flaskbb.utils.uploads import delete_avatar_file
 
 from ..core.exceptions import PersistenceError, StopValidation
 from .services.factories import (
@@ -224,6 +225,7 @@ class DeleteAvatar(MethodView):
                 status=403,
             )
 
+        delete_avatar_file(user.avatar)
         user.avatar = None
         user.save()
         return jsonify(
