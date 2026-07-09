@@ -58,7 +58,7 @@ if TYPE_CHECKING:
     from flaskbb.user.models import User
 
 from flaskbb.utils.http import get_first_safe_redirect_url
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.core.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
 

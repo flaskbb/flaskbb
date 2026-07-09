@@ -1,139 +1,114 @@
-# -*- coding: utf-8 -*-
 """
-flaskbb.plugins.models
-~~~~~~~~~~~~~~~~~~~~~~~
-
-This module provides registration and a basic DB backed key-value
-store for plugins.
-
-:copyright: (c) 2017 by the FlaskBB Team.
-:license: BSD, see LICENSE for more details.
+A plugin's settings are just a SettingGroup registered via the
+flaskbb_load_setting_groups hook keyed by group_key == plugin
+name, stored as ordinary Setting rows alongside core's own settings.
 """
 
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm.collections import attribute_mapped_collection
+from typing import Any
 
-from flaskbb.extensions import db, pluggy
+from sqlalchemy.orm import Mapped, mapped_column
+
+from flaskbb.core.settings.forms import build_form
+from flaskbb.core.settings.models import Setting
+from flaskbb.core.settings.registry import setting_registry
+from flaskbb.extensions import db
 from flaskbb.utils.database import CRUDMixin
-from flaskbb.utils.forms import SettingValueType, generate_settings_form
 
 
-class PluginStore(CRUDMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.Unicode(255), nullable=False)
-    value = db.Column(db.PickleType, nullable=False)
-    # Available types: string, integer, float, boolean, select, selectmultiple
-    value_type = db.Column(db.Enum(SettingValueType), nullable=False)
-    # Extra attributes like, validation things (min, max length...)
-    # For Select*Fields required: choices
-    extra = db.Column(db.PickleType, nullable=True)
-    plugin_id = db.Column(
-        db.Integer, db.ForeignKey("plugin_registry.id", ondelete="CASCADE")
-    )
+class PluginRegistry(db.Model, CRUDMixin):
+    __tablename__ = "plugin_registry"
 
-    # Display stuff
-    name = db.Column(db.Unicode(255), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-
-    __table_args__ = (UniqueConstraint("key", "plugin_id", name="plugin_kv_uniq"),)
-
-    def __repr__(self):
-        return "<PluginSetting plugin={} key={} value={}>".format(
-            self.plugin.name, self.key, self.value
-        )
-
-    @classmethod
-    def get_or_create(cls, plugin_id, key):
-        """Returns the PluginStore object or an empty one.
-        The created object still needs to be added to the database session
-        """
-        obj = cls.get_by(plugin_id=plugin_id, key=key)
-
-        if obj is not None:
-            return obj
-        return PluginStore()
-
-
-class PluginRegistry(CRUDMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode(255), unique=True, nullable=False)
-    enabled = db.Column(db.Boolean, default=True)
-    values = db.relationship(
-        "PluginStore",
-        collection_class=attribute_mapped_collection("key"),
-        backref="plugin",
-        cascade="all, delete-orphan",
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    # A plugin's name doubles as its SettingGroup.key - the plugin's
+    # flaskbb_load_setting_groups hookimpl must register a group with
+    # key == this name for settings/get_settings_form/etc. to find it.
+    name: Mapped[str] = mapped_column(db.String(255), unique=True)
+    enabled: Mapped[bool] = mapped_column(db.Boolean, default=True)
 
     @property
-    def settings(self):
-        """Returns a dict with contains all the settings in a plugin."""
-        return {kv.key: kv.value for kv in self.values.values()}
-
-    @property
-    def info(self):
-        """Returns some information about the plugin."""
-        return pluggy.list_plugin_metadata().get(self.name)
-
-    @property
-    def is_installable(self):
-        """Returns True if the plugin has settings that can be installed."""
-        plugin_module = pluggy.get_plugin(self.name)
-        return True if plugin_module.SETTINGS else False
-
-    @property
-    def is_installed(self):
-        """Returns True if the plugin is installed."""
-        if self.settings:
+    def has_settings(self):
+        try:
+            setting_registry.group(self.name)
             return True
-        return False
+        except KeyError:
+            return False
+
+    @property
+    def _group(self):
+        """The SettingGroup this plugin registered, if any. Plugins
+        with no settings (just enable/disable, no configuration) won't
+        have registered one."""
+        try:
+            return setting_registry.group(self.name)
+        except KeyError:
+            return None
+
+    @property
+    def is_installable(self) -> bool:
+        """A plugin is installable if it registered a SettingGroup with
+        at least one setting to configure."""
+        group = self._group
+        return group is not None and len(group.settings) > 0
+
+    @property
+    def is_installed(self) -> bool:
+        """A plugin is installed once every one of its settings has a
+        row in the settings table."""
+        group = self._group
+        if group is None:
+            return False
+        current_keys = Setting.as_dict().keys()
+        return all(s.key in current_keys for s in group.settings)
+
+    @property
+    def settings(self) -> dict[str, Any]:
+        """This plugin's current setting values, keyed by setting key."""
+        group = self._group
+        if group is None:
+            return {}
+        current_values = Setting.as_dict()
+        return {
+            s.key: current_values[s.key]
+            for s in group.settings
+            if s.key in current_values
+        }
 
     def get_settings_form(self):
-        """Generates a settings form based on the settings."""
-        return generate_settings_form(self.values.values())()
+        """Generates a settings form based on this plugin's
+        SettingGroup - same build_form() used for core settings groups."""
+        group = self._group
+        if group is None:
+            raise ValueError(f"Plugin '{self.name}' has no registered settings")
+        return build_form(group)()
 
-    def update_settings(self, settings):
-        """Updates the given settings of the plugin.
+    def update_settings(self, form_data: dict[str, Any]) -> None:
+        """Updates the given settings of the plugin."""
+        Setting.update(group_key=self.name, form_data=form_data)
 
-        :param settings: A dictionary containing setting items.
+    def add_settings(self, force: bool = False) -> None:
+        """Seeds DB rows for this plugin's settings - called on plugin
+        install.
+
+        :param force: if True, existing rows for this plugin's settings
+            are deleted and re-seeded from their defaults first (e.g.
+            for a "reset to defaults" admin action). Defaults to False,
+            which only fills in rows that don't exist yet and leaves
+            any existing values untouched.
         """
-        pluginstore = PluginStore.get_all(
-            PluginStore.plugin_id == self.id, PluginStore.key.in_(settings.keys())
-        )
+        if self._group is None:
+            # nothing to install - a plugin with no registered
+            # SettingGroup has no defaults to seed
+            return
 
-        setting_list = []
-        for pluginsetting in pluginstore:
-            pluginsetting.value = settings[pluginsetting.key]
-            setting_list.append(pluginsetting)
-        db.session.add_all(setting_list)
-        db.session.commit()
+        if force:
+            Setting.remove_group(self.name)
 
-    def add_settings(self, settings, force=False):
-        """Adds the given settings to the plugin.
+        Setting.install_group(self.name)
 
-        :param settings: A dictionary containing setting items.
-        :param force: Forcefully overwrite existing settings.
-        """
-        plugin_settings = []
-        for key in settings:
-            if force:
-                with db.session.no_autoflush:
-                    pluginstore = PluginStore.get_or_create(self.id, key)
-            else:
-                # otherwise we assume that no such setting exist
-                pluginstore = PluginStore()
-
-            pluginstore.key = key
-            pluginstore.plugin = self
-            pluginstore.value = settings[key]["value"]
-            pluginstore.value_type = settings[key]["value_type"]
-            pluginstore.extra = settings[key]["extra"]
-            pluginstore.name = settings[key]["name"]
-            pluginstore.description = settings[key]["description"]
-            plugin_settings.append(pluginstore)
-
-        db.session.add_all(plugin_settings)
-        db.session.commit()
-
-    def __repr__(self):
-        return "<Plugin name={} enabled={}>".format(self.name, self.enabled)
+    def remove_settings(self) -> None:
+        """Deletes all of this plugin's settings from the DB - called
+        on plugin uninstall. Delegates straight to Setting.remove_group()
+        rather than fetching self._group first, since uninstalling
+        should succeed even if the plugin's SettingGroup is no longer
+        registered (e.g. the plugin package itself was already removed)."""
+        Setting.remove_group(self.name)

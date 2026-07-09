@@ -30,6 +30,7 @@ from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import allows, db, pluggy
 from flaskbb.forum.forms import (
     EditTopicForm,
@@ -73,7 +74,6 @@ from flaskbb.utils.requirements import (
     Has,
     IsAtleastModeratorInForum,
 )
-from flaskbb.utils.settings import flaskbb_config
 
 from .locals import current_category, current_forum, current_topic
 from .utils import force_login_if_needed

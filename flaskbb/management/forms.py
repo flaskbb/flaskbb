@@ -44,11 +44,13 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import Group, User
-from flaskbb.utils.forms import FlaskBBForm
-from flaskbb.utils.requirements import IsAtleastModerator
-from flaskbb.utils.uploads import (
+from flaskbb.utils.forms import (
     AvatarExtensionValidator,
     AvatarSizeValidator,
+    FlaskBBForm,
+)
+from flaskbb.utils.requirements import IsAtleastModerator
+from flaskbb.utils.uploads import (
     validate_image,
 )
 
@@ -342,7 +344,7 @@ class GroupForm(FlaskForm):
                     )
                     result = False
 
-        checked = []
+        checked: list[bool] = []
         for field in group_fields:
             if field.data and field.data in checked:
                 if len(checked) > 1:
@@ -362,7 +364,7 @@ class GroupForm(FlaskForm):
 
 
 class EditGroupForm(GroupForm):
-    def __init__(self, group, *args, **kwargs):
+    def __init__(self, group: Group, *args, **kwargs):
         self.group = group
         kwargs["obj"] = self.group
         GroupForm.__init__(self, *args, **kwargs)

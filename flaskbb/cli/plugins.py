@@ -17,8 +17,9 @@ from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import get_cookiecutter, validate_plugin
+from flaskbb.core.settings.registry import SettingsRegistry
 from flaskbb.extensions import db, pluggy
-from flaskbb.plugins.models import PluginRegistry, PluginStore
+from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
 
@@ -133,7 +134,7 @@ def install(plugin_name, force):
 
     if plugin.is_installable:
         plugin_module = pluggy.get_plugin(plugin.name)
-        plugin.add_settings(plugin_module.SETTINGS, force)
+        plugin.add_settings(force)
         click.secho("[+] Plugin has been installed.", fg="green")
     else:
         click.secho("[+] Nothing to install.", fg="green")
@@ -151,8 +152,7 @@ def uninstall(plugin_name):
         raise click.Abort()
 
     if plugin.is_installed:
-        db.session.execute(db.delete(PluginStore).filter_by(plugin_id=plugin.id))
-        db.session.commit()
+        plugin.remove_settings()
         click.secho("[+] Plugin has been uninstalled.", fg="green")
     else:
         click.secho("[+] Nothing to uninstall.", fg="green")

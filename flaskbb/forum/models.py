@@ -35,6 +35,7 @@ from flaskbb.utils.queries import hidden, paginate
 if TYPE_CHECKING:
     from flaskbb.user.models import Group, User
 
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.utils.database import (
     CRUDMixin,
     HideableCRUDMixin,
@@ -48,7 +49,6 @@ from flaskbb.utils.helpers import (
     time_utcnow,
     topic_is_unread,
 )
-from flaskbb.utils.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
 

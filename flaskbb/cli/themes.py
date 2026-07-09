@@ -19,7 +19,7 @@ from flask_themes2 import get_theme, get_themes_list
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import get_cookiecutter, validate_theme
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.core.settings import flaskbb_config
 
 
 @flaskbb.group()

@@ -27,7 +27,7 @@ class TokenError(BaseFlaskBBError):
     :param str reason: An explanation of why the token is invalid
     """
 
-    def __init__(self, reason):
+    def __init__(self, reason: str):
         self.reason = reason
         super(TokenError, self).__init__(reason)
 

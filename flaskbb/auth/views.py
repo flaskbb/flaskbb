@@ -46,7 +46,7 @@ from flaskbb.utils.helpers import (
     render_template,
     requires_unactivated,
 )
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.core.settings import flaskbb_config
 
 from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo
