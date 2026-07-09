@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from flaskbb.forum.models import Category, Forum, ForumsRead, Topic, TopicsRead
     from flaskbb.user.models import User
 
-from flaskbb.utils.http import is_safe_url
+from flaskbb.utils.http import get_first_safe_redirect_url
 from flaskbb.utils.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
@@ -100,26 +100,34 @@ def slugify(text: str, delim: str = "-"):
 
 
 def redirect_url(endpoint: str | None, use_referrer: bool = True):
-    """Generates a redirect url based on the referrer or endpoint."""
-    targets = [endpoint]
+    """
+    Generates a redirect url via the ``next`` query-string parameter, the HTTP referrer
+    from the ``endpoint`` if neither is present or safe to redirect to.
+
+    :param endpoint: The trusted fallback URL to redirect to (e.g. built
+        with ``url_for``). If not provided 'forum.index' will be used.
+    """
     allowed_hosts: list[str] = current_app.config["ALLOWED_HOSTS"]
-    if use_referrer:
-        targets.insert(0, request.referrer)
-    for target in targets:
-        if target and is_safe_url(target, allowed_hosts):
-            return target
+    targets = [request.args.get("next"), request.referrer if use_referrer else None]
+    return get_first_safe_redirect_url(
+        *targets,
+        allowed_hosts=allowed_hosts,
+        fallback=endpoint or url_for("forum.index"),
+    )
 
 
 def redirect_or_next(endpoint: str, use_referrer: bool = True):
-    """Redirects the user back to the page they were viewing or to a specified
-    endpoint. Wraps Flasks :func:`Flask.redirect` function.
-
-    :param endpoint: The fallback endpoint.
     """
-    return redirect(
-        redirect_url(request.args.get("next"), use_referrer)
-        or redirect_url(endpoint, use_referrer)
-    )
+    Redirects the user back to the page they were viewing (via the ``next``
+    query-string parameter, then the HTTP referrer if enabled) or to
+    ``endpoint`` if neither is present or safe to redirect to.
+
+    :param endpoint: The trusted fallback URL to redirect to (e.g. built
+        with ``url_for``). This is used as-is if nothing else qualifies, so
+        never pass unsanitized user input here -- only server-controlled
+        values.
+    """
+    return redirect(redirect_url(endpoint, use_referrer))
 
 
 def render_template(template: str, **context: Any):  # pragma: no cover

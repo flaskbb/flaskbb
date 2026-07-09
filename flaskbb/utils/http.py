@@ -15,10 +15,39 @@ Note: Most of this code has been taken from Django 3.2.0.alpha0.
 import unicodedata
 from urllib.parse import urlparse
 
+# Mirrors the WHATWG URL spec's "C0 control or space" trim (applied at both
+# ends of the string) and its removal of ASCII tab/newline from anywhere in
+# the string. Browsers apply this same normalization when resolving a URL,
+# and so does Python's own urllib.parse.urlsplit() internally
+_C0_CONTROL_OR_SPACE = "".join(chr(i) for i in range(0x21))  # \x00-\x20 inclusive
+_ASCII_TAB_OR_NEWLINE = ("\t", "\r", "\n")
+
+
+def _normalize_url(url: str) -> str:
+    """
+    Strip the control characters that browsers and URL parsers silently
+    remove/ignore when resolving a URL, so that every check performed on
+    ``url`` afterwards sees the same string a browser would ultimately act
+    on. This must run before ANY validation logic. Validating a
+    not yet normalized string and then using a normalized one (or vice
+    versa) is exactly what makes a bypass like `/\t///google.com` possible.
+    """
+    url = url.strip(_C0_CONTROL_OR_SPACE)
+    for c in _ASCII_TAB_OR_NEWLINE:
+        url = url.replace(c, "")
+    return url
+
 
 def _url_has_allowed_host_and_scheme(
     url: str, allowed_hosts: set[str], require_https: bool = False
 ):
+    # Sanitize the url:
+    # - the "///" prefix check
+    # - the control-character check
+    url = _normalize_url(url)
+    if not url:
+        return False
+
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith("///"):
@@ -48,34 +77,65 @@ def _url_has_allowed_host_and_scheme(
     )
 
 
-def is_safe_url(
+def get_safe_redirect_url(
     url: str | None,
     allowed_hosts: set[str] | list[str] | str | None,
+    fallback: str | None = None,
     require_https: bool = False,
-):
+) -> str | None:
     """
-    Return ``True`` if the url uses an allowed host and a safe scheme.
-    Always return ``False`` on an empty url.
-    If ``require_https`` is ``True``, only 'https' will be considered a valid
-    scheme, as opposed to 'http' and 'https' with the default, ``False``.
-    Note: "True" doesn't entail that a URL is "safe". It may still be e.g.
-    quoted incorrectly. Ensure to also use django.utils.encoding.iri_to_uri()
-    on the path component of untrusted URLs.
+    Validate ``url`` and return the URL that should actually be redirected
+    to.
+
+    Returns ``fallback`` if ``url`` is missing or fails validation. ``fallback``
+    is trusted and is NOT re-validated. Callers must pass something known
+    to be safe (e.g. ``url_for("some.view")``), never user input.
     """
     if url is not None:
         url = url.strip()
     if not url:
-        return False
+        return fallback
+
+    normalized = _normalize_url(url)
+    normalized_backslashes = _normalize_url(url.replace("\\", "/"))
+
     if allowed_hosts is None:
         allowed_hosts = set()
     elif isinstance(allowed_hosts, str):
         allowed_hosts = {allowed_hosts}
     elif isinstance(allowed_hosts, list):
         allowed_hosts = set(allowed_hosts)
-    # Chrome treats \ completely as / in paths but it could be part of some
-    # basic auth credentials so we need to check both URLs.
-    return _url_has_allowed_host_and_scheme(
-        url, allowed_hosts, require_https=require_https
+
+    if _url_has_allowed_host_and_scheme(
+        normalized, allowed_hosts, require_https=require_https
     ) and _url_has_allowed_host_and_scheme(
-        url.replace("\\", "/"), allowed_hosts, require_https=require_https
-    )
+        normalized_backslashes, allowed_hosts, require_https=require_https
+    ):
+        return normalized
+
+    return fallback
+
+
+def get_first_safe_redirect_url(
+    *candidates: str | None,
+    allowed_hosts: set[str] | list[str] | str | None,
+    fallback: str,
+    require_https: bool = False,
+) -> str:
+    """
+    Return the first candidate in ``candidates`` (checked in order) that is
+    safe to redirect to, normalized. Falsy candidates are skipped.
+
+    Returns ``fallback`` if ``url`` is missing or fails validation. ``fallback``
+    is trusted and is NOT re-validated. Callers must pass something known
+    to be safe (e.g. ``url_for("some.view")``), never user input.
+    """
+    for candidate in candidates:
+        if not candidate:
+            continue
+        result = get_safe_redirect_url(
+            candidate, allowed_hosts, fallback=None, require_https=require_https
+        )
+        if result is not None:
+            return result
+    return fallback
