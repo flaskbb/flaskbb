@@ -25,7 +25,8 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-# extensions
+from flaskbb.core.settings import flaskbb_config
+from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import (
     alembic,
     allows,
@@ -90,9 +91,6 @@ from flaskbb.utils.search import (
     TopicWhoosheer,
     UserWhoosheer,
 )
-
-# app specific configurations
-from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 from flaskbb.utils.uploads import create_upload_directory
 
@@ -143,6 +141,7 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     configure_errorhandlers(app)
     configure_migrations(app)
     configure_translations(app)
+    setting_registry.load_from_plugins(pluggy)
     pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 
     return app

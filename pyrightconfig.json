@@ -10,6 +10,7 @@
   "reportUnusedCallResult": false,
   "reportUnannotatedClassAttribute": false,
   "reportUnusedParameter": false,
+  "reportImplicitStringConcatenation": false,
   "reportAny": false,
   "reportExplicitAny": false,
 }

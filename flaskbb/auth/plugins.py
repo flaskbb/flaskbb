@@ -14,7 +14,7 @@ from flask_login import current_user, logout_user
 from ..core.auth.authentication import ForceLogout
 from ..extensions import db
 from ..user.models import User
-from ..utils.settings import flaskbb_config
+from ..core.settings import flaskbb_config
 from . import impl
 from .services.authentication import (
     BlockUnactivatedUser,

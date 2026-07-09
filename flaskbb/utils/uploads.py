@@ -15,41 +15,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING, override
 
 from flask import Flask, current_app
-from flask_wtf.file import FileAllowed, FileSize, FileStorage
+from flask_wtf.file import FileStorage
 from PIL import ImageFile
 from werkzeug.utils import secure_filename
 
-if TYPE_CHECKING:
-    pass
-
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.core.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
-
-
-class AvatarExtensionValidator(FileAllowed):
-    def __init__(self, message: str | None = None):
-        super().__init__(upload_set=[], message=message)  # pyright: ignore[reportUnknownMemberType]
-
-    @override
-    def __call__(self, form, field):
-        self.upload_set = current_app.config.get("AVATAR_EXTENSIONS", [])  # pyright: ignore[reportUnknownMemberType]
-        return super(AvatarExtensionValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
-
-
-class AvatarSizeValidator(FileSize):
-    def __init__(self, message: str | None = None):
-        super().__init__(max_size=None, min_size=0, message=message)  # pyright: ignore[reportUnknownMemberType]
-
-    @override
-    def __call__(self, form, field):
-        self.max_size = flaskbb_config["AVATAR_SIZE"] * 1024
-        self.min_size = 0
-        if not self.message:
-            self.message = "Image is too big! {}kb are allowed.".format(
-                flaskbb_config["AVATAR_SIZE"]
-            )
-        return super(AvatarSizeValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
 
 
 def get_avatar_upload_path() -> str:

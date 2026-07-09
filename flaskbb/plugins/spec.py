@@ -87,6 +87,63 @@ def flaskbb_additional_setup(app, pluggy):
     """
 
 
+def flaskbb_load_internal_setting_groups():
+    """Hook for registering setting groups.
+
+    Implementations should return a SettingGroup instance, or a list of
+    SettingGroup instances if a single plugin needs to register more
+    than one group. All results across core and every installed plugin
+    are collected and registered into the settings registry - this
+    hookspec does not use firstresult, so every implementation's return
+    value is kept.
+
+    Example:
+        @impl
+        def flaskbb_load_setting_groups():
+            return SettingGroup(
+                key="my_plugin",
+                name="My Plugin Settings",
+                description="Settings for My Plugin.",
+                settings=(
+                    BoolSetting(
+                        key="MY_PLUGIN_ENABLED",
+                        value=True,
+                        name="Enabled",
+                        description="Whether My Plugin is active.",
+                    ),
+                ),
+            )
+    """
+
+def flaskbb_load_setting_groups():
+    """Hook for registering setting groups.
+
+    Implementations should return a SettingGroup instance, or a list of
+    SettingGroup instances if a single plugin needs to register more
+    than one group. All results across core and every installed plugin
+    are collected and registered into the settings registry - this
+    hookspec does not use firstresult, so every implementation's return
+    value is kept.
+
+    Example:
+        @impl
+        def flaskbb_load_setting_groups():
+            return SettingGroup(
+                key="my_plugin",
+                name="My Plugin Settings",
+                description="Settings for My Plugin.",
+                settings=(
+                    BoolSetting(
+                        key="MY_PLUGIN_ENABLED",
+                        value=True,
+                        name="Enabled",
+                        description="Whether My Plugin is active.",
+                    ),
+                ),
+            )
+    """
+
+
 @spec
 def flaskbb_load_post_markdown_class(app):
     """

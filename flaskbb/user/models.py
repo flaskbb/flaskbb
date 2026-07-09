@@ -28,11 +28,11 @@ from sqlalchemy.orm import (
 from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
 from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
 from flaskbb.utils.helpers import time_utcnow
-from flaskbb.utils.settings import flaskbb_config
 
 logger = logging.getLogger(__name__)
 

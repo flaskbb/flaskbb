@@ -22,155 +22,46 @@ from sqlalchemy_utils.functions import create_database, database_exists
 
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.forum.models import Category, Forum, Post, Topic
-from flaskbb.management.models import Setting, SettingsGroup
+from flaskbb.core.settings import Setting, setting_registry
+from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.user.models import Group, User
 
 logger = logging.getLogger(__name__)
 
 
-def delete_settings_from_fixture(fixture: Any):
-    """Deletes the settings from a fixture from the database.
-    Returns the deleted groups and settings.
+def create_default_settings() -> None:
+    """Populates the settings table for every registered SettingGroup
+    (core + plugins).
 
-    :param fixture: The fixture that should be deleted.
+    Call site change: the old create_default_settings() took no
+    arguments; this one needs the app's plugin manager so it can call
+    registry.load_from_plugins() before seeding, e.g. in the `install`
+    CLI command:
+
+        create_default_settings(app.pluggy)
     """
-    deleted_settings: dict[SettingsGroup, list[Setting]] = {}
-
-    for settingsgroup in fixture:
-        group: SettingsGroup = db.session.execute(
-            select(SettingsGroup).filter_by(key=settingsgroup[0])
-        ).scalar_one()
-        deleted_settings[group] = []
-
-        for settings in settingsgroup[1]["settings"]:
-            setting = db.session.execute(
-                db.select(Setting).filter_by(key=settings[0])
-            ).scalar_one_or_none()
-            if setting:
-                deleted_settings[group].append(setting)
-                setting.delete()
-
-        group.delete()
-
-    return deleted_settings
-
-
-def create_settings_from_fixture(fixture: Any):
-    """Inserts the settings from a fixture into the database.
-    Returns the created groups and settings.
-
-    :param fixture: The fixture which should inserted.
-    """
-    created_settings: dict[SettingsGroup, list[Setting]] = {}
-    for settingsgroup in fixture:
-        group = SettingsGroup(
-            key=settingsgroup[0],
-            name=settingsgroup[1]["name"],
-            description=settingsgroup[1]["description"],
-        )
-        group.save()
-        created_settings[group] = []
-
-        for settings in settingsgroup[1]["settings"]:
-            setting = Setting(
-                key=settings[0],
-                value=settings[1]["value"],
-                value_type=settings[1]["value_type"],
-                name=settings[1]["name"],
-                description=settings[1]["description"],
-                extra=settings[1].get("extra", ""),  # Optional field
-                settingsgroup=group.key,
-            )
-            if setting:
-                setting.save()
-                created_settings[group].append(setting)
-
-    return created_settings
+    for group in setting_registry.all_groups():
+        Setting.install_group(group.key)
 
 
 def update_settings_from_fixture(
-    fixture: Any,
-    overwrite_group: bool = False,
-    overwrite_setting: bool = False,
-):
-    """Updates the database settings from a fixture.
-    Returns the updated groups and settings.
+    group_key: str | None = None, force: bool = False
+) -> None:
+    """Re-applies default values from the registry to the settings
+    table - the `flaskbb upgrade` CLI command's underlying logic.
 
-    :param fixture: The fixture which should be inserted/updated.
-    :param overwrite_group: Set this to ``True`` if you want to overwrite
-                            the group if it already exists.
-                            Defaults to ``False``.
-    :param overwrite_setting: Set this to ``True`` if you want to overwrite the
-                              setting if it already exists.
-                              Defaults to ``False``.
+    :param group_key: limit to a single group (e.g. "general"); None
+        updates every registered group.
+    :param force: WARNING - this overwrites existing values back to
+        their defaults, discarding whatever an admin has configured.
+        Without this, only rows that don't exist yet are created,
+        matching the CLI's default (non---force) behavior.
     """
-    updated_settings: dict[SettingsGroup, list[Setting]] = collections.defaultdict(list)
-
-    for settingsgroup in fixture:
-        group = db.session.execute(
-            select(SettingsGroup).filter_by(key=settingsgroup[0])
-        ).scalar_one_or_none()
-
-        if (group is not None and overwrite_group) or group is None:
-            if group is not None:
-                group.name = settingsgroup[1]["name"]
-                group.description = settingsgroup[1]["description"]
-            else:
-                group = SettingsGroup(
-                    key=settingsgroup[0],
-                    name=settingsgroup[1]["name"],
-                    description=settingsgroup[1]["description"],
-                )
-
-            group.save()
-
-        for settings in settingsgroup[1]["settings"]:
-            setting = db.session.execute(
-                select(Setting).filter_by(key=settings[0])
-            ).scalar_one_or_none()
-
-            setting_is_different = False
-            if setting is not None:
-                setting_is_different: bool = (
-                    setting.value != settings[1]["value"]
-                    or setting.value_type != settings[1]["value_type"]
-                    or setting.name != settings[1]["name"]
-                    or setting.description != settings[1]["description"]
-                    or setting.extra != settings[1].get("extra", "")
-                    or setting.settingsgroup != group.key
-                )
-
-            if (
-                setting is not None and overwrite_setting and setting_is_different
-            ) or setting is None:
-                if setting is not None:
-                    setting.value = settings[1]["value"]
-                    setting.value_type = settings[1]["value_type"]
-                    setting.name = settings[1]["name"]
-                    setting.description = settings[1]["description"]
-                    setting.extra = settings[1].get("extra", "")
-                    setting.settingsgroup = group.key
-                else:
-                    setting = Setting(
-                        key=settings[0],
-                        value=settings[1]["value"],
-                        value_type=settings[1]["value_type"],
-                        name=settings[1]["name"],
-                        description=settings[1]["description"],
-                        extra=settings[1].get("extra", ""),
-                        settingsgroup=group.key,
-                    )
-
-                setting.save()
-                updated_settings[group].append(setting)
-    return updated_settings
-
-
-def create_default_settings():
-    """Creates the default settings."""
-    from flaskbb.fixtures.settings import fixture
-
-    create_settings_from_fixture(fixture)
+    groups = [setting_registry.group(group_key)] if group_key else setting_registry.all_groups()
+    for group in groups:
+        if force:
+            Setting.remove_group(group.key)
+        Setting.install_group(group.key)
 
 
 def create_default_groups():

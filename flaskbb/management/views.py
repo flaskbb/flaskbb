@@ -35,6 +35,10 @@ from pluggy import HookimplMarker
 from sqlalchemy import select
 
 from flaskbb import __version__ as flaskbb_version
+from flaskbb.core.settings import flaskbb_config
+from flaskbb.core.settings.forms import build_form
+from flaskbb.core.settings.models import Setting
+from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import allows, celery, db
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Category, Forum, Post, Report, Topic
@@ -47,11 +51,9 @@ from flaskbb.management.forms import (
     EditGroupForm,
     EditUserForm,
 )
-from flaskbb.management.models import Setting, SettingsGroup
-from flaskbb.plugins.models import PluginRegistry, PluginStore
+from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import validate_plugin
 from flaskbb.user.models import Group, Guest, User
-from flaskbb.utils.forms import populate_settings_dict, populate_settings_form
 from flaskbb.utils.helpers import (
     FlashAndRedirect,
     get_online_users,
@@ -94,42 +96,15 @@ class ManagementSettings(MethodView):
         )
     ]
 
-    def _determine_active_settings(self, slug: str | None, plugin: str | None):
-        """Determines which settings are active.
-        Returns a tuple in following order:
-            ``form``, ``old_settings``, ``plugin_obj``, ``active_nav``
-        """
-        # Any ideas how to do this better?
-        slug = slug if slug else "general"
-        active_nav = {}  # used to build the navigation
-        plugin_obj = None
-        if plugin is not None:
-            plugin_obj = PluginRegistry.get_by_or_404(name=plugin)
-            active_nav.update(
-                {"key": plugin_obj.name, "title": plugin_obj.name.title()}
-            )
-            form = plugin_obj.get_settings_form()
-            old_settings = plugin_obj.settings
-
-        elif slug is not None:
-            group_obj = SettingsGroup.get_by_or_404(key=slug)
-            active_nav.update({"key": group_obj.key, "title": group_obj.name})
-            form = Setting.get_form(group_obj)()
-            old_settings = Setting.get_settings(group_obj)
-
-        return form, old_settings, plugin_obj, active_nav
-
     def get(self, slug: str | None = None, plugin: str | None = None):
-        form, old_settings, plugin_obj, active_nav = self._determine_active_settings(
+        form, old_settings, _, active_nav = self._determine_active_settings(
             slug, plugin
         )
 
-        # get all groups and plugins - used to build the navigation
-        all_groups = SettingsGroup.get_all()
-        all_plugins = PluginRegistry.get_all(
-            db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
-        )
-        form = populate_settings_form(form, old_settings)
+        all_groups = setting_registry.all_groups()
+        all_plugins = self._get_plugins()
+
+        form.process(data=old_settings)
 
         return render_template(
             "management/settings.html",
@@ -140,23 +115,19 @@ class ManagementSettings(MethodView):
         )
 
     def post(self, slug: str | None = None, plugin: str | None = None):
-        form, old_settings, plugin_obj, active_nav = self._determine_active_settings(
-            slug, plugin
-        )
-        all_groups = SettingsGroup.get_all()
-        all_plugins = PluginRegistry.get_all(
-            db.and_(PluginRegistry.values != None, PluginRegistry.enabled == True)
-        )
+        form, _, plugin_obj, active_nav = self._determine_active_settings(slug, plugin)
+
+        all_groups = setting_registry.all_groups()
+        all_plugins = self._get_plugins()
 
         if form.validate_on_submit():
-            new_settings = populate_settings_dict(form, old_settings)
-
             if plugin_obj is not None:
-                plugin_obj.update_settings(new_settings)
+                plugin_obj.update_settings(form.data)
             else:
-                Setting.update(settings=new_settings)
-
-            flash(_("Settings saved."), "success")
+                Setting.update(
+                    group_key=slug if slug else "general", form_data=form.data
+                )
+            flash("Settings saved.", "success")
 
         return render_template(
             "management/settings.html",
@@ -165,6 +136,43 @@ class ManagementSettings(MethodView):
             all_plugins=all_plugins,
             active_nav=active_nav,
         )
+
+    def _determine_active_settings(self, slug: str | None, plugin: str | None):
+        """Determines which settings are active.
+
+        Returns a tuple in following order:
+        ``form``, ``old_settings``, ``plugin_obj``, ``active_nav``
+        """
+        slug = slug if slug else "general"
+        active_nav: dict[str, str] = {}
+        plugin_obj = None
+
+        if plugin is not None:
+            # plugin settings (PluginRegistry) are a separate mechanism
+            # from SettingGroup and are untouched by this refactor
+            plugin_obj = PluginRegistry.get_by_or_404(name=plugin)
+            active_nav.update(
+                {"key": plugin_obj.name, "title": plugin_obj.name.title()}
+            )
+            form = plugin_obj.get_settings_form()
+            old_settings = plugin_obj.settings
+        else:
+            group_obj = setting_registry.group(slug)
+            active_nav.update({"key": group_obj.key, "title": group_obj.name})
+
+            form_cls = build_form(group_obj)
+            form = form_cls()
+
+            all_values = Setting.as_dict()
+            old_settings = {
+                setting.key: all_values[setting.key] for setting in group_obj.settings
+            }
+
+        return form, old_settings, plugin_obj, active_nav
+
+    def _get_plugins(self):
+        plugins = PluginRegistry.get_all(PluginRegistry.enabled == True)
+        return [plugin for plugin in plugins if plugin.has_settings]
 
 
 class ManageUsers(MethodView):
@@ -330,7 +338,7 @@ class DeleteUser(MethodView):
             ids = json.get("ids")
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
-            data = []
+            data: list[dict[str, Any]] = []
             for user in User.get_all(User.id.in_(ids)):
                 # do not delete current user
                 if current_user.id == user.id:
@@ -476,7 +484,7 @@ class BanUser(MethodView):
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
 
-            data = []
+            data: list[dict[str, Any]] = []
             users = User.get_all(User.id.in_(ids))
             for user in users:
                 # don't let a user ban himself and do not allow a moderator
@@ -548,7 +556,7 @@ class UnbanUser(MethodView):
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
 
-            data = []
+            data: list[dict[str, Any]] = []
             for user in User.get_all(User.id.in_(ids)):
                 if user.unban():
                     data.append(
@@ -707,7 +715,7 @@ class DeleteGroup(MethodView):
                     status=404,
                 )
 
-            data = []
+            data: list[dict[str, Any]] = []
             for group in Group.get_all(Group.id.in_(id_list)):
                 group.delete()
                 data.append(
@@ -778,7 +786,7 @@ class EditForum(MethodView):
     ]
     form = EditForumForm
 
-    def get(self, forum_id):
+    def get(self, forum_id: int):
         forum = Forum.get_by_or_404(id=forum_id)
 
         form = self.form(forum)
@@ -794,7 +802,7 @@ class EditForum(MethodView):
             "management/forum_form.html", form=form, title=_("Edit Forum")
         )
 
-    def post(self, forum_id):
+    def post(self, forum_id: int):
         forum = Forum.get_by_or_404(id=forum_id)
 
         form = self.form(forum)
@@ -828,7 +836,7 @@ class AddForum(MethodView):
     ]
     form = AddForumForm
 
-    def get(self, category_id=None):
+    def get(self, category_id: int | None = None):
         form = self.form()
 
         form.groups.data = db.session.execute(
@@ -843,7 +851,7 @@ class AddForum(MethodView):
             "management/forum_form.html", form=form, title=_("Add Forum")
         )
 
-    def post(self, category_id=None):
+    def post(self, category_id: int | None = None):
         form = self.form()
 
         if form.validate_on_submit():
@@ -875,7 +883,7 @@ class DeleteForum(MethodView):
         )
     ]
 
-    def post(self, forum_id):
+    def post(self, forum_id: int):
         forum = Forum.get_by_or_404(id=forum_id)
 
         involved_users = User.get_all(
@@ -932,7 +940,7 @@ class EditCategory(MethodView):
     ]
     form = CategoryForm
 
-    def get(self, category_id):
+    def get(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
 
         form = self.form(obj=category)
@@ -941,7 +949,7 @@ class EditCategory(MethodView):
             "management/category_form.html", form=form, title=_("Edit Category")
         )
 
-    def post(self, category_id):
+    def post(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
 
         form = self.form(obj=category)
@@ -968,7 +976,7 @@ class DeleteCategory(MethodView):
         )
     ]
 
-    def post(self, category_id):
+    def post(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
 
         involved_users = User.query.filter(
@@ -1047,8 +1055,8 @@ class MarkReportRead(MethodView):
             ids = json.get("ids")
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
-            data = []
 
+            data: list[dict[str, Any]] = []
             for report in Report.get_all(Report.id.in_(ids)):
                 report.zapped_by = current_user.id
                 report.zapped = time_utcnow()
@@ -1088,7 +1096,7 @@ class MarkReportRead(MethodView):
 
         # mark all as read
         reports = Report.get_all(Report.zapped == None)
-        report_list = []
+        report_list: list[Report] = []
         for report in reports:
             report.zapped_by = current_user.id
             report.zapped = time_utcnow()
@@ -1113,14 +1121,14 @@ class DeleteReport(MethodView):
         )
     ]
 
-    def post(self, report_id=None):
+    def post(self, report_id: int | None = None):
         json = request.get_json(silent=True)
         if json is not None:
             ids = json.get("ids")
             if not ids:
                 return jsonify(message="No ids provided.", category="error", status=404)
 
-            data = []
+            data: list[dict[str, Any]] = []
             for report in Report.get_all(Report.id.in_(ids)):
                 if report.delete():
                     data.append(
@@ -1206,17 +1214,17 @@ class ManagementOverview(MethodView):
             "all_users": User.count(),
             "banned_users": banned_users,
             "online_users": online_users,
-            "all_groups": Group.query.count(),
-            "report_count": Report.query.count(),
-            "topic_count": Topic.query.count(),
-            "post_count": Post.query.count(),
+            "all_groups": Group.count(),
+            "report_count": Report.count(),
+            "topic_count": Topic.count(),
+            "post_count": Post.count(),
             # components
             "python_version": python_version,
             "celery_version": celery_version,
             "flask_version": importlib.metadata.version("flask"),
             "flaskbb_version": flaskbb_version,
             # plugins
-            "plugins": PluginRegistry.query.all(),
+            "plugins": PluginRegistry.get_all(),
         }
 
         return render_template("management/overview.html", **stats)
@@ -1235,7 +1243,7 @@ class PluginsView(MethodView):
     ]
 
     def get(self):
-        plugins = PluginRegistry.query.all()
+        plugins = PluginRegistry.get_all()
         return render_template("management/plugins.html", plugins=plugins)
 
 
@@ -1308,6 +1316,27 @@ class DisablePlugin(MethodView):
         return redirect(url_for("management.plugins"))
 
 
+class InstallPlugin(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self, name: str):
+        validate_plugin(name)
+        plugin = PluginRegistry.get_by_or_404(name=name)
+        plugin.add_settings()
+
+        flash(_("Plugin has been installed."), "success")
+        return redirect(url_for("management.plugins"))
+
+
 class UninstallPlugin(MethodView):
     decorators = [
         allows.requires(
@@ -1323,40 +1352,9 @@ class UninstallPlugin(MethodView):
     def post(self, name: str):
         validate_plugin(name)
         plugin = PluginRegistry.get_by_or_404(name=name)
-        PluginStore.query.filter_by(plugin_id=plugin.id).delete()
-        db.session.commit()
+        plugin.remove_settings()
+
         flash(_("Plugin has been uninstalled."), "success")
-        return redirect(url_for("management.plugins"))
-
-
-class InstallPlugin(MethodView):
-    decorators = [
-        allows.requires(
-            IsAdmin,
-            on_fail=FlashAndRedirect(
-                message=_("You are not allowed to modify plugins"),
-                level="danger",
-                endpoint="management.overview",
-            ),
-        )
-    ]
-
-    def post(self, name: str):
-        plugin_module = validate_plugin(name)
-        plugin = PluginRegistry.get_by_or_404(name=name)
-
-        if not plugin.enabled:
-            flash(
-                _(
-                    "Can't install plugin. Enable '%(plugin)s' plugin first.",
-                    plugin=plugin.name,
-                ),
-                "danger",
-            )
-            return redirect(url_for("management.plugins"))
-
-        plugin.add_settings(plugin_module.SETTINGS)
-        flash(_("Plugin has been installed."), "success")
         return redirect(url_for("management.plugins"))
 
 

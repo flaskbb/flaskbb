@@ -11,32 +11,25 @@ This module contains stuff for forms.
 
 import functools
 from collections.abc import Iterable
-from enum import Enum
 from typing import Any, TypeVar, override
 
+from flask import current_app
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm, RecaptchaField
-from wtforms import (
-    BooleanField,
-    FloatField,
-    IntegerField,
-    SelectField,
-    SelectMultipleField,
-    StringField,
-    validators,
-)
+from flask_wtf.file import FileAllowed, FileSize
 
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import limiter
 
 _F = TypeVar("_F", bound="FlaskBBForm")
 
 
 def add_recaptcha_field(only_on_ratelimit: bool = False):
-    def decorator(cls: type[_F]):
+    def decorator(cls: type[_F]):  # pyright: ignore[reportUnknownParameterType]
         @functools.wraps(cls)
         def decorated_class(*args: Any, **kwargs: Any) -> _F:
+            from flaskbb.core.settings import flaskbb_config
             from flaskbb.utils.helpers import enforce_recaptcha
-            from flaskbb.utils.settings import flaskbb_config
 
             if flaskbb_config["RECAPTCHA_ENABLED"]:
                 if (
@@ -51,9 +44,34 @@ def add_recaptcha_field(only_on_ratelimit: bool = False):
                     return RecaptchaEnabledForm()  # pyright: ignore
             return cls()
 
-        return decorated_class
+        return decorated_class  # pyright: ignore[reportUnknownVariableType]
 
     return decorator
+
+
+class AvatarExtensionValidator(FileAllowed):
+    def __init__(self, message: str | None = None):
+        super().__init__(upload_set=[], message=message)  # pyright: ignore[reportUnknownMemberType]
+
+    @override
+    def __call__(self, form, field):
+        self.upload_set = current_app.config.get("AVATAR_EXTENSIONS", [])  # pyright: ignore[reportUnknownMemberType]
+        return super(AvatarExtensionValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+
+
+class AvatarSizeValidator(FileSize):
+    def __init__(self, message: str | None = None):
+        super().__init__(max_size=None, min_size=0, message=message)  # pyright: ignore[reportUnknownMemberType]
+
+    @override
+    def __call__(self, form, field):
+        self.max_size = flaskbb_config["AVATAR_SIZE"] * 1024
+        self.min_size = 0
+        if not self.message:
+            self.message = "Image is too big! {}kb are allowed.".format(
+                flaskbb_config["AVATAR_SIZE"]
+            )
+        return super(AvatarSizeValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
 
 
 class FlaskBBForm(FlaskForm):
@@ -76,148 +94,3 @@ class FlaskBBForm(FlaskForm):
             field = getattr(self, attribute, None)
             if field:
                 field.errors.append(reason)
-
-
-class SettingValueType(Enum):
-    string = 0
-    integer = 1
-    float = 3
-    boolean = 4
-    select = 5
-    selectmultiple = 6
-
-
-def populate_settings_dict(form, settings):
-    new_settings = {}
-    for key, value in settings.items():
-        try:
-            # check if the value has changed
-            if value == form[key].data:
-                continue
-            else:
-                new_settings[key] = form[key].data
-        except KeyError:
-            pass
-
-    return new_settings
-
-
-def populate_settings_form(form, settings):
-    for key, value in settings.items():
-        try:
-            form[key].data = value
-        except (KeyError, ValueError):
-            pass
-
-    return form
-
-
-# TODO(anr): clean this up
-def generate_settings_form(settings):  # noqa: C901
-    """Generates a settings form which includes field validation
-    based on our Setting Schema."""
-
-    class SettingsForm(FlaskBBForm):
-        pass
-
-    # now parse the settings in this group
-    for setting in settings:
-        field_validators = []
-
-        if setting.value_type in {SettingValueType.integer, SettingValueType.float}:
-            validator_class = validators.NumberRange
-        elif setting.value_type == SettingValueType.string:
-            validator_class = validators.Length
-
-        # generate the validators
-        if "min" in setting.extra:
-            # Min number validator
-            field_validators.append(validator_class(min=setting.extra["min"]))
-
-        if "max" in setting.extra:
-            # Max number validator
-            field_validators.append(validator_class(max=setting.extra["max"]))
-
-        # Generate the fields based on value_type
-        # IntegerField
-        if setting.value_type == SettingValueType.integer:
-            setattr(
-                SettingsForm,
-                setting.key,
-                IntegerField(
-                    setting.name,
-                    validators=field_validators,
-                    description=setting.description,
-                ),
-            )
-        # FloatField
-        elif setting.value_type == SettingValueType.float:
-            setattr(
-                SettingsForm,
-                setting.key,
-                FloatField(
-                    setting.name,
-                    validators=field_validators,
-                    description=setting.description,
-                ),
-            )
-
-        # StringField
-        elif setting.value_type == SettingValueType.string:
-            setattr(
-                SettingsForm,
-                setting.key,
-                StringField(
-                    setting.name,
-                    validators=field_validators,
-                    description=setting.description,
-                ),
-            )
-
-        # SelectMultipleField
-        elif setting.value_type == SettingValueType.selectmultiple:
-            # if no coerce is found, it will fallback to unicode
-            if "coerce" in setting.extra:
-                coerce_to = setting.extra["coerce"]
-            else:
-                coerce_to = str
-
-            setattr(
-                SettingsForm,
-                setting.key,
-                SelectMultipleField(
-                    setting.name,
-                    choices=setting.extra["choices"](),
-                    coerce=coerce_to,
-                    description=setting.description,
-                ),
-            )
-
-        # SelectField
-        elif setting.value_type == SettingValueType.select:
-            # if no coerce is found, it will fallback to unicode
-            if "coerce" in setting.extra:
-                coerce_to = setting.extra["coerce"]
-            else:
-                coerce_to = str
-
-            setattr(
-                SettingsForm,
-                setting.key,
-                SelectField(
-                    setting.name,
-                    coerce=coerce_to,
-                    choices=setting.extra["choices"](),
-                    description=setting.description,
-                ),
-            )
-
-        # BooleanField
-        elif setting.value_type == SettingValueType.boolean:
-            setattr(
-                SettingsForm,
-                setting.key,
-                BooleanField(setting.name, description=setting.description),
-            )
-
-    return SettingsForm

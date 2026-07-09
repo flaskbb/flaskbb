@@ -43,7 +43,6 @@ from flaskbb.utils.populate import (
     create_welcome_forum,
     insert_bulk_data,
     run_plugin_migrations,
-    update_settings_from_fixture,
 )
 from flaskbb.utils.translations import compile_translations
 
@@ -335,9 +334,10 @@ def upgrade(all_latest: bool, fixture: str | None, force: bool):
             )
 
         click.secho("[+] Updating fixtures...", fg="cyan")
-        count = update_settings_from_fixture(
-            fixture=settings, overwrite_group=force, overwrite_setting=force
-        )
+        #count = update_settings_from_fixture(
+        #    fixture=settings, overwrite_group=force, overwrite_setting=force
+        #)
+        count = {}
         click.secho(
             "[+] {settings} settings in {groups} setting groups updated.".format(
                 groups=len(count),

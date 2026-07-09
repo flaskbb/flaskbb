@@ -31,10 +31,10 @@ from wtforms.validators import (
     Optional,
 )
 
-from flaskbb.utils.forms import FlaskBBForm
-from flaskbb.utils.uploads import (
+from flaskbb.utils.forms import (
     AvatarExtensionValidator,
     AvatarSizeValidator,
+    FlaskBBForm,
 )
 
 from ..core.user.update import (
