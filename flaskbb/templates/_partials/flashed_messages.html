@@ -1,8 +1,8 @@
 {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
         {% for category, message in messages %}
-            {% if category == 'error' %}
-                {% set icon = 'fas fa-exclamation' %}
+            {% if category == 'danger' or category == 'error' %}
+                {% set icon = 'fas fa-xmark' %}
             {% elif category == 'success' %}
                 {% set icon = 'fas fa-check' %}
             {% else %}

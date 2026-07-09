@@ -12,6 +12,7 @@ It provides the forms that are needed for the user views.
 import logging
 
 from flask_babelplus import lazy_gettext as _
+from flask_wtf.file import FileField, FileRequired
 from wtforms import (
     DateField,
     PasswordField,
@@ -31,8 +32,13 @@ from wtforms.validators import (
 )
 
 from flaskbb.utils.forms import FlaskBBForm
+from flaskbb.utils.uploads import (
+    AvatarExtensionValidator,
+    AvatarSizeValidator,
+)
 
 from ..core.user.update import (
+    AvatarUpdate,
     EmailUpdate,
     PasswordUpdate,
     SettingsUpdate,
@@ -101,7 +107,27 @@ class ChangePasswordForm(FlaskBBForm):
 
     def as_change(self):
         return PasswordUpdate(
-            new_password=self.new_password.data, old_password=self.old_password.data
+            new_password=self.new_password.data,  # pyright: ignore[reportArgumentType]
+            old_password=self.old_password.data,  # pyright: ignore[reportArgumentType]
+        )
+
+
+class ChangeAvatarForm(FlaskBBForm):
+    avatar = FileField(
+        _("New Avatar"),
+        validators=[
+            FileRequired(_("A avatar image must be provided.")),
+            AvatarExtensionValidator(
+                _("This file type is not supported for avatar images")
+            ),
+            AvatarSizeValidator(),
+        ],
+    )
+    submit = SubmitField(_("Save"))
+
+    def as_change(self):
+        return AvatarUpdate(
+            avatar=self.avatar.data,
         )
 
 
@@ -110,7 +136,6 @@ class ChangeUserDetailsForm(FlaskBBForm):
     gender = StringField(_("Gender"), validators=[Optional()])
     location = StringField(_("Location"), validators=[Optional()])
     website = StringField(_("Website"), validators=[Optional(), URL()])
-    avatar = StringField(_("Avatar"), validators=[Optional(), URL()])
     signature = TextAreaField(_("Forum Signature"), validators=[Optional()])
     notes = TextAreaField(_("Notes"), validators=[Optional(), Length(min=0, max=5000)])
     submit = SubmitField(_("Save"))
@@ -125,7 +150,6 @@ class ChangeUserDetailsForm(FlaskBBForm):
             gender=self.gender.data,
             location=self.location.data,
             website=self.website.data,
-            avatar=self.avatar.data,
             signature=self.signature.data,
             notes=self.notes.data,
         )

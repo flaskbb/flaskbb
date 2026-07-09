@@ -1,0 +1,60 @@
+{% extends theme("user/settings_layout.html") %}
+
+{% block settings_content %}
+{%- from theme("_macros/form.html") import horizontal_field, field_label, render_input_field %}
+{%- from theme("_macros/utils.html") import avatar_img %}
+
+<div class="card page">
+    <div class="card-header page-header">
+        {% trans %}Change Avatar{% endtrans %}
+    </div>
+    <div class="card-body page-body">
+        <form role="form" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            {{ horizontal_field(form.avatar, div_class="col-5") }}
+
+            <div class="row mb-3">
+                <div class="offset-3 col-5">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <label>{% trans %}Current Avatar{% endtrans %}</label>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        {{ avatar_img(user, size=150, class="profilepicture rounded") }}
+                    </div>
+                    {% if user.avatar %}
+                    <div class="d-flex justify-content-center align-items-center deleteavatar">
+                        <button class="btn btn-sm"
+                            onclick="return actions.execute('{{ url_for('user.delete_avatar') }}', {'user': '{{ user.id }}'}, resetProfilePicture, true)">
+                            <span class="fas fa-fw fa-trash text-danger"></span>
+                            {% trans %}Delete Avatar{% endtrans %}
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    const actions = new window.app.Actions();
+    const defaultAvatar = "{{ url_for('static', filename='avatar100x100.png') }}"
+
+    function resetProfilePicture(data) {
+        const profilePicutre = document.querySelector(".profilepicture");
+        profilePicutre.setAttribute("src", defaultAvatar);
+
+        const deleteAvatarBtn = document.querySelector(".deleteavatar");
+        if(deleteAvatarBtn) {
+            console.log(deleteAvatarBtn);
+            deleteAvatarBtn.remove()
+        }
+    }
+</script>
+{% endblock %}

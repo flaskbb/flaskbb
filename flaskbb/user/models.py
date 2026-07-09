@@ -18,6 +18,7 @@ from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
+    DynamicMapped,
     Mapped,
     WriteOnlyMapped,
     mapped_column,
@@ -171,7 +172,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         foreign_keys=[primary_group_id],
     )
 
-    secondary_groups: Mapped[list[Group]] = relationship(
+    secondary_groups: DynamicMapped[Group] = relationship(
         "Group",
         secondary=groups_users,
         primaryjoin=(groups_users.c.user_id == id),
@@ -188,7 +189,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     # Properties
     @property
     @override
-    def is_active(self):
+    def is_active(self):  # pyright: ignore[reportIncompatibleMethodOverride]
         """Returns the state of the account.
         If the ``ACTIVATE_ACCOUNT`` option has been disabled, it will always
         return ``True``. Is the option activated, it will, depending on the
@@ -214,6 +215,10 @@ class User(db.Model, UserMixin, CRUDMixin):
     def url(self):
         """Returns the url for the user."""
         return url_for("user.profile", username=self.username)
+
+    @property
+    def avatar_url(self):
+        return url_for("uploads.avatar", avatar=self.avatar)
 
     @property
     def permissions(self):
@@ -380,9 +385,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
         :param group: The group which should be checked.
         """
-        stmt = self.secondary_groups.select().filter(
-            groups_users.c.group_id == group.id
-        )
+        stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
         return db.session.execute(db.select(stmt.exists())).scalar()
 
     @cache.memoize()
@@ -461,9 +464,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         if groups is not None:
             # TODO: Only remove/add groups that are selected
             with db.session.no_autoflush:
-                secondary_groups = (
-                    db.session.execute(self.secondary_groups.select()).scalars().all()
-                )
+                secondary_groups = self.secondary_groups.all()
 
                 for group in secondary_groups:
                     self.remove_from_group(group)

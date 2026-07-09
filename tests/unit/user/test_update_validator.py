@@ -1,10 +1,9 @@
 from uuid import uuid4
 
 import pytest
-from requests.exceptions import RequestException
 
 from flaskbb.core.exceptions import StopValidation, ValidationError
-from flaskbb.core.user.update import EmailUpdate, PasswordUpdate, UserDetailsChange
+from flaskbb.core.user.update import EmailUpdate, PasswordUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services import validators
 
@@ -82,34 +81,3 @@ class TestOldPasswordMustMatchValidator(object):
     def test_doesnt_raise_if_old_passwords_match(self, Fred):
         change = PasswordUpdate("fred", str(uuid4()))
         validators.OldPasswordMustMatch().validate(Fred, change)
-
-
-class TestValidateAvatarURL(object):
-    def test_passes_if_avatar_url_is_none(self, Fred):
-        change = UserDetailsChange()
-        validators.ValidateAvatarURL().validate(Fred, change)
-
-    def test_raises_if_check_raises_requests_error(self, Fred, responses):
-        url = "http://notfake.example/image.png"
-        change = UserDetailsChange(avatar=url)
-        responses.add(responses.GET, url=url, body=RequestException())
-
-        with pytest.raises(ValidationError) as excinfo:
-            validators.ValidateAvatarURL().validate(Fred, change)
-
-        assert excinfo.value.attribute == "avatar"
-        assert excinfo.value.reason == "Could not retrieve avatar"
-
-    def test_raises_if_image_doesnt_pass_checks(self, image_too_tall, Fred, responses):
-        change = UserDetailsChange(avatar=image_too_tall.url)
-        responses.add(image_too_tall)
-
-        with pytest.raises(ValidationError) as excinfo:
-            validators.ValidateAvatarURL().validate(Fred, change)
-
-        assert "too high" in excinfo.value.reason
-
-    def tests_passes_if_image_is_just_right(self, image_just_right, Fred, responses):
-        change = UserDetailsChange(avatar=image_just_right.url)
-        responses.add(image_just_right)
-        validators.ValidateAvatarURL().validate(Fred, change)

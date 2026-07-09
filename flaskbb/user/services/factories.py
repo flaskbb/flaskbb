@@ -18,12 +18,14 @@ from flask_login import current_user
 from ...extensions import db, pluggy
 from ...utils.helpers import get_available_languages, get_available_themes
 from ..forms import (
+    ChangeAvatarForm,
     ChangeEmailForm,
     ChangePasswordForm,
     ChangeUserDetailsForm,
     GeneralSettingsForm,
 )
 from .update import (
+    DefaultAvatarUpdateHandler,
     DefaultDetailsUpdateHandler,
     DefaultEmailUpdateHandler,
     DefaultPasswordUpdateHandler,
@@ -60,6 +62,15 @@ def email_update_handler():
     return DefaultEmailUpdateHandler(db, pluggy, validators)
 
 
+def avatar_update_handler():
+    validators = list(
+        chain.from_iterable(
+            pluggy.hook.flaskbb_gather_avatar_validators(app=current_app)
+        )
+    )
+    return DefaultAvatarUpdateHandler(db, pluggy, validators)
+
+
 def settings_update_handler():
     return DefaultSettingsUpdateHandler(db, pluggy)
 
@@ -83,6 +94,10 @@ def change_password_form_factory():
 
 def change_email_form_factory():
     return ChangeEmailForm(user=current_user)
+
+
+def change_avatar_form_factory():
+    return ChangeAvatarForm(obj=current_user)
 
 
 def change_details_form_factory():

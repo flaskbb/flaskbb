@@ -22,7 +22,6 @@ from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar, overload
 from wsgiref.types import WSGIEnvironment
 
-import requests
 import unidecode
 from babel.core import get_locale_identifier
 from babel.dates import format_date as babel_format_date
@@ -48,7 +47,6 @@ from flask_limiter import Limiter
 from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
-from PIL import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
@@ -512,7 +510,7 @@ def _format_html_time_tag(
         # hinder internationalization and honestly why bother.
         content += " UTC"
     else:
-        raise ValueError("what_to_display argument invalid")
+        raise ValueError("what_to_display argument invalid")  # pyright: ignore[reportUnreachable]
 
     isoformat = datetime.isoformat()
 
@@ -582,109 +580,6 @@ def format_quote(username: str, content: str):
     )
 
     return quote
-
-
-def get_image_info(url: str):
-    """Returns the content-type, image size (kb), height and width of
-    an image without fully downloading it.
-
-    :param url: The URL of the image.
-    """
-
-    try:
-        r = requests.get(url, timeout=(3.05, 27), stream=True, allow_redirects=False)
-    except requests.ConnectionError:
-        return None
-
-    image_size = r.headers.get("content-length", None)
-    if image_size is None:
-        return None
-
-    image_size = float(image_size) / 1000  # in kilobyte
-    image_max_size = 10000
-    image_data = {
-        "content_type": "",
-        "size": image_size,
-        "width": 0,
-        "height": 0,
-    }
-
-    # lets set a hard limit of 10MB
-    if image_size > image_max_size:
-        return image_data
-
-    data = None
-    parser = ImageFile.Parser()
-
-    while True:
-        data = r.raw.read(1024)
-        if not data:
-            break
-
-        parser.feed(data)
-        if parser.image:
-            image_data["content_type"] = parser.image.format or ""
-            image_data["width"] = parser.image.size[0]
-            image_data["height"] = parser.image.size[1]
-            break
-
-    return image_data
-
-
-def check_image(url: str):
-    """A little wrapper for the :func:`get_image_info` function.
-    If the image doesn't match the ``flaskbb_config`` settings it will
-    return a tuple with a the first value is the custom error message and
-    the second value ``False`` for not passing the check.
-    If the check is successful, it will return ``None`` for the error message
-    and ``True`` for the passed check.
-
-    :param url: The image url to be checked.
-    """
-    img_info = get_image_info(url)
-    error = None
-
-    if img_info is None:
-        error = "Couldn't get image info. Try a different hoster and/or image."
-        return error, False
-
-    if (
-        flaskbb_config["AVATAR_SIZE"]
-        and img_info["size"] > flaskbb_config["AVATAR_SIZE"]
-    ):
-        error = "Image is too big! {}kb are allowed.".format(
-            flaskbb_config["AVATAR_SIZE"]
-        )
-        return error, False
-
-    if (
-        flaskbb_config["AVATAR_TYPES"]
-        and img_info["content_type"] not in flaskbb_config["AVATAR_TYPES"]
-    ):
-        error = "Image type {} is not allowed. Allowed types are: {}".format(
-            img_info["content_type"], ", ".join(flaskbb_config["AVATAR_TYPES"])
-        )
-        return error, False
-
-    if (
-        flaskbb_config["AVATAR_WIDTH"]
-        and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]
-    ):
-        error = "Image is too wide! {}px width is allowed.".format(
-            flaskbb_config["AVATAR_WIDTH"]
-        )
-        return error, False
-
-    if (
-        flaskbb_config["AVATAR_HEIGHT"]
-        and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]
-    ):
-        error = "Image is too high! {}px height is allowed.".format(
-            flaskbb_config["AVATAR_HEIGHT"]
-        )
-        return error, False
-
-    return error, True
 
 
 def get_alembic_locations(plugin_dirs: list[str]) -> list[tuple[str, ...]]:
@@ -859,7 +754,7 @@ class ReverseProxyPathFix(object):
         if self.force_https:
             environ["wsgi.url_scheme"] = "https"
 
-        return self.app(environ, start_response)
+        return self.app(environ, start_response)  # pyright: ignore[reportArgumentType]
 
 
 @overload

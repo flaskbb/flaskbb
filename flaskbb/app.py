@@ -94,6 +94,7 @@ from flaskbb.utils.search import (
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
+from flaskbb.utils.uploads import create_upload_directory
 
 from . import markup  # noqa
 from .auth import views as auth_views  # noqa
@@ -101,6 +102,7 @@ from .deprecation import FlaskBBDeprecation
 from .display.navigation import NavigationContentType
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
+from .upload import views as upload_views  # noqa
 from .user import views as user_views  # noqa
 
 logger = logging.getLogger(__name__)
@@ -226,6 +228,8 @@ def configure_app(app: Flask, config: Any):
 
     if all("WarningsPanel" not in p for p in debug_panels):
         debug_panels.append("flask_debugtoolbar_warnings.WarningsPanel")
+
+    create_upload_directory(app)
 
 
 def configure_celery_app(app: Flask, celery: Celery):

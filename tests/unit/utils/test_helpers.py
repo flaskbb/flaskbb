@@ -3,11 +3,9 @@ import datetime as dt
 
 from flaskbb.forum.models import Forum
 from flaskbb.utils.helpers import (
-    check_image,
     crop_title,
     format_quote,
     forum_is_unread,
-    get_image_info,
     is_online,
     slugify,
     time_utcnow,
@@ -109,74 +107,3 @@ def test_format_quote(topic):
     expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
     actual = format_quote(topic.first_post.username, topic.first_post.content)
     assert actual == expected_markdown
-
-
-def test_get_image_info_jpg(responses, image_jpg):
-    responses.add(image_jpg)
-    jpg_img = get_image_info(image_jpg.url)
-    assert jpg_img["content_type"] == "JPEG"
-    assert jpg_img["height"] == 1024
-    assert jpg_img["width"] == 1280
-    assert jpg_img["size"] == 209.06
-
-
-def test_get_image_info_gif(responses, image_gif):
-    responses.add(image_gif)
-    gif_img = get_image_info(image_gif.url)
-    assert gif_img["content_type"] == "GIF"
-    assert gif_img["height"] == 168
-    assert gif_img["width"] == 400
-    assert gif_img["size"] == 576.138
-
-
-def test_get_image_info_png(responses, image_png):
-    responses.add(image_png)
-    png_img = get_image_info(image_png.url)
-    assert png_img["content_type"] == "PNG"
-    assert png_img["height"] == 1080
-    assert png_img["width"] == 1920
-    assert png_img["size"] == 269.409
-
-
-def assert_bad_image_check(result, mesg):
-    assert not result[1]
-    assert mesg in result[0]
-
-
-def test_check_image_too_big(image_too_big, default_settings, responses):
-    responses.add(image_too_big)
-
-    flaskbb_config["AVATAR_WIDTH"] = 1000
-    flaskbb_config["AVATAR_HEIGHT"] = 1000
-    assert_bad_image_check(check_image(image_too_big.url), "big")
-
-
-def test_check_image_too_tall(image_too_tall, default_settings, responses):
-    responses.add(image_too_tall)
-
-    flaskbb_config["AVATAR_WIDTH"] = 200
-    flaskbb_config["AVATAR_HEIGHT"] = 90
-    assert_bad_image_check(check_image(image_too_tall.url), "high")
-
-
-def test_check_image_too_wide(image_too_wide, default_settings, responses):
-    responses.add(image_too_wide)
-
-    flaskbb_config["AVATAR_WIDTH"] = 90
-    flaskbb_config["AVATAR_HEIGHT"] = 200
-    assert_bad_image_check(check_image(image_too_wide.url), "wide")
-
-
-def test_check_image_wrong_mime(image_wrong_mime, default_settings, responses):
-    responses.add(image_wrong_mime)
-
-    assert_bad_image_check(check_image(image_wrong_mime.url), "type")
-
-
-def test_check_image_just_right(image_just_right, default_settings, responses):
-    responses.add(image_just_right)
-
-    flaskbb_config["AVATAR_WIDTH"] = 100
-    flaskbb_config["AVATAR_HEIGHT"] = 100
-    result = check_image(image_just_right.url)
-    assert result[1]
