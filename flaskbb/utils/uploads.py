@@ -12,7 +12,6 @@ A few helpers that are used by flaskbb
 import logging
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, override
 
 from flask import Flask, current_app
 from flask_wtf.file import FileStorage

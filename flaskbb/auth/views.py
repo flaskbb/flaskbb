@@ -35,6 +35,7 @@ from flaskbb.auth.forms import (
     RequestActivationForm,
     ResetPasswordForm,
 )
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import db, limiter, pluggy
 from flaskbb.utils.helpers import (
     anonymous_required,
@@ -46,7 +47,6 @@ from flaskbb.utils.helpers import (
     render_template,
     requires_unactivated,
 )
-from flaskbb.core.settings import flaskbb_config
 
 from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo

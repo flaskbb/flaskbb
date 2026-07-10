@@ -70,7 +70,6 @@ from flaskbb.utils.requirements import (
     IsAtleastModerator,
     IsAtleastSuperModerator,
 )
-from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.uploads import (
     delete_avatar_file,
     get_avatar_filename,
@@ -101,8 +100,8 @@ class ManagementSettings(MethodView):
             slug, plugin
         )
 
-        all_groups = setting_registry.all_groups()
-        all_plugins = self._get_plugins()
+        all_groups = setting_registry.core_groups()
+        all_plugins = PluginRegistry.get_installed_plugins()
 
         form.process(data=old_settings)
 
@@ -118,7 +117,7 @@ class ManagementSettings(MethodView):
         form, _, plugin_obj, active_nav = self._determine_active_settings(slug, plugin)
 
         all_groups = setting_registry.all_groups()
-        all_plugins = self._get_plugins()
+        all_plugins = PluginRegistry.get_installed_plugins()
 
         if form.validate_on_submit():
             if plugin_obj is not None:
@@ -169,10 +168,6 @@ class ManagementSettings(MethodView):
             }
 
         return form, old_settings, plugin_obj, active_nav
-
-    def _get_plugins(self):
-        plugins = PluginRegistry.get_all(PluginRegistry.enabled == True)
-        return [plugin for plugin in plugins if plugin.has_settings]
 
 
 class ManageUsers(MethodView):

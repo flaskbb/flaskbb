@@ -87,43 +87,39 @@ def flaskbb_additional_setup(app, pluggy):
     """
 
 
+@spec
 def flaskbb_load_internal_setting_groups():
-    """Hook for registering setting groups.
+    """Hook for registering FlaskBB's own built-in setting groups.
+
+    This is internal-only - implemented by flaskbb.core.settings.*_group
+    modules (general_group, auth_group, misc_group, appearance_group)
+    and nothing else. Plugin authors should implement
+    flaskbb_load_setting_groups instead (see below); groups loaded
+    through this hook show up in the admin UI's "FlaskBB Settings"
+    section, groups loaded through the other one show up under
+    "Plugin Settings" - which section a group lands in is determined
+    entirely by which hook found it, not by anything set on the
+    SettingGroup itself.
 
     Implementations should return a SettingGroup instance, or a list of
-    SettingGroup instances if a single plugin needs to register more
-    than one group. All results across core and every installed plugin
-    are collected and registered into the settings registry - this
-    hookspec does not use firstresult, so every implementation's return
-    value is kept.
-
-    Example:
-        @impl
-        def flaskbb_load_setting_groups():
-            return SettingGroup(
-                key="my_plugin",
-                name="My Plugin Settings",
-                description="Settings for My Plugin.",
-                settings=(
-                    BoolSetting(
-                        key="MY_PLUGIN_ENABLED",
-                        value=True,
-                        name="Enabled",
-                        description="Whether My Plugin is active.",
-                    ),
-                ),
-            )
+    SettingGroup instances. All results are collected and registered -
+    this hookspec does not use firstresult.
     """
 
+
+@spec
 def flaskbb_load_setting_groups():
-    """Hook for registering setting groups.
+    """Hook for plugins to register their own setting groups.
 
     Implementations should return a SettingGroup instance, or a list of
     SettingGroup instances if a single plugin needs to register more
-    than one group. All results across core and every installed plugin
-    are collected and registered into the settings registry - this
+    than one group. All results across every installed plugin are
+    collected and registered into the settings registry - this
     hookspec does not use firstresult, so every implementation's return
     value is kept.
+
+    Groups registered here show up in the admin UI under
+    "Plugin Settings", separate from FlaskBB's own settings.
 
     Example:
         @impl
