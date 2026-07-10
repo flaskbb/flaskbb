@@ -57,8 +57,8 @@ if TYPE_CHECKING:
     from flaskbb.forum.models import Category, Forum, ForumsRead, Topic, TopicsRead
     from flaskbb.user.models import User
 
-from flaskbb.utils.http import get_first_safe_redirect_url
 from flaskbb.core.settings import flaskbb_config
+from flaskbb.utils.http import get_first_safe_redirect_url
 
 logger = logging.getLogger(__name__)
 

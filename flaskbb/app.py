@@ -25,8 +25,11 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
-from flaskbb.core.settings import flaskbb_config
-from flaskbb.core.settings.registry import setting_registry
+from flaskbb.core.settings import (
+    fixture,  # noqa: F401
+    flaskbb_config,
+    setting_registry,
+)
 from flaskbb.extensions import (
     alembic,
     allows,
@@ -134,6 +137,7 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     configure_extensions(app)
 
     load_plugins(app)
+
     configure_blueprints(app)
     configure_template_filters(app)
     configure_context_processors(app)
@@ -141,7 +145,10 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     configure_errorhandlers(app)
     configure_migrations(app)
     configure_translations(app)
+
+    setting_registry.load_from_internal(pluggy)
     setting_registry.load_from_plugins(pluggy)
+
     pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 
     return app

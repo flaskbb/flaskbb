@@ -1,14 +1,22 @@
+# -*- coding: utf-8 -*-
 """
-The Setting model. Owns both storage and caching for settings values.
+flaskbb.core.settings.models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module contains the Setting model. It owns both storage and caching for
+settings values.
 
 `value` is stored as JSON text instead of PickleType - avoids arbitrary
 code execution risk from unpickling, and every setting value type (int,
 bool, str, list[str]) is JSON-safe anyway.
+
+:copyright: (c) 2014-2026 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 from typing import Any
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Mapped, mapped_column
 
 from flaskbb.extensions import cache, db
@@ -20,12 +28,14 @@ from .registry import setting_registry
 class Setting(db.Model):
     __tablename__ = "settings"
 
-    key: Mapped[str] = mapped_column(db.String(255), primary_key=True)
+    key: Mapped[str] = mapped_column(db.String(255), primary_key=True, nullable=False)
     value: Mapped[str | None] = mapped_column(db.Text)  # JSON-encoded
     group_key: Mapped[str] = mapped_column(db.String(255), index=True)
 
     def __init__(self, key: str, value: str | None, group_key: str):
-        pass
+        self.key = key
+        self.value = value
+        self.group_key = group_key
 
     def get_value(self, definition: SettingDefinition):
         if self.value is None:
@@ -40,16 +50,16 @@ class Setting(db.Model):
     def as_dict(cls) -> dict[str, Any]:
         """Load and deserialize every setting value from the DB."""
         rows = db.session.execute(select(cls)).scalars().all()
-        return {
-            row.key: None
-            if row.value is None
-            else setting_registry.definition(row.key).deserialize(row.value)
-            for row in rows
+        definitions = (setting_registry.definition(row.key) for row in rows)
+        config = {
+            d.key: d.deserialize(row.value) if row.value else None
+            for d, row in zip(definitions, rows)
         }
+        return config
 
     @classmethod
-    def invalidate_cache(cls) -> None:
-        """Invalidates the cached settings dict."""
+    def invalidate_cache(cls):
+        """Invalidates this objects cached metadata."""
         cache.delete_memoized(cls.as_dict, cls)
 
     @classmethod
@@ -65,7 +75,7 @@ class Setting(db.Model):
         group = setting_registry.group(group_key)
         for setting_def in group.settings:
             row = db.session.execute(
-                select(cls).where(cls.key == setting_def.key)
+                select(cls).where(func.lower(cls.key) == setting_def.key.lower())
             ).scalar_one()
             row.set_value(setting_def, form_data[setting_def.key])
 
@@ -82,18 +92,21 @@ class Setting(db.Model):
         update.
         """
         group = setting_registry.group(group_key)
-        existing_keys = set(
+        wanted_keys_lower = {s.key.lower() for s in group.settings}
+        existing_keys_lower = set(
             db.session.execute(
-                select(cls.key).where(cls.key.in_([s.key for s in group.settings]))
+                select(func.lower(cls.key)).where(
+                    func.lower(cls.key).in_(wanted_keys_lower)
+                )
             ).scalars()
         )
         for setting_def in group.settings:
-            if setting_def.key not in existing_keys:
+            if setting_def.key.lower() not in existing_keys_lower:
                 db.session.add(
                     cls(
                         key=setting_def.key,
                         value=setting_def.serialize(setting_def.value),
-                        group_key=group_key,
+                        group_key=group.key,
                     )
                 )
         db.session.commit()

@@ -730,8 +730,8 @@ requires-dist = [
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-whooshee", specifier = ">=0.9.1" },
     { name = "flask-wtf", specifier = ">=1.3.0" },
-    { name = "flaskbb-plugin-conversations", specifier = ">=2.0.2" },
-    { name = "flaskbb-plugin-portal", specifier = ">=2.0.0" },
+    { name = "flaskbb-plugin-conversations", editable = "../flaskbb-plugin-conversations" },
+    { name = "flaskbb-plugin-portal", editable = "../flaskbb-plugin-portal" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=3.0.3" },
     { name = "mistune", specifier = ">=3.3.2" },
@@ -771,25 +771,53 @@ dev = [
 [[package]]
 name = "flaskbb-plugin-conversations"
 version = "2.0.2"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../flaskbb-plugin-conversations" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/7d/37ca6ecffe5788b90345f76d0a0a5667248a3252d4235592f902375b3eee/flaskbb_plugin_conversations-2.0.2.tar.gz", hash = "sha256:a0c48d25675b0db172e8104b25cb29d4f77b9bbf08f13d7906ca943f73764d3f", size = 14459, upload-time = "2026-07-04T19:16:56.168Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/34/9e17a34554723937b661456ef3e081fd520413a99957692e7967f20f2f61/flaskbb_plugin_conversations-2.0.2-py3-none-any.whl", hash = "sha256:0b08792c8ca9b8e9f0e2c26982ef728a629f2af954c7c0fd9ad9b3d064fda512", size = 21191, upload-time = "2026-07-04T19:16:54.977Z" },
+
+[package.metadata]
+requires-dist = [{ name = "flaskbb", specifier = ">=2.1.0" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "alabaster" },
+    { name = "babel" },
+    { name = "cov-core" },
+    { name = "coverage" },
+    { name = "freezegun" },
+    { name = "hatch" },
+    { name = "ipython" },
+    { name = "pre-commit" },
+    { name = "py" },
+    { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [[package]]
 name = "flaskbb-plugin-portal"
 version = "2.0.0"
-source = { registry = "https://pypi.org/simple" }
+source = { editable = "../flaskbb-plugin-portal" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/73/b0/73f165dacff0b384ee6e01f70a925dc45b2ea8c88ab426373ad57b945f5c/flaskbb_plugin_portal-2.0.0.tar.gz", hash = "sha256:aa09aca6298b805d2dac9a0b5a7cc6be4b1aae3280eaa9abfa36808a3793b372", size = 6864, upload-time = "2026-02-07T18:53:33.888Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/ff/ac973f517275197a06b55f72dd5f44fd1656976eda6d1143ec28dba9bf2d/flaskbb_plugin_portal-2.0.0-py3-none-any.whl", hash = "sha256:94d39f0a78193dfe01211b79bacf6fce000783a774e01f7eb8d81d30d4c5080d", size = 11122, upload-time = "2026-02-07T18:53:32.672Z" },
+
+[package.metadata]
+requires-dist = [{ name = "flaskbb", specifier = ">=2.1.0" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "alabaster" },
+    { name = "babel" },
+    { name = "cov-core" },
+    { name = "coverage" },
+    { name = "freezegun" },
+    { name = "hatch" },
+    { name = "ipython" },
+    { name = "pre-commit" },
+    { name = "py" },
+    { name = "pytest" },
+    { name = "ruff" },
 ]
 
 [[package]]

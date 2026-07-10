@@ -1,5 +1,12 @@
+# -*- coding: utf-8 -*-
 """
-Type definitions for the settings.
+flaskbb.core.settings.definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This modules holds the Type definitions for the settings.
+
+:copyright: (c) 2014-2026 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 import json
@@ -82,7 +89,7 @@ class StringSetting(SettingDefinition):
 
 @dataclass(frozen=True)
 class SelectSetting(SettingDefinition):
-    choices: Callable[[], list[tuple[str, str]]] = field(default=list)
+    choices: Callable[[], list[tuple[Any, str]]] = field()
     coerce: type = str
 
     @override

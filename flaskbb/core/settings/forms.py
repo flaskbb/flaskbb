@@ -1,5 +1,12 @@
+# -*- coding: utf-8 -*-
 """
+flaskbb.core.settings.forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Auto-generates a Flask-WTF form class for a given SettingGroup
+
+:copyright: (c) 2014-2026 by the FlaskBB Team.
+:license: BSD, see LICENSE for more details.
 """
 
 from typing import Any

@@ -6,12 +6,13 @@ name, stored as ordinary Setting rows alongside core's own settings.
 
 from typing import Any
 
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
 from flaskbb.core.settings.forms import build_form
 from flaskbb.core.settings.models import Setting
 from flaskbb.core.settings.registry import setting_registry
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.utils.database import CRUDMixin
 
 
@@ -26,15 +27,12 @@ class PluginRegistry(db.Model, CRUDMixin):
     enabled: Mapped[bool] = mapped_column(db.Boolean, default=True)
 
     @property
-    def has_settings(self):
-        try:
-            setting_registry.group(self.name)
-            return True
-        except KeyError:
-            return False
+    def info(self):
+        """Returns some information about the plugin."""
+        return pluggy.list_plugin_metadata().get(self.name)
 
     @property
-    def _group(self):
+    def _settings_group(self):
         """The SettingGroup this plugin registered, if any. Plugins
         with no settings (just enable/disable, no configuration) won't
         have registered one."""
@@ -47,23 +45,31 @@ class PluginRegistry(db.Model, CRUDMixin):
     def is_installable(self) -> bool:
         """A plugin is installable if it registered a SettingGroup with
         at least one setting to configure."""
-        group = self._group
+        group = self._settings_group
         return group is not None and len(group.settings) > 0
 
     @property
     def is_installed(self) -> bool:
         """A plugin is installed once every one of its settings has a
         row in the settings table."""
-        group = self._group
+        group = self._settings_group
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
         return all(s.key in current_keys for s in group.settings)
 
     @property
+    def has_settings(self):
+        try:
+            setting_registry.group(self.name)
+            return True
+        except KeyError:
+            return False
+
+    @property
     def settings(self) -> dict[str, Any]:
         """This plugin's current setting values, keyed by setting key."""
-        group = self._group
+        group = self._settings_group
         if group is None:
             return {}
         current_values = Setting.as_dict()
@@ -73,10 +79,19 @@ class PluginRegistry(db.Model, CRUDMixin):
             if s.key in current_values
         }
 
+    @classmethod
+    def get_installed_plugins(cls):
+        """Plugins that have registered settings and are enabled."""
+        all_plugins = db.session.execute(
+            sa.select(PluginRegistry).where(PluginRegistry.enabled == True)
+        ).scalars()
+        plugins = [p for p in all_plugins if p.is_installed]
+        return plugins
+
     def get_settings_form(self):
         """Generates a settings form based on this plugin's
         SettingGroup - same build_form() used for core settings groups."""
-        group = self._group
+        group = self._settings_group
         if group is None:
             raise ValueError(f"Plugin '{self.name}' has no registered settings")
         return build_form(group)()
@@ -95,7 +110,7 @@ class PluginRegistry(db.Model, CRUDMixin):
             which only fills in rows that don't exist yet and leaves
             any existing values untouched.
         """
-        if self._group is None:
+        if self._settings_group is None:
             # nothing to install - a plugin with no registered
             # SettingGroup has no defaults to seed
             return

@@ -1,7 +1,8 @@
+from flaskbb.management.models import Setting, SettingsGroup
+
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.fixtures.settings import fixture as settings_fixture
 from flaskbb.forum.models import Category, Post, Topic
-from flaskbb.management.models import Setting, SettingsGroup
 from flaskbb.user.models import Group, User
 from flaskbb.utils.populate import (
     create_default_groups,

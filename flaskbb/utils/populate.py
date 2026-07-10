@@ -11,7 +11,6 @@ A module that makes creating data more easily
 
 from __future__ import unicode_literals
 
-import collections
 import logging
 import os
 from typing import Any
@@ -20,10 +19,9 @@ from alembic.util.exc import CommandError
 from sqlalchemy import func, select
 from sqlalchemy_utils.functions import create_database, database_exists
 
+from flaskbb.core.settings import Setting, setting_registry
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.forum.models import Category, Forum, Post, Topic
-from flaskbb.core.settings import Setting, setting_registry
-from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.user.models import Group, User
 
 logger = logging.getLogger(__name__)
@@ -41,6 +39,7 @@ def create_default_settings() -> None:
         create_default_settings(app.pluggy)
     """
     for group in setting_registry.all_groups():
+        print(group)
         Setting.install_group(group.key)
 
 
@@ -57,7 +56,11 @@ def update_settings_from_fixture(
         Without this, only rows that don't exist yet are created,
         matching the CLI's default (non---force) behavior.
     """
-    groups = [setting_registry.group(group_key)] if group_key else setting_registry.all_groups()
+    groups = (
+        [setting_registry.group(group_key)]
+        if group_key
+        else setting_registry.all_groups()
+    )
     for group in groups:
         if force:
             Setting.remove_group(group.key)

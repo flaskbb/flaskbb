@@ -17,7 +17,6 @@ from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import get_cookiecutter, validate_plugin
-from flaskbb.core.settings.registry import SettingsRegistry
 from flaskbb.extensions import db, pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
