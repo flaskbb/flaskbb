@@ -31,7 +31,6 @@ class TypedSettingsProxy:
         try:
             return Setting.as_dict()[key.upper()]
         except KeyError:
-            print(Setting.as_dict())
             raise KeyError(f"No such setting: {key!r}")
 
     def get(self, key: str, default: Any | None = None):
