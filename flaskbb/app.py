@@ -15,6 +15,7 @@ import os
 import sys
 import time
 import warnings
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from typing import Any, Callable
 
@@ -514,7 +515,9 @@ def load_plugins(app: Flask):
 
     try:
         with app.app_context():
-            plugins = db.session.execute(db.select(PluginRegistry)).scalars().all()
+            plugins: Sequence[PluginRegistry] = (
+                db.session.execute(db.select(PluginRegistry)).scalars().all()
+            )
 
     except (OperationalError, ProgrammingError) as exc:
         logger.debug(
@@ -530,6 +533,9 @@ def load_plugins(app: Flask):
     for plugin in plugins:
         if not plugin.enabled:
             pluggy.set_blocked(plugin.name)
+        if plugin.is_updatable:
+            logger.info("Updating installed plugin: {}".format(plugin.name))
+            plugin.add_settings()
 
     pluggy.load_setuptools_entrypoints("flaskbb_plugins")
     pluggy.hook.flaskbb_extensions(app=app)
