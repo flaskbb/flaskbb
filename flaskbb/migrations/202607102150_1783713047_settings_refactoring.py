@@ -70,7 +70,7 @@ def upgrade():
         batch_op.drop_column("value")
         batch_op.alter_column("value_json", new_column_name="value")
 
-    # 3. Drop the old pickled column, rename the new one into its place
+    op.drop_table("settingsgroup")
 
 
 def downgrade():
