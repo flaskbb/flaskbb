@@ -15,7 +15,7 @@ Supports both:
 """
 
 import logging
-from collections.abc import Iterator, MutableMapping
+from collections.abc import Iterator, Mapping, MutableMapping
 from typing import Any, override
 
 from .models import Setting
@@ -63,6 +63,35 @@ class FlaskBBConfigProxy(MutableMapping[str, Any]):
     @override
     def get(self, key: str, default: Any | None = None):
         return Setting.as_dict().get(key, default)
+
+    @override
+    def update(self, other=(), /, **kwargs: dict[str, Any]) -> None:  # pyright: ignore
+        """Batches every key/value pair into a single Setting.update()
+        call - and therefore a single commit + cache invalidation -
+        instead of the MutableMapping mixin's default, which would call
+        __setitem__ (and so Setting.update()) once per key.
+
+        Accepts the same shapes dict.update() does: a mapping, an
+        iterable of (key, value) pairs, keyword arguments, or any
+        combination - matching MutableMapping's own update() signature.
+        """
+        combined: dict[str, Any] = {}
+
+        if isinstance(other, Mapping):
+            for key in other:  # pyright: ignore
+                combined[key.lower()] = other[key]  # pyright: ignore
+        elif hasattr(other, "keys"):  # pyright: ignore
+            for key in other.keys():  # pyright: ignore
+                combined[key.lower()] = other[key]  # pyright: ignore
+        else:
+            for key, value in other:  # pyright: ignore
+                combined[key.lower()] = value  # pyright: ignore
+
+        for key, value in kwargs.items():
+            combined[key.lower()] = value
+
+        if combined:
+            Setting.update(combined)
 
 
 flaskbb_config = FlaskBBConfigProxy()
