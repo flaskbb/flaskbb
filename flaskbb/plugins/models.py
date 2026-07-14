@@ -98,7 +98,7 @@ class PluginRegistry(db.Model, CRUDMixin):
 
     def update_settings(self, form_data: dict[str, Any]) -> None:
         """Updates the given settings of the plugin."""
-        Setting.update(group_key=self.name, form_data=form_data)
+        Setting.update(form_data)
 
     def add_settings(self, force: bool = False) -> None:
         """Seeds DB rows for this plugin's settings - called on plugin
