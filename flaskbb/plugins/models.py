@@ -26,6 +26,9 @@ class PluginRegistry(db.Model, CRUDMixin):
     name: Mapped[str] = mapped_column(db.String(255), unique=True)
     enabled: Mapped[bool] = mapped_column(db.Boolean, default=True)
 
+    def __init__(self, name: str) -> None:
+        self.name = name
+
     @property
     def info(self):
         """Returns some information about the plugin."""
@@ -56,7 +59,19 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
-        return all(s.key in current_keys for s in group.settings)
+        return any(s.key in current_keys for s in group.settings)
+
+    @property
+    def is_updatable(self) -> bool:
+        """A plugin is installed once every one of its settings has a
+        row in the settings table."""
+        group = self._settings_group
+        if group is None:
+            return False
+        current_keys = Setting.as_dict().keys()
+        all_installed = all(s.key in current_keys for s in group.settings)
+        any_installed = any(s.key in current_keys for s in group.settings)
+        return not all_installed and any_installed
 
     @property
     def has_settings(self):
