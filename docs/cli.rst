@@ -35,7 +35,6 @@ commands.
       start            Starts a production ready wsgi server.
       themes           Themes command sub group.
       translations     Translations command sub group.
-      upgrade          Updates the migrations and fixtures.
       urls             Show routes for the app.
       users            Create, update or delete users.
 
@@ -78,24 +77,6 @@ of their options and arguments.
         The primary group of the user. The group ``GROUP`` has to be
         one of ``admin``, ``super_mod``, ``mod`` or ``member``.
 
-.. describe:: flaskbb upgrade
-
-    Updates the migrations and fixtures.
-
-    .. describe:: --all, -a
-
-        Upgrades migrations AND fixtures to the latest version.
-
-    .. describe:: --fixture FIXTURE, -f FIXTURE
-
-        The fixture which should be upgraded or installed.
-        All fixtures have to be places inside flaskbb/fixtures/
-
-    .. describe:: --force-fixture, -ff
-
-        Forcefully upgrades the fixtures. WARNING: This will also overwrite
-        any settings.
-
 .. describe:: flaskbb populate
 
     Creates the necessary tables and groups for FlaskBB.
@@ -125,7 +106,7 @@ of their options and arguments.
 
         Initializes the database before populating it.
 
-.. describe:: flaskbb runserver
+.. describe:: flaskbb run
 
     Starts the development server
 

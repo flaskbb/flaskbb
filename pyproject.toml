@@ -109,10 +109,6 @@ dev = [
 [tool.uv]
 package = true
 
-[tool.uv.sources]
-flaskbb-plugin-portal = { path = "../flaskbb-plugin-portal", editable = true }
-flaskbb-plugin-conversations = { path = "../flaskbb-plugin-conversations", editable = true }
-
 [tool.hatch.metadata]
 allow-direct-references = true
 

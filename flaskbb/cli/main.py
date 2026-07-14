@@ -23,18 +23,16 @@ from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy_utils.functions import database_exists
-from werkzeug.utils import import_string
 
 from flaskbb.app import create_app
 from flaskbb.cli.utils import (
     EmailType,
-    FlaskBBCLIError,
     get_version,
     prompt_config_path,
     prompt_save_user,
     write_config,
 )
-from flaskbb.extensions import alembic, celery, db, pluggy, whooshee
+from flaskbb.extensions import celery, db, pluggy, whooshee
 from flaskbb.utils.populate import (
     create_default_groups,
     create_default_settings,
@@ -298,53 +296,6 @@ def reindex():
     """Reindexes the search index."""
     click.secho("[+] Reindexing search index...", fg="cyan")
     whooshee.reindex()
-
-
-@flaskbb.command()
-@click.option(
-    "all_latest",
-    "--all",
-    "-a",
-    default=False,
-    is_flag=True,
-    help="Upgrades migrations AND fixtures to the latest version.",
-)
-@click.option(
-    "--fixture/",
-    "-f",
-    default=None,
-    help="The fixture which should be upgraded or installed.",
-)
-@click.option(
-    "--force", default=False, is_flag=True, help="Forcefully upgrades the fixtures."
-)
-def upgrade(all_latest: bool, fixture: str | None, force: bool):
-    """Updates the migrations and fixtures."""
-    if all_latest:
-        click.secho("[+] Upgrading migrations to the latest version...", fg="cyan")
-        alembic.upgrade()
-
-    if fixture or all_latest:
-        try:
-            settings = import_string("flaskbb.fixtures.{}".format(fixture))
-            settings = settings.fixture
-        except ImportError:
-            raise FlaskBBCLIError(
-                "{} fixture is not available".format(fixture), fg="red"
-            )
-
-        click.secho("[+] Updating fixtures...", fg="cyan")
-        #count = update_settings_from_fixture(
-        #    fixture=settings, overwrite_group=force, overwrite_setting=force
-        #)
-        count = {}
-        click.secho(
-            "[+] {settings} settings in {groups} setting groups updated.".format(
-                groups=len(count),
-                settings=sum(len(settings) for settings in count.values()),
-            ),
-            fg="green",
-        )
 
 
 @flaskbb.command(

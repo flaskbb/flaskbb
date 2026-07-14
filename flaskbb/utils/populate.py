@@ -17,7 +17,10 @@ from typing import Any
 
 from alembic.util.exc import CommandError
 from sqlalchemy import func, select
-from sqlalchemy_utils.functions import create_database, database_exists
+from sqlalchemy_utils.functions import (  # pyright: ignore[reportUnknownVariableType]
+    create_database,
+    database_exists,
+)
 
 from flaskbb.core.settings import Setting, setting_registry
 from flaskbb.extensions import alembic, db, pluggy
@@ -308,9 +311,9 @@ def insert_bulk_data(topic_count: int = 10, post_count: int = 100):
         db.session.bulk_save_objects(posts)
 
     # and finally, lets update some stats
-    forum.recalculate(last_post=True)
-    user1.recalculate()
-    user2.recalculate()
+    forum.recalculate(last_post=True)  # pyright: ignore[reportOptionalMemberAccess]
+    user1.recalculate()  # pyright: ignore[reportOptionalMemberAccess]
+    user2.recalculate()  # pyright: ignore[reportOptionalMemberAccess]
 
     return created_topics, created_posts
 
