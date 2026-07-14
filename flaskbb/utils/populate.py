@@ -39,7 +39,6 @@ def create_default_settings() -> None:
         create_default_settings(app.pluggy)
     """
     for group in setting_registry.all_groups():
-        print(group)
         Setting.install_group(group.key)
 
 
@@ -65,6 +64,31 @@ def update_settings_from_fixture(
         if force:
             Setting.remove_group(group.key)
         Setting.install_group(group.key)
+
+
+def delete_settings_from_fixture(group_key: str | None = None) -> None:
+    """Deletes settings rows whose definitions no longer exist in the
+    registry.
+
+    :param group_key: limit to a single group (e.g. "general"); None
+        checks every registered group.
+    """
+    groups = (
+        [setting_registry.group(group_key)]
+        if group_key
+        else setting_registry.all_groups()
+    )
+    for group in groups:
+        valid_keys_lower = {s.key.lower() for s in group.settings}
+        existing_rows = db.session.execute(
+            select(Setting).where(Setting.group_key == group.key)
+        ).scalars()
+        for row in existing_rows:
+            if row.key.lower() not in valid_keys_lower:
+                db.session.delete(row)
+
+    db.session.commit()
+    Setting.invalidate_cache()
 
 
 def create_default_groups():

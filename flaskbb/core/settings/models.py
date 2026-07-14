@@ -63,21 +63,21 @@ class Setting(db.Model):
         cache.delete_memoized(cls.as_dict, cls)
 
     @classmethod
-    def update(cls, group_key: str, form_data: dict[str, Any]) -> None:
-        """Save a settings group's form data to the DB and invalidate
-        the cache in one step.
+    def update(cls, settings: dict[str, Any]) -> None:
+        """Save one or more settings by key and invalidate the cache in
+        one step.
 
-        :param group_key: the SettingGroup.key whose settings are being
-            saved (e.g. "general").
-        :param form_data: dict of {setting_key: new_value}, typically
-            form.data from the WTForm built via build_form(group).
+        :param settings: dict of {setting_key: new_value}.
+            Each key resolves its own definition (and therefore group) via the
+            registry, so the caller doesn't need to know or pass a
+            group_key.
         """
-        group = setting_registry.group(group_key)
-        for setting_def in group.settings:
+        for key, value in settings.items():
+            definition = setting_registry.definition(key)
             row = db.session.execute(
-                select(cls).where(func.lower(cls.key) == setting_def.key.lower())
+                select(cls).where(func.lower(cls.key) == definition.key.lower())
             ).scalar_one()
-            row.set_value(setting_def, form_data[setting_def.key])
+            row.set_value(definition, value)
 
         db.session.commit()
         cls.invalidate_cache()

@@ -123,9 +123,7 @@ class ManagementSettings(MethodView):
             if plugin_obj is not None:
                 plugin_obj.update_settings(form.data)
             else:
-                Setting.update(
-                    group_key=slug if slug else "general", form_data=form.data
-                )
+                Setting.update(form.data)
             flash("Settings saved.", "success")
 
         return render_template(
