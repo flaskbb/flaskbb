@@ -32,10 +32,9 @@ from wtforms.validators import (
 )
 
 from flaskbb.utils.forms import (
-    AvatarExtensionValidator,
-    AvatarSizeValidator,
     FlaskBBForm,
 )
+from flaskbb.utils.validators import AvatarExtensionValidator, AvatarSizeValidator
 
 from ..core.user.update import (
     AvatarUpdate,

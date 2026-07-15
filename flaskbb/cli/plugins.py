@@ -17,7 +17,7 @@ from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import get_cookiecutter, validate_plugin
-from flaskbb.extensions import db, pluggy
+from flaskbb.extensions import pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db
 
@@ -34,6 +34,7 @@ def plugins():
 def list_plugins():
     """Lists all installed plugins."""
     enabled_plugins = pluggy.list_plugin_distinfo()
+    all_plugins = PluginRegistry.get_all()
     if len(enabled_plugins) > 0:
         click.secho("[+] Enabled Plugins:", fg="blue", bold=True)
         for plugin in enabled_plugins:
@@ -42,11 +43,23 @@ def list_plugins():
                 continue
             p_mod = plugin[0]
             p_dist = plugin[1]
+            plugin_reg = next(
+                (p for p in all_plugins if p.name == pluggy.get_name(p_mod)), None
+            )
+
+            settings_update_str = "up-to-date"
+            if plugin_reg:
+                settings_diff = plugin_reg.get_setting_diff()
+
+                if settings_diff is not None and settings_diff.has_changes:
+                    settings_update_str = f"{settings_diff.log_output}"
+
             click.secho(
-                "\t- {}\t\t({}) \tversion {}".format(
+                "\t- {}\t\t({}) \tversion {}\t settings: {}".format(
                     pluggy.get_name(p_mod),
                     p_dist.project_name,
                     p_dist.version,
+                    settings_update_str,
                 ),
                 bold=True,
             )
@@ -71,12 +84,10 @@ def list_plugins():
 @plugins.command("enable")
 @click.argument("plugin_name")
 @with_appcontext
-def enable_plugin(plugin_name):
+def enable_plugin(plugin_name: str):
     """Enables a plugin."""
     validate_plugin(plugin_name)
-    plugin = db.session.execute(
-        db.select(PluginRegistry).filter_by(name=plugin_name)
-    ).scalar_one_or_none()
+    plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
     if plugin is None:
         raise click.Abort()
 
@@ -91,12 +102,10 @@ def enable_plugin(plugin_name):
 @plugins.command("disable")
 @click.argument("plugin_name")
 @with_appcontext
-def disable_plugin(plugin_name):
+def disable_plugin(plugin_name: str):
     """Disables a plugin."""
     validate_plugin(plugin_name)
-    plugin = db.session.execute(
-        db.select(PluginRegistry).filter_by(name=plugin_name)
-    ).scalar_one_or_none()
+    plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
     if plugin is None:
         raise click.Abort()
 
@@ -113,12 +122,10 @@ def disable_plugin(plugin_name):
 @click.option(
     "--force", "-f", default=False, is_flag=True, help="Overwrites existing settings"
 )
-def install(plugin_name, force):
+def install(plugin_name: str, force: bool):
     """Installs a plugin (no migrations)."""
     validate_plugin(plugin_name)
-    plugin = db.session.execute(
-        db.select(PluginRegistry).filter_by(name=plugin_name)
-    ).scalar_one_or_none()
+    plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
     if plugin is None:
         raise click.Abort()
 
@@ -141,12 +148,10 @@ def install(plugin_name, force):
 
 @plugins.command("uninstall")
 @click.argument("plugin_name")
-def uninstall(plugin_name):
+def uninstall(plugin_name: str):
     """Uninstalls a plugin (no migrations)."""
     validate_plugin(plugin_name)
-    plugin = db.session.execute(
-        db.select(PluginRegistry).filter_by(name=plugin_name)
-    ).scalar_one_or_none()
+    plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
     if plugin is None:
         raise click.Abort()
 
@@ -155,6 +160,22 @@ def uninstall(plugin_name):
         click.secho("[+] Plugin has been uninstalled.", fg="green")
     else:
         click.secho("[+] Nothing to uninstall.", fg="green")
+
+
+@plugins.command("upgrade")
+@click.argument("plugin_name")
+def upgrade(plugin_name: str):
+    """Upgrades a plugin's settings to its newest version"""
+    validate_plugin(plugin_name)
+    plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
+    if plugin is None:
+        raise click.Abort()
+
+    if plugin.is_installed and plugin.needs_setting_upgrade():
+        plugin.upgrade_settings()
+        click.secho("[+] Plugin has been upgraded.", fg="green")
+    else:
+        click.secho("[+] Plugin has no upgradable settings.", fg="green")
 
 
 @plugins.command("cleanup")
@@ -197,7 +218,7 @@ def cleanup():
     default=False,
     help="Overwrite the contents of output directory if it exists",
 )
-def new_plugin(template, out_dir, force):
+def new_plugin(template: str, out_dir: str | None, force: bool):
     """Creates a new plugin based on the cookiecutter plugin
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-plugin.
