@@ -45,14 +45,13 @@ from flaskbb.extensions import db
 from flaskbb.forum.models import Category, Forum
 from flaskbb.user.models import Group, User
 from flaskbb.utils.forms import (
-    AvatarExtensionValidator,
-    AvatarSizeValidator,
     FlaskBBForm,
 )
 from flaskbb.utils.requirements import IsAtleastModerator
 from flaskbb.utils.uploads import (
     validate_image,
 )
+from flaskbb.utils.validators import AvatarExtensionValidator, AvatarSizeValidator
 
 logger = logging.getLogger(__name__)
 

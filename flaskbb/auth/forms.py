@@ -28,7 +28,8 @@ from wtforms.validators import (
     regexp,
 )
 
-from flaskbb.utils.forms import FlaskBBForm, add_recaptcha_field
+from flaskbb.utils.forms import FlaskBBForm
+from flaskbb.utils.validators import add_recaptcha_field
 
 logger = logging.getLogger(__name__)
 

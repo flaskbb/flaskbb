@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
 from flaskbb.core.settings.forms import build_form
-from flaskbb.core.settings.models import Setting
+from flaskbb.core.settings.models import Setting, SettingsDiff
 from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import db, pluggy
 from flaskbb.utils.database import CRUDMixin
@@ -110,6 +110,36 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             raise ValueError(f"Plugin '{self.name}' has no registered settings")
         return build_form(group)()
+
+    def get_setting_diff(self) -> SettingsDiff | None:
+        """Compares this plugin's currently registered settings against
+        what's actually stored in the DB - read-only, makes no changes.
+
+        Returns None if the plugin has no registered SettingGroup at
+        all (nothing to compare). Use this to show an admin what a
+        settings upgrade would actually change before applying it.
+        """
+        if self._settings_group is None:
+            return None
+        return Setting.diff_group(self.name)
+
+    def needs_setting_upgrade(self) -> bool:
+        """True if this plugin's stored settings differ from what its
+        currently loaded code registers - i.e. a new version added or
+        removed a setting since the DB was last synced."""
+        diff = self.get_setting_diff()
+        return diff is not None and diff.has_changes
+
+    def upgrade_settings(self) -> None:
+        """Syncs this plugin's settings rows to match its currently
+        registered SettingGroup: adds rows for settings that are new,
+        removes rows for settings that no longer exist.
+        """
+        if self._settings_group is None:
+            return
+
+        Setting.install_group(self.name)
+        Setting.prune_group(self.name)
 
     def update_settings(self, form_data: dict[str, Any]) -> None:
         """Updates the given settings of the plugin."""

@@ -152,6 +152,9 @@ class ManagementSettings(MethodView):
                 {"key": plugin_obj.name, "title": plugin_obj.name.title()}
             )
             form = plugin_obj.get_settings_form()
+            if plugin_obj.needs_setting_upgrade():
+                flash(_("Upgrade the plugin first to update its setting!"), "warning")
+                form.disable_all()
             old_settings = plugin_obj.settings
         else:
             group_obj = setting_registry.group(slug)
@@ -1351,6 +1354,36 @@ class UninstallPlugin(MethodView):
         return redirect(url_for("management.plugins"))
 
 
+class UpgradePlugin(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to modify plugins"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self, name: str):
+        validate_plugin(name)
+        plugin = PluginRegistry.get_by_or_404(name=name)
+
+        diff = plugin.get_setting_diff()
+        if diff is None:
+            flash(_("This plugin has no settings to upgrade."), "info")
+            return redirect(url_for("management.plugins"))
+
+        if not diff.has_changes:
+            flash(_("This plugin's settings are already up to date."), "info")
+            return redirect(url_for("management.plugins"))
+
+        plugin.upgrade_settings()
+        flash(_("Plugin settings have been upgraded."), "success")
+        return redirect(url_for("management.plugins"))
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app: Flask):
     management = Blueprint("management", __name__)
@@ -1433,6 +1466,11 @@ def flaskbb_load_blueprints(app: Flask):
         management,
         routes=["/plugins/<path:name>/uninstall"],
         view_func=UninstallPlugin.as_view("uninstall_plugin"),
+    )
+    register_view(
+        management,
+        routes=["/plugins/<path:name>/upgrade"],
+        view_func=UpgradePlugin.as_view("upgrade_plugin"),
     )
     register_view(
         management, routes=["/plugins"], view_func=PluginsView.as_view("plugins")

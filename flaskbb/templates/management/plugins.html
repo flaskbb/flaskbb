@@ -59,6 +59,18 @@
                         </form>
                         {% endif %}
 
+                        {% if plugin.is_installed and plugin.needs_setting_upgrade() %}
+                            {{
+                                action_confirm(
+                                    id="plugin-inst-" ~ plugin.name,
+                                    url=url_for('management.upgrade_plugin', name=plugin.name),
+                                    title=_("Upgrade"),
+                                    btn="btn btn-primary",
+                                    icon_only=False
+                                )
+                            }}
+                        {% endif %}
+
                         {% if plugin.is_installable and not plugin.is_installed %}
 
                             {{
@@ -82,7 +94,6 @@
                                     icon_only=False
                                 )
                             }}
-
                         <a class="btn btn-outline-dark" href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
                         {% endif %}
                     </div>
