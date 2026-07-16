@@ -9,7 +9,12 @@ This module provides the core FlaskBB plugin hook definitions
 :license: BSD, see LICENSE for more details.
 """
 
+import typing as t
+
 from pluggy import HookspecMarker
+
+if t.TYPE_CHECKING:
+    from flaskbb.core.settings.models import SettingsDiff
 
 spec = HookspecMarker("flaskbb")
 
@@ -137,6 +142,108 @@ def flaskbb_load_setting_groups():
                     ),
                 ),
             )
+    """
+
+
+@spec
+def on_plugin_install(plugin_name: str):
+    """Called after a plugin has been installed (its default settings
+    have just been seeded into the DB).
+
+    Not attached to any specific plugin's name - every implementation
+    across every installed plugin gets called for every plugin
+    install, and is expected to check plugin_name itself and no-op if
+    it's not the one it cares about (pluggy has no way to route a hook
+    call to only one plugin's implementation).
+
+    Use this for administrative setup tied to a plugin's presence, not
+    covered by its settings alone - e.g. a plugin that automates forum
+    moderation might create a dedicated service user here; a plugin
+    that defines new permissions might create those permission rows
+    here.
+
+    Example:
+        @impl
+        def on_plugin_install(plugin_name):
+            if plugin_name != "automod":
+                return
+            create_service_user("automod-bot")
+    """
+
+
+@spec
+def on_plugin_uninstall(plugin_name: str):
+    """Called after a plugin has been uninstalled (its settings rows
+    have just been removed from the DB).
+
+    Same "not attached to a name" shape as on_plugin_install - every
+    implementation gets called for every uninstall and checks
+    plugin_name itself.
+
+    Use this for cleanup that mirrors what on_plugin_install set up -
+    e.g. deleting a service user or permissions the plugin's install
+    hook created, so uninstalling actually reverses installing rather
+    than leaving orphaned state behind.
+
+    Example:
+        @impl
+        def on_plugin_uninstall(plugin_name):
+            if plugin_name != "automod":
+                return
+            delete_service_user("automod-bot")
+    """
+
+
+@spec
+def on_plugin_upgrade(plugin_name: str, diff: "SettingsDiff"):
+    """Called after a plugin's settings have been upgraded to match its
+    currently registered SettingDefinition.
+
+    `diff` is the SettingsDiff that was applied - the missing/obsolete
+    setting keys from before install_group()/prune_group() ran - so
+    implementations can react to specifically what changed between the
+    plugin's old and new version, not just "something changed."
+
+    Use this for migrating administrative state tied to a setting that
+    was renamed, removed, or newly introduced between plugin versions -
+    e.g. if a permission-defining plugin renames a permission's
+    underlying key, this is where you'd migrate any existing
+    role/user's assignment of the old key to the new one.
+
+    Example:
+        @impl
+        def on_plugin_upgrade(plugin_name, diff):
+            if plugin_name != "automod":
+                return
+            if "automod_legacy_mode" in diff.obsolete:
+                migrate_legacy_mode_setting()
+    """
+
+
+@spec
+def on_plugin_settings_changed(plugin_name: str, changed_keys: list[str]):
+    """Called after an admin saves changes to a plugin's setting
+    *values* via the management settings form - distinct from install/
+    uninstall/upgrade, which are about the settings' existence, not
+    their values.
+
+    `changed_keys` lists which setting keys were part of the save (not
+    necessarily which ones actually changed value - the admin form
+    submits every field in the group regardless of whether it was
+    edited).
+
+    Use this to react to configuration changes that need to propagate
+    somewhere outside the settings table itself - e.g. re-syncing an
+    external service's config when a plugin's connection settings are
+    updated, or updating a service user's permissions if a setting
+    controls what that user is allowed to do.
+
+    Example:
+        @impl
+        def on_plugin_settings_changed(plugin_name, changed_keys):
+            if plugin_name != "automod" or "AUTOMOD_ENABLED" not in changed_keys:
+                return
+            sync_service_user_active_state()
     """
 
 

@@ -28,7 +28,7 @@ from .registry import setting_registry
 
 @dataclass(frozen=True)
 class SettingsDiff:
-    """Read-only comparison of a group's registered SettingDefinitions
+    """A settings diff of a group's registered SettingDefinitions
     against what actually has rows in the DB. Used to check whether a
     plugin needs a settings upgrade before actually performing one."""
 
