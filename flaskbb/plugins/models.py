@@ -138,22 +138,28 @@ class PluginRegistry(db.Model, CRUDMixin):
         if self._settings_group is None:
             return
 
+        diff = self.get_setting_diff()
+
         Setting.install_group(self.name)
         Setting.prune_group(self.name)
+
+        if diff is not None:
+            pluggy.hook.on_plugin_upgrade(plugin_name=self.name, diff=diff)
 
     def update_settings(self, form_data: dict[str, Any]) -> None:
         """Updates the given settings of the plugin."""
         Setting.update(form_data)
+        pluggy.hook.on_plugin_settings_changed(
+            plugin_name=self.name, changed_keys=list(form_data.keys())
+        )
 
     def add_settings(self, force: bool = False) -> None:
-        """Seeds DB rows for this plugin's settings - called on plugin
-        install.
+        """Adds the settings for this plugin.
 
-        :param force: if True, existing rows for this plugin's settings
-            are deleted and re-seeded from their defaults first (e.g.
-            for a "reset to defaults" admin action). Defaults to False,
-            which only fills in rows that don't exist yet and leaves
-            any existing values untouched.
+        :param force: if True, existing settings for this plugin's settings
+            are deleted and re-installed from their defaults first.
+            Defaults to False, which only installs settings that don't exist yet
+            and leaves any existing values untouched.
         """
         if self._settings_group is None:
             # nothing to install - a plugin with no registered
@@ -164,6 +170,7 @@ class PluginRegistry(db.Model, CRUDMixin):
             Setting.remove_group(self.name)
 
         Setting.install_group(self.name)
+        pluggy.hook.on_plugin_install(plugin_name=self.name)
 
     def remove_settings(self) -> None:
         """Deletes all of this plugin's settings from the DB - called
