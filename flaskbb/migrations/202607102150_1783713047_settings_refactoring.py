@@ -70,31 +70,15 @@ def upgrade():
         batch_op.drop_column("value")
         batch_op.alter_column("value_json", new_column_name="value")
 
+        # make group_key + key unique and drop the old constraint
+        batch_op.drop_constraint(batch_op.f("pk_settings"), type_="primary")
+        batch_op.create_primary_key(batch_op.f("pk_settings"), ["group_key", "key"])
+
     op.drop_table("settingsgroup")
 
 
 def downgrade():
-    conn = op.get_bind()
-    op.add_column(
-        "settings", sa.Column("value_pickle", sa.LargeBinary(), nullable=True)
+    raise NotImplementedError(
+        "Downgrading past this revision is not supported - restore from "
+        "a backup taken before this migration ran."
     )
-
-    settings_table = sa.table(
-        "settings",
-        sa.column("key", sa.String),
-        sa.column("value", sa.Text),
-        sa.column("value_pickle", sa.LargeBinary),
-    )
-    rows = conn.execute(
-        sa.select(settings_table.c.key, settings_table.c.value)
-    ).fetchall()
-    for key, json_value in rows:
-        python_value = json.loads(json_value)
-        conn.execute(
-            settings_table.update()
-            .where(settings_table.c.key == key)
-            .values(value_pickle=pickle.dumps(python_value))
-        )
-
-    op.drop_column("settings", "value")
-    op.alter_column("settings", "value_pickle", new_column_name="value")

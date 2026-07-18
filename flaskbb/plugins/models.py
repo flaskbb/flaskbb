@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
 from flaskbb.core.settings.forms import build_form
-from flaskbb.core.settings.models import Setting, SettingsDiff
+from flaskbb.core.settings.models import Setting, SettingsDiff, display_key
 from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import db, pluggy
 from flaskbb.utils.database import CRUDMixin
@@ -59,7 +59,9 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
-        return any(s.key in current_keys for s in group.settings)
+        return any(
+            display_key(self.name, s.key) in current_keys for s in group.settings
+        )
 
     @property
     def is_updatable(self) -> bool:
@@ -69,8 +71,12 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
-        all_installed = all(s.key in current_keys for s in group.settings)
-        any_installed = any(s.key in current_keys for s in group.settings)
+        all_installed = all(
+            display_key(self.name, s.key) in current_keys for s in group.settings
+        )
+        any_installed = any(
+            display_key(self.name, s.key) in current_keys for s in group.settings
+        )
         return not all_installed and any_installed
 
     @property
@@ -83,15 +89,17 @@ class PluginRegistry(db.Model, CRUDMixin):
 
     @property
     def settings(self) -> dict[str, Any]:
-        """This plugin's current setting values, keyed by setting key."""
+        """This plugin's current setting values, prefixed with this plugin's
+        group_key (e.g. {"PORTAL_FORUM_IDS": [...]})
+        """
         group = self._settings_group
         if group is None:
             return {}
         current_values = Setting.as_dict()
         return {
-            s.key: current_values[s.key]
-            for s in group.settings
-            if s.key in current_values
+            setting_def.key: current_values[d_key]
+            for setting_def in group.settings
+            if (d_key := display_key(self.name, setting_def.key)) in current_values
         }
 
     @classmethod
@@ -148,7 +156,7 @@ class PluginRegistry(db.Model, CRUDMixin):
 
     def update_settings(self, form_data: dict[str, Any]) -> None:
         """Updates the given settings of the plugin."""
-        Setting.update(form_data)
+        Setting.update(self.name, form_data)
         pluggy.hook.on_plugin_settings_changed(
             plugin_name=self.name, changed_keys=list(form_data.keys())
         )

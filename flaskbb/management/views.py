@@ -116,14 +116,14 @@ class ManagementSettings(MethodView):
     def post(self, slug: str | None = None, plugin: str | None = None):
         form, _, plugin_obj, active_nav = self._determine_active_settings(slug, plugin)
 
-        all_groups = setting_registry.all_groups()
+        all_groups = setting_registry.core_groups()
         all_plugins = PluginRegistry.get_installed_plugins()
 
         if form.validate_on_submit():
             if plugin_obj is not None:
                 plugin_obj.update_settings(form.data)
             else:
-                Setting.update(form.data)
+                Setting.update(slug if slug else "general", form.data)
             flash("Settings saved.", "success")
 
         return render_template(

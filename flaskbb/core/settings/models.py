@@ -14,6 +14,7 @@ bool, str, list[str]) is JSON-safe anyway.
 :license: BSD, see LICENSE for more details.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
@@ -24,6 +25,20 @@ from flaskbb.extensions import cache, db
 
 from .definitions import SettingDefinition
 from .registry import setting_registry
+
+# Fields Flask-WTF/WTForms inject into form.data that are never actual
+# settings - excluded by default in Setting.update() so callers don't
+# have to strip them manually on every call site.
+DEFAULT_EXCLUDED_FORM_KEYS = frozenset({"csrf_token"})
+
+
+def display_key(group_key: str, definition_key: str) -> str:
+    """The publicly exposed key for core settings (without GROUPKEY_, e.q. PROJECT_TITLE)
+    and GROUPKEY_KEY-prefixed for plugin settings (PORTAL_FORUM_IDS).
+    """
+    if setting_registry.is_plugin_group(group_key):
+        return f"{group_key.upper()}_{definition_key}"
+    return definition_key
 
 
 @dataclass(frozen=True)
@@ -69,21 +84,21 @@ class Setting(db.Model):
     def as_dict(cls) -> dict[str, Any]:
         """Load and deserialize every setting value from the DB.
 
-        The setting definitions are the single source of truth: a Setting key-value
-        only ends up in the result if it still has a matching
-        SettingDefinition. A row with no definition (e.g. a plugin removed
-        the setting but its settings haven't been pruned yet) is silently skipped.
+        Core settings stay unprefixed (settings.PROJECT_TITLE),
+        plugin settings are exposed prefixed with
+        their group_key (settings.PORTAL_FORUM_IDS).
         """
         settings = db.session.execute(select(cls)).scalars().all()
         config: dict[str, Any] = {}
+
         for s in settings:
             try:
-                definition = setting_registry.definition(s.key)
+                definition = setting_registry.definition(s.group_key, s.key)
             except KeyError:
                 continue
-            config[definition.key] = (
-                definition.deserialize(s.value) if s.value else None
-            )
+
+            exposed_key = display_key(s.group_key, definition.key)
+            config[exposed_key] = definition.deserialize(s.value) if s.value else None
         return config
 
     @classmethod
@@ -92,19 +107,35 @@ class Setting(db.Model):
         cache.delete_memoized(cls.as_dict, cls)
 
     @classmethod
-    def update(cls, settings: dict[str, Any]) -> None:
-        """Save one or more settings by key and invalidate the cache in
-        one step.
+    def update(
+        cls,
+        group_key: str,
+        settings: dict[str, Any],
+        *,
+        exclude: Iterable[str] = DEFAULT_EXCLUDED_FORM_KEYS,
+    ) -> None:
+        """Save a settings group's form data to the DB and invalidate
+        the cache in one step.
 
-        :param settings: dict of {setting_key: new_value}.
-            Each key resolves its own definition (and therefore group) via the
-            registry, so the caller doesn't need to know or pass a
-            group_key.
+        :param group_key: the SettingGroup.key whose settings are being
+            saved (e.g. "general", "portal"). Required because
+            (group_key, key) together identify a setting.
+        :param settings: dict of {setting_key: new_value}, typically
+            form.data from the WTForm built via build_form(group)
+        :param exclude: keys to skip.
+            Defaults to just "csrf_token" because forms usually contain this key.
         """
+        excluded_keys = {key.lower() for key in exclude}
         for key, value in settings.items():
-            definition = setting_registry.definition(key)
+            if key.lower() in excluded_keys:
+                continue
+
+            definition = setting_registry.definition(group_key, key)
             setting = db.session.execute(
-                select(cls).where(func.lower(cls.key) == definition.key.lower())
+                select(cls).where(
+                    cls.group_key == group_key,
+                    func.lower(cls.key) == definition.key.lower(),
+                )
             ).scalar_one()
             setting.set_value(definition, value)
 
@@ -162,7 +193,8 @@ class Setting(db.Model):
         existing_keys_lower = set(
             db.session.execute(
                 select(func.lower(cls.key)).where(
-                    func.lower(cls.key).in_(group_setting_keys)
+                    cls.group_key == group_key,
+                    func.lower(cls.key).in_(group_setting_keys),
                 )
             ).scalars()
         )
