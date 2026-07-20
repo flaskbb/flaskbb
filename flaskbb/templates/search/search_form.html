@@ -1,0 +1,65 @@
+{% set page_title = _("Search") %}
+
+{% extends theme("layout.html") %}
+{% block content %}
+{% from theme("_macros/form.html") import horizontal_field %}
+
+<div class="page-view">
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Search{% endtrans %}</li>
+    </ol>
+
+    <div class="card page">
+        <div class="card-header page-header">
+            {% trans %}Search{% endtrans %}
+        </div>
+        <div class="card-body page-body">
+            {% set has_advanced_data = form.forum_id.data or form.author.data or form.date_from.data or form.date_to.data or form.state.data %}
+            <form class="form-horizontal" role="form" method="post">
+                {{ form.hidden_tag() }}
+                {{ horizontal_field(form.search_query) }}
+                {{ horizontal_field(form.search_type) }}
+
+                <div class="row mb-3">
+                    <div class="offset-3 col-4">
+                        <button type="button" id="advanced-filter-toggle" class="btn btn-outline-dark{{ ' d-none' if form.search_type.data != 'forum' }}">
+                            {% trans %}Advanced Filter{% endtrans %}
+                        </button>
+                    </div>
+                </div>
+
+                <div id="advanced-search" class="{{ '' if (form.search_type.data == 'forum' and has_advanced_data) else 'd-none' }}">
+                    {{ horizontal_field(form.forum_id) }}
+                    {{ horizontal_field(form.author) }}
+                    {{ horizontal_field(form.date_from) }}
+                    {{ horizontal_field(form.date_to) }}
+                    {{ horizontal_field(form.state) }}
+                </div>
+
+                {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var searchType = document.getElementById("{{ form.search_type.id }}");
+        var toggleBtn = document.getElementById("advanced-filter-toggle");
+        var advanced = document.getElementById("advanced-search");
+
+        searchType.addEventListener("change", function () {
+            var isForum = searchType.value === "forum";
+            toggleBtn.classList.toggle("d-none", !isForum);
+            if (!isForum) {
+                advanced.classList.add("d-none");
+            }
+        });
+
+        toggleBtn.addEventListener("click", function () {
+            advanced.classList.toggle("d-none");
+        });
+    })();
+</script>
+{% endblock %}

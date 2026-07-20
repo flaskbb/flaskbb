@@ -12,7 +12,6 @@ You can override these configuration variables in another class.
 
 import datetime
 import os
-import sys
 
 
 class DefaultConfig(object):
@@ -22,9 +21,6 @@ class DefaultConfig(object):
     basedir = os.path.join(
         os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
     )
-
-    # Python version
-    py_version = "{0.major}{0.minor}".format(sys.version_info)
 
     # Flask Settings
     # ------------------------------
@@ -177,14 +173,19 @@ class DefaultConfig(object):
     WTF_CSRF_ENABLED = True
     WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
 
-    # Full-Text-Search
+    # Search
     # ------------------------------
-    # This will use the "whoosh_index" directory to store the search indexes
-    WHOOSHEE_DIR = os.path.join(basedir, "whoosh_index", py_version)
-    # How long should whooshee try to acquire write lock? (defaults to 2)
-    WHOOSHEE_WRITER_TIMEOUT = 2
-    # Minimum number of characters for the search (defaults to 3)
-    WHOOSHEE_MIN_STRING_LEN = 3
+    # Which search backend to use. "sql" (the default) needs no extra
+    # dependency or index storage; it searches directly against the
+    # database via ILIKE. "tantivy" indexes searchable content on disk
+    # via the Tantivy full-text search engine, for better relevance
+    # ranking and performance at scale. See flaskbb/core/search/ for
+    # available backends.
+    SEARCH_BACKEND = "sql"
+    # Where the "tantivy" backend stores its on-disk indexes. Defaults
+    # to a "search_index" directory inside the instance folder. Unused
+    # by other backends.
+    SEARCH_INDEX_DIR = os.path.join(basedir, "search_index")
 
     # Forms
     # ------------------------------

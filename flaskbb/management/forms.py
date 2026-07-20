@@ -468,7 +468,7 @@ class ForumForm(FlaskForm):
         data.pop("submit", None)
         data.pop("csrf_token", None)
         forum = Forum(**data)
-        return forum.save()
+        return forum.save(groups=data["groups"])
 
 
 class EditForumForm(ForumForm):

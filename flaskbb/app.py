@@ -40,13 +40,13 @@ from flaskbb.extensions import (
     csrf,
     db,
     debugtoolbar,
+    flaskbb_search,
     limiter,
     login_manager,
     mail,
     pluggy,
     redis_store,
     themes,
-    whooshee,
 )
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
@@ -87,14 +87,6 @@ from flaskbb.utils.requirements import (
     has_permission,
     permission_with_identity,
 )
-
-# whooshees
-from flaskbb.utils.search import (
-    ForumWhoosheer,
-    PostWhoosheer,
-    TopicWhoosheer,
-    UserWhoosheer,
-)
 from flaskbb.utils.translations import FlaskBBDomain
 from flaskbb.utils.uploads import create_upload_directory
 
@@ -104,6 +96,7 @@ from .deprecation import FlaskBBDeprecation
 from .display.navigation import NavigationContentType
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
+from .search import views as search_views  # noqa
 from .upload import views as upload_views  # noqa
 from .user import views as user_views  # noqa
 
@@ -290,14 +283,8 @@ def configure_extensions(app: Flask):
     # Flask-Limiter
     limiter.init_app(app)
 
-    # Flask-Whooshee
-    whooshee.init_app(app)
-    # not needed for unittests - and it will speed up testing A LOT
-    if not app.testing:
-        whooshee.register_whoosheer(PostWhoosheer)
-        whooshee.register_whoosheer(TopicWhoosheer)
-        whooshee.register_whoosheer(ForumWhoosheer)
-        whooshee.register_whoosheer(UserWhoosheer)
+    # Search backend (pluggable; see flaskbb/core/search/)
+    flaskbb_search.init_app(app)
 
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]

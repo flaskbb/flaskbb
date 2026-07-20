@@ -21,10 +21,10 @@ from flask_mail import Mail
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
-from flask_whooshee import Whooshee
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import MetaData
 
+from flaskbb.core.search import FlaskBBSearch
 from flaskbb.exceptions import AuthorizationRequired
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.utils.alembic import Alembic
@@ -46,8 +46,8 @@ metadata = MetaData(
 )
 db = SQLAlchemy(metadata=metadata, session_options={"future": True})
 
-# Whooshee (Full Text Search)
-whooshee = Whooshee()
+# Search backend (pluggable full-text search; see flaskbb/core/search/)
+flaskbb_search = FlaskBBSearch()
 
 # Login
 login_manager = LoginManager()

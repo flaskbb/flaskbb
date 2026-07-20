@@ -101,7 +101,7 @@
                 <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
                 <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
             </div>
-            {% for user in result['user'].all() %}
+            {% for user in result['user'] %}
             <div class="row page-row hover clearfix">
                 <div class="col-md-1 col-sm-1 col-1">{{ user.id }}</div>
                 <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
@@ -132,7 +132,7 @@
                 <div class="col-md-3 col-sm-3 col-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
-            {% for topic in result['topic'].all() %}
+            {% for topic in result['topic'] %}
             <div class="row forum-row hover clearfix">
 
                 <div class="col-md-5 col-sm-5 col-8 topic-info">
@@ -210,7 +210,7 @@
                 <div class="col-md-2 col-sm-2 d-none d-sm-block forum-stats">{% trans %}Posts{% endtrans %}</div>
                 <div class="col-md-3 col-sm-3 col-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
-            {% for forum in result['forum'].all() %}
+            {% for forum in result['forum'] %}
             <div class="row category-row hover">
 
                 {% if forum.external %}

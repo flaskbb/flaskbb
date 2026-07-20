@@ -4,7 +4,7 @@ from flask import current_app
 from flask_login import current_user, login_user, logout_user
 from sqlalchemy import select
 
-from flaskbb.extensions import db
+from flaskbb.extensions import cache, db
 from flaskbb.forum.models import (
     Category,
     Forum,
@@ -297,6 +297,40 @@ def test_forum_get_topics(topic, user):
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
         assert topics.items == [(topic, topic.last_post, None)]
+
+
+def test_forum_get_accessible(forum, user, admin_user, default_groups):
+    # User.get_groups() is @cache.memoize()'d by username, and the cache
+    # outlives a single test (the app fixture is package-scoped) - clear
+    # it so an earlier test's cached result for "test_normal"/"test_admin"
+    # can't leak into this assertion.
+    cache.clear()
+
+    restricted = Forum(title="Admin Only Forum", category_id=forum.category_id)
+    restricted.groups = [default_groups[0]]
+    restricted.save(groups=restricted.groups)
+
+    with current_app.test_request_context():
+        # A normal member only sees forums open to their own groups
+        login_user(user)
+        accessible = Forum.get_accessible(current_user)
+        assert forum in accessible
+        assert restricted not in accessible
+
+        # An admin (in the restricted forum's group) sees both
+        logout_user()
+        login_user(admin_user)
+        accessible = Forum.get_accessible(current_user)
+        assert forum in accessible
+        assert restricted in accessible
+
+        # A guest falls back to the guest group, same as `forum` (open to
+        # every default group) but not the admin-only one
+        logout_user()
+        assert not current_user.is_authenticated
+        accessible = Forum.get_accessible(current_user)
+        assert forum in accessible
+        assert restricted not in accessible
 
 
 def test_topic_save(forum, user):
