@@ -16,7 +16,7 @@ from flask.views import MethodView
 from pluggy import HookimplMarker
 
 from flaskbb.extensions import db
-from flaskbb.search.forms import GlobalSearchForm
+from flaskbb.search.forms import SearchForm
 from flaskbb.utils.helpers import register_view, render_template
 
 impl = HookimplMarker("flaskbb")
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class Search(MethodView):
-    form = GlobalSearchForm
+    form = SearchForm
 
     def get(self):
         return render_template("search/search_form.html", form=self.form())

@@ -2,7 +2,7 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("_macros/form.html") import horizontal_field %}
+{% from theme("_macros/form.html") import render_field, render_input_field, render_select_field %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
@@ -16,50 +16,87 @@
         </div>
         <div class="card-body page-body">
             {% set has_advanced_data = form.forum_id.data or form.author.data or form.date_from.data or form.date_to.data or form.state.data %}
-            <form class="form-horizontal" role="form" method="post">
+            <form role="form" method="post">
                 {{ form.hidden_tag() }}
-                {{ horizontal_field(form.search_query) }}
-                {{ horizontal_field(form.search_type) }}
 
-                <div class="row mb-3">
-                    <div class="offset-3 col-4">
-                        <button type="button" id="advanced-filter-toggle" class="btn btn-outline-dark{{ ' d-none' if form.search_type.data != 'forum' }}">
-                            {% trans %}Advanced Filter{% endtrans %}
+                <div class="row justify-content-md-center">
+                    <div class="col-8">
+                        <div class="input-group mb-3">
+                            {{ render_input_field(form.search_query, class="form-control col-3") }}
+                            {{ render_select_field(form.search_type, class="form-select flex-grow-0 w-auto") }}
+                            <button class="btn btn-primary" type="submit">
+                                <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-auto">
+
+                        <button type="button" id="advanced-filter-toggle"
+                                class="btn btn-outline-dark mb-3{{ ' d-none' if form.search_type.data != 'forum' }}">
+                            {% trans %}Advanced filters{% endtrans %}
+                            <span id="advanced-filter-icon" class="fas fa-chevron-down"></span>
                         </button>
+
                     </div>
                 </div>
 
-                <div id="advanced-search" class="{{ '' if (form.search_type.data == 'forum' and has_advanced_data) else 'd-none' }}">
-                    {{ horizontal_field(form.forum_id) }}
-                    {{ horizontal_field(form.author) }}
-                    {{ horizontal_field(form.date_from) }}
-                    {{ horizontal_field(form.date_to) }}
-                    {{ horizontal_field(form.state) }}
-                </div>
+                <div class="row justify-content-md-center">
+                    <div class="col-8">
 
-                {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+                        <div id="advanced-search"
+                             class="{{ '' if (form.search_type.data == 'forum' and has_advanced_data) else 'd-none' }}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ render_field(form.content_type, div_class="mb-3") }}
+                                    {{ render_field(form.forum_id, div_class="mb-3") }}
+                                    {{ render_field(form.state, div_class="mb-3") }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ render_field(form.author, div_class="mb-3") }}
+                                    {{ render_field(form.date_from, div_class="mb-3") }}
+                                    {{ render_field(form.date_to, div_class="mb-3") }}
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-    (function () {
+    (function() {
         var searchType = document.getElementById("{{ form.search_type.id }}");
         var toggleBtn = document.getElementById("advanced-filter-toggle");
+        var toggleIcon = document.getElementById("advanced-filter-icon");
         var advanced = document.getElementById("advanced-search");
 
-        searchType.addEventListener("change", function () {
+        function setIcon(open) {
+            toggleIcon.classList.toggle("fa-chevron-down", !open);
+            toggleIcon.classList.toggle("fa-chevron-up", open);
+        }
+
+        searchType.addEventListener("change", function() {
             var isForum = searchType.value === "forum";
             toggleBtn.classList.toggle("d-none", !isForum);
             if (!isForum) {
                 advanced.classList.add("d-none");
+                setIcon(false);
             }
         });
 
-        toggleBtn.addEventListener("click", function () {
+        toggleBtn.addEventListener("click", function() {
+            var willOpen = advanced.classList.contains("d-none");
             advanced.classList.toggle("d-none");
+            setIcon(willOpen);
         });
+
+        setIcon(!advanced.classList.contains("d-none"));
     })();
 </script>
 {% endblock %}

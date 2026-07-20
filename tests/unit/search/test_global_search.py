@@ -6,15 +6,15 @@ from werkzeug.datastructures import MultiDict
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.search import service, views
-from flaskbb.search.forms import GlobalSearchForm
+from flaskbb.search.forms import SearchForm
 
 
 def _all(stmt):
     return db.session.scalars(stmt).unique().all()
 
 
-def test_global_search_form_forum_type_returns_topic_and_post(request_context, topic):
-    form = GlobalSearchForm(
+def test_search_form_forum_type_defaults_to_topics_only(request_context, topic):
+    form = SearchForm(
         formdata=MultiDict(
             {"search_query": "Test Topic Normal", "search_type": "forum"}
         ),
@@ -24,13 +24,32 @@ def test_global_search_form_forum_type_returns_topic_and_post(request_context, t
     assert form.validate()
 
     results = form.get_results()
-    assert set(results.keys()) == {"topic", "post"}
+    assert set(results.keys()) == {"topic"}
     assert topic in _all(results["topic"])
 
 
-def test_global_search_form_user_type_returns_users(request_context, topic):
+def test_search_form_forum_type_can_be_narrowed_to_posts(request_context, topic):
+    form = SearchForm(
+        formdata=MultiDict(
+            {
+                "search_query": "Test Content Normal",
+                "search_type": "forum",
+                "content_type": "post",
+            }
+        ),
+        meta={"csrf": False},
+        user=topic.user,
+    )
+    assert form.validate()
+
+    results = form.get_results()
+    assert set(results.keys()) == {"post"}
+    assert topic.first_post in _all(results["post"])
+
+
+def test_search_form_user_type_returns_users(request_context, topic):
     searched_user = topic.user
-    form = GlobalSearchForm(
+    form = SearchForm(
         formdata=MultiDict(
             {"search_query": searched_user.username, "search_type": "user"}
         ),
@@ -44,7 +63,7 @@ def test_global_search_form_user_type_returns_users(request_context, topic):
     assert searched_user in _all(results["user"])
 
 
-def test_global_search_form_forum_choices_are_permission_scoped(
+def test_search_form_forum_choices_are_permission_scoped(
     request_context, forum, user, admin_user, default_groups
 ):
     # User.get_groups()/.get_permissions() are @cache.memoize()'d by
@@ -57,12 +76,12 @@ def test_global_search_form_forum_choices_are_permission_scoped(
     restricted.groups = [default_groups[0]]
     restricted.save(groups=restricted.groups)
 
-    form = GlobalSearchForm(meta={"csrf": False}, user=user)
+    form = SearchForm(meta={"csrf": False}, user=user)
     choices = [f.id for f in form.forum_id.query_factory()]
     assert forum.id in choices
     assert restricted.id not in choices
 
-    admin_form = GlobalSearchForm(meta={"csrf": False}, user=admin_user)
+    admin_form = SearchForm(meta={"csrf": False}, user=admin_user)
     admin_choices = [f.id for f in admin_form.forum_id.query_factory()]
     assert restricted.id in admin_choices
 
@@ -74,7 +93,7 @@ def test_search_forums_excludes_inaccessible_forum_even_if_forced(
     the user's groups (e.g. a hand-crafted POST bypassing the dropdown),
     results from that forum must not leak through.
     """
-    cache.clear()  # see comment in test_global_search_form_forum_choices_are_permission_scoped
+    cache.clear()  # see comment in test_search_form_forum_choices_are_permission_scoped
 
     restricted = Forum(title="Admin Only Forum", category_id=forum.category_id)
     restricted.groups = [default_groups[0]]
@@ -108,10 +127,20 @@ def test_search_forums_filters_by_locked_state(
     assert topic not in topics
 
 
+def test_search_forums_locked_state_applies_to_posts_too(
+    request_context, topic, topic_locked, user
+):
+    results = service.search_forums("Test", user, content_type="post", state="locked")
+
+    posts = _all(results["post"])
+    assert topic_locked.first_post in posts
+    assert topic.first_post not in posts
+
+
 def test_search_forums_hidden_state_requires_viewhidden(
     request_context, topic, user, admin_user
 ):
-    cache.clear()  # see comment in test_global_search_form_forum_choices_are_permission_scoped
+    cache.clear()  # see comment in test_search_form_forum_choices_are_permission_scoped
 
     topic.hide(user=admin_user)
     topic.save()

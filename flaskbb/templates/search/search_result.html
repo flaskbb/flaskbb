@@ -2,93 +2,90 @@
 
 {% extends theme("layout.html") %}
 {% block content %}
-{% from theme("_macros/form.html") import group_field %}
-{% from theme("_macros/pagination.html") import render_pagination, topic_pages %}
 
-<div class="page-view">
+<div class="page-view search-content">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
         <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
         <li class="breadcrumb-item active">{% trans %}Search{% endtrans %}</li>
     </ol>
 
-    {% if result['post'] %}
-    <div class="card topic">
-        <div class="card-header topic-header">
-            {% trans %}Posts{% endtrans %}
-        </div>
-        <div class="card-body topic-body">
-            {% for post in result['post'] %}
-            <div id="{{ post.id }}" class="row post-row clearfix">
-
-                <div class="author col-md-2 col-sm-3 col-12">
-                    <!-- Registered User -->
-                    {% if post.user_id %}
-                    <div class="author-name"><h4><a href="{{ post.user.url }}">{{ post.user.username }}</a></h4></div>
-
-                    <!-- check if user is online or not -->
-                    {% if post.user|is_online %}
-                    <div class="author-online" data-bs-toggle="tooltip" data-placement="top" title="{% trans %}online{% endtrans %}"></div>
-                    {% else %}
-                    <div class="author-offline" data-bs-toggle="tooltip" data-placement="top" title="{% trans %}offline{% endtrans %}"></div>
-                    {% endif %}
-                    <div class="author-title"><h5>{{ post.user.primary_group.name }}</h5></div>
-
-                    {{ run_hook("flaskbb_tpl_post_author_info_before", user=post.user, post=post) }}
-
-                    {% if post.user.avatar %}
-                        <div class="author-avatar"><img src="{{ post.user.avatar }}" alt="avatar"></div>
-                    {% endif %}
-
-                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ post.user.date_joined|format_date }}</div>
-                    <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ post.user.post_count }}</div>
-
-                    {{ run_hook("flaskbb_tpl_post_author_info_after", user=post.user, post=post) }}
-
-                    {% else %}
-                    <!-- user deleted or guest -->
-                    <div class="author-name"><h4><a href="{{ post.user.url }}">{{ post.username }}</a></h4></div>
-                    <div class="author-title"><h5>{% trans %}Guest{% endtrans %}</h5></div>
-                    {% endif %}
-
-                </div>
-
-                <div class="post-box col-md-10 col-sm-9 col-12">
-
-                    <div class="post-meta clearfix">
-                        <div class="pull-left">
-                            <!-- Creation date / Date modified -->
-                            <a href="{{ post.url }}">
-                                {{ post.date_created|format_datetime }}
-                            </a>
-                            {% if post.user_id and post.date_modified %}
-                            <small>
-                                ({% trans date=post.date_modified|format_datetime, user_url=url_for('user.profile', username=post.modified_by), user=post.modified_by %}Last modified: {{ date }} by <a href="{{ user_url }}">{{ user }}</a>{% endtrans %})
-                            </small>
-                            {% endif %}
-                        </div>
-
-                        <!-- Post number -->
-                        <div class="pull-right">
-                            <strong>#{{ post.id }}</strong>
-                        </div>
+    {% if 'topic' in result %}
+    <h5 class="mb-3">{% trans %}Topics{% endtrans %}</h5>
+    <div class="col-12">
+        {% for topic in result['topic'] %}
+        <div class="card page mb-3">
+            <div class="card-header page-header topic-header fw-normal">
+                {% trans trimmed
+                    topic_url=topic.url,
+                    topic_title=topic.title,
+                    forum_url=topic.forum.url,
+                    forum_title=topic.forum.title
+                %}
+                <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
+                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+                {% endtrans %}
+            </div>
+            <div class="card-body page-body topic-content">
+                <div class="col-12 ps-3">
+                    <div class="topic-created">
+                        {{ topic.date_created|format_datetime }} {% trans %}by{% endtrans %}
+                        <a href="{{ url_for('user.profile', username=topic.username) }}">
+                            {{ topic.username }}
+                        </a>
                     </div>
+                    <div class="topic-content">
+                        {{ topic.first_post.content|markup }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert-message alert-message-info" role="alert">
+            {% trans %}No topics found matching your search criteria.{% endtrans %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-                    <div class="post-content post_body clearfix" id="pid{{ post.id }}">
+    {% if 'post' in result %}
+    <h5 class="mb-3">{% trans %}Posts{% endtrans %}</h5>
+    <div class="col-12">
+        {% for post in result['post'] %}
+        <div class="card page mb-3">
+            <div class="card-header page-header topic-header fw-normal">
+                {% trans trimmed
+                    post_url=post.url,
+                    topic_title=post.topic.title,
+                    forum_url=post.topic.forum.url,
+                    forum_title=post.topic.forum.title
+                %}
+                <strong><a href="{{ post_url }}">{{ topic_title }}</a></strong>
+                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+                {% endtrans %}
+            </div>
+            <div class="card-body page-body topic-content">
+                <div class="col-12 ps-3">
+                    <div class="topic-created">
+                        {{ post.date_created|format_datetime }} {% trans %}by{% endtrans %}
+                        <a href="{{ url_for('user.profile', username=post.username) }}">
+                            {{ post.username }}
+                        </a>
+                    </div>
+                    <div class="topic-content">
                         {{ post.content|markup }}
                     </div>
                 </div>
             </div>
-            {% else %}
-            <!-- cheating a bit here with page-row :P -->
-            <div class="row page-row clearfix">
-                <div class="col-md-12 col-sm-12 col-12">{% trans %}No posts found matching your search criteria.{% endtrans %}</div>
-            </div>
-            {% endfor %}
         </div>
+        {% else %}
+        <div class="alert-message alert-message-info" role="alert">
+            {% trans %}No posts found matching your search criteria.{% endtrans %}
+        </div>
+        {% endfor %}
     </div>
     {% endif %}
 
-    {% if result['user'] %}
+    {% if 'user' in result %}
     <div class="card page">
         <div class="card-header page-header">
             {% trans %}Users{% endtrans %}
@@ -111,223 +108,7 @@
             </div>
             {% else %}
             <div class="row page-row hover clearfix">
-                <div class="col-md-12 col-sm-12 col-12">{% trans %}No users found matching your search criteria.{% endtrans %}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {% if result['topic'] %}
-    <div class="card forum">
-        <div class="card-header forum-header">
-            {% trans %}Topics{% endtrans %}
-        </div>
-
-        <div class="card-body forum-body">
-            <div class="forum-meta">
-                <div class="col-md-5 col-sm-5 col-8 topic-name">{% trans %}Topic{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
-            </div>
-
-            {% for topic in result['topic'] %}
-            <div class="row forum-row hover clearfix">
-
-                <div class="col-md-5 col-sm-5 col-8 topic-info">
-                    <div class="row">
-                        <div class="col-md-1 col-sm-2 col-2 topic-status">
-                        {% if topic.locked %}
-                            <span class="fa fa-lock topic-locked"></span>
-                        {% elif topic.important %}
-                            <span class="fa fa-star-o topic-starred-read"></span>
-                        {% else %}
-                            <span class="fa fa-comment-o topic-read"></span>
-                        {% endif %}
-                        </div>
-                        <div class="col-md-11 col-sm-10 col-10">
-                            <div class="topic-name">
-                                <a href="{{ topic.url }}">{{ topic.title }}</a>
-                                <!-- Topic Pagination -->
-                                <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
-                            </div>
-
-                            <div class="topic-author">
-                                {% trans %}by{% endtrans %}
-                                {% if topic.user_id %}
-                                 <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
-                                {% else %}
-                                {{ topic.username }}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
-                    {{ topic.post_count }}
-                </div>
-
-                <div class="col-md-2 col-sm-2 d-none d-sm-block topic-stats">
-                    {{ topic.views }}
-                </div>
-
-                <div class="col-md-3 col-sm-3 col-4 topic-last-post">
-                    <a href="{{ topic.last_post.url }}">{{ topic.last_post.date_created|time_since }}</a><br />
-
-                    <div class="topic-author">
-                        {% trans %}by{% endtrans %}
-                        {% if topic.last_post.user_id %}
-                        <a href="{{ topic.last_post.user.url }}">{{ topic.last_post.user.username }}</a>
-                        {% else %}
-                        {{ topic.last_post.username }}
-                        {% endif %}
-                    </div>
-                </div>
-
-            </div>  <!-- end forum-row -->
-            {% else %}
-            <div class="row forum-row clearfix">
-                <div class="col-md-12 col-sm-12 co-xs-12">
-                    {% trans %}No topics found matching your search criteria.{% endtrans %}
-                </div>
-            </div> <!-- end forum-row -->
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {% if result['forum'] %}
-    <div class="card category">
-        <div class="card-header category-header">
-            {% trans %}Forums{% endtrans %}
-        </div>
-
-        <div class="card-body category-body">
-            <div class="category-meta">
-                <div class="col-md-5 col-sm-5 col-8 forum-name">{% trans %}Forum{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-stats">{% trans %}Topics{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-stats">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
-            </div>
-            {% for forum in result['forum'] %}
-            <div class="row category-row hover">
-
-                {% if forum.external %}
-                <div class="col-md-5 col-sm-5 col-8 forum-info">
-                    <div class="row">
-                        <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-2 forum-status">
-                            <span class="fa fa-external-link forum-external"></span>
-                        </div>
-
-                        <div class="col-md-11 col-sm-10 col-10">
-                            <!-- Forum Name -->
-                            <div class="forum-name">
-                                <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
-                            </div>
-
-                            <!-- Forum Description -->
-                            <div class="forum-description">
-                                {{ forum.description|nonpost_markup }}
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- end forum-info -->
-
-                <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-posts">
-                    -
-                </div>
-
-                <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-topics">
-                    -
-                </div>
-
-                <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-4 forum-last-post">
-                    ---
-                </div>
-                {% else %}
-                <div class="col-md-5 col-sm-5 col-8 forum-info">
-                    <div class="row">
-                        <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-2 forum-status">
-                            {% if forum.locked %}
-                                <span class="fa fa-lock forum-locked"></span>
-                            {% else %}
-                                <span class="fa fa-comments-o forum-read"></span>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-11 col-sm-10 col-10">
-                            <!-- Forum Name -->
-                            <div class="forum-name">
-                                <a href="{{ forum.url }}">{{ forum.title }}</a>
-                            </div>
-
-                            <!-- Forum Description -->
-                            <div class="forum-description">
-                                {{ forum.description|nonpost_markup }}
-                            </div>
-
-                            <!-- Forum Moderators -->
-                            {% if forum.show_moderators %}
-                            <div class="forum-moderators">
-                                {% trans %}Moderators{% endtrans %}:
-                                {% for moderator in forum.moderators %}
-                                <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div> <!-- end forum-info -->
-
-                <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-topics">
-                {{ forum.topic_count }}
-                </div>
-
-                <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 d-none d-sm-block forum-posts">
-                {{ forum.post_count }}
-                </div>
-
-                <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-4 forum-last-post">
-                    {% if forum.last_post_id %}
-                    <div class="last-post-title">
-                        <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
-                            {{ forum.last_post_title|crop_title }}
-                        </a>
-                    </div>
-
-                    <div class="last-post-time">
-                        {{ forum.last_post_created|time_since }}
-                    </div>
-
-                    <div class="last-post-author">
-                        {% trans %}by{% endtrans %}
-                        {% if forum.last_post_user_id %}
-                        <a href="{{ url_for('user.profile', username=forum.last_post_username) }}">{{ forum.last_post_username }}</a>
-                        {% else %}
-                        {{ forum.last_post_username }}
-                        {% endif %}
-                    </div>
-
-                    {% else %}
-                    {% trans %}No posts.{% endtrans %}
-                    {% endif %} {# endif forum.last_post_id #}
-                </div>
-
-            {% endif %} {# endif forum.external #}
-            </div> <!-- end category-content -->
-            {% else %}
-            <div class="row category-row">
-                <div class="col-md-12 col-sm-12 col-12">
-                    {% trans %}No forums found matching your search criteria.{% endtrans %}
+                <div class="col-md-12 col-sm-12 col-12">{% trans %}No users found matching your search criteria.{% endtrans %}
                 </div>
             </div>
             {% endfor %}

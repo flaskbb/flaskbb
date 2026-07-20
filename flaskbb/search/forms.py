@@ -39,6 +39,13 @@ class SearchForm(FlaskForm):
     )
 
     # Advanced filters, only relevant when search_type == "forum".
+    content_type = SelectField(
+        _("Content type"),
+        validators=[DataRequired()],
+        choices=[("topic", _("Topics")), ("post", _("Posts"))],
+        default="topic",
+    )
+
     forum_id = QuerySelectField(
         _("Forum"),
         validators=[Optional()],
@@ -90,6 +97,7 @@ class SearchForm(FlaskForm):
         return search_forums(
             query,
             self.user,
+            content_type=self.content_type.data or "topic",
             forum=self.forum_id.data,
             author=self.author.data,
             date_from=self.date_from.data,
