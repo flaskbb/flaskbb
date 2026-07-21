@@ -111,12 +111,16 @@ dev = [
 [tool.uv]
 package = true
 
+[tool.uv.sources]
+flaskbb-plugin-portal = { path = "../flaskbb-plugin-portal", editable = true }
+flaskbb-plugin-conversations = { path = "../flaskbb-plugin-conversations", editable = true }
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.basedpyright]
 include = ["flaskbb"]
-exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs", "**/whoosh_index"]
+exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs"]
 defineConstant = { DEBUG = true }
 reportIgnoreCommentWithoutRule = false
 reportMissingImports = "error"

@@ -15,6 +15,7 @@ from typing import Any, override
 
 from flask import Flask
 from flask_sqlalchemy.model import Model
+from markupsafe import Markup
 from sqlalchemy import Select
 
 from flaskbb.core.search.base import ModelT, SearchBackend
@@ -85,3 +86,7 @@ class FlaskBBSearch(SearchBackend):
     @override
     def reindex(self, models: Sequence[ModelT] | None = None) -> None:
         self._get_impl().reindex(models)
+
+    @override
+    def snippet(self, model: ModelT, pk: int, content: str, query: str) -> Markup:
+        return self._get_impl().snippet(model, pk, content, query)

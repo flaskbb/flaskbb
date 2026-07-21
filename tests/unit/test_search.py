@@ -2,6 +2,7 @@ import pytest
 
 from flaskbb.core.search import FlaskBBSearch
 from flaskbb.core.search.sql import SQLSearchBackend
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.plugins.models import PluginRegistry
@@ -130,6 +131,69 @@ def test_flaskbb_search_proxy_requires_init_app():
 
     with pytest.raises(RuntimeError):
         proxy.search(User, "test")
+
+
+def test_snippet_wraps_match_in_mark(database):
+    backend = SQLSearchBackend()
+
+    result = backend.snippet(Post, 1, "hello world test content here", "world")
+    assert "<mark>world</mark>" in result
+
+
+def test_snippet_is_case_insensitive(database):
+    backend = SQLSearchBackend()
+
+    result = backend.snippet(Post, 1, "Hello World", "world")
+    assert "<mark>World</mark>" in result
+
+
+def test_snippet_escapes_html(database):
+    backend = SQLSearchBackend()
+
+    result = backend.snippet(Post, 1, "<script>alert(1)</script> test", "test")
+    assert "<script>" not in result
+    assert "&lt;script&gt;" in result
+
+
+def test_snippet_no_match_returns_cropped_unhighlighted(default_settings):
+    backend = SQLSearchBackend()
+    flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 10
+
+    try:
+        result = backend.snippet(Post, 1, "no match here at all in this text", "zzz")
+        assert "<mark>" not in result
+        assert len(result) <= 10
+    finally:
+        flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 320
+
+
+def test_snippet_zero_length_shows_full_content(default_settings):
+    backend = SQLSearchBackend()
+    flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 0
+
+    try:
+        content = ("a" * 500) + "test" + ("b" * 500)
+        result = backend.snippet(Post, 1, content, "test")
+        assert result.startswith("a" * 500)
+        assert result.endswith("b" * 500)
+        assert "<mark>test</mark>" in result
+    finally:
+        flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 320
+
+
+def test_snippet_windows_around_match_with_ellipses(default_settings):
+    backend = SQLSearchBackend()
+    flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 20
+
+    try:
+        content = ("a" * 500) + "test" + ("b" * 500)
+        result = backend.snippet(Post, 1, content, "test")
+        assert result.startswith("…")
+        assert result.endswith("…")
+        assert "<mark>test</mark>" in result
+        assert len(result) < len(content)
+    finally:
+        flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 320
 
 
 def test_flaskbb_search_proxy_resolves_tantivy(application, tmp_path):

@@ -5,7 +5,12 @@ flaskbb.core.search.tantivy
 
 A search backend built on Tantivy (a Rust full-text search engine).
 Each searchable model gets its own on-disk Tantivy index (under `SEARCH_INDEX_DIR`),
-keyed on the model's primary key plus a single combined, tokenized text field.
+keyed on the model's primary key plus three tokenized text fields: `title`,
+`username` and `content`. `content` is the only one stored in the index
+(the other two are indexed for matching only) - it holds each model's
+actual body text (`Post.content`/`Topic.first_post.content`/...), so
+`snippet()` can generate a preview straight from the index via Tantivy's
+own `SnippetGenerator`, without a round-trip back to the database.
 
 The index is kept in sync via via SQLAlchemy session events `after_flush`,
 `after_commit` and `after_rollback`.
@@ -16,6 +21,29 @@ through these events - a bulk `Model.query.filter(...).delete()`/
 This can leave a stale entry in the index, but never a wrong search
 result: `search()` always re-verifies matches against the database, so
 a stale id simply stops resolving to a row. `reindex()` clears it up.
+
+Tantivy allows only one `IndexWriter` per index directory per process,
+so a multi-process deployment can't have every process open its own
+writer. `SEARCH_INDEX_WRITER` (config) says whether *this* process owns
+the writers - exactly one process (a Celery worker) should set it True;
+every other process (e.g. every web worker) sets it False and gets
+read-only `Index`/`Searcher` objects only. On a writer-less process,
+`_after_commit` dispatches the pending writes to the writer process as
+a Celery task (`_apply_pending_task`, on the "search" queue - a worker
+can consume it alongside other queues like the default one used for
+email) instead of applying them locally; `index()`/`update()`/
+`remove()`/`reindex()` raise if called directly there, since there's no
+local writer to use.
+
+The writer process must run with `--pool=solo`: prefork (the default
+pool) forks worker children *after* `IndexWriter` has already spawned
+Tantivy's own internal indexing threads, and forking a process with
+live native threads is unsafe. That applies to the whole worker
+process, not per-queue, so a single worker consuming both "search" and
+the default queue runs everything - email included - through the solo
+pool (sequential, no concurrency). Split into two worker processes,
+each consuming one queue with its own `--pool`, if that becomes a
+throughput problem.
 
 :copyright: (c) 2014-2026 by the FlaskBB Team.
 :license: BSD, see LICENSE for more details.
@@ -30,58 +58,75 @@ from typing import Any, override
 import tantivy
 from flask import Flask
 from flask_sqlalchemy.model import Model
+from markupsafe import Markup
 from sqlalchemy import Select, case, event, select
 from sqlalchemy import false as sql_false
 
 from flaskbb.core.search.base import ModelT, SearchBackend
-from flaskbb.extensions import db
+from flaskbb.core.settings import flaskbb_config
+from flaskbb.extensions import celery, db
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.user.models import User
 
 _SEARCH_LIMIT = 1000
 _STASH_KEY = "flaskbb_tantivy_pending"
+_FIELDS = ("title", "username", "content")
 
 
 @dataclass(frozen=True)
 class _ModelSpec:
     model: ModelT
-    text: Callable[[Any], str]
+    # (title, username, content) - `content` is the field previews/snippets
+    # are generated from, so it must always be the actual body text
+    # (`Post.content`/`Topic.first_post.content`), never blank if avoidable.
+    fields: Callable[[Any], tuple[str, str, str]]
 
 
 def _joined(*parts: Any) -> str:
     return " ".join(str(p) for p in parts if p)
 
 
-def _post_text(post: Post) -> str:
-    return _joined(post.username, post.modified_by, post.content)
+def _document(pk: int, fields: tuple[str, str, str]) -> "tantivy.Document":
+    title, username, content = fields
+    return tantivy.Document(pk=pk, title=title, username=username, content=content)
 
 
-def _topic_text(topic: Topic) -> str:
-    return _joined(
-        topic.title, topic.username, getattr(topic.first_post, "content", None)
+def _post_fields(post: Post) -> tuple[str, str, str]:
+    return ("", _joined(post.username, post.modified_by), post.content or "")
+
+
+def _topic_fields(topic: Topic) -> tuple[str, str, str]:
+    return (
+        topic.title,
+        topic.username,
+        getattr(topic.first_post, "content", None) or "",
     )
 
 
-def _forum_text(forum: Forum) -> str:
-    return _joined(forum.title, forum.description)
+def _forum_fields(forum: Forum) -> tuple[str, str, str]:
+    return (forum.title, "", forum.description or "")
 
 
-def _user_text(user: User) -> str:
-    return _joined(user.username, user.email)
+def _user_fields(user: User) -> tuple[str, str, str]:
+    return ("", _joined(user.username, user.email), "")
 
 
 _SPECS: tuple[_ModelSpec, ...] = (
-    _ModelSpec(Post, _post_text),
-    _ModelSpec(Topic, _topic_text),
-    _ModelSpec(Forum, _forum_text),
-    _ModelSpec(User, _user_text),
+    _ModelSpec(Post, _post_fields),
+    _ModelSpec(Topic, _topic_fields),
+    _ModelSpec(Forum, _forum_fields),
+    _ModelSpec(User, _user_fields),
 )
 
 
 def _build_schema() -> "tantivy.Schema":
     builder = tantivy.SchemaBuilder()
     builder.add_integer_field("pk", stored=True, indexed=True, fast=True)
-    builder.add_text_field("text", stored=False)
+    builder.add_text_field("title", stored=False)
+    builder.add_text_field("username", stored=False)
+    # stored so `snippet()` can generate a preview straight from the
+    # index, without needing the DB row's content passed back in.
+    builder.add_text_field("content", stored=True)
     return builder.build()
 
 
@@ -108,17 +153,52 @@ def _after_flush(session: Any, flush_context: Any) -> None:
     for obj in chain(session.new, session.dirty):
         spec = _active._spec_by_model.get(type(obj))
         if spec is not None:
-            pending["write"].append((spec.model, obj.id, spec.text(obj)))
+            pending["write"].append((spec.model, obj.id, spec.fields(obj)))
     for obj in session.deleted:
         spec = _active._spec_by_model.get(type(obj))
         if spec is not None:
             pending["remove"].append((spec.model, obj.id))
 
 
+_MODEL_BY_NAME: dict[str, ModelT] = {spec.model.__name__: spec.model for spec in _SPECS}
+
+
+def _serialize_pending(pending: dict[str, list[Any]]) -> dict[str, list[Any]]:
+    return {
+        "write": [
+            (model.__name__, pk, fields) for model, pk, fields in pending["write"]
+        ],
+        "remove": [(model.__name__, pk) for model, pk in pending["remove"]],
+    }
+
+
+def _deserialize_pending(payload: dict[str, list[Any]]) -> dict[str, list[Any]]:
+    return {
+        "write": [
+            (_MODEL_BY_NAME[name], pk, tuple(fields))
+            for name, pk, fields in payload["write"]
+        ],
+        "remove": [(_MODEL_BY_NAME[name], pk) for name, pk in payload["remove"]],
+    }
+
+
+@celery.task(queue="search")
+def _apply_pending_task(payload: dict[str, list[Any]]) -> None:
+    # Runs on the Celery worker that owns the writers (SEARCH_INDEX_WRITER
+    # is True there), dispatched from a process that has none - see
+    # module docstring.
+    if _active is not None:
+        _active._apply_pending(_deserialize_pending(payload))
+
+
 def _after_commit(session: Any) -> None:
     pending = session.info.pop(_STASH_KEY, None)
-    if pending and _active is not None:
+    if _active is None or not pending or not (pending["write"] or pending["remove"]):
+        return
+    if _active._can_write:
         _active._apply_pending(pending)
+    else:
+        _apply_pending_task.delay(_serialize_pending(pending))
 
 
 def _after_rollback(session: Any) -> None:
@@ -143,6 +223,7 @@ class TantivyBackend(SearchBackend):
         global _active
 
         index_dir = app.config["SEARCH_INDEX_DIR"]
+        self._can_write: bool = app.config["SEARCH_INDEX_WRITER"]
         self._spec_by_model: dict[ModelT, _ModelSpec] = {
             spec.model: spec for spec in _SPECS
         }
@@ -154,10 +235,20 @@ class TantivyBackend(SearchBackend):
             os.makedirs(model_dir, exist_ok=True)
             index = tantivy.Index(_build_schema(), path=model_dir)
             self._indexes[spec.model] = index
-            self._writers[spec.model] = index.writer()
+            if self._can_write:
+                self._writers[spec.model] = index.writer()
 
         _active = self
         _register_session_events()
+
+    def _require_writer(self) -> None:
+        if not self._can_write:
+            raise RuntimeError(
+                "This process has SEARCH_INDEX_WRITER=False; it holds no "
+                "Tantivy IndexWriter. Writes made through the ORM are "
+                "dispatched to the writer process as a Celery task "
+                "instead - call this on that process/config."
+            )
 
     def _spec_for(self, instance: Model) -> _ModelSpec:
         spec = self._spec_by_model.get(type(instance))
@@ -167,10 +258,11 @@ class TantivyBackend(SearchBackend):
 
     @override
     def index(self, instance: Any) -> None:
+        self._require_writer()
         spec = self._spec_for(instance)
         writer = self._writers[spec.model]
         writer.delete_documents_by_term("pk", instance.id)
-        writer.add_document(tantivy.Document(pk=instance.id, text=spec.text(instance)))
+        writer.add_document(_document(instance.id, spec.fields(instance)))
         writer.commit()
 
     @override
@@ -181,6 +273,7 @@ class TantivyBackend(SearchBackend):
 
     @override
     def remove(self, instance: Any) -> None:
+        self._require_writer()
         spec = self._spec_for(instance)
         writer = self._writers[spec.model]
         writer.delete_documents_by_term("pk", instance.id)
@@ -188,10 +281,10 @@ class TantivyBackend(SearchBackend):
 
     def _apply_pending(self, pending: dict[str, list[Any]]) -> None:
         touched: set[ModelT] = set()
-        for model, pk, text in pending["write"]:
+        for model, pk, fields in pending["write"]:
             writer = self._writers[model]
             writer.delete_documents_by_term("pk", pk)
-            writer.add_document(tantivy.Document(pk=pk, text=text))
+            writer.add_document(_document(pk, fields))
             touched.add(model)
         for model, pk in pending["remove"]:
             writer = self._writers[model]
@@ -202,15 +295,14 @@ class TantivyBackend(SearchBackend):
 
     @override
     def reindex(self, models: Sequence[ModelT] | None = None) -> None:
+        self._require_writer()
         specs = _SPECS if models is None else [s for s in _SPECS if s.model in models]
         for spec in specs:
             writer = self._writers[spec.model]
             writer.delete_all_documents()
             rows = db.session.execute(db.select(spec.model)).unique().scalars()
             for instance in rows:
-                writer.add_document(
-                    tantivy.Document(pk=instance.id, text=spec.text(instance))
-                )
+                writer.add_document(_document(instance.id, spec.fields(instance)))
             writer.commit()
 
     @override
@@ -224,7 +316,7 @@ class TantivyBackend(SearchBackend):
         # commits from this backend's own writer don't trigger it
         # automatically, so it's called explicitly before every search.
         index.reload()
-        parsed, _errors = index.parse_query_lenient(query, ["text"])
+        parsed, _errors = index.parse_query_lenient(query, list(_FIELDS))
         searcher = index.searcher()
         result = searcher.search(parsed, limit=_SEARCH_LIMIT)
 
@@ -239,3 +331,37 @@ class TantivyBackend(SearchBackend):
 
         ordering = case({pk: rank for rank, pk in enumerate(pks)}, value=pk_col)
         return select(model).where(pk_col.in_(pks)).order_by(ordering)
+
+    @override
+    def snippet(self, model: ModelT, pk: int, content: str, query: str) -> Markup:
+        length = flaskbb_config["SEARCH_SNIPPET_LENGTH"]
+        spec = self._spec_by_model.get(model)
+        if spec is None or not length:
+            # Unknown model, or SEARCH_SNIPPET_LENGTH == 0 ("show the
+            # full content") - Tantivy's snippet generator always bounds
+            # its output, so there's no native way to honor that; fall
+            # back to the generic implementation instead.
+            return super().snippet(model, pk, content, query)
+
+        index = self._indexes[model]
+        index.reload()
+        schema = index.schema
+        searcher = index.searcher()
+
+        pk_query = tantivy.Query.term_query(schema, "pk", pk)
+        hits = searcher.search(pk_query, limit=1).hits
+        if not hits:
+            return super().snippet(model, pk, content, query)
+
+        doc = searcher.doc(hits[0][1])
+        parsed, _errors = index.parse_query_lenient(query, list(_FIELDS))
+        generator = tantivy.SnippetGenerator.create(searcher, parsed, schema, "content")
+        generator.set_max_num_chars(length)
+
+        html = generator.snippet_from_doc(doc).to_html()
+        if not html:
+            # The match was in `title`/`username`, not `content` - nothing
+            # to highlight in the content preview itself.
+            return super().snippet(model, pk, content, query)
+
+        return Markup(html.replace("<b>", "<mark>").replace("</b>", "</mark>"))

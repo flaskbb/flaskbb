@@ -23,7 +23,7 @@
                     </a>
                 </div>
                 <div class="topic-content">
-                    {{ topic.first_post.content|markup|highlight(form.search_query.data) }}
+                    {{ topic|search_snippet(form.search_query.data) }}
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     </a>
                 </div>
                 <div class="topic-content">
-                    {{ post.content|markup|highlight(form.search_query.data) }}
+                    {{ post|search_snippet(form.search_query.data) }}
                 </div>
             </div>
         </div>

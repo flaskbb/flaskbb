@@ -463,20 +463,6 @@ def crop_title(title: str, length: int | None = None, suffix: str = "..."):
     return title[:length].rsplit(" ", 1)[0] + suffix
 
 
-def highlight(html: str, term: str | None):
-    """Highlights search results using <mark> tags."""
-    if not term:
-        return html
-
-    pattern = re.compile(re.escape(term), re.IGNORECASE)
-    parts = re.split(r"(<[^>]+>)", html)
-    for i, part in enumerate(parts):
-        if not part.startswith("<"):
-            parts[i] = pattern.sub(lambda m: f"<mark>{m.group(0)}</mark>", part)
-
-    return Markup("".join(parts))
-
-
 def is_online(user: "User"):
     """A simple check to see if the user was online within a specified
     time range

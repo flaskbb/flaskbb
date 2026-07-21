@@ -56,8 +56,8 @@ class FlaskBBGroup(FlaskGroup):
         if self._loaded_flaskbb_plugins:
             return
 
+        app = ctx.ensure_object(ScriptInfo).load_app()
         try:
-            app = ctx.ensure_object(ScriptInfo).load_app()
             pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception:
@@ -71,6 +71,13 @@ class FlaskBBGroup(FlaskGroup):
 
     @override
     def get_command(self, ctx: click.Context, name: str):
+        if name == "celery":
+            # The app is created below via _load_flaskbb_plugins(), before
+            # start_celery()'s own body ever runs - so anything the app
+            # factory needs to know about this being a celery invocation
+            # (see configure_app() in flaskbb/app.py) has to be signaled
+            # here, not there.
+            os.environ["FLASKBB_RUNNING_CELERY"] = "1"
         self._load_flaskbb_plugins(ctx)
         return super(FlaskBBGroup, self).get_command(ctx, name)
 
@@ -307,7 +314,20 @@ def reindex():
 @with_appcontext
 def start_celery(ctx: click.Context):
     """Preconfigured wrapper around the 'celery' command."""
-    celery.start(ctx.args)
+    args = ctx.args
+    is_search_writer = current_app.config.get(
+        "SEARCH_BACKEND"
+    ) == "tantivy" and current_app.config.get("SEARCH_INDEX_WRITER", True)
+    has_pool_flag = any(
+        a in ("-P", "--pool") or a.startswith("--pool=") for a in args
+    )
+    if is_search_writer and args and args[0] == "worker" and not has_pool_flag:
+        # The tantivy backend's IndexWriter must be the only thing using
+        # this process - prefork (celery's default pool) forks *after*
+        # it's already spawned its own indexing threads, which a fork
+        # can't safely carry over. See flaskbb/core/search/tantivy.py.
+        args = [*args, "--pool=solo"]
+    celery.start(args)
 
 
 @flaskbb.command("shell", short_help="Runs a shell in the app context.")

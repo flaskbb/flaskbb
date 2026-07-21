@@ -14,6 +14,7 @@ top of the returned `Select` statements.
 from datetime import date
 from typing import Any
 
+from markupsafe import Markup
 from sqlalchemy import Select
 from sqlalchemy.sql.elements import ColumnElement
 
@@ -100,3 +101,13 @@ def search_forums(
 
 def search_users(query: str) -> dict[str, Select[Any]]:
     return {"user": flaskbb_search.search(User, query)}
+
+
+def search_snippet(instance: Topic | Post, query: str) -> Markup:
+    """Returns a highlighted content preview of `instance` (a `Topic` or
+    `Post` search result) for `query`, via the active search backend.
+    """
+    content = (
+        instance.first_post.content if isinstance(instance, Topic) else instance.content
+    )
+    return flaskbb_search.snippet(type(instance), instance.id, content, query)

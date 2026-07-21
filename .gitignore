@@ -143,3 +143,4 @@ node_modules
 .pytest_cache
 test-results.xml
 .ruff_cache
+search_index

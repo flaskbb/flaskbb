@@ -14,7 +14,7 @@ import logging
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import DateField, SelectField, StringField, SubmitField
+from wtforms import DateField, HiddenField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
 from wtforms_sqlalchemy.fields import QuerySelectField
 
@@ -72,6 +72,11 @@ class SearchForm(FlaskForm):
         ],
         default="",
     )
+
+    # Tracks whether the advanced filters panel was expanded, so it stays
+    # expanded/collapsed across the search submit instead of only opening
+    # when an advanced field happens to have data.
+    advanced_open = HiddenField(default="")
 
     submit = SubmitField(_("Search"))
 

@@ -186,6 +186,14 @@ class DefaultConfig(object):
     # to a "search_index" directory inside the instance folder. Unused
     # by other backends.
     SEARCH_INDEX_DIR = os.path.join(basedir, "search_index")
+    # Whether this process owns the on-disk Tantivy index and may write
+    # to it. Tantivy allows only one IndexWriter per index directory per
+    # process - in a multi-process deployment, exactly one process
+    # (typically a single-concurrency Celery worker) should set this to
+    # True; every other process (e.g. every web worker) should set it
+    # to False, which routes its writes to the writer process as a
+    # Celery task instead. Unused by other backends.
+    SEARCH_INDEX_WRITER = True
 
     # Forms
     # ------------------------------

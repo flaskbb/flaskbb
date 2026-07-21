@@ -24,8 +24,8 @@ class TestingConfig(DefaultConfig):
     SQLALCHEMY_ECHO = False
 
     CELERY_CONFIG = {
-        "always_eager": True,
-        "eager_propagates_exceptions": True,
+        "task_always_eager": True,
+        "task_eager_propagates": True,
         "result_backend": "cache",
         "cache_backend": "memory",
     }

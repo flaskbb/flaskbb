@@ -3,22 +3,25 @@
 flaskbb.core.search.base
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The pluggable search backend abstraction. A backend owns two
+The pluggable search backend abstraction. A backend owns three
 responsibilities:
     - keeping whatever index it needs in sync (index/update/remove/reindex)
-    - and answering search queries with a `select(model)` statement that
-      returns a SQLAlchemy Model instance.
+    - answering search queries with a `select(model)` statement that
+      returns a SQLAlchemy Model instance
+    - producing a highlighted preview of a matched row's content (snippet)
 
 :copyright: (c) 2014-2026 by the FlaskBB Team.
 :license: BSD, see LICENSE for more details.
 """
 
+import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from typing import Any
 
 from flask import Flask
 from flask_sqlalchemy.model import Model
+from markupsafe import Markup, escape
 from sqlalchemy import Select
 
 ModelT = type[Model]
@@ -73,3 +76,43 @@ class SearchBackend(ABC):
         """Rebuild the index for `models` (default: all models this
         backend knows about).
         """
+
+    def snippet(self, model: ModelT, pk: int, content: str, query: str) -> Markup:
+        """Returns an HTML preview of `content` around the first match of
+        `query`, bounded to roughly the `SEARCH_SNIPPET_LENGTH` setting
+        (0 means the full content, unbounded). The match itself is
+        wrapped in `<mark>`.
+
+        `model`/`pk` identify the row `content` was taken from, for
+        backends that can produce a smarter, index-aware preview (e.g.
+        one that accounts for stemming/tokenization) by looking the row
+        up in their own index. This default implementation ignores both
+        and just does a literal, case-insensitive substring search - it's
+        optional to override, so backends that don't need anything
+        smarter (or can't) get a correct-enough preview for free.
+        """
+        # deferred: flaskbb.core.settings -> ... -> flaskbb.extensions ->
+        # flaskbb.core.search, a circular import at module level.
+        from flaskbb.core.settings import flaskbb_config
+
+        length = flaskbb_config["SEARCH_SNIPPET_LENGTH"]
+
+        match = re.search(re.escape(query), content, re.IGNORECASE) if query else None
+        if match is None:
+            text = content if not length else content[:length]
+            return Markup(escape(text))
+
+        if not length:
+            start, end = 0, len(content)
+        else:
+            half = length // 2
+            start = max(0, match.start() - half)
+            end = min(len(content), match.end() + half)
+
+        prefix = "…" if start > 0 else ""
+        suffix = "…" if end < len(content) else ""
+        before = escape(content[start : match.start()])
+        matched = escape(content[match.start() : match.end()])
+        after = escape(content[match.end() : end])
+
+        return Markup(f"{prefix}{before}<mark>{matched}</mark>{after}{suffix}")
