@@ -65,6 +65,7 @@ from flaskbb.utils.helpers import (
     forum_is_unread,
     get_alembic_locations,
     get_flaskbb_config,
+    highlight,
     is_online,
     mark_online,
     render_template,
@@ -316,6 +317,7 @@ def configure_template_filters(app: Flask):
     filters["format_time"] = format_time
     filters["format_datetime"] = format_datetime
     filters["forum_is_unread"] = forum_is_unread
+    filters["highlight"] = highlight
     filters["is_online"] = is_online
     filters["time_since"] = time_since
     filters["topic_is_unread"] = topic_is_unread

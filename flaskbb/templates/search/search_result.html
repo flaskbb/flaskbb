@@ -1,121 +1,106 @@
-{% set page_title = _("Search") %}
-
-{% extends theme("layout.html") %}
-{% block content %}
-
-<div class="page-view search-content">
-    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
-        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li class="breadcrumb-item active">{% trans %}Search{% endtrans %}</li>
-    </ol>
-
-    {% if 'topic' in result %}
-    <h5 class="mb-3">{% trans %}Topics{% endtrans %}</h5>
-    <div class="col-12">
-        {% for topic in result['topic'] %}
-        <div class="card page mb-3">
-            <div class="card-header page-header topic-header fw-normal">
-                {% trans trimmed
-                    topic_url=topic.url,
-                    topic_title=topic.title,
-                    forum_url=topic.forum.url,
-                    forum_title=topic.forum.title
-                %}
-                <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
-                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
-                {% endtrans %}
-            </div>
-            <div class="card-body page-body topic-content">
-                <div class="col-12 ps-3">
-                    <div class="topic-created">
-                        {{ topic.date_created|format_datetime }} {% trans %}by{% endtrans %}
-                        <a href="{{ url_for('user.profile', username=topic.username) }}">
-                            {{ topic.username }}
-                        </a>
-                    </div>
-                    <div class="topic-content">
-                        {{ topic.first_post.content|markup }}
-                    </div>
+{% if 'topic' in result %}
+<h5 class="mb-3">{% trans %}Search results for Topics:{% endtrans %}</h5>
+<div class="col-12">
+    {% for topic in result['topic'] %}
+    <div class="card page mb-3">
+        <div class="card-header page-header topic-header fw-normal">
+            {% trans trimmed
+                topic_url=topic.url,
+                topic_title=topic.title,
+                forum_url=topic.forum.url,
+                forum_title=topic.forum.title
+            %}
+            <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
+            in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+            {% endtrans %}
+        </div>
+        <div class="card-body page-body topic-content">
+            <div class="col-12 ps-3">
+                <div class="topic-created">
+                    {{ topic.date_created|format_datetime }} {% trans %}by{% endtrans %}
+                    <a href="{{ url_for('user.profile', username=topic.username) }}">
+                        {{ topic.username }}
+                    </a>
+                </div>
+                <div class="topic-content">
+                    {{ topic.first_post.content|markup|highlight(form.search_query.data) }}
                 </div>
             </div>
         </div>
-        {% else %}
-        <div class="alert-message alert-message-info" role="alert">
-            {% trans %}No topics found matching your search criteria.{% endtrans %}
-        </div>
-        {% endfor %}
     </div>
-    {% endif %}
-
-    {% if 'post' in result %}
-    <h5 class="mb-3">{% trans %}Posts{% endtrans %}</h5>
-    <div class="col-12">
-        {% for post in result['post'] %}
-        <div class="card page mb-3">
-            <div class="card-header page-header topic-header fw-normal">
-                {% trans trimmed
-                    post_url=post.url,
-                    topic_title=post.topic.title,
-                    forum_url=post.topic.forum.url,
-                    forum_title=post.topic.forum.title
-                %}
-                <strong><a href="{{ post_url }}">{{ topic_title }}</a></strong>
-                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
-                {% endtrans %}
-            </div>
-            <div class="card-body page-body topic-content">
-                <div class="col-12 ps-3">
-                    <div class="topic-created">
-                        {{ post.date_created|format_datetime }} {% trans %}by{% endtrans %}
-                        <a href="{{ url_for('user.profile', username=post.username) }}">
-                            {{ post.username }}
-                        </a>
-                    </div>
-                    <div class="topic-content">
-                        {{ post.content|markup }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="alert-message alert-message-info" role="alert">
-            {% trans %}No posts found matching your search criteria.{% endtrans %}
-        </div>
-        {% endfor %}
+    {% else %}
+    <div class="alert-message alert-message-info" role="alert">
+        {% trans %}No topics found matching your search criteria.{% endtrans %}
     </div>
-    {% endif %}
-
-    {% if 'user' in result %}
-    <div class="card page">
-        <div class="card-header page-header">
-            {% trans %}Users{% endtrans %}
-        </div>
-        <div class="card-body page-body">
-            <div class="page-meta">
-                <div class="col-md-1 col-sm-1 col-1 meta-item">#</div>
-                <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Username{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">{% trans %}Posts{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
-                <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
-            </div>
-            {% for user in result['user'] %}
-            <div class="row page-row hover clearfix">
-                <div class="col-md-1 col-sm-1 col-1">{{ user.id }}</div>
-                <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block">{{ user.post_count }}</div>
-                <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
-                <div class="col-md-3 col-sm-3 col-5">{{ user.primary_group.name }}</div>
-            </div>
-            {% else %}
-            <div class="row page-row hover clearfix">
-                <div class="col-md-12 col-sm-12 col-12">{% trans %}No users found matching your search criteria.{% endtrans %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
+    {% endfor %}
 </div>
+{% endif %}
 
-{% endblock %}
+{% if 'post' in result %}
+<h5 class="mb-3">{% trans %}Search results for Posts:{% endtrans %}</h5>
+<div class="col-12">
+    {% for post in result['post'] %}
+    <div class="card page mb-3">
+        <div class="card-header page-header topic-header fw-normal">
+            {% trans trimmed
+                post_url=post.url,
+                topic_title=post.topic.title,
+                forum_url=post.topic.forum.url,
+                forum_title=post.topic.forum.title
+            %}
+            <strong><a href="{{ post_url }}">{{ topic_title }}</a></strong>
+            in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+            {% endtrans %}
+        </div>
+        <div class="card-body page-body topic-content">
+            <div class="col-12 ps-3">
+                <div class="topic-created">
+                    {{ post.date_created|format_datetime }} {% trans %}by{% endtrans %}
+                    <a href="{{ url_for('user.profile', username=post.username) }}">
+                        {{ post.username }}
+                    </a>
+                </div>
+                <div class="topic-content">
+                    {{ post.content|markup|highlight(form.search_query.data) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert-message alert-message-info" role="alert">
+        {% trans %}No posts found matching your search criteria.{% endtrans %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+{% if 'user' in result %}
+<h5 class="mb-3">{% trans %}Search results for Users:{% endtrans %}</h5>
+
+<div class="card page">
+    <div class="card-body page-body">
+        <div class="row m-0 page-meta">
+            <div class="col-md-1 col-sm-1 col-1 meta-item">#</div>
+            <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Username{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">{% trans %}Posts{% endtrans %}</div>
+            <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
+            <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
+        </div>
+        {% for user in result['user'] %}
+        <div class="row page-row hover clearfix">
+            <div class="col-md-1 col-sm-1 col-1">{{ user.id }}</div>
+            <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
+            <div class="col-md-2 col-sm-2 d-none d-sm-block">{{ user.post_count }}</div>
+            <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
+            <div class="col-md-3 col-sm-3 col-5">{{ user.primary_group.name }}</div>
+        </div>
+        {% else %}
+        <div class="row page-row hover clearfix">
+            <div class="col-md-12 col-sm-12 col-12">{% trans %}No users found matching your search criteria.{% endtrans %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

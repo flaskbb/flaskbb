@@ -28,20 +28,18 @@ class Search(MethodView):
     form = SearchForm
 
     def get(self):
-        return render_template("search/search_form.html", form=self.form())
+        return render_template("search/search_form.html", form=self.form(), result=None)
 
     def post(self):
         form = self.form()
+        result = None
         if form.validate_on_submit():
             result = {
                 key: db.session.execute(stmt).unique().scalars().all()
                 for key, stmt in form.get_results().items()
             }
-            return render_template(
-                "search/search_result.html", form=form, result=result
-            )
 
-        return render_template("search/search_form.html", form=form)
+        return render_template("search/search_form.html", form=form, result=result)
 
 
 @impl(tryfirst=True)

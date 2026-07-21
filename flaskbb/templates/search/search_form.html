@@ -16,11 +16,10 @@
         </div>
         <div class="card-body page-body">
             {% set has_advanced_data = form.forum_id.data or form.author.data or form.date_from.data or form.date_to.data or form.state.data %}
-            <form role="form" method="post">
-                {{ form.hidden_tag() }}
-
-                <div class="row justify-content-md-center">
-                    <div class="col-8">
+            <div class="row justify-content-md-center">
+                <div class="col-8">
+                    <form role="form" method="post">
+                        {{ form.hidden_tag() }}
                         <div class="input-group mb-3">
                             {{ render_input_field(form.search_query, class="form-control col-3") }}
                             {{ render_select_field(form.search_type, class="form-select flex-grow-0 w-auto") }}
@@ -28,45 +27,41 @@
                                 <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
                             </button>
                         </div>
-                    </div>
-                </div>
-                <div class="row justify-content-md-center">
-                    <div class="col-auto">
-
-                        <button type="button" id="advanced-filter-toggle"
-                                class="btn btn-outline-dark mb-3{{ ' d-none' if form.search_type.data != 'forum' }}">
-                            {% trans %}Advanced filters{% endtrans %}
-                            <span id="advanced-filter-icon" class="fas fa-chevron-down"></span>
-                        </button>
-
-                    </div>
-                </div>
-
-                <div class="row justify-content-md-center">
-                    <div class="col-8">
-
-                        <div id="advanced-search"
-                             class="{{ '' if (form.search_type.data == 'forum' and has_advanced_data) else 'd-none' }}">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {{ render_field(form.content_type, div_class="mb-3") }}
-                                    {{ render_field(form.forum_id, div_class="mb-3") }}
-                                    {{ render_field(form.state, div_class="mb-3") }}
-                                </div>
-                                <div class="col-md-6">
-                                    {{ render_field(form.author, div_class="mb-3") }}
-                                    {{ render_field(form.date_from, div_class="mb-3") }}
-                                    {{ render_field(form.date_to, div_class="mb-3") }}
+                        <div class="col-auto">
+                            <button type="button" id="advanced-filter-toggle"
+                                    class="btn btn-outline-dark mb-3{{ ' d-none' if form.search_type.data != 'forum' }}">
+                                {% trans %}Advanced filters{% endtrans %}
+                                <span id="advanced-filter-icon" class="fas fa-chevron-down"></span>
+                            </button>
+                        </div>
+                        <div class="col-8">
+                            <div id="advanced-search"
+                                 class="{{ '' if (form.search_type.data == 'forum' and has_advanced_data) else 'd-none' }}">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ render_field(form.content_type, div_class="mb-3") }}
+                                        {{ render_field(form.forum_id, div_class="mb-3") }}
+                                        {{ render_field(form.state, div_class="mb-3") }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ render_field(form.author, div_class="mb-3") }}
+                                        {{ render_field(form.date_from, div_class="mb-3") }}
+                                        {{ render_field(form.date_to, div_class="mb-3") }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-
-                    </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    {% if result %}
+    <div class="mt-4">
+        {% include theme("search/search_result.html") %}
+    </div>
+    {% endif %}
 </div>
 
 <script>
