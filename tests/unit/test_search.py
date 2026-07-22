@@ -5,9 +5,9 @@ import pytest
 from sqlalchemy import text
 
 from flaskbb.core.search import FlaskBBSearch
-from flaskbb.core.search.postgresql import PostgreSQLSearchBackend
-from flaskbb.core.search.sql import SQLSearchBackend
-from flaskbb.core.search.sqlite import SQLiteSearchBackend
+from flaskbb.core.search.backends.postgresql import PostgreSQLSearchBackend
+from flaskbb.core.search.backends.sql import SQLSearchBackend
+from flaskbb.core.search.backends.sqlite import SQLiteSearchBackend
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Post, Topic

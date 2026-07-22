@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-flaskbb.core.search.sql
-~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.search.backends.sql
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A dependency-free search backend that searches directly against the
 database via ILIKE. The row is the index, so index/update/remove/

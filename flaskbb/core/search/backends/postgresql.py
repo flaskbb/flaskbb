@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-flaskbb.core.search.postgresql
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.search.backends.postgresql
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A search backend built on PostgreSQL's native full-text search. Each
 searchable table carries a `search_vector` column (`tsvector`, a

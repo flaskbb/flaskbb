@@ -26,15 +26,15 @@ _KNOWN_BACKENDS = ("sql", "postgresql", "sqlite")
 def _resolve_backend_class(name: str) -> type[SearchBackend]:
     # circular dependency
     if name == "sql":
-        from flaskbb.core.search.sql import SQLSearchBackend
+        from flaskbb.core.search.backends.sql import SQLSearchBackend
 
         return SQLSearchBackend
     if name == "postgresql":
-        from flaskbb.core.search.postgresql import PostgreSQLSearchBackend
+        from flaskbb.core.search.backends.postgresql import PostgreSQLSearchBackend
 
         return PostgreSQLSearchBackend
     if name == "sqlite":
-        from flaskbb.core.search.sqlite import SQLiteSearchBackend
+        from flaskbb.core.search.backends.sqlite import SQLiteSearchBackend
 
         return SQLiteSearchBackend
     raise ValueError(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-flaskbb.core.search.sqlite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+flaskbb.core.search.backends.sqlite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A search backend built on SQLite's FTS5 full-text extension. Each
 searchable table gets an external-content FTS5 virtual table (e.g.
