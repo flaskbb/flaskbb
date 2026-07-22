@@ -22,9 +22,25 @@ from typing import Any
 from flask import Flask
 from flask_sqlalchemy.model import Model
 from markupsafe import Markup, escape
-from sqlalchemy import Select
+from sqlalchemy import Select, case, select
+from sqlalchemy import false as sql_false
 
 ModelT = type[Model]
+
+
+def ordered_by_ids(model: ModelT, ids: Sequence[int]) -> Select[Any]:
+    """Build a `select(model)` restricted to `ids` and ordered to match
+    their sequence - the shared shape every index-backed backend returns
+    from `search()` once it has resolved a ranked list of primary keys.
+    An empty `ids` yields a statement that matches nothing.
+    """
+    # ModelT is bound to flask_sqlalchemy's generic Model, which doesn't
+    # declare an `id` attribute - all searchable models use `id` as pk.
+    pk_col = getattr(model, "id")
+    if not ids:
+        return select(model).where(sql_false())
+    ordering = case({pk: rank for rank, pk in enumerate(ids)}, value=pk_col)
+    return select(model).where(pk_col.in_(ids)).order_by(ordering)
 
 
 class SearchBackend(ABC):

@@ -165,16 +165,6 @@ def configure_app(app: Flask, config: Any):
     # Add the location of the config to the config
     app.config["CONFIG_PATH"] = config
 
-    # flaskbb/cli/main.py sets this before creating the app for the
-    # `celery` command specifically. Operators normally run `flaskbb
-    # celery` against the very same config as everything else, so this
-    # process should own the tantivy backend's IndexWriter by default -
-    # FLASKBB_SEARCH_INDEX_WRITER below still wins if set explicitly
-    # (e.g. a second, read-only celery worker - see
-    # flaskbb/core/search/tantivy.py).
-    if os.environ.get("FLASKBB_RUNNING_CELERY"):
-        app.config["SEARCH_INDEX_WRITER"] = True
-
     # Environment
     # Parse the env for FLASKBB_ prefixed env variables and set
     # them on the config object

@@ -1,7 +1,13 @@
+import importlib.util
+from pathlib import Path
+
 import pytest
+from sqlalchemy import text
 
 from flaskbb.core.search import FlaskBBSearch
+from flaskbb.core.search.postgresql import PostgreSQLSearchBackend
 from flaskbb.core.search.sql import SQLSearchBackend
+from flaskbb.core.search.sqlite import SQLiteSearchBackend
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import db
 from flaskbb.forum.models import Forum, Post, Topic
@@ -11,6 +17,35 @@ from flaskbb.user.models import User
 
 def _all(stmt):
     return db.session.scalars(stmt).unique().all()
+
+
+def _load_fts_migration():
+    path = (
+        Path(__file__).parents[2]
+        / "flaskbb"
+        / "migrations"
+        / "202607211500_1784625534_add_fts_search_indexes.py"
+    )
+    spec = importlib.util.spec_from_file_location("_fts_migration", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture()
+def sqlite_fts(database):
+    """Applies the SQLite FTS5 schema (virtual tables + sync triggers) the
+    migration would create, since the test DB is built via create_all(),
+    not migrations.
+    """
+    migration = _load_fts_migration()
+    for statement in migration.sqlite_upgrade_sql():
+        db.session.execute(text(statement))
+    db.session.commit()
+    yield
+    for statement in migration.sqlite_downgrade_sql():
+        db.session.execute(text(statement))
+    db.session.commit()
 
 
 def test_search_post(topic):
@@ -196,17 +231,145 @@ def test_snippet_windows_around_match_with_ellipses(default_settings):
         flaskbb_config["SEARCH_SNIPPET_LENGTH"] = 320
 
 
-def test_flaskbb_search_proxy_resolves_tantivy(application, tmp_path):
-    from flaskbb.core.search import tantivy as tantivy_module
-    from flaskbb.core.search.tantivy import TantivyBackend
+def test_sqlite_search_post_by_content(sqlite_fts, topic):
+    post = topic.first_post
+    backend = SQLiteSearchBackend()
 
-    application.config["SEARCH_BACKEND"] = "tantivy"
-    application.config["SEARCH_INDEX_DIR"] = str(tmp_path / "search_index")
+    assert post in _all(backend.search(Post, "Content Normal"))
+    assert _all(backend.search(Post, "nonexistentterm")) == []
+
+
+def test_sqlite_search_is_case_insensitive(sqlite_fts, topic):
+    post = topic.first_post
+    backend = SQLiteSearchBackend()
+
+    assert post in _all(backend.search(Post, "content normal"))
+
+
+def test_sqlite_search_topic_by_title(sqlite_fts, topic):
+    backend = SQLiteSearchBackend()
+
+    assert topic in _all(backend.search(Topic, "Test Topic Normal"))
+
+
+def test_sqlite_search_topic_by_first_post_content(sqlite_fts, topic):
+    """A topic must be findable by its opening post's body, matched
+    through posts_fts, mirroring the sql backend.
+    """
+    backend = SQLiteSearchBackend()
+
+    assert topic in _all(backend.search(Topic, "Content Normal"))
+
+
+def test_sqlite_search_forum(sqlite_fts, forum):
+    backend = SQLiteSearchBackend()
+
+    assert forum in _all(backend.search(Forum, "Test Forum"))
+
+
+def test_sqlite_search_user(sqlite_fts, user):
+    backend = SQLiteSearchBackend()
+
+    assert user in _all(backend.search(User, "test_normal"))
+
+
+def test_sqlite_search_empty_query_returns_nothing(sqlite_fts, user):
+    backend = SQLiteSearchBackend()
+
+    assert _all(backend.search(User, "")) == []
+
+
+def test_sqlite_search_reflects_updates_via_triggers(sqlite_fts, topic):
+    post = topic.first_post
+    backend = SQLiteSearchBackend()
+
+    assert _all(backend.search(Post, "zebra")) == []
+
+    post.content = "a zebra appeared"
+    post.save()
+
+    assert post in _all(backend.search(Post, "zebra"))
+
+
+def test_sqlite_reindex_backfills(sqlite_fts, topic):
+    backend = SQLiteSearchBackend()
+
+    backend.reindex()
+
+    assert topic.first_post in _all(backend.search(Post, "Content Normal"))
+
+
+def test_sqlite_search_unknown_model_raises(sqlite_fts):
+    backend = SQLiteSearchBackend()
+
+    with pytest.raises(ValueError):
+        backend.search(PluginRegistry, "whatever")
+
+
+def test_sqlite_lifecycle_write_methods_are_noops(sqlite_fts, user):
+    backend = SQLiteSearchBackend()
+
+    assert backend.index(user) is None
+    assert backend.update(user) is None
+    assert backend.remove(user) is None
+
+
+def test_create_all_builds_sqlite_fts_schema(application):
+    """A fresh install (db.create_all() + stamp, no migration run) must
+    still produce the FTS schema when the sqlite backend is active.
+    """
+    application.config["SEARCH_BACKEND"] = "sqlite"
+    try:
+        db.create_all()
+        tables = db.session.execute(
+            text(
+                "SELECT name FROM sqlite_master "
+                "WHERE type='table' AND name='posts_fts'"
+            )
+        ).scalars().all()
+        triggers = db.session.execute(
+            text("SELECT name FROM sqlite_master WHERE type='trigger'")
+        ).scalars().all()
+        assert "posts_fts" in tables
+        assert "posts_ai" in triggers
+    finally:
+        migration = _load_fts_migration()
+        for statement in migration.sqlite_downgrade_sql():
+            db.session.execute(text(statement))
+        db.session.commit()
+        db.drop_all()
+        del application.config["SEARCH_BACKEND"]
+
+
+def test_create_all_skips_fts_schema_for_other_backends(database):
+    """With a non-FTS backend selected (default 'sql'), create_all must
+    not build the FTS tables - the DDL guard keeps them out.
+    """
+    tables = db.session.execute(
+        text("SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'")
+    ).scalars().all()
+    assert tables == []
+
+
+def test_flaskbb_search_proxy_resolves_sqlite(application):
+    application.config["SEARCH_BACKEND"] = "sqlite"
     proxy = FlaskBBSearch()
 
     try:
         proxy.init_app(application)
-        assert isinstance(proxy._impl, TantivyBackend)
+        assert isinstance(proxy._impl, SQLiteSearchBackend)
     finally:
         del application.config["SEARCH_BACKEND"]
-        tantivy_module._active = None
+
+
+def test_flaskbb_search_proxy_resolves_postgresql(application):
+    application.config["SEARCH_BACKEND"] = "postgresql"
+    proxy = FlaskBBSearch()
+
+    try:
+        proxy.init_app(application)
+        assert isinstance(proxy._impl, PostgreSQLSearchBackend)
+    finally:
+        del application.config["SEARCH_BACKEND"]
+
+

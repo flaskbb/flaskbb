@@ -20,7 +20,7 @@ from sqlalchemy import Select
 
 from flaskbb.core.search.base import ModelT, SearchBackend
 
-_KNOWN_BACKENDS = ("sql", "tantivy")
+_KNOWN_BACKENDS = ("sql", "postgresql", "sqlite")
 
 
 def _resolve_backend_class(name: str) -> type[SearchBackend]:
@@ -29,16 +29,14 @@ def _resolve_backend_class(name: str) -> type[SearchBackend]:
         from flaskbb.core.search.sql import SQLSearchBackend
 
         return SQLSearchBackend
-    if name == "tantivy":
-        try:
-            from flaskbb.core.search.tantivy import TantivyBackend
-        except ImportError as exc:
-            raise ValueError(
-                "SEARCH_BACKEND='tantivy' requires the optional 'tantivy' "
-                "package; install it with `uv add tantivy` (or "
-                "`pip install tantivy`)."
-            ) from exc
-        return TantivyBackend
+    if name == "postgresql":
+        from flaskbb.core.search.postgresql import PostgreSQLSearchBackend
+
+        return PostgreSQLSearchBackend
+    if name == "sqlite":
+        from flaskbb.core.search.sqlite import SQLiteSearchBackend
+
+        return SQLiteSearchBackend
     raise ValueError(
         f"Unknown SEARCH_BACKEND {name!r}; choices: {list(_KNOWN_BACKENDS)}"
     )

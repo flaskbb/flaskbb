@@ -175,25 +175,11 @@ class DefaultConfig(object):
 
     # Search
     # ------------------------------
-    # Which search backend to use. "sql" (the default) needs no extra
-    # dependency or index storage; it searches directly against the
-    # database via ILIKE. "tantivy" indexes searchable content on disk
-    # via the Tantivy full-text search engine, for better relevance
-    # ranking and performance at scale. See flaskbb/core/search/ for
-    # available backends.
+    # You can choose from:
+    # - sql (uses ILIKE and works on all databases, however performance might be worse)
+    # - postgres (uses the FTS from Postgres)
+    # - sqlite (uses the FTS from SQLITE)
     SEARCH_BACKEND = "sql"
-    # Where the "tantivy" backend stores its on-disk indexes. Defaults
-    # to a "search_index" directory inside the instance folder. Unused
-    # by other backends.
-    SEARCH_INDEX_DIR = os.path.join(basedir, "search_index")
-    # Whether this process owns the on-disk Tantivy index and may write
-    # to it. Tantivy allows only one IndexWriter per index directory per
-    # process - in a multi-process deployment, exactly one process
-    # (typically a single-concurrency Celery worker) should set this to
-    # True; every other process (e.g. every web worker) should set it
-    # to False, which routes its writes to the writer process as a
-    # Celery task instead. Unused by other backends.
-    SEARCH_INDEX_WRITER = True
 
     # Forms
     # ------------------------------

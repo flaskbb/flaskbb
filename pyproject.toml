@@ -69,8 +69,6 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-[project.optional-dependencies]
-tantivy = ["tantivy>=0.25"]
 
 [project.urls]
 Homepage = "https://github.com/flaskbb/flaskbb"
@@ -105,7 +103,6 @@ dev = [
     "responses>=0.25.8",
     "ruff>=0.14.13",
     "sphinx>=9.1.0",
-    "tantivy>=0.25",
 ]
 
 [tool.uv]
