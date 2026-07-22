@@ -1,6 +1,6 @@
 [project]
 name = "FlaskBB"
-version = "2.2.1"
+version = "3.0.0"
 dependencies = [
   "alembic>=1.18.5",
   "attrs>=26.1.0",
