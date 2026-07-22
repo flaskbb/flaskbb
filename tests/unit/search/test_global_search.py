@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 from flask_login import login_user
 from werkzeug.datastructures import MultiDict
@@ -115,6 +116,32 @@ def test_search_forums_filters_by_author(request_context, topic, user, Fred):
     topics = _all(results["topic"])
     assert topic not in topics
     assert all(t.username == Fred.username for t in topics)
+
+
+def test_search_forums_filters_by_date_range(request_context, topic, user):
+    # Regression: DateField yields a plain `date`, but `date_created` is a
+    # tz-aware UTCDateTime column - a bare date used to blow up in binding.
+    # `date_to=today` must also include a topic created earlier today.
+    today = datetime.now(timezone.utc).date()
+
+    results = service.search_forums(
+        "Test Topic Normal",
+        user,
+        date_from=today - timedelta(days=1),
+        date_to=today,
+    )
+
+    assert topic in _all(results["topic"])
+
+
+def test_search_forums_excludes_topics_outside_date_range(
+    request_context, topic, user
+):
+    past = datetime.now(timezone.utc).date() - timedelta(days=10)
+
+    results = service.search_forums("Test Topic Normal", user, date_to=past)
+
+    assert topic not in _all(results["topic"])
 
 
 def test_search_forums_filters_by_locked_state(
