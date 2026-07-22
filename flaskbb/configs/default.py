@@ -177,8 +177,10 @@ class DefaultConfig(object):
     # ------------------------------
     # You can choose from:
     # - sql (uses ILIKE and works on all databases, however performance might be worse)
-    # - postgres (uses the FTS from Postgres)
+    # - postgresql (uses the FTS from Postgres)
     # - sqlite (uses the FTS from SQLITE)
+    # Plugins can register additional backends via the
+    # flaskbb_load_search_backends hook; use the name they provide.
     SEARCH_BACKEND = "sql"
 
     # Forms

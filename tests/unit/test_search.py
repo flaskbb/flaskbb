@@ -2,17 +2,47 @@ import importlib.util
 from pathlib import Path
 
 import pytest
+from pluggy import HookimplMarker
 from sqlalchemy import text
 
-from flaskbb.core.search import FlaskBBSearch
+from flaskbb.core.search import FlaskBBSearch, SearchBackendRegistration
 from flaskbb.core.search.backends.postgresql import PostgreSQLSearchBackend
 from flaskbb.core.search.backends.sql import SQLSearchBackend
 from flaskbb.core.search.backends.sqlite import SQLiteSearchBackend
+from flaskbb.core.search.base import SearchBackend, ordered_by_ids
 from flaskbb.core.settings import flaskbb_config
-from flaskbb.extensions import db
+from flaskbb.extensions import db, pluggy
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.user.models import User
+
+impl = HookimplMarker("flaskbb")
+
+
+class _DummyBackend(SearchBackend):
+    def index(self, instance):
+        pass
+
+    def update(self, instance):
+        pass
+
+    def remove(self, instance):
+        pass
+
+    def reindex(self, models=None):
+        pass
+
+    def search(self, model, query):
+        return ordered_by_ids(model, [])
+
+
+class _SearchPlugin:
+    def __init__(self, registration):
+        self._registration = registration
+
+    @impl
+    def flaskbb_load_search_backends(self):
+        return self._registration
 
 
 def _all(stmt):
@@ -166,6 +196,48 @@ def test_flaskbb_search_proxy_requires_init_app():
 
     with pytest.raises(RuntimeError):
         proxy.search(User, "test")
+
+
+def test_plugin_can_register_search_backend(application):
+    plugin = _SearchPlugin(SearchBackendRegistration("dummy", _DummyBackend))
+    pluggy.register(plugin)
+    application.config["SEARCH_BACKEND"] = "dummy"
+
+    try:
+        proxy = FlaskBBSearch(pluggy)
+        proxy.init_app(application)
+        assert isinstance(proxy._impl, _DummyBackend)
+    finally:
+        pluggy.unregister(plugin)
+        del application.config["SEARCH_BACKEND"]
+
+
+def test_plugin_backend_colliding_with_builtin_raises(application):
+    plugin = _SearchPlugin(SearchBackendRegistration("sql", _DummyBackend))
+    pluggy.register(plugin)
+
+    try:
+        # Selected backend is the default "sql", but the collision is still
+        # caught because plugin backends are always validated.
+        proxy = FlaskBBSearch(pluggy)
+        with pytest.raises(ValueError, match="built-in"):
+            proxy.init_app(application)
+    finally:
+        pluggy.unregister(plugin)
+
+
+def test_unknown_backend_error_lists_plugin_names(application):
+    plugin = _SearchPlugin(SearchBackendRegistration("dummy", _DummyBackend))
+    pluggy.register(plugin)
+    application.config["SEARCH_BACKEND"] = "does-not-exist"
+
+    try:
+        proxy = FlaskBBSearch(pluggy)
+        with pytest.raises(ValueError, match="dummy"):
+            proxy.init_app(application)
+    finally:
+        pluggy.unregister(plugin)
+        del application.config["SEARCH_BACKEND"]
 
 
 def test_snippet_wraps_match_in_mark(database):

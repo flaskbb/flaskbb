@@ -11,20 +11,30 @@ been set in the config `SEARCH_BACKEND`.
 """
 
 from collections.abc import Mapping, Sequence
-from typing import Any, override
+from typing import TYPE_CHECKING, Any, override
 
 from flask import Flask
 from flask_sqlalchemy.model import Model
 from markupsafe import Markup
 from sqlalchemy import Select
 
-from flaskbb.core.search.base import ModelT, SearchBackend
+from flaskbb.core.search.base import (
+    ModelT,
+    SearchBackend,
+    SearchBackendRegistration,
+)
 
-_KNOWN_BACKENDS = ("sql", "postgresql", "sqlite")
+if TYPE_CHECKING:
+    from flaskbb.plugins.manager import FlaskBBPluginManager
+
+__all__ = ["FlaskBBSearch", "SearchBackend", "SearchBackendRegistration"]
+
+_CORE_BACKENDS = ("sql", "postgresql", "sqlite")
 
 
-def _resolve_backend_class(name: str) -> type[SearchBackend]:
-    # circular dependency
+def _resolve_core(name: str) -> type[SearchBackend] | None:
+    # Lazily import only the selected built-in: importing a backend module
+    # also registers its create_all DDL, so unused ones stay out of the way.
     if name == "sql":
         from flaskbb.core.search.backends.sql import SQLSearchBackend
 
@@ -37,20 +47,60 @@ def _resolve_backend_class(name: str) -> type[SearchBackend]:
         from flaskbb.core.search.backends.sqlite import SQLiteSearchBackend
 
         return SQLiteSearchBackend
-    raise ValueError(
-        f"Unknown SEARCH_BACKEND {name!r}; choices: {list(_KNOWN_BACKENDS)}"
-    )
+    return None
+
+
+def _plugin_backends(
+    plugin_manager: "FlaskBBPluginManager",
+) -> dict[str, type[SearchBackend]]:
+    """Collect backends contributed via the `flaskbb_load_search_backends`
+    hook into a `{name: class}` dict. A name that collides with a built-in
+    or with another plugin's backend raises `ValueError`.
+    """
+    registry: dict[str, type[SearchBackend]] = {}
+    for result in plugin_manager.hook.flaskbb_load_search_backends():
+        regs = result if isinstance(result, (list, tuple)) else [result]
+        for reg in regs:
+            if reg.name in _CORE_BACKENDS:
+                raise ValueError(
+                    f"Search backend {reg.name!r} is a built-in and cannot be "
+                    f"registered by a plugin."
+                )
+            if reg.name in registry:
+                raise ValueError(
+                    f"Search backend {reg.name!r} is registered by more than "
+                    f"one plugin."
+                )
+            registry[reg.name] = reg.backend
+    return registry
 
 
 class FlaskBBSearch(SearchBackend):
-    def __init__(self) -> None:
+    def __init__(self, plugin_manager: "FlaskBBPluginManager | None" = None) -> None:
+        # plugin_manager is injected (see flaskbb/extensions.py) rather than
+        # imported, to avoid a core.search <-> extensions import cycle -
+        # the same dependency-injection the settings registry uses.
         self._impl: SearchBackend | None = None
+        self._plugin_manager = plugin_manager
 
     @override
     def init_app(self, app: Flask) -> None:
-        """Set the extension up and register the backend on the extension."""
+        """Resolve and initialize the configured backend. Must run after
+        plugins are loaded so `flaskbb_load_search_backends` contributions
+        are available (see `configure_search_backend` in flaskbb/app.py).
+        """
         name = app.config.get("SEARCH_BACKEND", "sql")
-        backend_cls = _resolve_backend_class(name)
+        # Always collected, so a plugin colliding with a built-in is caught
+        # even when that built-in is the backend actually selected.
+        plugins = (
+            _plugin_backends(self._plugin_manager)
+            if self._plugin_manager is not None
+            else {}
+        )
+        backend_cls = _resolve_core(name) or plugins.get(name)
+        if backend_cls is None:
+            choices = sorted({*_CORE_BACKENDS, *plugins})
+            raise ValueError(f"Unknown SEARCH_BACKEND {name!r}; choices: {choices}")
         self._impl = backend_cls()
         self._impl.init_app(app)
 

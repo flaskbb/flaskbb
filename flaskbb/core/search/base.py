@@ -17,6 +17,7 @@ responsibilities:
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from typing import Any
 
 from flask import Flask
@@ -132,3 +133,16 @@ class SearchBackend(ABC):
         after = escape(content[match.end() : end])
 
         return Markup(f"{prefix}{before}<mark>{matched}</mark>{after}{suffix}")
+
+
+@dataclass(frozen=True)
+class SearchBackendRegistration:
+    """Maps a `SEARCH_BACKEND` config name to a backend implementation.
+
+    Returned by the `flaskbb_load_search_backends` plugin hook so a plugin
+    can add its own backend under a new name. `name` must not collide with
+    a built-in ("sql", "postgresql", "sqlite") or another plugin's backend.
+    """
+
+    name: str
+    backend: type[SearchBackend]

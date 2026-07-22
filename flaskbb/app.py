@@ -133,6 +133,8 @@ def create_app(config: object | None = None, instance_path: str | None = None):
 
     load_plugins(app)
 
+    configure_search_backend(app)
+
     configure_blueprints(app)
     configure_template_filters(app)
     configure_context_processors(app)
@@ -284,9 +286,6 @@ def configure_extensions(app: Flask):
     # Flask-Limiter
     limiter.init_app(app)
 
-    # Search backend (pluggable; see flaskbb/core/search/)
-    flaskbb_search.init_app(app)
-
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
     login_manager.refresh_view = app.config["REAUTH_VIEW"]
@@ -306,6 +305,14 @@ def configure_extensions(app: Flask):
         return user
 
     login_manager.init_app(app)
+
+
+def configure_search_backend(app: Flask):
+    """Resolves and initializes the configured search backend. Runs after
+    load_plugins() so backends contributed by plugins via the
+    flaskbb_load_search_backends hook are available for selection.
+    """
+    flaskbb_search.init_app(app)
 
 
 def configure_template_filters(app: Flask):

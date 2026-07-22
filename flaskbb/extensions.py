@@ -47,7 +47,7 @@ metadata = MetaData(
 db = SQLAlchemy(metadata=metadata, session_options={"future": True})
 
 # Search backend (pluggable full-text search; see flaskbb/core/search/)
-flaskbb_search = FlaskBBSearch()
+flaskbb_search = FlaskBBSearch(pluggy)
 
 # Login
 login_manager = LoginManager()
