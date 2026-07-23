@@ -23,12 +23,9 @@ class TestingConfig(DefaultConfig):
     # This will print all SQL statements
     SQLALCHEMY_ECHO = False
 
-    # Use the in-memory storage
-    WHOOSHEE_MEMORY_STORAGE = True
-
     CELERY_CONFIG = {
-        "always_eager": True,
-        "eager_propagates_exceptions": True,
+        "task_always_eager": True,
+        "task_eager_propagates": True,
         "result_backend": "cache",
         "cache_backend": "memory",
     }

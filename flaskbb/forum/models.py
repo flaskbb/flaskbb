@@ -10,6 +10,7 @@ It provides the models for the forum
 """
 
 import logging
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, override
 
@@ -1303,12 +1304,14 @@ class Forum(db.Model, CRUDMixin):
         return self
 
     @override
-    def save(self, groups: "Group | None" = None):
+    def save(self, groups: "list[Group] | None" = None):
         """Saves a forum
 
         :param moderators: If given, it will update the moderators in this
                            forum with the given iterable of user objects.
-        :param groups: A list with group objects.
+        :param groups: A list with group objects to restrict this (new)
+                       forum to. If omitted, the forum is made visible to
+                       every group.
         """
         if self.id:
             db.session.merge(self)
@@ -1318,11 +1321,12 @@ class Forum(db.Model, CRUDMixin):
                     # importing here because of circular dependencies
                     from flaskbb.user.models import Group
 
-                    self.groups = (
+                    groups = list(
                         db.session.execute(db.select(Group).order_by(Group.name.asc()))
                         .scalars()
                         .all()
                     )
+                self.groups = groups
                 db.session.add(self)
 
         db.session.commit()
@@ -1444,6 +1448,23 @@ class Forum(db.Model, CRUDMixin):
                 (topic, last_post, None) for topic, last_post in topics.items
             ]
         return topics
+
+    @classmethod
+    def get_accessible(cls, user: "User") -> Sequence["Forum"]:
+        """Returns the forums that ``user`` is allowed to see.
+
+        :param user: The user object.
+        """
+        from flaskbb.user.models import Group
+
+        if user.is_authenticated:
+            user_groups = [gr.id for gr in user.groups]
+            stmt = db.select(cls).filter(cls.groups.any(Group.id.in_(user_groups)))
+        else:
+            guest_group = Group.get_guest_group()
+            stmt = db.select(cls).filter(cls.groups.any(Group.id == guest_group.id))
+
+        return db.session.execute(stmt.order_by(cls.position)).unique().scalars().all()
 
 
 @make_comparable

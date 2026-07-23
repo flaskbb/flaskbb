@@ -15,15 +15,14 @@ from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
-    SelectMultipleField,
     StringField,
     SubmitField,
     TextAreaField,
 )
 from wtforms.validators import DataRequired, Length, Optional
 
-from flaskbb.extensions import pluggy
-from flaskbb.forum.models import Forum, Post, Report, Topic
+from flaskbb.extensions import flaskbb_search, pluggy
+from flaskbb.forum.models import Post, Report, Topic
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
 
@@ -169,44 +168,8 @@ class UserSearchForm(FlaskForm):
     submit = SubmitField(_("Search"))
 
     def get_results(self):
-        query = self.search_query.data
-        return User.query.whooshee_search(query)
-
-
-class SearchPageForm(FlaskForm):
-    search_query = StringField(
-        _("Criteria"), validators=[DataRequired(), Length(min=3, max=50)]
-    )
-
-    search_types = SelectMultipleField(
-        _("Content"),
-        validators=[DataRequired()],
-        choices=[
-            ("post", _("Post")),
-            ("topic", _("Topic")),
-            ("forum", _("Forum")),
-            ("user", _("Users")),
-        ],
-    )
-
-    submit = SubmitField(_("Search"))
-
-    def get_results(self):
-        # Because the DB is not yet initialized when this form is loaded,
-        # the query objects cannot be instantiated in the class itself
-        search_actions = {
-            "post": Post.query.whooshee_search,
-            "topic": Topic.query.whooshee_search,
-            "forum": Forum.query.whooshee_search,
-            "user": User.query.whooshee_search,
-        }
-
-        query = self.search_query.data
-        types = self.search_types.data
-        results = {}
-
-        for search_type in search_actions.keys():
-            if search_type in types:
-                results[search_type] = search_actions[search_type](query)
-
-        return results
+        # search_query is DataRequired, so by the time get_results() is
+        # called (after a successful validate()) .data is never empty -
+        # the "or ''" is only to satisfy the type checker.
+        query = self.search_query.data or ""
+        return flaskbb_search.search(User, query)

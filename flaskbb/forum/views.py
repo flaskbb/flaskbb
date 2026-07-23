@@ -38,7 +38,6 @@ from flaskbb.forum.forms import (
     QuickreplyForm,
     ReplyForm,
     ReportForm,
-    SearchPageForm,
     UserSearchForm,
 )
 from flaskbb.forum.models import (
@@ -695,8 +694,11 @@ class MemberList(MethodView):
 
         form = self.form()
         if form.validate():
-            users = form.get_results().paginate(
-                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            users = db.paginate(
+                form.get_results(),
+                page=page,
+                per_page=flaskbb_config["USERS_PER_PAGE"],
+                error_out=False,
             )
             return render_template(
                 "forum/memberlist.html", users=users, search_form=form
@@ -766,21 +768,6 @@ class TopicTracker(MethodView):
             "success",
         )
         return redirect(url_for("forum.topictracker"))
-
-
-class Search(MethodView):
-    form = SearchPageForm
-
-    def get(self):
-        return render_template("forum/search_form.html", form=self.form())
-
-    def post(self):
-        form = self.form()
-        if form.validate_on_submit():
-            result = form.get_results()
-            return render_template("forum/search_result.html", form=form, result=result)
-
-        return render_template("forum/search_form.html", form=form)
 
 
 class DeleteTopic(MethodView):
@@ -1221,7 +1208,6 @@ def flaskbb_load_blueprints(app: Flask):
     register_view(
         forum, routes=["/post/<int:post_id>"], view_func=ViewPost.as_view("view_post")
     )
-    register_view(forum, routes=["/search"], view_func=Search.as_view("search"))
     register_view(
         forum,
         routes=["/topic/<int:topic_id>/delete", "/topic/<int:topic_id>-<slug>/delete"],

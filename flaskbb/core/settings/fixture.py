@@ -221,6 +221,16 @@ misc_group = SettingGroup(
             ),
         ),
         IntSetting(
+            key="SEARCH_SNIPPET_LENGTH",
+            value=320,
+            min=0,
+            name="Search snippet length",
+            description=(
+                "The number of characters shown around a search match in "
+                "the global search results. 0 to show the full content."
+            ),
+        ),
+        IntSetting(
             key="AVATAR_HEIGHT",
             value=150,
             min=0,

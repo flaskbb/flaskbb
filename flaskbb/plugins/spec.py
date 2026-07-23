@@ -146,6 +146,31 @@ def flaskbb_load_setting_groups():
 
 
 @spec
+def flaskbb_load_search_backends():
+    """Hook for plugins to register additional search backends.
+
+    Implementations should return a `SearchBackendRegistration` (from
+    `flaskbb.core.search`), or a list of them, each mapping a
+    `SEARCH_BACKEND` config value to a `SearchBackend` subclass. All
+    results across every installed plugin are collected - this hookspec
+    does not use firstresult. A name that collides with a built-in
+    ("sql", "postgresql", "sqlite") or with another plugin's backend
+    raises a ValueError at application setup.
+
+    The selected backend's `init_app(app)` is called after all plugins
+    have loaded. Backends needing their own schema register a migration
+    via `flaskbb_load_migrations` (and may register `after_create` DDL
+    for the `db.create_all()` path), exactly like the built-in
+    `postgresql`/`sqlite` backends.
+
+    Example:
+        @impl
+        def flaskbb_load_search_backends():
+            return SearchBackendRegistration("elasticsearch", ESBackend)
+    """
+
+
+@spec
 def on_plugin_install(plugin_name: str):
     """Called after a plugin has been installed (its default settings
     have just been seeded into the DB).

@@ -32,7 +32,7 @@ from flaskbb.cli.utils import (
     prompt_save_user,
     write_config,
 )
-from flaskbb.extensions import celery, db, pluggy, whooshee
+from flaskbb.extensions import celery, db, flaskbb_search, pluggy
 from flaskbb.utils.populate import (
     create_default_groups,
     create_default_settings,
@@ -56,8 +56,8 @@ class FlaskBBGroup(FlaskGroup):
         if self._loaded_flaskbb_plugins:
             return
 
+        app = ctx.ensure_object(ScriptInfo).load_app()
         try:
-            app = ctx.ensure_object(ScriptInfo).load_app()
             pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception:
@@ -295,7 +295,7 @@ def populate(
 def reindex():
     """Reindexes the search index."""
     click.secho("[+] Reindexing search index...", fg="cyan")
-    whooshee.reindex()
+    flaskbb_search.reindex()
 
 
 @flaskbb.command(

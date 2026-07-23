@@ -202,8 +202,11 @@ class ManageUsers(MethodView):
         form = self.form()
 
         if form.validate():
-            users = form.get_results().paginate(
-                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            users = db.paginate(
+                form.get_results(),
+                page=page,
+                per_page=flaskbb_config["USERS_PER_PAGE"],
+                error_out=False,
             )
             return render_template(
                 "management/users.html", users=users, search_form=form
@@ -443,8 +446,11 @@ class BannedUsers(MethodView):
         )
 
         if search_form.validate():
-            users = search_form.get_results().paginate(
-                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+            users = db.paginate(
+                search_form.get_results(),
+                page=page,
+                per_page=flaskbb_config["USERS_PER_PAGE"],
+                error_out=False,
             )
 
             return render_template(

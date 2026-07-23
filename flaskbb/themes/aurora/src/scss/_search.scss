@@ -1,0 +1,15 @@
+.search-content {
+    .topic-head {
+        font-weight: normal;
+    }
+
+    .topic-created {
+        font-size: 0.75em;
+        padding-bottom: 0.75em;
+    }
+}
+
+.topic-content mark {
+    padding: 0;
+    background-color: var(--bs-warning-bg-subtle);
+}

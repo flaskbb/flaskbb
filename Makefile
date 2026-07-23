@@ -1,4 +1,4 @@
-.PHONY: clean install help test lint isort run dependencies docs wheel upload
+.PHONY: clean install help test lint isort run dependencies docs wheel upload dev-plugins
 .DEFAULT_GOAL := help
 
 help: ## Displays this help message.
@@ -23,6 +23,9 @@ run: ## Runs the development server with the development config
 
 frontend: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
 	cd flaskbb/themes/aurora && npm run watch
+
+dev-plugins: ## Install the plugins as editable
+	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations
 
 devconfig:dependencies ## Generates a development config
 	uv run flaskbb makeconfig -d

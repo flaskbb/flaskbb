@@ -139,7 +139,6 @@ def install(plugin_name: str, force: bool):
         sys.exit(0)
 
     if plugin.is_installable:
-        plugin_module = pluggy.get_plugin(plugin.name)
         plugin.add_settings(force)
         click.secho("[+] Plugin has been installed.", fg="green")
     else:

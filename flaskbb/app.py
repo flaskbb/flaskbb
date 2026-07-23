@@ -40,17 +40,18 @@ from flaskbb.extensions import (
     csrf,
     db,
     debugtoolbar,
+    flaskbb_search,
     limiter,
     login_manager,
     mail,
     pluggy,
     redis_store,
     themes,
-    whooshee,
 )
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+from flaskbb.search.service import search_snippet
 
 # models
 from flaskbb.user.models import Guest, User
@@ -87,14 +88,6 @@ from flaskbb.utils.requirements import (
     has_permission,
     permission_with_identity,
 )
-
-# whooshees
-from flaskbb.utils.search import (
-    ForumWhoosheer,
-    PostWhoosheer,
-    TopicWhoosheer,
-    UserWhoosheer,
-)
 from flaskbb.utils.translations import FlaskBBDomain
 from flaskbb.utils.uploads import create_upload_directory
 
@@ -104,6 +97,7 @@ from .deprecation import FlaskBBDeprecation
 from .display.navigation import NavigationContentType
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
+from .search import views as search_views  # noqa
 from .upload import views as upload_views  # noqa
 from .user import views as user_views  # noqa
 
@@ -138,6 +132,8 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     configure_extensions(app)
 
     load_plugins(app)
+
+    configure_search_backend(app)
 
     configure_blueprints(app)
     configure_template_filters(app)
@@ -290,15 +286,6 @@ def configure_extensions(app: Flask):
     # Flask-Limiter
     limiter.init_app(app)
 
-    # Flask-Whooshee
-    whooshee.init_app(app)
-    # not needed for unittests - and it will speed up testing A LOT
-    if not app.testing:
-        whooshee.register_whoosheer(PostWhoosheer)
-        whooshee.register_whoosheer(TopicWhoosheer)
-        whooshee.register_whoosheer(ForumWhoosheer)
-        whooshee.register_whoosheer(UserWhoosheer)
-
     # Flask-Login
     login_manager.login_view = app.config["LOGIN_VIEW"]
     login_manager.refresh_view = app.config["REAUTH_VIEW"]
@@ -320,6 +307,14 @@ def configure_extensions(app: Flask):
     login_manager.init_app(app)
 
 
+def configure_search_backend(app: Flask):
+    """Resolves and initializes the configured search backend. Runs after
+    load_plugins() so backends contributed by plugins via the
+    flaskbb_load_search_backends hook are available for selection.
+    """
+    flaskbb_search.init_app(app)
+
+
 def configure_template_filters(app: Flask):
     """Configures the template filters."""
     filters: dict[str, Callable[..., Any]] = {}
@@ -330,6 +325,7 @@ def configure_template_filters(app: Flask):
     filters["format_datetime"] = format_datetime
     filters["forum_is_unread"] = forum_is_unread
     filters["is_online"] = is_online
+    filters["search_snippet"] = search_snippet
     filters["time_since"] = time_since
     filters["topic_is_unread"] = topic_is_unread
 
