@@ -87,17 +87,7 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["flaskbb", "wsgi.py", "celery_worker.py"]
 
-# The plugins are already declared in [project].dependencies.
-# `plugins-pypi` exists only so that uv doesn't automatically resolve to the local sources
 [dependency-groups]
-plugins-local = [
-    "flaskbb-plugin-portal",
-    "flaskbb-plugin-conversations",
-]
-plugins-pypi = [
-    "flaskbb-plugin-portal",
-    "flaskbb-plugin-conversations",
-]
 dev = [
     "alabaster>=1.0.0",
     "cov-core>=1.15.0",
@@ -118,16 +108,6 @@ dev = [
 [tool.uv]
 package = true
 default-groups = ["dev"]
-conflicts = [
-    [
-      { group = "plugins-local" },
-      { group = "plugins-pypi" },
-    ],
-]
-
-[tool.uv.sources]
-flaskbb-plugin-portal = { path = "../flaskbb-plugin-portal", editable = true, group = "plugins-local" }
-flaskbb-plugin-conversations = { path = "../flaskbb-plugin-conversations", editable = true, group = "plugins-local" }
 
 [tool.hatch.metadata]
 allow-direct-references = true
