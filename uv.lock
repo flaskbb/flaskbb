@@ -645,8 +645,8 @@ dependencies = [
     { name = "flask-wtf" },
     { name = "flaskbb-plugin-conversations", version = "2.0.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-7-flaskbb-plugins-pypi' or extra != 'group-7-flaskbb-plugins-local'" },
     { name = "flaskbb-plugin-conversations", version = "2.0.2", source = { editable = "../flaskbb-plugin-conversations" }, marker = "extra == 'group-7-flaskbb-plugins-local'" },
-    { name = "flaskbb-plugin-portal", version = "2.0.0", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-7-flaskbb-plugins-pypi' or extra != 'group-7-flaskbb-plugins-local'" },
-    { name = "flaskbb-plugin-portal", version = "2.0.0", source = { editable = "../flaskbb-plugin-portal" }, marker = "extra == 'group-7-flaskbb-plugins-local'" },
+    { name = "flaskbb-plugin-portal", version = "2.1.0.dev1", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-7-flaskbb-plugins-pypi' or extra != 'group-7-flaskbb-plugins-local'" },
+    { name = "flaskbb-plugin-portal", version = "2.1.0.dev1", source = { editable = "../flaskbb-plugin-portal" }, marker = "extra == 'group-7-flaskbb-plugins-local'" },
     { name = "jinja2" },
     { name = "markupsafe" },
     { name = "mistune" },
@@ -683,11 +683,11 @@ dev = [
 ]
 plugins-local = [
     { name = "flaskbb-plugin-conversations", version = "2.0.2", source = { editable = "../flaskbb-plugin-conversations" } },
-    { name = "flaskbb-plugin-portal", version = "2.0.0", source = { editable = "../flaskbb-plugin-portal" } },
+    { name = "flaskbb-plugin-portal", version = "2.1.0.dev1", source = { editable = "../flaskbb-plugin-portal" } },
 ]
 plugins-pypi = [
     { name = "flaskbb-plugin-conversations", version = "2.0.2", source = { registry = "https://pypi.org/simple" } },
-    { name = "flaskbb-plugin-portal", version = "2.0.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "flaskbb-plugin-portal", version = "2.1.0.dev1", source = { registry = "https://pypi.org/simple" } },
 ]
 
 [package.metadata]
@@ -717,7 +717,7 @@ requires-dist = [
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-wtf", specifier = ">=1.3.0" },
     { name = "flaskbb-plugin-conversations", specifier = ">=2.0.2" },
-    { name = "flaskbb-plugin-portal", specifier = ">=2.0.0" },
+    { name = "flaskbb-plugin-portal", specifier = "==2.1.0.dev1" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=3.0.3" },
     { name = "mistune", specifier = ">=3.3.2" },
@@ -801,26 +801,26 @@ dev = [
 
 [[package]]
 name = "flaskbb-plugin-portal"
-version = "2.0.0"
+version = "2.1.0.dev1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb", marker = "extra == 'group-7-flaskbb-plugins-pypi' or extra != 'group-7-flaskbb-plugins-local'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/73/b0/73f165dacff0b384ee6e01f70a925dc45b2ea8c88ab426373ad57b945f5c/flaskbb_plugin_portal-2.0.0.tar.gz", hash = "sha256:aa09aca6298b805d2dac9a0b5a7cc6be4b1aae3280eaa9abfa36808a3793b372", size = 6864, upload-time = "2026-02-07T18:53:33.888Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/33/9d83d6a547dd1b011dc0016cac9d905bafb1aad51da12336aeeb620fb64e/flaskbb_plugin_portal-2.1.0.dev1.tar.gz", hash = "sha256:4361478b308cc0df15faee3609fdbec5dd021f1944e39248cbba84980b6a8ecf", size = 6957, upload-time = "2026-07-23T18:54:02.351Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/ff/ac973f517275197a06b55f72dd5f44fd1656976eda6d1143ec28dba9bf2d/flaskbb_plugin_portal-2.0.0-py3-none-any.whl", hash = "sha256:94d39f0a78193dfe01211b79bacf6fce000783a774e01f7eb8d81d30d4c5080d", size = 11122, upload-time = "2026-02-07T18:53:32.672Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/0e/27b1229c88924b3affbb01b67955e4665e21f8c14354cfd0eab0155dd3ea/flaskbb_plugin_portal-2.1.0.dev1-py3-none-any.whl", hash = "sha256:c51e81cd5aa0854c49caf77fca3c174442ca95abf42111bbf1cddf0ce3ee0770", size = 11300, upload-time = "2026-07-23T18:54:00.879Z" },
 ]
 
 [[package]]
 name = "flaskbb-plugin-portal"
-version = "2.0.0"
+version = "2.1.0.dev1"
 source = { editable = "../flaskbb-plugin-portal" }
 dependencies = [
     { name = "flaskbb", marker = "extra == 'group-7-flaskbb-plugins-local'" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "flaskbb", specifier = ">=2.1.0" }]
+requires-dist = [{ name = "flaskbb", specifier = ">=2.2.0" }]
 
 [package.metadata.requires-dev]
 dev = [
