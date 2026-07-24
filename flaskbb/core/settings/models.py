@@ -31,6 +31,8 @@ from .registry import setting_registry
 # have to strip them manually on every call site.
 DEFAULT_EXCLUDED_FORM_KEYS = frozenset({"csrf_token"})
 
+_SETTINGS_CACHE_KEY = "settings"
+
 
 def display_key(group_key: str, definition_key: str) -> str:
     """The publicly exposed key for core settings (without GROUPKEY_, e.q. PROJECT_TITLE)
@@ -80,7 +82,7 @@ class Setting(db.Model):
         self.value = definition.serialize(value)
 
     @classmethod
-    @cache.cached(key_prefix="settings")
+    @cache.cached(key_prefix=_SETTINGS_CACHE_KEY)
     def as_dict(cls) -> dict[str, Any]:
         """Load and deserialize every setting value from the DB.
 
@@ -104,7 +106,7 @@ class Setting(db.Model):
     @classmethod
     def invalidate_cache(cls):
         """Invalidates this objects cached metadata."""
-        cache.delete_memoized(cls.as_dict, cls)
+        cache.delete(_SETTINGS_CACHE_KEY)
 
     @classmethod
     def update(
@@ -126,18 +128,18 @@ class Setting(db.Model):
             Defaults to just "csrf_token" because forms usually contain this key.
         """
         excluded_keys = {key.lower() for key in exclude}
+        rows = {
+            row.key.lower(): row
+            for row in db.session.execute(
+                select(cls).where(cls.group_key == group_key)
+            ).scalars()
+        }
         for key, value in settings.items():
             if key.lower() in excluded_keys:
                 continue
 
             definition = setting_registry.definition(group_key, key)
-            setting = db.session.execute(
-                select(cls).where(
-                    cls.group_key == group_key,
-                    func.lower(cls.key) == definition.key.lower(),
-                )
-            ).scalar_one()
-            setting.set_value(definition, value)
+            rows[definition.key.lower()].set_value(definition, value)
 
         db.session.commit()
         cls.invalidate_cache()

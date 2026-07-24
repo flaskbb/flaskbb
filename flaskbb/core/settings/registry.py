@@ -32,10 +32,14 @@ class SettingsRegistry:
         if group.key in self._groups:
             raise ValueError(f"Duplicate setting group: {group.key}")
 
+        seen: set[str] = set()
         for setting in group.settings:
-            normalized_key = (group.key, setting.key.upper())
-            if normalized_key in self._definitions:
-                raise ValueError(f"Duplicate setting key: {setting.key}")
+            normalized = setting.key.upper()
+            if normalized in seen:
+                raise ValueError(
+                    f"Duplicate setting key in group {group.key!r}: {setting.key}"
+                )
+            seen.add(normalized)
 
         self._groups[group.key] = group
         for setting in group.settings:

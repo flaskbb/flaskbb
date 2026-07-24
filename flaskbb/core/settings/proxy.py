@@ -12,7 +12,7 @@ Supports both:
 """
 
 import logging
-from collections.abc import Iterator, Mapping, MutableMapping
+from collections.abc import Iterator, MutableMapping
 from typing import Any, override
 
 from .models import Setting
@@ -64,7 +64,7 @@ class FlaskBBConfigProxy(MutableMapping[str, Any]):
 
     @override
     def get(self, key: str, default: Any | None = None):
-        return Setting.as_dict().get(key, default)
+        return Setting.as_dict().get(key.upper(), default)
 
     @override
     def update(self, other=(), /, **kwargs: dict[str, Any]) -> None:  # pyright: ignore
@@ -83,19 +83,8 @@ class FlaskBBConfigProxy(MutableMapping[str, Any]):
         call - this groups the incoming keys by their resolved
         group_key first, then issues one call per group.
         """
-        combined: dict[str, Any] = {}
-        if isinstance(other, Mapping):
-            for key in other:  # pyright: ignore
-                combined[key] = other[key]
-        elif hasattr(other, "keys"):  # pyright: ignore
-            for key in other.keys():  # pyright: ignore
-                combined[key] = other[key]
-        else:
-            for key, value in other:  # pyright: ignore
-                combined[key] = value
-
-        for key, value in kwargs.items():
-            combined[key] = value
+        combined: dict[str, Any] = dict(other)  # pyright: ignore
+        combined.update(kwargs)
 
         by_group: dict[str, dict[str, Any]] = {}
         for display_key, value in combined.items():
