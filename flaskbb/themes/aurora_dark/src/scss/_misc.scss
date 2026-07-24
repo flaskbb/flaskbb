@@ -1,0 +1,181 @@
+html {
+    // push footer to bottom
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    // Margin bottom by footer height
+    margin-bottom: 60px;
+}
+
+.emoji {
+   height: 1em;
+   width: 1em;
+   margin: 0 .05em 0 .1em;
+   vertical-align: -0.1em;
+}
+
+.flaskbb-footer {
+    position: absolute;
+    bottom: 0;
+    // Set the fixed height of the footer here
+    height: 60px;
+    width: 100%;
+    // use the same width as container
+    //padding-top: 1em;
+}
+
+.flaskbb-layout {
+    padding-top: 20px;
+}
+
+.flaskbb-header {
+    color: #fff;
+    text-align: left;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    background-color: $fbb-header-bg-primary;
+    background-image: linear-gradient(
+        to bottom,
+        $fbb-header-bg-secondary 0%,
+        $fbb-header-bg-primary 100%
+    );
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$fbb-header-bg-secondary', endColorstr='$fbb-header-bg-primary', GradientType=0);
+    border: 1px solid $border-color;
+    border-bottom: 0;
+
+    position: relative;
+    height: 12em;
+    padding: 2.5em 2em;
+    margin-top: 0.5em;
+
+    .flaskbb-meta {
+        .flaskbb-title {
+            color: $fbb-header-title-color;
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .flaskbb-subtitle {
+            color: $fbb-header-subtitle-color;
+        }
+    }
+}
+
+.flaskbb-navbar {
+    border-bottom: 1px solid $border-color;
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+    margin-bottom: 1rem;
+
+    &.navbar {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .nav-link {
+        padding: 1rem 1rem;
+
+        &:hover,
+        &.active,
+        &.dropdown-toggle.show {
+            background-color: $fbb-navigation-hover-color;
+        }
+    }
+}
+
+.flaskbb-breadcrumb {
+    border: 1px solid $border-color;
+    border-radius: 0;
+
+    padding: 0.5em 1em;
+}
+
+p.flaskbb-stats {
+    margin: 0;
+    padding: 0;
+}
+
+.controls-row {
+    padding: 0.5em 0;
+    margin: 0;
+
+    .pagination {
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.controls-col {
+    margin: 0;
+    padding: 0;
+}
+
+.settings-col {
+    padding: 0;
+}
+
+.conversation-content img,
+.message-content img {
+    &:not(.emoji) {
+        width: 100%;
+        height:100%;
+        object-fit: scale-down;
+    }
+}
+
+.cheatsheet {
+    h2 {
+        text-align: center;
+        font-size: 1.6em;
+        border-radius: 2px;
+        background-clip: padding-box;
+        padding: 10px 0;
+    }
+    .emojis {
+        text-align: center;
+    }
+
+    .typography {
+        column-count: 3;
+        column-gap: 4px;
+        text-align: center;
+    }
+    .code-example {
+        width: 100%;
+        position: relative;
+        margin-bottom: 1em;
+        column-count: 2;
+        column-gap: -4px;
+        .markup {
+            padding: 0;
+        }
+    }
+}
+
+.textcomplete-dropdown {
+    border: 1px solid $fbb-border-color;
+    background-color: $fbb-navigation-bg;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.textcomplete-dropdown li {
+    margin: 0;
+}
+
+.textcomplete-footer,
+.textcomplete-item {
+    border-top: 1px solid $fbb-border-color;
+}
+
+.textcomplete-item {
+    padding: 2px 5px;
+    cursor: pointer;
+}
+
+.textcomplete-item:hover,
+.textcomplete-item.active {
+    background-color: $fbb-navigation-hover-color;
+}

@@ -1,0 +1,56 @@
+// forum specific values
+.forum {
+
+    .forum-header {
+        font-weight: bold;
+    }
+
+    .forum-body {
+        padding: 0;
+    }
+
+    .forum-meta {
+        font-weight: bold;
+        padding-top: 0.5em;
+        height: 2.5em;
+        background-color: $page-meta-bg;
+        border-bottom: 1px solid $page-meta-border;
+
+        .topic-name, .topic-stats, .topic-last-post {
+            font-weight: bold;
+        }
+    }
+
+    .topic-info {
+        position: relative;
+
+        .topic-status {
+            float: left;
+            font-size: 1.5em;
+            padding-right: 0.5em;
+        }
+
+        .topic-name {
+            font-weight: bold;
+        }
+
+        .topic-pages {
+            font-weight: normal;
+            font-size: small;
+        }
+    }
+
+    .forum-row {
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid $page-border;
+        }
+
+        &.hover:hover {
+            background-color: $page-hover;
+        }
+    }
+}

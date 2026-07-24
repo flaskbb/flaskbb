@@ -1,0 +1,127 @@
+.page-body.profile-body {
+    background-color: $author-box-bg;
+}
+
+// The profile header carries Bootstrap's .bg-white utility in the shared
+// template; override it (it uses !important) so it matches the dark card.
+.profile-header.bg-white {
+    background-color: $page-head-bg !important;
+}
+
+.profile-content {
+    background-color: $page-bg;
+    min-height: 100%;
+
+    .topic-head {
+        font-weight: normal;
+    }
+
+    .topic-created {
+        font-size: 0.75em;
+        padding-bottom: 0.75em;
+    }
+}
+
+.profile-picture {
+    text-align: center;
+
+    img {
+        float: none;
+        margin: 0 auto;
+        width: 50%;
+        height: 50%;
+        -webkit-border-radius: 50% !important;
+        -moz-border-radius: 50% !important;
+        border-radius: 50% !important;
+    }
+}
+
+.profile-sidebar-stats {
+    text-shadow: none;
+}
+
+.profile-groupname {
+    color: $fresh-blue;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.profile-buttons {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+
+    .btn {
+        text-shadow: none;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 15px;
+        margin-right: 5px;
+    }
+}
+
+// conversation specific values
+.conversation {
+    margin-bottom: 0;
+
+    .conversation-header {
+        font-weight: bold;
+    }
+
+    .conversation-body {
+        padding: 0;
+    }
+
+
+    .conversation-row {
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        &:not(:last-child) {
+            border-bottom: 1px solid $page-border;
+        }
+        &.hover:hover {
+            background-color: $page-hover;
+        }
+        &.unread {
+            background-color: $page-head-bg;
+        }
+    }
+}
+
+.conversation {
+    .conversation-body {
+        .row > .conversation-row {
+            &:not(:last-child) {
+                border-bottom: 1px solid $page-border;
+            }
+        }
+    }
+
+    .conversation-message {
+        min-height: 16em;
+        padding: 0.5em;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+
+        .message-content {
+            padding-top: 0.5em;
+        }
+
+        .message-footer {
+            width: 100%;
+            bottom: 0;
+            position: absolute;
+            .right {
+                margin-right: 46px;
+                float: right;
+            }
+            .left {
+                float: left;
+            }
+        }
+
+    }
+
+}

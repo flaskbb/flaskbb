@@ -1,0 +1,235 @@
+// Aurora Dark - a dark variant of the default Aurora theme.
+// Only the color palette differs from Aurora; layout/spacing variables
+// are kept identical so both themes stay visually in sync.
+
+// bootstrap5 colors
+$green: #3fb950;
+
+// flaskbb accent colors - brightened so they stay legible on dark surfaces
+$blue: #58a6ff;
+$red: #f85149;
+$fresh-blue: #388bfd;
+$light-blue: #79c0ff;
+$dark-green: #3fb950;
+$orange: #d29922;
+$gray: #8b949e;
+$black: #000;
+$white: #fff;
+
+
+// FlaskBB Variables
+$fbb-color: #c9d1d9;              // primary body text
+$fbb-bg: #0d1117;                 // body background (deepest surface)
+$fbb-border-color: #30363d;
+$fbb-active-bg: #21262d;
+$fbb-link-color: #58a6ff;
+$fbb-link-hover-color: #79c0ff;
+
+$fbb-bg-dark: #010409;
+$fbb-bg-light: #161b22;
+
+
+// header && footer colors
+$fbb-header-title-color: #fff;
+$fbb-header-subtitle-color: #adbac7;
+$fbb-header-bg-primary: #1f6feb;
+$fbb-header-bg-secondary: #133a8e;
+$fbb-footer-bg: #010409;
+
+$fbb-navigation-color: #c9d1d9;
+$fbb-navigation-bg: #161b22;
+$fbb-navigation-hover-color: #21262d;
+
+
+// page colors
+$page-bg: #161b22;         // page body background (cards, posts)
+$page-head-bg: #1c2128;    // page head background
+$page-meta-bg: #21262d;    // page meta background
+$page-meta-border: $fbb-border-color;   // page meta (bottom) border
+$page-border: $fbb-border-color;        // page border (all over)
+$page-hover: #1c2128;                   // page-row hover
+
+
+// post colors
+$post-box-bg: $page-bg;
+$post-box-border: $fbb-border-color;
+$post-meta-border: $fbb-border-color;
+$post-meta-bg: $page-head-bg;
+$post-signature-border: $fbb-border-color;
+$post-footer-border: $fbb-border-color;
+$post-footer-bg: $page-head-bg;
+
+$author-box-bg: #1c2128;
+$author-online: $green;
+$author-offline: $gray;
+
+
+// Bootstrap Variables
+//
+// For more variables check out this file:
+// https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss
+//
+$body-bg:                   $fbb-bg;
+$body-color:                $fbb-color;
+
+// Bootstrap greyscale - flipped so component defaults land on dark
+$gray-100: #161b22;
+$gray-200: #21262d;
+$gray-300: #30363d;
+$gray-400: #3a4048;
+$gray-500: #484f58;
+$gray-600: #6e7681;
+$gray-700: #8b949e;
+$gray-800: #b1bac4;
+$gray-900: #c9d1d9;
+
+// Links
+$link-color:                              $fbb-link-color;
+$link-hover-color:                        $fbb-link-hover-color;
+$link-decoration:                         none;
+$link-shade-percentage:                   20%;
+$link-hover-decoration:                   underline;
+
+// Shared component surfaces
+$component-active-bg:               $fresh-blue;
+$border-color:                      $fbb-border-color;
+
+// Body secondary/tertiary (bs 5.3 uses these for muted text/surfaces)
+$body-secondary-color:              $gray;
+$body-secondary-bg:                 $page-head-bg;
+$body-tertiary-color:               $gray;
+$body-tertiary-bg:                  $page-meta-bg;
+
+$secondary-color:                   $gray;
+$secondary-bg:                      $page-head-bg;
+
+// Dropdown
+$dropdown-bg:                       $fbb-navigation-bg;
+$dropdown-color:                    $fbb-color;
+$dropdown-border-color:             $fbb-border-color;
+$dropdown-divider-bg:               $fbb-border-color;
+$dropdown-link-color:               $fbb-color;
+$dropdown-link-hover-color:         $fbb-color;
+$dropdown-link-hover-bg:            $fbb-navigation-hover-color;
+$dropdown-link-active-color:        $white;
+$dropdown-link-active-bg:           $fresh-blue;
+$dropdown-header-color:             $gray;
+
+// Cards
+$card-bg:                           $page-bg;
+$card-color:                        $fbb-color;
+$card-border-color:                 $fbb-border-color;
+$card-border-radius:                none;
+$card-cap-bg:                       $page-head-bg;
+$card-cap-color:                    $fbb-color;
+
+// Forms / inputs
+$input-bg:                          $fbb-bg-light;
+$input-disabled-bg:                 $page-head-bg;
+$input-color:                       $fbb-color;
+$input-border-color:                $fbb-border-color;
+$input-placeholder-color:           $gray;
+$input-group-addon-bg:              $page-head-bg;
+$input-group-addon-color:           $fbb-color;
+$form-select-bg:                    $input-bg;
+$form-select-color:                 $fbb-color;
+$form-select-border-color:          $fbb-border-color;
+$form-check-input-bg:               $input-bg;
+$form-check-input-border:           1px solid $fbb-border-color;
+$form-label-color:                  $fbb-color;
+$form-text-color:                   $gray;
+
+// Tables
+$table-color:                       $fbb-color;
+$table-bg:                          transparent;
+$table-border-color:                $fbb-border-color;
+$table-striped-bg:                  rgba(255, 255, 255, 0.03);
+$table-hover-bg:                    rgba(255, 255, 255, 0.06);
+$table-active-bg:                   rgba(255, 255, 255, 0.08);
+
+// Modals
+$modal-content-bg:                  $page-bg;
+$modal-content-color:               $fbb-color;
+$modal-content-border-color:        $fbb-border-color;
+$modal-header-border-color:         $fbb-border-color;
+$modal-footer-border-color:         $fbb-border-color;
+$modal-backdrop-bg:                 #000;
+$modal-backdrop-opacity:            .6;
+
+// List group
+$list-group-bg:                     $page-bg;
+$list-group-color:                  $fbb-color;
+$list-group-border-color:           $fbb-border-color;
+$list-group-hover-bg:               $page-hover;
+$list-group-action-color:           $fbb-color;
+$list-group-action-hover-color:     $fbb-color;
+$list-group-active-bg:              $fresh-blue;
+$list-group-active-border-color:    $fresh-blue;
+
+// Pagination
+$pagination-bg:                     $fbb-navigation-bg;
+$pagination-color:                  $fbb-link-color;
+$pagination-border-color:           $fbb-border-color;
+$pagination-hover-bg:               $fbb-navigation-hover-color;
+$pagination-hover-color:            $fbb-link-hover-color;
+$pagination-hover-border-color:     $fbb-border-color;
+$pagination-focus-bg:               $fbb-navigation-hover-color;
+$pagination-disabled-bg:            $page-head-bg;
+$pagination-disabled-color:         $gray;
+$pagination-disabled-border-color:  $fbb-border-color;
+$pagination-active-bg:              $fresh-blue;
+$pagination-active-border-color:    $fresh-blue;
+
+// Breadcrumb
+$breadcrumb-bg:                     $fbb-navigation-bg;
+$breadcrumb-divider-color:          $gray;
+$breadcrumb-active-color:           $gray;
+
+// Nav / tabs
+$nav-tabs-border-color:             $fbb-border-color;
+$nav-tabs-link-hover-border-color:  $fbb-border-color;
+$nav-tabs-link-active-color:        $fbb-color;
+$nav-tabs-link-active-bg:           $page-bg;
+$nav-tabs-link-active-border-color: $fbb-border-color;
+$nav-link-color:                    $fbb-link-color;
+$nav-link-hover-color:              $fbb-link-hover-color;
+
+// Navbar (the markup uses the light navbar variant)
+$navbar-light-color:                $fbb-color;
+$navbar-light-hover-color:          $fbb-link-hover-color;
+$navbar-light-active-color:         $white;
+$navbar-light-brand-color:          $fbb-color;
+$navbar-light-brand-hover-color:    $fbb-color;
+
+// Close button - invert the default dark glyph so it shows on dark surfaces
+$btn-close-color:                   $fbb-color;
+$btn-close-white-filter:            invert(1) grayscale(100%) brightness(200%);
+
+// Tooltips / popovers - bs 5.3 defaults to emphasis-color (near black) on
+// body-bg (also near black here), which is unreadable on a dark theme.
+$tooltip-color:                     #f0f6fc;
+$tooltip-bg:                        #3a4048;
+$tooltip-opacity:                   1;
+$popover-bg:                        $page-head-bg;
+$popover-border-color:              $fbb-border-color;
+$popover-header-bg:                 $page-meta-bg;
+$popover-body-color:                $fbb-color;
+
+// Code
+$code-color:                        #e685b5;
+$pre-color:                         $fbb-color;
+
+// Border
+$border-width:                1px;
+$border-widths: (
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px
+);
+
+$border-radius:               .25rem;
+$border-radius-sm:            .2rem;
+$border-radius-lg:            .3rem;
+$border-radius-pill:          50rem;

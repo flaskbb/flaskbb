@@ -1,0 +1,28 @@
+{
+  "name": "flaskbb-theme-aurora-dark",
+  "description": "A dark variant of the default Aurora theme for FlaskBB.",
+  "version": "1.0.0",
+  "license": "BSD-3-Clause",
+  "author": "Peter Justin <peter.justin@outlook.com>",
+  "url": "https://flaskbb.com",
+  "private": true,
+  "main": "src/styles.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flaskbb/flaskbb"
+  },
+  "bugs": "https://github.com/flaskbb/flaskbb/issues",
+  "keywords": [
+    "flaskbb",
+    "theme",
+    "aurora",
+    "dark"
+  ],
+  "scripts": {
+    "build": "npx webpack --config webpack.prod.js",
+    "watch": "npx webpack --config webpack.dev.js --watch"
+  },
+  "comments": {
+    "dependencies": "Aurora Dark ships CSS only and reuses the default Aurora theme's installed dependencies at build time. It requires to build the Aurora theme first."
+  }
+}

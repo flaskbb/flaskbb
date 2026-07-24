@@ -1,0 +1,11 @@
+{
+  "application": "flaskbb",
+  "identifier": "aurora_dark",
+  "name": "Aurora Dark",
+  "author": "sh4nks",
+  "license": "BSD 3-Clause",
+  "website": "https://flaskbb.com",
+  "description": "A dark variant of the default Aurora theme for FlaskBB.",
+  "preview": "preview.png",
+  "version": "1.0.0"
+}

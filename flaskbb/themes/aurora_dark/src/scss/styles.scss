@@ -1,0 +1,46 @@
+// Import custom Bootstrap variables
+@import "variables";
+@import "bootstrap/scss/bootstrap";
+
+// Import fontawesome icons.
+// The font files themselves are reused from the default theme's static
+// folder (served at /static), so they are not re-emitted for this theme.
+$fa-font-path: "/static";
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/solid";
+@import "@fortawesome/fontawesome-free/scss/regular";
+
+// Import FlaskBB theme
+@import "text";
+@import "misc";
+@import "navigation";
+@import "button";
+
+@import "category";
+@import "forum";
+@import "topic";
+@import "page";
+@import "profile";
+@import "search";
+
+@import "management";
+
+// Import pygments style (monokai)
+@import "pygments";
+
+// The monokai background clashes with the theme's blue-grey background.
+// use a more sane background
+.highlight {
+    padding: 0.75rem 1rem;
+    background: $fbb-bg-dark;
+    border: 1px solid $fbb-border-color;
+    border-radius: $border-radius;
+
+    pre {
+        margin-bottom: 0;
+    }
+
+    .hll {
+        background-color: rgba(240, 246, 252, 0.08);
+    }
+}
