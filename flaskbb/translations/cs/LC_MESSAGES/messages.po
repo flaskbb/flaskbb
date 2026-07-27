@@ -8,64 +8,66 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-02-08 16:25+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2026-07-27 22:33+0000\n"
+"Last-Translator: Michal Várady <miko.vaji@gmail.com>\n"
+"Language-Team: Czech <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"cs/>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.8.dev0\n"
 
 #: flaskbb/deprecation.py:72
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr ""
+msgstr "%(name)s je zastaralý a bude odstraněn ve verzi %(version)s."
 
 #: flaskbb/email.py:32
 msgid "Password Recovery Confirmation"
-msgstr ""
+msgstr "Potvrzení obnovení hesla"
 
 #: flaskbb/email.py:52 flaskbb/templates/auth/account_activation.html:1
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
-msgstr ""
+msgstr "Aktivace účtu"
 
 #: flaskbb/auth/forms.py:38 flaskbb/management/forms.py:54
 msgid "You can only use letters, numbers or dashes."
-msgstr ""
+msgstr "Můžete použít pouze písmena, číslice nebo pomlčky."
 
 #: flaskbb/auth/forms.py:44
 msgid "Username or Email address"
-msgstr ""
+msgstr "Uživatelské jméno nebo e-mailová adresa"
 
 #: flaskbb/auth/forms.py:46
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "Zadejte své uživatelské jméno nebo e-mailovou adresu."
 
 #: flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:83 flaskbb/auth/forms.py:107
 #: flaskbb/auth/forms.py:140 flaskbb/user/forms.py:89
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:108 flaskbb/user/forms.py:90
 msgid "Please enter your password."
-msgstr ""
+msgstr "Zadejte své heslo."
 
 #: flaskbb/auth/forms.py:55
 msgid "Remember me"
-msgstr ""
+msgstr "Zapamatovat si mě"
 
 #: flaskbb/auth/forms.py:57 flaskbb/templates/auth/login.html:1
 #: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:185
 msgid "Login"
-msgstr ""
+msgstr "Přihlásit se"
 
 #: flaskbb/auth/forms.py:58 flaskbb/auth/forms.py:62 flaskbb/auth/forms.py:92
 #: flaskbb/auth/forms.py:123
 msgid "Captcha"
-msgstr ""
+msgstr "CAPTCHA"
 
 #: flaskbb/auth/forms.py:67 flaskbb/auth/forms.py:154
 #: flaskbb/management/forms.py:84 flaskbb/templates/forum/memberlist.html:40
@@ -73,254 +75,260 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:60
 #: flaskbb/templates/management/users.html:60
 msgid "Username"
-msgstr ""
+msgstr "Uživatelské jméno"
 
 #: flaskbb/auth/forms.py:69
 msgid "A valid username is required"
-msgstr ""
+msgstr "Je vyžadováno platné uživatelské jméno."
 
 #: flaskbb/auth/forms.py:75 flaskbb/auth/forms.py:116 flaskbb/auth/forms.py:132
 #: flaskbb/auth/forms.py:162 flaskbb/management/forms.py:92
 msgid "Email address"
-msgstr ""
+msgstr "E-mailová adresa"
 
 #: flaskbb/auth/forms.py:77 flaskbb/auth/forms.py:118 flaskbb/auth/forms.py:134
 #: flaskbb/auth/forms.py:164 flaskbb/management/forms.py:94
 #: flaskbb/user/forms.py:60
 msgid "A valid email address is required."
-msgstr ""
+msgstr "Je vyžadována platná e-mailová adresa."
 
 #: flaskbb/auth/forms.py:78 flaskbb/auth/forms.py:165
 #: flaskbb/management/forms.py:95 flaskbb/user/forms.py:61
 #: flaskbb/user/forms.py:69 flaskbb/user/forms.py:74
 msgid "Invalid email address."
-msgstr ""
+msgstr "Neplatná e-mailová adresa."
 
 #: flaskbb/auth/forms.py:86 flaskbb/auth/forms.py:143
 msgid "Passwords must match."
-msgstr ""
+msgstr "Hesla se musí shodovat."
 
 #: flaskbb/auth/forms.py:90 flaskbb/auth/forms.py:147
 msgid "Confirm password"
-msgstr ""
+msgstr "Potvrzení hesla"
 
 #: flaskbb/auth/forms.py:94 flaskbb/user/forms.py:48
 msgid "Language"
-msgstr ""
+msgstr "Jazyk"
 
 #: flaskbb/auth/forms.py:97
 msgid "I accept the Terms of Service"
-msgstr ""
+msgstr "Souhlasím s podmínkami používání"
 
 #: flaskbb/auth/forms.py:98
 msgid "Please accept the TOS."
-msgstr ""
+msgstr "Přijměte podmínky používání."
 
 #: flaskbb/auth/forms.py:102 flaskbb/templates/auth/register.html:1
 #: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:208
 msgid "Register"
-msgstr ""
+msgstr "Registrovat se"
 
 #: flaskbb/auth/forms.py:111 flaskbb/templates/auth/reauth.html:1
 #: flaskbb/templates/auth/reauth.html:10
 msgid "Refresh Login"
-msgstr ""
+msgstr "Obnovit přihlášení"
 
 #: flaskbb/auth/forms.py:125
 msgid "Request Password"
-msgstr ""
+msgstr "Požádat o obnovení hesla"
 
 #: flaskbb/auth/forms.py:149
 msgid "Reset password"
-msgstr ""
+msgstr "Obnovit heslo"
 
 #: flaskbb/auth/forms.py:156 flaskbb/management/forms.py:86
 msgid "A valid username is required."
-msgstr ""
+msgstr "Je vyžadováno platné uživatelské jméno."
 
 #: flaskbb/auth/forms.py:169
 msgid "Send Confirmation Mail"
-msgstr ""
+msgstr "Odeslat potvrzovací e-mail"
 
 #: flaskbb/auth/forms.py:174
 msgid "Email confirmation token"
-msgstr ""
+msgstr "Potvrzovací token e-mailu"
 
 #: flaskbb/auth/forms.py:175
 msgid "Please enter the token we have sent to you."
-msgstr ""
+msgstr "Zadejte token, který jsme vám odeslali."
 
 #: flaskbb/auth/forms.py:177
 msgid "Confirm Email"
-msgstr ""
+msgstr "Potvrdit e-mail"
 
 #: flaskbb/auth/views.py:73
 msgid "Logged out"
-msgstr ""
+msgstr "Odhlášeno"
 
 #: flaskbb/auth/views.py:104
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "Při zpracování přihlášení došlo k neopravitelné chybě."
 
 #: flaskbb/auth/views.py:130
 msgid "Reauthenticated."
-msgstr ""
+msgstr "Opětovné ověření proběhlo."
 
 #: flaskbb/auth/views.py:135
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "Při opětovném ověření došlo k neopravitelné chybě."
 
 #: flaskbb/auth/views.py:179
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "Registraci nelze zpracovat kvůli neopravitelné chybě."
 
 #: flaskbb/auth/views.py:212
 msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
+"Zadali jste uživatelské jméno nebo e-mailovou adresu, které nejsou propojeny "
+"s vaším účtem."
 
 #: flaskbb/auth/views.py:218
 msgid "Email sent! Please check your inbox."
-msgstr ""
+msgstr "E-mail byl odeslán. Zkontrolujte svou doručenou poštu."
 
 #: flaskbb/auth/views.py:251
 msgid "Error when resetting password"
-msgstr ""
+msgstr "Při obnovování hesla došlo k chybě."
 
 #: flaskbb/auth/views.py:262
 msgid "Your password has been updated."
-msgstr ""
+msgstr "Vaše heslo bylo aktualizováno."
 
 #: flaskbb/auth/views.py:290
 msgid "A new account activation token has been sent to your email address."
-msgstr ""
+msgstr "Na vaši e-mailovou adresu byl odeslán nový token pro aktivaci účtu."
 
 #: flaskbb/auth/views.py:325 flaskbb/auth/views.py:371
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "Účet nelze aktivovat kvůli neopravitelné chybě."
 
 #: flaskbb/auth/views.py:333 flaskbb/auth/views.py:379
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "Váš účet byl aktivován a nyní se můžete přihlásit."
 
 #: flaskbb/auth/services/activation.py:36
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "Zadaný e-mail neexistuje."
 
 #: flaskbb/auth/services/activation.py:39
 #: flaskbb/auth/services/activation.py:59
 msgid "Account is already activated"
-msgstr ""
+msgstr "Účet je již aktivován."
 
 #: flaskbb/auth/services/authentication.py:74
 msgid "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"Váš účet je momentálně uzamčen kvůli příliš mnoha neúspěšným pokusům o "
+"přihlášení."
 
 #: flaskbb/auth/services/authentication.py:135
 msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
+"Abyste mohli používat svůj účet, musíte jej aktivovat pomocí odkazu, který "
+"jsme vám odeslali na e-mailovou adresu."
 
 #: flaskbb/auth/services/authentication.py:168
 msgid "Wrong username or password."
-msgstr ""
+msgstr "Nesprávné uživatelské jméno nebo heslo."
 
 #: flaskbb/auth/services/password.py:37
 msgid "Invalid email"
-msgstr ""
+msgstr "Neplatný e-mail"
 
 #: flaskbb/auth/services/reauthentication.py:76
 msgid "Wrong password."
-msgstr ""
+msgstr "Nesprávné heslo."
 
 #: flaskbb/auth/services/registration.py:81
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "Uživatelské jméno musí mít %(min)s až %(max)s znaků."
 
 #: flaskbb/auth/services/registration.py:92
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s je zakázané uživatelské jméno."
 
 #: flaskbb/auth/services/registration.py:116
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s je již zaregistrováno."
 
 #: flaskbb/auth/services/registration.py:139
 #: flaskbb/user/services/validators.py:39
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s je již zaregistrována."
 
 #: flaskbb/auth/services/registration.py:158
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
-msgstr ""
+msgstr "Na adresu %(email)s byl odeslán e-mail pro aktivaci účtu."
 
 #: flaskbb/auth/services/registration.py:172
 msgid "Thanks for registering."
-msgstr ""
+msgstr "Děkujeme za registraci."
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "Token je neplatný."
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "Platnost tokenu vypršela."
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "Token nelze zpracovat."
 
 #: flaskbb/forum/forms.py:35 flaskbb/forum/forms.py:86
 #: flaskbb/forum/forms.py:182
 msgid "Content"
-msgstr ""
+msgstr "Obsah"
 
 #: flaskbb/forum/forms.py:37 flaskbb/forum/forms.py:88
 msgid "You cannot post a reply without content."
-msgstr ""
+msgstr "Nemůžete odeslat odpověď bez obsahu."
 
 #: flaskbb/forum/forms.py:41 flaskbb/templates/forum/topic_controls.html:110
 msgid "Reply"
-msgstr ""
+msgstr "Odpovědět"
 
 #: flaskbb/forum/forms.py:55 flaskbb/forum/forms.py:93
 msgid "Track this topic"
-msgstr ""
+msgstr "Sledovat toto téma"
 
 #: flaskbb/forum/forms.py:81
 msgid "Topic title"
-msgstr ""
+msgstr "Název tématu"
 
 #: flaskbb/forum/forms.py:82
 msgid "Please choose a title for your topic."
-msgstr ""
+msgstr "Zvolte pro své téma název."
 
 #: flaskbb/forum/forms.py:96
 msgid "Post topic"
-msgstr ""
+msgstr "Odeslat téma"
 
 #: flaskbb/forum/forms.py:115
 msgid "Save topic"
-msgstr ""
+msgstr "Uložit téma"
 
 #: flaskbb/forum/forms.py:151 flaskbb/templates/management/reports.html:39
 msgid "Reason"
-msgstr ""
+msgstr "Důvod"
 
 #: flaskbb/forum/forms.py:153
 msgid "What is the reason for reporting this post?"
-msgstr ""
+msgstr "Jaký je důvod nahlášení tohoto příspěvku?"
 
 #: flaskbb/forum/forms.py:157
 msgid "Report post"
-msgstr ""
+msgstr "Nahlásit příspěvek"
 
 #: flaskbb/forum/forms.py:166 flaskbb/forum/forms.py:169
 #: flaskbb/forum/forms.py:192 flaskbb/templates/forum/memberlist.html:26
@@ -333,22 +341,22 @@ msgstr ""
 #: flaskbb/templates/management/banned_users.html:40
 #: flaskbb/templates/management/users.html:40
 msgid "Search"
-msgstr ""
+msgstr "Hledat"
 
 #: flaskbb/forum/forms.py:178
 msgid "Criteria"
-msgstr ""
+msgstr "Kritéria"
 
 #: flaskbb/forum/forms.py:185
 msgid "Post"
-msgstr ""
+msgstr "Příspěvek"
 
 #: flaskbb/forum/forms.py:186 flaskbb/templates/forum/_forum_meta.html:2
 #: flaskbb/templates/forum/search_result.html:129
 #: flaskbb/templates/forum/topictracker.html:31
 #: flaskbb/templates/management/reports.html:38
 msgid "Topic"
-msgstr ""
+msgstr "Téma"
 
 #: flaskbb/forum/forms.py:187 flaskbb/templates/forum/category.html:9
 #: flaskbb/templates/forum/category_layout.html:8
@@ -382,624 +390,628 @@ msgstr ""
 #: flaskbb/templates/user/profile.html:5
 #: flaskbb/templates/user/settings_layout.html:8
 msgid "Forum"
-msgstr ""
+msgstr "Fórum"
 
 #: flaskbb/forum/forms.py:188 flaskbb/templates/forum/search_result.html:94
 #: flaskbb/templates/management/users.html:1
 #: flaskbb/templates/management/users.html:36
 msgid "Users"
-msgstr ""
+msgstr "Uživatelé"
 
 #: flaskbb/forum/views.py:135 flaskbb/forum/views.py:922
 #: flaskbb/forum/views.py:940 flaskbb/forum/views.py:1027
 #: flaskbb/forum/views.py:1047
 msgid "You are not allowed to access that forum"
-msgstr ""
+msgstr "Nemáte oprávnění k přístupu do tohoto fóra."
 
 #: flaskbb/forum/views.py:172 flaskbb/forum/views.py:205
 msgid "You are not allowed to access that topic"
-msgstr ""
+msgstr "Nemáte oprávnění k přístupu k tomuto tématu."
 
 #: flaskbb/forum/views.py:247
 msgid "You are not allowed to post a reply to this topic."
-msgstr ""
+msgstr "Nemáte oprávnění odpovědět na toto téma."
 
 #: flaskbb/forum/views.py:260
 msgid "Cannot post reply"
-msgstr ""
+msgstr "Nelze odeslat odpověď"
 
 #: flaskbb/forum/views.py:285
 msgid "You are not allowed to post a topic here"
-msgstr ""
+msgstr "Nemáte oprávnění zde založit téma."
 
 #: flaskbb/forum/views.py:327
 msgid "You are not allowed to edit that topic"
-msgstr ""
+msgstr "Nemáte oprávnění upravovat toto téma."
 
 #: flaskbb/forum/views.py:369
 msgid "You are not allowed to manage this forum"
-msgstr ""
+msgstr "Nemáte oprávnění spravovat toto fórum."
 
 #: flaskbb/forum/views.py:428
 msgid "In order to perform this action you have to select at least one topic."
-msgstr ""
+msgstr "Chcete-li provést tuto akci, musíte vybrat alespoň jedno téma."
 
 #: flaskbb/forum/views.py:444
 #, python-format
 msgid "%(count)s topics locked."
-msgstr ""
+msgstr "Bylo uzamčeno %(count)s témat."
 
 #: flaskbb/forum/views.py:454
 #, python-format
 msgid "%(count)s topics unlocked."
-msgstr ""
+msgstr "Bylo odemčeno %(count)s témat."
 
 #: flaskbb/forum/views.py:465
 #, python-format
 msgid "%(count)s topics highlighted."
-msgstr ""
+msgstr "Bylo zvýrazněno %(count)s témat."
 
 #: flaskbb/forum/views.py:475
 #, python-format
 msgid "%(count)s topics trivialized."
-msgstr ""
+msgstr "U %(count)s témat bylo zrušeno zvýraznění."
 
 #: flaskbb/forum/views.py:486
 #, python-format
 msgid "%(count)s topics deleted."
-msgstr ""
+msgstr "Bylo smazáno %(count)s témat."
 
 #: flaskbb/forum/views.py:494
 msgid "Please choose a new forum for the topics."
-msgstr ""
+msgstr "Vyberte pro témata nové fórum."
 
 #: flaskbb/forum/views.py:507
 msgid "You do not have the permissions to move this topic."
-msgstr ""
+msgstr "Nemáte oprávnění přesunout toto téma."
 
 #: flaskbb/forum/views.py:512
 msgid "Topics moved."
-msgstr ""
+msgstr "Témata byla přesunuta."
 
 #: flaskbb/forum/views.py:514
 msgid "Failed to move topics."
-msgstr ""
+msgstr "Témata se nepodařilo přesunout."
 
 #: flaskbb/forum/views.py:523
 #, python-format
 msgid "%(count)s topics hidden."
-msgstr ""
+msgstr "Bylo skryto %(count)s témat."
 
 #: flaskbb/forum/views.py:533
 #, python-format
 msgid "%(count)s topics unhidden."
-msgstr ""
+msgstr "U %(count)s témat bylo zrušeno skrytí."
 
 #: flaskbb/forum/views.py:537
 msgid "Unknown action requested"
-msgstr ""
+msgstr "Byla požadována neznámá akce."
 
 #: flaskbb/forum/views.py:548
 msgid "You are not allowed to post a reply"
-msgstr ""
+msgstr "Nemáte oprávnění odeslat odpověď."
 
 #: flaskbb/forum/views.py:593
 msgid "You are not allowed to edit that post"
-msgstr ""
+msgstr "Nemáte oprávnění upravovat tento příspěvek."
 
 #: flaskbb/forum/views.py:644
 msgid "Thanks for reporting."
-msgstr ""
+msgstr "Děkujeme za nahlášení."
 
 #: flaskbb/forum/views.py:765
 #, python-format
 msgid "%(topic_count)s topics untracked."
-msgstr ""
+msgstr "Sledování bylo zrušeno u %(topic_count)s témat."
 
 #: flaskbb/forum/views.py:792
 msgid "You are not allowed to delete this topic"
-msgstr ""
+msgstr "Nemáte oprávnění smazat toto téma."
 
 #: flaskbb/forum/views.py:812
 msgid "You are not allowed to lock this topic"
-msgstr ""
+msgstr "Nemáte oprávnění uzamknout toto téma."
 
 #: flaskbb/forum/views.py:833
 msgid "You are not allowed to unlock this topic"
-msgstr ""
+msgstr "Nemáte oprávnění odemknout toto téma."
 
 #: flaskbb/forum/views.py:854
 msgid "You are not allowed to highlight this topic"
-msgstr ""
+msgstr "Nemáte oprávnění zvýraznit toto téma."
 
 #: flaskbb/forum/views.py:875
 msgid "You are not allowed to trivialize this topic"
-msgstr ""
+msgstr "Nemáte oprávnění zrušit zvýraznění tohoto tématu."
 
 #: flaskbb/forum/views.py:896
 msgid "You are not allowed to delete this post"
-msgstr ""
+msgstr "Nemáte oprávnění smazat tento příspěvek."
 
 #: flaskbb/forum/views.py:977
 #, python-format
 msgid "Forum %(forum)s marked as read."
-msgstr ""
+msgstr "Fórum %(forum)s bylo označeno jako přečtené."
 
 #: flaskbb/forum/views.py:1005
 msgid "All forums marked as read."
-msgstr ""
+msgstr "Všechna fóra byla označena jako přečtená."
 
 #: flaskbb/forum/views.py:1070
 msgid "You do not have permission to hide this topic"
-msgstr ""
+msgstr "Nemáte oprávnění skrýt toto téma."
 
 #: flaskbb/forum/views.py:1088
 msgid "You do not have permission to unhide this topic"
-msgstr ""
+msgstr "Nemáte oprávnění zrušit skrytí tohoto tématu."
 
 #: flaskbb/forum/views.py:1104
 msgid "You do not have permission to hide this post"
-msgstr ""
+msgstr "Nemáte oprávnění skrýt tento příspěvek."
 
 #: flaskbb/forum/views.py:1108
 msgid "Post is already hidden"
-msgstr ""
+msgstr "Příspěvek je již skrytý."
 
 #: flaskbb/forum/views.py:1115
 msgid "Topic hidden"
-msgstr ""
+msgstr "Téma bylo skryto."
 
 #: flaskbb/forum/views.py:1117
 msgid "Post hidden"
-msgstr ""
+msgstr "Příspěvek byl skryt."
 
 #: flaskbb/forum/views.py:1133
 msgid "You do not have permission to unhide this post"
-msgstr ""
+msgstr "Nemáte oprávnění zrušit skrytí tohoto příspěvku."
 
 #: flaskbb/forum/views.py:1137
 msgid "Post is already unhidden"
-msgstr ""
+msgstr "U příspěvku již bylo zrušeno skrytí."
 
 #: flaskbb/forum/views.py:1142
 msgid "Post unhidden"
-msgstr ""
+msgstr "U příspěvku bylo zrušeno skrytí."
 
 #: flaskbb/management/forms.py:101 flaskbb/user/forms.py:109
 msgid "Birthday"
-msgstr ""
+msgstr "Datum narození"
 
 #: flaskbb/management/forms.py:103 flaskbb/user/forms.py:110
 msgid "Gender"
-msgstr ""
+msgstr "Pohlaví"
 
 #: flaskbb/management/forms.py:105 flaskbb/user/forms.py:111
 msgid "Location"
-msgstr ""
+msgstr "Místo"
 
 #: flaskbb/management/forms.py:107 flaskbb/user/forms.py:112
 msgid "Website"
-msgstr ""
+msgstr "Webové stránky"
 
 #: flaskbb/management/forms.py:109 flaskbb/user/forms.py:113
 msgid "Avatar"
-msgstr ""
+msgstr "Avatar"
 
 #: flaskbb/management/forms.py:111
 msgid "Forum signature"
-msgstr ""
+msgstr "Podpis ve fóru"
 
 #: flaskbb/management/forms.py:113 flaskbb/user/forms.py:115
 msgid "Notes"
-msgstr ""
+msgstr "Poznámky"
 
 #: flaskbb/management/forms.py:115
 msgid "Is active?"
-msgstr ""
+msgstr "Je aktivní?"
 
 #: flaskbb/management/forms.py:118
 msgid "Primary group"
-msgstr ""
+msgstr "Primární skupina"
 
 #: flaskbb/management/forms.py:122
 msgid "Secondary groups"
-msgstr ""
+msgstr "Sekundární skupiny"
 
 #: flaskbb/management/forms.py:129 flaskbb/management/forms.py:267
 #: flaskbb/management/forms.py:422 flaskbb/management/forms.py:508
 #: flaskbb/templates/management/settings.html:65 flaskbb/user/forms.py:50
 #: flaskbb/user/forms.py:76 flaskbb/user/forms.py:100 flaskbb/user/forms.py:116
 msgid "Save"
-msgstr ""
+msgstr "Uložit"
 
 #: flaskbb/management/forms.py:143
 msgid "This username is already taken."
-msgstr ""
+msgstr "Toto uživatelské jméno je již obsazeno."
 
 #: flaskbb/management/forms.py:157
 msgid "This email address is already taken."
-msgstr ""
+msgstr "Tato e-mailová adresa je již obsazena."
 
 #: flaskbb/management/forms.py:191
 msgid "Group name"
-msgstr ""
+msgstr "Název skupiny"
 
 #: flaskbb/management/forms.py:192
 msgid "Please enter a name for the group."
-msgstr ""
+msgstr "Zadejte název skupiny."
 
 #: flaskbb/management/forms.py:195 flaskbb/management/forms.py:373
 #: flaskbb/management/forms.py:495 flaskbb/templates/management/groups.html:37
 msgid "Description"
-msgstr ""
+msgstr "Popis"
 
 #: flaskbb/management/forms.py:198
 msgid "Is 'Admin' group?"
-msgstr ""
+msgstr "Je skupina „Admin“?"
 
 #: flaskbb/management/forms.py:199
 msgid "With this option the group has access to the admin panel."
-msgstr ""
+msgstr "S touto volbou má skupina přístup do administrátorského panelu."
 
 #: flaskbb/management/forms.py:202
 msgid "Is 'Super Moderator' group?"
-msgstr ""
+msgstr "Je skupina „Supermoderátor“?"
 
 #: flaskbb/management/forms.py:204
 msgid ""
 "Check this, if the users in this group are allowed to moderate every "
 "forum."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou moderovat každé fórum."
 
 #: flaskbb/management/forms.py:209
 msgid "Is 'Moderator' group?"
-msgstr ""
+msgstr "Je skupina „Moderátor“?"
 
 #: flaskbb/management/forms.py:211
 msgid ""
 "Check this, if the users in this group are allowed to moderate specified "
 "forums."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou moderovat určená fóra."
 
 #: flaskbb/management/forms.py:216
 msgid "Is 'Banned' group?"
-msgstr ""
+msgstr "Je skupina „Zakázaní“?"
 
 #: flaskbb/management/forms.py:217
 msgid "Only one group of type 'Banned' is allowed."
-msgstr ""
+msgstr "Je povolena pouze jedna skupina typu „Zakázaní“."
 
 #: flaskbb/management/forms.py:220
 msgid "Is 'Guest' group?"
-msgstr ""
+msgstr "Je skupina „Hosté“?"
 
 #: flaskbb/management/forms.py:221
 msgid "Only one group of type 'Guest' is allowed."
-msgstr ""
+msgstr "Je povolena pouze jedna skupina typu „Hosté“."
 
 #: flaskbb/management/forms.py:224
 msgid "Can edit posts"
-msgstr ""
+msgstr "Může upravovat příspěvky"
 
 #: flaskbb/management/forms.py:225
 msgid "Check this, if the users in this group can edit posts."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou upravovat příspěvky."
 
 #: flaskbb/management/forms.py:228
 msgid "Can delete posts"
-msgstr ""
+msgstr "Může mazat příspěvky"
 
 #: flaskbb/management/forms.py:229
 msgid "Check this, if the users in this group can delete posts."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou mazat příspěvky."
 
 #: flaskbb/management/forms.py:232
 msgid "Can delete topics"
-msgstr ""
+msgstr "Může mazat témata"
 
 #: flaskbb/management/forms.py:233
 msgid "Check this, if the users in this group can delete topics."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou mazat témata."
 
 #: flaskbb/management/forms.py:236
 msgid "Can create topics"
-msgstr ""
+msgstr "Může vytvářet témata"
 
 #: flaskbb/management/forms.py:237
 msgid "Check this, if the users in this group can create topics."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou vytvářet témata."
 
 #: flaskbb/management/forms.py:240
 msgid "Can post replies"
-msgstr ""
+msgstr "Může odesílat odpovědi"
 
 #: flaskbb/management/forms.py:241
 msgid "Check this, if the users in this group can post replies."
-msgstr ""
+msgstr "Zaškrtněte, pokud uživatelé v této skupině mohou odesílat odpovědi."
 
 #: flaskbb/management/forms.py:245
 msgid "Moderators can edit user profiles"
-msgstr ""
+msgstr "Moderátoři mohou upravovat uživatelské profily"
 
 #: flaskbb/management/forms.py:247
 msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
+"Povolit moderátorům upravovat profil jiného uživatele včetně změn hesla a e-"
+"mailu."
 
 #: flaskbb/management/forms.py:253
 msgid "Moderators can ban users"
-msgstr ""
+msgstr "Moderátoři mohou zakazovat uživatele"
 
 #: flaskbb/management/forms.py:254
 msgid "Allow moderators to ban other users."
-msgstr ""
+msgstr "Povolit moderátorům zakazovat jiné uživatele."
 
 #: flaskbb/management/forms.py:258
 msgid "Can view hidden posts and topics"
-msgstr ""
+msgstr "Může zobrazit skryté příspěvky a témata"
 
 #: flaskbb/management/forms.py:259
 msgid "Allows a user to view hidden posts and topics"
-msgstr ""
+msgstr "Umožňuje uživateli zobrazit skryté příspěvky a témata."
 
 #: flaskbb/management/forms.py:263
 msgid "Can hide posts and topics"
-msgstr ""
+msgstr "Může skrývat příspěvky a témata"
 
 #: flaskbb/management/forms.py:264
 msgid "Allows a user to hide posts and topics"
-msgstr ""
+msgstr "Umožňuje uživateli skrývat příspěvky a témata."
 
 #: flaskbb/management/forms.py:281
 msgid "This group name is already taken."
-msgstr ""
+msgstr "Tento název skupiny je již obsazen."
 
 #: flaskbb/management/forms.py:292
 msgid "There is already a group of type 'Banned'."
-msgstr ""
+msgstr "Skupina typu „Zakázaní“ již existuje."
 
 #: flaskbb/management/forms.py:303
 msgid "There is already a group of type 'Guest'."
-msgstr ""
+msgstr "Skupina typu „Hosté“ již existuje."
 
 #: flaskbb/management/forms.py:330
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "Této skupině nelze přiřadit žádná oprávnění."
 
 #: flaskbb/management/forms.py:368
 msgid "Forum title"
-msgstr ""
+msgstr "Název fóra"
 
 #: flaskbb/management/forms.py:369
 msgid "Please enter a forum title."
-msgstr ""
+msgstr "Zadejte název fóra."
 
 #: flaskbb/management/forms.py:375 flaskbb/management/forms.py:497
 msgid "You can format your description with Markdown."
-msgstr ""
+msgstr "Popis můžete formátovat pomocí Markdownu."
 
 #: flaskbb/management/forms.py:379 flaskbb/management/forms.py:501
 msgid "Position"
-msgstr ""
+msgstr "Pozice"
 
 #: flaskbb/management/forms.py:381
 msgid "Please enter a position for theforum."
-msgstr ""
+msgstr "Zadejte pozici fóra."
 
 #: flaskbb/management/forms.py:385
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #: flaskbb/management/forms.py:389
 msgid "The category that contains this forum."
-msgstr ""
+msgstr "Kategorie obsahující toto fórum."
 
 #: flaskbb/management/forms.py:393
 msgid "External link"
-msgstr ""
+msgstr "Externí odkaz"
 
 #: flaskbb/management/forms.py:395
 msgid "A link to a website i.e. 'http://flaskbb.com'."
-msgstr ""
+msgstr "Odkaz na web, např. „http://flaskbb.com“."
 
 #: flaskbb/management/forms.py:399
 #: flaskbb/templates/forum/category_layout.html:74
 #: flaskbb/templates/forum/search_result.html:278
 #: flaskbb/templates/management/forums.html:145
 msgid "Moderators"
-msgstr ""
+msgstr "Moderátoři"
 
 #: flaskbb/management/forms.py:401
 msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
+"Uživatelská jména oddělená čárkou. Nechte prázdné, nechcete-li nastavit "
+"žádné moderátory."
 
 #: flaskbb/management/forms.py:407
 msgid "Show moderators"
-msgstr ""
+msgstr "Zobrazovat moderátory"
 
 #: flaskbb/management/forms.py:408
 msgid "Do you want to show the moderators on the index page?"
-msgstr ""
+msgstr "Chcete zobrazovat moderátory na hlavní stránce?"
 
 #: flaskbb/management/forms.py:412
 msgid "Locked?"
-msgstr ""
+msgstr "Uzamčeno?"
 
 #: flaskbb/management/forms.py:412
 msgid "Disable new posts and topics in this forum."
-msgstr ""
+msgstr "Zakázat v tomto fóru nové příspěvky a témata."
 
 #: flaskbb/management/forms.py:416
 msgid "Group access"
-msgstr ""
+msgstr "Přístup skupin"
 
 #: flaskbb/management/forms.py:419
 msgid "Select the groups that can access this forum."
-msgstr ""
+msgstr "Vyberte skupiny, které mají přístup do tohoto fóra."
 
 #: flaskbb/management/forms.py:429
 msgid "You cannot convert a forum that contains topics into an external link."
-msgstr ""
+msgstr "Fórum obsahující témata nemůžete převést na externí odkaz."
 
 #: flaskbb/management/forms.py:436
 msgid "You also need to specify some moderators."
-msgstr ""
+msgstr "Musíte také určit některé moderátory."
 
 #: flaskbb/management/forms.py:447
 #, python-format
 msgid "%(user)s is not in a moderators group."
-msgstr ""
+msgstr "%(user)s není ve skupině moderátorů."
 
 #: flaskbb/management/forms.py:490
 msgid "Category title"
-msgstr ""
+msgstr "Název kategorie"
 
 #: flaskbb/management/forms.py:491
 msgid "Please enter a category title."
-msgstr ""
+msgstr "Zadejte název kategorie."
 
 #: flaskbb/management/forms.py:504
 msgid "Please enter a position for the category."
-msgstr ""
+msgstr "Zadejte pozici kategorie."
 
 #: flaskbb/management/views.py:71 flaskbb/management/views.py:1120
 msgid "You are not allowed to access the management settings"
-msgstr ""
+msgstr "Nemáte oprávnění k přístupu do nastavení správy."
 
 #: flaskbb/management/views.py:140
 msgid "Settings saved."
-msgstr ""
+msgstr "Nastavení bylo uloženo."
 
 #: flaskbb/management/views.py:156 flaskbb/management/views.py:204
 #: flaskbb/management/views.py:291 flaskbb/management/views.py:345
 #: flaskbb/management/views.py:375 flaskbb/management/views.py:432
 #: flaskbb/management/views.py:504
 msgid "You are not allowed to manage users"
-msgstr ""
+msgstr "Nemáte oprávnění spravovat uživatele."
 
 #: flaskbb/management/views.py:239 flaskbb/management/views.py:282
 msgid "Edit User"
-msgstr ""
+msgstr "Upravit uživatele"
 
 #: flaskbb/management/views.py:278
 msgid "User updated."
-msgstr ""
+msgstr "Uživatel byl aktualizován."
 
 #: flaskbb/management/views.py:332
 msgid "You cannot delete yourself."
-msgstr ""
+msgstr "Nemůžete smazat sami sebe."
 
 #: flaskbb/management/views.py:336
 msgid "User deleted."
-msgstr ""
+msgstr "Uživatel byl smazán."
 
 #: flaskbb/management/views.py:355 flaskbb/management/views.py:366
 #: flaskbb/templates/management/banned_users.html:25
 #: flaskbb/templates/management/user_form.html:27
 #: flaskbb/templates/management/users.html:25
 msgid "Add User"
-msgstr ""
+msgstr "Přidat uživatele"
 
 #: flaskbb/management/views.py:362
 msgid "User added."
-msgstr ""
+msgstr "Uživatel byl přidán."
 
 #: flaskbb/management/views.py:441
 msgid "You do not have the permissions to ban this user."
-msgstr ""
+msgstr "Nemáte oprávnění zakázat tohoto uživatele."
 
 #: flaskbb/management/views.py:469 flaskbb/templates/forum/topic.html:82
 #: flaskbb/templates/management/banned_users.html:101
 #: flaskbb/templates/management/users.html:126
 #: flaskbb/templates/user/profile_layout.html:66
 msgid "Unban"
-msgstr ""
+msgstr "Zrušit zákaz"
 
 #: flaskbb/management/views.py:488
 msgid "A moderator cannot ban an admin user."
-msgstr ""
+msgstr "Moderátor nemůže zakázat administrátorského uživatele."
 
 #: flaskbb/management/views.py:492
 msgid "User is now banned."
-msgstr ""
+msgstr "Uživatel má nyní zákaz."
 
 #: flaskbb/management/views.py:494
 msgid "Could not ban user."
-msgstr ""
+msgstr "Uživatele se nepodařilo zakázat."
 
 #: flaskbb/management/views.py:513
 msgid "You do not have the permissions to unban this user."
-msgstr ""
+msgstr "Nemáte oprávnění zrušit zákaz tohoto uživatele."
 
 #: flaskbb/management/views.py:531 flaskbb/templates/forum/topic.html:72
 #: flaskbb/templates/management/users.html:115
 #: flaskbb/templates/user/profile_layout.html:57
 msgid "Ban"
-msgstr ""
+msgstr "Zakázat"
 
 #: flaskbb/management/views.py:548
 msgid "User is now unbanned."
-msgstr ""
+msgstr "Uživateli byl zrušen zákaz."
 
 #: flaskbb/management/views.py:550
 msgid "Could not unban user."
-msgstr ""
+msgstr "Uživateli se nepodařilo zrušit zákaz."
 
 #: flaskbb/management/views.py:560 flaskbb/management/views.py:584
 #: flaskbb/management/views.py:614 flaskbb/management/views.py:653
 msgid "You are not allowed to modify groups."
-msgstr ""
+msgstr "Nemáte oprávnění upravovat skupiny."
 
 #: flaskbb/management/views.py:594 flaskbb/management/views.py:605
 #: flaskbb/templates/management/group_form.html:23
 #: flaskbb/templates/management/groups.html:22
 msgid "Add Group"
-msgstr ""
+msgstr "Přidat skupinu"
 
 #: flaskbb/management/views.py:601
 msgid "Group added."
-msgstr ""
+msgstr "Skupina byla přidána."
 
 #: flaskbb/management/views.py:626 flaskbb/management/views.py:644
 msgid "Edit Group"
-msgstr ""
+msgstr "Upravit skupinu"
 
 #: flaskbb/management/views.py:640
 msgid "Group updated."
-msgstr ""
+msgstr "Skupina byla aktualizována."
 
 #: flaskbb/management/views.py:689
 msgid "You cannot delete one of the standard groups."
-msgstr ""
+msgstr "Nemůžete smazat jednu ze standardních skupin."
 
 #: flaskbb/management/views.py:699
 msgid "You cannot delete the standard groups. Try renaming it instead."
-msgstr ""
+msgstr "Standardní skupiny nemůžete smazat. Zkuste ji raději přejmenovat."
 
 #: flaskbb/management/views.py:708
 msgid "Group deleted."
-msgstr ""
+msgstr "Skupina byla smazána."
 
 #: flaskbb/management/views.py:711
 msgid "No group chosen."
-msgstr ""
+msgstr "Nebyla vybrána žádná skupina."
 
 #: flaskbb/management/views.py:720 flaskbb/management/views.py:739
 #: flaskbb/management/views.py:789
 msgid "You are not allowed to modify forums."
-msgstr ""
+msgstr "Nemáte oprávnění upravovat fóra."
 
 #: flaskbb/management/views.py:760 flaskbb/management/views.py:780
 #: flaskbb/templates/management/forums.html:163
 msgid "Edit Forum"
-msgstr ""
+msgstr "Upravit fórum"
 
 #: flaskbb/management/views.py:769
 msgid "Forum updated."
-msgstr ""
+msgstr "Fórum bylo aktualizováno."
 
 #: flaskbb/management/views.py:809 flaskbb/management/views.py:828
 #: flaskbb/templates/management/category_form.html:22
@@ -1007,132 +1019,133 @@ msgstr ""
 #: flaskbb/templates/management/forums.html:22
 #: flaskbb/templates/management/forums.html:45
 msgid "Add Forum"
-msgstr ""
+msgstr "Přidat fórum"
 
 #: flaskbb/management/views.py:817
 msgid "Forum added."
-msgstr ""
+msgstr "Fórum bylo přidáno."
 
 #: flaskbb/management/views.py:837
 msgid "You are not allowed to modify forums"
-msgstr ""
+msgstr "Nemáte oprávnění upravovat fóra."
 
 #: flaskbb/management/views.py:853
 msgid "Forum deleted."
-msgstr ""
+msgstr "Fórum bylo smazáno."
 
 #: flaskbb/management/views.py:862 flaskbb/management/views.py:893
 #: flaskbb/management/views.py:930
 msgid "You are not allowed to modify categories"
-msgstr ""
+msgstr "Nemáte oprávnění upravovat kategorie."
 
 #: flaskbb/management/views.py:872 flaskbb/management/views.py:884
 #: flaskbb/templates/management/category_form.html:23
 #: flaskbb/templates/management/forum_form.html:24
 #: flaskbb/templates/management/forums.html:23
 msgid "Add Category"
-msgstr ""
+msgstr "Přidat kategorii"
 
 #: flaskbb/management/views.py:880
 msgid "Category added."
-msgstr ""
+msgstr "Kategorie byla přidána."
 
 #: flaskbb/management/views.py:907 flaskbb/management/views.py:921
 #: flaskbb/templates/management/forums.html:48
 msgid "Edit Category"
-msgstr ""
+msgstr "Upravit kategorii"
 
 #: flaskbb/management/views.py:917
 msgid "Category updated."
-msgstr ""
+msgstr "Kategorie byla aktualizována."
 
 #: flaskbb/management/views.py:947
 msgid "Category with all associated forums deleted."
-msgstr ""
+msgstr "Kategorie včetně všech přidružených fór byla smazána."
 
 #: flaskbb/management/views.py:956 flaskbb/management/views.py:977
 #: flaskbb/management/views.py:1002 flaskbb/management/views.py:1075
 msgid "You are not allowed to view reports."
-msgstr ""
+msgstr "Nemáte oprávnění zobrazit hlášení."
 
 #: flaskbb/management/views.py:1044
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "Hlášení %(id)s je již označeno jako přečtené."
 
 #: flaskbb/management/views.py:1052
 #, python-format
 msgid "Report %(id)s marked as read."
-msgstr ""
+msgstr "Hlášení %(id)s bylo označeno jako přečtené."
 
 #: flaskbb/management/views.py:1066
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "Všechna hlášení byla označena jako přečtená."
 
 #: flaskbb/management/views.py:1111
 msgid "Report deleted."
-msgstr ""
+msgstr "Hlášení bylo smazáno."
 
 #: flaskbb/management/views.py:1145
 msgid "You are not allowed to access the management panel"
-msgstr ""
+msgstr "Nemáte oprávnění k přístupu do panelu správy."
 
 #: flaskbb/management/views.py:1196 flaskbb/management/views.py:1213
 #: flaskbb/management/views.py:1248 flaskbb/management/views.py:1282
 #: flaskbb/management/views.py:1303
 msgid "You are not allowed to modify plugins"
-msgstr ""
+msgstr "Nemáte oprávnění upravovat zásuvné moduly."
 
 #: flaskbb/management/views.py:1226
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
-msgstr ""
+msgstr "Zásuvný modul %(plugin)s je již povolen."
 
 #: flaskbb/management/views.py:1235
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Zásuvný modul %(plugin)s byl povolen. Nyní restartujte FlaskBB."
 
 #: flaskbb/management/views.py:1261
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "Zásuvný modul %(plugin)s je již zakázán."
 
 #: flaskbb/management/views.py:1269
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Zásuvný modul %(plugin)s byl zakázán. Nyní restartujte FlaskBB."
 
 #: flaskbb/management/views.py:1294
 msgid "Plugin has been uninstalled."
-msgstr ""
+msgstr "Zásuvný modul byl odinstalován."
 
 #: flaskbb/management/views.py:1317
 #, python-format
 msgid "Can't install plugin. Enable '%(plugin)s' plugin first."
 msgstr ""
+"Zásuvný modul nelze nainstalovat. Nejprve povolte zásuvný modul „%(plugin)s“."
 
 #: flaskbb/management/views.py:1325
 msgid "Plugin has been installed."
-msgstr ""
+msgstr "Zásuvný modul byl nainstalován."
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:14
 #: flaskbb/templates/forum/memberlist.html:34 flaskbb/templates/layout.html:84
 msgid "Memberlist"
-msgstr ""
+msgstr "Seznam členů"
 
 #: flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:15
 #: flaskbb/templates/forum/topictracker.html:26
 #: flaskbb/templates/layout.html:124
 msgid "Topic Tracker"
-msgstr ""
+msgstr "Sledování témat"
 
 #: flaskbb/templates/layout.html:140
 #: flaskbb/templates/user/settings_layout.html:10
 msgid "Settings"
-msgstr ""
+msgstr "Nastavení"
 
 #: flaskbb/templates/layout.html:153
 #: flaskbb/templates/management/banned_users.html:8
@@ -1148,122 +1161,124 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:9
 #: flaskbb/templates/management/users.html:8
 msgid "Management"
-msgstr ""
+msgstr "Správa"
 
 #: flaskbb/templates/layout.html:170
 msgid "Logout"
-msgstr ""
+msgstr "Odhlásit se"
 
 #: flaskbb/templates/auth/reset_password.html:1
 #: flaskbb/templates/auth/reset_password.html:10
 #: flaskbb/templates/layout.html:220
 msgid "Reset Password"
-msgstr ""
+msgstr "Obnovit heslo"
 
 #: flaskbb/templates/layout.html:233
 msgid "Activate Account"
-msgstr ""
+msgstr "Aktivovat účet"
 
 #: flaskbb/templates/auth/forgot_password.html:1
 #: flaskbb/templates/auth/forgot_password.html:10
 msgid "Forgot Password"
-msgstr ""
+msgstr "Zapomenuté heslo"
 
 #: flaskbb/templates/auth/login.html:27
 msgid "Not a member yet?"
-msgstr ""
+msgstr "Ještě nejste členem?"
 
 #: flaskbb/templates/auth/login.html:28
 msgid "Forgot your Password?"
-msgstr ""
+msgstr "Zapomněli jste heslo?"
 
 #: flaskbb/templates/auth/request_account_activation.html:1
 #: flaskbb/templates/auth/request_account_activation.html:10
 msgid "Request Account Activation"
-msgstr ""
+msgstr "Požádat o aktivaci účtu"
 
 #: flaskbb/templates/email/activate_account.html:3
 #: flaskbb/templates/email/reset_password.html:2
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Vážený uživateli %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:5
 msgid "Click the link below to activate your account:"
-msgstr ""
+msgstr "Kliknutím na odkaz níže aktivujete svůj účet:"
 
 #: flaskbb/templates/email/activate_account.html:9
 #: flaskbb/templates/email/reset_password.html:8
 msgid "Sincerely,"
-msgstr ""
+msgstr "S pozdravem"
 
 #: flaskbb/templates/email/activate_account.html:10
 #: flaskbb/templates/email/reset_password.html:9
 msgid "The Administration"
-msgstr ""
+msgstr "Administrace"
 
 #: flaskbb/templates/email/reset_password.html:4
 msgid "Click the link below to reset your password:"
-msgstr ""
+msgstr "Kliknutím na odkaz níže obnovíte své heslo:"
 
 #: flaskbb/templates/errors/forbidden_page.html:1
 msgid "Forbidden"
-msgstr ""
+msgstr "Zakázáno"
 
 #: flaskbb/templates/errors/forbidden_page.html:8
 msgid "403 - Forbidden Page"
-msgstr ""
+msgstr "403 – Přístup zakázán"
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 msgid "You do not have the permission to view this page."
-msgstr ""
+msgstr "Nemáte oprávnění zobrazit tuto stránku."
 
 #: flaskbb/templates/errors/forbidden_page.html:10
 #: flaskbb/templates/errors/page_not_found.html:10
 msgid "Back to the Forums"
-msgstr ""
+msgstr "Zpět na fóra"
 
 #: flaskbb/templates/errors/page_not_found.html:1
 msgid "Page not found"
-msgstr ""
+msgstr "Stránka nenalezena"
 
 #: flaskbb/templates/errors/page_not_found.html:8
 msgid "404 - Page not found!"
-msgstr ""
+msgstr "404 – Stránka nenalezena!"
 
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "The page you were looking for does not exist."
-msgstr ""
+msgstr "Hledaná stránka neexistuje."
 
 #: flaskbb/templates/errors/server_error.html:1
 msgid "Server Error"
-msgstr ""
+msgstr "Chyba serveru"
 
 #: flaskbb/templates/errors/server_error.html:8
 msgid "500 - Server Error"
-msgstr ""
+msgstr "500 – Chyba serveru"
 
 #: flaskbb/templates/errors/server_error.html:9
 msgid "Something went wrong!"
-msgstr ""
+msgstr "Něco se pokazilo!"
 
 #: flaskbb/templates/errors/too_many_logins.html:1
 msgid "Too Many Requests"
-msgstr ""
+msgstr "Příliš mnoho požadavků"
 
 #: flaskbb/templates/errors/too_many_logins.html:8
 msgid "429 - Too Many Requests"
-msgstr ""
+msgstr "429 – Příliš mnoho požadavků"
 
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
+"Abychom zabránili útokům hrubou silou na účty, omezili jsme počet požadavků "
+"na tuto cestu."
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid "Please try again in"
-msgstr ""
+msgstr "Zkuste to znovu za"
 
 #: flaskbb/templates/forum/_forum_meta.html:3
 #: flaskbb/templates/forum/category_layout.html:10
@@ -1281,13 +1296,13 @@ msgstr ""
 #: flaskbb/templates/management/users.html:61
 #: flaskbb/templates/user/all_posts.html:8 flaskbb/user/plugins.py:66
 msgid "Posts"
-msgstr ""
+msgstr "Příspěvky"
 
 #: flaskbb/templates/forum/_forum_meta.html:4
 #: flaskbb/templates/forum/search_result.html:131
 #: flaskbb/templates/forum/topictracker.html:33
 msgid "Views"
-msgstr ""
+msgstr "Zobrazení"
 
 #: flaskbb/templates/forum/_forum_meta.html:5
 #: flaskbb/templates/forum/category_layout.html:11
@@ -1295,12 +1310,12 @@ msgstr ""
 #: flaskbb/templates/forum/search_result.html:211
 #: flaskbb/templates/forum/topictracker.html:34
 msgid "Last Post"
-msgstr ""
+msgstr "Poslední příspěvek"
 
 #: flaskbb/templates/forum/_forum_meta.html:8
 #: flaskbb/templates/forum/topictracker.html:35
 msgid "Select all"
-msgstr ""
+msgstr "Vybrat vše"
 
 #: flaskbb/templates/forum/_forum_row.html:31
 #: flaskbb/templates/forum/_forum_row.html:58
@@ -1312,17 +1327,17 @@ msgstr ""
 #: flaskbb/templates/forum/topictracker.html:90
 #: flaskbb/templates/management/plugins.html:47
 msgid "by"
-msgstr ""
+msgstr "od"
 
 #: flaskbb/templates/forum/_forum_row.html:41
 #, python-format
 msgid "Hidden on %(when)s  by %(who)s"
-msgstr ""
+msgstr "Skryto %(when)s uživatelem %(who)s"
 
 #: flaskbb/templates/forum/_forum_row.html:69
 #: flaskbb/templates/forum/topictracker.html:100
 msgid "Select topic"
-msgstr ""
+msgstr "Vybrat téma"
 
 #: flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/forum/search_result.html:124
@@ -1330,191 +1345,191 @@ msgstr ""
 #: flaskbb/templates/management/overview.html:91
 #: flaskbb/templates/user/all_topics.html:8 flaskbb/user/plugins.py:60
 msgid "Topics"
-msgstr ""
+msgstr "Témata"
 
 #: flaskbb/templates/forum/category_layout.html:25
 #: flaskbb/templates/forum/search_result.html:227
 #: flaskbb/templates/management/forums.html:85
 msgid "Link to"
-msgstr ""
+msgstr "Odkaz na"
 
 #: flaskbb/templates/forum/category_layout.html:115
 #: flaskbb/templates/forum/search_result.html:321
 msgid "No posts."
-msgstr ""
+msgstr "Žádné příspěvky."
 
 #: flaskbb/templates/forum/edit_forum.html:39
 #: flaskbb/templates/forum/forum.html:55
 #: flaskbb/templates/forum/topictracker.html:106
 msgid "No Topics."
-msgstr ""
+msgstr "Žádná témata."
 
 #: flaskbb/templates/forum/edit_forum.html:48
 msgid "Back"
-msgstr ""
+msgstr "Zpět"
 
 #: flaskbb/templates/forum/edit_forum.html:57
 msgid "Lock"
-msgstr ""
+msgstr "Uzamknout"
 
 #: flaskbb/templates/forum/edit_forum.html:60
 msgid "Unlock"
-msgstr ""
+msgstr "Odemknout"
 
 #: flaskbb/templates/forum/edit_forum.html:66
 msgid "Highlight"
-msgstr ""
+msgstr "Zvýraznit"
 
 #: flaskbb/templates/forum/edit_forum.html:69
 msgid "Trivialize"
-msgstr ""
+msgstr "Zrušit zvýraznění"
 
 #: flaskbb/templates/forum/edit_forum.html:74
 #: flaskbb/templates/management/groups.html:71
 #: flaskbb/templates/management/reports.html:91
 #: flaskbb/templates/management/users.html:137
 msgid "Delete"
-msgstr ""
+msgstr "Smazat"
 
 #: flaskbb/templates/forum/edit_forum.html:80
 msgid "Hide"
-msgstr ""
+msgstr "Skrýt"
 
 #: flaskbb/templates/forum/edit_forum.html:83
 msgid "Unhide"
-msgstr ""
+msgstr "Zrušit skrytí"
 
 #: flaskbb/templates/forum/edit_forum.html:95
 msgid "Move to..."
-msgstr ""
+msgstr "Přesunout do…"
 
 #: flaskbb/templates/forum/edit_forum.html:102
 msgid "Move"
-msgstr ""
+msgstr "Přesunout"
 
 #: flaskbb/templates/forum/forum.html:25
 #: flaskbb/templates/management/reports.html:53
 #: flaskbb/templates/management/reports.html:81
 msgid "Mark as Read"
-msgstr ""
+msgstr "Označit jako přečtené"
 
 #: flaskbb/templates/forum/forum.html:31
 #: flaskbb/templates/forum/topic_controls.html:113
 msgid "Locked"
-msgstr ""
+msgstr "Uzamčeno"
 
 #: flaskbb/templates/forum/forum.html:35
 #: flaskbb/templates/forum/new_topic.html:4
 msgid "New Topic"
-msgstr ""
+msgstr "Nové téma"
 
 #: flaskbb/templates/forum/forum.html:66
 msgid "Moderation Mode"
-msgstr ""
+msgstr "Režim moderování"
 
 #: flaskbb/templates/forum/index.html:11
 msgid "Board Statistics"
-msgstr ""
+msgstr "Statistiky fóra"
 
 #: flaskbb/templates/forum/index.html:12
 msgid "Who is online?"
-msgstr ""
+msgstr "Kdo je online?"
 
 #: flaskbb/templates/forum/index.html:17
 msgid "Total number of registered users"
-msgstr ""
+msgstr "Celkový počet registrovaných uživatelů"
 
 #: flaskbb/templates/forum/index.html:18
 msgid "Total number of topics"
-msgstr ""
+msgstr "Celkový počet témat"
 
 #: flaskbb/templates/forum/index.html:19
 msgid "Total number of posts"
-msgstr ""
+msgstr "Celkový počet příspěvků"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "Newest registered user"
-msgstr ""
+msgstr "Nejnovější registrovaný uživatel"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "No users"
-msgstr ""
+msgstr "Žádní uživatelé"
 
 #: flaskbb/templates/forum/index.html:23
 msgid "Registered users online"
-msgstr ""
+msgstr "Registrovaní uživatelé online"
 
 #: flaskbb/templates/forum/index.html:25
 msgid "Guests online"
-msgstr ""
+msgstr "Hosté online"
 
 #: flaskbb/templates/forum/memberlist.html:43
 #: flaskbb/templates/forum/search_result.html:101
 #: flaskbb/templates/management/banned_users.html:62
 #: flaskbb/templates/management/users.html:62
 msgid "Date registered"
-msgstr ""
+msgstr "Datum registrace"
 
 #: flaskbb/templates/forum/memberlist.html:45
 #: flaskbb/templates/forum/search_result.html:102
 #: flaskbb/templates/management/banned_users.html:63
 #: flaskbb/templates/management/users.html:63
 msgid "Group"
-msgstr ""
+msgstr "Skupina"
 
 #: flaskbb/templates/forum/new_post.html:2
 msgid "Edit Post"
-msgstr ""
+msgstr "Upravit příspěvek"
 
 #: flaskbb/templates/forum/new_post.html:4
 msgid "New Post"
-msgstr ""
+msgstr "Nový příspěvek"
 
 #: flaskbb/templates/forum/new_topic.html:2
 msgid "Edit Topic"
-msgstr ""
+msgstr "Upravit téma"
 
 #: flaskbb/templates/forum/online_users.html:1
 #: flaskbb/templates/forum/online_users.html:13
 msgid "Online Users"
-msgstr ""
+msgstr "Uživatelé online"
 
 #: flaskbb/templates/forum/report_post.html:1
 #: flaskbb/templates/forum/report_post.html:16
 msgid "Report Post"
-msgstr ""
+msgstr "Nahlásit příspěvek"
 
 #: flaskbb/templates/forum/report_post.html:20
 msgid "Report"
-msgstr ""
+msgstr "Hlášení"
 
 #: flaskbb/templates/forum/report_post.html:21
 msgid "Close"
-msgstr ""
+msgstr "Zavřít"
 
 #: flaskbb/templates/forum/search_result.html:30
 #: flaskbb/templates/forum/topic.html:42
 #: flaskbb/templates/forum/topic_horizontal.html:47
 #: flaskbb/templates/user/profile_layout.html:30
 msgid "online"
-msgstr ""
+msgstr "online"
 
 #: flaskbb/templates/forum/search_result.html:32
 #: flaskbb/templates/forum/topic.html:44
 #: flaskbb/templates/forum/topic_horizontal.html:49
 msgid "offline"
-msgstr ""
+msgstr "offline"
 
 #: flaskbb/templates/forum/search_result.html:42
 #: flaskbb/templates/forum/topic.html:54
 #: flaskbb/templates/forum/topic_horizontal.html:59
 msgid "Joined"
-msgstr ""
+msgstr "Připojen"
 
 #: flaskbb/templates/forum/search_result.html:50
 #: flaskbb/templates/forum/topic.html:62
 msgid "Guest"
-msgstr ""
+msgstr "Host"
 
 #: flaskbb/templates/forum/search_result.html:65
 #: flaskbb/templates/forum/topic.html:106
@@ -1522,41 +1537,42 @@ msgstr ""
 #, python-format
 msgid "Last modified: %(date)s by <a href=\"%(user_url)s\">%(user)s</a>"
 msgstr ""
+"Naposledy upraveno: %(date)s uživatelem <a href=\"%(user_url)s\">%(user)s</a>"
 
 #: flaskbb/templates/forum/search_result.html:84
 msgid "No posts found matching your search criteria."
-msgstr ""
+msgstr "Nenalezeny žádné příspěvky odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/forum/search_result.html:114
 #: flaskbb/templates/management/users.html:146
 msgid "No users found matching your search criteria."
-msgstr ""
+msgstr "Nenalezeni žádní uživatelé odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/forum/search_result.html:192
 msgid "No topics found matching your search criteria."
-msgstr ""
+msgstr "Nenalezena žádná témata odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/forum/search_result.html:203
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/forums.html:9
 msgid "Forums"
-msgstr ""
+msgstr "Fóra"
 
 #: flaskbb/templates/forum/search_result.html:330
 msgid "No forums found matching your search criteria."
-msgstr ""
+msgstr "Nenalezena žádná fóra odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/forum/topic.html:2
 #: flaskbb/templates/forum/topic_horizontal.html:2
 #, python-format
 msgid "%(title)s - Topic"
-msgstr ""
+msgstr "%(title)s – téma"
 
 #: flaskbb/templates/forum/topic.html:22
 #: flaskbb/templates/forum/topic_horizontal.html:20
 #, python-format
 msgid "This topic is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Toto téma je skryté (%(when)s uživatelem %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:89
 #: flaskbb/templates/management/banned_users.html:92
@@ -1565,111 +1581,111 @@ msgstr ""
 #: flaskbb/templates/user/profile_layout.html:44
 #: flaskbb/templates/user/profile_layout.html:48
 msgid "Edit"
-msgstr ""
+msgstr "Upravit"
 
 #: flaskbb/templates/forum/topic.html:121
 #, python-format
 msgid "This post is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Tento příspěvek je skrytý (%(when)s uživatelem %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:149
 #: flaskbb/templates/forum/topic_horizontal.html:107
 msgid "Quote this post"
-msgstr ""
+msgstr "Citovat tento příspěvek"
 
 #: flaskbb/templates/forum/topic.html:151
 #: flaskbb/templates/forum/topic_horizontal.html:109
 msgid "Full Reply"
-msgstr ""
+msgstr "Celá odpověď"
 
 #: flaskbb/templates/forum/topic.html:157
 msgid "Edit this topic"
-msgstr ""
+msgstr "Upravit toto téma"
 
 #: flaskbb/templates/forum/topic.html:160
 #: flaskbb/templates/forum/topic_horizontal.html:114
 msgid "Edit this post"
-msgstr ""
+msgstr "Upravit tento příspěvek"
 
 #: flaskbb/templates/forum/topic.html:169
 #: flaskbb/templates/forum/topic_controls.html:20
 #: flaskbb/templates/forum/topic_horizontal.html:120
 msgid "Delete this topic"
-msgstr ""
+msgstr "Smazat toto téma"
 
 #: flaskbb/templates/forum/topic.html:176
 #: flaskbb/templates/forum/topic_horizontal.html:128
 msgid "Delete this post"
-msgstr ""
+msgstr "Smazat tento příspěvek"
 
 #: flaskbb/templates/forum/topic.html:184
 #: flaskbb/templates/forum/topic_horizontal.html:136
 msgid "Report this post"
-msgstr ""
+msgstr "Nahlásit tento příspěvek"
 
 #: flaskbb/templates/forum/topic.html:193
 #: flaskbb/templates/forum/topic_horizontal.html:144
 msgid "Unhide this topic"
-msgstr ""
+msgstr "Zrušit skrytí tohoto tématu"
 
 #: flaskbb/templates/forum/topic.html:198
 #: flaskbb/templates/forum/topic_horizontal.html:149
 msgid "Hide this topic"
-msgstr ""
+msgstr "Skrýt toto téma"
 
 #: flaskbb/templates/forum/topic.html:205
 #: flaskbb/templates/forum/topic_horizontal.html:156
 msgid "Unhide this post"
-msgstr ""
+msgstr "Zrušit skrytí tohoto příspěvku"
 
 #: flaskbb/templates/forum/topic.html:210
 #: flaskbb/templates/forum/topic_horizontal.html:161
 msgid "Hide this post"
-msgstr ""
+msgstr "Skrýt tento příspěvek"
 
 #: flaskbb/templates/forum/topic_controls.html:12
 msgid "Moderate"
-msgstr ""
+msgstr "Moderovat"
 
 #: flaskbb/templates/forum/topic_controls.html:21
 msgid "Delete Topic"
-msgstr ""
+msgstr "Smazat téma"
 
 #: flaskbb/templates/forum/topic_controls.html:33
 msgid "Lock Topic"
-msgstr ""
+msgstr "Uzamknout téma"
 
 #: flaskbb/templates/forum/topic_controls.html:42
 msgid "Unlock Topic"
-msgstr ""
+msgstr "Odemknout téma"
 
 #: flaskbb/templates/forum/topic_controls.html:53
 msgid "Highlight Topic"
-msgstr ""
+msgstr "Zvýraznit téma"
 
 #: flaskbb/templates/forum/topic_controls.html:62
 msgid "Trivialize Topic"
-msgstr ""
+msgstr "Zrušit zvýraznění tématu"
 
 #: flaskbb/templates/forum/topic_controls.html:74
 msgid "Unhide Topic"
-msgstr ""
+msgstr "Zrušit skrytí tématu"
 
 #: flaskbb/templates/forum/topic_controls.html:81
 msgid "Hide Topic"
-msgstr ""
+msgstr "Skrýt téma"
 
 #: flaskbb/templates/forum/topic_controls.html:96
 msgid "Untrack Topic"
-msgstr ""
+msgstr "Přestat sledovat téma"
 
 #: flaskbb/templates/forum/topic_controls.html:103
 msgid "Track Topic"
-msgstr ""
+msgstr "Sledovat téma"
 
 #: flaskbb/templates/forum/topictracker.html:115
 msgid "Untrack Topics"
-msgstr ""
+msgstr "Přestat sledovat témata"
 
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:22
@@ -1677,7 +1693,7 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:24
 #: flaskbb/templates/management/users.html:22
 msgid "Banned Users"
-msgstr ""
+msgstr "Zakázaní uživatelé"
 
 #: flaskbb/templates/management/banned_users.html:9
 #: flaskbb/templates/management/banned_users.html:21
@@ -1686,263 +1702,264 @@ msgstr ""
 #: flaskbb/templates/management/users.html:9
 #: flaskbb/templates/management/users.html:21
 msgid "Manage Users"
-msgstr ""
+msgstr "Správa uživatelů"
 
 #: flaskbb/templates/management/banned_users.html:68
 #: flaskbb/templates/management/groups.html:42
 #: flaskbb/templates/management/reports.html:46
 #: flaskbb/templates/management/users.html:68
 msgid "Actions"
-msgstr ""
+msgstr "Akce"
 
 #: flaskbb/templates/management/banned_users.html:75
 #: flaskbb/templates/management/users.html:82
 msgid "Unban selected Users"
-msgstr ""
+msgstr "Zrušit zákaz vybraným uživatelům"
 
 #: flaskbb/templates/management/banned_users.html:110
 msgid "No banned users found matching your search criteria."
 msgstr ""
+"Nenalezeni žádní zakázaní uživatelé odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/management/category_form.html:21
 #: flaskbb/templates/management/forum_form.html:22
 #: flaskbb/templates/management/forums.html:21
 #: flaskbb/templates/management/forums.html:31
 msgid "Manage Forums"
-msgstr ""
+msgstr "Správa fór"
 
 #: flaskbb/templates/management/forums.html:54
 msgid "Delete Category"
-msgstr ""
+msgstr "Smazat kategorii"
 
 #: flaskbb/templates/management/forums.html:68
 msgid "Topics / Posts"
-msgstr ""
+msgstr "Témata / příspěvky"
 
 #: flaskbb/templates/management/forums.html:105
 msgid "Edit Link"
-msgstr ""
+msgstr "Upravit odkaz"
 
 #: flaskbb/templates/management/forums.html:111
 msgid "Delete Link"
-msgstr ""
+msgstr "Smazat odkaz"
 
 #: flaskbb/templates/management/forums.html:169
 msgid "Delete Forum"
-msgstr ""
+msgstr "Smazat fórum"
 
 #: flaskbb/templates/management/group_form.html:10
 #: flaskbb/templates/management/group_form.html:22
 #: flaskbb/templates/management/groups.html:9
 #: flaskbb/templates/management/groups.html:21
 msgid "Manage Groups"
-msgstr ""
+msgstr "Správa skupin"
 
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:30
 #: flaskbb/templates/management/overview.html:88
 msgid "Groups"
-msgstr ""
+msgstr "Skupiny"
 
 #: flaskbb/templates/management/groups.html:36
 msgid "Group Name"
-msgstr ""
+msgstr "Název skupiny"
 
 #: flaskbb/templates/management/groups.html:48
 msgid "Delete selected Groups"
-msgstr ""
+msgstr "Smazat vybrané skupiny"
 
 #: flaskbb/templates/management/groups.html:80
 msgid "No groups found."
-msgstr ""
+msgstr "Nebyly nalezeny žádné skupiny."
 
 #: flaskbb/templates/management/overview.html:1
 #: flaskbb/templates/management/overview.html:16 flaskbb/user/plugins.py:54
 msgid "Overview"
-msgstr ""
+msgstr "Přehled"
 
 #: flaskbb/templates/management/overview.html:25
 msgid "There is something that wants your attention."
-msgstr ""
+msgstr "Něco vyžaduje vaši pozornost."
 
 #: flaskbb/templates/management/overview.html:26
 #, python-format
 msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
-msgstr ""
+msgstr "Máte <a href=\"%(url)s\">%(unread_reports)s nepřečtených hlášení</a>."
 
 #: flaskbb/templates/management/overview.html:30
 msgid "Everything seems alright."
-msgstr ""
+msgstr "Všechno se zdá být v pořádku."
 
 #: flaskbb/templates/management/overview.html:31
 msgid "No new notifications."
-msgstr ""
+msgstr "Žádná nová oznámení."
 
 #: flaskbb/templates/management/overview.html:44
 msgid "users"
-msgstr ""
+msgstr "uživatelé"
 
 #: flaskbb/templates/management/overview.html:56
 msgid "posts"
-msgstr ""
+msgstr "příspěvky"
 
 #: flaskbb/templates/management/overview.html:68
 msgid "topics"
-msgstr ""
+msgstr "témata"
 
 #: flaskbb/templates/management/overview.html:76
 msgid "Statistics"
-msgstr ""
+msgstr "Statistiky"
 
 #: flaskbb/templates/management/overview.html:79
 msgid "Registered users"
-msgstr ""
+msgstr "Registrovaní uživatelé"
 
 #: flaskbb/templates/management/overview.html:82
 msgid "Online users"
-msgstr ""
+msgstr "Uživatelé online"
 
 #: flaskbb/templates/management/overview.html:85
 msgid "Banned users"
-msgstr ""
+msgstr "Zakázaní uživatelé"
 
 #: flaskbb/templates/management/overview.html:97
 #: flaskbb/templates/management/reports.html:1
 #: flaskbb/templates/management/reports.html:10
 #: flaskbb/templates/management/reports.html:31
 msgid "Reports"
-msgstr ""
+msgstr "Hlášení"
 
 #: flaskbb/templates/management/overview.html:102
 msgid "Components"
-msgstr ""
+msgstr "Součásti"
 
 #: flaskbb/templates/management/overview.html:110
 msgid "checking status"
-msgstr ""
+msgstr "kontroluje se stav"
 
 #: flaskbb/templates/management/overview.html:123
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
-msgstr ""
+msgstr "Zásuvné moduly"
 
 #: flaskbb/templates/management/overview.html:136
 msgid "not enabled"
-msgstr ""
+msgstr "nepovoleno"
 
 #: flaskbb/templates/management/overview.html:139
 msgid "enabled &amp; installed"
-msgstr ""
+msgstr "povoleno &amp; nainstalováno"
 
 #: flaskbb/templates/management/overview.html:141
 msgid "enabled"
-msgstr ""
+msgstr "povoleno"
 
 #: flaskbb/templates/management/overview.html:143
 msgid "not installed"
-msgstr ""
+msgstr "nenainstalováno"
 
 #: flaskbb/templates/management/overview.html:163
 msgid "running"
-msgstr ""
+msgstr "spuštěno"
 
 #: flaskbb/templates/management/overview.html:164
 msgid "not running"
-msgstr ""
+msgstr "nespuštěno"
 
 #: flaskbb/templates/management/overview.html:168
 msgid "There is a problem."
-msgstr ""
+msgstr "Nastal problém."
 
 #: flaskbb/templates/management/overview.html:169
 msgid "Celery is <strong>not</strong> running."
-msgstr ""
+msgstr "Celery <strong>není</strong> spuštěno."
 
 #: flaskbb/templates/management/overview.html:170
 msgid "You can start celery with this command:"
-msgstr ""
+msgstr "Celery můžete spustit tímto příkazem:"
 
 #: flaskbb/templates/management/plugins.html:20
 msgid "Manage Plugins"
-msgstr ""
+msgstr "Správa zásuvných modulů"
 
 #: flaskbb/templates/management/plugins.html:26
 msgid "Plugin"
-msgstr ""
+msgstr "Zásuvný modul"
 
 #: flaskbb/templates/management/plugins.html:27
 msgid "Information"
-msgstr ""
+msgstr "Informace"
 
 #: flaskbb/templates/management/plugins.html:28
 msgid "Manage"
-msgstr ""
+msgstr "Spravovat"
 
 #: flaskbb/templates/management/plugins.html:45
 msgid "Version"
-msgstr ""
+msgstr "Verze"
 
 #: flaskbb/templates/management/plugins.html:53
 msgid "Enable"
-msgstr ""
+msgstr "Povolit"
 
 #: flaskbb/templates/management/plugins.html:58
 msgid "Disable"
-msgstr ""
+msgstr "Zakázat"
 
 #: flaskbb/templates/management/plugins.html:68
 msgid "Install"
-msgstr ""
+msgstr "Nainstalovat"
 
 #: flaskbb/templates/management/plugins.html:80
 msgid "Uninstall"
-msgstr ""
+msgstr "Odinstalovat"
 
 #: flaskbb/templates/management/reports.html:22
 msgid "Show all Reports"
-msgstr ""
+msgstr "Zobrazit všechna hlášení"
 
 #: flaskbb/templates/management/reports.html:23
 msgid "Show unread Reports"
-msgstr ""
+msgstr "Zobrazit nepřečtená hlášení"
 
 #: flaskbb/templates/management/reports.html:37
 msgid "Poster"
-msgstr ""
+msgstr "Autor příspěvku"
 
 #: flaskbb/templates/management/reports.html:40
 msgid "Reporter"
-msgstr ""
+msgstr "Oznamovatel"
 
 #: flaskbb/templates/management/reports.html:41
 msgid "Reported"
-msgstr ""
+msgstr "Nahlášeno"
 
 #: flaskbb/templates/management/reports.html:59
 msgid "Delete selected reports"
-msgstr ""
+msgstr "Smazat vybraná hlášení"
 
 #: flaskbb/templates/management/reports.html:99
 msgid "No reports."
-msgstr ""
+msgstr "Žádná hlášení."
 
 #: flaskbb/templates/management/users.html:75
 msgid "Ban selected Users"
-msgstr ""
+msgstr "Zakázat vybrané uživatele"
 
 #: flaskbb/templates/management/users.html:89
 msgid "Delete selected Users"
-msgstr ""
+msgstr "Smazat vybrané uživatele"
 
 #: flaskbb/templates/user/all_posts.html:18
 #, python-format
 msgid "<strong>%(topic_title)s</strong>"
-msgstr ""
+msgstr "<strong>%(topic_title)s</strong>"
 
 #: flaskbb/templates/user/all_posts.html:35
 msgid "No posts yet"
-msgstr ""
+msgstr "Zatím žádné příspěvky"
 
 #: flaskbb/templates/user/all_topics.html:18
 #, python-format
@@ -1950,161 +1967,163 @@ msgid ""
 "<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in forum "
 "<a href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
+"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> ve fóru <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/user/all_topics.html:43
 msgid "No topics yet"
-msgstr ""
+msgstr "Zatím žádná témata"
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
-msgstr ""
+msgstr "Změnit e-mailovou adresu"
 
 #: flaskbb/templates/user/change_password.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "Změnit heslo"
 
 #: flaskbb/templates/user/change_user_details.html:8
 msgid "Change User Details"
-msgstr ""
+msgstr "Změnit údaje uživatele"
 
 #: flaskbb/templates/user/general_settings.html:7
 msgid "General Settings"
-msgstr ""
+msgstr "Obecná nastavení"
 
 #: flaskbb/templates/user/profile.html:16
 msgid "Info"
-msgstr ""
+msgstr "Informace"
 
 #: flaskbb/templates/user/profile.html:27
 msgid "User has not added any notes."
-msgstr ""
+msgstr "Uživatel nepřidal žádné poznámky."
 
 #: flaskbb/templates/user/profile.html:35
 msgid "Signature"
-msgstr ""
+msgstr "Podpis"
 
 #: flaskbb/templates/user/profile_layout.html:5
 #, python-format
 msgid "%(user)s - User"
-msgstr ""
+msgstr "%(user)s – uživatel"
 
 #: flaskbb/templates/user/profile_layout.html:35
 msgid "Never seen"
-msgstr ""
+msgstr "Nikdy neviděn"
 
 #: flaskbb/templates/user/settings_layout.html:2
 #, python-format
 msgid "Settings - %(user)s - User"
-msgstr ""
+msgstr "Nastavení – %(user)s – uživatel"
 
 #: flaskbb/user/forms.py:49
 msgid "Theme"
-msgstr ""
+msgstr "Motiv"
 
 #: flaskbb/user/forms.py:58
 msgid "Old email address"
-msgstr ""
+msgstr "Stará e-mailová adresa"
 
 #: flaskbb/user/forms.py:65
 msgid "New email address"
-msgstr ""
+msgstr "Nová e-mailová adresa"
 
 #: flaskbb/user/forms.py:68
 msgid "Email addresses must match."
-msgstr ""
+msgstr "E-mailové adresy se musí shodovat."
 
 #: flaskbb/user/forms.py:73
 msgid "Confirm email address"
-msgstr ""
+msgstr "Potvrzení e-mailové adresy"
 
 #: flaskbb/user/forms.py:93
 msgid "New password"
-msgstr ""
+msgstr "Nové heslo"
 
 #: flaskbb/user/forms.py:96
 msgid "New passwords must match."
-msgstr ""
+msgstr "Nová hesla se musí shodovat."
 
 #: flaskbb/user/forms.py:99
 msgid "Confirm new password"
-msgstr ""
+msgstr "Potvrzení nového hesla"
 
 #: flaskbb/user/forms.py:114
 msgid "Forum Signature"
-msgstr ""
+msgstr "Podpis ve fóru"
 
 #: flaskbb/user/views.py:63
 msgid "Error while updating user settings"
-msgstr ""
+msgstr "Při aktualizaci uživatelských nastavení došlo k chybě."
 
 #: flaskbb/user/views.py:66
 msgid "Settings updated."
-msgstr ""
+msgstr "Nastavení bylo aktualizováno."
 
 #: flaskbb/user/views.py:97
 msgid "Error while changing password"
-msgstr ""
+msgstr "Při změně hesla došlo k chybě."
 
 #: flaskbb/user/views.py:100
 msgid "Password updated."
-msgstr ""
+msgstr "Heslo bylo aktualizováno."
 
 #: flaskbb/user/views.py:131
 msgid "Error while updating email"
-msgstr ""
+msgstr "Při aktualizaci e-mailu došlo k chybě."
 
 #: flaskbb/user/views.py:134
 msgid "Email address updated."
-msgstr ""
+msgstr "E-mailová adresa byla aktualizována."
 
 #: flaskbb/user/views.py:165
 msgid "Error while updating user details"
-msgstr ""
+msgstr "Při aktualizaci údajů uživatele došlo k chybě."
 
 #: flaskbb/user/views.py:168
 msgid "User details updated."
-msgstr ""
+msgstr "Údaje uživatele byly aktualizovány."
 
 #: flaskbb/user/services/validators.py:50
 msgid "Old email does not match"
-msgstr ""
+msgstr "Stará e-mailová adresa neodpovídá."
 
 #: flaskbb/user/services/validators.py:61
 msgid "New email address must be different"
-msgstr ""
+msgstr "Nová e-mailová adresa se musí lišit."
 
 #: flaskbb/user/services/validators.py:72
 msgid "New password must be different"
-msgstr ""
+msgstr "Nové heslo se musí lišit."
 
 #: flaskbb/user/services/validators.py:83
 msgid "Old password is wrong"
-msgstr ""
+msgstr "Staré heslo je nesprávné."
 
 #: flaskbb/user/services/validators.py:107
 msgid "Could not retrieve avatar"
-msgstr ""
+msgstr "Avatar se nepodařilo načíst."
 
 #: flaskbb/utils/helpers.py:147
 msgid "You do not have the permissions to execute this action."
-msgstr ""
+msgstr "Nemáte oprávnění provést tuto akci."
 
 #: flaskbb/utils/helpers.py:165
 msgid "You do not have the permissions to delete these topics."
-msgstr ""
+msgstr "Nemáte oprávnění smazat tato témata."
 
 #: flaskbb/utils/helpers.py:177
 msgid "You do not have the permissions to hide these topics."
-msgstr ""
+msgstr "Nemáte oprávnění skrýt tato témata."
 
 #: flaskbb/utils/helpers.py:191
 msgid "You do not have the permissions to unhide these topics."
-msgstr ""
+msgstr "Nemáte oprávnění zrušit skrytí těchto témat."
 
 #: flaskbb/utils/helpers.py:868
 msgid "The registration has been disabled."
-msgstr ""
+msgstr "Registrace byla zakázána."
 
 #: flaskbb/utils/helpers.py:879
 msgid "This account is already activated."
-msgstr ""
+msgstr "Tento účet je již aktivován."
