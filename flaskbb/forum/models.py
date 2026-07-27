@@ -483,9 +483,9 @@ class Post(HideableCRUDMixin, db.Model):
         return self
 
     def _deal_with_last_post(self):
-        if self.topic.last_post == self:
+        if self.topic.last_post_id == self.id:
             # update the last post in the forum
-            if self.topic.last_post == self.topic.forum.last_post:
+            if self.topic.last_post_id == self.topic.forum.last_post_id:
                 # We need the second last post in the forum here,
                 # because the last post will be deleted
                 second_last_post = db.session.execute(
@@ -514,16 +514,22 @@ class Post(HideableCRUDMixin, db.Model):
                     self.topic.forum.last_post_username = None
                     self.topic.forum.last_post_created = None
 
-            # check if there is a second last post in this topic
-            if self.topic.second_last_post is not None:
-                # Now the second last post will be the last post
-                self.topic.last_post_id = self.topic.second_last_post
+            # the same goes for the topic - this post is either already
+            # deleted or hidden, so this query returns the post that takes
+            # over. Falls back to the first post, which can never be the one
+            # being removed here.
+            second_last_post = db.session.execute(
+                db.select(Post)
+                .filter(
+                    Post.topic_id == self.topic_id,
+                    Post.hidden.is_(False),
+                    Post.id != self.id,
+                )
+                .order_by(Post.id.desc())
+                .limit(1)
+            ).scalar_one_or_none()
 
-            # there is no second last post, now the last post is also the
-            # first post
-            else:
-                self.topic.last_post = self.topic.first_post
-
+            self.topic.last_post = second_last_post or self.topic.first_post
             self.topic.last_updated = self.topic.last_post.date_created
 
     def _update_counts(self):
