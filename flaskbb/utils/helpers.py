@@ -34,7 +34,6 @@ from flask import (
     Response,
     current_app,
     flash,
-    g,
     redirect,
     request,
     session,
@@ -785,11 +784,12 @@ def anonymous_required(f: Any):
 
 
 def enforce_recaptcha(limiter: Limiter):
-    current_limit = getattr(g, "view_rate_limit", None)
+    # ``remaining`` is already decremented for the current request, so the
+    # difference is the number of requests made within the current window.
+    current_limit = limiter.current_limit
     login_recaptcha = False
     if current_limit is not None:
-        window_stats = limiter.limiter.get_window_stats(*current_limit)
-        stats_diff = flaskbb_config["AUTH_REQUESTS"] - window_stats[1]
+        stats_diff = flaskbb_config["AUTH_REQUESTS"] - current_limit.remaining
         login_recaptcha = stats_diff >= flaskbb_config["LOGIN_RECAPTCHA"]
     return login_recaptcha
 

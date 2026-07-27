@@ -11,10 +11,10 @@ resetting the password of a user if he has lost his password
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Callable
 
-from flask import Blueprint, Flask, flash, g, redirect, request, url_for
+from flask import Blueprint, Flask, flash, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (
@@ -46,6 +46,7 @@ from flaskbb.utils.helpers import (
     registration_enabled,
     render_template,
     requires_unactivated,
+    time_utcnow,
 )
 
 from ..core.auth.authentication import StopAuthentication
@@ -399,27 +400,29 @@ class ActivateAccount(MethodView):
         return render_template("auth/account_activation.html", form=form)
 
 
+def login_rate_limit():
+    """Dynamically load the rate limiting config from the database."""
+    # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
+    return "{count}/{timeout}minutes".format(
+        count=flaskbb_config["AUTH_REQUESTS"],
+        timeout=flaskbb_config["AUTH_TIMEOUT"],
+    )
+
+
+def login_rate_limit_message():
+    """Display the amount of time left until the user can access the requested
+    resource again."""
+    timeout = timedelta(minutes=flaskbb_config["AUTH_TIMEOUT"])
+    current_limit = limiter.current_limit
+    if current_limit is not None:
+        reset_time = datetime.fromtimestamp(current_limit.reset_at, tz=UTC)
+        timeout = max(reset_time - time_utcnow(), timedelta(0))
+    return format_timedelta(timeout)
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app: Flask):
     auth = Blueprint("auth", __name__)
-
-    def login_rate_limit():
-        """Dynamically load the rate limiting config from the database."""
-        # [count] [per|/] [n (optional)] [second|minute|hour|day|month|year]
-        return "{count}/{timeout}minutes".format(
-            count=flaskbb_config["AUTH_REQUESTS"],
-            timeout=flaskbb_config["AUTH_TIMEOUT"],
-        )
-
-    def login_rate_limit_message():
-        """Display the amount of time left until the user can access the requested
-        resource again."""
-        current_limit = getattr(g, "view_rate_limit", None)
-        if current_limit is not None:
-            window_stats = limiter.limiter.get_window_stats(*current_limit)
-            reset_time = datetime.utcfromtimestamp(window_stats[0])
-            timeout = reset_time - datetime.utcnow()
-        return "{timeout}".format(timeout=format_timedelta(timeout))
 
     @auth.before_request
     def check_rate_limiting():
@@ -433,7 +436,10 @@ def flaskbb_load_blueprints(app: Flask):
     def login_rate_limit_error(error):
         """Register a custom error handler for a 'Too Many Requests'
         (HTTP CODE 429) error."""
-        return render_template("errors/too_many_logins.html", timeout=error.description)
+        return (
+            render_template("errors/too_many_logins.html", timeout=error.description),
+            429,
+        )
 
     # Activate rate limiting on the whole blueprint
     limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
