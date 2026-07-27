@@ -78,12 +78,12 @@ from flaskbb.utils.helpers import (
 
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (
-    CanBanUser,
-    CanEditUser,
     IsAdmin,
     IsAtleastModerator,
+    can_ban_user,
     can_delete_topic,
     can_edit_post,
+    can_edit_user,
     can_moderate,
     can_post_reply,
     can_post_topic,
@@ -335,14 +335,14 @@ def configure_template_filters(app: Flask):
         ("is_admin", IsAdmin),
         ("is_moderator", IsAtleastModerator),
         ("is_admin_or_moderator", IsAtleastModerator),
-        ("can_edit_user", CanEditUser),
-        ("can_ban_user", CanBanUser),
     ]
 
     filters.update(
         (name, permission_with_identity(perm, name=name)) for name, perm in permissions
     )
 
+    filters["can_ban_user"] = can_ban_user
+    filters["can_edit_user"] = can_edit_user
     filters["can_moderate"] = can_moderate
     filters["post_reply"] = can_post_reply
     filters["edit_post"] = can_edit_post

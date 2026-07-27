@@ -25,7 +25,7 @@
             {{ navlink('management.banned_users', _('Banned Users')) }}
 
             {% if current_user|is_admin %}
-                {{ navlink('management.add_user', _("Add User")) }}
+            {{ navlink('management.add_user', _("Add User")) }}
             {% endif %}
         </ul>
     </div>
@@ -43,15 +43,25 @@
                 {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
 
                 {{ horizontal_field(form.username) }}
+                {% if form.email is not none %}
                 {{ horizontal_field(form.email) }}
+                {% endif %}
+                {% if form.password is not none %}
                 {{ horizontal_field(form.password) }}
+                {% endif %}
                 {{ horizontal_field(form.birthday) }}
                 {{ horizontal_field(form.gender) }}
                 {{ horizontal_field(form.location) }}
                 {{ horizontal_field(form.website) }}
+                {% if form.primary_group is not none %}
                 {{ horizontal_field(form.primary_group) }}
+                {% endif %}
+                {% if form.secondary_groups is not none %}
                 {{ horizontal_field(form.secondary_groups) }}
+                {% endif %}
+                {% if form.activated is not none %}
                 {{ horizontal_field(form.activated, div_class="offset-3 col-4") }}
+                {% endif %}
                 {{ form.delete_avatar(id="delete_avatar") }}
                 {{ horizontal_field(form.avatar, div_class="col-5") }}
                 <div class="row mb-3">
@@ -62,7 +72,7 @@
                         <div class="d-flex justify-content-center align-items-center">
                             {{ avatar_img(user, size=150, class="profilepicture rounded") }}
                         </div>
-                        {% if user.avatar %}
+                        {% if user and user.avatar %}
                         <div class="d-flex justify-content-center align-items-center deleteavatar">
                             <button type="button" class="btn btn-sm">
                                 <span class="fas fa-fw fa-trash text-danger"></span>
@@ -95,17 +105,17 @@
         const avatarControl = document.getElementById('avatar');
         avatarControl.value = "";
 
-    setTimeout(() => {
-        const deleteFlag = document.querySelector('input[name="delete_avatar"]');
-        if (deleteFlag) {
-            deleteFlag.setAttribute('value', 'true');
-            deleteFlag.value = "true";
+        setTimeout(() => {
+            const deleteFlag = document.querySelector('input[name="delete_avatar"]');
+            if (deleteFlag) {
+                deleteFlag.setAttribute('value', 'true');
+                deleteFlag.value = "true";
 
-            // Dispatch event to trick tracking libraries into updating their internal state
-            deleteFlag.dispatchEvent(new Event('input', { bubbles: true }));
-            deleteFlag.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-    });
+                // Dispatch event to trick tracking libraries into updating their internal state
+                deleteFlag.dispatchEvent(new Event('input', { bubbles: true }));
+                deleteFlag.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
 
         const profilePicutre = document.querySelector(".profilepicture");
         profilePicutre.setAttribute("src", defaultAvatar);

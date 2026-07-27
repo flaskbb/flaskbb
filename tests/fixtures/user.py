@@ -42,6 +42,24 @@ def moderator_user(user, forum, default_groups):
 
 
 @pytest.fixture
+def other_moderator_user(default_groups):
+    """Creates a second moderator who does not moderate any forum.
+
+    Models the cross-forum attacker from the ``mod_edituser`` advisory: same
+    group as ``moderator_user``, no overlapping moderation scope.
+    """
+    user = User(
+        username="test_other_mod",
+        email="test_other_mod@example.org",
+        password="test",
+        primary_group=default_groups[2],
+        activated=True,
+    )
+    user.save()
+    return user
+
+
+@pytest.fixture
 def admin_user(default_groups):
     """Creates a admin user."""
     user = User(

@@ -43,14 +43,14 @@
                             <a class="btn btn-sm btn-primary" href="{{ url_for('user.settings')}}">
                                 <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
                             </a>
-                            {% elif current_user|can_edit_user %}
+                            {% elif current_user|can_edit_user(user) %}
                             <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}">
                                 <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
                             </a>
                             {% endif %}
 
                             {# Ban user #}
-                            {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                            {% if current_user|can_ban_user(user) and not user.permissions['banned'] %}
                             <form class="d-inline" method="post" action="{{ url_for('management.ban_user', user_id=user.id) }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <button class="btn btn-sm btn-danger">
@@ -59,7 +59,7 @@
                             </form>
 
                             {# Unban user #}
-                            {% elif current_user|can_ban_user and user.permissions['banned'] %}
+                            {% elif current_user|can_ban_user(user) and user.permissions['banned'] %}
                             <form class="d-inline" method="post" action="{{ url_for('management.unban_user', user_id=user.id) }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                 <button class="btn btn-sm btn-warning">

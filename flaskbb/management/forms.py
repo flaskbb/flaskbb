@@ -15,6 +15,7 @@ from typing import Any, override
 
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from sqlalchemy import select
@@ -47,7 +48,7 @@ from flaskbb.user.models import Group, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
 )
-from flaskbb.utils.requirements import IsAtleastModerator
+from flaskbb.utils.requirements import IsAdmin, IsAtleastModerator
 from flaskbb.utils.uploads import (
     validate_image,
 )
@@ -79,6 +80,35 @@ def selectable_groups():
 def select_primary_group():
     return (
         db.session.execute(select(Group).where(Group.guest != True).order_by(Group.id))
+        .scalars()
+        .all()
+    )
+
+
+def assignable_groups():
+    """The groups the acting user is allowed to hand out.
+
+    Only administrators may grant administrator or super moderator status; a
+    super moderator can promote up to moderator. This is enforced server side
+    because wtforms-sqlalchemy validates a submitted choice against this list,
+    so a hand-crafted POST cannot smuggle in a group that is not offered.
+    """
+    if Permission(IsAdmin, identity=current_user):
+        return select_primary_group()
+
+    member_group = db.and_(
+        *[
+            getattr(Group, p).is_(False)
+            for p in ["admin", "mod", "super_mod", "banned", "guest"]
+        ]
+    )
+
+    return (
+        db.session.execute(
+            select(Group)
+            .where(db.or_(member_group, Group.mod, Group.banned))
+            .order_by(Group.id)
+        )
         .scalars()
         .all()
     )
@@ -194,6 +224,47 @@ class EditUserForm(UserForm):
         self.user = user
         kwargs["obj"] = self.user
         UserForm.__init__(self, *args, **kwargs)
+
+
+class SelfEditUserForm(EditUserForm):
+    """The edit form when the target is the acting user.
+
+    ``BanUser`` and ``DeleteUser`` both refuse to act on the acting user. The
+    edit form has to refuse the equivalent, or an administrator can lock
+    themselves out by handing themselves the banned group, demoting their own
+    primary group, dropping the secondary group their rights come from, or
+    clearing their own activation. Credentials stay - changing your own password
+    or email address is self service, not a lockout.
+    """
+
+    activated = None
+    primary_group = None
+    secondary_groups = None
+
+
+class SuperModeratorEditUserForm(EditUserForm):
+    """The edit form as seen by super moderators.
+
+    Credentials are administrator territory - being able to set another user's
+    password or email address is an account takeover, which is what group
+    membership on its own is not. Group assignment stays, but the choices are
+    narrowed per actor in ``EditUser`` so that only administrators can hand out
+    administrator or super moderator status.
+
+    Assigning ``None`` drops a field from the form, and therefore from
+    validation and ``populate_obj`` alike.
+    """
+
+    email = None
+    password = None
+    activated = None
+
+
+class ModeratorEditUserForm(SuperModeratorEditUserForm):
+    """The edit form as seen by moderators, who may only clean up profiles."""
+
+    primary_group = None
+    secondary_groups = None
 
 
 class GroupForm(FlaskForm):

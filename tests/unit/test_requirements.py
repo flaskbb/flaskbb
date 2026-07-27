@@ -112,3 +112,67 @@ def test_CanPostAttachment_with_mod(moderator_user):
 def test_guest_cannot_post_attachment(guest, forum, request_context):
     push_onto_request_context(forum=forum)
     assert not r.CanPostAttachment(guest)
+
+
+def test_IsMorePrivilegedThan_ranks_admin_over_mod(admin_user, moderator_user):
+    assert r.IsMorePrivilegedThan(moderator_user)(admin_user)
+
+
+def test_IsMorePrivilegedThan_ranks_mod_over_member(moderator_user, user):
+    assert r.IsMorePrivilegedThan(user)(moderator_user)
+
+
+def test_IsMorePrivilegedThan_is_strict_between_equals(
+    moderator_user, other_moderator_user
+):
+    assert not r.IsMorePrivilegedThan(other_moderator_user)(moderator_user)
+
+
+def test_IsMorePrivilegedThan_is_false_for_self(moderator_user):
+    assert not r.IsMorePrivilegedThan(moderator_user)(moderator_user)
+
+
+def test_IsMorePrivilegedThan_counts_secondary_groups(
+    user, moderator_user, default_groups
+):
+    """A privileged secondary group must outrank the primary group alone."""
+    user.save(groups=[default_groups[0]])
+    assert not r.IsMorePrivilegedThan(user)(moderator_user)
+
+
+def test_CanEditTargetUser_mod_can_edit_member(moderator_user, user):
+    assert r.CanEditTargetUser(user)(moderator_user)
+
+
+def test_CanEditTargetUser_mod_cannot_edit_other_mod(
+    moderator_user, other_moderator_user
+):
+    assert not r.CanEditTargetUser(other_moderator_user)(moderator_user)
+
+
+def test_CanEditTargetUser_mod_cannot_edit_supermod(
+    moderator_user, super_moderator_user
+):
+    assert not r.CanEditTargetUser(super_moderator_user)(moderator_user)
+
+
+def test_CanEditTargetUser_mod_cannot_edit_admin(moderator_user, admin_user):
+    assert not r.CanEditTargetUser(admin_user)(moderator_user)
+
+
+def test_CanEditTargetUser_admin_can_edit_admin(admin_user, super_moderator_user):
+    """Admins bypass the ranking check so they can still manage each other."""
+    assert r.CanEditTargetUser(admin_user)(admin_user)
+    assert r.CanEditTargetUser(super_moderator_user)(admin_user)
+
+
+def test_CanEditTargetUser_still_requires_the_permission(Fred, user):
+    assert not r.CanEditTargetUser(user)(Fred)
+
+
+def test_CanBanTargetUser_mod_cannot_ban_supermod(moderator_user, super_moderator_user):
+    assert not r.CanBanTargetUser(super_moderator_user)(moderator_user)
+
+
+def test_CanBanTargetUser_mod_can_ban_member(moderator_user, user):
+    assert r.CanBanTargetUser(user)(moderator_user)

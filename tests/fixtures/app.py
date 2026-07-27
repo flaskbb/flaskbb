@@ -2,7 +2,7 @@ import pytest
 
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
-from flaskbb.extensions import db
+from flaskbb.extensions import cache, db
 from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
@@ -21,6 +21,19 @@ def application():
     yield app
 
     ctx.pop()
+
+
+@pytest.fixture(autouse=True)
+def clear_cache(application):
+    """Drops the cache between tests.
+
+    ``User.get_permissions`` and ``get_groups`` are memoized on the user's
+    repr, which is just ``<User username>``. Fixture usernames repeat across
+    tests, so a cached entry from one test would otherwise be served to the
+    next one - with whatever groups the earlier test happened to assign.
+    """
+    yield
+    cache.clear()
 
 
 @pytest.fixture()
