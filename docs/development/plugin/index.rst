@@ -7,5 +7,6 @@ Plugin Development
    :maxdepth: 1
 
    developing
+   translations
    hooks
    manager

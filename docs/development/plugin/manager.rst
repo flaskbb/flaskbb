@@ -26,7 +26,7 @@ You can query it like any SQLAlchemy Model::
 Plugin Manager
 --------------
 FlaskBB overrides the PluginManager from pluggy to provide some additional
-functionality like accessing the information stored in a setup.py file. The
+functionality like accessing the information stored in a pyproject.toml file. The
 plugin manager will only list the currently enabled plugins and can be used to
 directly access the plugins instance by its name.
 
