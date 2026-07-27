@@ -1,5 +1,5 @@
 from flask import get_flashed_messages
-from flask_login import login_user
+from flask_login import login_user, logout_user
 
 from flaskbb.management import views
 
@@ -21,6 +21,7 @@ def test_overview_with_authorized(admin_user, application, default_settings):
         login_user(admin_user)
         resp = view()
         assert "Overview" in resp
+        logout_user()
 
 
 def test_overview_with_supermod(super_moderator_user, application, default_settings):  # noqa
@@ -29,6 +30,7 @@ def test_overview_with_supermod(super_moderator_user, application, default_setti
         login_user(super_moderator_user)
         resp = view()
         assert "Overview" in resp
+        logout_user()
 
 
 def test_overview_with_mod(moderator_user, application, default_settings):
@@ -37,3 +39,4 @@ def test_overview_with_mod(moderator_user, application, default_settings):
         login_user(moderator_user)
         resp = view()
         assert "Overview" in resp
+        logout_user()

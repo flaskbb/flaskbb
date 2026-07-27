@@ -4,7 +4,15 @@ import datetime
 
 import pytest
 
-from flaskbb.forum.models import Category, Forum, ForumsRead, Post, Topic, TopicsRead
+from flaskbb.forum.models import (
+    Attachment,
+    Category,
+    Forum,
+    ForumsRead,
+    Post,
+    Topic,
+    TopicsRead,
+)
 
 
 @pytest.fixture
@@ -64,6 +72,35 @@ def topic_in_locked_forum(forum_locked, user):
     topic = Topic(title="Test Topic Forum Locked")
     post = Post(content="Test Content Forum Locked")
     return topic.save(forum=forum_locked, user=user, post=post)
+
+
+@pytest.fixture
+def attachment_upload_path(application, tmp_path):
+    """Points the attachment upload path at a per-test tmp directory."""
+    application.config["ATTACHMENT_UPLOAD_PATH"] = str(tmp_path)
+    yield tmp_path
+    application.config["ATTACHMENT_UPLOAD_PATH"] = None
+
+
+@pytest.fixture
+def attachment(topic, user, attachment_upload_path):
+    """An image attachment on the topic's first post, with a real file
+    on disk."""
+    post = topic.first_post
+    stored_filename = "deadbeef"
+    post_dir = attachment_upload_path / str(post.id)
+    post_dir.mkdir()
+    (post_dir / stored_filename).write_bytes(b"not really a png")
+
+    attachment = Attachment(
+        post_id=post.id,
+        user_id=user.id,
+        filename=stored_filename,
+        original_filename="test image.png",
+        content_type="image/png",
+        size=16,
+    )
+    return attachment.save()
 
 
 @pytest.fixture

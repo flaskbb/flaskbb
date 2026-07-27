@@ -128,6 +128,31 @@
 
                         {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
 
+                        <!-- Attachments Begin -->
+                        {% if post.attachments %}
+                        <div class="post-attachments">
+                            <hr />
+                            <h6 class="post-attachments-heading text-muted">{% trans %}Attachments{% endtrans %}</h6>
+                            <ul class="list-unstyled">
+                            {% for attachment in post.attachments %}
+                                <li>
+                                    {% if attachment.is_image and flaskbb_config["ATTACHMENT_IMAGE_PREVIEWS"] %}
+                                    <div>
+                                        <a href="{{ attachment.url }}">
+                                            <img src="{{ attachment.url }}" class="img-fluid post-attachment-image" alt="{{ attachment.original_filename }}" />
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                    <span class="fas fa-paperclip"></span>
+                                    <a href="{{ attachment.url }}">{{ attachment.original_filename }}</a>
+                                    <small class="text-muted">({{ attachment.size|filesizeformat }})</small>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <!-- Attachments End -->
+
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
                         <div class="post-signature d-none d-sm-block">

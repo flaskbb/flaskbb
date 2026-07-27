@@ -269,6 +269,49 @@ misc_group = SettingGroup(
 )
 
 
+attachments_group = SettingGroup(
+    key="attachments",
+    name="Attachment Settings",
+    description="Settings for post attachments.",
+    settings=(
+        BoolSetting(
+            key="ATTACHMENTS_ENABLED",
+            value=True,
+            name="Enable Attachments",
+            description="Allow users to attach files to their posts.",
+        ),
+        BoolSetting(
+            key="ATTACHMENT_IMAGE_PREVIEWS",
+            value=True,
+            name="Enable attachment previews for images",
+            description="Show image attachments as inline previews in posts.",
+        ),
+        IntSetting(
+            key="ATTACHMENT_MAX_SIZE",
+            value=1024,
+            min=0,
+            name="Attachment Size",
+            description="The allowed size per attachment in kilobytes.",
+        ),
+        IntSetting(
+            key="ATTACHMENTS_PER_POST",
+            value=5,
+            min=1,
+            name="Attachments per Post",
+            description="The maximum number of attachments per post.",
+        ),
+        StringSetting(
+            key="ATTACHMENT_TYPES",
+            value="png, jpg, jpeg, gif, pdf",
+            name="Attachment Types",
+            description=(
+                "A comma separated list of the allowed file extensions for attachments."
+            ),
+        ),
+    ),
+)
+
+
 appearance_group = SettingGroup(
     key="appearance",
     name="Appearance Settings",
@@ -296,4 +339,10 @@ appearance_group = SettingGroup(
 
 @impl
 def flaskbb_load_internal_setting_groups():
-    return [general_group, auth_group, misc_group, appearance_group]
+    return [
+        general_group,
+        auth_group,
+        misc_group,
+        attachments_group,
+        appearance_group,
+    ]

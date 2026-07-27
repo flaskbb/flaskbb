@@ -218,7 +218,87 @@ export function check_overview_status(endpoint, notification, running, not_runni
         });
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function (_event) {
+    // attachment inputs: once an input has a file, offer another (empty)
+    // input so more files can be picked from a different location, and
+    // reject picks that are too big or would exceed the per-post attachment
+    // limit before the form is ever submitted. Delegated so it also fires on
+    // the inputs added here and on the delete checkboxes that free up slots
+    // again.
+    const dropOversizedFiles = (input, container) => {
+        const maxSize = parseInt(container.dataset.maxSize, 10) || 0;
+        if (!maxSize) return false;
+
+        const kept = new DataTransfer();
+        for (const file of input.files) {
+            if (file.size <= maxSize) kept.items.add(file);
+        }
+        if (kept.files.length === input.files.length) return false;
+
+        // keep the files that do fit, so only the offending ones are lost
+        input.files = kept.files;
+        return true;
+    };
+
+    const attachmentSlotsLeft = (container) => {
+        const max = parseInt(container.dataset.maxAttachments, 10) || 0;
+        if (!max) return Infinity;
+
+        const existing = parseInt(container.dataset.existingAttachments, 10) || 0;
+        const form = container.closest("form");
+        const deleted = form
+            ? form.querySelectorAll('input[name="delete_attachments"]:checked').length
+            : 0;
+        const selected = Array.from(
+            container.querySelectorAll('input[type="file"]')
+        ).reduce((n, el) => n + el.files.length, 0);
+        return max - (existing - deleted) - selected;
+    };
+
+    document.addEventListener("change", (event) => {
+        const form = event.target.closest("form");
+        const container = form && form.querySelector(".attachment-fields");
+        if (!container) return;
+
+        const isFileInput = event.target.matches(
+            '.attachment-fields input[type="file"]'
+        );
+        const isDeleteCheckbox = event.target.matches(
+            'input[name="delete_attachments"]'
+        );
+        if (!isFileInput && !isDeleteCheckbox) return;
+
+        const error = container.querySelector(".attachment-limit-error");
+        const sizeError = container.querySelector(".attachment-size-error");
+        let rejected = false;
+
+        if (isFileInput && event.target.files.length > 0) {
+            const tooLarge = dropOversizedFiles(event.target, container);
+            sizeError.style.display = tooLarge ? "block" : "none";
+        }
+
+        if (isFileInput && attachmentSlotsLeft(container) < 0) {
+            // this pick went over the limit - drop it and tell the user
+            event.target.value = "";
+            rejected = true;
+        }
+        const slots = attachmentSlotsLeft(container);
+        error.style.display = rejected || slots < 0 ? "block" : "none";
+
+        if (!isFileInput || event.target.files.length === 0) return;
+        if (slots <= 0) return;
+
+        const inputs = container.querySelectorAll('input[type="file"]');
+        if (Array.from(inputs).some((el) => el.files.length === 0)) return;
+
+        const fresh = event.target.cloneNode();
+        fresh.value = "";
+        fresh.removeAttribute("id");
+        fresh.classList.remove("is-invalid");
+        fresh.classList.add("mt-2");
+        event.target.after(fresh);
+    });
+
     // Reply to post
     document.querySelectorAll(".quote-btn").forEach((el) =>
         el.addEventListener("click", (event) => {

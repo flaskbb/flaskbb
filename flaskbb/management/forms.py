@@ -252,6 +252,12 @@ class GroupForm(FlaskForm):
         _("Can post replies"),
         description=_("Check this, if the users in this group can post replies."),
     )
+    postattachment = BooleanField(
+        _("Can upload attachments"),
+        description=_(
+            "Check this, if the users in this group can attach files to posts."
+        ),
+    )
 
     mod_edituser = BooleanField(
         _("Moderators can edit user profiles"),
@@ -326,6 +332,7 @@ class GroupForm(FlaskForm):
             self.deletetopic,
             self.posttopic,
             self.postreply,
+            self.postattachment,
             self.mod_edituser,
             self.mod_banuser,
             self.viewhidden,

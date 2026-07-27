@@ -144,3 +144,7 @@ node_modules
 test-results.xml
 .ruff_cache
 search_index
+flaskbb/static/uploads/*
+.zed
+*.sqlite*
+logs/*

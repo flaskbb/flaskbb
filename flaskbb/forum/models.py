@@ -22,6 +22,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    event,
     func,
     join,
     or_,
@@ -50,6 +51,7 @@ from flaskbb.utils.helpers import (
     time_utcnow,
     topic_is_unread,
 )
+from flaskbb.utils.uploads import delete_attachment_file
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +220,92 @@ class Report(db.Model, CRUDMixin):
 
 
 @make_comparable
+class Attachment(db.Model, CRUDMixin):
+    __tablename__ = "attachments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    post_id: Mapped[int] = mapped_column(
+        ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(255), nullable=False)
+    size: Mapped[int] = mapped_column(nullable=False)  # bytes
+    width: Mapped[int | None] = mapped_column(nullable=True)
+    height: Mapped[int | None] = mapped_column(nullable=True)
+    date_created: Mapped[datetime] = mapped_column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
+
+    post: Mapped["Post"] = relationship("Post", back_populates="attachments")
+
+    def __init__(
+        self,
+        post_id: int,
+        filename: str,
+        original_filename: str,
+        content_type: str,
+        size: int,
+        user_id: int | None = None,
+        width: int | None = None,
+        height: int | None = None,
+    ):
+        self.post_id = post_id
+        self.user_id = user_id
+        self.filename = filename
+        self.original_filename = original_filename
+        self.content_type = content_type
+        self.size = size
+        self.width = width
+        self.height = height
+        self.date_created = time_utcnow()
+
+    @property
+    def is_image(self):
+        return self.content_type.startswith("image/")
+
+    @property
+    def url(self):
+        # display_name is only used to return something more human readable
+        return url_for(
+            "uploads.attachment",
+            filename=self.filename,
+            display_name=self.original_filename,
+        )
+
+    @override
+    def __repr__(self):
+        return "<{} {}>".format(self.__class__.__name__, self.id)
+
+
+_PENDING_UNLINK_KEY = "attachment_files_pending_unlink"
+
+
+# Physical files must only be removed once the row deletion is committed --
+# unlinking earlier would orphan the rows on a rollback. The mapper event
+# fires for every deletion path (edit-time removal, post delete and the
+# topic delete-orphan cascade over its posts) because they all go through
+# ORM-level deletes, never bulk DELETE statements.
+@event.listens_for(Attachment, "after_delete")
+def _queue_attachment_unlink(mapper, connection, target: Attachment):
+    db.session.info.setdefault(_PENDING_UNLINK_KEY, []).append(
+        (target.post_id, target.filename)
+    )
+
+
+@event.listens_for(db.session, "after_commit")
+def _unlink_deleted_attachment_files(session):
+    for post_id, filename in session.info.pop(_PENDING_UNLINK_KEY, []):
+        delete_attachment_file(post_id, filename)
+
+
+@event.listens_for(db.session, "after_rollback")
+def _discard_pending_unlinks(session):
+    session.info.pop(_PENDING_UNLINK_KEY, None)
+
+
+@make_comparable
 class Post(HideableCRUDMixin, db.Model):
     __tablename__ = "posts"
 
@@ -245,6 +333,14 @@ class Post(HideableCRUDMixin, db.Model):
 
     topic: Mapped["Topic"] = relationship(
         "Topic", foreign_keys=[topic_id], back_populates="posts"
+    )
+
+    attachments: Mapped[list["Attachment"]] = relationship(
+        "Attachment",
+        back_populates="post",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="Attachment.id",
     )
 
     # Properties

@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import (
+    Attachment,
     Category,
     Forum,
     ForumsRead,
@@ -716,3 +717,66 @@ def test_retrieving_hidden_topics(topic, user):
         hidden(select(Topic).where(Topic.id == topic.id), True)
     ).first()
     assert hidden_topic == topic
+
+
+def test_attachment_is_image_and_url(attachment, request_context):
+    assert attachment.is_image
+    # the stored (unguessable) filename identifies the attachment, the
+    # original filename is only there to make the url readable
+    assert attachment.url.endswith("/uploads/attachments/deadbeef/test%20image.png")
+    assert str(attachment.id) not in attachment.url
+
+    attachment.content_type = "application/pdf"
+    assert not attachment.is_image
+
+
+def test_post_delete_removes_attachment_files(topic, user, attachment_upload_path):
+    post = Post(content="Test Content Attachment")
+    post.save(user=user, topic=topic)
+
+    post_dir = attachment_upload_path / str(post.id)
+    post_dir.mkdir()
+    (post_dir / "cafebabe.png").write_bytes(b"x")
+    Attachment(
+        post_id=post.id,
+        user_id=user.id,
+        filename="cafebabe.png",
+        original_filename="a.png",
+        content_type="image/png",
+        size=1,
+    ).save()
+
+    post.delete()
+
+    assert db.session.scalar(select(Attachment)) is None
+    assert not (post_dir / "cafebabe.png").exists()
+
+
+def test_topic_delete_removes_attachment_files(attachment, topic):
+    file_path = current_app.config["ATTACHMENT_UPLOAD_PATH"]
+    from pathlib import Path
+
+    file_path = Path(file_path, str(attachment.post_id), attachment.filename)
+    assert file_path.exists()
+
+    topic.delete()
+
+    assert db.session.scalar(select(Attachment)) is None
+    assert not file_path.exists()
+
+
+def test_attachment_rollback_keeps_file(attachment):
+    from pathlib import Path
+
+    file_path = Path(
+        current_app.config["ATTACHMENT_UPLOAD_PATH"],
+        str(attachment.post_id),
+        attachment.filename,
+    )
+
+    db.session.delete(attachment)
+    db.session.flush()
+    db.session.rollback()
+
+    assert db.session.scalar(select(Attachment)) is not None
+    assert file_path.exists()

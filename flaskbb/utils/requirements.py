@@ -224,6 +224,12 @@ CanPostReply = Or(
     IsAtleastSuperModerator,
 )
 
+CanPostAttachment = Or(
+    IsAtleastSuperModerator,
+    And(IsAuthed(), Has("postattachment")),
+    IsModeratorInForum(),
+)
+
 CanPostTopic = Or(
     And(CanAccessForum(), Has("posttopic"), ForumNotLocked()),
     IsAtleastSuperModerator,
