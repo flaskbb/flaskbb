@@ -23,29 +23,6 @@
             {{ navlink('management.attachments', _('All Attachments')) }}
         </ul>
     </div>
-
-    {% if current_user|is_admin %}
-        {{
-            action_confirm(
-                id="cleanup-attachments",
-                url=url_for('management.cleanup_attachments'),
-                title=_("Cleanup"),
-                icon="fas fa-broom",
-                btn="btn btn-warning btn-sm w-100 mt-2",
-                icon_only=False
-            )
-        }}
-        {{
-            action_confirm(
-                id="purge-attachments",
-                url=url_for('management.purge_attachments'),
-                title=_("Purge all"),
-                icon="far fa-trash-alt",
-                btn="btn btn-danger btn-sm w-100 mt-2",
-                icon_only=False
-            )
-        }}
-    {% endif %}
 </div>
 
 
@@ -57,6 +34,28 @@
                     <span class="fa fa-paperclip"></span> {% trans %}Attachments{% endtrans %}
                 </div>
                 <div class="col-auto">
+                    {% if current_user|is_admin %}
+                    {{
+                        action_confirm(
+                            id="cleanup-attachments",
+                            url=url_for('management.cleanup_attachments'),
+                            title=_("Cleanup"),
+                            icon="fas fa-broom",
+                            btn="btn btn-warning btn-xs",
+                            icon_only=False
+                        )
+                    }}
+                    {{
+                        action_confirm(
+                            id="purge-attachments",
+                            url=url_for('management.purge_attachments'),
+                            title=_("Purge all"),
+                            icon="far fa-trash-alt",
+                            btn="btn btn-danger btn-xs",
+                            icon_only=False
+                        )
+                    }}
+                    {% endif %}
                     <button type="button" class="btn btn-white btn-xs" onclick="return window.app.show_management_search()">
                         <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
                     </button>
@@ -76,23 +75,25 @@
             </div>
 
             <div class="settings-content">
-                <div class="settings-meta row">
-                    <div class="col-md-1 col-sm-1 col-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
-                    <div class="col-md-3 col-sm-3 col-4 meta-item">{% trans %}File{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Uploader{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">{% trans %}Topic{% endtrans %}</div>
-                    <div class="col-md-1 col-sm-1 col-2 meta-item">{% trans %}Size{% endtrans %}</div>
-                    <div class="col-md-2 d-none d-md-block meta-item">{% trans %}Uploaded{% endtrans %}</div>
-                    <div class="col-md-1 col-sm-2 col-2">
+                <div class="settings-meta row justify-content-evenly">
+                    <div class="meta-item col-auto">
+                        <input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All" />
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 meta-item">{% trans %}File{% endtrans %}</div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 meta-item">{% trans %}Uploader{% endtrans %}</div>
+                    <div class="col-lg-2 col-md-2 d-none d-lg-block meta-item">{% trans %}Topic{% endtrans %}</div>
+                    <div class="col-lg-1 col-md-2 d-none d-lg-block meta-item">{% trans %}Date{% endtrans %}</div>
+                    <div class="col-auto text-end">
                         <div class="dropdown">
-                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#"
+                               role="button" aria-expanded="false">
                                 <span class="fa fa-fw fa-cog"></span>
                                 {% trans %}Actions{% endtrans %}
                             </a>
-
                             <ul class="dropdown-menu">
                                 <li>
-                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.delete_attachment') }}')">
+                                    <button class="dropdown-item btn btn-sm"
+                                            onclick="return bulk_actions.execute('{{ url_for('management.delete_attachment') }}')">
                                         <span class="far fa-fw fa-trash-alt text-danger"></span>
                                         {% trans %}Delete selected Attachments{% endtrans %}
                                     </button>
@@ -101,31 +102,34 @@
                         </div>
                     </div>
                 </div>
-            {% for attachment in attachments.items %}
+                {% for attachment in attachments.items %}
                 <div class="row settings-row hover">
-                    <div class="col-md-1 col-sm-1 col-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ attachment.id }}" title="Select Attachment"/></div>
-                    <div class="col-md-3 col-sm-3 col-4">
+                    <div class="col-auto"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ attachment.id }}"
+                               title="Select Attachment" /></div>
+                    <div class="col-lg-4 col-md-4 col-sm-4">
                         <a href="{{ attachment.url }}" target="_blank">{{ attachment.original_filename }}</a>
                         {% if attachment.id in missing %}
-                            <span class="badge bg-danger">{% trans %}file missing{% endtrans %}</span>
+                        <span class="badge bg-danger">{% trans %}file missing{% endtrans %}</span>
                         {% endif %}
-                        <div><small class="text-muted">{{ attachment.content_type }}</small></div>
+                        <div><small class="text-muted">{{ attachment.content_type }},
+                                {{ attachment.size|filesizeformat }}</small></div>
                     </div>
-                    <div class="col-md-2 col-sm-2 col-3">
+                    <div class="col-lg-2 col-md-2 col-sm-4">
                         {% if attachment.user %}
-                            <a href="{{ attachment.user.url }}">{{ attachment.user.username }}</a>
+                        <a href="{{ attachment.user.url }}">{{ attachment.user.username }}</a>
                         {% else %}
-                            {% trans %}Guest{% endtrans %}
+                        {% trans %}Guest{% endtrans %}
                         {% endif %}
                     </div>
-                    <div class="col-md-2 col-sm-2 d-none d-sm-block">
+                    <div class="col-md-2 col-sm-2 d-none d-lg-block">
                         {% if attachment.post.topic %}
-                            <a href="{{ attachment.post.url }}" target="_blank">{{ attachment.post.topic.title }}</a>
+                        <a href="{{ attachment.post.url }}" data-bs-toggle="tooltip" data-placement="top"
+                           title="{{ attachment.post.topic.title }}"
+                           target="_blank">{{ attachment.post.topic.title | truncate(18, killwords=True)}}</a>
                         {% endif %}
                     </div>
-                    <div class="col-md-1 col-sm-1 col-2">{{ attachment.size|filesizeformat }}</div>
-                    <div class="col-md-2 d-none d-md-block">{{ attachment.date_created|format_date }}</div>
-                    <div class="col-md-1 col-sm-2 col-2">
+                    <div class="col-md-2 d-none d-lg-block">{{ attachment.date_created|format_date }}</div>
+                    <div class="col-auto text-end">
                         {{
                             action_confirm(
                                 id="delete-" ~ attachment.id,
@@ -136,11 +140,11 @@
                         }}
                     </div>
                 </div>
-            {% else %}
+                {% else %}
                 <div class="row settings-row">
                     <div class="col-12">{% trans %}No attachments found.{% endtrans %}</div>
                 </div>
-            {% endfor %}
+                {% endfor %}
             </div>
             <div class="card-footer settings-footer">
                 {{ render_pagination(attachments, url_for('management.attachments')) }}
@@ -152,7 +156,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script>
+<script>
     var bulk_actions = new window.app.BulkActions();
-    </script>
+</script>
 {% endblock %}

@@ -23,7 +23,8 @@
                             {% if unread_reports > 0 %}
                             <div class="alert-message alert-message-warning">
                                 <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
-                                <p>{% trans url=url_for('management.unread_reports') %}You have <a href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
+                                <p>{% trans url=url_for('management.unread_reports') %}You have <a
+                                       href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
                             </div>
                             {% else %}
                             <div id="overview-no-notifications" class="alert-message alert-message-success">
@@ -37,7 +38,7 @@
                         <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
-                                     <i class="fa fa-users text-success"></i>
+                                    <i class="fa fa-users text-success"></i>
                                 </div>
                                 <div class="text">
                                     <var>{{ all_users }}</var>
@@ -49,7 +50,7 @@
                         <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
-                                     <i class="fa fa-comment text-primary"></i>
+                                    <i class="fa fa-comment text-primary"></i>
                                 </div>
                                 <div class="text">
                                     <var>{{ post_count }}</var>
@@ -61,7 +62,7 @@
                         <div class="col-4">
                             <div class="stats-widget">
                                 <div class="icon">
-                                     <i class="fa fa-comments text-info"></i>
+                                    <i class="fa fa-comments text-info"></i>
                                 </div>
                                 <div class="text">
                                     <var>{{ topic_count }}</var>
@@ -76,25 +77,36 @@
                             <div class="row stats-heading">{% trans %}Statistics{% endtrans %}</div>
 
                             <div class="row">
-                                <div class="col key text-start">{% trans %}Registered users{% endtrans %}</div><div class="col text-end">{{ all_users }}</div>
+                                <div class="col key text-start">{% trans %}Registered users{% endtrans %}</div>
+                                <div class="col text-end">{{ all_users }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Online users{% endtrans %}</div><div class="col text-end">{{ online_users }}</div>
+                                <div class="col">{% trans %}Online users{% endtrans %}</div>
+                                <div class="col text-end">{{ online_users }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Banned users{% endtrans %}</div><div class="col text-end">{{ banned_users }}</div>
+                                <div class="col">{% trans %}Banned users{% endtrans %}</div>
+                                <div class="col text-end">{{ banned_users }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Groups{% endtrans %}</div><div class="col text-end">{{ all_groups }}</div>
+                                <div class="col">{% trans %}Groups{% endtrans %}</div>
+                                <div class="col text-end">{{ all_groups }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Topics{% endtrans %}</div><div class="col text-end">{{ topic_count }}</div>
+                                <div class="col">{% trans %}Topics{% endtrans %}</div>
+                                <div class="col text-end">{{ topic_count }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Posts{% endtrans %}</div><div class="col text-end">{{ post_count }}</div>
+                                <div class="col">{% trans %}Posts{% endtrans %}</div>
+                                <div class="col text-end">{{ post_count }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">{% trans %}Reports{% endtrans %}</div><div class="col text-end">{{ report_count }}</div>
+                                <div class="col">{% trans %}Attachments{% endtrans %}</div>
+                                <div class="col text-end">{{ attachment_count }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col">{% trans %}Reports{% endtrans %}</div>
+                                <div class="col text-end">{{ report_count }}</div>
                             </div>
                         </div>
 
@@ -102,7 +114,8 @@
                             <div class="row stats-heading">{% trans %}Components{% endtrans %}</div>
 
                             <div class="row">
-                                <div class="col">FlaskBB</div><div class="col text-end">{{ flaskbb_version }}</div>
+                                <div class="col">FlaskBB</div>
+                                <div class="col text-end">{{ flaskbb_version }}</div>
                             </div>
                             <div class="row">
                                 <div class="col">Celery</div>
@@ -112,10 +125,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col">Flask</div><div class="col text-end">{{ flask_version }}</div>
+                                <div class="col">Flask</div>
+                                <div class="col text-end">{{ flask_version }}</div>
                             </div>
                             <div class="row">
-                                <div class="col">Python</div><div class="col text-end">{{ python_version }}</div>
+                                <div class="col">Python</div>
+                                <div class="col text-end">{{ python_version }}</div>
                             </div>
                         </div>
 
@@ -125,23 +140,24 @@
                             {% for plugin in plugins %}
                             <div class="row">
                                 <div class="col">
-                                {% if plugin.installed %}
-                                    <a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
-                                {% else %}
+                                    {% if plugin.installed %}
+                                    <a
+                                       href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
+                                    {% else %}
                                     <a href="{{ url_for('management.plugins') }}">{{ plugin.name.title() }}</a>
-                                {% endif %}
+                                    {% endif %}
                                 </div>
                                 <div class="col text-end">
                                     {% if not plugin.enabled %}
-                                        <span class="text-danger">{% trans %}not enabled{% endtrans %}</span>
+                                    <span class="text-danger">{% trans %}not enabled{% endtrans %}</span>
                                     {% elif plugin.enabled %}
-                                        {% if plugin.is_installed %}
-                                        <span class="text-success">{% trans %}enabled &amp; installed{% endtrans %}</span>
-                                        {% elif not plugin.is_installable %}
-                                        <span class="text-success">{% trans %}enabled{% endtrans %}</span>
-                                        {% elif not plugin.is_installed %}
-                                        <span class="text-warning">{% trans %}not installed{% endtrans %}</span>
-                                        {% endif %}
+                                    {% if plugin.is_installed %}
+                                    <span class="text-success">{% trans %}enabled &amp; installed{% endtrans %}</span>
+                                    {% elif not plugin.is_installable %}
+                                    <span class="text-success">{% trans %}enabled{% endtrans %}</span>
+                                    {% elif not plugin.is_installed %}
+                                    <span class="text-warning">{% trans %}not installed{% endtrans %}</span>
+                                    {% endif %}
                                     {% endif %}
                                     {{ plugin.version }}
                                 </div>
@@ -159,11 +175,11 @@
 {% block scripts %}
 <script>
 
-// TOOD: Put this into management.celery_status
-const running = "<span id='celery-status' class='text-success'><strong>{% trans %}running{% endtrans %}</strong></span>";
-const not_running = "<span id='celery-status' class='text-danger'><strong>{% trans %}not running{% endtrans %}</strong></span>";
+    // TOOD: Put this into management.celery_status
+    const running = "<span id='celery-status' class='text-success'><strong>{% trans %}running{% endtrans %}</strong></span>";
+    const not_running = "<span id='celery-status' class='text-danger'><strong>{% trans %}not running{% endtrans %}</strong></span>";
 
-const notification = `
+    const notification = `
     <div class='alert-message alert-message-danger'>
         <h4>{% trans %}There is a problem.{% endtrans %}</h4>
         <p class="mb-0">{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
@@ -171,8 +187,8 @@ const notification = `
         <pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>
     </div>
 `;
-const endpoint = "{{ url_for('management.celery_status') }}";
+    const endpoint = "{{ url_for('management.celery_status') }}";
 
-window.app.check_overview_status(endpoint, notification, running, not_running);
+    window.app.check_overview_status(endpoint, notification, running, not_running);
 </script>
 {% endblock %}
