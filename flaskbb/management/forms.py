@@ -226,22 +226,6 @@ class EditUserForm(UserForm):
         UserForm.__init__(self, *args, **kwargs)
 
 
-class SelfEditUserForm(EditUserForm):
-    """The edit form when the target is the acting user.
-
-    ``BanUser`` and ``DeleteUser`` both refuse to act on the acting user. The
-    edit form has to refuse the equivalent, or an administrator can lock
-    themselves out by handing themselves the banned group, demoting their own
-    primary group, dropping the secondary group their rights come from, or
-    clearing their own activation. Credentials stay - changing your own password
-    or email address is self service, not a lockout.
-    """
-
-    activated = None
-    primary_group = None
-    secondary_groups = None
-
-
 class SuperModeratorEditUserForm(EditUserForm):
     """The edit form as seen by super moderators.
 

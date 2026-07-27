@@ -17,6 +17,13 @@
 {%- from theme('_macros/form.html') import horizontal_field -%}
 {%- from theme('_macros/utils.html') import avatar_img -%}
 
+{#- `user` is undefined on the Add User page, hence the `is defined` guard.
+    Only fields that can cost you your own access need confirming, so this is
+    false for a super moderator or moderator editing themselves - they have
+    neither field. -#}
+{% set editing_self = user is defined and current_user.id == user.id %}
+{% set confirm_self_change = editing_self
+    and (form.primary_group is not none or form.activated is not none) %}
 
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
@@ -88,38 +95,94 @@
                 {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
 
                 {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+
+                {%- if confirm_self_change %}
+                {#- Hidden trigger so the shared confirm_modal.js handles the
+                    dialog and the submit - it needs a real click with this
+                    button as relatedTarget, and it submits the closest form. -#}
+                <button type="button" id="confirm-self-change" class="d-none"
+                        data-bs-toggle="modal" data-bs-target="#confirmModal"></button>
+                {%- endif %}
             </form>
         </div>
     </div>
 </div>
+
+{% if confirm_self_change %}
+{% set confirm_title = _("Change your own account?") %}
+{% set confirm_message = _("You are about to change your own group or activation state. This can take away your access to the management panel, and you may not be able to undo it yourself.") %}
+{% include theme('_partials/confirm_dialog.html') %}
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
+{%- if confirm_self_change %}
+<script type="text/javascript">
+    // Editing your own account: make a change to your own group or activation
+    // state go through the confirm dialog first.
+    (function () {
+        const trigger = document.getElementById("confirm-self-change");
+        const form = trigger && trigger.closest("form");
+        if (!form) {
+            return;
+        }
+
+        const watched = ["primary_group", "secondary_groups", "activated"]
+            .map((name) => form.querySelector('[name="' + name + '"]'))
+            .filter(Boolean);
+
+        const valueOf = (el) => {
+            if (el.type === "checkbox") {
+                return String(el.checked);
+            }
+            if (el.multiple) {
+                return Array.from(el.selectedOptions).map((o) => o.value).sort().join(",");
+            }
+            return el.value;
+        };
+
+        const initial = new Map(watched.map((el) => [el, valueOf(el)]));
+
+        form.addEventListener("submit", (event) => {
+            if (watched.every((el) => valueOf(el) === initial.get(el))) {
+                return;
+            }
+            // confirm_modal.js submits the form natively on confirm, which does
+            // not re-fire this listener.
+            event.preventDefault();
+            trigger.click();
+        });
+    })();
+</script>
+{%- endif %}
 <script type="text/javascript">
     const defaultAvatar = "{{ url_for('static', filename='avatar100x100.png') }}"
 
+    // Only rendered when the user actually has an avatar
     const deleteAvatarBtn = document.querySelector(".deleteavatar");
-    deleteAvatarBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const avatarControl = document.getElementById('avatar');
-        avatarControl.value = "";
+    if (deleteAvatarBtn) {
+        deleteAvatarBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const avatarControl = document.getElementById('avatar');
+            avatarControl.value = "";
 
-        setTimeout(() => {
-            const deleteFlag = document.querySelector('input[name="delete_avatar"]');
-            if (deleteFlag) {
-                deleteFlag.setAttribute('value', 'true');
-                deleteFlag.value = "true";
+            setTimeout(() => {
+                const deleteFlag = document.querySelector('input[name="delete_avatar"]');
+                if (deleteFlag) {
+                    deleteFlag.setAttribute('value', 'true');
+                    deleteFlag.value = "true";
 
-                // Dispatch event to trick tracking libraries into updating their internal state
-                deleteFlag.dispatchEvent(new Event('input', { bubbles: true }));
-                deleteFlag.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        });
+                    // Dispatch event to trick tracking libraries into updating their internal state
+                    deleteFlag.dispatchEvent(new Event('input', { bubbles: true }));
+                    deleteFlag.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
 
-        const profilePicutre = document.querySelector(".profilepicture");
-        profilePicutre.setAttribute("src", defaultAvatar);
-        deleteAvatarBtn.remove()
-    }, { once: true });
+            const profilePicutre = document.querySelector(".profilepicture");
+            profilePicutre.setAttribute("src", defaultAvatar);
+            deleteAvatarBtn.remove()
+        }, { once: true });
+    }
 </script>
 {% endblock %}

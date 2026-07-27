@@ -51,7 +51,6 @@ from flaskbb.management.forms import (
     EditGroupForm,
     EditUserForm,
     ModeratorEditUserForm,
-    SelfEditUserForm,
     SuperModeratorEditUserForm,
     assignable_groups,
 )
@@ -253,15 +252,19 @@ class EditUser(MethodView):
         return user
 
     def _form_for(self, user: User):
-        # Only administrators ever get here for their own account - the strict
-        # rank comparison already stops everyone else editing themselves.
-        if user.id == current_user.id:
-            return SelfEditUserForm(user)
-
+        # Administrators keep every field, including on their own account. The
+        # template asks them to confirm a change to their own group or
+        # activation rather than taking the choice away.
         if Permission(IsAdmin, identity=current_user):
             return self.form(user)
 
-        if Permission(IsAtleastSuperModerator, identity=current_user):
+        # A super moderator may hand out groups, but not to themselves - that
+        # would be a self-demotion or self-ban, so they fall through to the
+        # moderator form for their own account.
+        if (
+            Permission(IsAtleastSuperModerator, identity=current_user)
+            and user.id != current_user.id
+        ):
             return SuperModeratorEditUserForm(user)
 
         return ModeratorEditUserForm(user)
