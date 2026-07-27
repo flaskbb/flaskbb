@@ -493,6 +493,13 @@ class ManageForum(MethodView):
                 flash(_("Please choose a new forum for the topics."), "info")
                 return redirect(mod_forum_url)
 
+            origin_forum_ids = set(topic.forum_id for topic in tmp_topics)
+            if origin_forum_ids - {forum_instance.id}:
+                flash(
+                    _("Please modify topics in only one forum at a time."), "danger"
+                )
+                return redirect(mod_forum_url)
+
             new_forum = first_or_404(db.select(Forum).where(Forum.id == new_forum_id))
 
             # check the permission in the current forum and in the new forum
