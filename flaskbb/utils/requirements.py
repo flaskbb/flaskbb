@@ -78,6 +78,37 @@ class IsModeratorInForum(IsAuthed):
         return current_forum
 
 
+def _privilege_level(user: User) -> int:
+    """Ranks a user by the highest privilege any of their groups grants."""
+    permissions = user.permissions
+    if permissions.get("admin"):
+        return 3
+    if permissions.get("super_mod"):
+        return 2
+    if permissions.get("mod"):
+        return 1
+    return 0
+
+
+class IsMorePrivilegedThan(Requirement):
+    """Fulfilled when the acting user outranks ``target``.
+
+    The comparison is strict, so it is never fulfilled for an equally
+    privileged target - including the acting user themselves.
+    """
+
+    def __init__(self, target: User):
+        self.target = target
+
+    @override
+    def __repr__(self):
+        return "<IsMorePrivilegedThan({!s})>".format(self.target)
+
+    @override
+    def fulfill(self, user: User):
+        return _privilege_level(user) > _privilege_level(self.target)
+
+
 class IsSameUser(IsAuthed):
     def __init__(self, topic_or_post: Post | Topic | int | None = None):
         self._topic_or_post = topic_or_post
@@ -210,6 +241,25 @@ CanBanUser = Or(IsAtleastSuperModerator, Has("mod_banuser"))
 
 CanEditUser = Or(IsAtleastSuperModerator, Has("mod_edituser"))
 
+
+def CanBanTargetUser(target: User):
+    """``CanBanUser``, restricted to targets the acting user outranks.
+
+    Administrators are exempt from the ranking check so that they can still
+    manage each other.
+    """
+    return And(CanBanUser, Or(IsAdmin, IsMorePrivilegedThan(target)))
+
+
+def CanEditTargetUser(target: User):
+    """``CanEditUser``, restricted to targets the acting user outranks.
+
+    Administrators are exempt from the ranking check so that they can still
+    manage each other and themselves.
+    """
+    return And(CanEditUser, Or(IsAdmin, IsMorePrivilegedThan(target)))
+
+
 CanEditPost = Or(
     IsAtleastSuperModerator,
     And(IsModeratorInForum(), Has("editpost")),
@@ -267,6 +317,20 @@ def has_permission(permission: str):
 
     _.__name__ = "Has_{}".format(permission)
     return _
+
+
+def can_edit_user(user: User, target: User | None = None):
+    if target is None:
+        return Permission(CanEditUser, identity=user)
+
+    return Permission(CanEditTargetUser(target), identity=user)
+
+
+def can_ban_user(user: User, target: User | None = None):
+    if target is None:
+        return Permission(CanBanUser, identity=user)
+
+    return Permission(CanBanTargetUser(target), identity=user)
 
 
 def can_moderate(user: User, forum: Forum | int | None):

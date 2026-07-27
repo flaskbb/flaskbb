@@ -101,13 +101,13 @@
                     <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
                     <div class="col-md-2 col-sm-2 col-3">{{ user.primary_group.name }}</div>
                     <div class="col-2">
-                    {% if current_user|can_edit_user and not user|is_admin or current_user|is_admin %}
+                    {% if current_user|can_edit_user(user) %}
                         <a href="{{ url_for('management.edit_user', user_id = user.id) }}" class="btn btn-icon">
                             <span class="fas fa-edit text-primary" data-bs-toggle="tooltip" title="{% trans %}Edit{% endtrans %}"></span>
                         </a>
                     {% endif %}
 
-                    {% if current_user|can_ban_user and not user.permissions['banned'] %}
+                    {% if current_user|can_ban_user(user) and not user.permissions['banned'] %}
                         {{
                             action_confirm(
                                 id="ban-" ~ user.id,
@@ -118,7 +118,7 @@
                         }}
                     {% endif %}
 
-                    {% if current_user|can_ban_user and user.permissions['banned'] %}
+                    {% if current_user|can_ban_user(user) and user.permissions['banned'] %}
                         {{
                             action_confirm(
                                 id="ban-" ~ user.id,

@@ -194,42 +194,43 @@ def create_welcome_forum():
 
 
 def create_test_data(
-    users: int = 2,
     categories: int = 1,
     forums: int = 1,
     topics: int = 1,
-    posts: int = 1,
+    posts: int = 2,
 ):
-    """Creates 5 users, 2 categories and 2 forums in each category.
-    It also creates a new topic topic in each forum with a post.
+    """Creates one user for each default group except the guest group, some
+    categories with forums in them and, in each forum, topics for every user
+    with replies from a different user.
     Returns the amount of created users, categories, forums, topics and posts
     as a dict.
 
-    :param users: The number of users.
     :param categories: The number of categories.
     :param forums: The number of forums which are created in each category.
-    :param topics: The number of topics which are created in each forum.
-    :param posts: The number of posts which are created in each topic.
+    :param topics: The number of topics which are created for each user in
+                   each forum.
+    :param posts: The number of replies which are created in each topic.
     """
-    create_default_groups()
+    groups = create_default_groups()
     create_default_settings()
 
     data_created = {"users": 0, "categories": 0, "forums": 0, "topics": 0, "posts": 0}
 
-    # create 5 users
-    for u in range(1, users + 1):
-        username = "test%s" % u
-        email = "test%s@example.org" % u
+    # create one user per group - a guest can't create topics or posts
+    users: list[User] = []
+    for group in groups:
+        if group.guest:
+            continue
+
+        username = group.name.lower().replace(" ", "_")
+        email = "%s@example.org" % username
         user = User(username=username, password="test", email=email)
-        user.primary_group_id = u
+        user.primary_group_id = group.id
         user.activated = True
         user.save()
+        users.append(user)
         data_created["users"] += 1
 
-    user1 = db.session.execute(select(User).filter_by(id=1)).scalar_one_or_none()
-    user2 = db.session.execute(select(User).filter_by(id=2)).scalar_one_or_none()
-
-    # create 2 categories
     with db.session.no_autoflush:
         for i in range(1, categories + 1):
             category_title = "Test Category %s" % i
@@ -237,31 +238,32 @@ def create_test_data(
             category.save()
             data_created["categories"] += 1
 
-            # create 2 forums in each category
             for j in range(1, forums + 1):
-                if i == 2:
-                    j += 2
-
                 forum_title = "Test Forum %s %s" % (j, i)
                 forum = Forum(
-                    title=forum_title, description="Test Description", category_id=i
+                    title=forum_title,
+                    description="Test Description",
+                    category_id=category.id,
                 )
                 forum.save()
                 data_created["forums"] += 1
 
-                for _ in range(1, topics + 1):
-                    # create a topic
-                    topic = Topic(title="Test Title %s" % j)
-                    post = Post(content="Test Content")
-                    topic.save(user=user1, forum=forum, post=post)
-                    data_created["topics"] += 1
+                for k in range(1, topics + 1):
+                    for index, user in enumerate(users):
+                        # the replies are written by the next user in the list
+                        other_user = users[(index + 1) % len(users)]
 
-                    for _ in range(1, posts + 1):
-                        # create a second post in the forum
-                        post = Post(content="Test Post")
-                        # db.session.add_all([post, user2, topic])
-                        post.save(user=user2, topic=topic)
-                        data_created["posts"] += 1
+                        topic = Topic(
+                            title="Test Title %s from %s" % (k, user.username)
+                        )
+                        post = Post(content="Test Content")
+                        topic.save(user=user, forum=forum, post=post)
+                        data_created["topics"] += 1
+
+                        for _ in range(1, posts + 1):
+                            post = Post(content="Test Post")
+                            post.save(user=other_user, topic=topic)
+                            data_created["posts"] += 1
 
     return data_created
 

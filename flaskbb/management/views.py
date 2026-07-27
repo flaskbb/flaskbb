@@ -27,7 +27,7 @@ from flask import (
     url_for,
 )
 from flask.views import MethodView
-from flask_allows2 import Not, Permission
+from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_fresh
 from flask_wtf.file import FileStorage
@@ -50,6 +50,10 @@ from flaskbb.management.forms import (
     EditForumForm,
     EditGroupForm,
     EditUserForm,
+    ModeratorEditUserForm,
+    SelfEditUserForm,
+    SuperModeratorEditUserForm,
+    assignable_groups,
 )
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import validate_plugin
@@ -64,7 +68,9 @@ from flaskbb.utils.helpers import (
     time_utcnow,
 )
 from flaskbb.utils.requirements import (
+    CanBanTargetUser,
     CanBanUser,
+    CanEditTargetUser,
     CanEditUser,
     IsAdmin,
     IsAtleastModerator,
@@ -235,65 +241,72 @@ class EditUser(MethodView):
     ]
     form = EditUserForm
 
-    def get(self, user_id: int):
+    def _load_target_user(self, user_id: int):
+        """Loads the user being edited, or ``None`` if the acting user may not
+        touch that account.
+        """
         user = User.get_by_or_404(id=user_id)
-        form = self.form(user)
-        member_group = db.and_(
-            *[
-                db.not_(getattr(Group, p))
-                for p in ["admin", "mod", "super_mod", "banned", "guest"]
-            ]
-        )
 
-        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
+        if not Permission(CanEditTargetUser(user), identity=current_user):
+            return None
 
-        if Permission(IsAtleastSuperModerator, identity=current_user):
-            filt = db.or_(filt, Group.mod)
+        return user
+
+    def _form_for(self, user: User):
+        # Only administrators ever get here for their own account - the strict
+        # rank comparison already stops everyone else editing themselves.
+        if user.id == current_user.id:
+            return SelfEditUserForm(user)
 
         if Permission(IsAdmin, identity=current_user):
-            filt = db.or_(filt, Group.admin, Group.super_mod)
+            return self.form(user)
 
-        if Permission(CanBanUser, identity=current_user):
-            filt = db.or_(filt, Group.banned)
+        if Permission(IsAtleastSuperModerator, identity=current_user):
+            return SuperModeratorEditUserForm(user)
 
-        group_query = Group.query.filter(filt)
+        return ModeratorEditUserForm(user)
 
-        form.primary_group.query = group_query
-        form.secondary_groups.query = group_query
+    def _restrict_group_choices(self, form: EditUserForm, user: User):
+        """Narrows the group fields to what the acting user may hand out.
+
+        Does nothing for moderators, whose form has no group fields at all.
+        """
+        if form.primary_group is None or form.secondary_groups is None:
+            return
+
+        groups = assignable_groups()
+        form.primary_group.query = groups  # pyright: ignore[reportAttributeAccessIssue]
+        form.secondary_groups.query = [  # pyright: ignore[reportAttributeAccessIssue]
+            group for group in groups if group.id != user.primary_group_id
+        ]
+
+    def get(self, user_id: int):
+        user = self._load_target_user(user_id)
+        if user is None:
+            flash(_("You are not allowed to edit this user."), "danger")
+            return redirect(url_for("management.users"))
+
+        form = self._form_for(user)
+        self._restrict_group_choices(form, user)
 
         return render_template(
             "management/user_form.html", form=form, user=user, title=_("Edit User")
         )
 
     def post(self, user_id: int):
-        user = User.get_by_or_404(id=user_id)
+        user = self._load_target_user(user_id)
+        if user is None:
+            flash(_("You are not allowed to edit this user."), "danger")
+            return redirect(url_for("management.users"))
 
-        member_group = db.and_(
-            *[
-                db.not_(getattr(Group, p))
-                for p in ["admin", "mod", "super_mod", "banned", "guest"]
-            ]
-        )
+        form = self._form_for(user)
+        self._restrict_group_choices(form, user)
 
-        filt = db.or_(Group.id.in_(g.id for g in current_user.groups), member_group)
-
-        if Permission(IsAtleastSuperModerator, identity=current_user):
-            filt = db.or_(filt, Group.mod)
-
-        if Permission(IsAdmin, identity=current_user):
-            filt = db.or_(filt, Group.admin, Group.super_mod)
-
-        if Permission(CanBanUser, identity=current_user):
-            filt = db.or_(filt, Group.banned)
-
-        group_query = Group.query.filter(filt)
-
-        form = EditUserForm(user)
-        form.primary_group.query = group_query  # pyright: ignore[reportAttributeAccessIssue]
-        form.secondary_groups.query = group_query  # pyright: ignore[reportAttributeAccessIssue]
         if form.validate_on_submit():
             form.populate_obj(user, exclude=("avatar", "secondary_groups"))
-            user.primary_group_id = form.primary_group.data.id
+
+            if form.primary_group is not None:
+                user.primary_group_id = form.primary_group.data.id
 
             if form.delete_avatar.data:
                 delete_avatar_file(user.avatar)
@@ -305,16 +318,21 @@ class EditUser(MethodView):
                 user.avatar = filename
 
             # Don't override the password
-            if form.password.data:
+            if form.password is not None and form.password.data:
                 user.password = form.password.data
 
-            user.save(groups=form.secondary_groups.data)
+            # Passing groups=None leaves the existing secondary groups alone,
+            # which is what has to happen when the form has no groups field.
+            groups = (
+                None if form.secondary_groups is None else form.secondary_groups.data
+            )
+            user.save(groups=groups)
 
             flash(_("User updated."), "success")
             return redirect(url_for("management.edit_user", user_id=user.id))
 
         return render_template(
-            "management/user_form.html", form=form, title=_("Edit User")
+            "management/user_form.html", form=form, user=user, title=_("Edit User")
         )
 
 
@@ -489,12 +507,10 @@ class BanUser(MethodView):
             data: list[dict[str, Any]] = []
             users = User.get_all(User.id.in_(ids))
             for user in users:
-                # don't let a user ban himself and do not allow a moderator
-                # to ban a admin user
-                if (
-                    current_user.id == user.id
-                    or Permission(IsAdmin, identity=user)
-                    and Permission(Not(IsAdmin), current_user)
+                # don't let a user ban himself and do not allow banning a user
+                # who is not outranked by the acting user
+                if current_user.id == user.id or not Permission(
+                    CanBanTargetUser(user), identity=current_user
                 ):
                     continue
 
@@ -519,11 +535,9 @@ class BanUser(MethodView):
             )
 
         user = User.get_by_or_404(id=user_id)
-        # Do not allow moderators to ban admins
-        if Permission(IsAdmin, identity=user) and Permission(
-            Not(IsAdmin), identity=current_user
-        ):
-            flash(_("A moderator cannot ban an admin user."), "danger")
+        # Do not allow banning a user who is not outranked by the acting user
+        if not Permission(CanBanTargetUser(user), identity=current_user):
+            flash(_("You are not allowed to ban this user."), "danger")
             return redirect(url_for("management.overview"))
 
         if not current_user.id == user.id and user.ban():
@@ -560,6 +574,11 @@ class UnbanUser(MethodView):
 
             data: list[dict[str, Any]] = []
             for user in User.get_all(User.id.in_(ids)):
+                # unban() drops the user into the member group, so it needs the
+                # same target check as banning
+                if not Permission(CanBanTargetUser(user), identity=current_user):
+                    continue
+
                 if user.unban():
                     data.append(
                         {
@@ -581,6 +600,10 @@ class UnbanUser(MethodView):
             )
 
         user = User.get_by_or_404(id=user_id)
+
+        if not Permission(CanBanTargetUser(user), identity=current_user):
+            flash(_("You are not allowed to unban this user."), "danger")
+            return redirect(url_for("management.overview"))
 
         if user.unban():
             flash(_("User is now unbanned."), "success")
