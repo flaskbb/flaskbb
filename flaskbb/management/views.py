@@ -102,6 +102,58 @@ ATTACHMENT_CLEANUP_GRACE = timedelta(minutes=5)
 ATTACHMENT_DELETE_BATCH = 500
 
 
+class ManagementOverview(MethodView):
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the management panel"),
+                level="danger",
+                endpoint="forum.index",
+            ),
+        )
+    ]
+
+    def get(self):
+        # user and group stats
+        banned_users = User.count(
+            clause=[Group.banned == True, Group.id == User.primary_group_id]
+        )
+        if not current_app.config["REDIS_ENABLED"]:
+            online_users = User.count(User.lastseen >= time_diff())
+        else:
+            online_users = len(get_online_users())
+
+        unread_reports = Report.count(Report.zapped == None)
+
+        python_version = "{}.{}.{}".format(
+            sys.version_info[0], sys.version_info[1], sys.version_info[2]
+        )
+
+        stats = {
+            "current_app": current_app,
+            "unread_reports": unread_reports,
+            # stats stats
+            "all_users": User.count(),
+            "banned_users": banned_users,
+            "online_users": online_users,
+            "all_groups": Group.count(),
+            "report_count": Report.count(),
+            "topic_count": Topic.count(),
+            "post_count": Post.count(),
+            "attachment_count": Attachment.count(),
+            # components
+            "python_version": python_version,
+            "celery_version": celery_version,
+            "flask_version": importlib.metadata.version("flask"),
+            "flaskbb_version": flaskbb_version,
+            # plugins
+            "plugins": PluginRegistry.get_all(),
+        }
+
+        return render_template("management/overview.html", **stats)
+
+
 class ManagementSettings(MethodView):
     decorators = [
         allows.requires(
@@ -1431,57 +1483,6 @@ class CeleryStatus(MethodView):
             celery_running = False
 
         return jsonify(celery_running=celery_running, status=200)
-
-
-class ManagementOverview(MethodView):
-    decorators = [
-        allows.requires(
-            IsAtleastModerator,
-            on_fail=FlashAndRedirect(
-                message=_("You are not allowed to access the management panel"),
-                level="danger",
-                endpoint="forum.index",
-            ),
-        )
-    ]
-
-    def get(self):
-        # user and group stats
-        banned_users = User.count(
-            clause=[Group.banned == True, Group.id == User.primary_group_id]
-        )
-        if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.count(User.lastseen >= time_diff())
-        else:
-            online_users = len(get_online_users())
-
-        unread_reports = Report.count(Report.zapped == None)
-
-        python_version = "{}.{}.{}".format(
-            sys.version_info[0], sys.version_info[1], sys.version_info[2]
-        )
-
-        stats = {
-            "current_app": current_app,
-            "unread_reports": unread_reports,
-            # stats stats
-            "all_users": User.count(),
-            "banned_users": banned_users,
-            "online_users": online_users,
-            "all_groups": Group.count(),
-            "report_count": Report.count(),
-            "topic_count": Topic.count(),
-            "post_count": Post.count(),
-            # components
-            "python_version": python_version,
-            "celery_version": celery_version,
-            "flask_version": importlib.metadata.version("flask"),
-            "flaskbb_version": flaskbb_version,
-            # plugins
-            "plugins": PluginRegistry.get_all(),
-        }
-
-        return render_template("management/overview.html", **stats)
 
 
 class PluginsView(MethodView):
