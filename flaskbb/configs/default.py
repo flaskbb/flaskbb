@@ -291,3 +291,9 @@ class DefaultConfig(object):
     # Uploads
     AVATAR_EXTENSIONS = ["jpg", "png", "gif"]
     AVATAR_UPLOAD_PATH = None  # defaults to static_folder/uploads/avatar
+    ATTACHMENT_UPLOAD_PATH = None  # defaults to static_folder/uploads/attachments
+
+    # Hard request size cap enforced by Flask before the view runs.
+    # Per-file/per-post attachment limits are runtime settings
+    # (ATTACHMENT_MAX_SIZE, ATTACHMENTS_PER_POST) and must fit below this.
+    MAX_CONTENT_LENGTH = 32 * 1024 * 1024

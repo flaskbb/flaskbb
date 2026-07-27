@@ -63,6 +63,23 @@
         }
     }
 
+    .post-attachments {
+        margin-top: 2em;
+
+        hr {
+            margin-bottom: 0.25rem;
+        }
+
+        .post-attachments-heading {
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .post-attachment-image {
+            max-height: 400px;
+        }
+    }
+
     .post-signature {
         margin-top: 2em;
         hr {

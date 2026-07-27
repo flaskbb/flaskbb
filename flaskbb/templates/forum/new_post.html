@@ -22,7 +22,7 @@
         </li>
     </ol>
 
-    <form class="form-horizontal" role="form" method="post">
+    <form class="form-horizontal" role="form" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="card page">
             <div class="card-header page-header">
@@ -36,6 +36,8 @@
 
                     {{ render_editor_field(form.content, rows=6) }}
                     {{ render_field(form.track_topic) }}
+
+                    {% include theme("forum/_attachment_fields.html") %}
 
                     {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
 

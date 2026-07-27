@@ -11,6 +11,7 @@ A few helpers that are used by flaskbb
 
 import logging
 import os
+import uuid
 from pathlib import Path
 
 from flask import Flask, current_app
@@ -52,15 +53,53 @@ def delete_avatar_file(filename: str | None):
         logger.error(f"An unexpected error occurred: {e}")
 
 
+def get_attachment_upload_path() -> str:
+    if current_app.config.get("ATTACHMENT_UPLOAD_PATH", None) is None:
+        return os.path.join(
+            current_app.static_folder or "static", "uploads", "attachments"
+        )
+    return current_app.config["ATTACHMENT_UPLOAD_PATH"]
+
+
+def make_attachment_filename() -> str:
+    # nothing of the name the uploader chose ends up on disk - not even the
+    # extension. The name is kept in the database (original_filename) and the
+    # type in content_type, so the stored name can stay a plain uuid
+    return uuid.uuid4().hex
+
+
+def get_attachment_disk_path(post_id: int, stored_filename: str) -> str:
+    return os.path.join(get_attachment_upload_path(), str(post_id), stored_filename)
+
+
+def delete_attachment_file(post_id: int, stored_filename: str):
+    file_path = Path(get_attachment_upload_path(), str(post_id), stored_filename)
+    try:
+        file_path.unlink(missing_ok=True)
+        try:
+            file_path.parent.rmdir()
+        except OSError:
+            pass
+    except PermissionError:
+        logger.error(
+            f"You do not have permission to delete this file: {stored_filename}"
+        )
+    except IsADirectoryError:
+        logger.error(
+            f"The specified path is a directory, not a file: {stored_filename}"
+        )
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
+
+
 def create_upload_directory(app: Flask):
     with app.app_context():
-        avatar_upload_path = get_avatar_upload_path()
+        for upload_path in (get_avatar_upload_path(), get_attachment_upload_path()):
+            if os.path.exists(upload_path):
+                continue
 
-        if os.path.exists(avatar_upload_path):
-            return
-
-        logger.info(f"Creating avatar upload path: {avatar_upload_path}")
-        os.makedirs(avatar_upload_path, exist_ok=True)
+            logger.info(f"Creating upload path: {upload_path}")
+            os.makedirs(upload_path, exist_ok=True)
 
 
 def get_image_info(file: FileStorage):

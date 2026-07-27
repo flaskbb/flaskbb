@@ -79,6 +79,7 @@ class Group(db.Model, CRUDMixin):
     deletetopic: Mapped[bool] = mapped_column(default=False, nullable=False)
     posttopic: Mapped[bool] = mapped_column(default=True, nullable=False)
     postreply: Mapped[bool] = mapped_column(default=True, nullable=False)
+    postattachment: Mapped[bool] = mapped_column(default=True, nullable=False)
     viewhidden: Mapped[bool] = mapped_column(default=False, nullable=False)
     makehidden: Mapped[bool] = mapped_column(default=False, nullable=False)
 

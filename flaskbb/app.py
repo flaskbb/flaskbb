@@ -20,8 +20,10 @@ from datetime import UTC, datetime
 from typing import Any, Callable
 
 from celery import Celery
-from flask import Flask, request
+from flask import Flask, flash, redirect, request, url_for
+from flask_babelplus import gettext as _
 from flask_login import current_user
+from jinja2.filters import do_filesizeformat
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -413,6 +415,20 @@ def configure_errorhandlers(app: Flask):
     @app.errorhandler(500)
     def server_error_page(error):
         return render_template("errors/server_error.html"), 500
+
+    @app.errorhandler(413)
+    def request_entity_too_large(error):
+        max_content_length = app.config.get("MAX_CONTENT_LENGTH")
+        if max_content_length:
+            message = _(
+                "The upload is too large. A request cannot be bigger than %(size)s.",
+                size=do_filesizeformat(max_content_length),
+            )
+        else:
+            message = _("The upload is too large.")
+
+        flash(message, "danger")
+        return redirect(request.referrer or url_for("forum.index"))
 
     pluggy.hook.flaskbb_errorhandlers(app=app)
 

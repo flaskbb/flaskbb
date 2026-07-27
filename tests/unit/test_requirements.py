@@ -99,3 +99,16 @@ def test_Fred_cannot_delete_others_post(Fred, topic, request_context):
 def test_Mod_can_delete_others_post(moderator_user, topic, request_context):
     push_onto_request_context(post=topic.first_post)
     assert r.CanDeletePost(moderator_user)
+
+
+def test_CanPostAttachment_with_member(user):
+    assert r.CanPostAttachment(user)
+
+
+def test_CanPostAttachment_with_mod(moderator_user):
+    assert r.CanPostAttachment(moderator_user)
+
+
+def test_guest_cannot_post_attachment(guest, forum, request_context):
+    push_onto_request_context(forum=forum)
+    assert not r.CanPostAttachment(guest)

@@ -1,0 +1,30 @@
+{% if flaskbb_config["ATTACHMENTS_ENABLED"] and current_user.permissions.get('postattachment') %}
+<div class="mb-3 col-12 attachment-fields" data-max-attachments="{{ flaskbb_config['ATTACHMENTS_PER_POST'] }}"
+     data-existing-attachments="{{ form.delete_attachments.choices|length }}"
+     data-max-size="{{ flaskbb_config['ATTACHMENT_MAX_SIZE'] * 1024 }}">
+    <label class="col-form-label" for="{{ form.new_attachments.id }}">{{ form.new_attachments.label.text }}</label>
+    {{ form.new_attachments(class="form-control" + (" is-invalid" if form.new_attachments.errors else "")) }}
+    <div class="invalid-feedback attachment-limit-error">
+        {{ _("Only %(amount)s attachments per post are allowed.", amount=flaskbb_config["ATTACHMENTS_PER_POST"]) }}</div>
+    <div class="invalid-feedback attachment-size-error">
+        {{ _("Attachments cannot be bigger than %(size)s.", size=(flaskbb_config["ATTACHMENT_MAX_SIZE"] * 1024)|filesizeformat) }}
+    </div>
+    {%- for error in form.new_attachments.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+    {%- endfor %}
+</div>
+{% if edit_mode and form.delete_attachments.choices %}
+<div class="mb-3 col-12">
+    <label class="col-form-label">{{ form.delete_attachments.label.text }}</label>
+    {% for subfield in form.delete_attachments %}
+    <div class="form-check">
+        {{ subfield(class="form-check-input") }}
+
+        <label class="form-check-label" for="{{ subfield.id }}">
+            <span class="fas fa-paperclip"></span>
+            {{ subfield.label.text }}</label>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endif %}
