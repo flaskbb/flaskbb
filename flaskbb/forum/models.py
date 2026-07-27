@@ -239,6 +239,7 @@ class Attachment(db.Model, CRUDMixin):
     )
 
     post: Mapped["Post"] = relationship("Post", back_populates="attachments")
+    user: Mapped["User | None"] = relationship("User", foreign_keys=[user_id])
 
     def __init__(
         self,

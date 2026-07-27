@@ -19,6 +19,7 @@ def flaskbb_tpl_admin_settings_menu(user):
         ("management.overview", "Overview", "fa fa-tasks"),
         ("management.unread_reports", "Reports", "fa fa-flag"),
         ("management.users", "Users", "fa fa-user"),
+        ("management.attachments", "Attachments", "fa fa-paperclip"),
     ]
 
     if Permission(IsAdmin, identity=user):
