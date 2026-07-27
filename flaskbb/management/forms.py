@@ -18,7 +18,8 @@ from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from sqlalchemy import select
+from sqlalchemy import or_, select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from wtforms import (
     BooleanField,
@@ -43,7 +44,7 @@ from wtforms.validators import (
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from flaskbb.extensions import db
-from flaskbb.forum.models import Category, Forum
+from flaskbb.forum.models import Attachment, Category, Forum
 from flaskbb.user.models import Group, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
@@ -112,6 +113,31 @@ def assignable_groups():
         .scalars()
         .all()
     )
+
+
+class AttachmentSearchForm(FlaskForm):
+    search_query = StringField(
+        _("Search"), validators=[DataRequired(), Length(min=3, max=50)]
+    )
+
+    submit = SubmitField(_("Search"))
+
+    def get_results(self):
+        pattern = "%{}%".format(self.search_query.data or "")
+        # outer join: user_id is nullable, an inner join would hide the
+        # attachments of deleted users
+        return (
+            select(Attachment)
+            .outerjoin(User, User.id == Attachment.user_id)
+            .options(joinedload(Attachment.user), joinedload(Attachment.post))
+            .where(
+                or_(
+                    Attachment.original_filename.ilike(pattern),
+                    User.username.ilike(pattern),
+                )
+            )
+            .order_by(Attachment.id.desc())
+        )
 
 
 class UserForm(FlaskBBForm):

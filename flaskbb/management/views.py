@@ -13,6 +13,7 @@ import importlib.metadata
 import logging
 import os
 import sys
+from datetime import timedelta
 from typing import Any
 
 from celery import __version__ as celery_version
@@ -33,6 +34,7 @@ from flask_login import current_user, login_fresh
 from flask_wtf.file import FileStorage
 from pluggy import HookimplMarker
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.core.settings import flaskbb_config
@@ -41,11 +43,12 @@ from flaskbb.core.settings.models import Setting
 from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import allows, celery, db
 from flaskbb.forum.forms import UserSearchForm
-from flaskbb.forum.models import Category, Forum, Post, Report, Topic
+from flaskbb.forum.models import Attachment, Category, Forum, Post, Report, Topic
 from flaskbb.management.forms import (
     AddForumForm,
     AddGroupForm,
     AddUserForm,
+    AttachmentSearchForm,
     CategoryForm,
     EditForumForm,
     EditGroupForm,
@@ -77,8 +80,11 @@ from flaskbb.utils.requirements import (
 )
 from flaskbb.utils.uploads import (
     delete_avatar_file,
+    get_attachment_disk_path,
     get_avatar_filename,
     get_avatar_upload_path,
+    remove_orphan_attachment_files,
+    scan_attachment_storage,
 )
 
 impl = HookimplMarker("flaskbb")
@@ -86,6 +92,14 @@ impl = HookimplMarker("flaskbb")
 logger = logging.getLogger(__name__)
 
 PROTECTED_GROUP_ID = 6
+
+# an upload writes the file before it commits the row, so anything younger
+# than this is left alone by the cleanup - in either direction
+ATTACHMENT_CLEANUP_GRACE = timedelta(minutes=5)
+
+# keeps the identity map and the pending unlink queue bounded when a large
+# table is deleted row by row
+ATTACHMENT_DELETE_BATCH = 500
 
 
 class ManagementSettings(MethodView):
@@ -1182,6 +1196,218 @@ class DeleteReport(MethodView):
         return redirect_or_next(url_for("management.reports"))
 
 
+class ManageAttachments(MethodView):
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage attachments"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+    form = AttachmentSearchForm
+
+    def get(self):
+        return self._render(self._all_attachments(), self.form())
+
+    def post(self):
+        form = self.form()
+
+        if form.validate():
+            return self._render(form.get_results(), form)
+
+        return self._render(self._all_attachments(), form)
+
+    def _all_attachments(self):
+        # id order is the insertion order and unlike date_created it is
+        # backed by the primary key index
+        return (
+            select(Attachment)
+            .options(joinedload(Attachment.user), joinedload(Attachment.post))
+            .order_by(Attachment.id.desc())
+        )
+
+    def _render(self, stmt, search_form):
+        page = request.args.get("page", 1, type=int)
+        attachments = db.paginate(
+            stmt,
+            page=page,
+            per_page=flaskbb_config["USERS_PER_PAGE"],
+            error_out=False,
+        )
+
+        # only the rows on this page are stat'ed, so the cleanup button has
+        # something to point at without walking the whole upload directory
+        missing = {
+            attachment.id
+            for attachment in attachments.items
+            if not os.path.exists(
+                get_attachment_disk_path(attachment.post_id, attachment.filename)
+            )
+        }
+
+        return render_template(
+            "management/attachments.html",
+            attachments=attachments,
+            search_form=search_form,
+            missing=missing,
+        )
+
+
+class DeleteAttachment(MethodView):
+    decorators = [
+        allows.requires(
+            IsAtleastModerator,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage attachments"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self, attachment_id: int | None = None):
+        # ajax request
+        json = request.get_json(silent=True)
+        if json is not None:
+            ids = json.get("ids")
+            if not ids:
+                return jsonify(message="No ids provided.", category="error", status=404)
+
+            data: list[dict[str, Any]] = []
+            for attachment in Attachment.get_all(Attachment.id.in_(ids)):
+                if attachment.delete():
+                    data.append(
+                        {
+                            "id": attachment.id,
+                            "type": "delete",
+                            "reverse": False,
+                            "reverse_name": None,
+                            "reverse_url": None,
+                        }
+                    )
+
+            return jsonify(
+                message=f"{len(data)} attachments deleted.",
+                category="success",
+                data=data,
+                status=200,
+            )
+
+        attachment = Attachment.get_by_or_404(id=attachment_id)
+        attachment.delete()
+        flash(_("Attachment deleted."), "success")
+        return redirect_or_next(url_for("management.attachments"))
+
+
+class CleanupAttachments(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage attachments"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self):
+        # the disk is scanned before the table is read: a file that appears
+        # in between is then guaranteed to have its row in the snapshot
+        storage = scan_attachment_storage()
+        cutoff = time_utcnow() - ATTACHMENT_CLEANUP_GRACE
+
+        known: dict[str, set[str]] = {}
+        stale_rows: list[int] = []
+        rows = db.session.execute(
+            select(
+                Attachment.id,
+                Attachment.post_id,
+                Attachment.filename,
+                Attachment.date_created,
+            ).execution_options(yield_per=1000)
+        )
+        # the cursor is drained before anything is deleted - a flush against
+        # a partially read result would lose the rest of it
+        for id, post_id, filename, date_created in rows:
+            directory = str(post_id)
+            known.setdefault(directory, set()).add(filename)
+
+            if filename not in storage.get(directory, {}) and date_created < cutoff:
+                stale_rows.append(id)
+
+        deleted_rows = 0
+        for start in range(0, len(stale_rows), ATTACHMENT_DELETE_BATCH):
+            batch = stale_rows[start : start + ATTACHMENT_DELETE_BATCH]
+            for attachment in Attachment.get_all(Attachment.id.in_(batch)):
+                db.session.delete(attachment)
+                deleted_rows += 1
+            db.session.commit()
+
+        deleted_files = remove_orphan_attachment_files(
+            storage, known, cutoff=cutoff.timestamp()
+        )
+
+        flash(
+            _(
+                "Removed %(rows)s attachment(s) with a missing file and "
+                "%(files)s orphaned file(s).",
+                rows=deleted_rows,
+                files=deleted_files,
+            ),
+            "success",
+        )
+        return redirect(url_for("management.attachments"))
+
+
+class PurgeAttachments(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage attachments"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self):
+        # a bulk DELETE would not fire the after_delete event and strand
+        # every file on disk, so the rows go through the ORM
+        deleted_rows = 0
+        while True:
+            batch = db.session.scalars(
+                select(Attachment)
+                .order_by(Attachment.id)
+                .limit(ATTACHMENT_DELETE_BATCH)
+            ).all()
+            if not batch:
+                break
+
+            for attachment in batch:
+                db.session.delete(attachment)
+            deleted_rows += len(batch)
+            db.session.commit()
+
+        # picks up whatever the delete events could not know about: orphaned
+        # files and the post directories they kept alive
+        deleted_files = remove_orphan_attachment_files(scan_attachment_storage(), {})
+
+        flash(
+            _(
+                "Purged %(rows)s attachment(s) and %(files)s leftover file(s).",
+                rows=deleted_rows,
+                files=deleted_files,
+            ),
+            "success",
+        )
+        return redirect(url_for("management.attachments"))
+
+
 class CeleryStatus(MethodView):
     decorators = [
         allows.requires(
@@ -1426,6 +1652,28 @@ def flaskbb_load_blueprints(app: Flask):
         has to reauthenticate."""
         if not login_fresh():
             return current_app.login_manager.needs_refresh()
+
+    # Attachments
+    register_view(
+        management,
+        routes=["/attachments/cleanup"],
+        view_func=CleanupAttachments.as_view("cleanup_attachments"),
+    )
+    register_view(
+        management,
+        routes=["/attachments/purge"],
+        view_func=PurgeAttachments.as_view("purge_attachments"),
+    )
+    register_view(
+        management,
+        routes=["/attachments/delete", "/attachments/<int:attachment_id>/delete"],
+        view_func=DeleteAttachment.as_view("delete_attachment"),
+    )
+    register_view(
+        management,
+        routes=["/attachments"],
+        view_func=ManageAttachments.as_view("attachments"),
+    )
 
     # Categories
     register_view(

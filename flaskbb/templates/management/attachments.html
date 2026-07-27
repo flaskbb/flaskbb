@@ -1,0 +1,158 @@
+{% set page_title = _("Attachments") %}
+{% set active = "management.attachments" %}
+
+{% extends theme("management/management_layout.html") %}
+
+{% block breadcrumb %}
+<ol class="breadcrumb flaskbb-breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+    <li class="breadcrumb-item active">{% trans %}Attachments{% endtrans %}</li>
+</ol>
+{% endblock %}
+
+{% block management_content %}
+{%- from theme('_macros/pagination.html') import render_pagination -%}
+{%- from theme('_macros/navigation.html') import navlink with context -%}
+{%- from theme('_macros/form.html') import render_input_field, action_confirm -%}
+
+
+<div class="col-md-3 settings-col">
+    <div class="nav-sidebar">
+        <ul class="nav">
+            {{ navlink('management.attachments', _('All Attachments')) }}
+        </ul>
+    </div>
+
+    {% if current_user|is_admin %}
+        {{
+            action_confirm(
+                id="cleanup-attachments",
+                url=url_for('management.cleanup_attachments'),
+                title=_("Cleanup"),
+                icon="fas fa-broom",
+                btn="btn btn-warning btn-sm w-100 mt-2",
+                icon_only=False
+            )
+        }}
+        {{
+            action_confirm(
+                id="purge-attachments",
+                url=url_for('management.purge_attachments'),
+                title=_("Purge all"),
+                icon="far fa-trash-alt",
+                btn="btn btn-danger btn-sm w-100 mt-2",
+                icon_only=False
+            )
+        }}
+    {% endif %}
+</div>
+
+
+<div class="col-md-9 settings-col with-left-border">
+    <div class="card settings">
+        <div class="card-header settings-header">
+            <div class="row">
+                <div class="col-auto me-auto">
+                    <span class="fa fa-paperclip"></span> {% trans %}Attachments{% endtrans %}
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-white btn-xs" onclick="return window.app.show_management_search()">
+                        <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body settings-body">
+
+            <div class="settings-search">
+                <form class="search-form" role="form" method="post">
+                    {{ search_form.hidden_tag() }}
+                    <div class="input-group">
+                        {{ render_input_field(search_form.search_query, class="form-control") }}
+                        <button class="btn btn-white" type="button"><span class="fas fa-search"></span></button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-content">
+                <div class="settings-meta row">
+                    <div class="col-md-1 col-sm-1 col-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
+                    <div class="col-md-3 col-sm-3 col-4 meta-item">{% trans %}File{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Uploader{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">{% trans %}Topic{% endtrans %}</div>
+                    <div class="col-md-1 col-sm-1 col-2 meta-item">{% trans %}Size{% endtrans %}</div>
+                    <div class="col-md-2 d-none d-md-block meta-item">{% trans %}Uploaded{% endtrans %}</div>
+                    <div class="col-md-1 col-sm-2 col-2">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <span class="fa fa-fw fa-cog"></span>
+                                {% trans %}Actions{% endtrans %}
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.delete_attachment') }}')">
+                                        <span class="far fa-fw fa-trash-alt text-danger"></span>
+                                        {% trans %}Delete selected Attachments{% endtrans %}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% for attachment in attachments.items %}
+                <div class="row settings-row hover">
+                    <div class="col-md-1 col-sm-1 col-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ attachment.id }}" title="Select Attachment"/></div>
+                    <div class="col-md-3 col-sm-3 col-4">
+                        <a href="{{ attachment.url }}" target="_blank">{{ attachment.original_filename }}</a>
+                        {% if attachment.id in missing %}
+                            <span class="badge bg-danger">{% trans %}file missing{% endtrans %}</span>
+                        {% endif %}
+                        <div><small class="text-muted">{{ attachment.content_type }}</small></div>
+                    </div>
+                    <div class="col-md-2 col-sm-2 col-3">
+                        {% if attachment.user %}
+                            <a href="{{ attachment.user.url }}">{{ attachment.user.username }}</a>
+                        {% else %}
+                            {% trans %}Guest{% endtrans %}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2 col-sm-2 d-none d-sm-block">
+                        {% if attachment.post.topic %}
+                            <a href="{{ attachment.post.url }}" target="_blank">{{ attachment.post.topic.title }}</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-1 col-sm-1 col-2">{{ attachment.size|filesizeformat }}</div>
+                    <div class="col-md-2 d-none d-md-block">{{ attachment.date_created|format_date }}</div>
+                    <div class="col-md-1 col-sm-2 col-2">
+                        {{
+                            action_confirm(
+                                id="delete-" ~ attachment.id,
+                                url=url_for('management.delete_attachment', attachment_id=attachment.id),
+                                title=_("Delete"),
+                                icon="far fa-trash-alt text-danger"
+                            )
+                        }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="row settings-row">
+                    <div class="col-12">{% trans %}No attachments found.{% endtrans %}</div>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="card-footer settings-footer">
+                {{ render_pagination(attachments, url_for('management.attachments')) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% include theme('_partials/confirm_dialog.html') %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    var bulk_actions = new window.app.BulkActions();
+    </script>
+{% endblock %}

@@ -92,6 +92,64 @@ def delete_attachment_file(post_id: int, stored_filename: str):
         logger.error(f"An unexpected error occurred: {e}")
 
 
+def scan_attachment_storage() -> dict[str, dict[str, float]]:
+    """Maps every directory below the attachment upload path to the files it
+    holds and their modification times.
+    """
+    root = get_attachment_upload_path()
+    storage: dict[str, dict[str, float]] = {}
+    if not os.path.isdir(root):
+        return storage
+
+    with os.scandir(root) as entries:
+        for entry in entries:
+            # only the <post_id> directories flaskbb creates itself are
+            # scanned - symlinks are never followed
+            if not entry.is_dir(follow_symlinks=False):
+                continue
+
+            with os.scandir(entry.path) as files:
+                storage[entry.name] = {
+                    file.name: file.stat().st_mtime
+                    for file in files
+                    if file.is_file(follow_symlinks=False)
+                }
+
+    return storage
+
+
+def remove_orphan_attachment_files(
+    storage: dict[str, dict[str, float]],
+    known: dict[str, set[str]],
+    cutoff: float | None = None,
+) -> int:
+    """Deletes every file in ``storage`` that no attachment row claims and
+    prunes the directories that end up empty.
+
+    ``known`` maps a post id (as a string) to the filenames its attachments
+    still reference. Files newer than ``cutoff`` are kept - they may belong to
+    an upload whose row has not been committed yet.
+    """
+    root = Path(get_attachment_upload_path())
+    removed = 0
+
+    for dirname, files in storage.items():
+        keep = known.get(dirname, set())
+        for filename, mtime in files.items():
+            if filename in keep or (cutoff is not None and mtime > cutoff):
+                continue
+
+            (root / dirname / filename).unlink(missing_ok=True)
+            removed += 1
+
+        try:
+            (root / dirname).rmdir()
+        except OSError:
+            pass
+
+    return removed
+
+
 def create_upload_directory(app: Flask):
     with app.app_context():
         for upload_path in (get_avatar_upload_path(), get_attachment_upload_path()):
