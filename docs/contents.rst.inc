@@ -18,6 +18,7 @@ Developer Documentation
    :maxdepth: 1
 
    development/theming
+   development/localization
    development/hooks/index
    development/plugin/index
    development/api/index
