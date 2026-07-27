@@ -109,6 +109,21 @@ class IsMorePrivilegedThan(Requirement):
         return _privilege_level(user) > _privilege_level(self.target)
 
 
+class IsSelf(Requirement):
+    """Fulfilled when the acting user *is* ``target``."""
+
+    def __init__(self, target: User):
+        self.target = target
+
+    @override
+    def __repr__(self):
+        return "<IsSelf({!s})>".format(self.target)
+
+    @override
+    def fulfill(self, user: User):
+        return user.id == self.target.id
+
+
 class IsSameUser(IsAuthed):
     def __init__(self, topic_or_post: Post | Topic | int | None = None):
         self._topic_or_post = topic_or_post
@@ -255,9 +270,11 @@ def CanEditTargetUser(target: User):
     """``CanEditUser``, restricted to targets the acting user outranks.
 
     Administrators are exempt from the ranking check so that they can still
-    manage each other and themselves.
+    manage each other. Everyone who may edit users at all may reach their own
+    account - which fields they actually get is decided by the form, so this
+    does not let anyone raise their own privileges.
     """
-    return And(CanEditUser, Or(IsAdmin, IsMorePrivilegedThan(target)))
+    return And(CanEditUser, Or(IsAdmin, IsSelf(target), IsMorePrivilegedThan(target)))
 
 
 CanEditPost = Or(

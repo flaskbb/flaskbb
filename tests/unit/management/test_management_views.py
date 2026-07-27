@@ -448,68 +448,72 @@ def second_admin_user(default_groups):
     return admin
 
 
-def test_self_edit_form_drops_group_and_activation_fields(default_settings, admin_user):
+def test_admin_editing_self_keeps_every_field(default_settings, admin_user):
+    """Administrators are trusted with their own account - nothing is taken
+    away, the template asks them to confirm instead.
+    """
     response, _messages = _edit(admin_user.id, admin_user)
 
-    # self service is fine
-    for field in ("username", "email", "password"):
+    for field in (
+        "username",
+        "email",
+        "password",
+        "primary_group",
+        "secondary_groups",
+        "activated",
+    ):
         assert 'name="{}"'.format(field) in response
-    # lockout vectors are not
-    for field in ("primary_group", "secondary_groups", "activated"):
-        assert 'name="{}"'.format(field) not in response
 
 
-def test_admin_cannot_ban_themselves_via_the_edit_form(
+def test_admin_editing_self_gets_the_confirm_dialog(default_settings, admin_user):
+    response, _messages = _edit(admin_user.id, admin_user)
+
+    assert 'id="confirm-self-change"' in response
+    assert 'id="confirmModal"' in response
+    assert "Change your own account?" in response
+
+
+def test_admin_editing_someone_else_gets_no_confirm_dialog(
+    default_settings, admin_user, user
+):
+    response, _messages = _edit(user.id, admin_user)
+
+    assert 'id="confirm-self-change"' not in response
+    assert "Change your own account?" not in response
+
+
+def test_super_moderator_self_edit_gets_no_confirm_dialog(
+    default_settings, super_moderator_user
+):
+    """Nothing to confirm - they have neither the group nor the activation
+    field on their own account.
+    """
+    response, _messages = _edit(super_moderator_user.id, super_moderator_user)
+
+    assert 'id="confirm-self-change"' not in response
+
+
+def test_admin_can_still_ban_themselves_after_confirming(
     default_settings, no_csrf, admin_user, default_groups
 ):
-    response, _messages = _edit(
-        admin_user.id,
-        admin_user,
-        username=admin_user.username,
-        email=admin_user.email,
-        primary_group=str(default_groups[4].id),
-    )
-
-    assert response.status_code == 302
-    assert not admin_user.permissions["banned"]
-    assert admin_user.permissions["admin"]
-
-
-def test_admin_cannot_demote_themselves_via_the_edit_form(
-    default_settings, no_csrf, admin_user, default_groups
-):
-    response, _messages = _edit(
-        admin_user.id,
-        admin_user,
-        username=admin_user.username,
-        email=admin_user.email,
-        primary_group=str(default_groups[3].id),
-    )
-
-    assert response.status_code == 302
-    assert admin_user.primary_group_id == default_groups[0].id
-    assert admin_user.permissions["admin"]
-
-
-def test_admin_cannot_deactivate_themselves_via_the_edit_form(
-    default_settings, no_csrf, admin_user
-):
-    """A BooleanField absent from the POST reads as False, so submitting the
-    form without ticking "Is active?" used to deactivate the account.
+    """The dialog is a speed bump, not a prohibition - an administrator is
+    allowed to change anything, including their own group.
     """
     response, _messages = _edit(
         admin_user.id,
         admin_user,
         username=admin_user.username,
         email=admin_user.email,
+        primary_group=str(default_groups[4].id),
+        activated="y",
     )
 
     assert response.status_code == 302
-    assert admin_user.activated
+    assert admin_user.permissions["banned"]
 
 
 def test_admin_can_still_change_their_own_password(
-    default_settings, no_csrf, admin_user
+    default_settings, no_csrf, admin_user, default_groups
 ):
     response, _messages = _edit(
         admin_user.id,
@@ -517,10 +521,60 @@ def test_admin_can_still_change_their_own_password(
         username=admin_user.username,
         email=admin_user.email,
         password="New-Self-Set-Password",
+        primary_group=str(default_groups[0].id),
+        activated="y",
     )
 
     assert response.status_code == 302
     assert admin_user.check_password("New-Self-Set-Password")
+    assert admin_user.permissions["admin"]
+
+
+def test_super_moderator_can_edit_themselves_without_groups(
+    default_settings, super_moderator_user
+):
+    """A super moderator may hand out groups, but not to their own account -
+    that would be a self-demotion or self-ban.
+    """
+    response, _messages = _edit(super_moderator_user.id, super_moderator_user)
+
+    assert 'name="username"' in response
+    assert 'name="signature"' in response
+    for field in (
+        "email",
+        "password",
+        "activated",
+        "primary_group",
+        "secondary_groups",
+    ):
+        assert 'name="{}"'.format(field) not in response
+
+
+def test_super_moderator_self_edit_applies_profile_changes(
+    default_settings, no_csrf, super_moderator_user, default_groups
+):
+    original = super_moderator_user.primary_group_id
+
+    response, _messages = _edit(
+        super_moderator_user.id,
+        super_moderator_user,
+        username=super_moderator_user.username,
+        signature="edited by myself",
+        primary_group=str(default_groups[4].id),
+    )
+
+    assert response.status_code == 302
+    assert super_moderator_user.signature == "edited by myself"
+    assert super_moderator_user.primary_group_id == original
+    assert not super_moderator_user.permissions["banned"]
+
+
+def test_moderator_can_edit_themselves(default_settings, moderator_user):
+    response, _messages = _edit(moderator_user.id, moderator_user)
+
+    assert 'name="username"' in response
+    for field in ("email", "password", "activated", "primary_group"):
+        assert 'name="{}"'.format(field) not in response
 
 
 def test_the_self_restriction_does_not_apply_to_other_admins(
