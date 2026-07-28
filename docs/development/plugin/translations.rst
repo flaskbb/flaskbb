@@ -8,6 +8,11 @@ Plugins ship and are translated exactly like core FlaskBB (see
 ``translations/`` directory and registers it with FlaskBB instead of relying
 on the core one.
 
+Unlike core, plugins aren't set up on `Weblate <https://hosted.weblate.org/projects/flaskbb/flaskbb/>`_
+yet, so there's no crowdsourced translation workflow for them at the
+moment - translations are contributed as regular PRs against the plugin's
+own ``.po`` files, using the ``pybabel``/CLI workflow below.
+
 Registering translations
 -------------------------
 

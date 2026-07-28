@@ -48,6 +48,27 @@ list of available translation functions.
     <button>{{ gettext("Submit") }}</button>
     <button>{% trans "Submit" endtrans%}</button>
 
+What to mark for translation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Anything a forum user or admin might see in the browser: page text, flashed
+messages, form labels/errors, emails. This includes the admin panel, not
+just the public-facing forum.
+
+CLI output (``flaskbb ...`` command help text) is **not**
+translated.
+
+Submitting your own translation alongside a string change
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're adding/changing a string and can also translate it into a
+language you speak, go ahead and edit that language's ``messages.po``
+directly in the same PR — run ``flaskbb translations update`` first so the
+``msgid`` exists, then fill in your translation. Weblate merges against
+whatever is already in the ``.po`` file rather than blindly overwriting it,
+so your translation stays and simply shows up as already-translated (and
+still editable) once Weblate picks up the change.
+
 Plugins register their own translation directories via the
 :func:`flaskbb_load_translations
 <flaskbb.plugins.spec.flaskbb_load_translations>` hook so their strings are
@@ -92,11 +113,60 @@ Weblate
 -------
 
 Translators contribute through `Weblate`_ instead of opening
-PRs against ``.po`` files directly. Weblate tracks :file:`messages.pot` and
-opens PRs back against this repository with translated ``.po`` files, so as
-a developer the only thing you need to keep current is the ``.pot``
-template (via ``flaskbb translations update``) whenever you touch a
-translatable string — Weblate and its translators handle the rest.
+PRs against ``.po`` files directly. Weblate pulls :file:`messages.pot`
+straight from this repository, so as soon as a PR that ran ``flaskbb
+translations update`` is merged to master, the new/changed strings show up
+on Weblate for translators without any separate upload step. Weblate opens
+PRs back against this repository with translated ``.po`` files, so as a
+developer the only thing you need to keep current is the ``.pot`` template
+whenever you touch a translatable string - Weblate and its translators
+handle the rest.
+
+To sign up as a translator, create a `Weblate`_ account and join the
+language you want to work on (or request a new one if it isn't listed yet).
+
+Style and fixing existing translations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There's no formal style guide or glossary yet. FlaskBB doesn't have a
+dedicated translation team, just whoever shows up on Weblate for a given
+language. If you spot a string that's translated inconsistently or
+incorrectly, just fix it directly in Weblate; there's no separate process
+to coordinate with anyone first.
+
+Context for ambiguous strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Weblate shows the source file and line number each ``msgid`` came from
+(e.g. ``flaskbb/templates/auth/login.html:12``), which is usually enough to
+tell whether e.g. "Login" is a button (verb) or a page/field label (noun).
+If that's still ambiguous, the most reliable way to check is to run
+FlaskBB locally and look at the string in place:
+
+.. code-block:: console
+
+    flaskbb translations compile
+    flaskbb run
+
+Then switch your account's language (or browser locale) to the one you're
+testing so the app renders with your in-progress ``.po`` file — remember to
+re-run ``flaskbb translations compile`` after every edit, since the app
+only reads the compiled ``.mo`` file.
+
+Review and release cadence
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+FlaskBB currently has a single maintainer and no dedicated proofreading
+step - translated PRs from Weblate get merged in as they come, on no fixed
+schedule tied to releases. There's no deadline to hit for a given release;
+translating at whatever pace works for you is fine.
+
+Plugin translations
+~~~~~~~~~~~~~~~~~~~~
+
+The stock plugins (Portal, Conversations) aren't set up on Weblate yet.
+For now, translating them means opening a PR directly against the plugin's
+own ``translations/`` directory — see :ref:`plugin_translations`.
 
 
 .. _Weblate: https://hosted.weblate.org/projects/flaskbb/flaskbb/
