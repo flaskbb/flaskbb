@@ -21,8 +21,9 @@ from flaskbb.cli.main import flaskbb
 @with_appcontext
 @click.pass_context
 def db(ctx: click.Context):
-    """Plugins command sub group. If you want to run migrations or do some
-    i18n stuff checkout the corresponding command sub groups."""
+    """Database command sub group. Wraps Flask-Alembic's CLI for running
+    migrations, with branch-per-plugin support (e.g. ``flaskbb db revision
+    --branch <plugin_name>``)."""
     ctx.obj = current_app.extensions["alembic"]
 
 

@@ -7,7 +7,10 @@ In FlaskBB we distinguish from `Python Hooks <#python-hooks>`_ and
 `Template Hooks <#template-hooks>`_.
 Python Hooks are prefixed with ``flaskbb_`` and called are called in Python
 files whereas Template Hooks have to be prefixed with ``flaskbb_tpl_`` and are
-executed in the templates.
+executed in the templates. The :ref:`plugin lifecycle hooks
+<hooks_plugin_lifecycle>` are the one exception - they're named
+``on_plugin_*`` instead, since they're tied to a specific event rather than
+a FlaskBB subsystem.
 
 If you miss a hook, feel free to open a new issue or create a pull
 request. The pull request should always contain a entry in this document
@@ -29,3 +32,4 @@ interact with these plugins in interesting ways.
    event
    forms
    template
+   plugin

@@ -70,6 +70,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
+[project.optional-dependencies]
+gunicorn = [
+  "gunicorn>=26.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/flaskbb/flaskbb"
 Documentation = "https://flaskbb.readthedocs.io/en/latest/"
@@ -89,21 +94,47 @@ packages = ["flaskbb", "wsgi.py", "celery_worker.py"]
 
 [dependency-groups]
 dev = [
-    "alabaster>=1.0.0",
-    "cov-core>=1.15.0",
-    "coverage>=7.13.1",
-    "freezegun>=1.5.5",
     "ipython>=9.9.0",
-    "pre-commit>=4.5.1",
-    "py>=1.11.0",
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
-    "pytest-mock>=3.15.1",
-    "pytest-xdist>=3.8.0",
-    "responses>=0.25.8",
-    "ruff>=0.14.13",
-    "sphinx>=9.1.0",
+    "ruff",
+    "tox>=4.39",
+    "tox-uv",
+    {include-group = "pre-commit"},
+    {include-group = "docs"},
+    {include-group = "tests"},
+    {include-group = "typing"},
 ]
+pre-commit = [
+    "pre-commit",
+    "pre-commit-uv",
+]
+docs = [
+    "alabaster",
+    "sphinx",
+    "sphinx-issues",
+    "sphinx-tabs",
+    "sphinx-intl>=2.3.1",
+    "sphinxcontrib-log-cabinet",
+]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "pytest-xprocess",
+    "cov-core",
+    "coverage",
+    "freezegun",
+    "responses"
+]
+typing = [
+    "mypy",
+    "pyright",
+    "pytest",
+]
+gha-update = [
+    "gha-update ; python_full_version >= '3.12'",
+]
+
 
 [tool.uv]
 package = true
@@ -142,5 +173,140 @@ addopts = [
 testpaths = [
     "tests",
 ]
+
+[tool.ruff]
+src = ["flaskbb"]
+fix = true
+show-fixes = true
+output-format = "full"
+
 [tool.ruff.lint]
-ignore = ["E711", "E712"]
+ignore = [
+    "E711",
+    "E712",
+    "UP007",  # Use X | Y for type annotations; doesn't work with some of our (stringy) type definitions - should aim to resolve this
+]
+
+select = [
+    "B",  # flake8-bugbear
+    "E",  # pycodestyle error
+    "F",  # pyflakes
+    "I",  # isort
+    "UP",  # pyupgrade
+    "W",  # pycodestyle warning
+]
+
+[tool.ruff.lint.isort]
+order-by-type = false
+
+[tool.coverage.run]
+branch = true
+source = ["flaskbb", "tests"]
+omit = [
+    "flaskbb/flaskbb/static/*",
+    "flaskbb/flaskbb/templates/*",
+    "flaskbb/flaskbb/themes/*",
+    "flaskbb/flaskbb/migrations/*"
+]
+
+[tool.coverage.paths]
+source = ["flaskbb", "*/site-packages"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if t.TYPE_CHECKING",
+    "raise NotImplementedError",
+    ": \\.{3}",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "error",
+    "default::pytest.PytestUnraisableExceptionWarning",
+]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["flaskbb/"]
+warn_unused_configs = true
+
+# TODO if all of these can be enabled we can just set 'strict = true'
+disallow_subclassing_any = true
+# disallow_untyped_calls = true
+# disallow_untyped_defs = true
+# disallow_incomplete_defs = true
+# check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+# warn_return_any = true
+# no_implicit_reexport = true
+strict_equality = true
+strict_concatenate = true
+
+
+[tool.tox]
+env_list = [
+    "py3.14",
+    "py3.13",
+    "py3.12",
+    "style",
+    "typing",
+    "docs",
+]
+
+[tool.tox.env_run_base]
+description = "pytest on latest dependency versions"
+runner = "uv-venv-lock-runner"
+package = "wheel"
+wheel_build_env = ".pkg"
+constrain_package_deps = true
+use_frozen_constraints = true
+dependency_groups = ["tests"]
+env_tmp_dir = "{toxworkdir}/tmp/{envname}"
+commands = [[
+    "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
+    {replace = "posargs", default = [], extend = true},
+]]
+
+[tool.tox.env.style]
+description = "run all pre-commit hooks on all files"
+dependency_groups = ["pre-commit"]
+skip_install = true
+commands = [["pre-commit", "run", "--all-files"]]
+
+[tool.tox.env.typing]
+description = "run static type checkers"
+dependency_groups = ["typing"]
+commands = [
+    ["mypy"],
+]
+
+[tool.tox.env.docs]
+description = "build docs"
+dependency_groups = ["docs"]
+commands = [["sphinx-build", "-E", "-W", "-b", "html", "docs", "docs/_build/"]]
+
+[tool.tox.env.update-actions]
+description = "update GitHub Actions pins"
+labels = ["update"]
+dependency_groups = ["gha-update"]
+skip_install = true
+commands = [["gha-update"]]
+
+[tool.tox.env.update-pre_commit]
+description = "update pre-commit pins"
+labels = ["update"]
+dependency_groups = ["pre-commit"]
+skip_install = true
+commands = [["pre-commit", "autoupdate", "--freeze", "-j4"]]
+
+[tool.tox.env.update-requirements]
+description = "update uv lock"
+labels = ["update"]
+dependency_groups = []
+no_default_groups = true
+skip_install = true
+commands = [["uv", "lock", {replace = "posargs", default = ["-U"], extend = true}]]

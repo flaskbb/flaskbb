@@ -235,6 +235,6 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Returns a set of registered internal plugins."""
         return set(self._internal_name2plugin.values())
 
-    def get_external_plugins(self):
+    def get_external_plugins(self) -> set[_Plugin]:
         """Returns a set of registered external plugins."""
         return set(self.get_plugins() - self.get_internal_plugins())

@@ -12,7 +12,7 @@ There are two separate audiences for this workflow:
   never need to touch the CLI or a local checkout.
 * **Developers** who add or change translatable strings in the code, or who
   need to add support for a language that doesn't have a translation yet.
-* **Plugin Developers** see the dedicated translations page :ref:`translations`.
+* **Plugin Developers** see the dedicated translations page :ref:`plugin_translations`.
 
 
 Getting Started

@@ -16,6 +16,7 @@ all standard FlaskBB blueprints have been loaded).
 The hooks below are listed in the order they are called.
 
 .. autofunction:: flaskbb_extensions
+.. autofunction:: flaskbb_load_search_backends
 .. autofunction:: flaskbb_load_blueprints
 .. autofunction:: flaskbb_jinja_directives
 .. autofunction:: flaskbb_request_processors
@@ -26,5 +27,11 @@ The hooks below are listed in the order they are called.
 .. autofunction:: flaskbb_load_nonpost_markdown_class
 .. autofunction:: flaskbb_load_post_markdown_plugins
 .. autofunction:: flaskbb_load_nonpost_markdown_plugins
+.. autofunction:: flaskbb_load_internal_setting_groups
+.. autofunction:: flaskbb_load_setting_groups
 .. autofunction:: flaskbb_additional_setup
+
+.. note::
+    See the :ref:`settings` chapter for a full guide to registering and
+    working with setting groups.
 

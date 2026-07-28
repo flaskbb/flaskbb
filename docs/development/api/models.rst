@@ -62,15 +62,17 @@ The user modules contains all related models for the users.
    :members:
 
 
-Management Models
------------------
+Settings Models
+---------------
 
-.. module:: flaskbb.management.models
+.. module:: flaskbb.core.settings.models
 
-The management module contains all related models for the management of FlaskBB.
-
-.. autoclass:: SettingsGroup
-   :members:
+This module owns storage and caching for setting values. See the
+:ref:`settings` chapter for how setting groups and definitions are
+registered.
 
 .. autoclass:: Setting
+   :members:
+
+.. autoclass:: SettingsDiff
    :members:

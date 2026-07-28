@@ -342,17 +342,23 @@ def has_migrations(plugin: Any):
     return False
 
 
-def run_plugin_migrations(plugins=None):
+def run_plugin_migrations(plugins: list[str] | None = None):
     """Runs the migrations for a list of plugins.
 
-    :param plugins: A iterable of plugins to run the migrations for. If set
+    :param plugins: A iterable of plugin names to run the migrations for. If set
                     to ``None``, all external plugin migrations will be run.
     """
+    all_plugins: list[str | None] | list[str] = []
     if plugins is None:
-        plugins = pluggy.get_external_plugins()
+        all_plugins = [pluggy.get_name(p) for p in pluggy.get_external_plugins()]
+    else:
+        all_plugins = plugins
 
-    for plugin in plugins:
-        plugin_name = pluggy.get_name(plugin)
+    for plugin_name in all_plugins:
+        if plugin_name is None:
+            continue
+
+        plugin = pluggy.get_plugin(plugin_name)
 
         if not has_migrations(plugin):
             logger.debug("No migrations found for plugin %s" % plugin_name)

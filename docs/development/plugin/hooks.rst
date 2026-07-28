@@ -51,7 +51,7 @@ For a complete list of all available hooks in FlaskBB see the
 pytest and pluggy are good resources to get better understanding on how to
 write `hook functions`_ using `pluggy`_.
 
-.. _`used code`: https://github.com/sh4nks/flaskbb-plugins/blob/master/portal/portal/__init__.py#L31
+.. _`used code`: https://github.com/flaskbb/flaskbb-plugin-portal/blob/master/portal/__init__.py#L50
 .. _`hook functions`: https://docs.pytest.org/en/latest/writing_plugins.html#writing-hook-functions
 .. _`pluggy`: https://pluggy.readthedocs.io/en/latest/#defining-and-collecting-hooks
 
