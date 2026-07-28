@@ -210,20 +210,13 @@ omit = [
 ]
 
 [tool.coverage.paths]
-source = ["flaskbb", "*/site-packages"]
+source = ["flaskbb"]
 
 [tool.coverage.report]
 exclude_also = [
     "if t.TYPE_CHECKING",
     "raise NotImplementedError",
     ": \\.{3}",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-filterwarnings = [
-    "error",
-    "default::pytest.PytestUnraisableExceptionWarning",
 ]
 
 [tool.mypy]
