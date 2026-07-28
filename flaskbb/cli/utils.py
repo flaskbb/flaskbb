@@ -161,7 +161,7 @@ def prompt_save_user(
     return create_user(username, password, email, group)  # # pyright: ignore
 
 
-def prompt_config_path(config_path: str):
+def prompt_config_path(config_path: str) -> str:
     """Asks for a config path. If the path exists it will ask the user
     for a new path until a he enters a path that doesn't exist.
 

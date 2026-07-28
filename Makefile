@@ -24,6 +24,9 @@ run: ## Runs the development server with the development config
 frontend: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
 	cd flaskbb/themes/aurora && npm run watch
 
+frontend-dark: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
+	cd flaskbb/themes/aurora && npm run watch
+
 dev-plugins: ## Install the plugins as editable
 	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations
 
@@ -37,15 +40,7 @@ upload: ## Uploads to PyPI
 	twine upload dist/{*.tar.gz,*.whl} --skip-existing
 
 docs: ## Builds the Sphinx docs
-	$(MAKE) -C docs html
-
-lint: ## Checks the source for style errors
-	@type flake8 >/dev/null 2>&1 || echo "Flake8 is not installed. You can install it with 'pip install flake8'."
-	flake8
-
-isort:  ## Sorts the python imports
-	@type isort >/dev/null 2>&1 || echo "isort is not installed. You can install it with 'pip install isort'."
-	isort --order-by-type -rc -up
+	uv run sphinx-build -b html docs docs/_build/html
 
 format: ## Sorts the imports and reformats the code
 	# sort imports / remove unused

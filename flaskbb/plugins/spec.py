@@ -126,7 +126,8 @@ def flaskbb_load_setting_groups():
     Groups registered here show up in the admin UI under
     "Plugin Settings", separate from FlaskBB's own settings.
 
-    Example:
+    Example::
+
         @impl
         def flaskbb_load_setting_groups():
             return SettingGroup(
@@ -163,7 +164,8 @@ def flaskbb_load_search_backends():
     for the `db.create_all()` path), exactly like the built-in
     `postgresql`/`sqlite` backends.
 
-    Example:
+    Example::
+
         @impl
         def flaskbb_load_search_backends():
             return SearchBackendRegistration("elasticsearch", ESBackend)
@@ -187,7 +189,8 @@ def on_plugin_install(plugin_name: str):
     that defines new permissions might create those permission rows
     here.
 
-    Example:
+    Example::
+
         @impl
         def on_plugin_install(plugin_name):
             if plugin_name != "automod":
@@ -210,7 +213,8 @@ def on_plugin_uninstall(plugin_name: str):
     hook created, so uninstalling actually reverses installing rather
     than leaving orphaned state behind.
 
-    Example:
+    Example::
+
         @impl
         def on_plugin_uninstall(plugin_name):
             if plugin_name != "automod":
@@ -235,7 +239,8 @@ def on_plugin_upgrade(plugin_name: str, diff: "SettingsDiff"):
     underlying key, this is where you'd migrate any existing
     role/user's assignment of the old key to the new one.
 
-    Example:
+    Example::
+
         @impl
         def on_plugin_upgrade(plugin_name, diff):
             if plugin_name != "automod":
@@ -263,7 +268,8 @@ def on_plugin_settings_changed(plugin_name: str, changed_keys: list[str]):
     updated, or updating a service user's permissions if a setting
     controls what that user is allowed to do.
 
-    Example:
+    Example::
+
         @impl
         def on_plugin_settings_changed(plugin_name, changed_keys):
             if plugin_name != "automod" or "AUTOMOD_ENABLED" not in changed_keys:

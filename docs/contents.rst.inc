@@ -4,7 +4,8 @@ User Documentation
 .. toctree::
    :maxdepth: 1
 
-   installation
+   development/setup
+   production/deployment
    cli
    plugins/index
    faq

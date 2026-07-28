@@ -5,6 +5,11 @@
 FlaskBB Event Hooks
 ===================
 
+User Loading
+------------
+
+.. autofunction:: flaskbb_current_user
+
 Post and Topic Events
 ---------------------
 
@@ -41,3 +46,5 @@ Profile Edit Events
 .. autofunction:: flaskbb_gather_details_update_validators
 .. autofunction:: flaskbb_details_updated
 .. autofunction:: flaskbb_settings_updated
+.. autofunction:: flaskbb_gather_avatar_validators
+.. autofunction:: flaskbb_avatar_updated

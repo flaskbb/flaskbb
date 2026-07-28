@@ -44,4 +44,4 @@ Validators
 .. autoclass:: flaskbb.user.services.validators.EmailsMustBeDifferent
 .. autoclass:: flaskbb.user.services.validators.PasswordsMustBeDifferent
 .. autoclass:: flaskbb.user.services.validators.OldPasswordMustMatch
-.. autoclass:: flaskbb.user.services.validators.ValidateAvatarURL
+.. autoclass:: flaskbb.user.services.validators.ValidateAvatarImage
