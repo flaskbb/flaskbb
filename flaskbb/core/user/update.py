@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.user.update
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +18,7 @@ from flask_wtf.file import FileStorage
 
 from flaskbb.user.models import User
 
-from ..changesets import EmptyValue, empty, is_empty
+from ..changesets import empty, EmptyValue, is_empty
 
 
 def _should_assign(current: Any, new: Any):
@@ -27,7 +26,7 @@ def _should_assign(current: Any, new: Any):
 
 
 @define(hash=True, eq=True, order=True, repr=True, frozen=True)
-class UserDetailsChange(object):
+class UserDetailsChange:
     """
     Object representing a change user details.
     """
@@ -46,7 +45,7 @@ class UserDetailsChange(object):
 
 
 @define(hash=True, eq=True, order=True, repr=False, frozen=True)
-class PasswordUpdate(object):
+class PasswordUpdate:
     """
     Object representing an update to a user's password.
     """
@@ -56,7 +55,7 @@ class PasswordUpdate(object):
 
 
 @define(hash=True, eq=True, order=True, repr=True, frozen=True)
-class EmailUpdate(object):
+class EmailUpdate:
     """
     Object representing a change to a user's email address.
     """
@@ -66,7 +65,7 @@ class EmailUpdate(object):
 
 
 @define(hash=True, eq=True, order=True, repr=False, frozen=True)
-class AvatarUpdate(object):
+class AvatarUpdate:
     """
     Object representing an update to a user's avatar.
     """
@@ -75,13 +74,14 @@ class AvatarUpdate(object):
 
 
 @define(hash=True, eq=True, order=True, repr=True, frozen=True)
-class SettingsUpdate(object):
+class SettingsUpdate:
     """
     Object representing an update to a user's settings.
     """
 
     language: str = field()
     theme: str = field()
+    open_links_in_new_tab: bool | None = field(default=None)
 
     def assign_to_user(self, user: User):
         for name, value in asdict(self).items():

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.markup
 ~~~~~~~~~~~~~~~~~~~~
@@ -11,11 +10,13 @@ A module for all markup related stuff.
 
 import logging
 import re
-from collections.abc import Iterable
-from typing import Any, Callable
+from collections.abc import Callable, Iterable
+from typing import Any, override
+from urllib.parse import urlparse
 
 import mistune
-from flask import Flask, url_for
+from flask import Flask, request, url_for
+from flask_login import current_user
 from markupsafe import Markup
 from mistune.plugins import PluginRef
 from mistune.plugins.abbr import abbr
@@ -38,8 +39,8 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
-from typing_extensions import override
 
+from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import pluggy
 
 impl = HookimplMarker("flaskbb")
@@ -88,11 +89,17 @@ DEFAULT_PLUGINS = [
 ]
 
 
+def should_open_in_new_tab() -> bool:
+    if current_user.is_authenticated and current_user.open_links_in_new_tab is not None:
+        return current_user.open_links_in_new_tab
+    return bool(flaskbb_config["OPEN_LINKS_IN_NEW_TAB"])
+
+
 class FlaskBBRenderer(mistune.HTMLRenderer):
     """Mistune renderer that uses pygments to apply code highlighting."""
 
     def __init__(self, **kwargs: Any):
-        super(FlaskBBRenderer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @override
     def block_code(self, code: str, info: str | None = None) -> str:
@@ -107,6 +114,21 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
             return "\n<pre><code>%s</code></pre>\n" % mistune.escape(code)
         formatter = HtmlFormatter()  # pyright: ignore
         return highlight(code, lexer, formatter)
+
+    @override
+    def link(self, text: str, url: str, title: str | None = None) -> str:
+        html = super().link(text, url, title)
+        if self._is_external(url):
+            attrs = ' rel="noopener noreferrer nofollow"'
+            if should_open_in_new_tab():
+                attrs += ' target="_blank"'
+            html = html.replace("<a ", f"<a{attrs} ", 1)
+        return html
+
+    @staticmethod
+    def _is_external(url: str) -> bool:
+        netloc = urlparse(url).netloc.lower()
+        return bool(netloc) and netloc != request.host.lower()
 
 
 @impl

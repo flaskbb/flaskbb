@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.user.models
 ~~~~~~~~~~~~~~~~~~~
@@ -20,10 +19,10 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
     DynamicMapped,
     Mapped,
-    WriteOnlyMapped,
     mapped_column,
     relationship,
     synonym,
+    WriteOnlyMapped,
 )
 from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -31,7 +30,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
-from flaskbb.utils.database import CRUDMixin, UTCDateTime, make_comparable
+from flaskbb.utils.database import CRUDMixin, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 
 logger = logging.getLogger(__name__)
@@ -88,7 +87,7 @@ class Group(db.Model, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {} {}>".format(self.__class__.__name__, self.id, self.name)
+        return f"<{self.__class__.__name__} {self.id} {self.name}>"
 
     @classmethod
     def selectable_groups_choices(cls):
@@ -146,6 +145,9 @@ class User(db.Model, UserMixin, CRUDMixin):
     theme: Mapped[str | None] = mapped_column(String(15), nullable=True)
     language: Mapped[str | None] = mapped_column(
         String(15), default="en", nullable=True
+    )
+    open_links_in_new_tab: Mapped[bool | None] = mapped_column(
+        default=None, nullable=True
     )
 
     post_count: Mapped[int] = mapped_column(default=0)
@@ -264,7 +266,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.username)
+        return f"<{self.__class__.__name__} {self.username}>"
 
     def _get_password(self):
         """Returns the hashed password."""

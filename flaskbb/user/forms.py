@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.user.forms
 ~~~~~~~~~~~~~~~~~~
@@ -22,13 +21,13 @@ from wtforms import (
     TextAreaField,
 )
 from wtforms.validators import (
-    URL,
     DataRequired,
     Email,
     EqualTo,
     InputRequired,
     Length,
     Optional,
+    URL,
 )
 
 from flaskbb.utils.forms import (
@@ -52,10 +51,24 @@ class GeneralSettingsForm(FlaskBBForm):
     # because we cannot access the current_app outside of the context
     language = SelectField(_("Language"))
     theme = SelectField(_("Theme"))
+    open_links_in_new_tab = SelectField(
+        _("Open Links in a New Tab"),
+        choices=[
+            ("inherit", _("Use forum default")),
+            ("yes", _("Always")),
+            ("no", _("Never")),
+        ],
+    )
     submit = SubmitField(_("Save"))
 
     def as_change(self):
-        return SettingsUpdate(language=self.language.data, theme=self.theme.data)
+        return SettingsUpdate(
+            language=self.language.data,
+            theme=self.theme.data,
+            open_links_in_new_tab={"yes": True, "no": False}.get(
+                self.open_links_in_new_tab.data
+            ),
+        )
 
 
 class ChangeEmailForm(FlaskBBForm):
@@ -83,7 +96,7 @@ class ChangeEmailForm(FlaskBBForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         kwargs["obj"] = self.user
-        super(ChangeEmailForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def as_change(self):
         return EmailUpdate(old_email=self.old_email.data, new_email=self.new_email.data)

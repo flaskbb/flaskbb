@@ -3,8 +3,6 @@ from datetime import date
 import pytest
 from flask import get_flashed_messages, url_for
 from flask_login import current_user, login_user
-from werkzeug.datastructures import MultiDict
-
 from flaskbb.core.changesets import ChangeSetHandler
 from flaskbb.core.exceptions import PersistenceError, StopValidation
 from flaskbb.core.user.update import (
@@ -25,6 +23,7 @@ from flaskbb.user.views import (
     ChangeUserDetails,
     UserSettings,
 )
+from werkzeug.datastructures import MultiDict
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -32,7 +31,7 @@ def setup_request(user, default_settings, post_request_context):
     login_user(user)
 
 
-class TestUserSettingsView(object):
+class TestUserSettingsView:
     def test_renders_get_okay(self, mocker):
         form = self.produce_form({})
         handler = mocker.Mock(spec=ChangeSetHandler)
@@ -54,6 +53,34 @@ class TestUserSettingsView(object):
         assert result.headers["Location"] == url_for("user.settings")
         handler.apply_changeset.assert_called_once_with(
             user, SettingsUpdate(language="python", theme="solarized")
+        )
+
+    @pytest.mark.parametrize(
+        "choice,expected",
+        [("inherit", None), ("yes", True), ("no", False)],
+    )
+    def test_update_user_settings_open_links_in_new_tab(
+        self, user, mocker, choice, expected
+    ):
+        form = self.produce_form(
+            data={
+                "language": "python",
+                "theme": "solarized",
+                "open_links_in_new_tab": choice,
+            }
+        )
+        handler = mocker.Mock(spec=ChangeSetHandler)
+        view = UserSettings(form=form, settings_update_handler=handler)
+
+        view.post()
+
+        handler.apply_changeset.assert_called_once_with(
+            user,
+            SettingsUpdate(
+                language="python",
+                theme="solarized",
+                open_links_in_new_tab=expected,
+            ),
         )
 
     def test_update_user_settings_fail_with_not_valid(self, mocker):
@@ -97,6 +124,7 @@ class TestUserSettingsView(object):
         assert result.headers["Location"] == url_for("user.settings")
 
     def produce_form(self, data):
+        data = {"open_links_in_new_tab": "inherit", **data}
         form = GeneralSettingsForm(formdata=MultiDict(data), meta={"csrf": False})
         form.language.choices = [
             ("python", "python"),
@@ -109,7 +137,7 @@ class TestUserSettingsView(object):
         return form
 
 
-class TestChangePasswordView(object):
+class TestChangePasswordView:
     def test_renders_get_okay(self, mocker):
         form = self.produce_form()
         handler = mocker.Mock(spec=ChangeSetHandler)
@@ -191,7 +219,7 @@ class TestChangePasswordView(object):
         )
 
 
-class TestChangeEmailView(object):
+class TestChangeEmailView:
     def test_renders_get_okay(self, mocker):
         form = self.produce_form()
         handler = mocker.Mock(spec=ChangeSetHandler)
@@ -267,7 +295,7 @@ class TestChangeEmailView(object):
         )
 
 
-class TestChangeUserDetailsView(object):
+class TestChangeUserDetailsView:
     def test_renders_get_okay(self, mocker):
         form = self.produce_form()
         handler = mocker.Mock(spec=ChangeSetHandler)

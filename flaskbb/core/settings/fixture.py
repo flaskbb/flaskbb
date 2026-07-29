@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.settings.fixture
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,6 +74,16 @@ general_group = SettingGroup(
             min=5,
             name="Users per page",
             description="Number of users displayed per page.",
+        ),
+        BoolSetting(
+            key="OPEN_LINKS_IN_NEW_TAB",
+            value=False,
+            name="Open external links in a new tab",
+            description=(
+                "Open links to external websites within posts in a new "
+                "browser tab. Users can override this in their own "
+                "settings."
+            ),
         ),
     ),
 )
