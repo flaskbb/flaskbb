@@ -19,8 +19,8 @@
     "dark"
   ],
   "scripts": {
-    "build": "npx webpack --config webpack.prod.js",
-    "watch": "npx webpack --config webpack.dev.js --watch"
+    "build": "NODE_PATH=../aurora/node_modules node ../aurora/node_modules/webpack/bin/webpack.js --config webpack.prod.js",
+    "watch": "NODE_PATH=../aurora/node_modules node ../aurora/node_modules/webpack/bin/webpack.js --config webpack.dev.js --watch"
   },
   "comments": {
     "dependencies": "Aurora Dark ships CSS only and reuses the default Aurora theme's installed dependencies at build time. It requires to build the Aurora theme first."

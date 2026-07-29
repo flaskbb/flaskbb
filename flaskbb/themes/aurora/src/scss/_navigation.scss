@@ -27,7 +27,7 @@
         font-size: 12px;
         font-weight: bold;
         line-height: 20px;
-        color: $black;
+        color: $fbb-sidenav-header-color;
         text-transform: uppercase;
     }
 
@@ -108,21 +108,23 @@
 
         .nav-link.active,
         .nav-item.show .nav-link {
-            background-color: $fresh-blue;
+            color: $fbb-management-tab-color;
+            background-color: $fbb-management-tab-active-bg;
         }
 
         // non-active and hover
         .nav-item {
             .nav-link {
-                color: $fbb-header-subtitle-color;
-                border: 1px solid $blue;
+                color: $fbb-management-tab-color;
+                border: 1px solid $fbb-management-tab-bg;
 
                 // different background color when hovering
                 &.active,
                 &:hover,
                 &:focus {
-                    background-color: $fresh-blue;
-                    border: 1px solid $fresh-blue;
+                    color: $fbb-management-tab-color;
+                    background-color: $fbb-management-tab-active-bg;
+                    border: 1px solid $fbb-management-tab-active-bg;
                 }
             }
         }

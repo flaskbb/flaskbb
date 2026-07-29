@@ -3,7 +3,7 @@
 }
 
 .profile-content {
-    background-color: #fff;
+    background-color: $page-bg;
     min-height: 100%;
 
     .topic-head {
@@ -31,7 +31,7 @@
 }
 
 .profile-sidebar-stats {
-    text-shadow: 0 1px 0 #fff;
+    text-shadow: $fbb-text-shadow;
 }
 
 .profile-groupname {

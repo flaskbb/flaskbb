@@ -38,7 +38,7 @@ $fbb-bg-light: #fff;
 // header && footer colors
 $fbb-header-title-color: #fff;
 $fbb-header-subtitle-color: #E8F1F2;
-$fbb-header-bg-primary: #0088cc;  // old: #3276b1
+$fbb-header-bg-primary: #0088cc; // old: #3276b1
 $fbb-header-bg-secondary: #285e8e;
 $fbb-footer-bg: #333333;
 
@@ -48,12 +48,12 @@ $fbb-navigation-hover-color: #e7e7e7;
 
 
 // page colors
-$page-bg: #fff;            // page body background
-$page-head-bg: #f5f5f5;    // page head background
-$page-meta-bg: #eaf1f5;    // page meta background
-$page-meta-border: $fbb-border-color;   // page meta (bottom) border
-$page-border: $fbb-border-color;        // page border (all over)
-$page-hover: #f8f8f8;                // page-row hover
+$page-bg: #fff; // page body background
+$page-head-bg: #f5f5f5; // page head background
+$page-meta-bg: #eaf1f5; // page meta background
+$page-meta-border: $fbb-border-color; // page meta (bottom) border
+$page-border: $fbb-border-color; // page border (all over)
+$page-hover: #f8f8f8; // page-row hover
 
 
 // post colors
@@ -77,22 +77,22 @@ $author-offline: $gray;
 // https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss
 // raw: https://raw.githubusercontent.com/twbs/bootstrap/main/scss/_variables.scss
 //
-$body-bg:                   $fbb-bg;
-$body-color:                $fbb-color;
+$body-bg: $fbb-bg;
+$body-color: $fbb-color;
 
 // Links
-$link-color:                              $fbb-link-color;
-$link-decoration:                         none;
-$link-shade-percentage:                   20%;
-$link-hover-decoration:                   underline;
+$link-color: $fbb-link-color;
+$link-decoration: none;
+$link-shade-percentage: 20%;
+$link-hover-decoration: underline;
 
 // Dropdown
 
-$dropdown-bg:                       $fbb-navigation-bg;
-$dropdown-link-hover-bg:            $fbb-navigation-hover-color;
+$dropdown-bg: $fbb-navigation-bg;
+$dropdown-link-hover-bg: $fbb-navigation-hover-color;
 
 // Border
-$border-width:                1px;
+$border-width: 1px;
 $border-widths: (
   1: 1px,
   2: 2px,
@@ -101,11 +101,11 @@ $border-widths: (
   5: 5px
 );
 
-$border-color:                $fbb-border-color;
-$border-radius:               .25rem;
-$border-radius-sm:            .2rem;
-$border-radius-lg:            .3rem;
-$border-radius-pill:          50rem;
+$border-color: $fbb-border-color;
+$border-radius: .25rem;
+$border-radius-sm: .2rem;
+$border-radius-lg: .3rem;
+$border-radius-pill: 50rem;
 
 
 // Cards
@@ -113,10 +113,41 @@ $card-border-radius: none;
 
 
 // Navbar
-$navbar-light-color:                $fbb-color;
-$navbar-light-hover-color:          $fbb-color;
-$navbar-light-active-color:         $fbb-color;
+$navbar-light-color: $fbb-color;
+$navbar-light-hover-color: $fbb-color;
+$navbar-light-active-color: $fbb-color;
 
 
 // Forms
-$input-bg: $white;  // default is $body-bg
+$input-bg: $white; // default is $body-bg
+
+
+// Management panel tabs
+$fbb-management-tab-bg: $blue;
+$fbb-management-tab-active-bg: $fresh-blue;
+$fbb-management-tab-color: $fbb-header-subtitle-color;
+
+// Alert message variants
+$fbb-msg-success-bg: #f4fdf0;
+$fbb-msg-error-bg: #fdf7f7;
+$fbb-msg-warning-bg: #fcf8f2;
+$fbb-msg-info-bg: #f4f8fa;
+$fbb-msg-default-bg: #eee;
+$fbb-msg-highlight-bg: #fcfcdd;
+$fbb-msg-highlight-border: #bdbd89;
+$fbb-msg-highlight-color: #444;
+
+$fbb-text-shadow: 0 1px 0 #fff;
+$fbb-search-highlight-bg: var(--bs-warning-bg-subtle);
+
+// Alert-message
+$fbb-msg-border-color: #eee;
+$fbb-msg-code-bg: #fff;
+$fbb-msg-default-color: $black;
+
+// Autocomplete/mention dropdown
+$fbb-dropdown-border: #ddd;
+$fbb-dropdown-bg: $white;
+$fbb-dropdown-hover-bg: rgb(110, 183, 219);
+
+$fbb-sidenav-header-color: $black;

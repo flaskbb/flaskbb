@@ -8,7 +8,7 @@
     }
 
     .management-header {
-        background-color: $blue;
+        background-color: $fbb-management-tab-bg;
     }
 
     .management-body {
@@ -147,7 +147,8 @@
     padding: 20px;
     border-radius: 5px;
     border: 1px solid $dark-green;
-    border-left: 3px solid #eee;
+    border-left: 3px solid $fbb-msg-border-color;
+    color: $fbb-color;
     h4 {
         margin-top: 0;
         margin-bottom: 5px;
@@ -156,50 +157,50 @@
         margin-bottom: 0;
     }
     code {
-        background-color: #fff;
+        background-color: $fbb-msg-code-bg;
         border-radius: 3px;
     }
 
     &.alert-message-success {
-        background-color: #f4fdf0;
+        background-color: $fbb-msg-success-bg;
         border-color: $dark-green;
     }
     &.alert-message-success h4 {
         color: $dark-green;
     }
     &.alert-message-danger {
-        background-color: #fdf7f7;
+        background-color: $fbb-msg-error-bg;
         border-color: $red;
     }
     &.alert-message-danger h4 {
         color: $red;
     }
     &.alert-message-warning {
-        background-color: #fcf8f2;
+        background-color: $fbb-msg-warning-bg;
         border-color: $orange;
     }
     &.alert-message-warning h4 {
         color: $orange;
     }
     &.alert-message-info {
-        background-color: #f4f8fa;
+        background-color: $fbb-msg-info-bg;
         border-color: $light-blue;
     }
     &.alert-message-info h4 {
         color: $light-blue;
     }
     &.alert-message-default {
-        background-color: #eee;
+        background-color: $fbb-msg-default-bg;
         border-color: $gray;
     }
     &.alert-message-default h4 {
-        color: #000;
+        color: $fbb-msg-default-color;
     }
     &.alert-message-notice {
-        background-color: #fcfcdd;
-        border-color: #bdbd89;
+        background-color: $fbb-msg-highlight-bg;
+        border-color: $fbb-msg-highlight-border;
     }
     &.alert-message-notice h4 {
-        color: #444;
+        color: $fbb-msg-highlight-color;
     }
 }

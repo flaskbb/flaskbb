@@ -160,8 +160,8 @@ p.flaskbb-stats {
 }
 
 .textcomplete-dropdown {
-    border: 1px solid #ddd;
-    background-color: white;
+    border: 1px solid $fbb-dropdown-border;
+    background-color: $fbb-dropdown-bg;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -173,7 +173,7 @@ p.flaskbb-stats {
 
 .textcomplete-footer,
 .textcomplete-item {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid $fbb-dropdown-border;
 }
 
 .textcomplete-item {
@@ -183,5 +183,5 @@ p.flaskbb-stats {
 
 .textcomplete-item:hover,
 .textcomplete-item.active {
-    background-color: rgb(110, 183, 219);
+    background-color: $fbb-dropdown-hover-bg;
 }

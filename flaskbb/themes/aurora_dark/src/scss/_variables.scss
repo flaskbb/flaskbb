@@ -43,6 +43,7 @@ $fbb-navigation-hover-color: #21262d;
 // management panel tabs - picked from the header gradient
 $fbb-management-tab-bg: #16409b;
 $fbb-management-tab-active-bg: #1b58c4;
+$fbb-management-tab-color: #fff;
 
 
 // page colors
@@ -237,3 +238,28 @@ $border-radius:               .25rem;
 $border-radius-sm:            .2rem;
 $border-radius-lg:            .3rem;
 $border-radius-pill:          50rem;
+
+// Alert message variants
+$fbb-msg-success-bg: rgba($dark-green, 0.12);
+$fbb-msg-error-bg: rgba($red, 0.12);
+$fbb-msg-warning-bg: rgba($orange, 0.12);
+$fbb-msg-info-bg: rgba($light-blue, 0.12);
+$fbb-msg-default-bg: $page-head-bg;
+$fbb-msg-highlight-bg: rgba(#d4d466, 0.12);
+$fbb-msg-highlight-border: #8a8a4a;
+$fbb-msg-highlight-color: #d4d466;
+
+$fbb-text-shadow: none;
+$fbb-search-highlight-bg: rgba($orange, 0.35);
+
+// Alert-message chrome
+$fbb-msg-border-color: $fbb-border-color;
+$fbb-msg-code-bg: $fbb-bg-dark;
+$fbb-msg-default-color: $fbb-color;
+
+// Autocomplete/mention dropdown
+$fbb-dropdown-border: $fbb-border-color;
+$fbb-dropdown-bg: $fbb-navigation-bg;
+$fbb-dropdown-hover-bg: $fbb-navigation-hover-color;
+
+$fbb-sidenav-header-color: $fbb-color;

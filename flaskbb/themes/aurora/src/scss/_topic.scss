@@ -115,7 +115,7 @@
 // author
 .author {
     padding: 0.5rem 1rem;
-    text-shadow: 0px 1px 0px #fff;
+    text-shadow: $fbb-text-shadow;
 
     // probably not the best name but i couldn't come up with a better one
     &.author-horizontal {
@@ -181,7 +181,7 @@ h4.author-name {
 
 .author-title h5,
 h5.author-title {
-    text-shadow: 0px 1px 0px #fff;
+    text-shadow: $fbb-text-shadow;
     font-size: 1rem;
     font-weight: 600;
     margin-top: 0;
