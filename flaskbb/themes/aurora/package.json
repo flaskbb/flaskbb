@@ -23,8 +23,8 @@
     "watch": "npx webpack --config webpack.dev.js --watch"
   },
   "dependencies": {
+    "@flaskbb/markdown-toolbar-element": "^1.0.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "@github/markdown-toolbar-element": "^2.2.3",
     "@popperjs/core": "^2.11.8",
     "@textcomplete/core": "^0.1.13",
     "@textcomplete/textarea": "^0.1.13",

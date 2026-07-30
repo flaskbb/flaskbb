@@ -292,6 +292,8 @@
         <script type="text/javascript">
             const FORUM_URL_PREFIX = "{{ config['FORUM_URL_PREFIX'] }}";
         </script>
+
+        {{ run_hook("flaskbb_tpl_scripts") }}
         {% endblock %} {# for extra scripts in other templates. #} {% block
         scripts %} {% endblock %}
     </body>

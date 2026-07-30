@@ -125,6 +125,8 @@
                         <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
                     </div>
 
+                    {{ run_hook("flaskbb_tpl_markdown_toolbar_buttons") }}
+
                     <button class="btn btn-sm btn-primary me-2 preview-btn" data-preview="{{ field.id }}">Preview</button>
                     <button type="button" class="btn btn-sm btn-white help-btn" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
                 </markdown-toolbar>

@@ -1353,3 +1353,108 @@ def flaskbb_tpl_form_new_topic_after(form):
     in :file:`templates/forum/new_topic.html`
     :param form: The form object.
     """
+
+
+@spec
+def flaskbb_tpl_markdown_cheatsheet():
+    """Hook for documenting a custom markdown directive in the editor's
+    cheatsheet.
+
+    Implementations should return an HTML fragment. Everything returned by
+    this hook is concatenated and inserted at the bottom of the cheatsheet
+    modal, so a fragment should bring its own heading::
+
+        @impl
+        def flaskbb_tpl_markdown_cheatsheet():
+            return render_template("myplugin/cheatsheet.html")
+
+    The fragment is inserted as-is. Escaping any user or configuration
+    supplied value in it is the plugin's responsibility - rendering it
+    through :func:`flask.render_template` or
+    :func:`flask.render_template_string` gets that for free, building it by
+    string concatenation does not.
+
+    in :file:`templates/_partials/editor_help.html`
+
+    .. versionadded:: 3.0
+
+    .. seealso::
+
+        :func:`flaskbb_tpl_markdown_toolbar_buttons`
+            Hook for adding a toolbar button for the directive.
+    """
+
+
+@spec
+def flaskbb_tpl_markdown_toolbar_buttons():
+    """Hook for adding buttons to the markdown editor's toolbar.
+
+    Implementations should return an HTML fragment, which is inserted into
+    the ``<markdown-toolbar>`` element after FlaskBB's own buttons.
+
+    For directives that wrap the selection in fixed text, the ``<md-custom>``
+    element does the work and no JavaScript is needed::
+
+        @impl
+        def flaskbb_tpl_markdown_toolbar_buttons():
+            return render_template_string(
+                '''
+                <div class="btn-group btn-group-sm me-2">
+                    <md-custom class="btn btn-white"
+                               data-md-prefix="||"
+                               data-md-placeholder="spoiler"
+                               data-tooltip="tooltip" title="Spoiler">
+                        <span class="fas fa-eye-slash"></span>
+                    </md-custom>
+                </div>
+                '''
+            )
+
+    ``<md-custom>`` understands ``data-md-prefix``, ``data-md-suffix``
+    (defaults to the prefix), ``data-md-insert`` (insert a fixed block
+    instead of wrapping) and ``data-md-placeholder`` (inserted and selected
+    when clicked without a selection).
+
+    Anything else - a button that is aware of multiline selections, or one
+    that opens a dialog - needs a custom element subclassing
+    ``MarkdownButtonElement``, which the plugin ships as its own script and
+    registers through :func:`flaskbb_tpl_scripts`. Custom element names are
+    global to the page, so prefix them with the plugin name
+    (``myplugin-spoiler``, not ``spoiler``).
+
+    The fragment is inserted as-is, see
+    :func:`flaskbb_tpl_markdown_cheatsheet` for what that means for escaping.
+
+    in :file:`templates/_macros/form.html`
+
+    .. versionadded:: 3.0
+
+    .. seealso::
+
+        :func:`flaskbb_tpl_markdown_cheatsheet`
+            Hook for documenting the directive in the editor's cheatsheet.
+    """
+
+
+@spec
+def flaskbb_tpl_scripts():
+    """Hook for loading additional scripts on every page.
+
+    Implementations should return an HTML fragment, which is inserted at the
+    end of the ``<body>`` element after FlaskBB's own scripts::
+
+        @impl
+        def flaskbb_tpl_scripts():
+            return render_template_string(
+                '<script src="{{ url_for("myplugin.static", '
+                'filename="spoiler.js") }}"></script>'
+            )
+
+    This runs after the page markup has been parsed, which is fine for
+    registering custom elements - elements already in the document are
+    upgraded as soon as ``customElements.define`` is called for them.
+
+    in :file:`templates/layout.html`
+
+    .. versionadded:: 3.0
+    """

@@ -9,4 +9,5 @@ Plugin Development
    developing
    translations
    hooks
+   editor
    manager

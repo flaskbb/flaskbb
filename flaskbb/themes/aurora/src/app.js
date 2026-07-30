@@ -1,4 +1,4 @@
-import '@github/markdown-toolbar-element';
+import '@flaskbb/markdown-toolbar-element';
 import { Alert, Dropdown, Modal, Tooltip } from 'bootstrap';
 
 import "./app/confirm_modal.js";

@@ -35,3 +35,11 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_topic_controls
 .. autofunction:: flaskbb_tpl_admin_settings_menu
 .. autofunction:: flaskbb_tpl_admin_settings_sidebar
+.. autofunction:: flaskbb_tpl_markdown_cheatsheet
+.. autofunction:: flaskbb_tpl_markdown_toolbar_buttons
+.. autofunction:: flaskbb_tpl_scripts
+
+.. note::
+
+    See :ref:`plugin_development_editor` for a walkthrough of the two
+    markdown editor hooks.

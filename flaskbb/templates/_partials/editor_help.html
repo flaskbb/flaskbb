@@ -50,6 +50,8 @@
                             <span class="col-3 markup">{{ '```python\r print "Hello World"\n```' | markup }}</span>
                         </div>
                     </div>
+                    {{ run_hook("flaskbb_tpl_markdown_cheatsheet") }}
+
                     <p class="credit text-center" style="bottom: 10px; position: absolute; left: 0; right: 0; margin: 0 auto">
                         <small>For a more detailed info visit the <a href="http://daringfireball.net/projects/markdown/basics">official Markdown website</a></small>
                     </p>

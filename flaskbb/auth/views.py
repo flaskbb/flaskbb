@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.auth.views
 ~~~~~~~~~~~~~~~~~~
@@ -11,10 +10,11 @@ resetting the password of a user if he has lost his password
 """
 
 import logging
-from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from datetime import datetime, timedelta, UTC
+from typing import TYPE_CHECKING
 
-from flask import Blueprint, Flask, flash, redirect, request, url_for
+from flask import Blueprint, flash, Flask, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (
