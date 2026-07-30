@@ -132,6 +132,17 @@
                     {% if current_user|is_admin %}
                         {{
                             action_confirm(
+                                id="delete-posts-" ~ user.id,
+                                url=url_for('management.delete_user_posts', user_id=user.id),
+                                title=_("Delete all posts"),
+                                icon="fas fa-eraser text-danger"
+                            )
+                        }}
+                    {% endif %}
+
+                    {% if current_user|is_admin %}
+                        {{
+                            action_confirm(
                                 id="delete-" ~ user.id,
                                 url=url_for('management.delete_user', user_id=user.id),
                                 title=_("Delete"),

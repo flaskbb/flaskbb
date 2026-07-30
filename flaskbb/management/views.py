@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.management.views
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,9 +18,9 @@ from typing import Any
 from celery import __version__ as celery_version
 from flask import (
     Blueprint,
-    Flask,
     current_app,
     flash,
+    Flask,
     jsonify,
     redirect,
     request,
@@ -48,6 +47,7 @@ from flaskbb.management.forms import (
     AddForumForm,
     AddGroupForm,
     AddUserForm,
+    assignable_groups,
     AttachmentSearchForm,
     CategoryForm,
     EditForumForm,
@@ -55,7 +55,6 @@ from flaskbb.management.forms import (
     EditUserForm,
     ModeratorEditUserForm,
     SuperModeratorEditUserForm,
-    assignable_groups,
 )
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import validate_plugin
@@ -126,8 +125,8 @@ class ManagementOverview(MethodView):
 
         unread_reports = Report.count(Report.zapped == None)
 
-        python_version = "{}.{}.{}".format(
-            sys.version_info[0], sys.version_info[1], sys.version_info[2]
+        python_version = (
+            f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}"
         )
 
         stats = {
@@ -459,6 +458,40 @@ class DeleteUser(MethodView):
         return redirect(url_for("management.users"))
 
 
+class DeleteUserPosts(MethodView):
+    decorators = [
+        allows.requires(
+            IsAdmin,
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to manage users"),
+                level="danger",
+                endpoint="management.overview",
+            ),
+        )
+    ]
+
+    def post(self, user_id: int):
+        user = User.get_by_or_404(id=user_id)
+
+        # Post.delete() can cascade-delete the whole topic (and every post in
+        # it) when it's a topic's first post, so a pre-fetched batch could
+        # hold stale objects for rows a previous iteration already removed.
+        # Re-querying the lowest remaining id each time sidesteps that.
+        while True:
+            post = db.session.execute(
+                db.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
+            ).scalar_one_or_none()
+            if post is None:
+                break
+            post.delete()
+
+        flash(
+            _("All posts by %(user)s have been deleted.", user=user.username),
+            "success",
+        )
+        return redirect(url_for("management.users"))
+
+
 class AddUser(MethodView):
     decorators = [
         allows.requires(
@@ -597,7 +630,7 @@ class BanUser(MethodView):
                     )
 
             return jsonify(
-                message="{} users banned.".format(len(data)),
+                message=f"{len(data)} users banned.",
                 category="success",
                 data=data,
                 status=200,
@@ -823,7 +856,7 @@ class DeleteGroup(MethodView):
                 )
 
             return jsonify(
-                message="{} groups deleted.".format(len(data)),
+                message=f"{len(data)} groups deleted.",
                 category="success",
                 data=data,
                 status=200,
@@ -1166,7 +1199,7 @@ class MarkReportRead(MethodView):
                 )
 
             return jsonify(
-                message="{} reports marked as read.".format(len(data)),
+                message=f"{len(data)} reports marked as read.",
                 category="success",
                 data=data,
                 status=200,
@@ -1236,7 +1269,7 @@ class DeleteReport(MethodView):
                     )
 
             return jsonify(
-                message="{} reports deleted.".format(len(data)),
+                message=f"{len(data)} reports deleted.",
                 category="success",
                 data=data,
                 status=200,
@@ -1800,6 +1833,11 @@ def flaskbb_load_blueprints(app: Flask):
         management,
         routes=["/users/delete", "/users/<int:user_id>/delete"],
         view_func=DeleteUser.as_view("delete_user"),
+    )
+    register_view(
+        management,
+        routes=["/users/<int:user_id>/delete_posts"],
+        view_func=DeleteUserPosts.as_view("delete_user_posts"),
     )
     register_view(
         management,

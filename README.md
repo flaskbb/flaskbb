@@ -18,6 +18,8 @@ Currently, following features are implemented:
 * Completely Themeable
 * Plugin System
 * Command Line Interface
+* Attachments
+* Full-Text Search for PostgreSQL and SQLite
 
 
 ## Quickstart
@@ -27,7 +29,7 @@ For a complete installation guide please visit the installation documentation
 
 This is how you set up an development instance of FlaskBB:
 
-* Create a virtualenv
+* Install [uv](https://docs.astral.sh/uv/)
 * Configuration
     * `make devconfig`
 * Install dependencies and FlaskBB

@@ -12,7 +12,9 @@ import pytest
 from flask import g, get_flashed_messages
 from flask_login import login_user, logout_user
 
+from flaskbb.extensions import db
 from flaskbb.forum import views as forum_views
+from flaskbb.forum.models import Post, Topic
 from flaskbb.management import views
 from flaskbb.user import views as user_views
 from flaskbb.user.models import Group, User
@@ -594,3 +596,72 @@ def test_the_self_restriction_does_not_apply_to_other_admins(
 
     assert response.status_code == 302
     assert second_admin_user.primary_group_id == default_groups[3].id
+
+
+def test_admin_can_delete_all_of_a_users_posts(
+    default_settings, no_csrf, admin_user, user, topic
+):
+    view = views.DeleteUserPosts.as_view("delete_user_posts")
+
+    with views.current_app.test_request_context(method="POST"):
+        login_user(admin_user)
+        response = view(user_id=user.id)
+        messages = get_flashed_messages(with_categories=True)
+        logout_user()
+
+    assert response.status_code == 302
+    assert (
+        "success",
+        "All posts by {} have been deleted.".format(user.username),
+    ) in messages
+    assert user.post_count == 0
+    assert db.session.get(Topic, topic.id) is None
+
+
+def test_deleting_a_users_posts_cascades_a_topic_they_started(
+    default_settings, no_csrf, admin_user, user, moderator_user, topic
+):
+    """A reply from a different user in the same topic is collateral - this
+    is the same cascade forum.views.DeletePost already has for a single post,
+    not a new behavior introduced here.
+    """
+    reply = Post(content="a reply from someone else")
+    reply.save(user=moderator_user, topic=topic)
+
+    view = views.DeleteUserPosts.as_view("delete_user_posts")
+    with views.current_app.test_request_context(method="POST"):
+        login_user(admin_user)
+        view(user_id=user.id)
+        logout_user()
+
+    assert db.session.get(Topic, topic.id) is None
+    assert db.session.get(Post, reply.id) is None
+
+
+def test_moderator_cannot_delete_a_users_posts(
+    default_settings, no_csrf, moderator_user, user, topic
+):
+    view = views.DeleteUserPosts.as_view("delete_user_posts")
+
+    with views.current_app.test_request_context(method="POST"):
+        login_user(moderator_user)
+        response = view(user_id=user.id)
+        messages = get_flashed_messages(with_categories=True)
+        logout_user()
+
+    assert response.status_code == 302
+    assert ("danger", "You are not allowed to manage users") in messages
+    assert db.session.get(Topic, topic.id) is not None
+
+
+def test_deleting_posts_for_a_user_with_none_is_a_no_op(
+    default_settings, no_csrf, admin_user, user
+):
+    view = views.DeleteUserPosts.as_view("delete_user_posts")
+
+    with views.current_app.test_request_context(method="POST"):
+        login_user(admin_user)
+        response = view(user_id=user.id)
+        logout_user()
+
+    assert response.status_code == 302
