@@ -196,13 +196,6 @@ misc_group = SettingGroup(
     description="Miscellaneous settings.",
     settings=(
         IntSetting(
-            key="MESSAGE_QUOTA",
-            value=50,
-            min=0,
-            name="Private Message Quota",
-            description="The amount of messages a user can have.",
-        ),
-        IntSetting(
             key="ONLINE_LAST_MINUTES",
             value=15,
             min=0,
