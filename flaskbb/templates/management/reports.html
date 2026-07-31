@@ -1,5 +1,4 @@
 {% set page_title = _("Reports") %}
-{% set active = "management.unread_reports" %}
 
 {% extends theme("management/management_layout.html") %}
 
@@ -13,19 +12,9 @@
 
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/navigation.html') import navlink with context -%}
 {%- from theme('_macros/form.html') import action_confirm -%}
 
-
-<div class="col-3 settings-col">
-    <ul class="nav nav-sidebar">
-        {{ navlink('management.reports', _("Show all Reports")) }}
-        {{ navlink('management.unread_reports', _("Show unread Reports")) }}
-    </ul>
-</div>
-
-
-<div class="col-9 settings-col with-left-border">
+<div class="col-md-12 settings-col">
     <div class="card settings">
         <div class="card-header settings-header">
             <span class="fa fa-flag"></span> {% trans %}Reports{% endtrans %}

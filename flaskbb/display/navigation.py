@@ -19,6 +19,7 @@ __all__ = (
     "NavigationExternalLink",
     "NavigationHeader",
     "NavigationDivider",
+    "NavigationTree",
 )
 
 
@@ -31,6 +32,7 @@ class NavigationContentType(Enum):
     external_link = 1
     header = 2
     divider = 3
+    tree = 4
 
 
 class NavigationItem:
@@ -107,3 +109,29 @@ class NavigationDivider(NavigationItem):
     """
 
     content_type = NavigationContentType.divider
+
+
+@dataclass(eq=True, order=True, repr=True, frozen=True, slots=True)
+class NavigationTree(NavigationItem):
+    """
+    Representation of a togglable navigation link with nested children::
+
+        NavigationTree(
+            endpoint="management.settings",
+            name="Settings",
+            icon="fa fa-cogs",
+            active=True,
+            children=(
+                NavigationLink(endpoint="management.settings", name="General"),
+                ...
+            )
+        )
+    """
+
+    endpoint: str
+    name: str
+    icon: str = ""
+    active: bool = False
+    urlforkwargs: dict[str, Any] = field(default_factory=dict)
+    children: tuple["NavigationItem", ...] = field(default_factory=tuple)
+    content_type = NavigationContentType.tree

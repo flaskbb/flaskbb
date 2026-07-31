@@ -63,10 +63,23 @@
     .nav-header {
         position: relative;
         display: block;
-        padding: 10px 7.5px;
-        font-size: 12px;
+        padding: 8px 16px;
+        margin-top: 4px;
+        font-size: 13px;
+        line-height: 24px;
         font-weight: bold;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
+        color: $fbb-sidenav-header-color;
+        background-color: $page-hover;
+        border-bottom: 1px solid $border-color;
+        cursor: default;
+    }
+    .nav-item:first-child.nav-header {
+        margin-top: 0;
+    }
+    > .nav > .nav-header:not(:first-child) {
+        border-top: 1px solid $border-color;
     }
     .nav-item {
         width: 100%;
@@ -74,59 +87,94 @@
 
     .nav-link {
         color: $fbb-navigation-color;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:hover {
             background-color: $fbb-navigation-bg;
         }
 
         &.active {
-            border-top: 1px solid $border-color;
-            border-bottom: 1px solid $border-color;
+            border-top-color: $border-color;
+            border-bottom-color: $border-color;
 
             cursor: default;
             background-color: $fbb-navigation-bg;
         }
     }
 
-    .nav-item:first-child > .nav-link:first-child.active {
-        border-top: none;
+    .nav-header + .nav-item > .nav-link.active {
+        border-top-color: transparent;
     }
-}
 
-.card-tabs {
-    > .card-header {
-        padding: 0;
-        font-weight: 500;
+    .tree-parent-row {
+        position: relative;
+
+        > .nav-link {
+            padding-right: 32px;
+        }
     }
-    > .card-header > .nav-tabs {
-        border-bottom: none;
+
+    .tree-toggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 32px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $fbb-navigation-hover-color;
+        }
+    }
+
+    .tree-chevron {
+        font-size: 10px;
+        transition: transform 0.15s ease;
+    }
+
+    .tree-parent.expanded .tree-chevron {
+        transform: rotate(90deg);
+    }
+
+    .tree-children {
+        display: none;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        .nav-header {
+            padding-left: 40px;
+        }
+
+        > .nav-header:not(:first-child) {
+            border-top: 1px solid $border-color;
+        }
 
         .nav-link {
-            border-radius: 0;
-            border-color: transparent;
-        }
+            padding-left: 40px;
+            font-size: 13px;
 
-        .nav-link.active,
-        .nav-item.show .nav-link {
-            color: $fbb-management-tab-color;
-            background-color: $fbb-management-tab-active-bg;
-        }
-
-        // non-active and hover
-        .nav-item {
-            .nav-link {
-                color: $fbb-management-tab-color;
-                border: 1px solid $fbb-management-tab-bg;
-
-                // different background color when hovering
-                &.active,
-                &:hover,
-                &:focus {
-                    color: $fbb-management-tab-color;
-                    background-color: $fbb-management-tab-active-bg;
-                    border: 1px solid $fbb-management-tab-active-bg;
-                }
+            &.active {
+                border-top-color: transparent;
+                border-bottom-color: transparent;
+                background-color: transparent;
+                font-weight: bold;
+                color: $fbb-link-color;
             }
         }
+    }
+
+    .tree-parent.expanded > .tree-children {
+        display: block;
     }
 }

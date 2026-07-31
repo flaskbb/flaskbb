@@ -12,19 +12,9 @@
 
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/navigation.html') import navlink with context -%}
 {%- from theme('_macros/form.html') import action_confirm -%}
 
-<div class="col-md-3 settings-col">
-    <div class="nav-sidebar">
-        <ul class="nav">
-            {{ navlink('management.groups', _("Manage Groups")) }}
-            {{ navlink('management.add_group', _("Add Group")) }}
-        </ul>
-    </div>
-</div>
-
-<div class="col-md-9 settings-col with-left-border">
+<div class="col-md-12 settings-col">
     <div class="card settings">
         <div class="card-header settings-header">
             <span class="fa fa-users"></span> {% trans %}Groups{% endtrans %}

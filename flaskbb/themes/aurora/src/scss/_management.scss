@@ -7,12 +7,19 @@
             border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
 
-    .management-header {
-        background-color: $fbb-management-tab-bg;
-    }
-
     .management-body {
         padding: 0;
+    }
+
+    .management-sidebar {
+        flex: 0 0 210px;
+        width: 210px;
+        border-right: 1px solid $border-color;
+        padding: 0 0 8px 0;
+    }
+
+    .management-content {
+        min-width: 0;
     }
 }
 

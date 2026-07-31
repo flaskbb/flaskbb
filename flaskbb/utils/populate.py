@@ -137,8 +137,14 @@ def create_user(username: str, password: str, email: str, groupname: str):
     return user
 
 
-def update_user(username: str, password: str, email: str, groupname: str):
-    """Update an existing user.
+def update_user(
+    username: str,
+    password: str | None,
+    email: str | None,
+    groupname: str | None,
+):
+    """Update an existing user. Only the fields that are not ``None`` are
+    updated.
     Returns the updated user.
 
     :param username: The username of the user.
@@ -153,16 +159,18 @@ def update_user(username: str, password: str, email: str, groupname: str):
     if user is None:
         return None
 
-    if groupname == "member":
-        group = Group.get_member_group()
-    else:
-        group = db.session.execute(
-            select(Group).filter(getattr(Group, groupname).is_(True))
-        ).scalar_one()
-
-    user.password = password
-    user.email = email
-    user.primary_group_id = group.id
+    if password is not None:
+        user.password = password
+    if email is not None:
+        user.email = email
+    if groupname is not None:
+        if groupname == "member":
+            group = Group.get_member_group()
+        else:
+            group = db.session.execute(
+                select(Group).filter(getattr(Group, groupname).is_(True))
+            ).scalar_one()
+        user.primary_group_id = group.id
     return user.save()
 
 

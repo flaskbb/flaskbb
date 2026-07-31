@@ -35,6 +35,19 @@
 {% endmacro %}
 
 
+{% macro navlink_exact(endpoint, name, icon='', active=false, urlforkwargs=None) %}
+{# Like navlink, but trusts the given active flag as-is instead of falling
+   back to matching request.endpoint - needed when several links share one
+   endpoint (e.g. settings tree children distinguished by query args) and
+   only one of them should ever be marked active. #}
+<li class="nav-item">
+    <a class="nav-link {% if active %}active{% endif %}" href="{% if urlforkwargs %}{{ url_for(endpoint, **urlforkwargs) }}{% else %}{{ url_for(endpoint) }}{% endif %}">
+        {% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}
+    </a>
+</li>
+{% endmacro %}
+
+
 {% macro externalnavlink(uri, name, icon='') %}
 <li class="nav-item">
     <a class="nav-link" href="{{uri}}">{% if icon %}<i class="{{ icon }}"></i> {% endif %} {{ name }}</a>
@@ -43,7 +56,7 @@
 
 
 {% macro navtext(text, icon="", cls="") %}
-<li {%- if cls -%}class="{{ cls }}"{%- endif -%}><a href="#">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ text }}</a></li>
+<li{% if cls %} class="{{ cls }}"{% endif %}>{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ text }}</li>
 {% endmacro %}
 
 
@@ -54,6 +67,33 @@
 
 {% macro navdivider() %}
 <li class="nav-divider"></li>
+{% endmacro %}
+
+
+{% macro navtree(item) %}
+<li class="nav-item tree-parent {% if item.active %}expanded{% endif %}">
+    <div class="tree-parent-row">
+        <a class="nav-link {{ is_active(item.endpoint, item.active) }}" href="{% if item.urlforkwargs %}{{ url_for(item.endpoint, **item.urlforkwargs) }}{% else %}{{ url_for(item.endpoint) }}{% endif %}">
+            {% if item.icon %}<i class="{{ item.icon }}"></i> {% endif %} {{ item.name }}
+        </a>
+        {% if item.children %}
+        <button type="button" class="tree-toggle" aria-expanded="{{ 'true' if item.active else 'false' }}" aria-label="{% trans %}Toggle submenu{% endtrans %}">
+            <i class="fa fa-chevron-right tree-chevron"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% if item.children %}
+    <ul class="nav tree-children">
+    {% for child in item.children %}
+        {% if child.content_type == NavigationContentType.link %}
+        {{ navlink_exact(child.endpoint, child.name, child.icon, child.active, child.urlforkwargs) }}
+        {% elif child.content_type == NavigationContentType.header %}
+        {{ navheader(child.text, child.icon, cls="nav-item nav-header") }}
+        {% endif %}
+    {% endfor %}
+    </ul>
+    {% endif %}
+</li>
 {% endmacro %}
 
 
@@ -73,9 +113,11 @@
     {% elif item.content_type == NavigationContentType.external_link %}
     {{ externalnavlink(item.uri, item.name, item.icon) }}
     {% elif item.content_type == NavigationContentType.header %}
-    {{ navheader(item.text, cls="sidenav-header") }}
+    {{ navheader(item.text, item.icon, cls="nav-item nav-header") }}
     {% elif item.content_type == NavigationContentType.divider %}
     {{ navdivider() }}
+    {% elif item.content_type == NavigationContentType.tree %}
+    {{ navtree(item) }}
     {% else %}
     {# skip unknown #}
     {% endif %}

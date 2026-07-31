@@ -99,6 +99,7 @@ from .deprecation import FlaskBBDeprecation
 from .display.navigation import NavigationContentType
 from .forum import views as forum_views  # noqa
 from .management import views as management_views  # noqa
+from .management.navigation import get_management_navigation
 from .search import views as search_views  # noqa
 from .upload import views as upload_views  # noqa
 from .user import views as user_views  # noqa
@@ -356,6 +357,7 @@ def configure_template_filters(app: Flask):
     jinja_globals: dict[str, Callable[..., Any]] = {}
     jinja_globals["run_hook"] = template_hook
     jinja_globals["NavigationContentType"] = NavigationContentType
+    jinja_globals["get_management_navigation"] = get_management_navigation
     app.jinja_env.globals.update(jinja_globals)
 
     pluggy.hook.flaskbb_jinja_directives(app=app)

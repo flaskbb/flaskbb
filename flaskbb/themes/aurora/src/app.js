@@ -19,6 +19,15 @@ var tooltipList = tooltips.map(function (el) {
   return new Tooltip(el)
 })
 
+document.addEventListener('click', function (event) {
+  var toggle = event.target.closest('.tree-toggle')
+  if (!toggle) return
+  event.preventDefault()
+  var parent = toggle.closest('.tree-parent')
+  var expanded = parent.classList.toggle('expanded')
+  toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false')
+})
+
 // import all assets in ./assets
 function importAll(r) {
   return r.keys().map(r);

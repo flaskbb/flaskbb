@@ -11,41 +11,9 @@
 {% endblock %}
 
 {% block management_content %}
-{%- from theme('_macros/navigation.html') import sidebaritems -%}
 {%- from theme('_macros/form.html') import render_field -%}
 
-{% set extra_setting_links = run_hook("flaskbb_tpl_admin_settings_sidebar", user=current_user, is_markup=False) %}
-
-<div class="col-md-3 settings-col">
-    <div class="nav-sidebar">
-        <ul class="nav">
-            <li class="nav-item nav-header">FlaskBB Settings</li>
-        {% for group in all_groups %}
-            {% if group.key == active_nav.get('key') %}
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('management.settings', slug=group.key) }}">{{ group.name }}</a>
-                </li>
-            {% endif %}
-        {% endfor %}
-        {% if all_plugins or extra_setting_links|length %}
-            <li class="nav-item nav-header">Plugin Settings</li>
-        {% for plugin in all_plugins %}
-            <li class="nav-item">
-                <a class="nav-link {% if plugin.name == active_nav.get('key') %}active{% endif %}" href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
-            </li>
-        {% endfor %}
-
-        {{ sidebaritems(extra_setting_links) }}
-        {% endif %}
-        </ul>
-    </div>
-</div><!--/.col-md-3 -->
-
-<div class="col-md-9 settings-col with-left-border">
+<div class="col-md-12 settings-col">
     <div class="card settings">
         <div class="card-header settings-header">
             <span class="fa fa-cogs"></span> {{ active_nav.get('title') }}

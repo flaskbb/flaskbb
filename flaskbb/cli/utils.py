@@ -131,7 +131,6 @@ def prompt_save_user(
     email: str | None,
     password: str | None,
     group: str | None,
-    only_update: bool = False,
 ):
     if not username:
         username = click.prompt(
@@ -156,9 +155,26 @@ def prompt_save_user(
             default="admin",
         )
 
-    if only_update:
-        return update_user(username, password, email, group)  # pyright: ignore
-    return create_user(username, password, email, group)  # # pyright: ignore
+    return create_user(username, password, email, group)  # pyright: ignore
+
+
+def prompt_update_user(
+    username: str | None,
+    email: str | None,
+    password: str | None,
+    group: str | None,
+):
+    """Updates a user. Only ``username`` is required; any other option that
+    is ``None`` is left unchanged on the user.
+    """
+    if not username:
+        username = click.prompt(
+            click.style("Username", fg="magenta"),
+            type=str,
+            default=os.environ.get("USER", ""),
+        )
+
+    return update_user(username, password, email, group)
 
 
 def prompt_config_path(config_path: str) -> str:

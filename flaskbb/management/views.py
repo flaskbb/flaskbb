@@ -170,24 +170,16 @@ class ManagementSettings(MethodView):
             slug, plugin
         )
 
-        all_groups = setting_registry.core_groups()
-        all_plugins = PluginRegistry.get_installed_plugins()
-
         form.process(data=old_settings)
 
         return render_template(
             "management/settings.html",
             form=form,
-            all_groups=all_groups,
-            all_plugins=all_plugins,
             active_nav=active_nav,
         )
 
     def post(self, slug: str | None = None, plugin: str | None = None):
         form, _, plugin_obj, active_nav = self._determine_active_settings(slug, plugin)
-
-        all_groups = setting_registry.core_groups()
-        all_plugins = PluginRegistry.get_installed_plugins()
 
         if form.validate_on_submit():
             if plugin_obj is not None:
@@ -199,8 +191,6 @@ class ManagementSettings(MethodView):
         return render_template(
             "management/settings.html",
             form=form,
-            all_groups=all_groups,
-            all_plugins=all_plugins,
             active_nav=active_nav,
         )
 
