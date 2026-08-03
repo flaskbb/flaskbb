@@ -53,6 +53,9 @@ modify are the following:
 - ``SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/flaskbb.sqlite'``
 - ``SECRET_KEY = "secret key"``
 - ``WTF_CSRF_SECRET_KEY = "secret key"``
+- ``TRUSTED_HOSTS = ["example.org"]`` -- rejects requests with a forged
+  ``Host`` header instead of reflecting it into emailed links
+  (password reset, account activation)
 
 By default it will try to save the configuration file with the name
 ``flaskbb.cfg`` in FlaskBB's root folder.

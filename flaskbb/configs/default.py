@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.configs.default
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -14,7 +13,7 @@ import datetime
 import os
 
 
-class DefaultConfig(object):
+class DefaultConfig:
     # Get the app root path
     #            <_basedir>
     # ../../ -->  flaskbb/flaskbb/configs/base.py
@@ -49,6 +48,18 @@ class DefaultConfig(object):
     # urls. If set to None only the host currently serving this website
     # will be considered "safe".
     ALLOWED_HOSTS = None
+
+    # Trusted Hosts
+    # A list of Host header values Flask will accept. Requests with any
+    # other Host are rejected with a 400.
+    # Without this, an attacker can send an arbitrary Host header and have it reflected
+    # into _external=True URLs (e.g. password reset and account
+    # activation emails), pointing victims at an attacker-controlled
+    # domain. If left as None and SERVER_NAME is set, it defaults to
+    # [SERVER_NAME] (see configure_app() in app.py). Set explicitly for
+    # multiple hosts, e.g. TRUSTED_HOSTS = ["forums.flaskbb.com"]
+    # See https://flask.palletsprojects.com/en/stable/config/#TRUSTED_HOSTS
+    TRUSTED_HOSTS = None
 
     # Logging Settings
     # ------------------------------

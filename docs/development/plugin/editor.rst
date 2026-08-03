@@ -3,9 +3,9 @@
 Extending the Markdown Editor
 =============================
 
-A plugin that adds a markdown directive - through
+A plugin that adds a markdown directive through
 :func:`~flaskbb.plugins.spec.flaskbb_load_post_markdown_class` or
-:func:`~flaskbb.plugins.spec.flaskbb_load_post_markdown_plugins` - usually
+:func:`~flaskbb.plugins.spec.flaskbb_load_post_markdown_plugins` usually
 wants two more things: an entry in the editor's cheatsheet so users can find
 out the directive exists, and a button on the editor's toolbar. There is one
 hook for each.

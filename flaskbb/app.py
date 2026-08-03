@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.app
 ~~~~~~~~~~~
@@ -15,12 +14,12 @@ import os
 import sys
 import time
 import warnings
-from collections.abc import Sequence
-from datetime import UTC, datetime
-from typing import Any, Callable
+from collections.abc import Callable, Sequence
+from datetime import datetime, UTC
+from typing import Any
 
 from celery import Celery
-from flask import Flask, flash, redirect, request, url_for
+from flask import flash, Flask, redirect, request, url_for
 from flask_babelplus import gettext as _
 from flask_login import current_user
 from jinja2.filters import do_filesizeformat
@@ -78,8 +77,6 @@ from flaskbb.utils.helpers import (
 
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (
-    IsAdmin,
-    IsAtleastModerator,
     can_ban_user,
     can_delete_topic,
     can_edit_post,
@@ -88,6 +85,8 @@ from flaskbb.utils.requirements import (
     can_post_reply,
     can_post_topic,
     has_permission,
+    IsAdmin,
+    IsAtleastModerator,
     permission_with_identity,
 )
 from flaskbb.utils.translations import FlaskBBDomain
@@ -197,11 +196,11 @@ def configure_app(app: Flask, config: Any):
     configure_logging(app)
 
     if not isinstance(config, str) and config is not None:
-        config_name = "{}.{}".format(config.__module__, config.__name__)
+        config_name = f"{config.__module__}.{config.__name__}"
     else:
         config_name = config
 
-    logger.info("Using config from: {}".format(config_name))
+    logger.info(f"Using config from: {config_name}")
 
     deprecation_level = app.config.get("DEPRECATION_LEVEL", "default")
 
@@ -214,6 +213,21 @@ def configure_app(app: Flask, config: Any):
         warnings.filterwarnings(
             action="ignore",
             message=".*Using the in-memory storage for tracking rate limits.*",
+        )
+
+    # Fall back to SERVER_NAME for TRUSTED_HOSTS so Host header validation
+    # is covered by the same setting deployments are already required to set.
+    if not app.config["TRUSTED_HOSTS"] and app.config["SERVER_NAME"]:
+        app.config["TRUSTED_HOSTS"] = [app.config["SERVER_NAME"]]
+
+    if not app.debug and not app.testing and not app.config["TRUSTED_HOSTS"]:
+        logger.warning(
+            "Neither SERVER_NAME nor TRUSTED_HOSTS is configured. Requests "
+            "where URL generation happens outside of the request context "
+            "are not protected against Host Header Poisoning. "
+            "Set TRUSTED_HOSTS or SERVER_NAME in your flaskbb.cfg. "
+            "See https://flask.palletsprojects.com/en/stable/config/#TRUSTED_HOSTS "
+            "for more information about these configuration variables."
         )
 
     debug_panels = app.config.setdefault(
@@ -548,7 +562,7 @@ def load_plugins(app: Flask):
         if not plugin.enabled:
             pluggy.set_blocked(plugin.name)
         if plugin.is_updatable:
-            logger.info("Updating installed plugin: {}".format(plugin.name))
+            logger.info(f"Updating installed plugin: {plugin.name}")
             plugin.add_settings()
 
     pluggy.load_setuptools_entrypoints("flaskbb_plugins")
@@ -569,7 +583,7 @@ def load_plugins(app: Flask):
         removed = 0
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
-            logger.info("Removed Plugins: {}".format(removed))
+            logger.info(f"Removed Plugins: {removed}")
 
     # we need a copy of it because of
     # RuntimeError: dictionary changed size during iteration
@@ -577,5 +591,5 @@ def load_plugins(app: Flask):
     disabled_plugins = [p.__package__ for p in pluggy.get_disabled_plugins()]
     for task_name, task in tasks.items():
         if task.__module__.split(".")[0] in disabled_plugins:
-            logger.debug("Unregistering task: '{}'".format(task))
+            logger.debug(f"Unregistering task: '{task}'")
             celery.tasks.unregister(task_name)
