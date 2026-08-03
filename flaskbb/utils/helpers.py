@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.helpers
 ~~~~~~~~~~~~~~~~~~~~~
@@ -16,10 +15,11 @@ import operator
 import os
 import re
 import time
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar, overload
+from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
 from wsgiref.types import WSGIEnvironment
 
 import unidecode
@@ -30,12 +30,12 @@ from babel.dates import format_time as babel_format_time
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask import (
     Blueprint,
-    Flask,
-    Response,
     current_app,
     flash,
+    Flask,
     redirect,
     request,
+    Response,
     session,
     url_for,
 )
@@ -48,7 +48,7 @@ from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from pytz import UTC
 from werkzeug.local import LocalProxy
-from werkzeug.utils import ImportStringError, import_string
+from werkzeug.utils import import_string, ImportStringError
 
 from flaskbb.extensions import babel, redis_store
 
@@ -229,10 +229,48 @@ def do_topic_action(
     return modified_topics
 
 
+@dataclass(frozen=True)
+class ForumRow:
+    forum: "Forum"
+    forumsread: "ForumsRead | None"
+
+    def __iter__(self):
+        return iter((self.forum, self.forumsread))
+
+
+@dataclass(frozen=True)
+class CategoryForums:
+    category: "Category | None"
+    forums: list[ForumRow]
+
+    def __iter__(self):
+        return iter((self.category, self.forums))
+
+
+def _group_forums_by_category(
+    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    user: "User",
+) -> Iterable[CategoryForums]:
+    it = itertools.groupby(query_result, operator.itemgetter(0))
+
+    if user.is_authenticated:
+        for category, rows in it:
+            forum_rows: list[ForumRow] = []
+            for row in rows:
+                forum_rows.append(ForumRow(row[1], row[2]))
+            yield CategoryForums(category, forum_rows)
+    else:
+        for category, rows in it:
+            forum_rows: list[ForumRow] = []
+            for row in rows:
+                forum_rows.append(ForumRow(row[1], None))
+            yield CategoryForums(category, forum_rows)
+
+
 def get_categories_and_forums(
     query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
     user: "User",
-):
+) -> list[CategoryForums]:
     """Returns a list with categories. Every category has a list for all
      their associated forums.
 
@@ -263,24 +301,13 @@ def get_categories_and_forums(
      :param user: The user object is needed because a signed out user does not
                   have the ForumsRead relation joined.
     """
-    it = itertools.groupby(query_result, operator.itemgetter(0))
-
-    forums: list[tuple["Category", list[tuple["Forum", "ForumsRead | None"]]]] = []
-
-    if user.is_authenticated:
-        for key, value in it:
-            forums.append((key, [(item[1], item[2]) for item in value]))
-    else:
-        for key, value in it:
-            forums.append((key, [(item[1], None) for item in value]))
-
-    return forums
+    return list(_group_forums_by_category(query_result, user))
 
 
 def get_forums(
     query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
     user: "User",
-):
+) -> CategoryForums:
     """Returns a tuple which contains the category and the forums as list.
     This is the counterpart for get_categories_and_forums and especially
     usefull when you just need the forums for one category.
@@ -295,18 +322,10 @@ def get_forums(
     :param user: The user object is needed because a signed out user does not
                  have the ForumsRead relation joined.
     """
-    it = itertools.groupby(query_result, operator.itemgetter(0))
-    forums: (
-        tuple["Category", list[tuple["Forum", "ForumsRead | None"]]] | tuple[None, None]
-    ) = None, None
-    if user.is_authenticated:
-        for key, value in it:
-            forums = key, [(item[1], item[2]) for item in value]
-    else:
-        for key, value in it:
-            forums = key, [(item[1], None) for item in value]
-
-    return forums
+    result = CategoryForums(None, [])
+    for group in _group_forums_by_category(query_result, user):
+        result = group
+    return result
 
 
 def forum_is_unread(
@@ -416,11 +435,11 @@ def mark_online(user_id: str | int | None, guest: bool = False):  # pragma: no c
     now = int(time.time())
     expires = now + (flaskbb_config["ONLINE_LAST_MINUTES"] * 60) + 10
     if guest:
-        all_users_key = "online-guests/%d" % (now // 60)
-        user_key = "guest-activity/%s" % user
+        all_users_key = f"online-guests/{now // 60}"
+        user_key = f"guest-activity/{user}"
     else:
-        all_users_key = "online-users/%d" % (now // 60)
-        user_key = "user-activity/%s" % user
+        all_users_key = f"online-users/{now // 60}"
+        user_key = f"user-activity/{user}"
     p = redis_store.pipeline()
     p.sadd(all_users_key, user)
     p.set(user_key, now)
@@ -437,11 +456,9 @@ def get_online_users(guest: bool = False):  # pragma: no cover
     current = int(time.time()) // 60
     minutes = range(flaskbb_config["ONLINE_LAST_MINUTES"])
     if guest:
-        users = redis_store.sunion(
-            ["online-guests/%d" % (current - x) for x in minutes]
-        )
+        users = redis_store.sunion([f"online-guests/{current - x}" for x in minutes])
     else:
-        users = redis_store.sunion(["online-users/%d" % (current - x) for x in minutes])
+        users = redis_store.sunion([f"online-users/{current - x}" for x in minutes])
 
     return [to_unicode(u) for u in users]
 
@@ -514,9 +531,9 @@ def _format_html_time_tag(
     isoformat = datetime.isoformat()
 
     return Markup(
-        '<time datetime="{}" data-what_to_display="{}">{}</time>'.format(
-            isoformat, what_to_display, content
-        )
+        f"""<time datetime="{isoformat}" data-what_to_display="{what_to_display}">
+            {content}
+        </time>"""
     )
 
 
@@ -574,9 +591,7 @@ def format_quote(username: str, content: str):
     """
     profile_url = url_for("user.profile", username=username)
     content = "\n> ".join(content.strip().split("\n"))
-    quote = "**[{username}]({profile_url}) wrote:**\n> {content}\n".format(
-        username=username, profile_url=profile_url, content=content
-    )
+    quote = f"**[{username}]({profile_url}) wrote:**\n> {content}\n"
 
     return quote
 
@@ -618,7 +633,7 @@ def get_available_languages() -> list[tuple[str, str]]:
     ]
 
 
-def app_config_from_env(app: Flask, prefix="FLASKBB_"):
+def app_config_from_env(app: Flask, prefix: str = "FLASKBB_"):
     """Retrieves the configuration variables from the environment.
     Set your environment variables like this::
 
@@ -700,7 +715,7 @@ def get_flaskbb_config(app: Flask, config_file: str | object):
             return project_config
 
 
-class ReverseProxyPathFix(object):
+class ReverseProxyPathFix:
     """Wrap the application in this middleware and configure the
     front-end server to add these headers, to let you quietly bind
     this to a URL other than / and to an HTTP scheme that is
@@ -757,11 +772,11 @@ class ReverseProxyPathFix(object):
 
 
 @overload
-def real(obj: LocalProxy[T]) -> "User": ...
+def real[T](obj: LocalProxy[T]) -> "User": ...
 
 
 @overload
-def real(obj: T) -> T: ...
+def real[T](obj: T) -> T: ...
 
 
 def real(obj):
@@ -824,10 +839,10 @@ def register_view(
     **kwargs: Any,
 ):
     for route in routes:
-        bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)
+        bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)  # noqa: B026
 
 
-class FlashAndRedirect(object):
+class FlashAndRedirect:
     def __init__(self, message: str, level: str, endpoint: str | Callable[..., str]):
         # need to reassign to avoid capturing the reassigned endpoint
         # in the generated closure, otherwise bad things happen at resolution

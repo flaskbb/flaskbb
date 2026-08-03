@@ -1,9 +1,7 @@
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
-from sqlalchemy import select
-
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import (
     Attachment,
@@ -16,8 +14,10 @@ from flaskbb.forum.models import (
     TopicsRead,
 )
 from flaskbb.user.models import User
+from flaskbb.utils.helpers import CategoryForums, ForumRow
 from flaskbb.utils.queries import hidden
 from flaskbb.utils.settings import flaskbb_config
+from sqlalchemy import select
 
 
 def test_category_save(database):
@@ -88,7 +88,7 @@ def test_category_get_forums(forum, user):
         # than one forum in it (not in these tests)
         assert isinstance(forums, list) is True
 
-        assert forums == [(forum, None)]
+        assert forums == [ForumRow(forum, None)]
         assert cat == category
 
         # Test the same thing with a logged out user
@@ -100,7 +100,7 @@ def test_category_get_forums(forum, user):
         # than one forum in it (not in these tests)
         assert isinstance(forums, list) is True
 
-        assert forums == [(forum, None)]
+        assert forums == [ForumRow(forum, None)]
         assert cat == category
 
 
@@ -116,9 +116,9 @@ def test_category_get_all(forum, user):
         # All categories are stored in a list
         assert isinstance(categories, list)
         # The forums for a category are also stored in a list
-        assert isinstance(categories[0][1], list)
+        assert isinstance(categories[0].forums, list)
 
-        assert categories == [(category, [(forum, None)])]
+        assert categories == [CategoryForums(category, [ForumRow(forum, None)])]
 
         # Test with logged out user
         logout_user()
@@ -128,9 +128,9 @@ def test_category_get_all(forum, user):
         # All categories are stored in a list
         assert isinstance(categories, list)
         # The forums for a category are also stored in a list
-        assert isinstance(categories[0][1], list)
+        assert isinstance(categories[0].forums, list)
 
-        assert categories == [(category, [(forum, None)])]
+        assert categories == [CategoryForums(category, [ForumRow(forum, None)])]
 
 
 def test_forum_save(category, moderator_user):
@@ -290,9 +290,7 @@ def test_forum_get_topics(topic, user):
 
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
-        assert topics.items == [
-            (topic, topic.last_post, None, topic.last_post.url)
-        ]
+        assert topics.items == [(topic, topic.last_post, None, topic.last_post.url)]
 
         # Test with logged out user
         logout_user()
