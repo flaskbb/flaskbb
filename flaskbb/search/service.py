@@ -16,6 +16,7 @@ from typing import Any
 
 from markupsafe import Markup
 from sqlalchemy import Select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.elements import ColumnElement
 
 from flaskbb.extensions import flaskbb_search
@@ -100,6 +101,11 @@ def search_forums(
         stmt = hidden(stmt, hidden=True)
     elif not has_viewhidden:
         stmt = hidden(stmt, hidden=False)
+
+    if model is Topic:
+        stmt = stmt.options(joinedload(Topic.forum), joinedload(Topic.first_post))
+    else:
+        stmt = stmt.options(joinedload(Post.topic).joinedload(Topic.forum))
 
     return {content_type: stmt}
 

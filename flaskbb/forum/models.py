@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.forum.models
 ~~~~~~~~~~~~~~~~~~~~
@@ -22,6 +21,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    and_,
     event,
     func,
     join,
@@ -198,7 +198,7 @@ class Report(db.Model, CRUDMixin):
 
     @override
     def __repr__(self):
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
     @override
     def save(self, post: "Post | None" = None, user: "User | None" = None):
@@ -277,7 +277,7 @@ class Attachment(db.Model, CRUDMixin):
 
     @override
     def __repr__(self):
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
 
 _PENDING_UNLINK_KEY = "attachment_files_pending_unlink"
@@ -382,7 +382,7 @@ class Post(HideableCRUDMixin, db.Model):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
     def is_first_post(self):
         """Checks whether this post is the first post in the topic or not."""
@@ -462,7 +462,7 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.hide(user)
             return self
 
-        super(Post, self).hide(user)
+        super().hide(user)
         self._deal_with_last_post()
         self._update_counts()
         db.session.commit()
@@ -478,7 +478,7 @@ class Post(HideableCRUDMixin, db.Model):
             return self
 
         self._restore_post_to_topic()
-        super(Post, self).unhide()
+        super().unhide()
         self._update_counts()
         db.session.commit()
         return self
@@ -504,10 +504,10 @@ class Post(HideableCRUDMixin, db.Model):
                 if second_last_post:
                     # now lets update the second last post to the last post
                     self.topic.forum.last_post = second_last_post
-                    self.topic.forum.last_post_title = second_last_post.topic.title  # noqa
+                    self.topic.forum.last_post_title = second_last_post.topic.title
                     self.topic.forum.last_post_user = second_last_post.user
-                    self.topic.forum.last_post_username = second_last_post.username  # noqa
-                    self.topic.forum.last_post_created = second_last_post.date_created  # noqa
+                    self.topic.forum.last_post_username = second_last_post.username
+                    self.topic.forum.last_post_created = second_last_post.date_created
                 else:
                     self.topic.forum.last_post = None
                     self.topic.forum.last_post_title = None
@@ -726,7 +726,7 @@ class Topic(HideableCRUDMixin, db.Model):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
     def is_first_post(self, post: Post):
         """Checks if the post is the first post in the topic.
@@ -866,7 +866,7 @@ class Topic(HideableCRUDMixin, db.Model):
         # A new post has been submitted that the user hasn't read.
         # Updating...
         if topicsread:
-            logger.debug("Updating existing TopicsRead '{}' object.".format(topicsread))
+            logger.debug(f"Updating existing TopicsRead '{topicsread}' object.")
             topicsread.last_read = time_utcnow()
             topicsread.save()
             updated = True
@@ -1016,7 +1016,7 @@ class Topic(HideableCRUDMixin, db.Model):
 
         involved_users = self.involved_users()
         self._remove_topic_from_forum()
-        super(Topic, self).hide(user)
+        super().hide(user)
         self._handle_first_post()
         self._fix_user_post_counts(involved_users)
         self._fix_post_counts(self.forum)
@@ -1029,7 +1029,7 @@ class Topic(HideableCRUDMixin, db.Model):
             return
 
         involved_users = self.involved_users()
-        super(Topic, self).unhide()
+        super().unhide()
         self._handle_first_post()
         self._restore_topic_to_forum()
         self._fix_user_post_counts(involved_users)
@@ -1245,7 +1245,7 @@ class Forum(db.Model, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
     def update_last_post(self, commit: bool = True):
         """Updates the last post in the forum."""
@@ -1351,9 +1351,7 @@ class Forum(db.Model, CRUDMixin):
             # has been submitted and has read everything (obviously, else the
             # unread_count would be useless).
             elif forumsread:
-                logger.debug(
-                    "Updating existing ForumsRead '{}' object.".format(forumsread)
-                )
+                logger.debug(f"Updating existing ForumsRead '{forumsread}' object.")
                 forumsread.last_read = time_utcnow()
                 forumsread.save()
                 return True
@@ -1370,9 +1368,7 @@ class Forum(db.Model, CRUDMixin):
         # Nothing updated, because there are still more than 0 unread
         # topicsread
         logger.debug(
-            "No ForumsRead object updated - there are still {} unread topics.".format(
-                unread_count
-            )
+            f"No ForumsRead object updated - there are still {unread_count} unread topics."
         )
         return False
 
@@ -1507,7 +1503,14 @@ class Forum(db.Model, CRUDMixin):
         return forum, forumsread
 
     @classmethod
-    def get_topics(cls, forum_id: int, user: "User", page: int = 1, per_page: int = 20):
+    def get_topics(
+        cls,
+        forum_id: int,
+        user: "User",
+        page: int = 1,
+        per_page: int = 20,
+        forumsread: ForumsRead | None = None,
+    ):
         """Get the topics for the forum. If the user is logged in,
         it will perform an outerjoin for the topics with the topicsread and
         forumsread relation to check if it is read or unread.
@@ -1516,6 +1519,8 @@ class Forum(db.Model, CRUDMixin):
         :param user: The user object
         :param page: The page whom should be loaded
         :param per_page: How many topics per page should be shown
+        :param forumsread: The forumsread object for the forum, used to
+                        determine unread state together with topicsread
         """
         if user.is_authenticated:
             # Now thats intersting - if i don't do the add_entity(Post)
@@ -1538,6 +1543,41 @@ class Forum(db.Model, CRUDMixin):
             )
             hidden(stmt)
             topics = paginate(stmt, page=page, per_page=per_page)
+
+            # Batch the first-unread-post lookup for the whole page instead
+            # of one query per unread topic (see Topic.first_unread).
+            candidates = [
+                (topic.id, topicsread.last_read if topicsread is not None else None)
+                for topic, _, topicsread in topics.items
+                if topic_is_unread(topic, topicsread, user, forumsread)
+            ]
+            first_unread_ids = {}
+            if candidates:
+                conditions = [
+                    and_(Post.topic_id == topic_id, Post.date_created > cutoff)
+                    if cutoff is not None
+                    else (Post.topic_id == topic_id)
+                    for topic_id, cutoff in candidates
+                ]
+                first_unread_ids = dict(
+                    db.session.execute(
+                        select(Post.topic_id, func.min(Post.id))
+                        .where(or_(*conditions))
+                        .group_by(Post.topic_id)
+                    ).all()
+                )
+
+            topics.items = [
+                (
+                    topic,
+                    last_post,
+                    topicsread,
+                    url_for("forum.view_post", post_id=first_unread_ids[topic.id])
+                    if topic.id in first_unread_ids
+                    else topic.url,
+                )
+                for topic, last_post, topicsread in topics.items
+            ]
         else:
             stmt = (
                 db.select(Topic, Post)
@@ -1548,7 +1588,7 @@ class Forum(db.Model, CRUDMixin):
             stmt = hidden(stmt)
             topics = paginate(stmt, page=page, per_page=per_page)
             topics.items = [
-                (topic, last_post, None) for topic, last_post in topics.items
+                (topic, last_post, None, topic.url) for topic, last_post in topics.items
             ]
         return topics
 
@@ -1606,7 +1646,7 @@ class Category(db.Model, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.id)
+        return f"<{self.__class__.__name__} {self.id}>"
 
     @override
     def delete(self, users: list["User"] | None = None):

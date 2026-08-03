@@ -153,6 +153,7 @@ class ViewForum(MethodView):
             user=real(current_user),
             page=page,
             per_page=flaskbb_config["TOPICS_PER_PAGE"],
+            forumsread=forumsread,
         )
 
         return render_template(
@@ -397,6 +398,7 @@ class ManageForum(MethodView):
             user=real(current_user),
             page=page,
             per_page=flaskbb_config["TOPICS_PER_PAGE"],
+            forumsread=forumsread,
         )
 
         return render_template(

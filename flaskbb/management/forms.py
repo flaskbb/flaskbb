@@ -44,7 +44,7 @@ from wtforms.validators import (
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from flaskbb.extensions import db
-from flaskbb.forum.models import Attachment, Category, Forum
+from flaskbb.forum.models import Attachment, Category, Forum, Post
 from flaskbb.user.models import Group, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
@@ -129,7 +129,10 @@ class AttachmentSearchForm(FlaskForm):
         return (
             select(Attachment)
             .outerjoin(User, User.id == Attachment.user_id)
-            .options(joinedload(Attachment.user), joinedload(Attachment.post))
+            .options(
+                joinedload(Attachment.user),
+                joinedload(Attachment.post).joinedload(Post.topic),
+            )
             .where(
                 or_(
                     Attachment.original_filename.ilike(pattern),

@@ -290,14 +290,16 @@ def test_forum_get_topics(topic, user):
 
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
-        assert topics.items == [(topic, topic.last_post, None)]
+        assert topics.items == [
+            (topic, topic.last_post, None, topic.last_post.url)
+        ]
 
         # Test with logged out user
         logout_user()
 
         topics = Forum.get_topics(forum_id=forum.id, user=current_user)
 
-        assert topics.items == [(topic, topic.last_post, None)]
+        assert topics.items == [(topic, topic.last_post, None, topic.url)]
 
 
 def test_forum_get_accessible(forum, user, admin_user, default_groups):

@@ -1300,7 +1300,10 @@ class ManageAttachments(MethodView):
         # backed by the primary key index
         return (
             select(Attachment)
-            .options(joinedload(Attachment.user), joinedload(Attachment.post))
+            .options(
+                joinedload(Attachment.user),
+                joinedload(Attachment.post).joinedload(Post.topic),
+            )
             .order_by(Attachment.id.desc())
         )
 

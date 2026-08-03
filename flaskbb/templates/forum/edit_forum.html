@@ -31,7 +31,7 @@
                 {% set forum_row_css_class = 'set-checkbox' %}
                 {% include theme("forum/_forum_meta.html") %}
 
-                {% for topic, last_post, topicread in topics.items %}
+                {% for topic, last_post, topicread, first_unread_url in topics.items %}
                     {% include theme("forum/_forum_row.html") %}
                 {% else %}
                 <div class="row forum-row">
