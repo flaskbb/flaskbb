@@ -79,9 +79,11 @@
                                 "flaskbb_tpl_navigation_before", is_markup=False
                                 )) }} {{ topnav(endpoint='forum.index',
                                 name=_('Forum'), icon='far fa-comment',
-                                active=active_forum_nav) }} {{
+                                active=active_forum_nav) }} {% if
+                                flaskbb_config["MEMBERLIST_ENABLED"] %} {{
                                 topnav(endpoint='forum.memberlist',
-                                name=_('Memberlist'), icon='far fa-user') }} {{
+                                name=_('Memberlist'), icon='far fa-user') }} {%
+                                endif %} {{
                                 topnav(endpoint='search.search',
                                 name=_('Search'), icon='fas fa-search') }} {{
                                 topnavitems( run_hook(

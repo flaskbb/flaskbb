@@ -259,10 +259,13 @@ constrain_package_deps = true
 use_frozen_constraints = true
 dependency_groups = ["tests"]
 env_tmp_dir = "{toxworkdir}/tmp/{envname}"
-commands = [[
-    "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
-    {replace = "posargs", default = [], extend = true},
-]]
+commands = [
+    ["pybabel", "compile", "-d", "{envsitepackagesdir}/flaskbb/translations"],
+    [
+        "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
+        {replace = "posargs", default = [], extend = true},
+    ],
+]
 
 [tool.tox.env.style]
 description = "run all pre-commit hooks on all files"

@@ -76,6 +76,15 @@ general_group = SettingGroup(
             description="Number of users displayed per page.",
         ),
         BoolSetting(
+            key="MEMBERLIST_ENABLED",
+            value=True,
+            name="Enable Memberlist",
+            description=(
+                "Show the memberlist. If disabled, the memberlist is no longer "
+                "reachable."
+            ),
+        ),
+        BoolSetting(
             key="OPEN_LINKS_IN_NEW_TAB",
             value=False,
             name="Open external links in a new tab",

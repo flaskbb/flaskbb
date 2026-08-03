@@ -29,6 +29,7 @@ from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_time as babel_format_time
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask import (
+    abort,
     Blueprint,
     current_app,
     flash,
@@ -815,6 +816,16 @@ def registration_enabled(f: Any):
         if not flaskbb_config["REGISTRATION_ENABLED"]:
             flash(_("The registration has been disabled."), "info")
             return redirect_or_next(url_for("forum.index"))
+        return f(*a, **k)
+
+    return wrapper
+
+
+def memberlist_enabled(f: Any):
+    @wraps(f)
+    def wrapper(*a: Any, **k: Any):
+        if not flaskbb_config["MEMBERLIST_ENABLED"]:
+            abort(404)
         return f(*a, **k)
 
     return wrapper

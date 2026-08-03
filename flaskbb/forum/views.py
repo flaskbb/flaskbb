@@ -56,6 +56,7 @@ from flaskbb.utils.helpers import (
     do_topic_action,
     format_quote,
     get_online_users,
+    memberlist_enabled,
     real,
     register_view,
     render_template,
@@ -655,6 +656,7 @@ class ReportView(MethodView):
 
 
 class MemberList(MethodView):
+    decorators = [memberlist_enabled]
     form = UserSearchForm
 
     def get(self):
