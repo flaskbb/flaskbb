@@ -28,7 +28,7 @@ class Has(Requirement):
 
     @override
     def __repr__(self):
-        return "<Has({!s})>".format(self.permission)
+        return f"<Has({self.permission!s})>"
 
     @override
     def fulfill(self, user: User):
@@ -49,9 +49,7 @@ class IsModeratorInForum(IsAuthed):
     @override
     def fulfill(self, user: User):
         moderators = self._get_forum_moderators()
-        return super(IsModeratorInForum, self).fulfill(
-            user
-        ) and self._user_is_forum_moderator(user, moderators)
+        return super().fulfill(user) and self._user_is_forum_moderator(user, moderators)
 
     def _user_is_forum_moderator(self, user: User, moderators: list[User]):
         return user in moderators
@@ -102,7 +100,7 @@ class IsMorePrivilegedThan(Requirement):
 
     @override
     def __repr__(self):
-        return "<IsMorePrivilegedThan({!s})>".format(self.target)
+        return f"<IsMorePrivilegedThan({self.target!s})>"
 
     @override
     def fulfill(self, user: User):
@@ -117,7 +115,7 @@ class IsSelf(Requirement):
 
     @override
     def __repr__(self):
-        return "<IsSelf({!s})>".format(self.target)
+        return f"<IsSelf({self.target!s})>"
 
     @override
     def fulfill(self, user: User):
@@ -130,9 +128,7 @@ class IsSameUser(IsAuthed):
 
     @override
     def fulfill(self, user: User):
-        return (
-            super(IsSameUser, self).fulfill(user) and user.id == self._determine_user()
-        )
+        return super().fulfill(user) and user.id == self._determine_user()
 
     def _determine_user(self):
         if isinstance(self._topic_or_post, int) or self._topic_or_post is None:
@@ -206,7 +202,7 @@ class ForumNotLocked(Requirement):
 
     @override
     def fulfill(self, user: User):
-        return self._is_forum_locked()
+        return not self._is_forum_locked()
 
     def _is_forum_locked(self):
         forum = self._determine_forum()
@@ -332,7 +328,7 @@ def has_permission(permission: str):
     def _(user: User):
         return Permission(Has(permission), identity=user)
 
-    _.__name__ = "Has_{}".format(permission)
+    _.__name__ = f"Has_{permission}"
     return _
 
 

@@ -1,6 +1,5 @@
 import pytest
 from flask import g
-
 from flaskbb.utils import requirements as r
 
 
@@ -116,6 +115,16 @@ def test_guest_cannot_post_attachment(guest, forum, request_context):
 
 def test_IsMorePrivilegedThan_ranks_admin_over_mod(admin_user, moderator_user):
     assert r.IsMorePrivilegedThan(moderator_user)(admin_user)
+
+
+def test_member_can_post_topic_in_unlocked_forum(user, forum, request_context):
+    push_onto_request_context(forum=forum, topic=None, post=None)
+    assert r.CanPostTopic(user)
+
+
+def test_member_cannot_post_topic_in_locked_forum(user, forum_locked, request_context):
+    push_onto_request_context(forum=forum_locked, topic=None, post=None)
+    assert not r.CanPostTopic(user)
 
 
 def test_IsMorePrivilegedThan_ranks_mod_over_member(moderator_user, user):
