@@ -1,8 +1,10 @@
-name: test
+name: Tests
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - "*.x"
     paths-ignore:
       - 'docs/**'
       - 'flaskbb/themes/**'
@@ -12,7 +14,9 @@ on:
       - '**/AUTHORS'
       - '**/LICENSE'
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - "*.x"
     paths-ignore:
       - 'docs/**'
       - 'flaskbb/themes/**'
@@ -26,31 +30,9 @@ env:
   FORCE_COLOR: '1'
 
 jobs:
-  style:
-    name: pre-commit
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v6
-
-    - name: Install uv and set up Python
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
-        python-version: '3.14'
-
-    - name: Cache pre-commit hooks
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pre-commit
-        key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-
-    - name: Run pre-commit
-      run: uv run --locked tox run -e style
-
   tests:
-    name: ${{ matrix.tox }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name || matrix.python }}
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
@@ -58,15 +40,16 @@ jobs:
           - {python: '3.14', tox: 'py3.14'}
           - {python: '3.13', tox: 'py3.13'}
           - {python: '3.12', tox: 'py3.12'}
+          - { name: "typing", tox: "typing", python: "3.14" }
 
     steps:
-    - uses: actions/checkout@v6
-
-    - name: Install uv and set up Python
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
-        python-version: ${{ matrix.python }}
-
-    - name: Test with tox
-      run: uv run --locked tox run -e ${{ matrix.tox }}
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python }}
+          allow-prereleases: true
+      - run: uv sync --group dev
+      - run: uv run tox run -e ${{ matrix.tox || format('py{0}', matrix.python) }}

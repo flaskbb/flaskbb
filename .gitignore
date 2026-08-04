@@ -148,3 +148,4 @@ flaskbb/static/uploads/*
 .zed
 *.sqlite*
 logs/*
+*.bak

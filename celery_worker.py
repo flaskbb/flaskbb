@@ -13,6 +13,8 @@ To start celery, enter this in the console::
 """
 
 from flaskbb.app import create_app
-from flaskbb.extensions import celery  # noqa
+from flaskbb.extensions import (
+    celery,  # pyright: ignore[reportUnusedImport, reportUnusedImport]  # noqa: F401
+)
 
 app = create_app()

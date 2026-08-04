@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and discussions
+    url: https://matrix.to/#/#flaskbb:matrix.org
+    about: Discuss questions about your code on our Matrix chat.

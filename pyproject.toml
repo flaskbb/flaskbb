@@ -89,6 +89,22 @@ flaskbb = "flaskbb.cli.main:flaskbb"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build]
+# Themes ship compiled only:
+# aurora builds into flaskbb/static and
+# aurora_dark into its own static dir.
+exclude = [
+  "flaskbb/themes/*/src",
+  "flaskbb/themes/*/node_modules",
+  "flaskbb/themes/*/.sass-cache",
+  "flaskbb/themes/*/package.json",
+  "flaskbb/themes/*/package-lock.json",
+  "flaskbb/themes/*/webpack.*.js",
+  "flaskbb/themes/*/tsconfig.json",
+  "flaskbb/themes/*/Makefile",
+  "flaskbb/themes/*/build_emoji_set.py",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["flaskbb", "wsgi.py", "celery_worker.py"]
 
@@ -128,8 +144,10 @@ tests = [
 ]
 typing = [
     "mypy",
-    "pyright",
-    "pytest",
+    "basedpyright",
+    "types-Pygments",
+    "types-pytz",
+    "types-WTForms",
 ]
 gha-update = [
     "gha-update ; python_full_version >= '3.12'",
@@ -153,6 +171,7 @@ reportMissingTypeStubs = false
 reportUnusedCallResult = false
 reportUnannotatedClassAttribute = false
 reportUnusedParameter = false
+reportImplicitStringConcatenation = false
 reportAny = false
 reportExplicitAny = false
 
@@ -238,6 +257,21 @@ warn_unused_ignores = true
 # no_implicit_reexport = true
 strict_equality = true
 strict_concatenate = true
+
+# No py.typed and no stubs on typeshed
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "flask_allows2.*",
+    "flask_babelplus.*",
+    "flask_login.*",
+    "flask_redis.*",
+    "flask_themes2.*",
+    "flask_wtf.*",
+    "sqlalchemy_utils.*",
+    "wtforms_sqlalchemy.*",
+]
+follow_untyped_imports = true
 
 
 [tool.tox]
