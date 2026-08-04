@@ -87,11 +87,15 @@ Once installed, confirm FlaskBB sees your plugin::
 
     $ uv run flaskbb plugins list
 
-Then install its settings and, if it ships any, run its migrations - see
+Then install its settings and, if it ships any, its migrations - see
 :ref:`the CLI reference <commandline>` for the full ``flaskbb plugins`` and
 ``flaskbb db`` command groups::
 
     $ uv run flaskbb plugins install your_plugin_name
+
+While working on a migration you'll want to apply it directly, without
+going through the whole install::
+
     $ uv run flaskbb db upgrade your_plugin_name@head
 
 Restart the dev server afterwards - plugins are loaded once at startup

@@ -283,8 +283,8 @@ migration branch, keyed by the plugin's name.
 .. describe:: upgrade [TARGET]
 
     Run migrations to upgrade the database. ``TARGET`` defaults to
-    ``head``, and can be scoped to a single branch, e.g.
-    ``flaskbb db upgrade portal@head``.
+    ``heads``, which upgrades FlaskBB and every enabled plugin, and can
+    be scoped to a single branch, e.g. ``flaskbb db upgrade portal@head``.
 
 .. describe:: downgrade [TARGET]
 
@@ -417,26 +417,74 @@ install/uninstall/enable/disable workflow.
 
         Overwrite the contents of the output directory if it exists.
 
-.. describe:: install PLUGIN_NAME
+.. describe:: install [PLUGIN_NAME]
 
-    Installs a plugin's settings (no migrations - run
-    ``flaskbb db upgrade PLUGIN_NAME@head`` separately, if the plugin
-    has any).
+    Installs a plugin's settings and applies its migrations (if the
+    plugin has any).
+
+    .. describe:: --all, -a
+
+        Installs all plugins instead of a single one. Either this or
+        ``PLUGIN_NAME`` has to be given.
+
+    .. describe:: --settings-only, -s
+
+        Only installs the settings.
+
+    .. describe:: --migrations-only, -m
+
+        Only applies the migrations. Mutually exclusive with
+        ``--settings-only``.
 
     .. describe:: --force, -f
 
         Overwrites existing settings.
 
-.. describe:: uninstall PLUGIN_NAME
+.. describe:: uninstall [PLUGIN_NAME]
 
-    Uninstalls a plugin's settings (no migrations - run
-    ``flaskbb db downgrade PLUGIN_NAME@base`` separately, if needed).
+    Uninstalls a plugin's settings and reverts its migrations (if the
+    plugin has any). Reverting the migrations drops the plugin's tables,
+    so this asks for confirmation first.
 
-.. describe:: upgrade PLUGIN_NAME
+    .. describe:: --all, -a
+
+        Uninstalls all plugins instead of a single one. Either this or
+        ``PLUGIN_NAME`` has to be given.
+
+    .. describe:: --settings-only, -s
+
+        Only removes the settings. No confirmation is asked for since
+        nothing is dropped.
+
+    .. describe:: --migrations-only, -m
+
+        Only reverts the migrations. Mutually exclusive with
+        ``--settings-only``.
+
+    .. describe:: --force, -f
+
+        Doesn't ask for confirmation.
+
+.. describe:: upgrade [PLUGIN_NAME]
 
     Upgrades a plugin's settings to match its currently registered
-    :class:`~flaskbb.core.settings.definitions.SettingGroup` - use this
-    after upgrading a plugin whose settings changed between versions.
+    :class:`~flaskbb.core.settings.definitions.SettingGroup` and applies
+    its newest migrations - use this after upgrading a plugin whose
+    settings or database schema changed between versions.
+
+    .. describe:: --all, -a
+
+        Upgrades all plugins instead of a single one. Either this or
+        ``PLUGIN_NAME`` has to be given.
+
+    .. describe:: --settings-only, -s
+
+        Only upgrades the settings.
+
+    .. describe:: --migrations-only, -m
+
+        Only applies the migrations. Mutually exclusive with
+        ``--settings-only``.
 
 .. describe:: enable PLUGIN_NAME
 

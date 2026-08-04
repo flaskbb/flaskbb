@@ -70,26 +70,53 @@ I am open for suggestions.
 The plugin can be installed via the Admin Panel (in tab 'Plugins') or by
 running::
 
-    flaskbb plugins install <plugin_name>
+    $ flaskbb plugins install <plugin_name>
 
+This installs the plugin's settings and applies its migrations (if it has
+any). To do that for every plugin at once, use ``--all``::
 
-Make sure to to apply the migrations of the plugin as well (**if any**, check the plugins docs)::
+    $ flaskbb plugins install --all
 
-    flaskbb db upgrade <plugin_name>@head
+``install``, ``upgrade`` and ``uninstall`` all take care of both halves.
+If you only want one of them, restrict the command with ``--settings-only``
+or ``--migrations-only``::
+
+    $ flaskbb plugins install <plugin_name> --settings-only
+    $ flaskbb plugins install <plugin_name> --migrations-only
+
+.. note:: The Admin Panel only manages the settings of a plugin. Migrations
+    are exclusive to the CLI.
+
+Upgrade
+~~~~~~~
+
+After updating a plugin to a newer version, its settings and its database
+schema might have changed. Both are brought up to date with::
+
+    $ flaskbb plugins upgrade <plugin_name>
+
+or, for every plugin at once::
+
+    $ flaskbb plugins upgrade --all
 
 Uninstall
 ~~~~~~~~~
 
-Removing a plugin involves two steps. The first one is to check if the plugin
-has applied any migrations on FlaskBB and if so you can
-undo them via::
-
-    $ flaskbb db downgrade <plugin_name>@base
-
-The second step is to wipe the settings from FlaskBB which can be done in the
-Admin Panel or by running::
+Uninstalling a plugin reverts its migrations and wipes its settings from
+FlaskBB::
 
     $ flaskbb plugins uninstall <plugin_name>
+
+Since reverting the migrations drops the plugin's tables, you are asked for
+confirmation first. Pass ``--force`` to skip the prompt and ``--all`` to
+uninstall every plugin::
+
+    $ flaskbb plugins uninstall --all --force
+
+To keep the plugin's tables around and only get rid of its settings, use
+``--settings-only`` - that is also what the Admin Panel does::
+
+    $ flaskbb plugins uninstall <plugin_name> --settings-only
 
 Disable
 ~~~~~~~
@@ -121,8 +148,11 @@ Database
 Upgrading, downgrading and generating database revisions is all handled
 via alembic. We make use of alembic's branching feature to manage seperate
 migrations for the plugins. Each plugin will have it's own branch in alembic
-where migrations can be managed. Following commands are used for generaring,
-upgrading and downgrading your plugins database migrations:
+where migrations can be managed.
+
+``flaskbb plugins install|upgrade|uninstall`` already run the migrations of
+the plugins they act on, so the commands below are only needed if you want
+to target a specific revision or are developing a plugin:
 
 * (Auto-)Generating revisions
     ``flaskbb db revision --branch <plugin_name> "<YOUR_MESSAGE>"``
@@ -135,7 +165,8 @@ upgrading and downgrading your plugins database migrations:
     ``flaskbb db upgrade <plugin_name>@head``
 
     If you want to upgrade to specific revision, replace ``head`` with the
-    revision id.
+    revision id. Without a target, ``flaskbb db upgrade`` upgrades FlaskBB
+    and every enabled plugin to their newest revision.
 
 * Downgrading revisions
     ``flaskbb db downgrade <plugin_name>@-1``
