@@ -41,9 +41,7 @@ def upgrade():
         sa.column("group_key", sa.String),
     )
 
-    collisions, orphans = _check_for_collisions(
-        conn, plugin_store, plugin_registry, settings_table
-    )
+    collisions, orphans = _check_for_collisions(conn, plugin_store, plugin_registry, settings_table)
 
     if collisions:
         details = "\n".join(f"  - {c}" for c in collisions)
@@ -79,9 +77,8 @@ def upgrade():
             python_value = pickle.loads(raw_value)
         except Exception as e:
             raise RuntimeError(
-                f"Could not unpickle plugin setting '{key}' for plugin "
-                f"'{plugin_name}': {e}"
-            )
+                f"Could not unpickle plugin setting '{key}' for plugin '{plugin_name}': {e}"
+            ) from e
 
         conn.execute(
             settings_table.insert().values(
@@ -132,9 +129,7 @@ def _check_for_collisions(
         key.lower() for key in conn.execute(sa.select(settings_table.c.key)).scalars()
     }
 
-    rows = conn.execute(
-        sa.select(plugin_store.c.plugin_id, plugin_store.c.key)
-    ).fetchall()
+    rows = conn.execute(sa.select(plugin_store.c.plugin_id, plugin_store.c.key)).fetchall()
 
     collisions: list[str] = []
     orphans: list[str] = []

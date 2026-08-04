@@ -52,9 +52,7 @@ class FlaskBBDomain(Domain):
         # load them into the cache
         if translations is None:
             dirname = self.get_translations_path(state.app)
-            translations = babel.support.Translations.load(
-                dirname, locale, domain=self.domain
-            )
+            translations = babel.support.Translations.load(dirname, locale, domain=self.domain)
             # now load and add the plugin translations
             for plugin in self.plugin_translations:
                 logger.debug(f"Loading plugin translation from: {plugin}")

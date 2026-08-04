@@ -37,9 +37,7 @@ class Alembic(FlaskAlembic):
             version_locations.append(version_location)
 
         c.set_main_option("script_location", script_location)
-        c.set_main_option(
-            "path_separator", current_app.config["ALEMBIC"]["path_separator"]
-        )
+        c.set_main_option("path_separator", current_app.config["ALEMBIC"]["path_separator"])
         path_sep = self._get_file_separator_char(c)
         c.set_main_option(
             "version_locations",
@@ -74,6 +72,4 @@ class Alembic(FlaskAlembic):
             ":": ":",
             ";": ";",
         }
-        return join_on_path.get(
-            current_app.config["ALEMBIC"].get("version_path_separator"), ","
-        )
+        return join_on_path.get(current_app.config["ALEMBIC"].get("version_path_separator"), ",")

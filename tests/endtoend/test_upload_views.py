@@ -14,16 +14,12 @@ def test_serves_image_attachment_inline(application, attachment, default_setting
     assert resp.headers["Content-Type"].startswith("image/png")
 
 
-def test_serves_non_image_attachment_as_download(
-    application, attachment, default_settings
-):
+def test_serves_non_image_attachment_as_download(application, attachment, default_settings):
     attachment.content_type = "application/pdf"
     attachment.save()
 
     with application.test_client() as client:
-        resp = client.get(
-            "/uploads/attachments/{}/{}".format(attachment.filename, "whatever.pdf")
-        )
+        resp = client.get("/uploads/attachments/{}/{}".format(attachment.filename, "whatever.pdf"))
 
     assert resp.status_code == 200
     assert resp.headers["Content-Type"].startswith("application/pdf")
@@ -41,9 +37,7 @@ def test_display_name_segment_does_not_identify_the_attachment(
         any_name = client.get(
             "/uploads/attachments/{}/{}".format(attachment.filename, "anything.png")
         )
-        by_id = client.get(
-            "/uploads/attachments/{}/{}".format(attachment.id, "test-image.png")
-        )
+        by_id = client.get("/uploads/attachments/{}/{}".format(attachment.id, "test-image.png"))
 
     assert any_name.status_code == 200
     assert by_id.status_code == 404

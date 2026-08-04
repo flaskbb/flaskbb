@@ -150,12 +150,8 @@ def flaskbb(ctx: click.Context):
 
 
 @flaskbb.command()
-@click.option(
-    "--welcome", "-w", default=True, is_flag=True, help="Disable the welcome forum."
-)
-@click.option(
-    "--force", "-f", default=False, is_flag=True, help="Doesn't ask for confirmation."
-)
+@click.option("--welcome", "-w", default=True, is_flag=True, help="Disable the welcome forum.")
+@click.option("--force", "-f", default=False, is_flag=True, help="Doesn't ask for confirmation.")
 @click.option("--username", "-u", help="The username of the user.")
 @click.option("--email", "-e", type=EmailType(), help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
@@ -190,8 +186,7 @@ def install(
     if database_exists(db.engine.url):
         if force or click.confirm(
             click.style(
-                "Existing database found. Do you want to delete the old one and "
-                "create a new one?",
+                "Existing database found. Do you want to delete the old one and create a new one?",
                 fg="magenta",
             )
         ):
@@ -224,32 +219,22 @@ def install(
 
 
 @flaskbb.command()
-@click.option(
-    "--test-data", "-t", default=False, is_flag=True, help="Adds some test data."
-)
-@click.option(
-    "--bulk-data", "-b", default=False, is_flag=True, help="Adds a lot of data."
-)
+@click.option("--test-data", "-t", default=False, is_flag=True, help="Adds some test data.")
+@click.option("--bulk-data", "-b", default=False, is_flag=True, help="Adds a lot of data.")
 @click.option(
     "--posts",
     default=100,
     help="Number of posts to create in each topic (default: 100).",
 )
-@click.option(
-    "--topics", default=100, help="Number of topics to create (default: 100)."
-)
-@click.option(
-    "--force", "-f", is_flag=True, help="Will delete the database before populating it."
-)
+@click.option("--topics", default=100, help="Number of topics to create (default: 100).")
+@click.option("--force", "-f", is_flag=True, help="Will delete the database before populating it.")
 @click.option(
     "--initdb",
     "-i",
     is_flag=True,
     help="Initializes the database before populating it.",
 )
-def populate(
-    bulk_data: bool, test_data: bool, posts: int, topics: int, force: bool, initdb: bool
-):
+def populate(bulk_data: bool, test_data: bool, posts: int, topics: int, force: bool, initdb: bool):
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
@@ -350,23 +335,15 @@ def shell_command():
 
 
 @flaskbb.command("urls", short_help="Show routes for the app.")
-@click.option(
-    "--route", "-r", "order_by", flag_value="rule", default=True, help="Order by route"
-)
-@click.option(
-    "--endpoint", "-e", "order_by", flag_value="endpoint", help="Order by endpoint"
-)
-@click.option(
-    "--methods", "-m", "order_by", flag_value="methods", help="Order by methods"
-)
+@click.option("--route", "-r", "order_by", flag_value="rule", default=True, help="Order by route")
+@click.option("--endpoint", "-e", "order_by", flag_value="endpoint", help="Order by endpoint")
+@click.option("--methods", "-m", "order_by", flag_value="methods", help="Order by methods")
 @with_appcontext
 def list_urls(order_by: str):
     """Lists all available routes."""
     from flask import current_app
 
-    rules = sorted(
-        current_app.url_map.iter_rules(), key=lambda rule: getattr(rule, order_by)
-    )
+    rules = sorted(current_app.url_map.iter_rules(), key=lambda rule: getattr(rule, order_by))
 
     max_rule_len = max(len(rule.rule) for rule in rules)
     max_rule_len = max(max_rule_len, len("Route"))
@@ -374,19 +351,13 @@ def list_urls(order_by: str):
     max_endpoint_len = max(len(rule.endpoint) for rule in rules)
     max_endpoint_len = max(max_endpoint_len, len("Endpoint"))
 
-    max_method_len = max(
-        len(", ".join(rule.methods if rule.methods else [])) for rule in rules
-    )
+    max_method_len = max(len(", ".join(rule.methods if rule.methods else [])) for rule in rules)
     max_method_len = max(max_method_len, len("Methods"))
 
     column_header_len = max_rule_len + max_endpoint_len + max_method_len + 4
-    column_template = (
-        f"{{:<{max_rule_len}}}  {{:<{max_endpoint_len}}}  {{:<{max_method_len}}}"
-    )
+    column_template = f"{{:<{max_rule_len}}}  {{:<{max_endpoint_len}}}  {{:<{max_method_len}}}"
 
-    click.secho(
-        column_template.format("Route", "Endpoint", "Methods"), fg="blue", bold=True
-    )
+    click.secho(column_template.format("Route", "Endpoint", "Methods"), fg="blue", bold=True)
     click.secho("=" * column_header_len, bold=True)
 
     for rule in rules:
@@ -641,7 +612,7 @@ def generate_config(development: bool, output: str | None, force: bool):
 
     # Finished
     click.secho(
-        f"The configuration file has been saved to:\n{config_path}\n Feel free to adjust it as needed.",
+        f"The configuration file has been saved to:\n{config_path}\n Feel free to adjust it as needed.",  # noqa: E501
         fg="blue",
         bold=True,
     )

@@ -27,9 +27,7 @@ class AccountActivator(_AccountActivator):
         self.users = users
 
     def initiate_account_activation(self, email: str):
-        user = db.session.execute(
-            db.select(self.users).filter_by(email=email)
-        ).scalar_one_or_none()
+        user = db.session.execute(db.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Entered email doesn't exist"))
@@ -41,9 +39,7 @@ class AccountActivator(_AccountActivator):
             Token(user_id=user.id, operation=TokenActions.ACTIVATE_ACCOUNT)
         )
 
-        send_activation_token.delay(
-            token=token, username=user.username, email=user.email
-        )
+        send_activation_token.delay(token=token, username=user.username, email=user.email)
 
     def activate_account(self, token):
         token = self.token_serializer.loads(token)

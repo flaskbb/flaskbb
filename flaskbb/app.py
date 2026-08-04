@@ -307,17 +307,13 @@ def configure_extensions(app: Flask):
     login_manager.login_view = app.config["LOGIN_VIEW"]
     login_manager.refresh_view = app.config["REAUTH_VIEW"]
     login_manager.login_message_category = app.config["LOGIN_MESSAGE_CATEGORY"]
-    login_manager.needs_refresh_message_category = app.config[
-        "REFRESH_MESSAGE_CATEGORY"
-    ]
+    login_manager.needs_refresh_message_category = app.config["REFRESH_MESSAGE_CATEGORY"]
     login_manager.anonymous_user = Guest
 
     @login_manager.user_loader
     def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
-        user = db.session.execute(
-            db.select(User).filter_by(id=user_id)
-        ).scalar_one_or_none()
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
         pluggy.hook.flaskbb_current_user(app=app, user=user)
         return user
 
@@ -352,9 +348,7 @@ def configure_template_filters(app: Flask):
         ("is_admin_or_moderator", IsAtleastModerator),
     ]
 
-    filters.update(
-        (name, permission_with_identity(perm, name=name)) for name, perm in permissions
-    )
+    filters.update((name, permission_with_identity(perm, name=name)) for name, perm in permissions)
 
     filters["can_ban_user"] = can_ban_user
     filters["can_edit_user"] = can_edit_user
@@ -479,22 +473,16 @@ def configure_logging(app: Flask):
         configure_default_logging(app)
 
     if app.config.get("LOG_CONF_FILE"):
-        logging.config.fileConfig(
-            app.config["LOG_CONF_FILE"], disable_existing_loggers=False
-        )
+        logging.config.fileConfig(app.config["LOG_CONF_FILE"], disable_existing_loggers=False)
 
     if app.config["SQLALCHEMY_ECHO"]:
         # Ref: http://stackoverflow.com/a/8428546
         @event.listens_for(Engine, "before_cursor_execute")
-        def before_cursor_execute(
-            conn, cursor, statement, parameters, context, executemany
-        ):
+        def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
             conn.info.setdefault("query_start_time", []).append(time.time())
 
         @event.listens_for(Engine, "after_cursor_execute")
-        def after_cursor_execute(
-            conn, cursor, statement, parameters, context, executemany
-        ):
+        def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
             total = time.time() - conn.info["query_start_time"].pop(-1)
             app.logger.debug("Total Time: %f", total)
 
@@ -511,9 +499,7 @@ def configure_mail_logs(app: Flask, formatter: logging.Formatter | None = None):
     from logging.handlers import SMTPHandler
 
     if formatter is None:
-        formatter = logging.Formatter(
-            "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s %(levelname)-7s %(name)-25s %(message)s")
     mail_handler = SMTPHandler(
         app.config["MAIL_SERVER"],
         app.config["MAIL_DEFAULT_SENDER"],

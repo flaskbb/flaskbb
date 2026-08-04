@@ -20,9 +20,7 @@ def test_get_safe_redirect_url_falls_back_to_default_for_tab_payload():
     # Werkzeug/urllib percent-decode the query string before application code
     # ever sees it, so by the time `next` reaches `is_safe_url` it already
     # contains a real tab byte (0x09), not the literal text "%09".
-    result = get_safe_redirect_url(
-        "/\t///google.com", ALLOWED_HOSTS, fallback="/dashboard"
-    )
+    result = get_safe_redirect_url("/\t///google.com", ALLOWED_HOSTS, fallback="/dashboard")
     assert result == "/dashboard"
 
 
@@ -110,9 +108,7 @@ def test_bad_urls():
         "http://2001:cdba:0000:0000:0000:0000:3257:9652]/",
     )
     for bad_url in bad_urls:
-        assert not get_safe_redirect_url(
-            bad_url, allowed_hosts={"testserver", "testserver2"}
-        )
+        assert not get_safe_redirect_url(bad_url, allowed_hosts={"testserver", "testserver2"})
 
 
 def test_good_urls():
@@ -129,9 +125,7 @@ def test_good_urls():
         "path/http:2222222222",
     )
     for good_url in good_urls:
-        assert get_safe_redirect_url(
-            good_url, allowed_hosts={"otherserver", "testserver"}
-        )
+        assert get_safe_redirect_url(good_url, allowed_hosts={"otherserver", "testserver"})
 
 
 def test_basic_auth():
@@ -145,9 +139,7 @@ def test_no_allowed_hosts():
     # A path without host is allowed.
     assert get_safe_redirect_url("/confirm/me@example.com", allowed_hosts=None)
     # Basic auth without host is not allowed.
-    assert not get_safe_redirect_url(
-        r"http://testserver\@example.com", allowed_hosts=None
-    )
+    assert not get_safe_redirect_url(r"http://testserver\@example.com", allowed_hosts=None)
 
 
 def test_allowed_hosts_str():
@@ -162,9 +154,7 @@ def test_secure_param_https_urls():
         "/view/?param=http://example.com",
     )
     for url in secure_urls:
-        assert get_safe_redirect_url(
-            url, allowed_hosts={"example.com"}, require_https=True
-        )
+        assert get_safe_redirect_url(url, allowed_hosts={"example.com"}, require_https=True)
 
 
 def test_secure_param_non_https_urls():
@@ -174,6 +164,4 @@ def test_secure_param_non_https_urls():
         "//example.com/p",
     )
     for url in insecure_urls:
-        assert not get_safe_redirect_url(
-            url, allowed_hosts={"example.com"}, require_https=True
-        )
+        assert not get_safe_redirect_url(url, allowed_hosts={"example.com"}, require_https=True)

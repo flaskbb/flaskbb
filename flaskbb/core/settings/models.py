@@ -129,9 +129,7 @@ class Setting(db.Model):
         excluded_keys = {key.lower() for key in exclude}
         rows = {
             row.key.lower(): row
-            for row in db.session.execute(
-                select(cls).where(cls.group_key == group_key)
-            ).scalars()
+            for row in db.session.execute(select(cls).where(cls.group_key == group_key)).scalars()
         }
         for key, value in settings.items():
             if key.lower() in excluded_keys:

@@ -185,9 +185,7 @@ def test_forum_update_read(database, user, topic):
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
     )
 
-    topicsread = TopicsRead.get(
-        TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    )
+    topicsread = TopicsRead.get(TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id)
 
     forum = topic.forum
 
@@ -414,9 +412,7 @@ def test_topic_tracker_needs_update(database, user, topic):
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
     )
 
-    topicsread = TopicsRead.get(
-        TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    )
+    topicsread = TopicsRead.get(TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id)
 
     with current_app.test_request_context():
         assert topic.tracker_needs_update(forumsread, topicsread)
@@ -469,9 +465,7 @@ def test_topic_tracker_needs_update_cleared(database, user, topic):
         ForumsRead.user_id == user.id, ForumsRead.forum_id == topic.forum_id
     )
 
-    topicsread = TopicsRead.get(
-        TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id
-    )
+    topicsread = TopicsRead.get(TopicsRead.user_id == user.id, TopicsRead.topic_id == topic.id)
 
     with current_app.test_request_context():
         assert topic.tracker_needs_update(forumsread, topicsread)
@@ -683,14 +677,9 @@ def test_retrieving_hidden_posts(topic, user):
     new_post.save(user, topic)
     new_post.hide(user)
 
+    assert db.session.scalars(hidden(select(Post).where(Post.id == new_post.id))).first() is None
     assert (
-        db.session.scalars(hidden(select(Post).where(Post.id == new_post.id))).first()
-        is None
-    )
-    assert (
-        db.session.scalars(
-            hidden(select(Post).where(Post.id == new_post.id), True)
-        ).first()
+        db.session.scalars(hidden(select(Post).where(Post.id == new_post.id), True)).first()
         == new_post
     )
     hidden_post = db.session.scalars(
@@ -702,15 +691,9 @@ def test_retrieving_hidden_posts(topic, user):
 def test_retrieving_hidden_topics(topic, user):
     topic.hide(user)
 
+    assert db.session.scalars(hidden(select(Topic).where(Topic.id == topic.id))).first() is None
     assert (
-        db.session.scalars(hidden(select(Topic).where(Topic.id == topic.id))).first()
-        is None
-    )
-    assert (
-        db.session.scalars(
-            hidden(select(Topic).where(Topic.id == topic.id), True)
-        ).first()
-        == topic
+        db.session.scalars(hidden(select(Topic).where(Topic.id == topic.id), True)).first() == topic
     )
 
     hidden_topic = db.session.scalars(

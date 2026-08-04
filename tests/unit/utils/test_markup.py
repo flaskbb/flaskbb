@@ -14,10 +14,7 @@ def test_userify():
         result2 = markdown("Hello, @sh4nks is developing @flaskbb @wow.")
 
     assert all(substring in result for substring in ("/user/sh4nks"))
-    assert all(
-        substring in result2
-        for substring in ("/user/sh4nks", "/user/flaskbb", "/user/wow")
-    )
+    assert all(substring in result2 for substring in ("/user/sh4nks", "/user/flaskbb", "/user/wow"))
 
 
 def test_highlighting():

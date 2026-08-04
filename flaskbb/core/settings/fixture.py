@@ -50,8 +50,7 @@ general_group = SettingGroup(
             value="",
             name="Copyright",
             description=(
-                "Copyright notice of the Project like '&copy; 2018 FlaskBB'. "
-                "Leave blank to ignore."
+                "Copyright notice of the Project like '&copy; 2018 FlaskBB'. Leave blank to ignore."
             ),
         ),
         IntSetting(
@@ -80,8 +79,7 @@ general_group = SettingGroup(
             value=True,
             name="Enable Memberlist",
             description=(
-                "Show the memberlist. If disabled, the memberlist is no longer "
-                "reachable."
+                "Show the memberlist. If disabled, the memberlist is no longer reachable."
             ),
         ),
         BoolSetting(
@@ -180,9 +178,7 @@ auth_group = SettingGroup(
             value=5,
             min=0,
             name="Login reCAPTCHA",
-            description=(
-                "Use a CAPTCHA after a specified amount of failed login attempts."
-            ),
+            description=("Use a CAPTCHA after a specified amount of failed login attempts."),
         ),
         BoolSetting(
             key="RECAPTCHA_ENABLED",
@@ -210,8 +206,7 @@ misc_group = SettingGroup(
             min=0,
             name="Online last minutes",
             description=(
-                "How long a user can be inactive before he is marked as "
-                "offline. 0 to disable it."
+                "How long a user can be inactive before he is marked as offline. 0 to disable it."
             ),
         ),
         IntSetting(
@@ -227,8 +222,7 @@ misc_group = SettingGroup(
             min=0,
             name="Tracker length",
             description=(
-                "The days for how long the forum should deal with unread "
-                "topics. 0 to disable it."
+                "The days for how long the forum should deal with unread topics. 0 to disable it."
             ),
         ),
         IntSetting(
@@ -315,9 +309,7 @@ attachments_group = SettingGroup(
             key="ATTACHMENT_TYPES",
             value="png, jpg, jpeg, gif, pdf",
             name="Attachment Types",
-            description=(
-                "A comma separated list of the allowed file extensions for attachments."
-            ),
+            description=("A comma separated list of the allowed file extensions for attachments."),
         ),
     ),
 )

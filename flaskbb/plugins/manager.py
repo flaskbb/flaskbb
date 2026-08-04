@@ -99,9 +99,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         self._internal_name2plugin: dict[str, _Plugin] = {}
 
     @override
-    def register(
-        self, plugin: _Plugin, name: str | None = None, internal: bool = False
-    ):
+    def register(self, plugin: _Plugin, name: str | None = None, internal: bool = False):
         """Register a plugin and return its canonical name or None
         if the name is blocked from registering.
         Raise a ValueError if the plugin is already registered.

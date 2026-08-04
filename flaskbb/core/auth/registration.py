@@ -56,9 +56,7 @@ class RegistrationFailureHandler(ABC):
     """
 
     @abstractmethod
-    def handle_failure(
-        self, user_info: UserRegistrationInfo, failures: tuple[str, str]
-    ):
+    def handle_failure(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
         """
         This method is abstract.
 

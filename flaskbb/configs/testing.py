@@ -34,9 +34,7 @@ class TestingConfig(DefaultConfig):
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "standard": {
-                "format": "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
-            },
+            "standard": {"format": "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"},
         },
         "handlers": {
             "console": {

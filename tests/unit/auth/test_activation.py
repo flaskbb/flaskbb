@@ -29,9 +29,7 @@ class TestAccountActivationInitiateActivation:
     ):
         service = activation.AccountActivator(token_serializer, User)
         mock = mocker.MagicMock()
-        mocker.patch(
-            "flaskbb.auth.services.activation.send_activation_token.delay", mock
-        )
+        mocker.patch("flaskbb.auth.services.activation.send_activation_token.delay", mock)
         service.initiate_account_activation(unactivated_user.email)
 
         token = token_serializer.dumps(
@@ -47,9 +45,7 @@ class TestAccountActivationInitiateActivation:
 class TestAccountActivationActivateAccount:
     def test_raises_if_token_operation_isnt_activate(self, token_serializer):
         service = activation.AccountActivator(token_serializer, User)
-        token = token_serializer.dumps(
-            Token(user_id=1, operation=TokenActions.RESET_PASSWORD)
-        )
+        token = token_serializer.dumps(Token(user_id=1, operation=TokenActions.RESET_PASSWORD))
 
         with pytest.raises(TokenError):
             service.activate_account(token)

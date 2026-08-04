@@ -21,9 +21,7 @@ class TestPasswordReset:
         assert "invalid" in str(excinfo.value)
 
     def test_raises_StopValidation_if_verifiers_fail(self, token_serializer):
-        token = token_serializer.dumps(
-            Token(user_id=1, operation=TokenActions.RESET_PASSWORD)
-        )
+        token = token_serializer.dumps(Token(user_id=1, operation=TokenActions.RESET_PASSWORD))
 
         def verifier(*a, **k):
             raise ValidationError("attr", "no")
@@ -34,9 +32,7 @@ class TestPasswordReset:
             service.reset_password(token, "an@e.mail", "great password!")
         assert ("attr", "no") in excinfo.value.reasons
 
-    def test_sets_user_password_to_provided_if_verifiers_pass(
-        self, token_serializer, Fred
-    ):
+    def test_sets_user_password_to_provided_if_verifiers_pass(self, token_serializer, Fred):
         token = token_serializer.dumps(
             Token(user_id=Fred.id, operation=TokenActions.RESET_PASSWORD)
         )
@@ -67,6 +63,4 @@ class TestPasswordReset:
         token = token_serializer.dumps(
             Token(user_id=Fred.id, operation=TokenActions.RESET_PASSWORD)
         )
-        mock.assert_called_once_with(
-            token=token, username=Fred.username, email=Fred.email
-        )
+        mock.assert_called_once_with(token=token, username=Fred.username, email=Fred.email)

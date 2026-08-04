@@ -58,9 +58,7 @@ logger = logging.getLogger(__name__)
 
 
 USERNAME_RE = r"^[\w.+-]+$"
-is_username = regexp(
-    USERNAME_RE, message=_("You can only use letters, numbers or dashes.")
-)
+is_username = regexp(USERNAME_RE, message=_("You can only use letters, numbers or dashes."))
 
 
 def selectable_forums():
@@ -68,9 +66,7 @@ def selectable_forums():
 
 
 def selectable_categories():
-    return (
-        db.session.execute(select(Category).order_by(Category.position)).scalars().all()
-    )
+    return db.session.execute(select(Category).order_by(Category.position)).scalars().all()
 
 
 def selectable_groups():
@@ -97,17 +93,12 @@ def assignable_groups():
         return select_primary_group()
 
     member_group = db.and_(
-        *[
-            getattr(Group, p).is_(False)
-            for p in ["admin", "mod", "super_mod", "banned", "guest"]
-        ]
+        *[getattr(Group, p).is_(False) for p in ["admin", "mod", "super_mod", "banned", "guest"]]
     )
 
     return (
         db.session.execute(
-            select(Group)
-            .where(db.or_(member_group, Group.mod, Group.banned))
-            .order_by(Group.id)
+            select(Group).where(db.or_(member_group, Group.mod, Group.banned)).order_by(Group.id)
         )
         .scalars()
         .all()
@@ -115,9 +106,7 @@ def assignable_groups():
 
 
 class AttachmentSearchForm(FlaskForm):
-    search_query = StringField(
-        _("Search"), validators=[DataRequired(), Length(min=3, max=50)]
-    )
+    search_query = StringField(_("Search"), validators=[DataRequired(), Length(min=3, max=50)])
 
     submit = SubmitField(_("Search"))
 
@@ -296,15 +285,13 @@ class GroupForm(FlaskForm):
     super_mod = BooleanField(
         _("Is 'Super Moderator' group?"),
         description=_(
-            "Check this, if the users in this group are allowed to "
-            "moderate every forum."
+            "Check this, if the users in this group are allowed to moderate every forum."
         ),
     )
     mod = BooleanField(
         _("Is 'Moderator' group?"),
         description=_(
-            "Check this, if the users in this group are allowed to "
-            "moderate specified forums."
+            "Check this, if the users in this group are allowed to moderate specified forums."
         ),
     )
     banned = BooleanField(
@@ -337,16 +324,13 @@ class GroupForm(FlaskForm):
     )
     postattachment = BooleanField(
         _("Can upload attachments"),
-        description=_(
-            "Check this, if the users in this group can attach files to posts."
-        ),
+        description=_("Check this, if the users in this group can attach files to posts."),
     )
 
     mod_edituser = BooleanField(
         _("Moderators can edit user profiles"),
         description=_(
-            "Allow moderators to edit another user's profile "
-            "including password and email changes."
+            "Allow moderators to edit another user's profile including password and email changes."
         ),
     )
 
@@ -383,9 +367,7 @@ class GroupForm(FlaskForm):
 
     def validate_banned(self, field: Field):
         if self.group is not None:
-            group = Group.count(
-                db.and_(Group.banned, db.not_(Group.id == self.group.id))
-            )
+            group = Group.count(db.and_(Group.banned, db.not_(Group.id == self.group.id)))
         else:
             group = Group.count(Group.banned == True)
 
@@ -394,9 +376,7 @@ class GroupForm(FlaskForm):
 
     def validate_guest(self, field: Field):
         if self.group is not None:
-            group = Group.count(
-                db.and_(Group.guest, db.not_(Group.id == self.group.id))
-            )
+            group = Group.count(db.and_(Group.guest, db.not_(Group.id == self.group.id)))
         else:
             group = Group.count(Group.guest == True)
 
@@ -428,9 +408,7 @@ class GroupForm(FlaskForm):
                 if field.data:
                     # if done in 'validate_guest' it would display this
                     # warning on the fields
-                    field.errors.append(
-                        _("Can't assign any permissions to this group.")
-                    )
+                    field.errors.append(_("Can't assign any permissions to this group."))
                     result = False
 
         checked: list[bool] = []
@@ -500,8 +478,7 @@ class ForumForm(FlaskForm):
     moderators = StringField(
         _("Moderators"),
         description=_(
-            "Comma separated usernames. Leave it blank if you do "
-            "not want to set any moderators."
+            "Comma separated usernames. Leave it blank if you do not want to set any moderators."
         ),
     )
 
@@ -527,10 +504,7 @@ class ForumForm(FlaskForm):
         if self.forum is not None:
             if len(self.forum.topics) > 0:
                 raise ValidationError(
-                    _(
-                        "You cannot convert a forum that contains topics into an "
-                        "external link."
-                    )
+                    _("You cannot convert a forum that contains topics into an external link.")
                 )
 
     def validate_show_moderators(self, field: Field):
@@ -602,9 +576,7 @@ class CategoryForm(FlaskForm):
     position = IntegerField(
         _("Position"),
         default=1,
-        validators=[
-            DataRequired(message=_("Please enter a position for the category."))
-        ],
+        validators=[DataRequired(message=_("Please enter a position for the category."))],
     )
 
     submit = SubmitField(_("Save"))

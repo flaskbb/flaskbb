@@ -127,9 +127,7 @@ def upgrade():
         sa.Column("forum_id", sa.Integer(), nullable=False),
         sa.Column("last_read", sa.DateTime(), nullable=True),
         sa.Column("cleared", sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["forum_id"], ["forums.id"], name="fk_fr_forum_id", use_alter=True
-        ),
+        sa.ForeignKeyConstraint(["forum_id"], ["forums.id"], name="fk_fr_forum_id", use_alter=True),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.id"],
@@ -140,9 +138,7 @@ def upgrade():
         "moderators",
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("forum_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["forum_id"], ["forums.id"], name="fk_forum_id", use_alter=True
-        ),
+        sa.ForeignKeyConstraint(["forum_id"], ["forums.id"], name="fk_forum_id", use_alter=True),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.id"],
@@ -203,12 +199,8 @@ def upgrade():
         sa.Column("topic_id", sa.Integer(), nullable=False),
         sa.Column("forum_id", sa.Integer(), nullable=False),
         sa.Column("last_read", sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["forum_id"], ["forums.id"], name="fk_tr_forum_id", use_alter=True
-        ),
-        sa.ForeignKeyConstraint(
-            ["topic_id"], ["topics.id"], name="fk_tr_topic_id", use_alter=True
-        ),
+        sa.ForeignKeyConstraint(["forum_id"], ["forums.id"], name="fk_tr_forum_id", use_alter=True),
+        sa.ForeignKeyConstraint(["topic_id"], ["topics.id"], name="fk_tr_topic_id", use_alter=True),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.id"],

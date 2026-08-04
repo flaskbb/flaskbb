@@ -181,10 +181,8 @@ class HideableCRUDMixin(HideableMixin, CRUDMixin):
     pass
 
 
-def try_commit(
-    session: Session | scoped_session[Session], message: str = "Error while saving"
-):
+def try_commit(session: Session | scoped_session[Session], message: str = "Error while saving"):
     try:
         session.commit()
-    except Exception:
-        raise PersistenceError(message)
+    except Exception as e:
+        raise PersistenceError(message) from e

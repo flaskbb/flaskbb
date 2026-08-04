@@ -20,9 +20,7 @@ from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.datastructures import TemplateEventResult
 
 
-def template_hook(
-    name: str, silent: bool = True, is_markup: bool = True, **kwargs: Any
-):
+def template_hook(name: str, silent: bool = True, is_markup: bool = True, **kwargs: Any):
     """Calls the given template hook.
 
     :param name: The name of the hook.
@@ -65,9 +63,7 @@ def remove_zombie_plugins_from_db():
     """
     d_fs_plugins: list[str] = [p[0] for p in pluggy.list_disabled_plugins()]
     d_db_plugins = (
-        db.session.execute(db.select(PluginRegistry.name).filter_by(enabled=False))
-        .scalars()
-        .all()
+        db.session.execute(db.select(PluginRegistry.name).filter_by(enabled=False)).scalars().all()
     )
 
     plugin_names = db.session.execute(db.select(PluginRegistry.name)).scalars().all()
@@ -78,8 +74,6 @@ def remove_zombie_plugins_from_db():
             remove_me.append(p)
 
     if len(remove_me) > 0:
-        db.session.execute(
-            db.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me))
-        )
+        db.session.execute(db.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me)))
         db.session.commit()
     return remove_me

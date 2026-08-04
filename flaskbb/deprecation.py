@@ -49,9 +49,7 @@ class RemovedInFlaskBB3(FlaskBBDeprecation):
     version = (3, 0, 0)
 
 
-def deprecated(
-    message: str = "", category: type[FlaskBBDeprecation] = RemovedInFlaskBB3
-):
+def deprecated(message: str = "", category: type[FlaskBBDeprecation] = RemovedInFlaskBB3):
     """
     Flags a function or method as deprecated, should not be used on
     classes as it will break inheritance and introspection.

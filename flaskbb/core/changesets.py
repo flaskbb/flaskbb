@@ -40,9 +40,7 @@ class EmptyValue:
 
     @override
     def __eq__(self, other: Any):
-        return isinstance(other, EmptyValue) or (
-            isclass(other) and issubclass(other, EmptyValue)
-        )
+        return isinstance(other, EmptyValue) or (isclass(other) and issubclass(other, EmptyValue))
 
     def __bool__(self):
         return False

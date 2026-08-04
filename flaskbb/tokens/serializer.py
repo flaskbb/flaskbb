@@ -76,18 +76,16 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         :returns flaskbb.core.tokens.Token: Parsed token
         """
         try:
-            parsed = jwt.decode(
-                raw_token, key=self.secret_key, algorithms=[self.algorithm]
-            )
-        except jwt.ExpiredSignatureError:
-            raise tokens.TokenError.expired()
-        except jwt.DecodeError:  # pragma: no branch
-            raise tokens.TokenError.invalid()
+            parsed = jwt.decode(raw_token, key=self.secret_key, algorithms=[self.algorithm])
+        except jwt.ExpiredSignatureError as e:
+            raise tokens.TokenError.expired() from e
+        except jwt.DecodeError as e:  # pragma: no branch
+            raise tokens.TokenError.invalid() from e
         # ideally we never end up here as DecodeError should
         # catch everything else, however since this is the root
         # exception for PyJWT we'll catch it down and
         # and re-raise our own
-        except jwt.InvalidTokenError:  # pragma: no cover
-            raise tokens.TokenError.bad()
+        except jwt.InvalidTokenError as e:  # pragma: no cover
+            raise tokens.TokenError.bad() from e
         else:
             return tokens.Token(user_id=parsed["id"], operation=parsed["op"])

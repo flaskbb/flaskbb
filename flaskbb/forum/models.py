@@ -124,9 +124,7 @@ class TopicsRead(db.Model, CRUDMixin):
     forum_id: Mapped[int] = mapped_column(
         ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
     )
-    forum: Mapped["Forum"] = relationship(
-        "Forum", uselist=False, foreign_keys=[forum_id]
-    )
+    forum: Mapped["Forum"] = relationship("Forum", uselist=False, foreign_keys=[forum_id])
     last_read: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
@@ -142,15 +140,11 @@ class ForumsRead(db.Model, CRUDMixin):
     forum_id: Mapped[int] = mapped_column(
         ForeignKey("forums.id", ondelete="CASCADE"), primary_key=True
     )
-    forum: Mapped["Forum"] = relationship(
-        "Forum", uselist=False, foreign_keys=[forum_id]
-    )
+    forum: Mapped["Forum"] = relationship("Forum", uselist=False, foreign_keys=[forum_id])
     last_read: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
-    cleared: Mapped[datetime | None] = mapped_column(
-        UTCDateTime(timezone=True), nullable=True
-    )
+    cleared: Mapped[datetime | None] = mapped_column(UTCDateTime(timezone=True), nullable=True)
 
     @classmethod
     def get_for_user(cls, user_id: int, forum_id: int):
@@ -171,16 +165,12 @@ class Report(db.Model, CRUDMixin):
     # still view the report
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    reporter_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id"), nullable=True
-    )
+    reporter_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     reported: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
     post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
-    zapped: Mapped[datetime | None] = mapped_column(
-        UTCDateTime(timezone=True), nullable=True
-    )
+    zapped: Mapped[datetime | None] = mapped_column(UTCDateTime(timezone=True), nullable=True)
     zapped_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -189,12 +179,8 @@ class Report(db.Model, CRUDMixin):
         lazy="joined",
         backref=db.backref("report", cascade="all, delete-orphan"),
     )
-    reporter: Mapped["User"] = relationship(
-        "User", lazy="joined", foreign_keys=[reporter_id]
-    )
-    zapper: Mapped["User"] = relationship(
-        "User", lazy="joined", foreign_keys=[zapped_by]
-    )
+    reporter: Mapped["User"] = relationship("User", lazy="joined", foreign_keys=[reporter_id])
+    zapper: Mapped["User"] = relationship("User", lazy="joined", foreign_keys=[zapped_by])
 
     @override
     def __repr__(self):
@@ -290,9 +276,7 @@ _PENDING_UNLINK_KEY = "attachment_files_pending_unlink"
 # ORM-level deletes, never bulk DELETE statements.
 @event.listens_for(Attachment, "after_delete")
 def _queue_attachment_unlink(mapper, connection, target: Attachment):
-    db.session.info.setdefault(_PENDING_UNLINK_KEY, []).append(
-        (target.post_id, target.filename)
-    )
+    db.session.info.setdefault(_PENDING_UNLINK_KEY, []).append((target.post_id, target.filename))
 
 
 @event.listens_for(db.session, "after_commit")
@@ -332,9 +316,7 @@ class Post(HideableCRUDMixin, db.Model):
         foreign_keys=[user_id],
     )
 
-    topic: Mapped["Topic"] = relationship(
-        "Topic", foreign_keys=[topic_id], back_populates="posts"
-    )
+    topic: Mapped["Topic"] = relationship("Topic", foreign_keys=[topic_id], back_populates="posts")
 
     attachments: Mapped[list["Attachment"]] = relationship(
         "Attachment",
@@ -631,9 +613,7 @@ class Topic(HideableCRUDMixin, db.Model):
     views: Mapped[int] = mapped_column(default=0, nullable=False)
     post_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
-    forum: Mapped["Forum"] = relationship(
-        "Forum", back_populates="topics", foreign_keys=[forum_id]
-    )
+    forum: Mapped["Forum"] = relationship("Forum", back_populates="topics", foreign_keys=[forum_id])
 
     # One-to-one (uselist=False) relationship between first_post and topic
     first_post_id: Mapped[int | None] = mapped_column(
@@ -647,9 +627,7 @@ class Topic(HideableCRUDMixin, db.Model):
     )
 
     # One-to-one
-    last_post_id: Mapped[int | None] = mapped_column(
-        ForeignKey("posts.id"), nullable=True
-    )
+    last_post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
 
     last_post: Mapped["Post | None"] = relationship(
         "Post",
@@ -784,9 +762,7 @@ class Topic(HideableCRUDMixin, db.Model):
             .where(Post.topic_id == topic_id)
             .order_by(Post.id.asc())
         )
-        posts = paginate(
-            hidden(stmt), page=page, per_page=flaskbb_config["POSTS_PER_PAGE"]
-        )
+        posts = paginate(hidden(stmt), page=page, per_page=flaskbb_config["POSTS_PER_PAGE"])
         return posts
 
     def tracker_needs_update(
@@ -804,9 +780,7 @@ class Topic(HideableCRUDMixin, db.Model):
         """
         read_cutoff = None
         if flaskbb_config["TRACKER_LENGTH"] > 0:
-            read_cutoff = time_utcnow() - timedelta(
-                days=flaskbb_config["TRACKER_LENGTH"]
-            )
+            read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
         # The tracker is disabled - abort
         if read_cutoff is None or self.last_post is None:
@@ -835,9 +809,7 @@ class Topic(HideableCRUDMixin, db.Model):
         logger.debug("Topic is unread.")
         return True
 
-    def update_read(
-        self, user: "User", forum: "Forum", forumsread: "ForumsRead | None"
-    ):
+    def update_read(self, user: "User", forum: "Forum", forumsread: "ForumsRead | None"):
         """Updates the topicsread and forumsread tracker for a specified user,
         if the topic contains new posts or the user hasn't read the topic.
         Returns True if the tracker has been updated.
@@ -1085,11 +1057,7 @@ class Topic(HideableCRUDMixin, db.Model):
             .scalar_subquery()
         )
 
-        stmt = (
-            update(User)
-            .where(User.id.in_(user_ids))
-            .values(post_count=post_count_subquery)
-        )
+        stmt = update(User).where(User.id.in_(user_ids)).values(post_count=post_count_subquery)
         db.session.execute(stmt)
 
     def _fix_post_counts(self, forum: "Forum"):
@@ -1097,9 +1065,7 @@ class Topic(HideableCRUDMixin, db.Model):
         if self.hidden:
             stmt_topic_count = stmt.where(Topic.id != self.id, Topic.hidden.is_(False))
         else:
-            stmt_topic_count = stmt.where(
-                or_(Topic.id == self.id, Topic.hidden.is_(False))
-            )
+            stmt_topic_count = stmt.where(or_(Topic.id == self.id, Topic.hidden.is_(False)))
 
         forum.topic_count = db.session.scalar(stmt_topic_count)
 
@@ -1111,9 +1077,7 @@ class Topic(HideableCRUDMixin, db.Model):
         if self.hidden:
             stmt_post_count = stmt.where(Post.hidden.is_(False))
         else:
-            stmt_post_count = stmt.where(
-                or_(Post.hidden.is_(False), Post.id == self.first_post_id)
-            )
+            stmt_post_count = stmt.where(or_(Post.hidden.is_(False), Post.id == self.first_post_id))
 
         forum.post_count = db.session.scalar(stmt_post_count)
 
@@ -1304,9 +1268,7 @@ class Forum(db.Model, CRUDMixin):
 
         read_cutoff = None
         if flaskbb_config["TRACKER_LENGTH"] > 0:
-            read_cutoff = time_utcnow() - timedelta(
-                days=flaskbb_config["TRACKER_LENGTH"]
-            )
+            read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
         # fetch the unread posts in the forum
         unread_count = db.session.execute(
@@ -1446,9 +1408,7 @@ class Forum(db.Model, CRUDMixin):
         if users:
             for user in users:
                 user.post_count = db.session.execute(
-                    db.select(db.func.count())
-                    .select_from(Post)
-                    .filter_by(user_id=user.id)
+                    db.select(db.func.count()).select_from(Post).filter_by(user_id=user.id)
                 ).scalar_one()
             db.session.commit()
 
@@ -1677,11 +1637,7 @@ class Category(db.Model, CRUDMixin):
             .scalar_subquery()
         )
 
-        stmt = (
-            db.update(User)
-            .where(User.id.in_(user_ids))
-            .values(post_count=post_count_subquery)
-        )
+        stmt = db.update(User).where(User.id.in_(user_ids)).values(post_count=post_count_subquery)
         db.session.execute(stmt)
         return self
 
@@ -1708,9 +1664,7 @@ class Category(db.Model, CRUDMixin):
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
             user_forums = (
-                db.select(Forum)
-                .filter(Forum.groups.any(Group.id.in_(user_groups)))
-                .subquery()
+                db.select(Forum).filter(Forum.groups.any(Group.id.in_(user_groups))).subquery()
             )
 
             forum_alias = aliased(Forum, user_forums)
@@ -1737,9 +1691,7 @@ class Category(db.Model, CRUDMixin):
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = (
-                db.select(Forum)
-                .filter(Forum.groups.any(Group.id == guest_group.id))
-                .subquery()
+                db.select(Forum).filter(Forum.groups.any(Group.id == guest_group.id)).subquery()
             )
 
             forum_alias = aliased(Forum, guest_forums)
@@ -1776,9 +1728,7 @@ class Category(db.Model, CRUDMixin):
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
             user_forums = (
-                db.select(Forum)
-                .filter(Forum.groups.any(Group.id.in_(user_groups)))
-                .subquery()
+                db.select(Forum).filter(Forum.groups.any(Group.id.in_(user_groups))).subquery()
             )
 
             forum_alias = aliased(Forum, user_forums)
@@ -1805,9 +1755,7 @@ class Category(db.Model, CRUDMixin):
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = (
-                db.select(Forum)
-                .filter(Forum.groups.any(Group.id == guest_group.id))
-                .subquery()
+                db.select(Forum).filter(Forum.groups.any(Group.id == guest_group.id)).subquery()
             )
 
             forum_alias = aliased(Forum, guest_forums)

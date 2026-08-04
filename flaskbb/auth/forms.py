@@ -33,18 +33,14 @@ from flaskbb.utils.validators import add_recaptcha_field
 logger = logging.getLogger(__name__)
 
 USERNAME_RE = r"^[\w.+-]+$"
-is_valid_username = regexp(
-    USERNAME_RE, message=_("You can only use letters, numbers or dashes.")
-)
+is_valid_username = regexp(USERNAME_RE, message=_("You can only use letters, numbers or dashes."))
 
 
 @add_recaptcha_field()
 class LoginForm(FlaskBBForm):
     login = StringField(
         _("Username or Email address"),
-        validators=[
-            DataRequired(message=_("Please enter your username or email address."))
-        ],
+        validators=[DataRequired(message=_("Please enter your username or email address."))],
     )
 
     password = PasswordField(

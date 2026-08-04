@@ -24,9 +24,7 @@ def test_guest_user_cannot_see_hidden_posts(
         assert hidden_topic is None
 
 
-def test_regular_user_cannot_see_hidden_posts(
-    application, topic, user, request_context
-):
+def test_regular_user_cannot_see_hidden_posts(application, topic, user, request_context):
     topic.hide(user)
 
     logout_user()
@@ -35,16 +33,11 @@ def test_regular_user_cannot_see_hidden_posts(
         login_user(user)
 
         assert (
-            db.session.execute(
-                hidden(select(Topic).where(Topic.id == topic.id))
-            ).scalar()
-            is None
+            db.session.execute(hidden(select(Topic).where(Topic.id == topic.id))).scalar() is None
         )
 
 
-def test_moderator_user_can_see_hidden_posts(
-    application, topic, moderator_user, request_context
-):
+def test_moderator_user_can_see_hidden_posts(application, topic, moderator_user, request_context):
     topic.hide(moderator_user)
 
     logout_user()
@@ -53,9 +46,7 @@ def test_moderator_user_can_see_hidden_posts(
         login_user(moderator_user)
 
         assert (
-            db.session.execute(
-                hidden(select(Topic).where(Topic.id == topic.id))
-            ).scalar()
+            db.session.execute(hidden(select(Topic).where(Topic.id == topic.id))).scalar()
             is not None
         )
 
@@ -70,16 +61,12 @@ def test_super_moderator_user_can_see_hidden_posts(
     with application.test_client(user=super_moderator_user):
         login_user(super_moderator_user)
         assert (
-            db.session.execute(
-                hidden(select(Topic).where(Topic.id == topic.id))
-            ).scalar()
+            db.session.execute(hidden(select(Topic).where(Topic.id == topic.id))).scalar()
             is not None
         )
 
 
-def test_admin_user_can_see_hidden_posts(
-    application, topic, admin_user, request_context
-):
+def test_admin_user_can_see_hidden_posts(application, topic, admin_user, request_context):
     topic.hide(admin_user)
 
     logout_user()
@@ -87,8 +74,6 @@ def test_admin_user_can_see_hidden_posts(
     with application.test_client(user=admin_user):
         login_user(admin_user)
         assert (
-            db.session.execute(
-                hidden(select(Topic).where(Topic.id == topic.id))
-            ).scalar()
+            db.session.execute(hidden(select(Topic).where(Topic.id == topic.id))).scalar()
             is not None
         )

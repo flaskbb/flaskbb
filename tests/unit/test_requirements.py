@@ -69,9 +69,7 @@ def test_Fred_CannotEditLockedTopic(Fred, topic_locked, request_context):
     assert not r.CanEditPost(Fred)
 
 
-def test_Moderator_in_Forum_CanEditLockedTopic(
-    moderator_user, topic_locked, request_context
-):
+def test_Moderator_in_Forum_CanEditLockedTopic(moderator_user, topic_locked, request_context):
     push_onto_request_context(topic=topic_locked)
     assert r.CanEditPost(moderator_user)
 
@@ -131,9 +129,7 @@ def test_IsMorePrivilegedThan_ranks_mod_over_member(moderator_user, user):
     assert r.IsMorePrivilegedThan(user)(moderator_user)
 
 
-def test_IsMorePrivilegedThan_is_strict_between_equals(
-    moderator_user, other_moderator_user
-):
+def test_IsMorePrivilegedThan_is_strict_between_equals(moderator_user, other_moderator_user):
     assert not r.IsMorePrivilegedThan(other_moderator_user)(moderator_user)
 
 
@@ -141,9 +137,7 @@ def test_IsMorePrivilegedThan_is_false_for_self(moderator_user):
     assert not r.IsMorePrivilegedThan(moderator_user)(moderator_user)
 
 
-def test_IsMorePrivilegedThan_counts_secondary_groups(
-    user, moderator_user, default_groups
-):
+def test_IsMorePrivilegedThan_counts_secondary_groups(user, moderator_user, default_groups):
     """A privileged secondary group must outrank the primary group alone."""
     user.save(groups=[default_groups[0]])
     assert not r.IsMorePrivilegedThan(user)(moderator_user)
@@ -153,15 +147,11 @@ def test_CanEditTargetUser_mod_can_edit_member(moderator_user, user):
     assert r.CanEditTargetUser(user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_cannot_edit_other_mod(
-    moderator_user, other_moderator_user
-):
+def test_CanEditTargetUser_mod_cannot_edit_other_mod(moderator_user, other_moderator_user):
     assert not r.CanEditTargetUser(other_moderator_user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_cannot_edit_supermod(
-    moderator_user, super_moderator_user
-):
+def test_CanEditTargetUser_mod_cannot_edit_supermod(moderator_user, super_moderator_user):
     assert not r.CanEditTargetUser(super_moderator_user)(moderator_user)
 
 

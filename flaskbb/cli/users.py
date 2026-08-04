@@ -41,23 +41,20 @@ def users():
     help="The group of the user.",
     type=click.Choice(["admin", "super_mod", "mod", "member"]),
 )
-def new_user(
-    username: str | None, email: str | None, password: str | None, group: str | None
-):
+def new_user(username: str | None, email: str | None, password: str | None, group: str | None):
     """Creates a new user. Omit any options to use the interactive mode."""
     try:
         user = prompt_save_user(username, email, password, group)
 
         click.secho(
-            f"[+] User {user.username} with Email {user.email} in Group {user.primary_group.name} created.",
+            f"[+] User {user.username} with Email {user.email} in Group {user.primary_group.name} created.",  # noqa: E501
             fg="cyan",
         )
-    except IntegrityError:
+    except IntegrityError as e:
         raise FlaskBBCLIError(
-            "Couldn't create the user because the "
-            "username or email address is already taken.",
+            "Couldn't create the user because the username or email address is already taken.",
             fg="red",
-        )
+        ) from e
 
 
 @users.command("update")
@@ -76,9 +73,7 @@ def change_user(username, email, password, group):
 
     user = prompt_update_user(username, email, password, group)
     if user is None:
-        raise FlaskBBCLIError(
-            f"The user with username {username} does not exist.", fg="red"
-        )
+        raise FlaskBBCLIError(f"The user with username {username} does not exist.", fg="red")
 
     click.secho(f"[+] User {user.username} updated.", fg="cyan")
 
@@ -101,13 +96,9 @@ def delete_user(username, force):
             default=os.environ.get("USER", ""),
         )
 
-    user = db.session.execute(
-        db.select(User).filter_by(username=username)
-    ).scalar_one_or_none()
+    user = db.session.execute(db.select(User).filter_by(username=username)).scalar_one_or_none()
     if user is None:
-        raise FlaskBBCLIError(
-            f"The user with username {username} does not exist.", fg="red"
-        )
+        raise FlaskBBCLIError(f"The user with username {username} does not exist.", fg="red")
 
     if not force and not click.confirm(click.style("Are you sure?", fg="magenta")):
         sys.exit(0)

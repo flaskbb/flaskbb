@@ -13,9 +13,7 @@ class TestForceLoginHelpers:
     def test_would_not_force_login_for_anon_in_guest_allowed(self, forum, guest):
         assert not utils.should_force_login(guest, forum)
 
-    def test_would_force_login_for_anon_in_guest_unallowed(
-        self, database, guest, category
-    ):
+    def test_would_force_login_for_anon_in_guest_unallowed(self, database, guest, category):
         with database.session.no_autoflush:
             forum = Forum(title="no guest", category=category)
             forum.groups = Group.get_all(Group.guest == False)
@@ -41,6 +39,4 @@ class TestForceLoginHelpers:
                     "On GitHub Actions this test failed for whatever reason I cannot identify"
                 )
 
-            assert (
-                url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]
-            )
+            assert url_for(application.config["LOGIN_VIEW"]) in result.headers["Location"]

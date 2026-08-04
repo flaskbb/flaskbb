@@ -54,9 +54,7 @@ class EmailType(click.ParamType):
     name = "email"
 
     @override
-    def convert(
-        self, value: str, param: click.Parameter | None, ctx: click.Context | None
-    ):
+    def convert(self, value: str, param: click.Parameter | None, ctx: click.Context | None):
         # Exact match
         if re.match(_email_regex, value):
             return value
@@ -85,8 +83,8 @@ def validate_theme(theme: str):
     """Checks if a theme is installed."""
     try:
         get_theme(theme)
-    except KeyError:
-        raise FlaskBBCLIError(f"Theme {theme} not found.", fg="red")
+    except KeyError as e:
+        raise FlaskBBCLIError(f"Theme {theme} not found.", fg="red") from e
 
 
 def get_cookiecutter() -> object:
@@ -110,9 +108,7 @@ def get_cookiecutter() -> object:
 def get_version(ctx: click.Context, param: str | None, value: str | None) -> None:
     if not value or ctx.resilient_parsing:
         return
-    message = (
-        "FlaskBB %(version)s using Flask %(flask_version)s on Python %(python_version)s"
-    )
+    message = "FlaskBB %(version)s using Flask %(flask_version)s on Python %(python_version)s"
     click.echo(
         message
         % {
@@ -138,9 +134,7 @@ def prompt_save_user(
             default=os.environ.get("USER", ""),
         )
     if not email:
-        email = click.prompt(
-            click.style("Email address", fg="magenta"), type=EmailType()
-        )
+        email = click.prompt(click.style("Email address", fg="magenta"), type=EmailType())
     if not password:
         password = click.prompt(
             click.style("Password", fg="magenta"),
@@ -192,9 +186,7 @@ def prompt_config_path(config_path: str) -> str:
         ):
             break
 
-        config_path = click.prompt(
-            click.style("Save to", fg="magenta"), default=config_path
-        )
+        config_path = click.prompt(click.style("Save to", fg="magenta"), default=config_path)
 
         if not os.path.exists(config_path):
             break
@@ -202,9 +194,7 @@ def prompt_config_path(config_path: str) -> str:
     return config_path
 
 
-def write_config(
-    config: dict[str, bool | str | int], config_template: Template, config_path: str
-):
+def write_config(config: dict[str, bool | str | int], config_template: Template, config_path: str):
     """Writes a new config file based upon the config template.
 
     :param config: A dict containing all the key/value pairs which should be

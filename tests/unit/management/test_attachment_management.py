@@ -88,9 +88,7 @@ def test_bulk_delete_attachments(
     assert not on_disk.exists()
 
 
-def test_moderator_cannot_cleanup_or_purge(
-    default_settings, moderator_user, attachment
-):
+def test_moderator_cannot_cleanup_or_purge(default_settings, moderator_user, attachment):
     for view_cls in (views.CleanupAttachments, views.PurgeAttachments):
         response, messages = _post(view_cls.as_view("attachments"), moderator_user)
 
@@ -106,9 +104,7 @@ def test_cleanup_removes_row_with_missing_file(
     _backdate(attachment)
     (attachment_upload_path / str(attachment.post_id) / attachment.filename).unlink()
 
-    _response, messages = _post(
-        views.CleanupAttachments.as_view("cleanup_attachments"), admin_user
-    )
+    _response, messages = _post(views.CleanupAttachments.as_view("cleanup_attachments"), admin_user)
 
     assert Attachment.query.count() == 0
     assert (
@@ -124,17 +120,13 @@ def test_cleanup_removes_orphan_file(
     orphan_dir = attachment_upload_path / "999"
     orphan = _make_stale_file(orphan_dir, "stray")
 
-    _response, messages = _post(
-        views.CleanupAttachments.as_view("cleanup_attachments"), admin_user
-    )
+    _response, messages = _post(views.CleanupAttachments.as_view("cleanup_attachments"), admin_user)
 
     assert not orphan.exists()
     assert not orphan_dir.exists()
     # the attachment that is still backed by a file is left alone
     assert Attachment.query.count() == 1
-    assert (
-        attachment_upload_path / str(attachment.post_id) / attachment.filename
-    ).exists()
+    assert (attachment_upload_path / str(attachment.post_id) / attachment.filename).exists()
     assert (
         "success",
         "Removed 0 attachment(s) with a missing file and 1 orphaned file(s).",
@@ -196,9 +188,7 @@ def test_purge_removes_everything(
 
     orphan = _make_stale_file(attachment_upload_path / "999", "stray")
 
-    _response, messages = _post(
-        views.PurgeAttachments.as_view("purge_attachments"), admin_user
-    )
+    _response, messages = _post(views.PurgeAttachments.as_view("purge_attachments"), admin_user)
 
     assert Attachment.query.count() == 0
     assert not orphan.exists()
@@ -228,9 +218,7 @@ def test_attachments_list_renders_for_moderator(
     assert "/admin/attachments/cleanup" not in response
 
 
-def test_attachments_list_renders_admin_actions(
-    default_settings, no_csrf, admin_user, attachment
-):
+def test_attachments_list_renders_admin_actions(default_settings, no_csrf, admin_user, attachment):
     view = views.ManageAttachments.as_view("attachments")
 
     with views.current_app.test_request_context():
@@ -262,9 +250,7 @@ def test_attachments_search_matches_filename_and_uploader(
     view = views.ManageAttachments.as_view("attachments")
 
     for query in (attachment.original_filename[:5], attachment.user.username):
-        with views.current_app.test_request_context(
-            method="POST", data={"search_query": query}
-        ):
+        with views.current_app.test_request_context(method="POST", data={"search_query": query}):
             login_user(admin_user)
             response = view()
             logout_user()

@@ -40,14 +40,10 @@ class TestRegistrationService:
 
         assert ("username", "nope") in excinfo.value.reasons
 
-    def test_calls_failure_handlers_if_validation_fails(
-        self, plugin_manager, database, mocker
-    ):
+    def test_calls_failure_handlers_if_validation_fails(self, plugin_manager, database, mocker):
         service = self._get_service(plugin_manager, database)
         failure = mocker.MagicMock(spec=RegistrationFailureHandler)
-        plugin_manager.register(
-            self.impls(validator=RaisingValidator(), failure=failure)
-        )
+        plugin_manager.register(self.impls(validator=RaisingValidator(), failure=failure))
 
         with pytest.raises(StopValidation) as excinfo:
             service.register(self.fred)

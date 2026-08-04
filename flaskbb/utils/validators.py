@@ -30,11 +30,7 @@ def add_recaptcha_field(only_on_ratelimit: bool = False):
             from flaskbb.utils.helpers import enforce_recaptcha
 
             if flaskbb_config["RECAPTCHA_ENABLED"]:
-                if (
-                    not only_on_ratelimit
-                    or only_on_ratelimit
-                    and enforce_recaptcha(limiter)
-                ):
+                if not only_on_ratelimit or only_on_ratelimit and enforce_recaptcha(limiter):
 
                     class RecaptchaEnabledForm(cls):
                         recaptcha = RecaptchaField(_("Captcha"))

@@ -48,10 +48,7 @@ def postgresql_upgrade_sql():
             f"ALTER TABLE {table} ADD COLUMN search_vector tsvector "
             f"GENERATED ALWAYS AS (to_tsvector('english', {expr})) STORED"
         )
-        stmts.append(
-            f"CREATE INDEX ix_{table}_search_vector "
-            f"ON {table} USING gin (search_vector)"
-        )
+        stmts.append(f"CREATE INDEX ix_{table}_search_vector ON {table} USING gin (search_vector)")
     return stmts
 
 

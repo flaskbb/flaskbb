@@ -34,9 +34,7 @@ class SettingsRegistry:
         for setting in group.settings:
             normalized = setting.key.upper()
             if normalized in seen:
-                raise ValueError(
-                    f"Duplicate setting key in group {group.key!r}: {setting.key}"
-                )
+                raise ValueError(f"Duplicate setting key in group {group.key!r}: {setting.key}")
             seen.add(normalized)
 
         self._groups[group.key] = group
@@ -96,9 +94,7 @@ class SettingsRegistry:
 
     def _load(
         self,
-        hook_caller: Callable[
-            [], Sequence[SettingGroup] | Sequence[Sequence[SettingGroup]]
-        ],
+        hook_caller: Callable[[], Sequence[SettingGroup] | Sequence[Sequence[SettingGroup]]],
         *,
         is_plugin: bool,
     ) -> None:

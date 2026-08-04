@@ -10,13 +10,9 @@ from pluggy import HookimplMarker
 
 
 class TestDefaultDetailsUpdateHandler:
-    def test_raises_stop_validation_if_errors_occur(
-        self, mocker, user, database, plugin_manager
-    ):
+    def test_raises_stop_validation_if_errors_occur(self, mocker, user, database, plugin_manager):
         validator = mocker.Mock(spec=ChangeSetValidator)
-        validator.validate.side_effect = ValidationError(
-            "location", "Dont be from there"
-        )
+        validator.validate.side_effect = ValidationError("location", "Dont be from there")
 
         details = UserDetailsChange()
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
@@ -38,9 +34,7 @@ class TestDefaultDetailsUpdateHandler:
 
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
-        handler = DefaultDetailsUpdateHandler(
-            validators=[], db=db, plugin_manager=plugin_manager
-        )
+        handler = DefaultDetailsUpdateHandler(validators=[], db=db, plugin_manager=plugin_manager)
 
         with pytest.raises(PersistenceError) as excinfo:
             handler.apply_changeset(user, details)
@@ -48,32 +42,24 @@ class TestDefaultDetailsUpdateHandler:
         assert "Could not update details" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_users_details(
-        self, user, database, plugin_manager, mocker
-    ):
+    def test_actually_updates_users_details(self, user, database, plugin_manager, mocker):
         location = str(uuid4())
         details = UserDetailsChange(location=location)
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
-        handler = DefaultDetailsUpdateHandler(
-            db=database, plugin_manager=plugin_manager
-        )
+        handler = DefaultDetailsUpdateHandler(db=database, plugin_manager=plugin_manager)
 
         handler.apply_changeset(user, details)
         same_user = User.get_by(id=user.id)
 
         assert same_user.location == location
-        hook_impl.post_process_changeset.assert_called_once_with(
-            user=user, details_update=details
-        )
+        hook_impl.post_process_changeset.assert_called_once_with(user=user, details_update=details)
 
     @staticmethod
     def impl(post_processor):
         class Impl:
             @HookimplMarker("flaskbb")
             def flaskbb_details_updated(self, user, details_update):
-                post_processor.post_process_changeset(
-                    user=user, details_update=details_update
-                )
+                post_processor.post_process_changeset(user=user, details_update=details_update)
 
         return Impl()

@@ -129,9 +129,7 @@ def test_search_user(user):
 def test_search_result_supports_pagination(user):
     backend = SQLSearchBackend()
 
-    page = db.paginate(
-        backend.search(User, "test_normal"), page=1, per_page=10, error_out=False
-    )
+    page = db.paginate(backend.search(User, "test_normal"), page=1, per_page=10, error_out=False)
     assert user in page.items
 
 
@@ -394,18 +392,13 @@ def test_create_all_builds_sqlite_fts_schema(application):
         db.create_all()
         tables = (
             db.session.execute(
-                text(
-                    "SELECT name FROM sqlite_master "
-                    "WHERE type='table' AND name='posts_fts'"
-                )
+                text("SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'")
             )
             .scalars()
             .all()
         )
         triggers = (
-            db.session.execute(
-                text("SELECT name FROM sqlite_master WHERE type='trigger'")
-            )
+            db.session.execute(text("SELECT name FROM sqlite_master WHERE type='trigger'"))
             .scalars()
             .all()
         )
@@ -426,9 +419,7 @@ def test_create_all_skips_fts_schema_for_other_backends(database):
     """
     tables = (
         db.session.execute(
-            text(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'"
-            )
+            text("SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'")
         )
         .scalars()
         .all()

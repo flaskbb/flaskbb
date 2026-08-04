@@ -10,13 +10,9 @@ from pluggy import HookimplMarker
 
 
 class TestDefaultPasswordUpdateHandler:
-    def test_raises_stop_validation_if_errors_occur(
-        self, mocker, user, database, plugin_manager
-    ):
+    def test_raises_stop_validation_if_errors_occur(self, mocker, user, database, plugin_manager):
         validator = mocker.Mock(spec=ChangeSetValidator)
-        validator.validate.side_effect = ValidationError(
-            "new_password", "Don't use that password"
-        )
+        validator.validate.side_effect = ValidationError("new_password", "Don't use that password")
         password_change = PasswordUpdate(str(uuid4()), str(uuid4()))
         hook_impl = mocker.MagicMock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
@@ -35,9 +31,7 @@ class TestDefaultPasswordUpdateHandler:
         db.session.commit.side_effect = Exception("no")
         hook_impl = mocker.MagicMock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
-        handler = DefaultPasswordUpdateHandler(
-            db=db, plugin_manager=plugin_manager, validators=[]
-        )
+        handler = DefaultPasswordUpdateHandler(db=db, plugin_manager=plugin_manager, validators=[])
 
         with pytest.raises(PersistenceError) as excinfo:
             handler.apply_changeset(user, password_change)

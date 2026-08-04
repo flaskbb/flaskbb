@@ -66,9 +66,7 @@ class AttachmentFormMixin:
             ]
 
     def validate_new_attachments(self, field):
-        files = [
-            f for f in (field.data or []) if isinstance(f, FileStorage) and f.filename
-        ]
+        files = [f for f in (field.data or []) if isinstance(f, FileStorage) and f.filename]
         if not files:
             return
 
@@ -97,8 +95,7 @@ class AttachmentFormMixin:
             if ext not in allowed_types:
                 raise ValidationError(
                     _(
-                        "File type %(ext)s is not allowed. Allowed types "
-                        "are: %(types)s",
+                        "File type %(ext)s is not allowed. Allowed types are: %(types)s",
                         ext=ext,
                         types=", ".join(sorted(allowed_types)),
                     )
@@ -119,9 +116,7 @@ class AttachmentFormMixin:
 class PostForm(FlaskForm, AttachmentFormMixin):
     content = TextAreaField(
         _("Content"),
-        validators=[
-            DataRequired(message=_("You cannot post a reply without content."))
-        ],
+        validators=[DataRequired(message=_("You cannot post a reply without content."))],
     )
 
     submit = SubmitField(_("Reply"))
@@ -139,9 +134,7 @@ class QuickreplyForm(PostForm):
 
 
 class ReplyForm(PostForm):
-    track_topic = BooleanField(
-        _("Track this topic"), default=False, validators=[Optional()]
-    )
+    track_topic = BooleanField(_("Track this topic"), default=False, validators=[Optional()])
 
     def __init__(self, *args, **kwargs):
         self.post = kwargs.get("obj", None)
@@ -180,14 +173,10 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
 
     content = TextAreaField(
         _("Content"),
-        validators=[
-            DataRequired(message=_("You cannot post a reply without content."))
-        ],
+        validators=[DataRequired(message=_("You cannot post a reply without content."))],
     )
 
-    track_topic = BooleanField(
-        _("Track this topic"), default=False, validators=[Optional()]
-    )
+    track_topic = BooleanField(_("Track this topic"), default=False, validators=[Optional()])
 
     submit = SubmitField(_("Post topic"))
 
@@ -255,9 +244,7 @@ class EditTopicForm(TopicForm):
 class ReportForm(FlaskForm):
     reason = TextAreaField(
         _("Reason"),
-        validators=[
-            DataRequired(message=_("What is the reason for reporting this post?"))
-        ],
+        validators=[DataRequired(message=_("What is the reason for reporting this post?"))],
     )
 
     submit = SubmitField(_("Report post"))
@@ -268,9 +255,7 @@ class ReportForm(FlaskForm):
 
 
 class UserSearchForm(FlaskForm):
-    search_query = StringField(
-        _("Search"), validators=[DataRequired(), Length(min=3, max=50)]
-    )
+    search_query = StringField(_("Search"), validators=[DataRequired(), Length(min=3, max=50)])
 
     submit = SubmitField(_("Search"))
 

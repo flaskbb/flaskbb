@@ -50,18 +50,12 @@ def upgrade():
         sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_attachments_post_id"), "attachments", ["post_id"], unique=False
-    )
+    op.create_index(op.f("ix_attachments_post_id"), "attachments", ["post_id"], unique=False)
     # filename is the lookup key of the download url
-    op.create_index(
-        op.f("ix_attachments_filename"), "attachments", ["filename"], unique=True
-    )
+    op.create_index(op.f("ix_attachments_filename"), "attachments", ["filename"], unique=True)
 
     with op.batch_alter_table("groups", schema=None) as batch_op:
-        batch_op.add_column(
-            sa.Column("postattachment", sa.Boolean(), nullable=True, default=True)
-        )
+        batch_op.add_column(sa.Column("postattachment", sa.Boolean(), nullable=True, default=True))
 
     with op.batch_alter_table("groups", schema=None) as batch_op:
         groups = sa.sql.table(
@@ -71,18 +65,12 @@ def upgrade():
         )
         # exactly the groups that may post replies may attach files
         batch_op.execute(
-            groups.update()
-            .where(groups.c.postreply == True)
-            .values(postattachment=True)
+            groups.update().where(groups.c.postreply == True).values(postattachment=True)
         )
         batch_op.execute(
-            groups.update()
-            .where(groups.c.postreply != True)
-            .values(postattachment=False)
+            groups.update().where(groups.c.postreply != True).values(postattachment=False)
         )
-        batch_op.alter_column(
-            "postattachment", existing_type=sa.Boolean(), nullable=False
-        )
+        batch_op.alter_column("postattachment", existing_type=sa.Boolean(), nullable=False)
 
     # Seed the attachment settings rows for existing installs
     conn = op.get_bind()
@@ -95,9 +83,7 @@ def upgrade():
     existing_keys = {
         key.lower()
         for key in conn.execute(
-            sa.select(settings_table.c.key).where(
-                settings_table.c.group_key == "attachments"
-            )
+            sa.select(settings_table.c.key).where(settings_table.c.group_key == "attachments")
         ).scalars()
     }
     for key, value in ATTACHMENT_SETTINGS.items():

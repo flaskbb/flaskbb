@@ -97,9 +97,7 @@ def paginate(
     )
 
 
-def hidden(
-    stmt: sa.Select[t.Any], hidden: bool | None = None, *entities: type[HideableMixin]
-):
+def hidden(stmt: sa.Select[t.Any], hidden: bool | None = None, *entities: type[HideableMixin]):
     """Applies filtering for hidden items to a select statement.
 
     :param stmt: The SQLAlchemy select statement.

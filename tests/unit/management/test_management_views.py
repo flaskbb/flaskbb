@@ -244,9 +244,7 @@ def _edit_link(target):
     return f'"/admin/users/{target.id}/edit"'
 
 
-def test_users_list_renders_for_moderator(
-    default_settings, moderator_user, admin_user, user
-):
+def test_users_list_renders_for_moderator(default_settings, moderator_user, admin_user, user):
     """Covers the target-aware can_edit_user/can_ban_user filters in
     management/users.html - a signature mismatch there is a template error.
     """
@@ -264,9 +262,7 @@ def test_users_list_renders_for_admin(default_settings, admin_user, moderator_us
     assert _edit_link(moderator_user) in response
 
 
-def test_banned_users_list_renders_for_moderator(
-    default_settings, moderator_user, user
-):
+def test_banned_users_list_renders_for_moderator(default_settings, moderator_user, user):
     """Covers the same filters in management/banned_users.html."""
     user.ban()
     response = _render(views.BannedUsers.as_view("banned_users"), moderator_user)
@@ -275,9 +271,7 @@ def test_banned_users_list_renders_for_moderator(
     assert _edit_link(user) in response
 
 
-def test_profile_page_renders_for_moderator(
-    default_settings, moderator_user, admin_user
-):
+def test_profile_page_renders_for_moderator(default_settings, moderator_user, admin_user):
     """Covers the filters in user/profile_layout.html, which previously linked
     to the edit page for any target.
     """
@@ -318,9 +312,7 @@ def test_secondary_groups_exclude_the_targets_primary_group(
     """
     response, _messages = _edit(moderator_user.id, admin_user)
 
-    secondary = re.search(
-        r'<select[^>]*name="secondary_groups".*?</select>', response, re.S
-    )
+    secondary = re.search(r'<select[^>]*name="secondary_groups".*?</select>', response, re.S)
     assert secondary is not None
     offered = re.findall(r'value="([^"]*)"', secondary.group(0))
 
@@ -474,18 +466,14 @@ def test_admin_editing_self_gets_the_confirm_dialog(default_settings, admin_user
     assert "Change your own account?" in response
 
 
-def test_admin_editing_someone_else_gets_no_confirm_dialog(
-    default_settings, admin_user, user
-):
+def test_admin_editing_someone_else_gets_no_confirm_dialog(default_settings, admin_user, user):
     response, _messages = _edit(user.id, admin_user)
 
     assert 'id="confirm-self-change"' not in response
     assert "Change your own account?" not in response
 
 
-def test_super_moderator_self_edit_gets_no_confirm_dialog(
-    default_settings, super_moderator_user
-):
+def test_super_moderator_self_edit_gets_no_confirm_dialog(default_settings, super_moderator_user):
     """Nothing to confirm - they have neither the group nor the activation
     field on their own account.
     """
@@ -531,9 +519,7 @@ def test_admin_can_still_change_their_own_password(
     assert admin_user.permissions["admin"]
 
 
-def test_super_moderator_can_edit_themselves_without_groups(
-    default_settings, super_moderator_user
-):
+def test_super_moderator_can_edit_themselves_without_groups(default_settings, super_moderator_user):
     """A super moderator may hand out groups, but not to their own account -
     that would be a self-demotion or self-ban.
     """
@@ -597,9 +583,7 @@ def test_the_self_restriction_does_not_apply_to_other_admins(
     assert second_admin_user.primary_group_id == default_groups[3].id
 
 
-def test_admin_can_delete_all_of_a_users_posts(
-    default_settings, no_csrf, admin_user, user, topic
-):
+def test_admin_can_delete_all_of_a_users_posts(default_settings, no_csrf, admin_user, user, topic):
     view = views.DeleteUserPosts.as_view("delete_user_posts")
 
     with views.current_app.test_request_context(method="POST"):

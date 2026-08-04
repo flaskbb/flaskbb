@@ -25,8 +25,8 @@ class FlaskBBConfigProxy(MutableMapping[str, Any]):
         # only invoked when normal attribute lookup fails
         try:
             return Setting.as_dict()[key.upper()]
-        except KeyError:
-            raise AttributeError(f"No such setting: {key!r}")
+        except KeyError as e:
+            raise AttributeError(f"No such setting: {key!r}") from e
 
     @override
     def __getitem__(self, key: str):

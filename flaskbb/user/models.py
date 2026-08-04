@@ -91,15 +91,11 @@ class Group(db.Model, CRUDMixin):
 
     @classmethod
     def selectable_groups_choices(cls):
-        return db.session.execute(
-            db.select(cls.id, cls.name).order_by(cls.name.asc())
-        ).all()
+        return db.session.execute(db.select(cls.id, cls.name).order_by(cls.name.asc())).all()
 
     @classmethod
     def get_guest_group(cls) -> "Group":
-        return db.session.execute(
-            db.select(cls).filter(cls.guest.is_(True))
-        ).scalar_one()
+        return db.session.execute(db.select(cls).filter(cls.guest.is_(True))).scalar_one()
 
     @classmethod
     def get_member_group(cls) -> "Group":
@@ -143,18 +139,12 @@ class User(db.Model, UserMixin, CRUDMixin):
     activated: Mapped[bool] = mapped_column(default=False, nullable=False)
 
     theme: Mapped[str | None] = mapped_column(String(15), nullable=True)
-    language: Mapped[str | None] = mapped_column(
-        String(15), default="en", nullable=True
-    )
-    open_links_in_new_tab: Mapped[bool | None] = mapped_column(
-        default=None, nullable=True
-    )
+    language: Mapped[str | None] = mapped_column(String(15), default="en", nullable=True)
+    open_links_in_new_tab: Mapped[bool | None] = mapped_column(default=None, nullable=True)
 
     post_count: Mapped[int] = mapped_column(default=0)
 
-    primary_group_id: Mapped[int] = mapped_column(
-        ForeignKey("groups.id"), nullable=False
-    )
+    primary_group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), nullable=False)
 
     posts: Mapped[list[Post]] = relationship(
         "Post",
@@ -209,9 +199,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     def last_post(self):
         """Returns the latest post from the user."""
         return db.session.execute(
-            db.select(Post)
-            .filter(Post.user_id == self.id)
-            .order_by(Post.date_created.desc())
+            db.select(Post).filter(Post.user_id == self.id).order_by(Post.date_created.desc())
         ).scalar_one_or_none()
 
     @property
@@ -245,9 +233,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     def topic_count(self):
         """Returns the thread count."""
         return db.session.execute(
-            db.select(db.func.count())
-            .select_from(Topic)
-            .filter(Topic.user_id == self.id)
+            db.select(db.func.count()).select_from(Topic).filter(Topic.user_id == self.id)
         ).scalar_one()
 
     @property
@@ -313,9 +299,7 @@ class User(db.Model, UserMixin, CRUDMixin):
             )
             .order_by(Topic.id.desc())
         )
-        topics = db.paginate(
-            stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"]
-        )
+        topics = db.paginate(stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"])
         return topics
 
     def all_posts(self, page: int, viewer: "User"):

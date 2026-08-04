@@ -37,9 +37,7 @@ def test_login_rate_limit_message_without_a_current_limit(request_context):
     assert login_rate_limit_message() == "15 minutes"
 
 
-def test_login_rate_limit_message_uses_the_current_limits_reset_time(
-    request_context, monkeypatch
-):
+def test_login_rate_limit_message_uses_the_current_limits_reset_time(request_context, monkeypatch):
     flaskbb_config["AUTH_TIMEOUT"] = 15
     reset_at = int((time_utcnow() + timedelta(minutes=5, seconds=1)).timestamp())
     monkeypatch.setattr(
@@ -88,9 +86,7 @@ def test_enforce_recaptcha_without_a_current_limit(request_context):
     assert enforce_recaptcha(limiter) is False
 
 
-@pytest.mark.parametrize(
-    "remaining, expected", [(20, False), (18, False), (17, True), (0, True)]
-)
+@pytest.mark.parametrize("remaining, expected", [(20, False), (18, False), (17, True), (0, True)])
 def test_enforce_recaptcha_counts_the_requests_in_the_current_window(
     request_context, monkeypatch, remaining, expected
 ):
@@ -104,14 +100,10 @@ def test_enforce_recaptcha_counts_the_requests_in_the_current_window(
     assert enforce_recaptcha(limiter) is expected
 
 
-def test_enforce_recaptcha_after_repeated_logins(
-    application, clean_limiter, monkeypatch
-):
+def test_enforce_recaptcha_after_repeated_logins(application, clean_limiter, monkeypatch):
     """``RequestLimit.remaining`` is already decremented for the request being
     handled, so the captcha kicks in on the LOGIN_RECAPTCHA'th request."""
-    flaskbb_config.update(
-        {"AUTH_REQUESTS": 10, "AUTH_TIMEOUT": 15, "LOGIN_RECAPTCHA": 3}
-    )
+    flaskbb_config.update({"AUTH_REQUESTS": 10, "AUTH_TIMEOUT": 15, "LOGIN_RECAPTCHA": 3})
     credentials = {"login": "nobody", "password": "nothing"}
     observed = []
 

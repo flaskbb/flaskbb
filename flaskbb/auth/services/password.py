@@ -29,9 +29,7 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
-        user = db.session.execute(
-            db.select(self.users).filter_by(email=email)
-        ).scalar_one_or_none()
+        user = db.session.execute(db.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Invalid email"))

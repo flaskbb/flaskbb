@@ -112,9 +112,7 @@ def test_reply_form_rejects_without_permission(
         logout_user()
 
 
-def test_edit_form_deletes_attachment(
-    member_request, topic, attachment, attachment_upload_path
-):
+def test_edit_form_deletes_attachment(member_request, topic, attachment, attachment_upload_path):
     user = member_request
     post = topic.first_post
     file_path = attachment_upload_path / str(post.id) / attachment.filename
@@ -126,9 +124,7 @@ def test_edit_form_deletes_attachment(
         content="edited content",
         delete_attachments=str(attachment.id),
     )
-    assert form.delete_attachments.choices == [
-        (attachment.id, attachment.original_filename)
-    ]
+    assert form.delete_attachments.choices == [(attachment.id, attachment.original_filename)]
 
     assert form.validate()
     form.save(user, topic)

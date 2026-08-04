@@ -20,9 +20,7 @@ def upgrade():
         "forumgroups",
         sa.Column("group_id", sa.Integer(), nullable=False),
         sa.Column("forum_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["forum_id"], ["forums.id"], name="fk_forum_id", use_alter=True
-        ),
+        sa.ForeignKeyConstraint(["forum_id"], ["forums.id"], name="fk_forum_id", use_alter=True),
         sa.ForeignKeyConstraint(
             ["group_id"],
             ["groups.id"],

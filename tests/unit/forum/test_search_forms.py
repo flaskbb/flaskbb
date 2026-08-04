@@ -51,9 +51,7 @@ def test_memberlist_search_finds_user(application, topic):
             assert user.username in resp
 
 
-def test_banned_users_search_is_not_filtered_by_ban_status(
-    application, admin_user, user
-):
+def test_banned_users_search_is_not_filtered_by_ban_status(application, admin_user, user):
     """Documents an existing quirk (not a fix): BannedUsers' search
     path reuses UserSearchForm.get_results() directly and does not
     additionally filter by Group.banned, unlike its own non-search

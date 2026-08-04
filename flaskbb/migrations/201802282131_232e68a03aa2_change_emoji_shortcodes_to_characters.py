@@ -932,9 +932,7 @@ def do_the_thing(func):
             new_content = func(content)
             if not new_content == content:
                 conn.execute(
-                    table.update()
-                    .where(table.c.id == row.id)
-                    .values(**{column_name: new_content})
+                    table.update().where(table.c.id == row.id).values(**{column_name: new_content})
                 )
 
 

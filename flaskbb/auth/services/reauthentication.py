@@ -8,6 +8,7 @@ Tools for handling reauthentication needs inside FlaskBB.
 """
 
 import logging
+from typing import override
 
 from flask_babelplus import gettext as _
 from werkzeug.security import check_password_hash
@@ -66,11 +67,10 @@ class PluginReauthenticationManager(ReauthenticateManager):
         self.plugin_manager = plugin_manager
         self.session = session
 
+    @override
     def reauthenticate(self, user, secret):
         try:
-            result = self.plugin_manager.hook.flaskbb_reauth_attempt(
-                user=user, secret=secret
-            )
+            result = self.plugin_manager.hook.flaskbb_reauth_attempt(user=user, secret=secret)
             if not result:
                 raise StopAuthentication(_("Wrong password."))
             self.plugin_manager.hook.flaskbb_post_reauth(user=user)

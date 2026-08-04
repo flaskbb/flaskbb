@@ -197,9 +197,11 @@ testpaths = [
 src = ["flaskbb", "tests"]
 fix = true
 show-fixes = true
+line-length = 100
 output-format = "full"
 
 [tool.ruff.lint]
+extend-select = ["B", "Q"]
 ignore = [
     "E711",
     "E712",
@@ -217,6 +219,9 @@ select = [
 
 [tool.ruff.lint.isort]
 order-by-type = false
+
+[tool.ruff.lint.per-file-ignores]
+"flaskbb/migrations/*" = ["E501"]
 
 [tool.coverage.run]
 branch = true
@@ -310,8 +315,11 @@ commands = [["pre-commit", "run", "--all-files"]]
 [tool.tox.env.typing]
 description = "run static type checkers"
 dependency_groups = ["typing"]
+# Run both checkers even if the first one fails, so CI reports all findings.
+ignore_errors = true
 commands = [
     ["mypy"],
+    ["basedpyright", "--pythonpath", "{envpython}"],
 ]
 
 [tool.tox.env.docs]

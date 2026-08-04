@@ -22,15 +22,11 @@ class TestDefaultSettingsUpdateHandler:
         assert "Could not update settings" in str(excinfo.value)
         hook_impl.post_process_changeset.assert_not_called()
 
-    def test_actually_updates_password(
-        self, user: User, database, mocker, plugin_manager
-    ):
+    def test_actually_updates_password(self, user: User, database, mocker, plugin_manager):
         settings_update = SettingsUpdate(language="python", theme="molokai")
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
-        handler = DefaultSettingsUpdateHandler(
-            db=database, plugin_manager=plugin_manager
-        )
+        handler = DefaultSettingsUpdateHandler(db=database, plugin_manager=plugin_manager)
 
         handler.apply_changeset(user, settings_update)
         same_user = User.get_by(id=user.id)
@@ -46,8 +42,6 @@ class TestDefaultSettingsUpdateHandler:
         class Impl:
             @HookimplMarker("flaskbb")
             def flaskbb_settings_updated(self, user, settings_update):
-                post_processor.post_process_changeset(
-                    user=user, settings_update=settings_update
-                )
+                post_processor.post_process_changeset(user=user, settings_update=settings_update)
 
         return Impl()

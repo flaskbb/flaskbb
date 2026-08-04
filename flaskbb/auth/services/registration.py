@@ -71,9 +71,7 @@ class UsernameValidator(UserValidator):
         self._requirements = requirements
 
     def validate(self, user_info: "User"):
-        if not (
-            self._requirements.min <= len(user_info.username) <= self._requirements.max
-        ):
+        if not (self._requirements.min <= len(user_info.username) <= self._requirements.max):
             raise ValidationError(
                 "username",
                 _(
@@ -232,9 +230,7 @@ class RegistrationService(UserRegistrationService):
         if failures:
             raise StopValidation(failures)
 
-    def _handle_failure(
-        self, user_info: UserRegistrationInfo, failures: tuple[str, str]
-    ):
+    def _handle_failure(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
         self.plugins.hook.flaskbb_registration_failure_handler(
             user_info=user_info, failures=failures
         )
@@ -252,9 +248,9 @@ class RegistrationService(UserRegistrationService):
             self.db.session.add(user)
             self.db.session.commit()
             return user
-        except Exception:
+        except Exception as e:
             self.db.session.rollback()
-            raise PersistenceError("Could not persist user")
+            raise PersistenceError("Could not persist user") from e
 
     def _post_process(self, user: User):
         self.plugins.hook.flaskbb_registration_post_processor(user=user)

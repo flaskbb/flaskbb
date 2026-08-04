@@ -46,7 +46,7 @@ def ordered_by_ids(model: ModelT, ids: Sequence[int]) -> Select[Any]:
 class SearchBackend(ABC):
     """Pluggable full-text/attribute search over FlaskBB models."""
 
-    def init_app(self, app: Flask) -> None:
+    def init_app(self, app: Flask) -> None:  # noqa: B027 - optional hook, not all backends need it
         """Register this backend on the app."""
 
     @abstractmethod
@@ -75,9 +75,7 @@ class SearchBackend(ABC):
         this backend.
         """
 
-    def search_multi(
-        self, models: Mapping[str, ModelT], query: str
-    ) -> dict[str, Select[Any]]:
+    def search_multi(self, models: Mapping[str, ModelT], query: str) -> dict[str, Select[Any]]:
         """Search several models at once. `models` maps a result-dict key
         ("post", "topic", "forum", "user") to the model class. Returns a
         dict containing only the given keys, each mapped to the same

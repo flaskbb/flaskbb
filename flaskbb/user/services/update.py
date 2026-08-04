@@ -45,9 +45,7 @@ class DefaultDetailsUpdateHandler(ChangeSetHandler[User, UserDetailsChange]):
         accumulate_errors(lambda v: v.validate(model, changeset), self.validators)
         changeset.assign_to_user(model)
         try_commit(self.db.session, "Could not update details")
-        self.plugin_manager.hook.flaskbb_details_updated(
-            user=model, details_update=changeset
-        )
+        self.plugin_manager.hook.flaskbb_details_updated(user=model, details_update=changeset)
 
 
 @define(eq=False, order=False, frozen=True, repr=True, hash=False)
@@ -104,9 +102,7 @@ class DefaultEmailUpdateHandler(ChangeSetHandler[User, EmailUpdate]):
         accumulate_errors(lambda v: v.validate(model, changeset), self.validators)
         model.email = changeset.new_email
         try_commit(self.db.session, "Could not update email")
-        self.plugin_manager.hook.flaskbb_email_updated(
-            user=model, email_update=changeset
-        )
+        self.plugin_manager.hook.flaskbb_email_updated(user=model, email_update=changeset)
 
 
 @define(eq=False, order=False, frozen=True, repr=True, hash=False)
@@ -122,6 +118,4 @@ class DefaultSettingsUpdateHandler(ChangeSetHandler[User, SettingsUpdate]):
     def apply_changeset(self, model: User, changeset: SettingsUpdate):
         changeset.assign_to_user(model)
         try_commit(self.db.session, "Could not update settings")
-        self.plugin_manager.hook.flaskbb_settings_updated(
-            user=model, settings_update=changeset
-        )
+        self.plugin_manager.hook.flaskbb_settings_updated(user=model, settings_update=changeset)

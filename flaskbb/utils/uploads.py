@@ -54,9 +54,7 @@ def delete_avatar_file(filename: str | None):
 
 def get_attachment_upload_path() -> str:
     if current_app.config.get("ATTACHMENT_UPLOAD_PATH", None) is None:
-        return os.path.join(
-            current_app.static_folder or "static", "uploads", "attachments"
-        )
+        return os.path.join(current_app.static_folder or "static", "uploads", "attachments")
     return current_app.config["ATTACHMENT_UPLOAD_PATH"]
 
 
@@ -80,13 +78,9 @@ def delete_attachment_file(post_id: int, stored_filename: str):
         except OSError:
             pass
     except PermissionError:
-        logger.error(
-            f"You do not have permission to delete this file: {stored_filename}"
-        )
+        logger.error(f"You do not have permission to delete this file: {stored_filename}")
     except IsADirectoryError:
-        logger.error(
-            f"The specified path is a directory, not a file: {stored_filename}"
-        )
+        logger.error(f"The specified path is a directory, not a file: {stored_filename}")
     except Exception as e:
         logger.error(f"An unexpected error occurred: {e}")
 
@@ -221,22 +215,12 @@ def validate_image(file: FileStorage):
         )
         return error, False
 
-    if (
-        flaskbb_config["AVATAR_WIDTH"]
-        and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]
-    ):
-        error = "Image is too wide! {}px width is allowed.".format(
-            flaskbb_config["AVATAR_WIDTH"]
-        )
+    if flaskbb_config["AVATAR_WIDTH"] and img_info["width"] > flaskbb_config["AVATAR_WIDTH"]:
+        error = "Image is too wide! {}px width is allowed.".format(flaskbb_config["AVATAR_WIDTH"])
         return error, False
 
-    if (
-        flaskbb_config["AVATAR_HEIGHT"]
-        and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]
-    ):
-        error = "Image is too high! {}px height is allowed.".format(
-            flaskbb_config["AVATAR_HEIGHT"]
-        )
+    if flaskbb_config["AVATAR_HEIGHT"] and img_info["height"] > flaskbb_config["AVATAR_HEIGHT"]:
+        error = "Image is too high! {}px height is allowed.".format(flaskbb_config["AVATAR_HEIGHT"])
         return error, False
 
     return error, True

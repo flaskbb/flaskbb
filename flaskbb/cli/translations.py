@@ -29,9 +29,7 @@ def translations():
 
 
 @translations.command("new")
-@click.option(
-    "--plugin", "-p", type=click.STRING, help="Adds a new language to a plugin."
-)
+@click.option("--plugin", "-p", type=click.STRING, help="Adds a new language to a plugin.")
 @click.argument("lang")
 def new_translation(lang, plugin):
     """Adds a new language to the translations. "lang" is the language code

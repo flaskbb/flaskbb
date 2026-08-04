@@ -16,15 +16,11 @@ pytestmark = pytest.mark.usefixtures("default_settings")
 
 class TestBlockTooManyFailedLogins:
     provider = auth.BlockTooManyFailedLogins(
-        auth.FailedLoginConfiguration(
-            limit=1, lockout_window=datetime.timedelta(hours=1)
-        )
+        auth.FailedLoginConfiguration(limit=1, lockout_window=datetime.timedelta(hours=1))
     )
 
     @freeze_time(datetime.datetime(2018, 1, 1, 13, 30))
-    def test_raises_StopAuthentication_if_user_is_at_limit_and_inside_window(
-        self, Fred
-    ):
+    def test_raises_StopAuthentication_if_user_is_at_limit_and_inside_window(self, Fred):
         Fred.last_failed_login = datetime.datetime(2018, 1, 1, 14, tzinfo=datetime.UTC)
         Fred.login_attempts = 1
 

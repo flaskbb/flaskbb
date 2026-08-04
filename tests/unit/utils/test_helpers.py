@@ -103,6 +103,8 @@ def test_is_online(default_settings, user):
 
 
 def test_format_quote(topic):
-    expected_markdown = "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
+    expected_markdown = (
+        "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
+    )
     actual = format_quote(topic.first_post.username, topic.first_post.content)
     assert actual == expected_markdown

@@ -58,9 +58,7 @@ logger = logging.getLogger(__name__)
 @define(frozen=True, eq=False, order=False, hash=False, repr=True)
 class UserSettings(MethodView):
     form: GeneralSettingsForm = field(factory=settings_form_factory)
-    settings_update_handler: DefaultSettingsUpdateHandler = field(
-        factory=settings_update_handler
-    )
+    settings_update_handler: DefaultSettingsUpdateHandler = field(factory=settings_update_handler)
 
     decorators = [login_required]
 
@@ -95,9 +93,7 @@ class UserSettings(MethodView):
 @define(frozen=True, hash=False, eq=False, order=False, repr=True)
 class ChangePassword(MethodView):
     form: ChangePasswordForm = field(factory=change_password_form_factory)
-    password_update_handler: DefaultPasswordUpdateHandler = field(
-        factory=password_update_handler
-    )
+    password_update_handler: DefaultPasswordUpdateHandler = field(factory=password_update_handler)
     decorators = [login_required]
 
     def get(self):
@@ -131,9 +127,7 @@ class ChangePassword(MethodView):
 @define(frozen=True, eq=False, order=False, hash=False, repr=True)
 class ChangeEmail(MethodView):
     form: ChangeEmailForm = field(factory=change_email_form_factory)
-    update_email_handler: DefaultEmailUpdateHandler = field(
-        factory=email_update_handler
-    )
+    update_email_handler: DefaultEmailUpdateHandler = field(factory=email_update_handler)
     decorators = [login_required]
 
     def get(self):
@@ -142,9 +136,7 @@ class ChangeEmail(MethodView):
     def post(self):
         if self.form.validate_on_submit():
             try:
-                self.update_email_handler.apply_changeset(
-                    real(current_user), self.form.as_change()
-                )
+                self.update_email_handler.apply_changeset(real(current_user), self.form.as_change())
             except StopValidation as e:
                 self.form.populate_errors(e.reasons)
                 return self.render()
@@ -167,9 +159,7 @@ class ChangeEmail(MethodView):
 @define(frozen=True, eq=False, order=False, hash=False, repr=True)
 class ChangeAvatar(MethodView):
     form: ChangeAvatarForm = field(factory=change_avatar_form_factory)
-    update_avatar_handler: DefaultAvatarUpdateHandler = field(
-        factory=avatar_update_handler
-    )
+    update_avatar_handler: DefaultAvatarUpdateHandler = field(factory=avatar_update_handler)
     decorators = [login_required]
 
     def get(self):
@@ -194,9 +184,7 @@ class ChangeAvatar(MethodView):
         return self.render()
 
     def render(self):
-        return render_template(
-            "user/change_avatar.html", form=self.form, user=current_user
-        )
+        return render_template("user/change_avatar.html", form=self.form, user=current_user)
 
     def redirect(self):
         return redirect(url_for("user.change_avatar"))
@@ -237,9 +225,7 @@ class DeleteAvatar(MethodView):
 @define(frozen=True, repr=True, eq=False, order=False, hash=False)
 class ChangeUserDetails(MethodView):
     form: ChangeUserDetailsForm = field(factory=change_details_form_factory)
-    details_update_handler: DefaultDetailsUpdateHandler = field(
-        factory=details_update_factory
-    )
+    details_update_handler: DefaultDetailsUpdateHandler = field(factory=details_update_factory)
     decorators = [login_required]
 
     def get(self):
@@ -295,12 +281,8 @@ class UserProfile(MethodView):  # pragma: no cover
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app: Flask):
     user = Blueprint("user", __name__)
-    register_view(
-        user, routes=["/settings/email"], view_func=ChangeEmail.as_view("change_email")
-    )
-    register_view(
-        user, routes=["/settings/general"], view_func=UserSettings.as_view("settings")
-    )
+    register_view(user, routes=["/settings/email"], view_func=ChangeEmail.as_view("change_email"))
+    register_view(user, routes=["/settings/general"], view_func=UserSettings.as_view("settings"))
     register_view(
         user,
         routes=["/settings/password"],
@@ -332,8 +314,6 @@ def flaskbb_load_blueprints(app: Flask):
         view_func=AllUserTopics.as_view("view_all_topics"),
     )
 
-    register_view(
-        user, routes=["/<username>"], view_func=UserProfile.as_view("profile")
-    )
+    register_view(user, routes=["/<username>"], view_func=UserProfile.as_view("profile"))
 
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])

@@ -14,13 +14,9 @@ def random_email():
 
 
 class TestDefaultEmailUpdateHandler:
-    def test_raises_stop_validation_if_errors_occur(
-        self, mocker, user, database, plugin_manager
-    ):
+    def test_raises_stop_validation_if_errors_occur(self, mocker, user, database, plugin_manager):
         validator = mocker.Mock(spec=ChangeSetValidator)
-        validator.validate.side_effect = ValidationError(
-            "new_email", "That's not even valid"
-        )
+        validator.validate.side_effect = ValidationError("new_email", "That's not even valid")
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
         email_change = EmailUpdate(user.email, random_email())
@@ -40,9 +36,7 @@ class TestDefaultEmailUpdateHandler:
         db.session.commit.side_effect = Exception("no")
         hook_impl = mocker.Mock(spec=ChangeSetPostProcessor)
         plugin_manager.register(self.impl(hook_impl))
-        handler = DefaultEmailUpdateHandler(
-            db=db, validators=[], plugin_manager=plugin_manager
-        )
+        handler = DefaultEmailUpdateHandler(db=db, validators=[], plugin_manager=plugin_manager)
 
         with pytest.raises(PersistenceError) as excinfo:
             handler.apply_changeset(user, email_change)
@@ -71,8 +65,6 @@ class TestDefaultEmailUpdateHandler:
         class Impl:
             @HookimplMarker("flaskbb")
             def flaskbb_email_updated(self, user, email_update):
-                post_processor.post_process_changeset(
-                    user=user, email_update=email_update
-                )
+                post_processor.post_process_changeset(user=user, email_update=email_update)
 
         return Impl()

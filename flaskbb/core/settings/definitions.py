@@ -62,9 +62,7 @@ class IntSetting(SettingDefinition):
 class BoolSetting(SettingDefinition):
     @override
     def wtf_field(self):
-        return wtf_fields.BooleanField(
-            self.name, description=self.description, default=self.value
-        )
+        return wtf_fields.BooleanField(self.name, description=self.description, default=self.value)
 
 
 @dataclass(frozen=True)
@@ -76,9 +74,7 @@ class StringSetting(SettingDefinition):
     def wtf_field(self):
         validators = []
         if self.min is not None or self.max is not None:
-            validators.append(
-                wtf_validators.Length(min=self.min or 0, max=self.max or -1)
-            )
+            validators.append(wtf_validators.Length(min=self.min or 0, max=self.max or -1))
         return wtf_fields.StringField(
             self.name,
             description=self.description,

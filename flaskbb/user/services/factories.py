@@ -34,18 +34,14 @@ from .update import (
 
 def details_update_factory():
     validators = list(
-        chain.from_iterable(
-            pluggy.hook.flaskbb_gather_details_update_validators(app=current_app)
-        )
+        chain.from_iterable(pluggy.hook.flaskbb_gather_details_update_validators(app=current_app))
     )
     return DefaultDetailsUpdateHandler(db, pluggy, validators)
 
 
 def password_update_handler():
     validators = list(
-        chain.from_iterable(
-            pluggy.hook.flaskbb_gather_password_validators(app=current_app)
-        )
+        chain.from_iterable(pluggy.hook.flaskbb_gather_password_validators(app=current_app))
     )
 
     return DefaultPasswordUpdateHandler(db, pluggy, validators)
@@ -53,9 +49,7 @@ def password_update_handler():
 
 def email_update_handler():
     validators = list(
-        chain.from_iterable(
-            pluggy.hook.flaskbb_gather_email_validators(app=current_app)
-        )
+        chain.from_iterable(pluggy.hook.flaskbb_gather_email_validators(app=current_app))
     )
 
     return DefaultEmailUpdateHandler(db, pluggy, validators)
@@ -63,9 +57,7 @@ def email_update_handler():
 
 def avatar_update_handler():
     validators = list(
-        chain.from_iterable(
-            pluggy.hook.flaskbb_gather_avatar_validators(app=current_app)
-        )
+        chain.from_iterable(pluggy.hook.flaskbb_gather_avatar_validators(app=current_app))
     )
     return DefaultAvatarUpdateHandler(db, pluggy, validators)
 

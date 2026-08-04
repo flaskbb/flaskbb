@@ -28,7 +28,7 @@ frontend-dark: ## Runs the webpack server which watches for changes in flaskbb/t
 	cd flaskbb/themes/aurora && npm run watch
 
 dev-plugins: ## Install the plugins as editable
-	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations
+	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote
 
 devconfig:dependencies ## Generates a development config
 	uv run flaskbb makeconfig -d

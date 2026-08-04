@@ -24,9 +24,7 @@ def test_create_user(default_groups):
 def test_create_welcome_forum(default_groups):
     assert not create_welcome_forum()
 
-    create_user(
-        username="admin", password="test", email="test@example.org", groupname="admin"
-    )
+    create_user(username="admin", password="test", email="test@example.org", groupname="admin")
     assert create_welcome_forum()
 
 

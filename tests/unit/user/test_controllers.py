@@ -59,9 +59,7 @@ class TestUserSettingsView:
         "choice,expected",
         [("inherit", None), ("yes", True), ("no", False)],
     )
-    def test_update_user_settings_open_links_in_new_tab(
-        self, user, mocker, choice, expected
-    ):
+    def test_update_user_settings_open_links_in_new_tab(self, user, mocker, choice, expected):
         form = self.produce_form(
             data={
                 "language": "python",
@@ -98,9 +96,7 @@ class TestUserSettingsView:
     def test_update_user_settings_fail_with_stopvalidation_error(self, mocker):
         form = self.produce_form(data={"language": "python", "theme": "molokai"})
         handler = mocker.Mock(spec=ChangeSetHandler)
-        handler.apply_changeset.side_effect = StopValidation(
-            [("theme", "Solarized is better")]
-        )
+        handler.apply_changeset.side_effect = StopValidation([("theme", "Solarized is better")])
         view = UserSettings(form=form, settings_update_handler=handler)
 
         view.post()
@@ -263,9 +259,7 @@ class TestChangeEmailView:
             confirm_new_email="new@e.mail",
         )
         handler = mocker.Mock(spec=ChangeSetHandler)
-        handler.apply_changeset.side_effect = StopValidation(
-            [("new_email", "bad email")]
-        )
+        handler.apply_changeset.side_effect = StopValidation([("new_email", "bad email")])
         view = ChangeEmail(form=form, update_email_handler=handler)
 
         view.post()
@@ -290,9 +284,7 @@ class TestChangeEmailView:
         assert result.headers["Location"] == url_for("user.change_email")
 
     def produce_form(self, **data):
-        return ChangeEmailForm(
-            formdata=MultiDict(data), user=current_user, meta={"csrf": False}
-        )
+        return ChangeEmailForm(formdata=MultiDict(data), user=current_user, meta={"csrf": False})
 
 
 class TestChangeUserDetailsView:
@@ -352,9 +344,7 @@ class TestChangeUserDetailsView:
 
         view.post()
 
-        assert form.errors == {
-            "birthday": ["I just want you to know that's a great birthday"]
-        }
+        assert form.errors == {"birthday": ["I just want you to know that's a great birthday"]}
 
     def test_update_user_fails_with_persistence_error(self, mocker):
         form = self.produce_form(birthday="2000-4-25")

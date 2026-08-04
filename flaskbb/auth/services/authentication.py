@@ -59,25 +59,18 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
 
     def authenticate(self, identifier, secret):
         user = db.session.execute(
-            db.select(User).filter(
-                db.or_(User.username == identifier, User.email == identifier)
-            )
+            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
             attempts = user.login_attempts
             last_attempt = user.last_failed_login or datetime.min.replace(tzinfo=UTC)
             reached_attempt_limit = attempts >= self.configuration.limit
-            inside_lockout = (
-                last_attempt + self.configuration.lockout_window
-            ) >= time_utcnow()
+            inside_lockout = (last_attempt + self.configuration.lockout_window) >= time_utcnow()
 
             if reached_attempt_limit and inside_lockout:
                 raise StopAuthentication(
-                    _(
-                        "Your account is currently locked out due to too many "
-                        "failed login attempts"
-                    )
+                    _("Your account is currently locked out due to too many failed login attempts")
                 )
 
 
@@ -94,9 +87,7 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
 
     def authenticate(self, identifier: str, secret: str):
         user = db.session.execute(
-            db.select(User).filter(
-                db.or_(User.username == identifier, User.email == identifier)
-            )
+            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -116,9 +107,7 @@ class MarkFailedLogin(AuthenticationFailureHandler):
 
     def handle_authentication_failure(self, identifier: str):
         user = db.session.execute(
-            db.select(User).filter(
-                db.or_(User.username == identifier, User.email == identifier)
-            )
+            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -173,9 +162,7 @@ class PluginAuthenticationManager(AuthenticationManager):
             self.plugin_manager.hook.flaskbb_post_authenticate(user=user)
             return user
         except StopAuthentication:
-            self.plugin_manager.hook.flaskbb_authentication_failed(
-                identifier=identifier
-            )
+            self.plugin_manager.hook.flaskbb_authentication_failed(identifier=identifier)
             raise
         finally:
             try:

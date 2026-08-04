@@ -26,9 +26,7 @@ def upgrade():
     op.add_column("settings", sa.Column("value_json", sa.Text(), nullable=True))
 
     # Add the group_key column
-    op.add_column(
-        "settings", sa.Column("group_key", sa.String(length=255), nullable=True)
-    )
+    op.add_column("settings", sa.Column("group_key", sa.String(length=255), nullable=True))
     op.create_index("ix_settings_group_key", "settings", ["group_key"], unique=False)
 
     # 2. Read every row, unpickle the old value, dump it as JSON
@@ -41,16 +39,14 @@ def upgrade():
         sa.column("group_key", sa.String),
     )
     rows = conn.execute(
-        sa.select(
-            settings_table.c.key, settings_table.c.value, settings_table.c.settingsgroup
-        )
+        sa.select(settings_table.c.key, settings_table.c.value, settings_table.c.settingsgroup)
     ).fetchall()
     for key, raw_value, group_key in rows:
         print(group_key, key, raw_value)
         try:
             python_value = pickle.loads(raw_value)
         except Exception as e:
-            raise RuntimeError(f"Could not unpickle setting '{key}': {e}")
+            raise RuntimeError(f"Could not unpickle setting '{key}': {e}") from e
         conn.execute(
             settings_table.update()
             .where(settings_table.c.key == key)

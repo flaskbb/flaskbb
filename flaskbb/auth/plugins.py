@@ -87,9 +87,7 @@ def flaskbb_errorhandlers(app):
 
 @impl
 def flaskbb_gather_registration_validators():
-    blacklist = [
-        w.strip() for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")
-    ]
+    blacklist = [w.strip() for w in flaskbb_config["AUTH_USERNAME_BLACKLIST"].split(",")]
 
     requirements = UsernameRequirements(
         min=flaskbb_config["AUTH_USERNAME_MIN_LENGTH"],

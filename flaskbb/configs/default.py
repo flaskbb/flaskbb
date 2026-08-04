@@ -86,9 +86,7 @@ class DefaultConfig:
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "standard": {
-                "format": "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"
-            },
+            "standard": {"format": "%(asctime)s %(levelname)-7s %(name)-25s %(message)s"},
             "advanced": {
                 "format": "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
             },
@@ -168,7 +166,7 @@ class DefaultConfig:
     ALEMBIC = {
         "script_location": os.path.join(basedir, "flaskbb/migrations"),
         "version_locations": "",
-        "file_template": "%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s",
+        "file_template": "%%(year)d%%(month).2d%%(day).2d%%(hour).2d%%(minute).2d_%%(rev)s_%%(slug)s",  # noqa: E501
     }
     ALEMBIC_CONTEXT = {"render_as_batch": True}
 

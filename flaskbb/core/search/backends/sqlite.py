@@ -35,9 +35,7 @@ from flaskbb.forum.models import Topic
 _SEARCH_LIMIT = 1000
 
 # model -> FTS virtual table name (`<table>_fts`).
-_FTS_TABLES: dict[ModelT, str] = {
-    model: f"{table}_fts" for model, table, _cols in INDEX_SPECS
-}
+_FTS_TABLES: dict[ModelT, str] = {model: f"{table}_fts" for model, table, _cols in INDEX_SPECS}
 
 
 def _fts_query(query: str) -> str:
@@ -129,10 +127,7 @@ class SQLiteSearchBackend(SearchBackend):
     def _ranked_ids(self, fts: str, fts_query: str) -> list[int]:
         # `fts` is an internal constant, never user input. bm25() returns
         # a lower score for better matches, so ascending order is best-first.
-        stmt = text(
-            f"SELECT rowid FROM {fts} WHERE {fts} MATCH :q "
-            f"ORDER BY bm25({fts}) LIMIT :lim"
-        )
+        stmt = text(f"SELECT rowid FROM {fts} WHERE {fts} MATCH :q ORDER BY bm25({fts}) LIMIT :lim")
         rows = db.session.execute(stmt, {"q": fts_query, "lim": _SEARCH_LIMIT})
         return list(rows.scalars())
 

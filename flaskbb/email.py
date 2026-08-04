@@ -31,12 +31,8 @@ def send_reset_token(token: str, username: str, email: str):
     send_email(
         subject=_("Password Recovery Confirmation"),
         recipients=[email],
-        text_body=render_template(
-            "email/reset_password.txt", username=username, token=token
-        ),
-        html_body=render_template(
-            "email/reset_password.html", username=username, token=token
-        ),
+        text_body=render_template("email/reset_password.txt", username=username, token=token),
+        html_body=render_template("email/reset_password.html", username=username, token=token),
     )
 
 
@@ -51,12 +47,8 @@ def send_activation_token(token: str, username: str, email: str):
     send_email(
         subject=_("Account Activation"),
         recipients=[email],
-        text_body=render_template(
-            "email/activate_account.txt", username=username, token=token
-        ),
-        html_body=render_template(
-            "email/activate_account.html", username=username, token=token
-        ),
+        text_body=render_template("email/activate_account.txt", username=username, token=token),
+        html_body=render_template("email/activate_account.html", username=username, token=token),
     )
 
 

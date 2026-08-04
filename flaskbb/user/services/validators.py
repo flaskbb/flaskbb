@@ -113,5 +113,5 @@ class ValidateAvatarImage(ChangeSetValidator[User, AvatarUpdate]):
             error, __ = validate_image(changeset.avatar)
             if error:
                 raise ValidationError("avatar", error)
-        except RequestException:
-            raise ValidationError("avatar", _("Could not retrieve avatar"))
+        except RequestException as e:
+            raise ValidationError("avatar", _("Could not retrieve avatar")) from e

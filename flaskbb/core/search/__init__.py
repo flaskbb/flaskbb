@@ -67,8 +67,7 @@ def _plugin_backends(
                 )
             if reg.name in registry:
                 raise ValueError(
-                    f"Search backend {reg.name!r} is registered by more than "
-                    f"one plugin."
+                    f"Search backend {reg.name!r} is registered by more than one plugin."
                 )
             registry[reg.name] = reg.backend
     return registry
@@ -91,11 +90,7 @@ class FlaskBBSearch(SearchBackend):
         name = app.config.get("SEARCH_BACKEND", "sql")
         # Always collected, so a plugin colliding with a built-in is caught
         # even when that built-in is the backend actually selected.
-        plugins = (
-            _plugin_backends(self._plugin_manager)
-            if self._plugin_manager is not None
-            else {}
-        )
+        plugins = _plugin_backends(self._plugin_manager) if self._plugin_manager is not None else {}
         backend_cls = _resolve_core(name) or plugins.get(name)
         if backend_cls is None:
             choices = sorted({*_CORE_BACKENDS, *plugins})
@@ -125,9 +120,7 @@ class FlaskBBSearch(SearchBackend):
         return self._get_impl().search(model, query)
 
     @override
-    def search_multi(
-        self, models: Mapping[str, ModelT], query: str
-    ) -> dict[str, Select[Any]]:
+    def search_multi(self, models: Mapping[str, ModelT], query: str) -> dict[str, Select[Any]]:
         return self._get_impl().search_multi(models, query)
 
     @override

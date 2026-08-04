@@ -19,9 +19,7 @@ def upgrade():
     # read here for more info: http://alembic.zzzcomputing.com/en/latest/ops.html#alembic.operations.Operations.batch_alter_table
     with op.batch_alter_table("users", schema=None) as batch_op:
         batch_op.add_column(sa.Column("activated", sa.Boolean(), nullable=True))
-        batch_op.add_column(
-            sa.Column("last_failed_login", sa.DateTime(), nullable=True)
-        )
+        batch_op.add_column(sa.Column("last_failed_login", sa.DateTime(), nullable=True))
         batch_op.add_column(sa.Column("login_attempts", sa.Integer(), nullable=True))
     ### end Alembic commands ###
 

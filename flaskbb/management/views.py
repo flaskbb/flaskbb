@@ -115,9 +115,7 @@ class ManagementOverview(MethodView):
 
     def get(self):
         # user and group stats
-        banned_users = User.count(
-            clause=[Group.banned == True, Group.id == User.primary_group_id]
-        )
+        banned_users = User.count(clause=[Group.banned == True, Group.id == User.primary_group_id])
         if not current_app.config["REDIS_ENABLED"]:
             online_users = User.count(User.lastseen >= time_diff())
         else:
@@ -125,9 +123,7 @@ class ManagementOverview(MethodView):
 
         unread_reports = Report.count(Report.zapped == None)
 
-        python_version = (
-            f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}"
-        )
+        python_version = f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}"
 
         stats = {
             "current_app": current_app,
@@ -166,9 +162,7 @@ class ManagementSettings(MethodView):
     ]
 
     def get(self, slug: str | None = None, plugin: str | None = None):
-        form, old_settings, _, active_nav = self._determine_active_settings(
-            slug, plugin
-        )
+        form, old_settings, _, active_nav = self._determine_active_settings(slug, plugin)
 
         form.process(data=old_settings)
 
@@ -208,9 +202,7 @@ class ManagementSettings(MethodView):
             # plugin settings (PluginRegistry) are a separate mechanism
             # from SettingGroup and are untouched by this refactor
             plugin_obj = PluginRegistry.get_by_or_404(name=plugin)
-            active_nav.update(
-                {"key": plugin_obj.name, "title": plugin_obj.name.title()}
-            )
+            active_nav.update({"key": plugin_obj.name, "title": plugin_obj.name.title()})
             form = plugin_obj.get_settings_form()
             if plugin_obj.needs_setting_upgrade():
                 flash(_("Upgrade the plugin first to update its setting!"), "warning")
@@ -224,9 +216,7 @@ class ManagementSettings(MethodView):
             form = form_cls()
 
             all_values = Setting.as_dict()
-            old_settings = {
-                setting.key: all_values[setting.key] for setting in group_obj.settings
-            }
+            old_settings = {setting.key: all_values[setting.key] for setting in group_obj.settings}
 
         return form, old_settings, plugin_obj, active_nav
 
@@ -268,9 +258,7 @@ class ManageUsers(MethodView):
                 per_page=flaskbb_config["USERS_PER_PAGE"],
                 error_out=False,
             )
-            return render_template(
-                "management/users.html", users=users, search_form=form
-            )
+            return render_template("management/users.html", users=users, search_form=form)
 
         users = db.paginate(
             select(User).order_by(User.id.asc()),
@@ -381,9 +369,7 @@ class EditUser(MethodView):
 
             # Passing groups=None leaves the existing secondary groups alone,
             # which is what has to happen when the form has no groups field.
-            groups = (
-                None if form.secondary_groups is None else form.secondary_groups.data
-            )
+            groups = None if form.secondary_groups is None else form.secondary_groups.data
             user.save(groups=groups)
 
             flash(_("User updated."), "success")
@@ -469,10 +455,7 @@ class DeleteUserPosts(MethodView):
         # Re-querying the lowest remaining id each time sidesteps that.
         while True:
             post = db.session.execute(
-                db.select(Post)
-                .where(Post.user_id == user.id)
-                .order_by(Post.id)
-                .limit(1)
+                db.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
             ).scalar_one_or_none()
             if post is None:
                 break
@@ -499,9 +482,7 @@ class AddUser(MethodView):
     form = AddUserForm
 
     def get(self):
-        return render_template(
-            "management/user_form.html", form=self.form(), title=_("Add User")
-        )
+        return render_template("management/user_form.html", form=self.form(), title=_("Add User"))
 
     def post(self):
         form = self.form()
@@ -510,9 +491,7 @@ class AddUser(MethodView):
             flash(_("User added."), "success")
             return redirect(url_for("management.users"))
 
-        return render_template(
-            "management/user_form.html", form=form, title=_("Add User")
-        )
+        return render_template("management/user_form.html", form=form, title=_("Add User"))
 
 
 class BannedUsers(MethodView):
@@ -533,26 +512,20 @@ class BannedUsers(MethodView):
         search_form = self.form()
 
         users = db.paginate(
-            select(User)
-            .join(Group, Group.id == User.primary_group_id)
-            .where(Group.banned == True),
+            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
         )
 
-        return render_template(
-            "management/banned_users.html", users=users, search_form=search_form
-        )
+        return render_template("management/banned_users.html", users=users, search_form=search_form)
 
     def post(self):
         page = request.args.get("page", 1, type=int)
         search_form = self.form()
 
         users = db.paginate(
-            select(User)
-            .join(Group, Group.id == User.primary_group_id)
-            .where(Group.banned == True),
+            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -570,9 +543,7 @@ class BannedUsers(MethodView):
                 "management/banned_users.html", users=users, search_form=search_form
             )
 
-        return render_template(
-            "management/banned_users.html", users=users, search_form=search_form
-        )
+        return render_template("management/banned_users.html", users=users, search_form=search_form)
 
 
 class BanUser(MethodView):
@@ -616,9 +587,7 @@ class BanUser(MethodView):
                             "type": "ban",
                             "reverse": "unban",
                             "reverse_name": _("Unban"),
-                            "reverse_url": url_for(
-                                "management.unban_user", user_id=user.id
-                            ),
+                            "reverse_url": url_for("management.unban_user", user_id=user.id),
                         }
                     )
 
@@ -681,9 +650,7 @@ class UnbanUser(MethodView):
                             "type": "ban",
                             "reverse": "ban",
                             "reverse_name": _("Ban"),
-                            "reverse_url": url_for(
-                                "management.ban_user", user_id=user.id
-                            ),
+                            "reverse_url": url_for("management.ban_user", user_id=user.id),
                         }
                     )
 
@@ -746,9 +713,7 @@ class AddGroup(MethodView):
     form = AddGroupForm
 
     def get(self):
-        return render_template(
-            "management/group_form.html", form=self.form(), title=_("Add Group")
-        )
+        return render_template("management/group_form.html", form=self.form(), title=_("Add Group"))
 
     def post(self):
         form = AddGroupForm()
@@ -757,9 +722,7 @@ class AddGroup(MethodView):
             flash(_("Group added."), "success")
             return redirect(url_for("management.groups"))
 
-        return render_template(
-            "management/group_form.html", form=form, title=_("Add Group")
-        )
+        return render_template("management/group_form.html", form=form, title=_("Add Group"))
 
 
 class EditGroup(MethodView):
@@ -778,9 +741,7 @@ class EditGroup(MethodView):
     def get(self, group_id: int):
         group = Group.get_by_or_404(id=group_id)
         form = self.form(group)
-        return render_template(
-            "management/group_form.html", form=form, title=_("Edit Group")
-        )
+        return render_template("management/group_form.html", form=form, title=_("Edit Group"))
 
     def post(self, group_id: int):
         group = Group.get_by_or_404(id=group_id)
@@ -796,9 +757,7 @@ class EditGroup(MethodView):
             flash(_("Group updated."), "success")
             return redirect(url_for("management.groups", group_id=group.id))
 
-        return render_template(
-            "management/group_form.html", form=form, title=_("Edit Group")
-        )
+        return render_template("management/group_form.html", form=form, title=_("Edit Group"))
 
 
 class DeleteGroup(MethodView):
@@ -823,9 +782,7 @@ class DeleteGroup(MethodView):
             try:
                 id_list = [int(id) for id in ids]
             except (ValueError, TypeError):
-                return jsonify(
-                    message="No valid ids provided.", category="error", status=404
-                )
+                return jsonify(message="No valid ids provided.", category="error", status=404)
 
             if any(id <= PROTECTED_GROUP_ID for id in id_list):
                 return jsonify(
@@ -858,9 +815,7 @@ class DeleteGroup(MethodView):
         if group_id is not None:
             if group_id <= PROTECTED_GROUP_ID:  # there are 6 standard groups
                 flash(
-                    _(
-                        "You cannot delete the standard groups. Try renaming it instead."
-                    ),
+                    _("You cannot delete the standard groups. Try renaming it instead."),
                     "danger",
                 )
                 return redirect(url_for("management.groups"))
@@ -912,15 +867,11 @@ class EditForum(MethodView):
         form = self.form(forum)
 
         if forum.moderators:
-            form.moderators.data = ",".join(
-                [user.username for user in forum.moderators]
-            )
+            form.moderators.data = ",".join([user.username for user in forum.moderators])
         else:
             form.moderators.data = None
 
-        return render_template(
-            "management/forum_form.html", form=form, title=_("Edit Forum")
-        )
+        return render_template("management/forum_form.html", form=form, title=_("Edit Forum"))
 
     def post(self, forum_id: int):
         forum = Forum.get_by_or_404(id=forum_id)
@@ -932,15 +883,11 @@ class EditForum(MethodView):
             return redirect(url_for("management.edit_forum", forum_id=forum.id))
         else:
             if forum.moderators:
-                form.moderators.data = ",".join(
-                    [user.username for user in forum.moderators]
-                )
+                form.moderators.data = ",".join([user.username for user in forum.moderators])
             else:
                 form.moderators.data = None
 
-        return render_template(
-            "management/forum_form.html", form=form, title=_("Edit Forum")
-        )
+        return render_template("management/forum_form.html", form=form, title=_("Edit Forum"))
 
 
 class AddForum(MethodView):
@@ -959,17 +906,13 @@ class AddForum(MethodView):
     def get(self, category_id: int | None = None):
         form = self.form()
 
-        form.groups.data = db.session.execute(
-            select(Group).order_by(Group.id.asc())
-        ).scalars()
+        form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
 
         if category_id:
             category = Category.get_by(id=category_id)
             form.category.data = category
 
-        return render_template(
-            "management/forum_form.html", form=form, title=_("Add Forum")
-        )
+        return render_template("management/forum_form.html", form=form, title=_("Add Forum"))
 
     def post(self, category_id: int | None = None):
         form = self.form()
@@ -979,16 +922,12 @@ class AddForum(MethodView):
             flash(_("Forum added."), "success")
             return redirect(url_for("management.forums"))
         else:
-            form.groups.data = db.session.execute(
-                select(Group).order_by(Group.id.asc())
-            ).scalars()
+            form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
             if category_id:
                 category = Category.get_by(id=category_id)
                 form.category.data = category
 
-        return render_template(
-            "management/forum_form.html", form=form, title=_("Add Forum")
-        )
+        return render_template("management/forum_form.html", form=form, title=_("Add Forum"))
 
 
 class DeleteForum(MethodView):
@@ -1006,9 +945,7 @@ class DeleteForum(MethodView):
     def post(self, forum_id: int):
         forum = Forum.get_by_or_404(id=forum_id)
 
-        involved_users = User.get_all(
-            Topic.forum_id == forum.id, Post.user_id == User.id
-        )
+        involved_users = User.get_all(Topic.forum_id == forum.id, Post.user_id == User.id)
 
         forum.delete(involved_users)
 
@@ -1042,9 +979,7 @@ class AddCategory(MethodView):
             flash(_("Category added."), "success")
             return redirect(url_for("management.forums"))
 
-        return render_template(
-            "management/category_form.html", form=form, title=_("Add Category")
-        )
+        return render_template("management/category_form.html", form=form, title=_("Add Category"))
 
 
 class EditCategory(MethodView):
@@ -1065,9 +1000,7 @@ class EditCategory(MethodView):
 
         form = self.form(obj=category)
 
-        return render_template(
-            "management/category_form.html", form=form, title=_("Edit Category")
-        )
+        return render_template("management/category_form.html", form=form, title=_("Edit Category"))
 
     def post(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
@@ -1079,9 +1012,7 @@ class EditCategory(MethodView):
             flash(_("Category updated."), "success")
             category.save()
 
-        return render_template(
-            "management/category_form.html", form=form, title=_("Edit Category")
-        )
+        return render_template("management/category_form.html", form=form, title=_("Edit Category"))
 
 
 class DeleteCategory(MethodView):
@@ -1148,9 +1079,7 @@ class UnreadReports(MethodView):
         reports = (
             Report.query.filter(Report.zapped == None)
             .order_by(Report.id.desc())
-            .paginate(
-                page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
-            )
+            .paginate(page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False)
         )
 
         return render_template("management/reports.html", reports=reports)
@@ -1324,9 +1253,7 @@ class ManageAttachments(MethodView):
         missing = {
             attachment.id
             for attachment in attachments.items
-            if not os.path.exists(
-                get_attachment_disk_path(attachment.post_id, attachment.filename)
-            )
+            if not os.path.exists(get_attachment_disk_path(attachment.post_id, attachment.filename))
         }
 
         return render_template(
@@ -1428,9 +1355,7 @@ class CleanupAttachments(MethodView):
                 deleted_rows += 1
             db.session.commit()
 
-        deleted_files = remove_orphan_attachment_files(
-            storage, known, cutoff=cutoff.timestamp()
-        )
+        deleted_files = remove_orphan_attachment_files(storage, known, cutoff=cutoff.timestamp())
 
         flash(
             _(
@@ -1462,9 +1387,7 @@ class PurgeAttachments(MethodView):
         deleted_rows = 0
         while True:
             batch = db.session.scalars(
-                select(Attachment)
-                .order_by(Attachment.id)
-                .limit(ATTACHMENT_DELETE_BATCH)
+                select(Attachment).order_by(Attachment.id).limit(ATTACHMENT_DELETE_BATCH)
             ).all()
             if not batch:
                 break
@@ -1548,9 +1471,7 @@ class EnablePlugin(MethodView):
         plugin = PluginRegistry.get_by_or_404(name=name)
 
         if plugin.enabled:
-            flash(
-                _("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info"
-            )
+            flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
             return redirect(url_for("management.plugins"))
 
         plugin.enabled = True
@@ -1583,9 +1504,7 @@ class DisablePlugin(MethodView):
         plugin = PluginRegistry.get_by_or_404(name=name)
 
         if not plugin.enabled:
-            flash(
-                _("Plugin %(plugin)s is already disabled.", plugin=plugin.name), "info"
-            )
+            flash(_("Plugin %(plugin)s is already disabled.", plugin=plugin.name), "info")
             return redirect(url_for("management.plugins"))
 
         plugin.enabled = False
@@ -1741,9 +1660,7 @@ def flaskbb_load_blueprints(app: Flask):
     register_view(management, routes=["/forums"], view_func=Forums.as_view("forums"))
 
     # Groups
-    register_view(
-        management, routes=["/groups/add"], view_func=AddGroup.as_view("add_group")
-    )
+    register_view(management, routes=["/groups/add"], view_func=AddGroup.as_view("add_group"))
     register_view(
         management,
         routes=["/groups/<int:group_id>/delete", "/groups/delete"],
@@ -1782,9 +1699,7 @@ def flaskbb_load_blueprints(app: Flask):
         routes=["/plugins/<path:name>/upgrade"],
         view_func=UpgradePlugin.as_view("upgrade_plugin"),
     )
-    register_view(
-        management, routes=["/plugins"], view_func=PluginsView.as_view("plugins")
-    )
+    register_view(management, routes=["/plugins"], view_func=PluginsView.as_view("plugins"))
 
     # Reports
     register_view(
@@ -1812,9 +1727,7 @@ def flaskbb_load_blueprints(app: Flask):
     )
 
     # Users
-    register_view(
-        management, routes=["/users/add"], view_func=AddUser.as_view("add_user")
-    )
+    register_view(management, routes=["/users/add"], view_func=AddUser.as_view("add_user"))
     register_view(
         management,
         routes=["/users/banned"],
@@ -1851,8 +1764,6 @@ def flaskbb_load_blueprints(app: Flask):
         routes=["/celerystatus"],
         view_func=CeleryStatus.as_view("celery_status"),
     )
-    register_view(
-        management, routes=["/"], view_func=ManagementOverview.as_view("overview")
-    )
+    register_view(management, routes=["/"], view_func=ManagementOverview.as_view("overview"))
 
     app.register_blueprint(management, url_prefix=app.config["ADMIN_URL_PREFIX"])

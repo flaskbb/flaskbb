@@ -59,9 +59,7 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
-        return any(
-            display_key(self.name, s.key) in current_keys for s in group.settings
-        )
+        return any(display_key(self.name, s.key) in current_keys for s in group.settings)
 
     @property
     def is_updatable(self) -> bool:
@@ -71,12 +69,8 @@ class PluginRegistry(db.Model, CRUDMixin):
         if group is None:
             return False
         current_keys = Setting.as_dict().keys()
-        all_installed = all(
-            display_key(self.name, s.key) in current_keys for s in group.settings
-        )
-        any_installed = any(
-            display_key(self.name, s.key) in current_keys for s in group.settings
-        )
+        all_installed = all(display_key(self.name, s.key) in current_keys for s in group.settings)
+        any_installed = any(display_key(self.name, s.key) in current_keys for s in group.settings)
         return not all_installed and any_installed
 
     @property

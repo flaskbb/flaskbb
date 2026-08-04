@@ -45,12 +45,7 @@ def current_category() -> Category | None:
 
 
 def _get_item(model: Any, view_arg: str, name: str):
-    if (
-        g
-        and not getattr(g, name, None)
-        and request.view_args
-        and view_arg in request.view_args
-    ):
+    if g and not getattr(g, name, None) and request.view_args and view_arg in request.view_args:
         result = db.session.execute(
             select(model).filter_by(id=request.view_args[view_arg])
         ).scalar()

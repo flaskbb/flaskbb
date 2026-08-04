@@ -53,8 +53,7 @@ def _create_statements(table: str, cols: tuple[str, ...]) -> list[str]:
     return [
         f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS search_vector tsvector "
         f"GENERATED ALWAYS AS (to_tsvector('{_TS_CONFIG}', {expr})) STORED",
-        f"CREATE INDEX IF NOT EXISTS ix_{table}_search_vector "
-        f"ON {table} USING gin (search_vector)",
+        f"CREATE INDEX IF NOT EXISTS ix_{table}_search_vector ON {table} USING gin (search_vector)",
     ]
 
 

@@ -11,9 +11,7 @@ def _setup_forums_and_topic(default_groups):
     forum_a.groups = default_groups
     forum_a.save()
 
-    forum_b = Forum(
-        title="Forum B (attacker has zero rights here)", category_id=category.id
-    )
+    forum_b = Forum(title="Forum B (attacker has zero rights here)", category_id=category.id)
     forum_b.groups = default_groups
     forum_b.save()
 

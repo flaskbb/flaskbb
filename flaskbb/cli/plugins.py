@@ -75,9 +75,7 @@ def _apply_migrations(plugin_name: str):
         alembic.upgrade(target=f"{plugin_name}@head")
         click.secho(f"[+] Applied the migrations of '{plugin_name}'.", fg="green")
     except CommandError as exc:
-        click.secho(
-            f"[!] Couldn't apply the migrations of '{plugin_name}': {exc}", fg="red"
-        )
+        click.secho(f"[!] Couldn't apply the migrations of '{plugin_name}': {exc}", fg="red")
 
 
 def _revert_migrations(plugin_name: str):
@@ -88,9 +86,7 @@ def _revert_migrations(plugin_name: str):
         alembic.downgrade(target=f"{plugin_name}@base")
         click.secho(f"[+] Reverted the migrations of '{plugin_name}'.", fg="green")
     except CommandError as exc:
-        click.secho(
-            f"[!] Couldn't revert the migrations of '{plugin_name}': {exc}", fg="red"
-        )
+        click.secho(f"[!] Couldn't revert the migrations of '{plugin_name}': {exc}", fg="red")
 
 
 @plugins.command("list")
@@ -107,9 +103,7 @@ def list_plugins():
                 continue
             p_mod = plugin[0]
             p_dist = plugin[1]
-            plugin_reg = next(
-                (p for p in all_plugins if p.name == pluggy.get_name(p_mod)), None
-            )
+            plugin_reg = next((p for p in all_plugins if p.name == pluggy.get_name(p_mod)), None)
 
             settings_update_str = "up-to-date"
             if plugin_reg:
@@ -199,9 +193,7 @@ def disable_plugin(plugin_name: str):
     is_flag=True,
     help="Only applies the migrations.",
 )
-@click.option(
-    "--force", "-f", default=False, is_flag=True, help="Overwrites existing settings"
-)
+@click.option("--force", "-f", default=False, is_flag=True, help="Overwrites existing settings")
 def install(
     plugin_name: str | None,
     all_plugins: bool,
@@ -215,8 +207,7 @@ def install(
     for plugin in _select_plugins(plugin_name, all_plugins):
         if not plugin.enabled:
             click.secho(
-                f"[+] Can't install disabled plugin. "
-                f"Enable '{plugin.name}' Plugin first.",
+                f"[+] Can't install disabled plugin. Enable '{plugin.name}' Plugin first.",
                 fg="red",
             )
             continue
@@ -224,9 +215,7 @@ def install(
         if do_settings:
             if plugin.is_installable:
                 plugin.add_settings(force)
-                click.secho(
-                    f"[+] Plugin '{plugin.name}' has been installed.", fg="green"
-                )
+                click.secho(f"[+] Plugin '{plugin.name}' has been installed.", fg="green")
             else:
                 click.secho(f"[+] Nothing to install for '{plugin.name}'.", fg="green")
 
@@ -258,9 +247,7 @@ def install(
     is_flag=True,
     help="Only reverts the migrations.",
 )
-@click.option(
-    "--force", "-f", default=False, is_flag=True, help="Doesn't ask for confirmation."
-)
+@click.option("--force", "-f", default=False, is_flag=True, help="Doesn't ask for confirmation.")
 def uninstall(
     plugin_name: str | None,
     all_plugins: bool,
@@ -291,13 +278,9 @@ def uninstall(
         if do_settings:
             if plugin.is_installed:
                 plugin.remove_settings()
-                click.secho(
-                    f"[+] Plugin '{plugin.name}' has been uninstalled.", fg="green"
-                )
+                click.secho(f"[+] Plugin '{plugin.name}' has been uninstalled.", fg="green")
             else:
-                click.secho(
-                    f"[+] Nothing to uninstall for '{plugin.name}'.", fg="green"
-                )
+                click.secho(f"[+] Nothing to uninstall for '{plugin.name}'.", fg="green")
 
 
 @plugins.command("upgrade")
@@ -337,9 +320,7 @@ def upgrade(
         if do_settings:
             if plugin.is_installed and plugin.needs_setting_upgrade():
                 plugin.upgrade_settings()
-                click.secho(
-                    f"[+] Plugin '{plugin.name}' has been upgraded.", fg="green"
-                )
+                click.secho(f"[+] Plugin '{plugin.name}' has been upgraded.", fg="green")
             else:
                 click.secho(
                     f"[+] Plugin '{plugin.name}' has no upgradable settings.",
@@ -360,9 +341,7 @@ def cleanup():
     """
     deleted_plugins = remove_zombie_plugins_from_db()
     if len(deleted_plugins) > 0:
-        click.secho(
-            "[+] Removed following zombie plugins from FlaskBB: ", fg="green", nl=False
-        )
+        click.secho("[+] Removed following zombie plugins from FlaskBB: ", fg="green", nl=False)
         click.secho("{}".format(", ".join(deleted_plugins)))
     else:
         click.secho("[+] No zombie plugins found.", fg="green")

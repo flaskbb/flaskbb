@@ -58,9 +58,7 @@ def parse_attachment_types(raw: str | None) -> set[str]:
     """
     if not raw:
         return set()
-    return {
-        ext.strip().lstrip(".").lower() for ext in raw.split(",") if ext.strip(". ")
-    }
+    return {ext.strip().lstrip(".").lower() for ext in raw.split(",") if ext.strip(". ")}
 
 
 def handle_post_attachments(form, post: "Post | None", user: "User"):

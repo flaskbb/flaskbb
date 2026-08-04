@@ -26,9 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class SearchForm(FlaskForm):
-    search_query = StringField(
-        _("Criteria"), validators=[DataRequired(), Length(min=3, max=50)]
-    )
+    search_query = StringField(_("Criteria"), validators=[DataRequired(), Length(min=3, max=50)])
 
     search_type = SelectField(
         _("Search in"),

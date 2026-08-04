@@ -15,9 +15,7 @@ def _all(stmt):
 
 def test_search_form_forum_type_defaults_to_topics_only(request_context, topic):
     form = SearchForm(
-        formdata=MultiDict(
-            {"search_query": "Test Topic Normal", "search_type": "forum"}
-        ),
+        formdata=MultiDict({"search_query": "Test Topic Normal", "search_type": "forum"}),
         meta={"csrf": False},
         user=topic.user,
     )
@@ -50,9 +48,7 @@ def test_search_form_forum_type_can_be_narrowed_to_posts(request_context, topic)
 def test_search_form_user_type_returns_users(request_context, topic):
     searched_user = topic.user
     form = SearchForm(
-        formdata=MultiDict(
-            {"search_query": searched_user.username, "search_type": "user"}
-        ),
+        formdata=MultiDict({"search_query": searched_user.username, "search_type": "user"}),
         meta={"csrf": False},
         user=searched_user,
     )
@@ -141,9 +137,7 @@ def test_search_forums_excludes_topics_outside_date_range(request_context, topic
     assert topic not in _all(results["topic"])
 
 
-def test_search_forums_filters_by_locked_state(
-    request_context, topic, topic_locked, user
-):
+def test_search_forums_filters_by_locked_state(request_context, topic, topic_locked, user):
     results = service.search_forums("Test", user, state="locked")
 
     topics = _all(results["topic"])
@@ -161,9 +155,7 @@ def test_search_forums_locked_state_applies_to_posts_too(
     assert topic.first_post not in posts
 
 
-def test_search_forums_hidden_state_requires_viewhidden(
-    request_context, topic, user, admin_user
-):
+def test_search_forums_hidden_state_requires_viewhidden(request_context, topic, user, admin_user):
     cache.clear()  # see comment in test_search_form_forum_choices_are_permission_scoped
 
     topic.hide(user=admin_user)

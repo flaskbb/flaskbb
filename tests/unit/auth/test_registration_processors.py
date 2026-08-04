@@ -10,18 +10,14 @@ from flaskbb.utils.settings import flaskbb_config
 
 
 class TestAutoActivateUserPostProcessor:
-    def test_activates_when_user_activation_isnt_required(
-        self, unactivated_user, database
-    ):
+    def test_activates_when_user_activation_isnt_required(self, unactivated_user, database):
         config = {"ACTIVATE_ACCOUNT": False}
         processor = AutoActivateUserPostProcessor(database, config)
         processor.post_process(unactivated_user)
 
         assert unactivated_user.activated
 
-    def test_doesnt_activate_when_user_activation_is_required(
-        self, database, unactivated_user
-    ):
+    def test_doesnt_activate_when_user_activation_is_required(self, database, unactivated_user):
         config = {"ACTIVATE_ACCOUNT": True}
         processor = AutoActivateUserPostProcessor(database, config)
         processor.post_process(unactivated_user)
@@ -55,9 +51,7 @@ class TestSendActivationPostProcessor:
         def activate_account(self, token):
             pass
 
-    def test_sends_activation_notice(
-        self, request_context, unactivated_user, default_settings
-    ):
+    def test_sends_activation_notice(self, request_context, unactivated_user, default_settings):
         activator = self.SpyingActivator()
         processor = SendActivationPostProcessor(activator)
 

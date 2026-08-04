@@ -42,9 +42,7 @@ def create_default_settings() -> None:
         Setting.install_group(group.key)
 
 
-def update_settings_from_fixture(
-    group_key: str | None = None, force: bool = False
-) -> None:
+def update_settings_from_fixture(group_key: str | None = None, force: bool = False) -> None:
     """Re-applies default values from the registry to the settings
     table - the `flaskbb upgrade` CLI command's underlying logic.
 
@@ -55,11 +53,7 @@ def update_settings_from_fixture(
         Without this, only rows that don't exist yet are created,
         matching the CLI's default (non---force) behavior.
     """
-    groups = (
-        [setting_registry.group(group_key)]
-        if group_key
-        else setting_registry.all_groups()
-    )
+    groups = [setting_registry.group(group_key)] if group_key else setting_registry.all_groups()
     for group in groups:
         if force:
             Setting.remove_group(group.key)
@@ -73,11 +67,7 @@ def delete_settings_from_fixture(group_key: str | None = None) -> None:
     :param group_key: limit to a single group (e.g. "general"); None
         checks every registered group.
     """
-    groups = (
-        [setting_registry.group(group_key)]
-        if group_key
-        else setting_registry.all_groups()
-    )
+    groups = [setting_registry.group(group_key)] if group_key else setting_registry.all_groups()
     for group in groups:
         valid_keys_lower = {s.key.lower() for s in group.settings}
         existing_rows = db.session.execute(
@@ -150,9 +140,7 @@ def update_user(
     :param groupname: The name of the group to which the user
                       should belong to.
     """
-    user = db.session.execute(
-        select(User).filter_by(username=username)
-    ).scalar_one_or_none()
+    user = db.session.execute(select(User).filter_by(username=username)).scalar_one_or_none()
     if user is None:
         return None
 
@@ -175,9 +163,7 @@ def create_welcome_forum():
     """This will create the `welcome forum` with a welcome topic.
     Returns True if it's created successfully.
     """
-    user_count = db.session.execute(
-        db.select(func.count()).select_from(User)
-    ).scalar_one()
+    user_count = db.session.execute(db.select(func.count()).select_from(User)).scalar_one()
     if user_count < 1:
         return False
 
@@ -186,9 +172,7 @@ def create_welcome_forum():
     category = Category(title="My Category", position=1)
     category.save()
 
-    forum = Forum(
-        title="Welcome", description="Your first forum", category_id=category.id
-    )
+    forum = Forum(title="Welcome", description="Your first forum", category_id=category.id)
     forum.save()
 
     topic = Topic(title="Welcome!")
@@ -258,9 +242,7 @@ def create_test_data(
                         # the replies are written by the next user in the list
                         other_user = users[(index + 1) % len(users)]
 
-                        topic = Topic(
-                            title=f"Test Title {k} from {user.username}"
-                        )
+                        topic = Topic(title=f"Test Title {k} from {user.username}")
                         post = Post(content="Test Content")
                         topic.save(user=user, forum=forum, post=post)
                         data_created["topics"] += 1

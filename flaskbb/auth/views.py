@@ -118,9 +118,7 @@ class Reauth(MethodView):
     decorators = [login_required, limiter.exempt]
     form = ReauthForm
 
-    def __init__(
-        self, reauthentication_factory: Callable[[], "PluginReauthenticationManager"]
-    ):
+    def __init__(self, reauthentication_factory: Callable[[], "PluginReauthenticationManager"]):
         self.reauthentication_factory = reauthentication_factory
 
     def get(self):
@@ -133,9 +131,7 @@ class Reauth(MethodView):
         if form.validate_on_submit():
             reauth_manager = self.reauthentication_factory()
             try:
-                reauth_manager.reauthenticate(
-                    user=current_user, secret=form.password.data
-                )
+                reauth_manager.reauthenticate(user=current_user, secret=form.password.data)
                 confirm_login()
                 flash(_("Reauthenticated."), "success")
                 return redirect_or_next(current_user.url)
@@ -151,9 +147,7 @@ class Reauth(MethodView):
 class Register(MethodView):
     decorators = [anonymous_required, registration_enabled]
 
-    def __init__(
-        self, registration_service_factory: Callable[[], "RegistrationService"]
-    ):
+    def __init__(self, registration_service_factory: Callable[[], "RegistrationService"]):
         self.registration_service_factory = registration_service_factory
 
     def form(self):
@@ -194,9 +188,7 @@ class Register(MethodView):
 
                 return render_template("auth/register.html", form=form)
 
-            pluggy.hook.flaskbb_event_user_registered(
-                username=registration_info.username
-            )
+            pluggy.hook.flaskbb_event_user_registered(username=registration_info.username)
             return redirect_or_next(url_for("forum.index"))
 
         return render_template("auth/register.html", form=form)
@@ -206,9 +198,7 @@ class ForgotPassword(MethodView):
     decorators = [anonymous_required]
     form = ForgotPasswordForm
 
-    def __init__(
-        self, password_reset_service_factory: Callable[[], "ResetPasswordService"]
-    ):
+    def __init__(self, password_reset_service_factory: Callable[[], "ResetPasswordService"]):
         self.password_reset_service_factory = password_reset_service_factory
 
     def get(self):
@@ -239,9 +229,7 @@ class ResetPassword(MethodView):
     decorators = [anonymous_required]
     form = ResetPasswordForm
 
-    def __init__(
-        self, password_reset_service_factory: Callable[[], "ResetPasswordService"]
-    ):
+    def __init__(self, password_reset_service_factory: Callable[[], "ResetPasswordService"]):
         self.password_reset_service_factory = password_reset_service_factory
 
     def get(self, token: str):
@@ -302,10 +290,7 @@ class RequestActivationToken(MethodView):
                 form.populate_errors([(e.attribute, e.reason)])
             else:
                 flash(
-                    _(
-                        "A new account activation token has been sent to "
-                        "your email address."
-                    ),
+                    _("A new account activation token has been sent to your email address."),
                     "success",
                 )
                 return redirect(url_for("forum.index"))
@@ -345,9 +330,7 @@ class AutoActivateAccount(MethodView):
 
                 return redirect(url_for("auth.request_activation_token"))
 
-            flash(
-                _("Your account has been activated and you can now login."), "success"
-            )
+            flash(_("Your account has been activated and you can now login."), "success")
             return redirect(url_for("forum.index"))
 
         return redirect(url_for("auth.activate_account"))

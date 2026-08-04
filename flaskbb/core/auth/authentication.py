@@ -196,9 +196,6 @@ class ReauthenticateManager(ABC):
         """
         pass
 
-    def __call__(self, user: "User | CurrentUser", secret: str | None):
-        pass
-
 
 class ReauthenticateProvider(ABC):
     """
@@ -235,9 +232,7 @@ class ReauthenticateProvider(ABC):
     """
 
     @abstractmethod
-    def reauthenticate(
-        self, user: "User | CurrentUser", secret: str | None
-    ) -> bool | None:
+    def reauthenticate(self, user: "User | CurrentUser", secret: str | None) -> bool | None:
         """
         This method is abstract.
 

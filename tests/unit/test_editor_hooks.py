@@ -57,9 +57,7 @@ def test_cheatsheet_renders_without_plugins(request_context, default_settings):
     assert "Markdown Cheatsheet" in render_cheatsheet()
 
 
-def test_cheatsheet_renders_plugin_entry(
-    request_context, default_settings, editor_plugin
-):
+def test_cheatsheet_renders_plugin_entry(request_context, default_settings, editor_plugin):
     rendered = render_cheatsheet()
 
     assert CHEATSHEET in rendered
@@ -70,9 +68,7 @@ def test_toolbar_renders_without_plugins(request_context, default_settings):
     assert "<md-bold" in render_editor()
 
 
-def test_toolbar_renders_plugin_button(
-    request_context, default_settings, editor_plugin
-):
+def test_toolbar_renders_plugin_button(request_context, default_settings, editor_plugin):
     rendered = render_editor()
 
     assert TOOLBAR_BUTTON in rendered

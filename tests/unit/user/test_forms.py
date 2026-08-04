@@ -72,9 +72,7 @@ class TestChangeEmailForm:
             "confirm_new_email": "totally@real.email",
         }
         data.update(formdata)
-        form = forms.ChangeEmailForm(
-            Fred, formdata=MultiDict(data), meta={"csrf": False}
-        )
+        form = forms.ChangeEmailForm(Fred, formdata=MultiDict(data), meta={"csrf": False})
 
         assert not form.validate_on_submit()
 
@@ -178,9 +176,7 @@ class TestChangeUserDetailsForm:
         )
         data.update(formdata)
 
-        form = forms.ChangeUserDetailsForm(
-            formdata=MultiDict(data), meta={"csrf": False}
-        )
+        form = forms.ChangeUserDetailsForm(formdata=MultiDict(data), meta={"csrf": False})
 
         assert form.validate_on_submit()
 
@@ -199,8 +195,6 @@ class TestChangeUserDetailsForm:
             notes="testy mctest face",
         )
         data.update(formdata)
-        form = forms.ChangeUserDetailsForm(
-            formdata=MultiDict(data), meta={"csrf": False}
-        )
+        form = forms.ChangeUserDetailsForm(formdata=MultiDict(data), meta={"csrf": False})
 
         assert not form.validate_on_submit()

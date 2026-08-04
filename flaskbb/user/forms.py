@@ -65,9 +65,7 @@ class GeneralSettingsForm(FlaskBBForm):
         return SettingsUpdate(
             language=self.language.data,
             theme=self.theme.data,
-            open_links_in_new_tab={"yes": True, "no": False}.get(
-                self.open_links_in_new_tab.data
-            ),
+            open_links_in_new_tab={"yes": True, "no": False}.get(self.open_links_in_new_tab.data),
         )
 
 
@@ -129,9 +127,7 @@ class ChangeAvatarForm(FlaskBBForm):
         _("New Avatar"),
         validators=[
             FileRequired(_("A avatar image must be provided.")),
-            AvatarExtensionValidator(
-                _("This file type is not supported for avatar images")
-            ),
+            AvatarExtensionValidator(_("This file type is not supported for avatar images")),
             AvatarSizeValidator(),
         ],
     )

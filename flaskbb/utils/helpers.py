@@ -140,9 +140,7 @@ def render_template(template: str, **context: Any):  # pragma: no cover
 
 
 # TODO(anr): clean this up
-def do_topic_action(
-    topics: Sequence["Topic"], user: "User", action: str, reverse: bool
-):  # noqa: C901
+def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):  # noqa: C901
     """Executes a specific action for topics. Returns a list with the modified
     topic objects.
 
@@ -329,9 +327,7 @@ def get_forums(
     return result
 
 
-def forum_is_unread(
-    forum: "Forum | None", forumsread: "ForumsRead | None", user: "User"
-):
+def forum_is_unread(forum: "Forum | None", forumsread: "ForumsRead | None", user: "User"):
     """Checks if a forum is unread
 
     :param forum: The forum that should be checked if it is unread
@@ -602,9 +598,7 @@ def get_alembic_locations(plugin_dirs: list[str]) -> list[tuple[str, ...]]:
     The branchname is the name of plugin directory which should also be
     the unique identifier of the plugin.
     """
-    branches_dirs = [
-        tuple([os.path.basename(os.path.dirname(p)), p]) for p in plugin_dirs
-    ]
+    branches_dirs = [tuple([os.path.basename(os.path.dirname(p)), p]) for p in plugin_dirs]
 
     return branches_dirs
 
