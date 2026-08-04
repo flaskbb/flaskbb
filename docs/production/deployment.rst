@@ -219,6 +219,12 @@ FlaskBB using the ``gunicorn`` command::
 
     uv run gunicorn wsgi:flaskbb --log-file logs/gunicorn.log --pid gunicorn.pid -w 4
 
+Alternatively, ``flaskbb serve`` starts gunicorn for you and passes the
+``--config``/``--instance`` options of the ``flaskbb`` command on to the
+application::
+
+    uv run flaskbb --config flaskbb.cfg serve -w 4
+
 **uWSGI**
 
 `uWSGI is a web application solution with batteries included.`

@@ -170,6 +170,38 @@ production.
     Files matching these fnmatch patterns will not trigger a reload on
     change. Multiple patterns are separated by ``:``.
 
+``flaskbb serve``
+~~~~~~~~~~~~~~~~~
+
+Serves FlaskBB with gunicorn. This requires the ``gunicorn`` extra to be
+installed (``uv sync --extra gunicorn``). Options that are not listed below
+can be set through a gunicorn configuration file.
+
+.. describe:: --host HOST, -h HOST
+
+    The interface to bind FlaskBB to. Defaults to ``127.0.0.1``.
+
+.. describe:: --port PORT, -p PORT
+
+    The port to bind FlaskBB to. Defaults to ``8000``.
+
+.. describe:: --workers WORKERS, -w WORKERS
+
+    The number of worker processes for handling requests. Defaults to ``1``.
+
+.. describe:: --worker-class CLASS, -k CLASS
+
+    The type of worker to use. Defaults to ``sync``.
+
+.. describe:: --daemon, -d
+
+    Runs gunicorn in the background.
+
+.. describe:: --gunicorn-config FILE, -c FILE
+
+    A gunicorn configuration file. Options given on the command line take
+    precedence over the ones in the configuration file.
+
 ``flaskbb celery CELERY_ARGS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

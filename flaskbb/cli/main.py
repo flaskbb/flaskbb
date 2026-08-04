@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.cli.commands
 ~~~~~~~~~~~~~~~~~~~~
@@ -15,7 +14,7 @@ import os
 import sys
 import time
 import traceback
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 from typing import Any, override
 
 import click
@@ -49,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 class FlaskBBGroup(FlaskGroup):
     def __init__(self, *args: Any, **kwargs: Any):
-        super(FlaskBBGroup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._loaded_flaskbb_plugins = False
 
     def _load_flaskbb_plugins(self, ctx: click.Context):
@@ -62,7 +61,8 @@ class FlaskBBGroup(FlaskGroup):
             self._loaded_flaskbb_plugins = True
         except Exception:
             logger.error(
-                "Error while loading CLI Plugins", exc_info=traceback.format_exc()
+                "Error while loading CLI Plugins",
+                exc_info=traceback.format_exc(),  # pyright: ignore[reportArgumentType]
             )
         else:
             shell_context_processors = pluggy.hook.flaskbb_shell_context()
@@ -72,12 +72,12 @@ class FlaskBBGroup(FlaskGroup):
     @override
     def get_command(self, ctx: click.Context, name: str):
         self._load_flaskbb_plugins(ctx)
-        return super(FlaskBBGroup, self).get_command(ctx, name)
+        return super().get_command(ctx, name)
 
     @override
     def list_commands(self, ctx: click.Context):
         self._load_flaskbb_plugins(ctx)
-        return super(FlaskBBGroup, self).list_commands(ctx)
+        return super().list_commands(ctx)
 
 
 def make_app():
@@ -93,13 +93,13 @@ def make_app():
 
 def set_config(ctx: click.Context, param: str, value: str):
     """This will pass the config file to the create_app function."""
-    ctx.ensure_object(ScriptInfo).config_file = value
+    ctx.ensure_object(ScriptInfo).config_file = value  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def set_instance(ctx: click.Context, param: str, value: str):
     """This will pass the instance path on the script info which can then
     be used in 'make_app'."""
-    ctx.ensure_object(ScriptInfo).instance_path = value
+    ctx.ensure_object(ScriptInfo).instance_path = value  # pyright: ignore[reportAttributeAccessIssue]
 
 
 @click.group(
@@ -277,9 +277,7 @@ def populate(
             rv = insert_bulk_data(int(topics), int(posts))
         elapsed = time.time() - timer
         click.secho(
-            "[+] It took {:.2f} seconds to create {} topics and {} posts.".format(
-                elapsed, rv[0], rv[1]
-            ),
+            f"[+] It took {elapsed:.2f} seconds to create {rv[0]} topics and {rv[1]} posts.",  # pyright: ignore[reportIndexIssue]  # noqa: E501
             fg="cyan",
         )
 
@@ -325,30 +323,28 @@ def shell_command():
     """
     import code
 
-    banner = "Python %s on %s\nInstance Path: %s" % (
-        sys.version,
-        sys.platform,
-        current_app.instance_path,
-    )
+    banner = f"Python {sys.version} on {sys.platform}\nInstance Path: {current_app.instance_path}"  # noqa: E501
     ctx = {"db": db}
 
     # Support the regular Python interpreter startup script if someone
     # is using it.
     startup = os.environ.get("PYTHONSTARTUP")
     if startup and os.path.isfile(startup):
-        with open(startup, "r") as f:
+        with open(startup) as f:
             eval(compile(f.read(), startup, "exec"), ctx)
 
     ctx.update(current_app.make_shell_context())
 
     try:
         import IPython
-        from traitlets.config import get_config
+        from traitlets.config import (
+            get_config,  # pyright: ignore[reportPrivateImportUsage]
+        )
 
         c = get_config()
         # This makes the prompt to use colors again
         c.InteractiveShellEmbed.colors = "Linux"
-        IPython.embed(config=c, banner1=banner, user_ns=ctx)
+        IPython.embed(config=c, banner1=banner, user_ns=ctx)  # pyright: ignore[reportUnknownMemberType]
     except ImportError:
         code.interact(banner=banner, local=ctx)
 
@@ -384,10 +380,8 @@ def list_urls(order_by: str):
     max_method_len = max(max_method_len, len("Methods"))
 
     column_header_len = max_rule_len + max_endpoint_len + max_method_len + 4
-    column_template = "{:<%s}  {:<%s}  {:<%s}" % (
-        max_rule_len,
-        max_endpoint_len,
-        max_method_len,
+    column_template = (
+        f"{{:<{max_rule_len}}}  {{:<{max_endpoint_len}}}  {{:<{max_method_len}}}"
     )
 
     click.secho(
@@ -471,9 +465,7 @@ def generate_config(development: bool, output: str | None, force: bool):
         config_path = prompt_config_path(config_path)
 
     if force and os.path.exists(config_path):
-        click.secho(
-            "Overwriting existing config file: {}".format(config_path), fg="yellow"
-        )
+        click.secho(f"Overwriting existing config file: {config_path}", fg="yellow")
 
     if development:
         default_conf["is_debug"] = True
@@ -654,3 +646,104 @@ def generate_config(development: bool, output: str | None, force: bool):
         bold=True,
     )
     click.secho(f"Usage: \nflaskbb --config {config_path} run", fg="green")
+
+
+@flaskbb.command("serve", short_help="Starts a gunicorn server.")
+@click.option(
+    "--host",
+    "-h",
+    default=None,
+    help="The interface to bind FlaskBB to. Defaults to '127.0.0.1'.",
+)
+@click.option(
+    "--port",
+    "-p",
+    default=None,
+    type=int,
+    help="The port to bind FlaskBB to. Defaults to 8000.",
+)
+@click.option(
+    "--workers",
+    "-w",
+    default=None,
+    type=int,
+    help="The number of worker processes for handling requests. Defaults to 1.",
+)
+@click.option(
+    "--worker-class",
+    "-k",
+    default=None,
+    help="The type of worker to use. Defaults to 'sync'.",
+)
+@click.option(
+    "--daemon",
+    "-d",
+    default=False,
+    is_flag=True,
+    help="Runs gunicorn in the background.",
+)
+@click.option(
+    "--gunicorn-config",
+    "-c",
+    default=None,
+    help="A gunicorn configuration file. Options given on the command line "
+    "take precedence over the ones in the configuration file.",
+)
+@click.pass_context
+def serve(
+    ctx: click.Context,
+    host: str | None,
+    port: int | None,
+    workers: int | None,
+    worker_class: str | None,
+    daemon: bool,
+    gunicorn_config: str | None,
+):
+    """Starts a gunicorn server with FlaskBB."""
+    try:
+        from gunicorn.app.base import Application
+    except ImportError:
+        click.secho(
+            "[!] gunicorn is not installed. "
+            "You can install it with 'pip install FlaskBB[gunicorn]'.",
+            fg="red",
+        )
+        sys.exit(1)
+
+    app = ctx.ensure_object(ScriptInfo).load_app()
+
+    options: dict[str, Any] = {"workers": workers, "worker_class": worker_class}
+    if host is not None or port is not None:
+        options["bind"] = f"{host or '127.0.0.1'}:{port or 8000}"
+    if daemon:
+        options["daemon"] = True
+
+    class FlaskBBApplication(Application):
+        @override
+        def load_config(self):
+            if gunicorn_config is not None:
+                self.load_config_from_file(gunicorn_config)
+
+            for key, value in options.items():
+                if value is not None:
+                    self.cfg.set(key, value)
+
+            configured_post_fork = self.cfg.post_fork
+
+            def post_fork(server: Any, worker: Any):
+                # the app is created before gunicorn forks its workers, so the
+                # pooled connections belong to the master process - get rid of
+                # them in the worker without closing them
+                with app.app_context():
+                    for engine in db.engines.values():
+                        engine.dispose(close=False)
+
+                configured_post_fork(server, worker)
+
+            self.cfg.set("post_fork", post_fork)
+
+        @override
+        def load(self) -> Any:
+            return app
+
+    FlaskBBApplication().run()
