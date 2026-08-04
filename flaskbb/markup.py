@@ -111,7 +111,7 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
         else:
             lexer = None
         if not lexer:
-            return "\n<pre><code>%s</code></pre>\n" % mistune.escape(code)
+            return f"\n<pre><code>{mistune.escape(code)}</code></pre>\n"
         formatter = HtmlFormatter()  # pyright: ignore
         return highlight(code, lexer, formatter)
 

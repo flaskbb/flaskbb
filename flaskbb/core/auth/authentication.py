@@ -6,7 +6,7 @@ flaskbb.core.auth.authentication
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING, TypeAlias
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from werkzeug.local import LocalProxy
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from flaskbb.user.models import User
 from ..exceptions import BaseFlaskBBError
 
-CurrentUser: TypeAlias = "LocalProxy[User | None] | LocalProxy[Any | None]"
+type CurrentUser = "LocalProxy[User | None] | LocalProxy[Any | None]"
 
 
 class StopAuthentication(BaseFlaskBBError):

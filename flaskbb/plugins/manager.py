@@ -11,14 +11,14 @@ Plugin Manager for FlaskBB
 import logging
 import string
 from importlib.metadata import Distribution, PackageMetadata
-from typing import override, TypeAlias
+from typing import override
 
 import pluggy
 from pluggy._manager import DistFacade
 
 logger = logging.getLogger(__name__)
 
-_Plugin: TypeAlias = object
+type _Plugin = object
 
 
 class DistMeta:

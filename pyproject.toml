@@ -194,7 +194,7 @@ testpaths = [
 ]
 
 [tool.ruff]
-src = ["flaskbb"]
+src = ["flaskbb", "tests"]
 fix = true
 show-fixes = true
 output-format = "full"

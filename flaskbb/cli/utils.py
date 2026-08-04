@@ -42,7 +42,7 @@ class FlaskBBCLIError(click.ClickException):
     def show(self, file: IO[Any] | None = None):
         if file is None:
             file = get_text_stderr()
-        click.secho("error: %s" % self.format_message(), file=file, **self.styles)
+        click.secho(f"error: {self.format_message()}", file=file, **self.styles)
 
 
 class EmailType(click.ParamType):
@@ -61,7 +61,7 @@ class EmailType(click.ParamType):
         if re.match(_email_regex, value):
             return value
         else:
-            self.fail(("invalid email: %s" % value), param, ctx)
+            self.fail((f"invalid email: {value}"), param, ctx)
 
     @override
     def __repr__(self):

@@ -10,7 +10,7 @@ Core interfaces for handlers, services, etc.
 
 from abc import ABC, abstractmethod
 from inspect import isclass
-from typing import Any, Generic, override, TypeVar
+from typing import Any, override, TypeVar
 
 from flask_sqlalchemy.model import Model
 
@@ -60,7 +60,7 @@ def is_empty(value: Any, consider_none: bool = False):
     return empty == value or (consider_none and value is None)
 
 
-class ChangeSetValidator(ABC, Generic[M, C]):
+class ChangeSetValidator[M: Model, C](ABC):
     """
     Used to validate a change set is valid to apply against a model
     """
@@ -76,7 +76,7 @@ class ChangeSetValidator(ABC, Generic[M, C]):
         pass
 
 
-class ChangeSetHandler(ABC, Generic[M, C]):
+class ChangeSetHandler[M: Model, C](ABC):
     """
     Used to apply a changeset to a model.
     """
@@ -91,7 +91,7 @@ class ChangeSetHandler(ABC, Generic[M, C]):
         """
 
 
-class ChangeSetPostProcessor(ABC, Generic[M, C]):
+class ChangeSetPostProcessor[M: Model, C](ABC):
     """
     Used to handle actions after a change set has been persisted.
     """

@@ -228,7 +228,7 @@ def create_test_data(
             continue
 
         username = group.name.lower().replace(" ", "_")
-        email = "%s@example.org" % username
+        email = f"{username}@example.org"
         user = User(username=username, password="test", email=email)
         user.primary_group_id = group.id
         user.activated = True
@@ -238,13 +238,13 @@ def create_test_data(
 
     with db.session.no_autoflush:
         for i in range(1, categories + 1):
-            category_title = "Test Category %s" % i
+            category_title = f"Test Category {i}"
             category = Category(title=category_title, description="Test Description")
             category.save()
             data_created["categories"] += 1
 
             for j in range(1, forums + 1):
-                forum_title = "Test Forum %s %s" % (j, i)
+                forum_title = f"Test Forum {j} {i}"
                 forum = Forum(
                     title=forum_title,
                     description="Test Description",
@@ -259,7 +259,7 @@ def create_test_data(
                         other_user = users[(index + 1) % len(users)]
 
                         topic = Topic(
-                            title="Test Title %s from %s" % (k, user.username)
+                            title=f"Test Title {k} from {user.username}"
                         )
                         post = Post(content="Test Content")
                         topic.save(user=user, forum=forum, post=post)
@@ -300,7 +300,7 @@ def insert_bulk_data(topic_count: int = 10, post_count: int = 100):
             last_post_id += 1
 
             # create a topic
-            topic = Topic(title="Test Title %s" % i)
+            topic = Topic(title=f"Test Title {i}")
             post = Post(content="First Post")
             topic.save(post=post, user=user1, forum=forum)
             created_topics += 1
@@ -366,7 +366,7 @@ def run_plugin_migrations(plugins: list[str] | None = None):
         plugin = pluggy.get_plugin(plugin_name)
 
         if not has_migrations(plugin):
-            logger.debug("No migrations found for plugin %s" % plugin_name)
+            logger.debug(f"No migrations found for plugin {plugin_name}")
             continue
 
         try:
