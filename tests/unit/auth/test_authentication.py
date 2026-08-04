@@ -1,9 +1,6 @@
 import datetime
 
 import pytest
-from freezegun import freeze_time
-from pluggy import HookimplMarker
-
 from flaskbb.auth.services import authentication as auth
 from flaskbb.core.auth.authentication import (
     AuthenticationFailureHandler,
@@ -11,11 +8,13 @@ from flaskbb.core.auth.authentication import (
     PostAuthenticationHandler,
     StopAuthentication,
 )
+from freezegun import freeze_time
+from pluggy import HookimplMarker
 
 pytestmark = pytest.mark.usefixtures("default_settings")
 
 
-class TestBlockTooManyFailedLogins(object):
+class TestBlockTooManyFailedLogins:
     provider = auth.BlockTooManyFailedLogins(
         auth.FailedLoginConfiguration(
             limit=1, lockout_window=datetime.timedelta(hours=1)
@@ -56,7 +55,7 @@ class TestBlockTooManyFailedLogins(object):
         self.provider.authenticate("completely@made.up", "not considered")
 
 
-class TestDefaultFlaskBBAuthProvider(object):
+class TestDefaultFlaskBBAuthProvider:
     provider = auth.DefaultFlaskBBAuthProvider()
 
     def test_returns_None_if_user_doesnt_exist(self, Fred):
@@ -75,7 +74,7 @@ class TestDefaultFlaskBBAuthProvider(object):
         assert result.username == Fred.username
 
 
-class TestMarkFailedLoginAttempt(object):
+class TestMarkFailedLoginAttempt:
     handler = auth.MarkFailedLogin()
 
     @freeze_time(datetime.datetime(2018, 1, 1, 12))
@@ -90,7 +89,7 @@ class TestMarkFailedLoginAttempt(object):
         self.handler.handle_authentication_failure("completely@made.up")
 
 
-class TestClearFailedLogins(object):
+class TestClearFailedLogins:
     handler = auth.ClearFailedLogins()
 
     def test_clears_failed_logins_attempts(self, Fred):
@@ -99,7 +98,7 @@ class TestClearFailedLogins(object):
         assert Fred.login_attempts == 0
 
 
-class TestBlockUnactivatedUser(object):
+class TestBlockUnactivatedUser:
     handler = auth.BlockUnactivatedUser()
 
     def test_raises_StopAuthentication_if_user_is_unactivated(self, unactivated_user):
@@ -109,7 +108,7 @@ class TestBlockUnactivatedUser(object):
         assert "In order to use your account" in excinfo.value.reason
 
 
-class TestPluginAuthenticationManager(object):
+class TestPluginAuthenticationManager:
     def raises_stop_authentication_if_user_isnt_authenticated(
         self, plugin_manager, mocker, database
     ):

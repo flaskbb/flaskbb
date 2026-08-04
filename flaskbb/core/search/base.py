@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.search.base
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -22,8 +21,8 @@ from typing import Any
 
 from flask import Flask
 from flask_sqlalchemy.model import Model
-from markupsafe import Markup, escape
-from sqlalchemy import Select, case, select
+from markupsafe import escape, Markup
+from sqlalchemy import case, Select, select
 from sqlalchemy import false as sql_false
 
 ModelT = type[Model]
@@ -37,7 +36,7 @@ def ordered_by_ids(model: ModelT, ids: Sequence[int]) -> Select[Any]:
     """
     # ModelT is bound to flask_sqlalchemy's generic Model, which doesn't
     # declare an `id` attribute - all searchable models use `id` as pk.
-    pk_col = getattr(model, "id")
+    pk_col = model.id
     if not ids:
         return select(model).where(sql_false())
     ordering = case({pk: rank for rank, pk in enumerate(ids)}, value=pk_col)

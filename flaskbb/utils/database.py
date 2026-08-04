@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.database
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -18,10 +17,10 @@ import sqlalchemy.types as types
 from flask import abort
 from flask_sqlalchemy.session import Session
 from sqlalchemy.orm import (
-    InstrumentedAttribute,
-    Mapped,
     declarative_mixin,
     declared_attr,
+    InstrumentedAttribute,
+    Mapped,
     mapped_column,
     relationship,
     scoped_session,
@@ -53,9 +52,9 @@ def make_comparable(cls):
     return cls
 
 
-class CRUDMixin(object):
+class CRUDMixin:
     def __repr__(self):
-        return "<{}>".format(self.__class__.__name__)
+        return f"<{self.__class__.__name__}>"
 
     @classmethod
     def get(cls, *clause: sa.ColumnExpressionArgument[bool]):
@@ -132,7 +131,7 @@ class UTCDateTime(types.TypeDecorator[object]):
         if value is not None:
             if not value.tzinfo or value.tzinfo.utcoffset(value) is None:
                 raise TypeError("tzinfo is required")
-            value = value.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+            value = value.astimezone(datetime.UTC).replace(tzinfo=None)
         return value
 
     @t.override
@@ -141,12 +140,12 @@ class UTCDateTime(types.TypeDecorator[object]):
     ) -> datetime.datetime | None:
         """Way out of the database."""
         if value is not None:
-            value = value.replace(tzinfo=datetime.timezone.utc)
+            value = value.replace(tzinfo=datetime.UTC)
         return value
 
 
 @declarative_mixin
-class HideableMixin(object):
+class HideableMixin:
     hidden: Mapped[bool] = mapped_column(default=False, nullable=False)
     hidden_at: Mapped[datetime.datetime | None] = mapped_column(
         UTCDateTime(timezone=True), nullable=True
@@ -155,7 +154,7 @@ class HideableMixin(object):
     @declared_attr
     def hidden_by_id(cls) -> Mapped[int | None]:
         return mapped_column(
-            sa.ForeignKey("users.id", name="fk_{}_hidden_by".format(cls.__name__)),  # pyright: ignore
+            sa.ForeignKey("users.id", name=f"fk_{cls.__name__}_hidden_by"),  # pyright: ignore
             nullable=True,
         )
 

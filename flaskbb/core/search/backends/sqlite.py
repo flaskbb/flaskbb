@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.search.backends.sqlite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,9 +25,9 @@ from typing import Any, override
 
 from flask import current_app
 from flask_sqlalchemy.model import Model
-from sqlalchemy import DDL, Select, event, text
+from sqlalchemy import DDL, event, Select, text
 
-from flaskbb.core.search.base import ModelT, SearchBackend, ordered_by_ids
+from flaskbb.core.search.base import ModelT, ordered_by_ids, SearchBackend
 from flaskbb.core.search.spec import INDEX_SPECS
 from flaskbb.extensions import db
 from flaskbb.forum.models import Topic
@@ -92,7 +91,7 @@ def _register_create_all_ddl() -> None:
     for model, table, cols in INDEX_SPECS:
         for statement in _create_statements(table, cols):
             event.listen(
-                getattr(model, "__table__"),
+                model.__table__,
                 "after_create",
                 DDL(statement).execute_if(callable_=_emit_on_create),
             )

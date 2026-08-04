@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.management.forms
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,13 +32,13 @@ from wtforms import (
     TextAreaField,
 )
 from wtforms.validators import (
-    URL,
     DataRequired,
     Email,
     Length,
     Optional,
-    ValidationError,
     regexp,
+    URL,
+    ValidationError,
 )
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
@@ -406,7 +405,7 @@ class GroupForm(FlaskForm):
 
     @override
     def validate(self, extra_validators: Mapping[str, Sequence[Any]] | None = None):
-        if not super(GroupForm, self).validate():
+        if not super().validate():
             return False
 
         result = True

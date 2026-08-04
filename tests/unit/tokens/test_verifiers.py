@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb.core.exceptions import ValidationError
 from flaskbb.core.tokens import Token, TokenActions
 from flaskbb.tokens import verifiers

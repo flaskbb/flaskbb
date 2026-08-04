@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.helpers
 ~~~~~~~~~~~~~~~~~~~~~
@@ -14,7 +13,7 @@ import os
 import uuid
 from pathlib import Path
 
-from flask import Flask, current_app
+from flask import current_app, Flask
 from flask_wtf.file import FileStorage
 from PIL import ImageFile
 from werkzeug.utils import secure_filename

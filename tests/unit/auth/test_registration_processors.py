@@ -1,6 +1,5 @@
 from flask import get_flashed_messages
 from flask_login import current_user
-
 from flaskbb.auth.services.registration import (
     AutoActivateUserPostProcessor,
     AutologinPostProcessor,
@@ -10,7 +9,7 @@ from flaskbb.core.auth.activation import AccountActivator
 from flaskbb.utils.settings import flaskbb_config
 
 
-class TestAutoActivateUserPostProcessor(object):
+class TestAutoActivateUserPostProcessor:
     def test_activates_when_user_activation_isnt_required(
         self, unactivated_user, database
     ):
@@ -30,7 +29,7 @@ class TestAutoActivateUserPostProcessor(object):
         assert not unactivated_user.activated
 
 
-class TestAutologinPostProcessor(object):
+class TestAutologinPostProcessor:
     def test_sets_user_as_current_user(self, Fred, request_context, default_settings):
         flaskbb_config["ACTIVATE_ACCOUNT"] = False
         processor = AutologinPostProcessor()
@@ -43,7 +42,7 @@ class TestAutologinPostProcessor(object):
         assert get_flashed_messages(with_categories=True)[0] == expected_message
 
 
-class TestSendActivationPostProcessor(object):
+class TestSendActivationPostProcessor:
     class SpyingActivator(AccountActivator):
         def __init__(self):
             self.called = False

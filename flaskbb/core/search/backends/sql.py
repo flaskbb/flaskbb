@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.search.backends.sql
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -15,7 +14,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, override
 
 from flask_sqlalchemy.model import Model
-from sqlalchemy import Select, or_, select
+from sqlalchemy import or_, Select, select
 from sqlalchemy.sql.elements import ColumnElement
 
 from flaskbb.core.search.base import ModelT, SearchBackend

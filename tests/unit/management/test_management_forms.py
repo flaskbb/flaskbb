@@ -1,6 +1,5 @@
-from werkzeug.datastructures import MultiDict
-
 from flaskbb.management.forms import AddForumForm
+from werkzeug.datastructures import MultiDict
 
 
 def _form(category, groups=None):

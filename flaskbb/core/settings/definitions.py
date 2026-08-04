@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.settings.definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -10,8 +9,9 @@ This modules holds the Type definitions for the settings.
 """
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, override
+from typing import Any, override
 
 from wtforms import fields as wtf_fields
 from wtforms import validators as wtf_validators

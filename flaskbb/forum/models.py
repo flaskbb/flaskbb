@@ -11,25 +11,25 @@ It provides the models for the forum
 import logging
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, override
+from typing import override, TYPE_CHECKING
 
 from flask import abort, url_for
 from sqlalchemy import (
-    Column,
-    ForeignKey,
-    Integer,
-    String,
-    Table,
-    Text,
     and_,
+    Column,
     event,
+    ForeignKey,
     func,
+    Integer,
     join,
     or_,
     select,
+    String,
+    Table,
+    Text,
     update,
 )
-from sqlalchemy.orm import Mapped, aliased, mapped_column, relationship
+from sqlalchemy.orm import aliased, Mapped, mapped_column, relationship
 
 from flaskbb.extensions import db, pluggy
 from flaskbb.utils.queries import hidden, paginate
@@ -41,8 +41,8 @@ from flaskbb.core.settings import flaskbb_config
 from flaskbb.utils.database import (
     CRUDMixin,
     HideableCRUDMixin,
-    UTCDateTime,
     make_comparable,
+    UTCDateTime,
 )
 from flaskbb.utils.helpers import (
     get_categories_and_forums,

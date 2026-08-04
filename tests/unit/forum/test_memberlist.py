@@ -1,8 +1,7 @@
 import pytest
-from werkzeug.exceptions import NotFound
-
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.forum import views
+from werkzeug.exceptions import NotFound
 
 
 def test_memberlist_is_reachable_when_enabled(application, default_settings, user):

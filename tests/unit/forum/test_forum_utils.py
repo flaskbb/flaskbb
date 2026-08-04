@@ -1,13 +1,12 @@
 import pytest
 from flask import g, url_for
 from flask_login import FlaskLoginClient
-
 from flaskbb.forum import utils
 from flaskbb.forum.models import Forum
 from flaskbb.user.models import Group
 
 
-class TestForceLoginHelpers(object):
+class TestForceLoginHelpers:
     def test_would_not_force_login_for_authed_user(self, user, forum):
         assert not utils.should_force_login(user, forum)
 

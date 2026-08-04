@@ -469,7 +469,10 @@ class DeleteUserPosts(MethodView):
         # Re-querying the lowest remaining id each time sidesteps that.
         while True:
             post = db.session.execute(
-                db.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
+                db.select(Post)
+                .where(Post.user_id == user.id)
+                .order_by(Post.id)
+                .limit(1)
             ).scalar_one_or_none()
             if post is None:
                 break

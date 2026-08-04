@@ -4,12 +4,11 @@ from io import BytesIO
 
 import pytest
 from flask_login import login_user, logout_user
-from werkzeug.datastructures import FileStorage, MultiDict
-
 from flaskbb.forum.forms import ReplyForm
 from flaskbb.forum.models import Attachment
 from flaskbb.forum.utils import parse_attachment_types
 from flaskbb.utils.settings import flaskbb_config
+from werkzeug.datastructures import FileStorage, MultiDict
 
 
 def test_parse_attachment_types():
@@ -90,7 +89,7 @@ def test_reply_form_rejects_when_disabled(member_request, topic):
 
 
 def test_reply_form_rejects_too_many(member_request, topic):
-    files = [_upload("a{}.png".format(i)) for i in range(6)]
+    files = [_upload(f"a{i}.png") for i in range(6)]
     form = _reply_form(files, content="test content")
 
     assert not form.validate()
@@ -104,7 +103,7 @@ def test_reply_form_rejects_without_permission(
     user.primary_group.save()
     user.invalidate_cache()
 
-    with application.test_request_context("/topic/{}".format(topic.id)):
+    with application.test_request_context(f"/topic/{topic.id}"):
         login_user(user)
         form = _reply_form([_upload("a.png")], content="test content")
 

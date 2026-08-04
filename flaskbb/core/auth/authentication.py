@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.auth.authentication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -7,7 +6,7 @@ flaskbb.core.auth.authentication
 """
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, TypeAlias
+from typing import Any, TYPE_CHECKING, TypeAlias
 
 if TYPE_CHECKING:
     from werkzeug.local import LocalProxy
@@ -27,7 +26,7 @@ class StopAuthentication(BaseFlaskBBError):
     """
 
     def __init__(self, reason: str):
-        super(StopAuthentication, self).__init__(reason)
+        super().__init__(reason)
         self.reason = reason
 
 
@@ -39,7 +38,7 @@ class ForceLogout(BaseFlaskBBError):
     """
 
     def __init__(self, reason: str):
-        super(ForceLogout, self).__init__(reason)
+        super().__init__(reason)
         self.reason = reason
 
 

@@ -1,11 +1,10 @@
 from flask_login import login_user, logout_user
 from flask_login.test_client import FlaskLoginClient
-from sqlalchemy import select
-
 from flaskbb.extensions import db
 from flaskbb.forum.models import Topic
 from flaskbb.user.models import Guest
 from flaskbb.utils.queries import hidden
+from sqlalchemy import select
 
 
 def test_guest_user_cannot_see_hidden_posts(

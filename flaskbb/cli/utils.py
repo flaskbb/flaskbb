@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.cli.utils
 ~~~~~~~~~~~~~~~~~
@@ -14,7 +13,7 @@ import importlib.metadata
 import os
 import re
 import sys
-from typing import IO, Any, override
+from typing import Any, IO, override
 
 import click
 from click._compat import get_text_stderr
@@ -78,7 +77,7 @@ def validate_plugin(plugin: str):
     # list_name holds all plugin names, also the disabled ones (they won't do
     # anything as they are set as 'blocked' on pluggy)
     if plugin not in pluggy.list_name():
-        raise FlaskBBCLIError("Plugin {} not found.".format(plugin), fg="red")
+        raise FlaskBBCLIError(f"Plugin {plugin} not found.", fg="red")
     return True
 
 
@@ -87,7 +86,7 @@ def validate_theme(theme: str):
     try:
         get_theme(theme)
     except KeyError:
-        raise FlaskBBCLIError("Theme {} not found.".format(theme), fg="red")
+        raise FlaskBBCLIError(f"Theme {theme} not found.", fg="red")
 
 
 def get_cookiecutter() -> object:
@@ -187,9 +186,7 @@ def prompt_config_path(config_path: str) -> str:
     while True:
         if os.path.exists(config_path) and click.confirm(
             click.style(
-                "Config {cfg} exists. Do you want to overwrite it?".format(
-                    cfg=config_path
-                ),
+                f"Config {config_path} exists. Do you want to overwrite it?",
                 fg="magenta",
             )
         ):

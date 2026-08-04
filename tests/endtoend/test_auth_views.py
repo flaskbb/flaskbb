@@ -1,6 +1,5 @@
 from flask import get_flashed_messages
 from flask_login import login_user, logout_user
-
 from flaskbb.management import views
 
 

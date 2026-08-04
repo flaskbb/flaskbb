@@ -1,6 +1,4 @@
 import pytest
-from pluggy import HookimplMarker
-
 from flaskbb.auth.services.registration import RegistrationService
 from flaskbb.core.auth.registration import (
     RegistrationFailureHandler,
@@ -14,6 +12,7 @@ from flaskbb.core.exceptions import (
     ValidationError,
 )
 from flaskbb.user.models import User
+from pluggy import HookimplMarker
 
 pytestmark = pytest.mark.usefixtures("default_settings")
 
@@ -23,7 +22,7 @@ class RaisingValidator(UserValidator):
         raise ValidationError("username", "nope")
 
 
-class TestRegistrationService(object):
+class TestRegistrationService:
     fred = UserRegistrationInfo(
         username="Fred",
         password="Fred",

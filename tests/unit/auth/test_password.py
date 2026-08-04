@@ -1,15 +1,14 @@
 import pytest
-from werkzeug.security import check_password_hash
-
 from flaskbb.auth.services import password
 from flaskbb.core.exceptions import StopValidation, ValidationError
 from flaskbb.core.tokens import Token, TokenActions, TokenError
 from flaskbb.user.models import User
+from werkzeug.security import check_password_hash
 
 pytestmark = pytest.mark.usefixtures("default_settings")
 
 
-class TestPasswordReset(object):
+class TestPasswordReset:
     def test_raises_token_error_if_not_a_password_reset(self, token_serializer):
         service = password.ResetPasswordService(token_serializer, User, [])
         raw_token = token_serializer.dumps(

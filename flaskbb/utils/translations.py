@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -16,7 +15,7 @@ from typing import override
 
 import babel
 import babel.support
-from flask import Flask, current_app
+from flask import current_app, Flask
 from flask_babelplus import Domain, get_locale
 from flask_babelplus.utils import get_state
 
@@ -28,7 +27,7 @@ logger = logging.getLogger(__name__)
 class FlaskBBDomain(Domain):
     def __init__(self, app: Flask):
         self.app = app
-        super(FlaskBBDomain, self).__init__()
+        super().__init__()
 
         # Plugin translations
         with self.app.app_context():
@@ -58,7 +57,7 @@ class FlaskBBDomain(Domain):
             )
             # now load and add the plugin translations
             for plugin in self.plugin_translations:
-                logger.debug("Loading plugin translation from: {}".format(plugin))
+                logger.debug(f"Loading plugin translation from: {plugin}")
                 plugin_translation = babel.support.Translations.load(
                     dirname=plugin, locales=locale, domain="messages"
                 )

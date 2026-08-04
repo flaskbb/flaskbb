@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.forum.forms
 ~~~~~~~~~~~~~~~~~~~
@@ -229,7 +228,7 @@ class EditTopicForm(TopicForm):
         post objects at the same time.
         """
         for obj in objs:
-            super(EditTopicForm, self).populate_obj(obj)
+            super().populate_obj(obj)
 
     def save(self, user, forum):
         if self.track_topic.data:

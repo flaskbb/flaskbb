@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.search.backends.postgresql
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,10 +26,10 @@ from typing import Any, override
 
 from flask import current_app
 from flask_sqlalchemy.model import Model
-from sqlalchemy import DDL, Select, event, func, literal_column, select
+from sqlalchemy import DDL, event, func, literal_column, Select, select
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
-from flaskbb.core.search.base import ModelT, SearchBackend, ordered_by_ids
+from flaskbb.core.search.base import ModelT, ordered_by_ids, SearchBackend
 from flaskbb.core.search.spec import INDEX_SPECS, TABLES
 from flaskbb.extensions import db
 from flaskbb.forum.models import Post, Topic
@@ -78,7 +77,7 @@ def _register_create_all_ddl() -> None:
     for model, table, cols in INDEX_SPECS:
         for statement in _create_statements(table, cols):
             event.listen(
-                getattr(model, "__table__"),
+                model.__table__,
                 "after_create",
                 DDL(statement).execute_if(callable_=_emit_on_create),
             )
@@ -109,7 +108,7 @@ class PostgreSQLSearchBackend(SearchBackend):
     def _ranked_ids(self, model: ModelT, table: str, query: str) -> list[int]:
         vector = _search_vector(table)
         tsquery = func.plainto_tsquery(_TS_CONFIG, query)
-        pk_col = getattr(model, "id")
+        pk_col = model.id
         stmt = (
             select(pk_col)
             .where(vector.op("@@")(tsquery))

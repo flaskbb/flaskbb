@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.auth.services.authentication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s(frozen=True)
-class FailedLoginConfiguration(object):
+class FailedLoginConfiguration:
     """
     Used to configure how many failed logins are accepted until an account
     is temporarily locked out and how long to temporarily lock the account

@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 import pytest
-
 from flaskbb.core.exceptions import StopValidation, ValidationError
 from flaskbb.core.user.update import EmailUpdate, PasswordUpdate
 from flaskbb.user.models import User
@@ -10,7 +9,7 @@ from flaskbb.user.services import validators
 pytestmark = pytest.mark.usefixtures("default_settings")
 
 
-class TestEmailsMustBeDifferent(object):
+class TestEmailsMustBeDifferent:
     def test_raises_if_emails_match(self, Fred):
         matching_emails = EmailUpdate("same@email.example", Fred.email)
 
@@ -24,7 +23,7 @@ class TestEmailsMustBeDifferent(object):
         validators.EmailsMustBeDifferent().validate(Fred, different_emails)
 
 
-class TestPasswordsMustBeDifferent(object):
+class TestPasswordsMustBeDifferent:
     def test_raises_if_passwords_are_the_same(self, Fred):
         change = PasswordUpdate("fred", "fred")
 
@@ -39,7 +38,7 @@ class TestPasswordsMustBeDifferent(object):
         validators.PasswordsMustBeDifferent().validate(Fred, change)
 
 
-class TestCantShareEmailValidator(object):
+class TestCantShareEmailValidator:
     def test_raises_if_email_is_already_registered(self, Fred, user):
         change = EmailUpdate("old@email.example", user.email)
 
@@ -54,7 +53,7 @@ class TestCantShareEmailValidator(object):
         validators.CantShareEmailValidator(User).validate(Fred, change)
 
 
-class TestOldEmailMustMatchValidator(object):
+class TestOldEmailMustMatchValidator:
     def test_raises_if_old_email_doesnt_match(self, Fred):
         change = EmailUpdate("not@the.same.one.bit", "probably@real.email.provider")
 
@@ -69,7 +68,7 @@ class TestOldEmailMustMatchValidator(object):
         validators.OldEmailMustMatch().validate(Fred, change)
 
 
-class TestOldPasswordMustMatchValidator(object):
+class TestOldPasswordMustMatchValidator:
     def test_raises_if_old_password_doesnt_match(self, Fred):
         change = PasswordUpdate(str(uuid4()), str(uuid4()))
 

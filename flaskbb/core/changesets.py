@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.changesets
 ~~~~~~~~~~~~~~~~~~~~~
@@ -11,7 +10,7 @@ Core interfaces for handlers, services, etc.
 
 from abc import ABC, abstractmethod
 from inspect import isclass
-from typing import Any, Generic, TypeVar, override
+from typing import Any, Generic, override, TypeVar
 
 from flask_sqlalchemy.model import Model
 
@@ -22,7 +21,7 @@ M = TypeVar("M", bound=Model)
 C = TypeVar("C")  # Unbound type variable for the attrs class
 
 
-class EmptyValue(object):
+class EmptyValue:
     """
     Represents an empty change set value when None is a valid value
     to apply to the model.

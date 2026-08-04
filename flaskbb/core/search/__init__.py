@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.search
 ~~~~~~~~~~~~~~~~~~~~
@@ -11,7 +10,7 @@ been set in the config `SEARCH_BACKEND`.
 """
 
 from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Any, override
+from typing import Any, override, TYPE_CHECKING
 
 from flask import Flask
 from flask_sqlalchemy.model import Model

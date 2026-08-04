@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.plugins.manager
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -12,7 +11,7 @@ Plugin Manager for FlaskBB
 import logging
 import string
 from importlib.metadata import Distribution, PackageMetadata
-from typing import TypeAlias, override
+from typing import override, TypeAlias
 
 import pluggy
 from pluggy._manager import DistFacade
@@ -92,7 +91,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     """
 
     def __init__(self, project_name: str):
-        super(FlaskBBPluginManager, self).__init__(project_name=project_name)
+        super().__init__(project_name=project_name)
         self._plugin_metadata: dict[str, DistMeta] = {}
         self._disabled_plugins: dict[str, _Plugin] = {}
 
@@ -108,12 +107,12 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         Raise a ValueError if the plugin is already registered.
         """
         # internal plugins are stored in self._plugin2hookcallers
-        name = super(FlaskBBPluginManager, self).register(plugin, name)
+        name = super().register(plugin, name)
         if not internal:
             return name
 
         if name is None:
-            logger.error("Couldn't register plugin {}".format(plugin))
+            logger.error(f"Couldn't register plugin {plugin}")
             return None
 
         self._internal_name2plugin[name] = self._name2plugin[name]
@@ -124,7 +123,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Unregister a plugin object and all its contained hook implementations
         from internal data structures.
         """
-        plugin = super(FlaskBBPluginManager, self).unregister(plugin=plugin, name=name)
+        plugin = super().unregister(plugin=plugin, name=name)
 
         name = self.get_name(plugin)
         if name is None:
@@ -140,13 +139,13 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         """Block registrations of the given name, unregister if already
         registered.
         """
-        super(FlaskBBPluginManager, self).set_blocked(name)
+        super().set_blocked(name)
         self._internal_name2plugin[name] = None
 
     @override
     def is_blocked(self, name: str):
         """Return True if the name blockss registering plugins of that name."""
-        blocked = super(FlaskBBPluginManager, self).is_blocked(name)
+        blocked = super().is_blocked(name)
 
         return (
             blocked
@@ -157,13 +156,13 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     @override
     def get_plugin(self, name: str):
         """Return a plugin or None for the given name."""
-        plugin = super(FlaskBBPluginManager, self).get_plugin(name)
+        plugin = super().get_plugin(name)
         return self._internal_name2plugin.get(name, plugin)
 
     @override
     def get_name(self, plugin: _Plugin):
         """Return name for registered plugin or None if not registered."""
-        name = super(FlaskBBPluginManager, self).get_name(plugin)
+        name = super().get_name(plugin)
         if name:
             return name
 
@@ -175,7 +174,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     def load_setuptools_entrypoints(self, group: str, name: str | None = None) -> int:
         """Load modules from querying the specified setuptools entrypoint name.
         Return the number of loaded plugins."""
-        logger.info("Loading plugins under entrypoint {}".format(group))
+        logger.info(f"Loading plugins under entrypoint {group}")
         import importlib.metadata
 
         count = 0
@@ -199,7 +198,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
                 self.register(plugin, name=ep.name)
 
                 count += 1
-                logger.info("Loaded plugin: {}".format(ep.name))
+                logger.info(f"Loaded plugin: {ep.name}")
 
         logger.info(f"Loaded {count} plugins for entrypoint {group}")
         return count

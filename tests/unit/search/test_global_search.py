@@ -1,13 +1,12 @@
 from contextlib import contextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from flask_login import login_user
-from werkzeug.datastructures import MultiDict
-
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.search import service, views
 from flaskbb.search.forms import SearchForm
+from werkzeug.datastructures import MultiDict
 
 
 def _all(stmt):
@@ -122,7 +121,7 @@ def test_search_forums_filters_by_date_range(request_context, topic, user):
     # Regression: DateField yields a plain `date`, but `date_created` is a
     # tz-aware UTCDateTime column - a bare date used to blow up in binding.
     # `date_to=today` must also include a topic created earlier today.
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
 
     results = service.search_forums(
         "Test Topic Normal",
@@ -134,10 +133,8 @@ def test_search_forums_filters_by_date_range(request_context, topic, user):
     assert topic in _all(results["topic"])
 
 
-def test_search_forums_excludes_topics_outside_date_range(
-    request_context, topic, user
-):
-    past = datetime.now(timezone.utc).date() - timedelta(days=10)
+def test_search_forums_excludes_topics_outside_date_range(request_context, topic, user):
+    past = datetime.now(UTC).date() - timedelta(days=10)
 
     results = service.search_forums("Test Topic Normal", user, date_to=past)
 

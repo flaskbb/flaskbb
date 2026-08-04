@@ -1,8 +1,6 @@
 from datetime import date
 
 import pytest
-from werkzeug.datastructures import MultiDict
-
 from flaskbb.core.user.update import (
     EmailUpdate,
     PasswordUpdate,
@@ -10,11 +8,12 @@ from flaskbb.core.user.update import (
     UserDetailsChange,
 )
 from flaskbb.user import forms
+from werkzeug.datastructures import MultiDict
 
 pytestmark = pytest.mark.usefixtures("post_request_context", "default_settings")
 
 
-class TestGeneralSettingsForm(object):
+class TestGeneralSettingsForm:
     def test_transforms_to_expected_change_object(self):
         data = MultiDict({"language": "python", "theme": "molokai", "submit": True})
 
@@ -24,7 +23,7 @@ class TestGeneralSettingsForm(object):
         assert form.as_change() == expected
 
 
-class TestChangeEmailForm(object):
+class TestChangeEmailForm:
     def test_transforms_to_expected_change_object(self, Fred):
         data = MultiDict(
             {
@@ -80,7 +79,7 @@ class TestChangeEmailForm(object):
         assert not form.validate_on_submit()
 
 
-class TestChangePasswordForm(object):
+class TestChangePasswordForm:
     def test_transforms_to_expected_change_object(self):
         data = MultiDict(
             {
@@ -127,7 +126,7 @@ class TestChangePasswordForm(object):
         assert not form.validate_on_submit()
 
 
-class TestChangeUserDetailsForm(object):
+class TestChangeUserDetailsForm:
     def test_transforms_to_expected_change_object(self):
         data = MultiDict(
             dict(

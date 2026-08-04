@@ -7,7 +7,7 @@ import pytest
 def test_pluginmanager(plugin_manager):
     """Tests basic pluggy plugin registration."""
 
-    class A(object):
+    class A:
         pass
 
     a1, a2 = A(), A()
@@ -36,7 +36,7 @@ def test_pluginmanager(plugin_manager):
 def test_register_internal(plugin_manager):
     """Tests registration of internal flaskbb plugins."""
 
-    class A(object):
+    class A:
         pass
 
     a1, a2 = A(), A()
@@ -59,7 +59,7 @@ def test_register_internal(plugin_manager):
 
 
 def test_set_blocked(plugin_manager):
-    class A(object):
+    class A:
         pass
 
     a1 = A()
@@ -78,7 +78,7 @@ def test_set_blocked(plugin_manager):
 
 
 def test_set_blocked_internal(plugin_manager):
-    class A(object):
+    class A:
         pass
 
     a1 = A()
@@ -91,7 +91,7 @@ def test_set_blocked_internal(plugin_manager):
 
 
 def test_get_internal_plugin(plugin_manager):
-    class A(object):
+    class A:
         pass
 
     a1, a2 = A(), A()
@@ -102,7 +102,7 @@ def test_get_internal_plugin(plugin_manager):
 
 
 def test_get_internal_name(plugin_manager):
-    class A(object):
+    class A:
         pass
 
     a1, a2 = A(), A()

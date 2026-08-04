@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.user.views
 ~~~~~~~~~~~~~~~~~~
@@ -13,7 +12,7 @@ and the user settings from a signed in user.
 import logging
 
 from attrs import define, field
-from flask import Blueprint, Flask, flash, jsonify, redirect, request, url_for
+from flask import Blueprint, flash, Flask, jsonify, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required

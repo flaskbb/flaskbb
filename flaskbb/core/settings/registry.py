@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.settings.registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -10,8 +9,7 @@ into. Populated via the flaskbb_load_setting_groups pluggy hook.
 :license: BSD, see LICENSE for more details.
 """
 
-from collections.abc import Sequence
-from typing import Callable
+from collections.abc import Callable, Sequence
 
 from flaskbb.plugins.manager import FlaskBBPluginManager
 

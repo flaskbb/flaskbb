@@ -11,7 +11,6 @@ import os
 import pytest
 from flask import get_flashed_messages
 from flask_login import login_user, logout_user
-
 from flaskbb.forum.models import Attachment, Post
 from flaskbb.management import views
 from flaskbb.utils.helpers import time_utcnow
@@ -223,7 +222,7 @@ def test_attachments_list_renders_for_moderator(
 
     assert attachment.original_filename in response
     assert attachment.user.username in response
-    assert '"/admin/attachments/{}/delete"'.format(attachment.id) in response
+    assert f'"/admin/attachments/{attachment.id}/delete"' in response
     # admin-only actions stay out of a moderator's page
     assert "/admin/attachments/purge" not in response
     assert "/admin/attachments/cleanup" not in response

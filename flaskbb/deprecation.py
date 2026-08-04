@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.deprecation
 ~~~~~~~~~~~~~~~~~~~
@@ -12,8 +11,9 @@ Module used for deprecation handling in FlaskBB
 import inspect
 import warnings
 from abc import ABC
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable
+from typing import Any
 
 from flask_babelplus import gettext as _
 
@@ -64,9 +64,7 @@ def deprecated(
     def deprecation_decorator(f: Callable[..., None]):
         if not issubclass(category, FlaskBBDeprecation):
             raise ValueError(
-                "Expected subclass of FlaskBBDeprecation for category, got {}".format(
-                    str(category)
-                )
+                f"Expected subclass of FlaskBBDeprecation for category, got {str(category)}"
             )
 
         version = ".".join([str(x) for x in category.version])
@@ -77,7 +75,7 @@ def deprecated(
             version=version,
         )
         if message:
-            warning = "{} {}".format(warning, message)
+            warning = f"{warning} {message}"
 
         docstring = f.__doc__
 

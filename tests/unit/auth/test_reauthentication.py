@@ -1,9 +1,6 @@
-from datetime import UTC, datetime
+from datetime import datetime, UTC
 
 import pytest
-from freezegun import freeze_time
-from pluggy import HookimplMarker
-
 from flaskbb.auth.services import reauthentication as reauth
 from flaskbb.core.auth.authentication import (
     PostReauthenticateHandler,
@@ -11,6 +8,8 @@ from flaskbb.core.auth.authentication import (
     ReauthenticateProvider,
     StopAuthentication,
 )
+from freezegun import freeze_time
+from pluggy import HookimplMarker
 
 pytestmark = pytest.mark.usefixtures("default_settings")
 
@@ -40,7 +39,7 @@ def test_marks_failed_login_attempt(Fred):
     assert Fred.last_failed_login == datetime(2018, 1, 1, 13, 30, tzinfo=UTC)
 
 
-class TestPluginAuthenticationManager(object):
+class TestPluginAuthenticationManager:
     def raises_stop_authentication_if_user_isnt_reauthenticated(
         self, plugin_manager, mocker, database, Fred
     ):

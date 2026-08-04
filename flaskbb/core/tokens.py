@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.auth.tokens
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -29,7 +28,7 @@ class TokenError(BaseFlaskBBError):
 
     def __init__(self, reason: str):
         self.reason = reason
-        super(TokenError, self).__init__(reason)
+        super().__init__(reason)
 
     @classmethod
     def invalid(cls):
@@ -74,7 +73,7 @@ class TokenActions:
 
 
 @attr.s(frozen=True, eq=True, order=True, hash=True)
-class Token(object):
+class Token:
     """
     :param int user_id:
     :param str operation: An operation taken from

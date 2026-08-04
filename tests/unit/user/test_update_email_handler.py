@@ -1,20 +1,19 @@
 from uuid import uuid4
 
 import pytest
-from pluggy import HookimplMarker
-
 from flaskbb.core.changesets import ChangeSetPostProcessor, ChangeSetValidator
 from flaskbb.core.exceptions import PersistenceError, StopValidation, ValidationError
 from flaskbb.core.user.update import EmailUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultEmailUpdateHandler
+from pluggy import HookimplMarker
 
 
 def random_email():
-    return "{}@not.real.at.all".format(str(uuid4()))
+    return f"{str(uuid4())}@not.real.at.all"
 
 
-class TestDefaultEmailUpdateHandler(object):
+class TestDefaultEmailUpdateHandler:
     def test_raises_stop_validation_if_errors_occur(
         self, mocker, user, database, plugin_manager
     ):

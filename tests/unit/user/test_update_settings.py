@@ -1,14 +1,13 @@
 import pytest
-from pluggy import HookimplMarker
-
 from flaskbb.core.changesets import ChangeSetPostProcessor
 from flaskbb.core.exceptions import PersistenceError
 from flaskbb.core.user.update import SettingsUpdate
 from flaskbb.user.models import User
 from flaskbb.user.services.update import DefaultSettingsUpdateHandler
+from pluggy import HookimplMarker
 
 
-class TestDefaultSettingsUpdateHandler(object):
+class TestDefaultSettingsUpdateHandler:
     def test_raises_persistence_error_if_save_fails(self, mocker, user, plugin_manager):
         settings_update = SettingsUpdate(language="python", theme="molokai")
         db = mocker.Mock()

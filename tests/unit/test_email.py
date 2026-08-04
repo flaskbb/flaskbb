@@ -1,5 +1,4 @@
 from flask import current_app
-
 from flaskbb.email import send_activation_token, send_reset_token
 from flaskbb.extensions import mail
 

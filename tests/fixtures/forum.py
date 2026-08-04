@@ -3,7 +3,6 @@
 import datetime
 
 import pytest
-
 from flaskbb.forum.models import (
     Attachment,
     Category,

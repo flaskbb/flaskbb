@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb.auth.services import activation
 from flaskbb.core.exceptions import ValidationError
 from flaskbb.core.tokens import Token, TokenActions, TokenError
@@ -8,7 +7,7 @@ from flaskbb.user.models import User
 pytestmark = pytest.mark.usefixtures("default_settings")
 
 
-class TestAccountActivationInitiateActivation(object):
+class TestAccountActivationInitiateActivation:
     def test_raises_if_user_doesnt_exist(self, Fred, token_serializer):
         service = activation.AccountActivator(token_serializer, User)
 
@@ -45,7 +44,7 @@ class TestAccountActivationInitiateActivation(object):
         )
 
 
-class TestAccountActivationActivateAccount(object):
+class TestAccountActivationActivateAccount:
     def test_raises_if_token_operation_isnt_activate(self, token_serializer):
         service = activation.AccountActivator(token_serializer, User)
         token = token_serializer.dumps(

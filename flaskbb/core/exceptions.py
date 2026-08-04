@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.core.exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,7 +34,7 @@ class ValidationError(BaseFlaskBBError):
     def __init__(self, attribute: str, reason: Any):
         self.attribute = attribute
         self.reason = reason
-        super(ValidationError, self).__init__((attribute, reason))
+        super().__init__((attribute, reason))
 
 
 class StopValidation(BaseFlaskBBError):
@@ -53,7 +52,7 @@ class StopValidation(BaseFlaskBBError):
 
     def __init__(self, reasons: list[tuple[str, str]]):
         self.reasons = reasons
-        super(StopValidation, self).__init__(reasons)
+        super().__init__(reasons)
 
 
 class PersistenceError(BaseFlaskBBError):

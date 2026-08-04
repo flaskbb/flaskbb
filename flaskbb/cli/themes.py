@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.cli.themes
 ~~~~~~~~~~~~~~~~~~
@@ -38,15 +37,13 @@ def list_themes():
 
     click.secho("[+] Active Theme:", fg="blue", bold=True)
     click.secho(
-        "    - {} (version {})".format(active_theme.name, active_theme.version),
+        f"    - {active_theme.name} (version {active_theme.version})",
         bold=True,
     )
 
     click.secho("[+] Available Themes:", fg="yellow", bold=True)
     for theme in available_themes:
-        click.secho(
-            "    - {} (version {})".format(theme.name, theme.version), bold=True
-        )
+        click.secho(f"    - {theme.name} (version {theme.version})", bold=True)
 
 
 @themes.command("new")
@@ -86,7 +83,7 @@ def new_theme(template, out_dir, force):
         )
 
     r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
-    click.secho("[+] Created new theme in {}".format(r), fg="green", bold=True)
+    click.secho(f"[+] Created new theme in {r}", fg="green", bold=True)
 
 
 @themes.command("remove")

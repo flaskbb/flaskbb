@@ -1,10 +1,9 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 import pytest
-from freezegun import freeze_time
-
 from flaskbb import tokens
 from flaskbb.core.tokens import Token, TokenActions, TokenError
+from freezegun import freeze_time
 
 pytestmark = pytest.mark.usefixtures("default_settings")
 

@@ -1,12 +1,11 @@
 from contextlib import contextmanager
 
 from flask_login import login_user
-from werkzeug.datastructures import MultiDict
-
 from flaskbb.extensions import db
 from flaskbb.forum import views
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.management import views as management_views
+from werkzeug.datastructures import MultiDict
 
 
 def _all(stmt):

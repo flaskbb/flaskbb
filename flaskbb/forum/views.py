@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.forum.views
 ~~~~~~~~~~~~~~~~~~~
@@ -14,11 +13,11 @@ import logging
 import math
 
 from flask import (
-    Blueprint,
-    Flask,
     abort,
+    Blueprint,
     current_app,
     flash,
+    Flask,
     redirect,
     request,
     url_for,
@@ -52,8 +51,8 @@ from flaskbb.forum.models import (
 from flaskbb.markup import make_renderer
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
-    FlashAndRedirect,
     do_topic_action,
+    FlashAndRedirect,
     format_quote,
     get_online_users,
     memberlist_enabled,
@@ -498,9 +497,7 @@ class ManageForum(MethodView):
 
             origin_forum_ids = set(topic.forum_id for topic in tmp_topics)
             if origin_forum_ids - {forum_instance.id}:
-                flash(
-                    _("Please modify topics in only one forum at a time."), "danger"
-                )
+                flash(_("Please modify topics in only one forum at a time."), "danger")
                 return redirect(mod_forum_url)
 
             new_forum = first_or_404(db.select(Forum).where(Forum.id == new_forum_id))

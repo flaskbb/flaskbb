@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
 from flaskbb.extensions import cache, db

@@ -29,7 +29,7 @@ def _get_image_resp(which, mime):
     return Response(
         method="GET",
         body=raw,
-        url="http://example/{}".format(which),
+        url=f"http://example/{which}",
         headers={"Content-Type": mime, "Content-Length": str(len(raw))},
     )
 

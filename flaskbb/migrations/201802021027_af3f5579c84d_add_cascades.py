@@ -28,9 +28,7 @@ def upgrade():
 
     if con.engine.dialect.name == "sqlite":
         # its not possible to remove unnamed constraints...
-        logger.warning(
-            "SQLite is only partially supported for revision {}.".format(revision)
-        )
+        logger.warning(f"SQLite is only partially supported for revision {revision}.")
 
     with op.batch_alter_table("conversations", schema=None) as batch_op:
         if con.engine.dialect.name == "mysql":

@@ -11,7 +11,6 @@ import re
 import pytest
 from flask import g, get_flashed_messages
 from flask_login import login_user, logout_user
-
 from flaskbb.extensions import db
 from flaskbb.forum import views as forum_views
 from flaskbb.forum.models import Post, Topic
@@ -128,7 +127,7 @@ def test_member_edit_page_hides_credential_fields_from_moderator(
         "primary_group",
         "secondary_groups",
     ):
-        assert 'name="{}"'.format(field) not in response
+        assert f'name="{field}"' not in response
 
 
 def test_admin_edit_page_shows_credential_fields(default_settings, admin_user, user):
@@ -141,7 +140,7 @@ def test_admin_edit_page_shows_credential_fields(default_settings, admin_user, u
         "primary_group",
         "secondary_groups",
     ):
-        assert 'name="{}"'.format(field) in response
+        assert f'name="{field}"' in response
 
 
 def test_moderator_editing_member_cannot_change_credentials_or_groups(
@@ -242,7 +241,7 @@ def _edit_link(target):
     """The href the templates emit - relative, unlike url_for() called outside
     of a request context.
     """
-    return '"/admin/users/{}/edit"'.format(target.id)
+    return f'"/admin/users/{target.id}/edit"'
 
 
 def test_users_list_renders_for_moderator(
@@ -328,7 +327,7 @@ def test_secondary_groups_exclude_the_targets_primary_group(
     assert str(moderator_user.primary_group_id) not in offered
     # the other groups are still on offer, and primary_group still lists it
     assert offered
-    assert 'value="{}"'.format(moderator_user.primary_group_id) in response
+    assert f'value="{moderator_user.primary_group_id}"' in response
 
 
 def test_super_moderator_form_hides_credentials_but_keeps_groups(
@@ -337,9 +336,9 @@ def test_super_moderator_form_hides_credentials_but_keeps_groups(
     response, _messages = _edit(user.id, super_moderator_user)
 
     for field in ("email", "password", "activated"):
-        assert 'name="{}"'.format(field) not in response
+        assert f'name="{field}"' not in response
     for field in ("primary_group", "secondary_groups"):
-        assert 'name="{}"'.format(field) in response
+        assert f'name="{field}"' in response
 
 
 def test_super_moderator_can_promote_a_member_to_moderator(
@@ -464,7 +463,7 @@ def test_admin_editing_self_keeps_every_field(default_settings, admin_user):
         "secondary_groups",
         "activated",
     ):
-        assert 'name="{}"'.format(field) in response
+        assert f'name="{field}"' in response
 
 
 def test_admin_editing_self_gets_the_confirm_dialog(default_settings, admin_user):
@@ -549,7 +548,7 @@ def test_super_moderator_can_edit_themselves_without_groups(
         "primary_group",
         "secondary_groups",
     ):
-        assert 'name="{}"'.format(field) not in response
+        assert f'name="{field}"' not in response
 
 
 def test_super_moderator_self_edit_applies_profile_changes(
@@ -576,7 +575,7 @@ def test_moderator_can_edit_themselves(default_settings, moderator_user):
 
     assert 'name="username"' in response
     for field in ("email", "password", "activated", "primary_group"):
-        assert 'name="{}"'.format(field) not in response
+        assert f'name="{field}"' not in response
 
 
 def test_the_self_restriction_does_not_apply_to_other_admins(
@@ -612,7 +611,7 @@ def test_admin_can_delete_all_of_a_users_posts(
     assert response.status_code == 302
     assert (
         "success",
-        "All posts by {} have been deleted.".format(user.username),
+        f"All posts by {user.username} have been deleted.",
     ) in messages
     assert user.post_count == 0
     assert db.session.get(Topic, topic.id) is None

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.populate
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -8,8 +7,6 @@ A module that makes creating data more easily
 :copyright: (c) 2014 by the FlaskBB Team.
 :license: BSD, see LICENSE for more details.
 """
-
-from __future__ import unicode_literals
 
 import logging
 import os
@@ -373,10 +370,10 @@ def run_plugin_migrations(plugins: list[str] | None = None):
             continue
 
         try:
-            alembic.upgrade(target="{}@head".format(plugin_name))
+            alembic.upgrade(target=f"{plugin_name}@head")
         except CommandError as exc:
             logger.debug(
-                "Couldn't run migrations for plugin {} because of "
-                "following exception: ".format(plugin_name),
+                f"Couldn't run migrations for plugin {plugin_name} because of "
+                "following exception: ",
                 exc_info=exc,
             )

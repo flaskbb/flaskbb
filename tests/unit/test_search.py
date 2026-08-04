@@ -2,19 +2,18 @@ import importlib.util
 from pathlib import Path
 
 import pytest
-from pluggy import HookimplMarker
-from sqlalchemy import text
-
 from flaskbb.core.search import FlaskBBSearch, SearchBackendRegistration
 from flaskbb.core.search.backends.postgresql import PostgreSQLSearchBackend
 from flaskbb.core.search.backends.sql import SQLSearchBackend
 from flaskbb.core.search.backends.sqlite import SQLiteSearchBackend
-from flaskbb.core.search.base import SearchBackend, ordered_by_ids
+from flaskbb.core.search.base import ordered_by_ids, SearchBackend
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import db, pluggy
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.user.models import User
+from pluggy import HookimplMarker
+from sqlalchemy import text
 
 impl = HookimplMarker("flaskbb")
 
@@ -393,15 +392,23 @@ def test_create_all_builds_sqlite_fts_schema(application):
     application.config["SEARCH_BACKEND"] = "sqlite"
     try:
         db.create_all()
-        tables = db.session.execute(
-            text(
-                "SELECT name FROM sqlite_master "
-                "WHERE type='table' AND name='posts_fts'"
+        tables = (
+            db.session.execute(
+                text(
+                    "SELECT name FROM sqlite_master "
+                    "WHERE type='table' AND name='posts_fts'"
+                )
             )
-        ).scalars().all()
-        triggers = db.session.execute(
-            text("SELECT name FROM sqlite_master WHERE type='trigger'")
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
+        triggers = (
+            db.session.execute(
+                text("SELECT name FROM sqlite_master WHERE type='trigger'")
+            )
+            .scalars()
+            .all()
+        )
         assert "posts_fts" in tables
         assert "posts_ai" in triggers
     finally:
@@ -417,9 +424,15 @@ def test_create_all_skips_fts_schema_for_other_backends(database):
     """With a non-FTS backend selected (default 'sql'), create_all must
     not build the FTS tables - the DDL guard keeps them out.
     """
-    tables = db.session.execute(
-        text("SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'")
-    ).scalars().all()
+    tables = (
+        db.session.execute(
+            text(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='posts_fts'"
+            )
+        )
+        .scalars()
+        .all()
+    )
     assert tables == []
 
 
@@ -443,5 +456,3 @@ def test_flaskbb_search_proxy_resolves_postgresql(application):
         assert isinstance(proxy._impl, PostgreSQLSearchBackend)
     finally:
         del application.config["SEARCH_BACKEND"]
-
-

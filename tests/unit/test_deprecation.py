@@ -1,8 +1,7 @@
 import warnings
 
 import pytest
-
-from flaskbb.deprecation import RemovedInFlaskBB3, deprecated
+from flaskbb.deprecation import deprecated, RemovedInFlaskBB3
 
 NEXT_VERSION_STRING = ".".join([str(x) for x in RemovedInFlaskBB3.version])
 
@@ -21,7 +20,7 @@ def default_deprecation():
     pass
 
 
-class TestDeprecation(object):
+class TestDeprecation:
     def test_emits_default_deprecation_warning(self, recwarn):
         warnings.simplefilter("default", RemovedInFlaskBB3)
         default_deprecation()

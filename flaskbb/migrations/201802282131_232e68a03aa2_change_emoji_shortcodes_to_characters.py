@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """change emoji shortcodes to characters
 
 Revision ID: 232e68a03aa2
@@ -6,8 +5,6 @@ Revises: af3f5579c84d
 Create Date: 2018-02-28 21:31:35.260704
 
 """
-
-from __future__ import unicode_literals
 
 import sqlalchemy as sa
 from alembic import op
@@ -907,7 +904,7 @@ _emoji_replacement_mapping = {
 
 def _replace_emoji(line):
     for shortcode, characters in _emoji_replacement_mapping.items():
-        line = line.replace(":{}:".format(shortcode), characters)
+        line = line.replace(f":{shortcode}:", characters)
     return line
 
 
@@ -916,7 +913,7 @@ def _unreplace_emoji(line):
     for shortcode, character in sorted(
         _emoji_replacement_mapping.items(), key=lambda t: len(t[1]), reverse=True
     ):
-        line = line.replace(character, ":{}:".format(shortcode))
+        line = line.replace(character, f":{shortcode}:")
     return line
 
 

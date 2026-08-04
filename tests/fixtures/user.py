@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb.user.models import Guest, User
 
 

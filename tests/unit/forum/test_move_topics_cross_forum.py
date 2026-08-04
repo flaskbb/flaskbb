@@ -1,5 +1,4 @@
 from flask_login.test_client import FlaskLoginClient
-
 from flaskbb.forum.models import Category, Forum, Post, Topic
 from flaskbb.user.models import User
 
@@ -12,7 +11,9 @@ def _setup_forums_and_topic(default_groups):
     forum_a.groups = default_groups
     forum_a.save()
 
-    forum_b = Forum(title="Forum B (attacker has zero rights here)", category_id=category.id)
+    forum_b = Forum(
+        title="Forum B (attacker has zero rights here)", category_id=category.id
+    )
     forum_b.groups = default_groups
     forum_b.save()
 
@@ -56,7 +57,11 @@ def test_moderator_can_move_topic_from_unmoderated_forum(
     with application.test_client(user=attacker) as client:
         resp = client.post(
             f"/forum/{forum_a.id}/edit",
-            data={"rowid": [str(victim_topic.id)], "move": "Move", "forum": str(forum_a.id)},
+            data={
+                "rowid": [str(victim_topic.id)],
+                "move": "Move",
+                "forum": str(forum_a.id),
+            },
             follow_redirects=True,
         )
         assert resp.status_code == 200
@@ -84,7 +89,11 @@ def test_non_moderator_cannot_move_topics_control(
     with application.test_client(user=plain_member) as client:
         resp = client.post(
             f"/forum/{forum_a.id}/edit",
-            data={"rowid": [str(victim_topic.id)], "move": "Move", "forum": str(forum_a.id)},
+            data={
+                "rowid": [str(victim_topic.id)],
+                "move": "Move",
+                "forum": str(forum_a.id),
+            },
             follow_redirects=True,
         )
         assert resp.status_code == 200

@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb.auth.services.registration import (
     EmailUniquenessValidator,
     UsernameRequirements,

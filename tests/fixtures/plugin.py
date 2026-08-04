@@ -1,5 +1,4 @@
 import pytest
-
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.utils.forms
 ~~~~~~~~~~~~~~~~~~~
@@ -10,7 +9,7 @@ This module contains stuff for forms.
 """
 
 import functools
-from typing import Any, TypeVar, override
+from typing import Any, override, TypeVar
 
 from flask import current_app
 from flask_babelplus import lazy_gettext as _
@@ -55,7 +54,7 @@ class AvatarExtensionValidator(FileAllowed):
     @override
     def __call__(self, form, field):
         self.upload_set = current_app.config.get("AVATAR_EXTENSIONS", [])  # pyright: ignore[reportUnknownMemberType]
-        return super(AvatarExtensionValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+        return super().__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
 
 
 class AvatarSizeValidator(FileSize):
@@ -70,4 +69,4 @@ class AvatarSizeValidator(FileSize):
             self.message = "Image is too big! {}kb are allowed.".format(
                 flaskbb_config["AVATAR_SIZE"]
             )
-        return super(AvatarSizeValidator, self).__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+        return super().__call__(form, field)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]

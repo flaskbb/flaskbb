@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 flaskbb.search.service
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -11,7 +10,7 @@ top of the returned `Select` statements.
 :license: BSD, see LICENSE for more details.
 """
 
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timedelta, UTC
 from typing import Any
 
 from markupsafe import Markup
@@ -78,11 +77,11 @@ def search_forums(
     # form's DateField yields a plain `date` - bind UTC day boundaries so the
     # comparison has tzinfo and `date_to` includes the whole selected day.
     if date_from:
-        start = datetime.combine(date_from, time.min, tzinfo=timezone.utc)
+        start = datetime.combine(date_from, time.min, tzinfo=UTC)
         stmt = stmt.where(model.date_created >= start)
 
     if date_to:
-        end = datetime.combine(date_to + timedelta(days=1), time.min, tzinfo=timezone.utc)
+        end = datetime.combine(date_to + timedelta(days=1), time.min, tzinfo=UTC)
         stmt = stmt.where(model.date_created < end)
 
     if state == "locked":
