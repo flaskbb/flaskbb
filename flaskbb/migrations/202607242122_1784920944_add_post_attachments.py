@@ -11,7 +11,7 @@ import json
 import sqlalchemy as sa
 from alembic import op
 
-import flaskbb
+import flaskbb.utils.database
 
 # revision identifiers, used by Alembic.
 revision = "1784920944"

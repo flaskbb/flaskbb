@@ -23,7 +23,7 @@ def upgrade():
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("from_user_id", sa.Integer(), nullable=True),
         sa.Column("to_user_id", sa.Integer(), nullable=True),
-        sa.Column("shared_id", sqlalchemy_utils.types.uuid.UUIDType(binary=16), nullable=False),
+        sa.Column("shared_id", sqlalchemy_utils.types.uuid.UUIDType(binary=True), nullable=False),
         sa.Column("subject", sa.String(length=255), nullable=True),
         sa.Column("date_created", sa.DateTime(), nullable=True),
         sa.Column("trash", sa.Boolean(), nullable=False),

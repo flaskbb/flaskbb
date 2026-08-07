@@ -56,7 +56,7 @@ class RegistrationFailureHandler(ABC):
     """
 
     @abstractmethod
-    def handle_failure(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
+    def handle_failure(self, user_info: UserRegistrationInfo, failures: list[tuple[str, str]]):
         """
         This method is abstract.
 
@@ -66,7 +66,7 @@ class RegistrationFailureHandler(ABC):
         """  # noqa
         pass
 
-    def __call__(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
+    def __call__(self, user_info: UserRegistrationInfo, failures: list[tuple[str, str]]):
         self.handle_failure(user_info, failures)
 
 

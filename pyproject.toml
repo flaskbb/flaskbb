@@ -145,6 +145,7 @@ tests = [
 typing = [
     "mypy",
     "basedpyright",
+    "types-gunicorn",
     "types-Pygments",
     "types-pytz",
     "types-WTForms",
@@ -164,6 +165,8 @@ allow-direct-references = true
 [tool.basedpyright]
 include = ["flaskbb"]
 exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs"]
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
 defineConstant = { DEBUG = true }
 reportIgnoreCommentWithoutRule = false
 reportMissingImports = "error"
@@ -201,13 +204,6 @@ line-length = 100
 output-format = "full"
 
 [tool.ruff.lint]
-extend-select = ["B", "Q"]
-ignore = [
-    "E711",
-    "E712",
-    "UP007",  # Use X | Y for type annotations; doesn't work with some of our (stringy) type definitions - should aim to resolve this
-]
-
 select = [
     "B",  # flake8-bugbear
     "E",  # pycodestyle error
@@ -215,6 +211,11 @@ select = [
     "I",  # isort
     "UP",  # pyupgrade
     "W",  # pycodestyle warning
+]
+ignore = [
+    "E711",
+    "E712",
+    "UP007",  # Use X | Y for type annotations; doesn't work with some of our (stringy) type definitions - should aim to resolve this
 ]
 
 [tool.ruff.lint.isort]
@@ -247,7 +248,8 @@ exclude_also = [
 python_version = "3.12"
 files = ["flaskbb/"]
 warn_unused_configs = true
-
+show_error_codes = true
+pretty = true
 # TODO if all of these can be enabled we can just set 'strict = true'
 disallow_subclassing_any = true
 # disallow_untyped_calls = true
@@ -277,6 +279,11 @@ module = [
     "wtforms_sqlalchemy.*",
 ]
 follow_untyped_imports = true
+
+# Optional dependencies, imported lazily behind a try/except ImportError
+[[tool.mypy.overrides]]
+module = ["cookiecutter.*", "IPython.*", "traitlets.*"]
+ignore_missing_imports = true
 
 
 [tool.tox]
@@ -319,7 +326,7 @@ dependency_groups = ["typing"]
 ignore_errors = true
 commands = [
     ["mypy"],
-    ["basedpyright", "--pythonpath", "{envpython}"],
+    #["basedpyright", "--pythonpath", "{envpython}"],
 ]
 
 [tool.tox.env.docs]

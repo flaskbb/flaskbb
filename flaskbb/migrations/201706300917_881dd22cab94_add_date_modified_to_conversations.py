@@ -9,7 +9,7 @@ Create Date: 2017-06-30 09:17:14.436704
 import sqlalchemy as sa
 from alembic import op
 
-import flaskbb
+import flaskbb.utils.database
 from flaskbb.utils.helpers import time_utcnow
 
 # revision identifiers, used by Alembic.

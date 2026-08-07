@@ -10,7 +10,7 @@ Create Date: 2016-11-19 09:19:28.000276
 import sqlalchemy as sa
 from alembic import op
 
-import flaskbb
+import flaskbb.utils.database
 
 revision = "d87cea4e995d"
 down_revision = "d9530a529b3f"

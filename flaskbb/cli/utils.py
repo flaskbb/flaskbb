@@ -13,6 +13,7 @@ import importlib.metadata
 import os
 import re
 import sys
+from collections.abc import Callable
 from typing import Any, IO, override
 
 import click
@@ -45,7 +46,7 @@ class FlaskBBCLIError(click.ClickException):
         click.secho(f"error: {self.format_message()}", file=file, **self.styles)
 
 
-class EmailType(click.ParamType):
+class EmailType(click.ParamType[str]):
     """The choice type allows a value to be checked against a fixed set of
     supported values.  All of these values have to be strings.
     See :ref:`choice-opts` for an example.
@@ -87,7 +88,7 @@ def validate_theme(theme: str):
         raise FlaskBBCLIError(f"Theme {theme} not found.", fg="red") from e
 
 
-def get_cookiecutter() -> object:
+def get_cookiecutter() -> Callable[..., str]:
     cookiecutter_available = False
     try:
         from cookiecutter.main import cookiecutter  # pyright: ignore
@@ -161,10 +162,12 @@ def prompt_update_user(
     is ``None`` is left unchanged on the user.
     """
     if not username:
-        username = click.prompt(
-            click.style("Username", fg="magenta"),
-            type=str,
-            default=os.environ.get("USER", ""),
+        username = str(
+            click.prompt(
+                click.style("Username", fg="magenta"),
+                type=str,
+                default=os.environ.get("USER", ""),
+            )
         )
 
     return update_user(username, password, email, group)

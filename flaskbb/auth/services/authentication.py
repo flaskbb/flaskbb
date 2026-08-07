@@ -10,13 +10,14 @@ in FlaskBB
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import attr
 from flask_babelplus import gettext as _
 from flask_sqlalchemy.session import Session
 from pytz import UTC
+from sqlalchemy.orm import scoped_session
 from werkzeug.security import check_password_hash
 
 from ...core.auth.authentication import (
@@ -44,8 +45,8 @@ class FailedLoginConfiguration:
     out for.
     """
 
-    limit = attr.ib()
-    lockout_window = attr.ib()
+    limit: int = attr.ib()
+    lockout_window: timedelta = attr.ib()
 
 
 class BlockTooManyFailedLogins(AuthenticationProvider):
@@ -148,7 +149,7 @@ class PluginAuthenticationManager(AuthenticationManager):
     process. This is the default authentication manager for FlaskBB.
     """
 
-    def __init__(self, plugin_manager: "FlaskBBPluginManager", session: Session):
+    def __init__(self, plugin_manager: "FlaskBBPluginManager", session: scoped_session[Session]):
         self.plugin_manager = plugin_manager
         self.session = session
 

@@ -48,6 +48,7 @@ from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from pytz import UTC
+from sqlalchemy import Row
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string, ImportStringError
 
@@ -247,7 +248,7 @@ class CategoryForums:
 
 
 def _group_forums_by_category(
-    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    query_result: Iterable[Row[Any]],
     user: "User",
 ) -> Iterable[CategoryForums]:
     it = itertools.groupby(query_result, operator.itemgetter(0))
@@ -267,7 +268,7 @@ def _group_forums_by_category(
 
 
 def get_categories_and_forums(
-    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    query_result: Iterable[Row[Any]],
     user: "User",
 ) -> list[CategoryForums]:
     """Returns a list with categories. Every category has a list for all
@@ -304,7 +305,7 @@ def get_categories_and_forums(
 
 
 def get_forums(
-    query_result: Iterable[tuple["Category", "Forum", "ForumsRead | None"]],
+    query_result: Iterable[Row[Any]],
     user: "User",
 ) -> CategoryForums:
     """Returns a tuple which contains the category and the forums as list.

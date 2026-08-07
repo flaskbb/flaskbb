@@ -408,14 +408,17 @@ class GroupForm(FlaskForm):
                 if field.data:
                     # if done in 'validate_guest' it would display this
                     # warning on the fields
-                    field.errors.append(_("Can't assign any permissions to this group."))
+                    field.errors = [
+                        *field.errors,
+                        _("Can't assign any permissions to this group."),
+                    ]
                     result = False
 
         checked: list[bool] = []
         for field in group_fields:
             if field.data and field.data in checked:
                 if len(checked) > 1:
-                    field.errors.append("A group can't have multiple group types.")
+                    field.errors = [*field.errors, "A group can't have multiple group types."]
                     result = False
             else:
                 checked.append(field.data)

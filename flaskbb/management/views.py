@@ -40,7 +40,7 @@ from flaskbb.core.settings import flaskbb_config
 from flaskbb.core.settings.forms import build_form
 from flaskbb.core.settings.models import Setting
 from flaskbb.core.settings.registry import setting_registry
-from flaskbb.extensions import allows, celery, db
+from flaskbb.extensions import allows, celery, db, login_manager
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Attachment, Category, Forum, Post, Report, Topic
 from flaskbb.management.forms import (
@@ -1600,7 +1600,7 @@ def flaskbb_load_blueprints(app: Flask):
         """Checks if the login is fresh for the current user, otherwise the user
         has to reauthenticate."""
         if not login_fresh():
-            return current_app.login_manager.needs_refresh()
+            return login_manager.needs_refresh()
 
     # Attachments
     register_view(

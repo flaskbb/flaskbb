@@ -11,7 +11,7 @@ import logging
 import sqlalchemy as sa
 from alembic import op
 
-import flaskbb
+import flaskbb.utils.database
 
 logger = logging.getLogger("alembic.runtime.migration")
 

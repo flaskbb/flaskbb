@@ -53,6 +53,15 @@ def make_comparable(cls):
 
 
 class CRUDMixin:
+    if t.TYPE_CHECKING:
+        # every model mixing this in declares its own primary key and is
+        # mapped by the declarative metaclass, which supplies __table__ and
+        # the kwargs-only declarative constructor
+        id: Mapped[int] = mapped_column(primary_key=True)
+        __table__: t.ClassVar[sa.Table]
+
+        def __init__(self, **kwargs: t.Any) -> None: ...
+
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
 
@@ -119,7 +128,7 @@ class CRUDMixin:
         return self
 
 
-class UTCDateTime(types.TypeDecorator[object]):
+class UTCDateTime(types.TypeDecorator[datetime.datetime]):
     impl = types.DateTime
     cache_ok = True
 

@@ -53,15 +53,17 @@ class FlaskBBDomain(Domain):
         if translations is None:
             dirname = self.get_translations_path(state.app)
             translations = babel.support.Translations.load(dirname, locale, domain=self.domain)
-            # now load and add the plugin translations
-            for plugin in self.plugin_translations:
-                logger.debug(f"Loading plugin translation from: {plugin}")
-                plugin_translation = babel.support.Translations.load(
-                    dirname=plugin, locales=locale, domain="messages"
-                )
+            # now load and add the plugin translations - only a real
+            # Translations catalog can merge others into itself
+            if isinstance(translations, babel.support.Translations):
+                for plugin in self.plugin_translations:
+                    logger.debug(f"Loading plugin translation from: {plugin}")
+                    plugin_translation = babel.support.Translations.load(
+                        dirname=plugin, locales=locale, domain="messages"
+                    )
 
-                if type(plugin_translation) is not babel.support.NullTranslations:
-                    translations.add(plugin_translation)
+                    if isinstance(plugin_translation, babel.support.Translations):
+                        translations.add(plugin_translation)
 
             self.cache[str(locale)] = translations
 

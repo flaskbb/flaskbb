@@ -188,7 +188,7 @@ def configure_app(app: Flask, config: Any):
                 pass
 
     # merge the new config with the old one
-    new_celery_config = app.config.get("CELERY_CONFIG")
+    new_celery_config = app.config["CELERY_CONFIG"]
     new_celery_config.update(celery_config)
     app.config.update({"CELERY_CONFIG": new_celery_config})
 

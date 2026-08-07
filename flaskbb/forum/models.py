@@ -1079,7 +1079,7 @@ class Topic(HideableCRUDMixin, db.Model):
         else:
             stmt_post_count = stmt.where(or_(Post.hidden.is_(False), Post.id == self.first_post_id))
 
-        forum.post_count = db.session.scalar(stmt_post_count)
+        forum.post_count = db.session.execute(stmt_post_count).scalar_one()
 
     def _restore_topic_to_forum(self):
         if (
@@ -1115,7 +1115,7 @@ class Topic(HideableCRUDMixin, db.Model):
             .where(Post.topic_id == self.id)
             .distinct()
         )
-        return db.session.execute(stmt).scalars().all()
+        return list(db.session.execute(stmt).scalars())
 
 
 @make_comparable
@@ -1524,7 +1524,9 @@ class Forum(db.Model, CRUDMixin):
                         select(Post.topic_id, func.min(Post.id))
                         .where(or_(*conditions))
                         .group_by(Post.topic_id)
-                    ).all()
+                    )
+                    .tuples()
+                    .all()
                 )
 
             topics.items = [

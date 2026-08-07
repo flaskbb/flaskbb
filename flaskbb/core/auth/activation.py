@@ -9,10 +9,6 @@ in FlaskBB
 """
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from flaskbb.user.models import User
 
 
 class AccountActivator(ABC):
@@ -22,7 +18,7 @@ class AccountActivator(ABC):
     """
 
     @abstractmethod
-    def initiate_account_activation(self, user: "User"):
+    def initiate_account_activation(self, email: str):
         """
         This method is abstract.
 
@@ -37,8 +33,8 @@ class AccountActivator(ABC):
         be sent to an email that is not registered in the installation or
         the account associated with that email has already been activated).
 
-        :param user: The user that the activation request applies to.
-        :type user: :class:`User<flaskbb.user.models.User>`
+        :param str email: The email address of the user that the activation
+            request applies to.
         """
         pass
 

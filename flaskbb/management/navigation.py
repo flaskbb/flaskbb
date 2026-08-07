@@ -13,7 +13,12 @@ from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 
 from flaskbb.core.settings.registry import setting_registry
-from flaskbb.display.navigation import NavigationHeader, NavigationLink, NavigationTree
+from flaskbb.display.navigation import (
+    NavigationHeader,
+    NavigationItem,
+    NavigationLink,
+    NavigationTree,
+)
 from flaskbb.extensions import pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.requirements import IsAdmin
@@ -23,11 +28,12 @@ ANCHOR = "management-content"
 
 def _settings_tree(user):
     on_settings = request.endpoint == "management.settings"
-    slug = request.view_args.get("slug") if on_settings else None
-    plugin = request.view_args.get("plugin") if on_settings else None
+    view_args = request.view_args or {}
+    slug = view_args.get("slug") if on_settings else None
+    plugin = view_args.get("plugin") if on_settings else None
     active_slug = (slug or "general") if on_settings and plugin is None else None
 
-    children = [
+    children: list[NavigationItem] = [
         NavigationLink(
             endpoint="management.settings",
             name=group.name,

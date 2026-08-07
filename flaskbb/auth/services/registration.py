@@ -70,7 +70,7 @@ class UsernameValidator(UserValidator):
     def __init__(self, requirements: UsernameRequirements):
         self._requirements = requirements
 
-    def validate(self, user_info: "User"):
+    def validate(self, user_info: UserRegistrationInfo):
         if not (self._requirements.min <= len(user_info.username) <= self._requirements.max):
             raise ValidationError(
                 "username",
@@ -100,7 +100,7 @@ class UsernameUniquenessValidator(UserValidator):
     def __init__(self, users):
         self.users = users
 
-    def validate(self, user_info: User):
+    def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             db.select(func.count(self.users.id)).filter(
                 func.lower(self.users.username) == user_info.username
@@ -124,7 +124,7 @@ class EmailUniquenessValidator(UserValidator):
     def __init__(self, users):
         self.users = users
 
-    def validate(self, user_info: User):
+    def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             db.select(func.count(self.users.id)).filter(
                 func.lower(self.users.email) == user_info.email
@@ -201,7 +201,7 @@ class RegistrationService(UserRegistrationService):
     reasons why the registration was prevented.
     """
 
-    def __init__(self, plugins: "FlaskBBPluginManager", users: User, db: SQLAlchemy):
+    def __init__(self, plugins: "FlaskBBPluginManager", users: type[User], db: SQLAlchemy):
         self.plugins = plugins
         self.users = users
         self.db = db
@@ -230,7 +230,7 @@ class RegistrationService(UserRegistrationService):
         if failures:
             raise StopValidation(failures)
 
-    def _handle_failure(self, user_info: UserRegistrationInfo, failures: tuple[str, str]):
+    def _handle_failure(self, user_info: UserRegistrationInfo, failures: list[tuple[str, str]]):
         self.plugins.hook.flaskbb_registration_failure_handler(
             user_info=user_info, failures=failures
         )

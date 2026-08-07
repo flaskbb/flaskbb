@@ -463,7 +463,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     click.secho("Is HTTPS (recommended) or HTTP used for to serve FlaskBB?", fg="cyan")
     default_conf["use_https"] = click.confirm(
         click.style("Use HTTPS?", fg="magenta"),
-        default=default_conf.get("use_https"),
+        default=bool(default_conf["use_https"]),
     )
 
     # SQLALCHEMY_DATABASE_URI
@@ -521,13 +521,13 @@ def generate_config(development: bool, output: str | None, force: bool):
     )
     default_conf["mail_use_tls"] = click.confirm(
         click.style("Use TLS for sending mails?", fg="magenta"),
-        default=default_conf.get("mail_use_tls"),
+        default=bool(default_conf["mail_use_tls"]),
     )
     # MAIL_USE_SSL
     click.secho("Same as above. TLS is the successor to SSL.", fg="cyan")
     default_conf["mail_use_ssl"] = click.confirm(
         click.style("Use SSL for sending mails?", fg="magenta"),
-        default=default_conf.get("mail_use_ssl"),
+        default=bool(default_conf["mail_use_ssl"]),
     )
     # MAIL_USERNAME
     click.secho(

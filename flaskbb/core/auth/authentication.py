@@ -96,19 +96,20 @@ class AuthenticationProvider(ABC):
     """
 
     @abstractmethod
-    def authenticate(self, identifier: str, secret: str) -> "User":
+    def authenticate(self, identifier: str, secret: str) -> "User | None":
         """
         This method is abstract.
 
         :param str identifier: An identifer for the user, typically this is
             either a username or an email.
         :param str secret: A secret to verify the user is who they say they are
-        :returns: An authenticated user.
+        :returns: An authenticated user, or None if this provider could not
+            authenticate them.
         :rtype: :class:`User<flaskbb.user.models.User>`
         """
         pass
 
-    def __call__(self, identifier: str, secret: str) -> "User":
+    def __call__(self, identifier: str, secret: str) -> "User | None":
         return self.authenticate(identifier, secret)
 
 

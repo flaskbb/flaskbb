@@ -17,16 +17,16 @@ wheels = [
 
 [[package]]
 name = "alembic"
-version = "1.18.5"
+version = "1.19.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mako" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/cc/ac0bed8e562e7407fe55c3ba85a4dce86e6dbd8730887bd1e406a6c5c18a/alembic-1.18.5.tar.gz", hash = "sha256:1554982221dd17e9a749b53902407578eb305e453f71999e8c7f0a48389fff8e", size = 2060480, upload-time = "2026-06-25T15:20:54.888Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/01/a48dab7827ac4421272399f7ed9a2ec17edd12c8bcde4417bd7b6821b71a/alembic-1.19.0.tar.gz", hash = "sha256:6487c612fc719dcfa22b17d2dd5b2b458929641e6aa2f0b65b135727f5e6d501", size = 2069906, upload-time = "2026-08-04T18:57:04.599Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/78/5fe6dc3a3a5b2f5a2a4faef8bfe336d5fa049a38884ab3172e0098160c01/alembic-1.18.5-py3-none-any.whl", hash = "sha256:06d8ba9d04558022f5395e9317de03d270f3dced49cee01f89fe7a13c26f14bc", size = 264664, upload-time = "2026-06-25T15:20:56.673Z" },
+    { url = "https://files.pythonhosted.org/packages/34/79/59ab6f1fe72eee229de91aa393225389a85df12a0fbbbfa264efcf6d7872/alembic-1.19.0-py3-none-any.whl", hash = "sha256:cf839d3849116aab3cc047e09c6968b9bd6b2fde61b6bb7c1e97352fe5503580", size = 265738, upload-time = "2026-08-04T18:57:06.219Z" },
 ]
 
 [[package]]
@@ -529,27 +529,27 @@ wheels = [
 
 [[package]]
 name = "flask-allows2"
-version = "1.2.0"
+version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flask" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/08/b7/874b45d6baedc32e5055b0d9880ba66c4ecd6fcfeadff51e157027ed8a39/flask_allows2-1.2.0.tar.gz", hash = "sha256:2624e1b6b0ba4ef8d807f83ab87148a01b4fa6c827846038ea2c33e57f98c6d3", size = 85879, upload-time = "2026-05-11T18:43:13.937Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/90/dd3d8a5312546b498ae47db5825e1ef012d5d57ef05621a19eec3d977bc3/flask_allows2-1.3.0.tar.gz", hash = "sha256:ece1f51bdd101206d5e14f8dc61a897f10e651c0ecd0da2b122a5e223ab090b5", size = 87013, upload-time = "2026-08-04T19:45:08.322Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/2a/6fe30eb00af3774353962494e5fd247b51e5fc2bbee5ffb510f123e19661/flask_allows2-1.2.0-py3-none-any.whl", hash = "sha256:0c9c28d07415c9f9f6da311c0854a9278aee31ee9d956e3d4ee07364cac3d36b", size = 14632, upload-time = "2026-05-11T18:43:12.321Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/3f/d744f9635bce9a2c65e491818d0d5e1e79ab71618d6d058eaf9c1ae7e87b/flask_allows2-1.3.0-py3-none-any.whl", hash = "sha256:139295e3fbcaa1dff3608a8e1085ada8005ae5a4fc74e4d9ec50d3404c3e2278", size = 16152, upload-time = "2026-08-04T19:45:06.615Z" },
 ]
 
 [[package]]
 name = "flask-babelplus"
-version = "2.4.1"
+version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "babel" },
     { name = "flask" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/72/27/771c92a71a66179eace6a103722fac68347a6563f6b61b63e834c6a8a477/flask_babelplus-2.4.1.tar.gz", hash = "sha256:4b9ccba505027e957127b805a2d91d901a2af8023481a463864be2f88c78d9cf", size = 10981, upload-time = "2026-02-11T23:21:54.068Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/08/dbb3cd48c8d92c9f359f1f52848dd98af0145ec7f38742e79b433a665882/flask_babelplus-2.5.0.tar.gz", hash = "sha256:c8f0c159211296d3df58e9dad5e81ebdbe2dccd9debec40527646100b4d6c170", size = 11849, upload-time = "2026-08-04T20:03:37.25Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/6f/f5d9a35a66296f9ee855602835c7a25d97f9c04280178c9b5308b836321f/flask_babelplus-2.4.1-py3-none-any.whl", hash = "sha256:dca646782dfe2ab514f0f06ccd964d98d747fd0a1032ac5489d65ead4219f3ef", size = 13407, upload-time = "2026-02-11T23:21:53.045Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/d3/eb4c89b7e8d9b48e6dd1697d6b24a6da522ed23ee9a28681af75593e1df3/flask_babelplus-2.5.0-py3-none-any.whl", hash = "sha256:2fcaeeaaebd8f86aa265ee1eb184992f11ce6f4c171f186cb0aa131458f47eb2", size = 14473, upload-time = "2026-08-04T20:03:35.96Z" },
 ]
 
 [[package]]
@@ -758,6 +758,7 @@ dev = [
     { name = "sphinxcontrib-log-cabinet" },
     { name = "tox" },
     { name = "tox-uv" },
+    { name = "types-gunicorn" },
     { name = "types-pygments" },
     { name = "types-pytz" },
     { name = "types-wtforms" },
@@ -791,6 +792,7 @@ tests = [
 typing = [
     { name = "basedpyright" },
     { name = "mypy" },
+    { name = "types-gunicorn" },
     { name = "types-pygments" },
     { name = "types-pytz" },
     { name = "types-wtforms" },
@@ -868,6 +870,7 @@ dev = [
     { name = "sphinxcontrib-log-cabinet" },
     { name = "tox", specifier = ">=4.39" },
     { name = "tox-uv" },
+    { name = "types-gunicorn" },
     { name = "types-pygments" },
     { name = "types-pytz" },
     { name = "types-wtforms" },
@@ -899,6 +902,7 @@ tests = [
 typing = [
     { name = "basedpyright" },
     { name = "mypy" },
+    { name = "types-gunicorn" },
     { name = "types-pygments" },
     { name = "types-pytz" },
     { name = "types-wtforms" },
@@ -1252,14 +1256,14 @@ wheels = [
 
 [[package]]
 name = "mako"
-version = "1.3.12"
+version = "1.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/62/791b31e69ae182791ec67f04850f2f062716bbd205483d63a215f3e062d3/mako-1.3.12.tar.gz", hash = "sha256:9f778e93289bd410bb35daadeb4fc66d95a746f0b75777b942088b7fd7af550a", size = 400219, upload-time = "2026-04-28T19:01:08.512Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/12/b5fa2353e2754cd67fb9f83793fa48ff42c213a5da7e719869d2301f6ab8/mako-1.4.1.tar.gz", hash = "sha256:d7904710b662996425a21627710c4777c45053146942cf8a7aebf757c92b8c27", size = 410165, upload-time = "2026-08-05T06:10:56.611Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bc/b1/a0ec7a5a9db730a08daef1fdfb8090435b82465abbf758a596f0ea88727e/mako-1.3.12-py3-none-any.whl", hash = "sha256:8f61569480282dbf557145ce441e4ba888be453c30989f879f0d652e39f53ea9", size = 78521, upload-time = "2026-04-28T19:01:10.393Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/54/12ed58d458474aaab5c3d180173e745a4fe131bb330370596876d19ff60f/mako-1.4.1-py3-none-any.whl", hash = "sha256:a359d9a94a541213958742b2698d0a7757bb83551767bc468a74b9905aba9617", size = 80010, upload-time = "2026-08-05T06:10:58.248Z" },
 ]
 
 [[package]]
@@ -1436,11 +1440,11 @@ wheels = [
 
 [[package]]
 name = "packaging"
-version = "26.2"
+version = "26.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d7/f1/e7a6dd94a8d4a5626c03e4e99c87f241ba9e350cd9e6d75123f992427270/packaging-26.2.tar.gz", hash = "sha256:ff452ff5a3e828ce110190feff1178bb1f2ea2281fa2075aadb987c2fb221661", size = 228134, upload-time = "2026-04-24T20:15:23.917Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz", hash = "sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79", size = 313412, upload-time = "2026-08-04T18:15:28.737Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/b2/87e62e8c3e2f4b32e5fe99e0b86d576da1312593b39f47d8ceef365e95ed/packaging-26.2-py3-none-any.whl", hash = "sha256:5fc45236b9446107ff2415ce77c807cee2862cb6fac22b8a73826d0693b0980e", size = 100195, upload-time = "2026-04-24T20:15:22.081Z" },
+    { url = "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl", hash = "sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c", size = 129956, upload-time = "2026-08-04T18:15:27.159Z" },
 ]
 
 [[package]]
@@ -2179,6 +2183,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/2c/2e/a7fbfe268c8a3b32546930c0297c101d65a4a14c304ad5790a9f478f0e4e/traitlets-5.16.1.tar.gz", hash = "sha256:ed900c2b631aa3a112811139fa97b8d2c3bad5e989656bba4b7e52c7852c18c1", size = 166137, upload-time = "2026-08-03T08:32:36.848Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ad/66/0d785f0bc5e4315a96c989bb476d0fc07ea4f85132550c7b156ca2035d52/traitlets-5.16.1-py3-none-any.whl", hash = "sha256:f775618166caa0396c8e337099240f2bd3e5e917d203b2e6fbe21a58d3cb1f6b", size = 86211, upload-time = "2026-08-03T08:32:34.48Z" },
+]
+
+[[package]]
+name = "types-gunicorn"
+version = "26.0.0.20260728"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/27/c0856f11c5929b363a6e0561cee3435929df61a5ed9489b34ce64bfdc37a/types_gunicorn-26.0.0.20260728.tar.gz", hash = "sha256:82aa51db88fc2b73d8b0ffb7f8cf51a2e5949b6409bcb9cdaee9edc230120548", size = 34743, upload-time = "2026-07-28T04:51:20.148Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/c0/7dbadf4a075d5f00a7b6ad901c5f7b03432d374e30762a7aa9e95dd7234d/types_gunicorn-26.0.0.20260728-py3-none-any.whl", hash = "sha256:14e8fcfe9748177e76cabf7f13802fe5a67eae713eb73569ba88a5bae2c14f8b", size = 52634, upload-time = "2026-07-28T04:51:19.069Z" },
 ]
 
 [[package]]

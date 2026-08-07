@@ -80,8 +80,8 @@ class Token:
         :class:`TokenActions<flaskbb.core.tokens.TokenActions>`
     """
 
-    user_id = attr.ib()
-    operation = attr.ib()
+    user_id: int = attr.ib()
+    operation: str = attr.ib()
 
 
 class TokenSerializer(ABC):

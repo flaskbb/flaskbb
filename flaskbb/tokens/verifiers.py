@@ -31,7 +31,7 @@ class EmailMatchesUserToken(TokenVerifier):
         self.users = users
 
     @override
-    def verify_token(self, token, email, **kwargs):
+    def verify_token(self, token, *, email, **kwargs):
         user = db.session.execute(select(User).where(User.id == token.user_id)).scalar()
         if not user:
             raise ValidationError("email", "User not found")

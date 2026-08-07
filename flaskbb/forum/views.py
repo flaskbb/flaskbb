@@ -11,6 +11,7 @@ topics and posts.
 
 import logging
 import math
+from typing import Any
 
 from flask import (
     abort,
@@ -182,7 +183,7 @@ class ViewPost(MethodView):
         )
         page = int(math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"])))
 
-        url_kwargs = {
+        url_kwargs: dict[str, Any] = {
             "topic_id": post.topic.id,
             "page": page,
             "_anchor": f"pid{post.id}",

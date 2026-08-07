@@ -10,7 +10,7 @@ Plugin implementations for FlaskBB auth hooks
 from flask import flash, redirect, url_for
 from flask_login import current_user, logout_user
 
-from ..core.auth.authentication import ForceLogout
+from ..core.auth.authentication import ForceLogout, PostAuthenticationHandler
 from ..core.settings import flaskbb_config
 from ..extensions import db
 from ..user.models import User
@@ -45,7 +45,7 @@ def flaskbb_authenticate(identifier, secret):
 
 @impl(tryfirst=True)
 def flaskbb_post_authenticate(user):
-    handlers = [ClearFailedLogins()]
+    handlers: list[PostAuthenticationHandler] = [ClearFailedLogins()]
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
         handlers.append(BlockUnactivatedUser())
