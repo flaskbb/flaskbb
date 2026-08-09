@@ -30,7 +30,7 @@
     "@textcomplete/textarea": "^0.1.13",
     "bootstrap": "^5.3.8",
     "core-js": "^3.49.0",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.13",
     "marked": "^18.0.5",
     "twemoji": "^14.0.2"
   },
