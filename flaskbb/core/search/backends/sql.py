@@ -53,10 +53,7 @@ def _forum_clause(term: str) -> ColumnElement[bool]:
 
 
 def _user_clause(term: str) -> ColumnElement[bool]:
-    return or_(
-        User.username.ilike(term, escape="\\"),
-        User.email.ilike(term, escape="\\"),
-    )
+    return User.username.ilike(term, escape="\\")
 
 
 class SQLSearchBackend(SearchBackend):

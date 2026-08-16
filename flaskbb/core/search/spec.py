@@ -19,7 +19,7 @@ INDEX_SPECS: tuple[tuple[ModelT, str, tuple[str, ...]], ...] = (
     (Post, "posts", ("username", "modified_by", "content")),
     (Topic, "topics", ("title", "username")),
     (Forum, "forums", ("title", "description")),
-    (User, "users", ("username", "email")),
+    (User, "users", ("username",)),
 )
 
 # model -> table name

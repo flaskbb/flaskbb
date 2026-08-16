@@ -22,6 +22,15 @@ def test_user_search_form_get_results(request_context, topic):
     assert user in _all(form.get_results())
 
 
+def test_user_search_form_does_not_match_email(request_context, user):
+    form = UserSearchForm(
+        formdata=MultiDict({"search_query": user.email}),
+        meta={"csrf": False},
+    )
+    assert form.validate()
+    assert _all(form.get_results()) == []
+
+
 @contextmanager
 def _csrf_disabled(application):
     """Search views build their form from `request.form` via

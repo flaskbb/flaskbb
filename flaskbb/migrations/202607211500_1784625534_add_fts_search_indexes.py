@@ -36,7 +36,7 @@ _TABLES = [
     ("posts", ["username", "modified_by", "content"]),
     ("topics", ["title", "username"]),
     ("forums", ["title", "description"]),
-    ("users", ["username", "email"]),
+    ("users", ["username"]),
 ]
 
 

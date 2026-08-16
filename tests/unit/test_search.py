@@ -127,6 +127,13 @@ def test_search_user(user):
     assert user in _all(result)
 
 
+def test_search_user_does_not_match_email(user):
+    backend = SQLSearchBackend()
+
+    assert _all(backend.search(User, user.email)) == []
+    assert _all(backend.search(User, "example.org")) == []
+
+
 def test_search_result_supports_pagination(user):
     backend = SQLSearchBackend()
 
@@ -341,6 +348,12 @@ def test_sqlite_search_user(sqlite_fts, user):
     backend = SQLiteSearchBackend()
 
     assert user in _all(backend.search(User, "test_normal"))
+
+
+def test_sqlite_search_user_does_not_match_email(sqlite_fts, user):
+    backend = SQLiteSearchBackend()
+
+    assert _all(backend.search(User, "example.org")) == []
 
 
 def test_sqlite_search_empty_query_returns_nothing(sqlite_fts, user):
