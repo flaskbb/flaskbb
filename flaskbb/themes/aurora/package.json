@@ -29,19 +29,19 @@
     "@textcomplete/core": "^0.1.13",
     "@textcomplete/textarea": "^0.1.13",
     "bootstrap": "^5.3.8",
-    "core-js": "^3.49.0",
-    "dompurify": "^3.4.12",
-    "marked": "^18.0.5",
+    "core-js": "^3.50.0",
+    "dompurify": "^3.4.13",
+    "marked": "^18.0.9",
     "twemoji": "^14.0.2"
   },
   "devDependencies": {
-    "@babel/cli": "^8.0.1",
+    "@babel/cli": "^8.0.4",
     "@babel/core": "^8.0.1",
     "@babel/plugin-transform-class-properties": "^8.0.1",
     "@babel/plugin-transform-object-rest-spread": "^8.0.1",
     "@babel/preset-env": "^8.0.2",
     "@babel/preset-typescript": "^8.0.1",
-    "autoprefixer": "^10.5.2",
+    "autoprefixer": "^10.5.4",
     "babel-loader": "^10.1.1",
     "babel-plugin-polyfill-corejs3": "^1.0.0",
     "clean-webpack-plugin": "^4.0.0",
@@ -52,8 +52,8 @@
     "sass": "1.77.0",
     "sass-loader": "^14.2.1",
     "typescript": "^6.0.3",
-    "webpack": "^5.108.4",
-    "webpack-cli": "^7.2.0"
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   },
   "browserslist": [
     "> 0.25%",
