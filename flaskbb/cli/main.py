@@ -32,6 +32,7 @@ from flaskbb.cli.utils import (
     write_config,
 )
 from flaskbb.extensions import celery, db, flaskbb_search, pluggy
+from flaskbb.utils.database import drop_all
 from flaskbb.utils.populate import (
     create_default_groups,
     create_default_settings,
@@ -190,7 +191,7 @@ def install(
                 fg="magenta",
             )
         ):
-            db.drop_all()
+            drop_all()
         else:
             sys.exit(0)
 
@@ -238,7 +239,7 @@ def populate(bulk_data: bool, test_data: bool, posts: int, topics: int, force: b
     """Creates the necessary tables and groups for FlaskBB."""
     if force:
         click.secho("[+] Recreating database...", fg="cyan")
-        db.drop_all()
+        drop_all()
 
         # do not initialize the db if -i is passed
         if not initdb:

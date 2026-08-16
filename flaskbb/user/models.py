@@ -175,8 +175,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     tracked_topics: WriteOnlyMapped["Topic"] = relationship(
         secondary=topictracker,
         primaryjoin=(topictracker.c.user_id == id),
-        lazy="dynamic",
-        single_parent=True,
+        passive_deletes=True,
     )
 
     # Properties

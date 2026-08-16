@@ -2,6 +2,7 @@ import pytest
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
 from flaskbb.extensions import cache, db
+from flaskbb.utils.database import drop_all
 from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
@@ -66,5 +67,5 @@ def database():
 
     yield db
 
-    db.drop_all()
+    drop_all()
     db.session.close()

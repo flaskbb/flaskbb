@@ -12,6 +12,7 @@ from flaskbb.extensions import db, pluggy
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.user.models import User
+from flaskbb.utils.database import drop_all
 from pluggy import HookimplMarker
 from sqlalchemy import text
 
@@ -409,7 +410,7 @@ def test_create_all_builds_sqlite_fts_schema(application):
         for statement in migration.sqlite_downgrade_sql():
             db.session.execute(text(statement))
         db.session.commit()
-        db.drop_all()
+        drop_all()
         del application.config["SEARCH_BACKEND"]
 
 

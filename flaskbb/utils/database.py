@@ -195,3 +195,25 @@ def try_commit(session: Session | scoped_session[Session], message: str = "Error
         session.commit()
     except Exception as e:
         raise PersistenceError(message) from e
+
+
+def drop_all():
+    """Drops every table.
+
+    SQLite cannot DROP tables whose foreign keys are mutually dependent.
+    `defer_foreign_keys`` is needed since ``foreign_keys`` is a no-op while a transaction is open.
+    """
+    if db.engine.dialect.name != "sqlite":
+        db.drop_all()
+        return
+
+    with db.engine.connect() as connection:
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        connection.exec_driver_sql("PRAGMA defer_foreign_keys=ON")
+        db.metadata.drop_all(bind=connection)
+        connection.commit()
+
+        # the connection goes back to the pool afterwards, where the connect
+        # listener that normally turns this on will not run again
+        connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+        connection.commit()

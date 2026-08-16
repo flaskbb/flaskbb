@@ -50,7 +50,7 @@ class TestRegistrationService:
 
         failure.assert_called_once_with(self.fred, excinfo.value.reasons)
 
-    def test_registers_user_if_everything_is_good(self, database, plugin_manager):
+    def test_registers_user_if_everything_is_good(self, database, plugin_manager, default_groups):
         service = self._get_service(plugin_manager, database)
 
         service.register(self.fred)
@@ -60,7 +60,7 @@ class TestRegistrationService:
         assert actual_fred.id is not None
 
     def test_calls_post_processors_if_user_registration_works(
-        self, database, plugin_manager, mocker
+        self, database, plugin_manager, mocker, default_groups
     ):
         service = self._get_service(plugin_manager, database)
         post_process = mocker.MagicMock(spec=RegistrationPostProcessor)

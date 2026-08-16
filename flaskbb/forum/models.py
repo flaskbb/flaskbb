@@ -427,9 +427,15 @@ class Post(HideableCRUDMixin, db.Model):
             self.topic.delete()
             return self
 
-        db.session.delete(self)
-
+        # The pointers have to move off this post and reach the database
+        # before the DELETE does, otherwise topics.last_post_id and
+        # forums.last_post_id still reference the row being removed.
         self._deal_with_last_post()
+        db.session.flush()
+
+        db.session.delete(self)
+        db.session.flush()
+
         self._update_counts()
 
         db.session.commit()
@@ -966,12 +972,25 @@ class Topic(HideableCRUDMixin, db.Model):
         invovled_users = self.involved_users()
 
         topic_last_post_id = self.last_post_id
+        # forum.last_post_id shouldn't usually be none
+        update_forum_last_post = (
+            forum.last_post_id is None or topic_last_post_id == forum.last_post_id
+        )
+
+        # forums.last_post_id would still reference one of the posts that go
+        # away with the topic, so let go of it before the DELETE is flushed
+        # and recompute it once the posts are gone.
+        if update_forum_last_post:
+            forum.last_post = None
+            db.session.flush()
+
         db.session.delete(self)
+        db.session.flush()
+
         self._fix_user_post_counts(invovled_users)
         self._fix_post_counts(forum)
 
-        # forum.last_post_id shouldn't usually be none
-        if forum.last_post_id is None or topic_last_post_id == forum.last_post_id:
+        if update_forum_last_post:
             forum.update_last_post(commit=False)
 
         db.session.commit()

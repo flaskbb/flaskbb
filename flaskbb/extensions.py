@@ -8,6 +8,9 @@ The extensions that are used by FlaskBB.
 :license: BSD, see LICENSE for more details.
 """
 
+import sqlite3
+from typing import Any
+
 from celery import Celery
 from flask_allows2 import Allows
 from flask_babelplus import Babel
@@ -21,7 +24,8 @@ from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import MetaData
+from sqlalchemy import event, MetaData
+from sqlalchemy.engine import Engine
 
 from flaskbb.core.search import FlaskBBSearch
 from flaskbb.exceptions import AuthorizationRequired
@@ -44,6 +48,26 @@ metadata = MetaData(
     }
 )
 db = SQLAlchemy(metadata=metadata, session_options={"future": True})
+
+
+def _enable_sqlite_foreign_keys(dbapi_connection: Any, connection_record: Any) -> None:
+    """SQLite ignores ``ON DELETE CASCADE`` unless foreign keys are enabled per
+    connection, which would leave orphaned rows behind on every delete.
+    """
+    if isinstance(dbapi_connection, sqlite3.Connection):
+        # the sqlite3 driver ignores the pragma while autocommit is off
+        autocommit = dbapi_connection.autocommit
+        dbapi_connection.autocommit = True
+
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+        dbapi_connection.autocommit = autocommit
+
+
+event.listen(Engine, "connect", _enable_sqlite_foreign_keys)
+
 
 # Search backend (pluggable full-text search; see flaskbb/core/search/)
 flaskbb_search = FlaskBBSearch(pluggy)
