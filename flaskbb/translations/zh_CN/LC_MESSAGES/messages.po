@@ -7,19 +7,21 @@
 # 一 王 <whydo1@yahoo.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version:  FlaskBB\n"
+"Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-02-08 16:25+0100\n"
-"PO-Revision-Date: 2022-06-14 01:23+0000\n"
-"Last-Translator: xlivevil <xlivevil@163.com>\n"
+"PO-Revision-Date: 2026-08-22 13:51+0000\n"
+"Last-Translator: reducedradius "
+"<137701630+flytothehighest@users.noreply.github.com>\n"
 "Language: zh_CN\n"
-"Language-Team: Chinese (Simplified) "
-"<https://hosted.weblate.org/projects/flaskbb/flaskbb/zh_Hans/>\n"
+"Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
+"projects/flaskbb/flaskbb/zh_Hans/>\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+"X-Generator: Weblate 2026.9.dev0\n"
 
 #: flaskbb/deprecation.py:72
 #, python-format
@@ -45,12 +47,12 @@ msgstr ""
 
 #: flaskbb/auth/forms.py:46
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "请输入您的用户名或邮件地址。"
 
 #: flaskbb/auth/forms.py:51 flaskbb/auth/forms.py:83 flaskbb/auth/forms.py:107
 #: flaskbb/auth/forms.py:140 flaskbb/user/forms.py:89
 msgid "Password"
-msgstr ""
+msgstr "密码"
 
 #: flaskbb/auth/forms.py:52 flaskbb/auth/forms.py:108 flaskbb/user/forms.py:90
 msgid "Please enter your password."
@@ -3322,4 +3324,3 @@ msgstr ""
 
 #~ msgid "This account is already activated."
 #~ msgstr "账户已激活."
-
