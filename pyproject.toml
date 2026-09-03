@@ -269,8 +269,6 @@ strict_concatenate = true
 [[tool.mypy.overrides]]
 module = [
     "celery.*",
-    "flask_allows2.*",
-    "flask_babelplus.*",
     "flask_login.*",
     "flask_redis.*",
     "flask_themes2.*",

@@ -15,10 +15,10 @@ from sqlalchemy.exc import IntegrityError
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import (
-    GROUP_TYPES,
     FlaskBBCLIError,
     get_group,
     group_permissions,
+    GROUP_TYPES,
     invalidate_permission_cache,
     print_details,
     print_table,
@@ -59,9 +59,7 @@ def _validate_permissions(grant: tuple[str, ...], revoke: tuple[str, ...]):
     both = set(grant) & set(revoke)
     if both:
         raise FlaskBBCLIError(
-            "Can't grant and revoke the same permission(s): {}.".format(
-                ", ".join(sorted(both))
-            ),
+            "Can't grant and revoke the same permission(s): {}.".format(", ".join(sorted(both))),
             fg="red",
         )
 
@@ -94,7 +92,7 @@ def _validate_group_type(group: Group, group_type: str):
 
     if existing is not None:
         raise FlaskBBCLIError(
-            f"Only one group of type '{group_type}' is allowed and '{existing.name}' already is one.",
+            f"Only one group of type '{group_type}' (currently: '{existing.name}') is allowed.",
             fg="red",
         )
 

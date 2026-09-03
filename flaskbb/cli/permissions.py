@@ -38,21 +38,16 @@ def permissions():
 
 
 @permissions.command("list")
-@click.option(
-    "--group", "-g", "group_name", help="Only show the permissions of this group."
-)
+@click.option("--group", "-g", "group_name", help="Only show the permissions of this group.")
 def list_permissions(group_name: str | None):
     """Lists the permissions of every group."""
     if group_name:
         selected = [get_group(group_name)]
     else:
-        selected = list(
-            db.session.execute(db.select(Group).order_by(Group.id.asc())).scalars()
-        )
+        selected = list(db.session.execute(db.select(Group).order_by(Group.id.asc())).scalars())
 
     rows = [
-        [permission]
-        + ["yes" if getattr(group, permission) else "no" for group in selected]
+        [permission] + ["yes" if getattr(group, permission) else "no" for group in selected]
         for permission in group_permissions()
     ]
 
