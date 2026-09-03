@@ -19,7 +19,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 from wsgiref.types import WSGIEnvironment
 
 import unidecode
@@ -29,14 +29,14 @@ from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_time as babel_format_time
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask import (
-    abort,
     Blueprint,
+    Flask,
+    Response,
+    abort,
     current_app,
     flash,
-    Flask,
     redirect,
     request,
-    Response,
     session,
     url_for,
 )
@@ -50,7 +50,7 @@ from markupsafe import Markup
 from pytz import UTC
 from sqlalchemy import Row
 from werkzeug.local import LocalProxy
-from werkzeug.utils import import_string, ImportStringError
+from werkzeug.utils import ImportStringError, import_string
 
 from flaskbb.extensions import babel, redis_store
 
@@ -140,8 +140,15 @@ def render_template(template: str, **context: Any):  # pragma: no cover
     return render_theme_template(theme, template, **context)
 
 
+def is_htmx_request() -> bool:
+    """Whether the current request came from htmx."""
+    return request.headers.get("HX-Request") == "true"
+
+
 # TODO(anr): clean this up
-def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):  # noqa: C901
+def do_topic_action(
+    topics: Sequence["Topic"], user: "User", action: str, reverse: bool
+):
     """Executes a specific action for topics. Returns a list with the modified
     topic objects.
 
@@ -328,7 +335,9 @@ def get_forums(
     return result
 
 
-def forum_is_unread(forum: "Forum | None", forumsread: "ForumsRead | None", user: "User"):
+def forum_is_unread(
+    forum: "Forum | None", forumsread: "ForumsRead | None", user: "User"
+):
     """Checks if a forum is unread
 
     :param forum: The forum that should be checked if it is unread
@@ -599,7 +608,9 @@ def get_alembic_locations(plugin_dirs: list[str]) -> list[tuple[str, ...]]:
     The branchname is the name of plugin directory which should also be
     the unique identifier of the plugin.
     """
-    branches_dirs = [tuple([os.path.basename(os.path.dirname(p)), p]) for p in plugin_dirs]
+    branches_dirs = [
+        tuple([os.path.basename(os.path.dirname(p)), p]) for p in plugin_dirs
+    ]
 
     return branches_dirs
 

@@ -67,6 +67,7 @@ from flaskbb.utils.helpers import (
     forum_is_unread,
     get_alembic_locations,
     get_flaskbb_config,
+    is_htmx_request,
     is_online,
     mark_online,
     render_template,
@@ -366,6 +367,7 @@ def configure_template_filters(app: Flask):
     jinja_globals["run_hook"] = template_hook
     jinja_globals["NavigationContentType"] = NavigationContentType
     jinja_globals["get_management_navigation"] = get_management_navigation
+    jinja_globals["is_htmx_request"] = is_htmx_request
     app.jinja_env.globals.update(jinja_globals)
 
     pluggy.hook.flaskbb_jinja_directives(app=app)

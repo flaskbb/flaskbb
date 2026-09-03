@@ -1,5 +1,6 @@
 import '@flaskbb/markdown-toolbar-element';
 import { Alert, Dropdown, Modal, Tooltip } from 'bootstrap';
+import htmx from 'htmx.org';
 
 import "./app/confirm_modal.js";
 import "./app/editor.js";
@@ -9,6 +10,10 @@ import "./app/flaskbb.js";
 
 import "./scss/styles.scss";
 export { Actions, BulkActions, check_overview_status, show_management_search } from "./app/flaskbb.js";
+
+// htmx has to be reachable via window. plugins register extensions against it and
+// templates outside this bundle call into it.
+window.htmx = htmx;
 
 var flaskbbAllowList = Tooltip.Default.allowList
 // allow <time> elements

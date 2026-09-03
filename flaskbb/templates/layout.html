@@ -32,7 +32,7 @@
         #} {% block head_extra %} {% endblock %}
     </head>
 
-    <body>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token() }}"}'>
         <!-- main forum layout -->
         <div class="flaskbb-layout">
             <div class="container pb-3">
