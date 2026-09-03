@@ -105,7 +105,7 @@ class CRUDMixin:
         if column is None:
             column = cls.id
 
-        stmt = db.select(db.func.count(column))
+        stmt = sa.select(sa.func.count(column))
         if clause is not None:
             if not isinstance(clause, list):
                 clause = [clause]

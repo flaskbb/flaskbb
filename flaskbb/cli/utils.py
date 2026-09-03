@@ -18,6 +18,7 @@ from collections.abc import Callable
 from typing import Any, IO, override
 
 import click
+import sqlalchemy as sa
 from click._compat import get_text_stderr
 from flask_themes2 import get_theme
 from jinja2 import Template
@@ -98,7 +99,7 @@ def group_permissions() -> list[str]:
 
 def get_user(username: str) -> User:
     """Returns the user with the given username or aborts the command."""
-    user = db.session.execute(db.select(User).filter_by(username=username)).scalar_one_or_none()
+    user = db.session.execute(sa.select(User).filter_by(username=username)).scalar_one_or_none()
     if user is None:
         raise FlaskBBCLIError(f"The user with username {username} does not exist.", fg="red")
     return user
@@ -109,7 +110,7 @@ def get_group(name: str) -> Group:
     The name is matched case insensitively.
     """
     group = db.session.execute(
-        db.select(Group).filter(db.func.lower(Group.name) == name.lower())
+        sa.select(Group).filter(sa.func.lower(Group.name) == name.lower())
     ).scalar_one_or_none()
     if group is None:
         raise FlaskBBCLIError(f"The group with name {name} does not exist.", fg="red")
@@ -124,8 +125,8 @@ def invalidate_permission_cache(group: Group):
         Guest.invalidate_cache()
 
     members = db.session.execute(
-        db.select(User).filter(
-            db.or_(
+        sa.select(User).filter(
+            sa.or_(
                 User.primary_group_id == group.id,
                 User.secondary_groups.any(Group.id == group.id),
             )

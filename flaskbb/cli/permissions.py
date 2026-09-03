@@ -9,6 +9,7 @@ This module contains all permission commands.
 """
 
 import click
+import sqlalchemy as sa
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import (
@@ -44,7 +45,7 @@ def list_permissions(group_name: str | None):
     if group_name:
         selected = [get_group(group_name)]
     else:
-        selected = list(db.session.execute(db.select(Group).order_by(Group.id.asc())).scalars())
+        selected = list(db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars())
 
     rows = [
         [permission] + ["yes" if getattr(group, permission) else "no" for group in selected]

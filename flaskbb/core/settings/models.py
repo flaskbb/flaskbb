@@ -17,7 +17,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import delete, func, select
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
 from flaskbb.extensions import BaseModel, cache, db
@@ -63,9 +63,9 @@ class SettingsDiff:
 class Setting(BaseModel):
     __tablename__ = "settings"
 
-    key: Mapped[str] = mapped_column(db.String(255), primary_key=True, nullable=False)
-    value: Mapped[str | None] = mapped_column(db.Text)  # JSON-encoded
-    group_key: Mapped[str] = mapped_column(db.String(255), index=True)
+    key: Mapped[str] = mapped_column(sa.String(255), primary_key=True, nullable=False)
+    value: Mapped[str | None] = mapped_column(sa.Text)  # JSON-encoded
+    group_key: Mapped[str] = mapped_column(sa.String(255), index=True)
 
     def __init__(self, key: str, value: str | None, group_key: str):
         self.key = key
@@ -89,7 +89,7 @@ class Setting(BaseModel):
         plugin settings are exposed prefixed with
         their group_key (settings.PORTAL_FORUM_IDS).
         """
-        settings = db.session.execute(select(Setting)).scalars().all()
+        settings = db.session.execute(sa.select(Setting)).scalars().all()
         config: dict[str, Any] = {}
 
         for s in settings:
@@ -129,7 +129,9 @@ class Setting(BaseModel):
         excluded_keys = {key.lower() for key in exclude}
         rows = {
             row.key.lower(): row
-            for row in db.session.execute(select(cls).where(cls.group_key == group_key)).scalars()
+            for row in db.session.execute(
+                sa.select(cls).where(cls.group_key == group_key)
+            ).scalars()
         }
         for key, value in settings.items():
             if key.lower() in excluded_keys:
@@ -153,7 +155,7 @@ class Setting(BaseModel):
         group_setting_keys = {s.key.lower() for s in group.settings}
         existing_keys_lower = set(
             db.session.execute(
-                select(func.lower(cls.key)).where(cls.group_key == group_key)
+                sa.select(sa.func.lower(cls.key)).where(cls.group_key == group_key)
             ).scalars()
         )
 
@@ -169,7 +171,7 @@ class Setting(BaseModel):
         group = setting_registry.group(group_key)
         group_setting_keys = {s.key.lower() for s in group.settings}
         existing_settings = db.session.execute(
-            select(cls).where(cls.group_key == group_key)
+            sa.select(cls).where(cls.group_key == group_key)
         ).scalars()
         for setting in existing_settings:
             if setting.key.lower() not in group_setting_keys:
@@ -191,9 +193,9 @@ class Setting(BaseModel):
         group_setting_keys = {s.key.lower() for s in group.settings}
         existing_keys_lower = set(
             db.session.execute(
-                select(func.lower(cls.key)).where(
+                sa.select(sa.func.lower(cls.key)).where(
                     cls.group_key == group_key,
-                    func.lower(cls.key).in_(group_setting_keys),
+                    sa.func.lower(cls.key).in_(group_setting_keys),
                 )
             ).scalars()
         )
@@ -217,6 +219,6 @@ class Setting(BaseModel):
         Used when uninstalling a plugin - deletes only rows tagged with
         this group_key, so other groups settings are untouched.
         """
-        db.session.execute(delete(cls).where(cls.group_key == group_key))
+        db.session.execute(sa.delete(cls).where(cls.group_key == group_key))
         db.session.commit()
         cls.invalidate_cache()

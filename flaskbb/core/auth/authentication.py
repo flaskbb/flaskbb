@@ -78,7 +78,7 @@ class AuthenticationProvider(ABC):
                 try:
                     self.ldap_client.bind_user(user_dn, secret)
                     return db.session.execute(
-                        db.select(User)
+                        sa.select(User)
                         .join(UserLDAP)
                         .filter(UserLDAP.dn == user_dn)
                     ).scalar_one()

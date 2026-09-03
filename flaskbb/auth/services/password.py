@@ -8,6 +8,7 @@ Password reset manager
 :license: BSD, see LICENSE for more details
 """
 
+import sqlalchemy as sa
 from flask_babelplus import gettext as _
 
 from ...core.auth.password import ResetPasswordService as _ResetPasswordService
@@ -29,7 +30,7 @@ class ResetPasswordService(_ResetPasswordService):
         self.token_verifiers = token_verifiers
 
     def initiate_password_reset(self, email):
-        user = db.session.execute(db.select(self.users).filter_by(email=email)).scalar_one_or_none()
+        user = db.session.execute(sa.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Invalid email"))
@@ -46,7 +47,7 @@ class ResetPasswordService(_ResetPasswordService):
             raise TokenError.invalid()
         self._verify_token(token, email)
         user = db.session.execute(
-            db.select(self.users).filter_by(id=token.user_id)
+            sa.select(self.users).filter_by(id=token.user_id)
         ).scalar_one_or_none()
         if user is None:
             raise TokenError.invalid()

@@ -12,6 +12,7 @@ import os
 import sys
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.exc import IntegrityError
 
 from flaskbb.cli.main import flaskbb
@@ -101,7 +102,7 @@ def delete_user(username, force):
             default=os.environ.get("USER", ""),
         )
 
-    user = db.session.execute(db.select(User).filter_by(username=username)).scalar_one_or_none()
+    user = db.session.execute(sa.select(User).filter_by(username=username)).scalar_one_or_none()
     if user is None:
         raise FlaskBBCLIError(f"The user with username {username} does not exist.", fg="red")
 
@@ -124,12 +125,12 @@ def delete_user(username, force):
 )
 def list_users(group_name: str | None, banned: bool, unactivated: bool):
     """Lists all users."""
-    stmt = db.select(User).order_by(User.id.asc())
+    stmt = sa.select(User).order_by(User.id.asc())
 
     if group_name:
         group = get_group(group_name)
         stmt = stmt.filter(
-            db.or_(
+            sa.or_(
                 User.primary_group_id == group.id,
                 User.secondary_groups.any(Group.id == group.id),
             )

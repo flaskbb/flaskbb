@@ -12,11 +12,11 @@ import logging
 from collections.abc import Mapping, Sequence
 from typing import Any, override
 
+import sqlalchemy as sa
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from sqlalchemy import or_, select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
 from wtforms import (
@@ -62,20 +62,20 @@ is_username = regexp(USERNAME_RE, message=_("You can only use letters, numbers o
 
 
 def selectable_forums():
-    return db.session.execute(select(Forum).order_by(Forum.position)).scalars().all()
+    return db.session.execute(sa.select(Forum).order_by(Forum.position)).scalars().all()
 
 
 def selectable_categories():
-    return db.session.execute(select(Category).order_by(Category.position)).scalars().all()
+    return db.session.execute(sa.select(Category).order_by(Category.position)).scalars().all()
 
 
 def selectable_groups():
-    return db.session.execute(select(Group).order_by(Group.id.asc())).scalars().all()
+    return db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars().all()
 
 
 def select_primary_group():
     return (
-        db.session.execute(select(Group).where(Group.guest != True).order_by(Group.id))
+        db.session.execute(sa.select(Group).where(Group.guest != True).order_by(Group.id))
         .scalars()
         .all()
     )
@@ -92,13 +92,13 @@ def assignable_groups():
     if Permission(IsAdmin, identity=current_user):
         return select_primary_group()
 
-    member_group = db.and_(
+    member_group = sa.and_(
         *[getattr(Group, p).is_(False) for p in ["admin", "mod", "super_mod", "banned", "guest"]]
     )
 
     return (
         db.session.execute(
-            select(Group).where(db.or_(member_group, Group.mod, Group.banned)).order_by(Group.id)
+            sa.select(Group).where(sa.or_(member_group, Group.mod, Group.banned)).order_by(Group.id)
         )
         .scalars()
         .all()
@@ -115,14 +115,14 @@ class AttachmentSearchForm(FlaskForm):
         # outer join: user_id is nullable, an inner join would hide the
         # attachments of deleted users
         return (
-            select(Attachment)
+            sa.select(Attachment)
             .outerjoin(User, User.id == Attachment.user_id)
             .options(
                 joinedload(Attachment.user),
                 joinedload(Attachment.post).joinedload(Post.topic),
             )
             .where(
-                or_(
+                sa.or_(
                     Attachment.original_filename.ilike(pattern),
                     User.username.ilike(pattern),
                 )
@@ -190,9 +190,9 @@ class UserForm(FlaskBBForm):
     def validate_username(self, field: Field):
         if self.user is not None:
             user = User.get(
-                db.and_(
+                sa.and_(
                     User.username.like(field.data.lower()),
-                    db.not_(User.id == self.user.id),
+                    sa.not_(User.id == self.user.id),
                 )
             )
         else:
@@ -204,9 +204,9 @@ class UserForm(FlaskBBForm):
     def validate_email(self, field: Field):
         if self.user is not None:
             user = User.get(
-                db.and_(
+                sa.and_(
                     User.email.like(field.data.lower()),
-                    db.not_(User.id == self.user.id),
+                    sa.not_(User.id == self.user.id),
                 )
             )
         else:
@@ -354,9 +354,9 @@ class GroupForm(FlaskForm):
     def validate_name(self, field: Field):
         if self.group is not None:
             group = Group.get(
-                db.and_(
+                sa.and_(
                     Group.name.like(field.data.lower()),
-                    db.not_(Group.id == self.group.id),
+                    sa.not_(Group.id == self.group.id),
                 )
             )
         else:
@@ -367,7 +367,7 @@ class GroupForm(FlaskForm):
 
     def validate_banned(self, field: Field):
         if self.group is not None:
-            group = Group.count(db.and_(Group.banned, db.not_(Group.id == self.group.id)))
+            group = Group.count(sa.and_(Group.banned, sa.not_(Group.id == self.group.id)))
         else:
             group = Group.count(Group.banned == True)
 
@@ -376,7 +376,7 @@ class GroupForm(FlaskForm):
 
     def validate_guest(self, field: Field):
         if self.group is not None:
-            group = Group.count(db.and_(Group.guest, db.not_(Group.id == self.group.id)))
+            group = Group.count(sa.and_(Group.guest, sa.not_(Group.id == self.group.id)))
         else:
             group = Group.count(Group.guest == True)
 

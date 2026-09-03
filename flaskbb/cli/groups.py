@@ -11,6 +11,7 @@ This module contains all group commands.
 import sys
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.exc import IntegrityError
 
 from flaskbb.cli.main import flaskbb
@@ -38,7 +39,7 @@ def _group_type(group: Group) -> str:
 
 def _member_count(group: Group) -> int:
     return User.count(
-        db.or_(
+        sa.or_(
             User.primary_group_id == group.id,
             User.secondary_groups.any(Group.id == group.id),
         )
@@ -84,7 +85,7 @@ def _validate_group_type(group: Group, group_type: str):
         return
 
     existing = db.session.execute(
-        db.select(Group).filter(
+        sa.select(Group).filter(
             getattr(Group, group_type).is_(True),
             Group.id != group.id,
         )
@@ -105,7 +106,7 @@ def groups():
 @groups.command("list")
 def list_groups():
     """Lists all groups."""
-    all_groups = db.session.execute(db.select(Group).order_by(Group.id.asc())).scalars()
+    all_groups = db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars()
 
     rows = [
         [

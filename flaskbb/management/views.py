@@ -15,6 +15,7 @@ import sys
 from datetime import timedelta
 from typing import Any
 
+import sqlalchemy as sa
 from celery import __version__ as celery_version
 from flask import (
     Blueprint,
@@ -32,7 +33,6 @@ from flask_babelplus import gettext as _
 from flask_login import login_fresh
 from flask_wtf.file import FileStorage
 from pluggy import HookimplMarker
-from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from flaskbb import __version__ as flaskbb_version
@@ -240,7 +240,7 @@ class ManageUsers(MethodView):
         form = self.form()
 
         users = db.paginate(
-            select(User).order_by(User.id.asc()),
+            sa.select(User).order_by(User.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -262,7 +262,7 @@ class ManageUsers(MethodView):
             return render_template("management/users.html", users=users, search_form=form)
 
         users = db.paginate(
-            select(User).order_by(User.id.asc()),
+            sa.select(User).order_by(User.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -456,7 +456,7 @@ class DeleteUserPosts(MethodView):
         # Re-querying the lowest remaining id each time sidesteps that.
         while True:
             post = db.session.execute(
-                db.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
+                sa.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
             ).scalar_one_or_none()
             if post is None:
                 break
@@ -513,7 +513,9 @@ class BannedUsers(MethodView):
         search_form = self.form()
 
         users = db.paginate(
-            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
+            sa.select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -526,7 +528,9 @@ class BannedUsers(MethodView):
         search_form = self.form()
 
         users = db.paginate(
-            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
+            sa.select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -692,7 +696,7 @@ class Groups(MethodView):
         page = request.args.get("page", 1, type=int)
 
         groups = db.paginate(
-            select(Group).order_by(Group.id.asc()),
+            sa.select(Group).order_by(Group.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -844,7 +848,7 @@ class Forums(MethodView):
 
     def get(self):
         categories = db.session.execute(
-            select(Category).order_by(Category.position.asc())
+            sa.select(Category).order_by(Category.position.asc())
         ).scalars()
         return render_template("management/forums.html", categories=categories)
 
@@ -907,7 +911,7 @@ class AddForum(MethodView):
     def get(self, category_id: int | None = None):
         form = self.form()
 
-        form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
+        form.groups.data = db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars()
 
         if category_id:
             category = Category.get_by(id=category_id)
@@ -923,7 +927,9 @@ class AddForum(MethodView):
             flash(_("Forum added."), "success")
             return redirect(url_for("management.forums"))
         else:
-            form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
+            form.groups.data = db.session.execute(
+                sa.select(Group).order_by(Group.id.asc())
+            ).scalars()
             if category_id:
                 category = Category.get_by(id=category_id)
                 form.category.data = category
@@ -1232,7 +1238,7 @@ class ManageAttachments(MethodView):
         # id order is the insertion order and unlike date_created it is
         # backed by the primary key index
         return (
-            select(Attachment)
+            sa.select(Attachment)
             .options(
                 joinedload(Attachment.user),
                 joinedload(Attachment.post).joinedload(Post.topic),
@@ -1332,7 +1338,7 @@ class CleanupAttachments(MethodView):
         known: dict[str, set[str]] = {}
         stale_rows: list[int] = []
         rows = db.session.execute(
-            select(
+            sa.select(
                 Attachment.id,
                 Attachment.post_id,
                 Attachment.filename,
@@ -1388,7 +1394,7 @@ class PurgeAttachments(MethodView):
         deleted_rows = 0
         while True:
             batch = db.session.scalars(
-                select(Attachment).order_by(Attachment.id).limit(ATTACHMENT_DELETE_BATCH)
+                sa.select(Attachment).order_by(Attachment.id).limit(ATTACHMENT_DELETE_BATCH)
             ).all()
             if not batch:
                 break

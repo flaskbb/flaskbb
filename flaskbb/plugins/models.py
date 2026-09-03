@@ -23,8 +23,8 @@ class PluginRegistry(BaseModel, CRUDMixin):
     # A plugin's name doubles as its SettingGroup.key - the plugin's
     # flaskbb_load_setting_groups hookimpl must register a group with
     # key == this name for settings/get_settings_form/etc. to find it.
-    name: Mapped[str] = mapped_column(db.String(255), unique=True)
-    enabled: Mapped[bool] = mapped_column(db.Boolean, default=True)
+    name: Mapped[str] = mapped_column(sa.String(255), unique=True)
+    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
     def __init__(self, name: str) -> None:
         self.name = name

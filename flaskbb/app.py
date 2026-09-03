@@ -18,6 +18,7 @@ from collections.abc import Callable, Sequence
 from datetime import datetime, UTC
 from typing import Any
 
+import sqlalchemy as sa
 from celery import Celery
 from flask import flash, Flask, redirect, request, url_for
 from flask_babelplus import gettext as _
@@ -315,7 +316,7 @@ def configure_extensions(app: Flask):
     @login_manager.user_loader  # type: ignore[untyped-decorator]
     def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
-        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        user = db.session.execute(sa.select(User).filter_by(id=user_id)).scalar_one_or_none()
         pluggy.hook.flaskbb_current_user(app=app, user=user)
         return user
 
@@ -533,7 +534,7 @@ def load_plugins(app: Flask):
     try:
         with app.app_context():
             plugins: Sequence[PluginRegistry] = (
-                db.session.execute(db.select(PluginRegistry)).scalars().all()
+                db.session.execute(sa.select(PluginRegistry)).scalars().all()
             )
 
     except (OperationalError, ProgrammingError) as exc:

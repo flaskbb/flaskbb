@@ -13,12 +13,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from itertools import chain
 
+import sqlalchemy as sa
 from flask import flash
 from flask_babelplus import gettext as _
 from flask_login import login_user
 from flask_sqlalchemy import SQLAlchemy
 from pytz import UTC
-from sqlalchemy import func
 
 if t.TYPE_CHECKING:
     from flaskbb.plugins.manager import FlaskBBPluginManager
@@ -102,8 +102,8 @@ class UsernameUniquenessValidator(UserValidator):
 
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
-            db.select(func.count(self.users.id)).filter(
-                func.lower(self.users.username) == user_info.username
+            sa.select(sa.func.count(self.users.id)).filter(
+                sa.func.lower(self.users.username) == user_info.username
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch
@@ -126,8 +126,8 @@ class EmailUniquenessValidator(UserValidator):
 
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
-            db.select(func.count(self.users.id)).filter(
-                func.lower(self.users.email) == user_info.email
+            sa.select(sa.func.count(self.users.id)).filter(
+                sa.func.lower(self.users.email) == user_info.email
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch

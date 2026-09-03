@@ -12,10 +12,10 @@ import logging
 from datetime import datetime
 from typing import override
 
+import sqlalchemy as sa
 from flask import url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
     DynamicMapped,
     Mapped,
@@ -36,18 +36,19 @@ from flaskbb.utils.helpers import time_utcnow
 logger = logging.getLogger(__name__)
 
 
-groups_users = db.Table(
+groups_users = sa.Table(
     "groups_users",
-    db.Column(
+    db.metadata,
+    sa.Column(
         "user_id",
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+        sa.Integer,
+        sa.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    db.Column(
+    sa.Column(
         "group_id",
-        db.Integer,
-        db.ForeignKey("groups.id", ondelete="CASCADE"),
+        sa.Integer,
+        sa.ForeignKey("groups.id", ondelete="CASCADE"),
         nullable=False,
     ),
 )
@@ -91,17 +92,17 @@ class Group(BaseModel, CRUDMixin):
 
     @classmethod
     def selectable_groups_choices(cls):
-        return db.session.execute(db.select(cls.id, cls.name).order_by(cls.name.asc())).all()
+        return db.session.execute(sa.select(cls.id, cls.name).order_by(cls.name.asc())).all()
 
     @classmethod
     def get_guest_group(cls) -> "Group":
-        return db.session.execute(db.select(cls).filter(cls.guest.is_(True))).scalar_one()
+        return db.session.execute(sa.select(cls).filter(cls.guest.is_(True))).scalar_one()
 
     @classmethod
     def get_member_group(cls) -> "Group":
         """Returns the first member group."""
         return db.session.execute(
-            db.select(cls)
+            sa.select(cls)
             .filter(
                 cls.admin.is_(False),
                 cls.super_mod.is_(False),
@@ -147,7 +148,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
 
     post_count: Mapped[int] = mapped_column(default=0)
 
-    primary_group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), nullable=False)
+    primary_group_id: Mapped[int] = mapped_column(sa.ForeignKey("groups.id"), nullable=False)
 
     posts: Mapped[list[Post]] = relationship(
         "Post",
@@ -201,7 +202,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
     def last_post(self):
         """Returns the latest post from the user."""
         return db.session.execute(
-            db.select(Post).filter(Post.user_id == self.id).order_by(Post.date_created.desc())
+            sa.select(Post).filter(Post.user_id == self.id).order_by(Post.date_created.desc())
         ).scalar_one_or_none()
 
     @property
@@ -235,7 +236,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
     def topic_count(self):
         """Returns the thread count."""
         return db.session.execute(
-            db.select(db.func.count()).select_from(Topic).filter(Topic.user_id == self.id)
+            sa.select(sa.func.count()).select_from(Topic).filter(Topic.user_id == self.id)
         ).scalar_one()
 
     @property
@@ -279,7 +280,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
     def recalculate(self):
         """Recalculates the post count from the user."""
         self.post_count = db.session.execute(
-            db.select(db.func.count()).select_from(Post).filter_by(user_id=self.id)
+            sa.select(sa.func.count()).select_from(Post).filter_by(user_id=self.id)
         ).scalar_one()
         self.save()
         return self
@@ -294,7 +295,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         """
         group_ids = [g.id for g in viewer.groups]
         stmt = (
-            db.select(Topic)
+            sa.select(Topic)
             .where(
                 Topic.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
@@ -314,7 +315,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         """
         group_ids = [g.id for g in viewer.groups]
         stmt = (
-            db.select(Post)
+            sa.select(Post)
             .where(
                 Post.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
@@ -349,7 +350,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         :param topic: The topic which should be checked.
         """
         stmt = self.tracked_topics.select().where(topictracker.c.topic_id == topic.id)
-        return db.session.execute(db.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar()
 
     def add_to_group(self, group: Group):
         """Adds the user to the `group` if he isn't in it.
@@ -375,7 +376,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         :param group: The group which should be checked.
         """
         stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
-        return db.session.execute(db.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar()
 
     @cache.memoize()
     def get_groups(self):
@@ -408,7 +409,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         """Bans the user. Returns True upon success."""
         if not self.get_permissions()["banned"]:
             banned_group = db.session.execute(
-                db.select(Group).filter(Group.banned.is_(True))
+                sa.select(Group).filter(Group.banned.is_(True))
             ).scalar_one_or_none()
 
             if not banned_group:
@@ -424,7 +425,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         """Unbans the user. Returns True upon success."""
         if self.get_permissions()["banned"]:
             member_group = db.session.scalar(
-                db.select(Group)
+                sa.select(Group)
                 .filter(
                     Group.admin.is_(False),
                     Group.super_mod.is_(False),
@@ -492,7 +493,7 @@ class Guest(AnonymousUserMixin):
 
     @cache.memoize()
     def get_groups(self):
-        stmt = db.select(Group).where(Group.guest == True)
+        stmt = sa.select(Group).where(Group.guest == True)
         result = db.session.execute(stmt).scalars().all()
         return result
 

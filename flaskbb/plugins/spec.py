@@ -599,7 +599,7 @@ def flaskbb_authenticate(identifier, secret):
 
         def prevent_login_with_too_many_failed_attempts(identifier):
             user = User.get(
-                db.or_(
+                sa.or_(
                     User.username == identifier,
                     User.email == identifier
                 )
@@ -664,7 +664,7 @@ def flaskbb_authentication_failed(identifier):
 
         def mark_failed_logins(identifier):
             user = User.get(
-                db.or_(
+                sa.or_(
                     User.username == identifier,
                     User.email == identifier
                 )

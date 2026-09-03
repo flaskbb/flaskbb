@@ -11,6 +11,7 @@ store for plugins.
 
 from typing import Any
 
+import sqlalchemy as sa
 from flask import flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
@@ -63,10 +64,10 @@ def remove_zombie_plugins_from_db():
     """
     d_fs_plugins: list[str] = [p[0] for p in pluggy.list_disabled_plugins()]
     d_db_plugins = (
-        db.session.execute(db.select(PluginRegistry.name).filter_by(enabled=False)).scalars().all()
+        db.session.execute(sa.select(PluginRegistry.name).filter_by(enabled=False)).scalars().all()
     )
 
-    plugin_names = db.session.execute(db.select(PluginRegistry.name)).scalars().all()
+    plugin_names = db.session.execute(sa.select(PluginRegistry.name)).scalars().all()
 
     remove_me: list[str] = []
     for p in plugin_names:
@@ -74,6 +75,6 @@ def remove_zombie_plugins_from_db():
             remove_me.append(p)
 
     if len(remove_me) > 0:
-        db.session.execute(db.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me)))
+        db.session.execute(sa.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me)))
         db.session.commit()
     return remove_me

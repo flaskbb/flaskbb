@@ -12,8 +12,8 @@ import logging
 import os
 from typing import Any
 
+import sqlalchemy as sa
 from alembic.util.exc import CommandError
-from sqlalchemy import func, select
 from sqlalchemy_utils.functions import (  # pyright: ignore[reportUnknownVariableType]
     create_database,
     database_exists,
@@ -71,7 +71,7 @@ def delete_settings_from_fixture(group_key: str | None = None) -> None:
     for group in groups:
         valid_keys_lower = {s.key.lower() for s in group.settings}
         existing_rows = db.session.execute(
-            select(Setting).where(Setting.group_key == group.key)
+            sa.select(Setting).where(Setting.group_key == group.key)
         ).scalars()
         for row in existing_rows:
             if row.key.lower() not in valid_keys_lower:
@@ -111,7 +111,7 @@ def create_user(username: str, password: str, email: str, groupname: str):
         group = Group.get_member_group()
     else:
         group = db.session.execute(
-            select(Group)
+            sa.select(Group)
             .filter(getattr(Group, groupname).is_(True))
             .order_by(Group.id.asc())
             .limit(1)
@@ -143,7 +143,7 @@ def update_user(
     :param groupname: The name of the group to which the user
                       should belong to.
     """
-    user = db.session.execute(select(User).filter_by(username=username)).scalar_one_or_none()
+    user = db.session.execute(sa.select(User).filter_by(username=username)).scalar_one_or_none()
     if user is None:
         return None
 
@@ -156,7 +156,7 @@ def update_user(
             group = Group.get_member_group()
         else:
             group = db.session.execute(
-                select(Group)
+                sa.select(Group)
                 .filter(getattr(Group, groupname).is_(True))
                 .order_by(Group.id.asc())
                 .limit(1)
@@ -169,11 +169,11 @@ def create_welcome_forum():
     """This will create the `welcome forum` with a welcome topic.
     Returns True if it's created successfully.
     """
-    user_count = db.session.execute(db.select(func.count()).select_from(User)).scalar_one()
+    user_count = db.session.execute(sa.select(sa.func.count()).select_from(User)).scalar_one()
     if user_count < 1:
         return False
 
-    user = db.session.execute(select(User).filter_by(id=1)).scalar_one_or_none()
+    user = db.session.execute(sa.select(User).filter_by(id=1)).scalar_one_or_none()
 
     category = Category(title="My Category", position=1)
     category.save()
@@ -269,11 +269,11 @@ def insert_bulk_data(topic_count: int = 10, post_count: int = 100):
     :param topics: The amount of topics in the forum.
     :param posts: The number of posts in each topic.
     """
-    user1 = db.session.execute(select(User).where(User.id == 1)).scalar()
-    user2 = db.session.execute(select(User).where(User.id == 2)).scalar()
-    forum = db.session.execute(select(Forum).where(Forum.id == 1)).scalar()
+    user1 = db.session.execute(sa.select(User).where(User.id == 1)).scalar()
+    user2 = db.session.execute(sa.select(User).where(User.id == 2)).scalar()
+    forum = db.session.execute(sa.select(Forum).where(Forum.id == 1)).scalar()
 
-    last_post = db.session.execute(select(Post).order_by(Post.id.desc())).scalar()
+    last_post = db.session.execute(sa.select(Post).order_by(Post.id.desc())).scalar()
     last_post_id = 1 if last_post is None else last_post.id
 
     created_posts = 0

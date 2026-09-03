@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import attr
+import sqlalchemy as sa
 from flask_babelplus import gettext as _
 from flask_sqlalchemy.session import Session
 from pytz import UTC
@@ -60,7 +61,7 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
 
     def authenticate(self, identifier, secret):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -88,7 +89,7 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
 
     def authenticate(self, identifier: str, secret: str):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -108,7 +109,7 @@ class MarkFailedLogin(AuthenticationFailureHandler):
 
     def handle_authentication_failure(self, identifier: str):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:

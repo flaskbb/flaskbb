@@ -7,6 +7,7 @@ Handlers for activating accounts in FlaskBB
 :license: BSD, see LICENSE for more details
 """
 
+import sqlalchemy as sa
 from flask_babelplus import gettext as _
 
 from ...core.auth.activation import AccountActivator as _AccountActivator
@@ -27,7 +28,7 @@ class AccountActivator(_AccountActivator):
         self.users = users
 
     def initiate_account_activation(self, email: str):
-        user = db.session.execute(db.select(self.users).filter_by(email=email)).scalar_one_or_none()
+        user = db.session.execute(sa.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
         if user is None:
             raise ValidationError("email", _("Entered email doesn't exist"))
@@ -46,7 +47,7 @@ class AccountActivator(_AccountActivator):
         if token.operation != TokenActions.ACTIVATE_ACCOUNT:
             raise TokenError.invalid()
         user = db.session.execute(
-            db.select(self.users).filter_by(id=token.user_id)
+            sa.select(self.users).filter_by(id=token.user_id)
         ).scalar_one_or_none()
         if user is None:
             raise TokenError.invalid()
