@@ -36,19 +36,20 @@ from ..core.exceptions import PersistenceError
 logger = logging.getLogger(__name__)
 
 
-def make_comparable(cls):
-    def __eq__(self, other):
+def make_comparable[T: CRUDMixin](cls: type[T]) -> type[T]:
+    def __eq__(self: T, other: object) -> bool:
         return isinstance(other, cls) and self.id == other.id
 
-    def __ne__(self, other):
+    def __ne__(self: T, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self: T) -> int:
         return hash((cls, self.id))
 
-    cls.__eq__ = __eq__
-    cls.__ne__ = __ne__
-    cls.__hash__ = __hash__
+    # the slots are typed with an ``object`` self, so a narrower one never fits
+    cls.__eq__ = __eq__  # type: ignore[method-assign,assignment]
+    cls.__ne__ = __ne__  # type: ignore[method-assign,assignment]
+    cls.__hash__ = __hash__  # type: ignore[method-assign,assignment]
     return cls
 
 
@@ -62,6 +63,7 @@ class CRUDMixin:
 
         def __init__(self, **kwargs: t.Any) -> None: ...
 
+    @t.override
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
 
