@@ -96,7 +96,9 @@
                     <div class="col-auto"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ attachment.id }}"
                                title="Select Attachment" /></div>
                     <div class="col-lg-4 col-md-4 col-sm-4">
-                        <a href="{{ attachment.url }}" target="_blank">{{ attachment.original_filename }}</a>
+                        <a href="{{ attachment.url }}" data-bs-toggle="tooltip" data-placement="top"
+                           title="{{ attachment.original_filename }}"
+                           target="_blank">{{ attachment.original_filename|truncate(32, killwords=True, leeway=0) }}</a>
                         {% if attachment.id in missing %}
                         <span class="badge bg-danger">{% trans %}file missing{% endtrans %}</span>
                         {% endif %}
@@ -114,7 +116,7 @@
                         {% if attachment.post.topic %}
                         <a href="{{ attachment.post.url }}" data-bs-toggle="tooltip" data-placement="top"
                            title="{{ attachment.post.topic.title }}"
-                           target="_blank">{{ attachment.post.topic.title | truncate(18, killwords=True)}}</a>
+                           target="_blank">{{ attachment.post.topic.title|truncate(18, killwords=True, leeway=0) }}</a>
                         {% endif %}
                     </div>
                     <div class="col-md-2 d-none d-lg-block">{{ attachment.date_created|format_date }}</div>
