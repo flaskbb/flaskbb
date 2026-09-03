@@ -8,7 +8,9 @@ Plugin implementations for FlaskBB auth hooks
 """
 
 from flask import flash, redirect, url_for
-from flask_login import current_user, logout_user
+from flask_login import logout_user
+
+from flaskbb.utils.proxies import current_user
 
 from ..core.auth.authentication import ForceLogout, PostAuthenticationHandler
 from ..core.settings import flaskbb_config

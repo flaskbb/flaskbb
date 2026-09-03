@@ -14,7 +14,6 @@ from typing import Any, override
 
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from sqlalchemy import or_, select
@@ -48,6 +47,7 @@ from flaskbb.user.models import Group, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
 )
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.requirements import IsAdmin, IsAtleastModerator
 from flaskbb.utils.uploads import (
     validate_image,
@@ -240,7 +240,7 @@ class EditUserForm(UserForm):
     def __init__(self, user: User, *args: Any, **kwargs: Any):
         self.user = user
         kwargs["obj"] = self.user
-        UserForm.__init__(self, *args, **kwargs)
+        UserForm.__init__(self, *args, **kwargs)  # pyright: ignore[reportUnknownMemberType]
 
 
 class SuperModeratorEditUserForm(EditUserForm):
@@ -256,16 +256,16 @@ class SuperModeratorEditUserForm(EditUserForm):
     validation and ``populate_obj`` alike.
     """
 
-    email = None
-    password = None
-    activated = None
+    email = None  # type: ignore[assignment]
+    password = None  # type: ignore[assignment]
+    activated = None  # type: ignore[assignment]
 
 
 class ModeratorEditUserForm(SuperModeratorEditUserForm):
     """The edit form as seen by moderators, who may only clean up profiles."""
 
-    primary_group = None
-    secondary_groups = None
+    primary_group = None  # type: ignore[assignment]
+    secondary_groups = None  # type: ignore[assignment]
 
 
 class GroupForm(FlaskForm):

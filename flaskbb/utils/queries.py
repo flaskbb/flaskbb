@@ -14,10 +14,10 @@ import typing as t
 
 import sqlalchemy as sa
 from flask import abort
-from flask_login import current_user
 
 from flaskbb.extensions import db
 from flaskbb.utils.database import HideableMixin
+from flaskbb.utils.proxies import current_user
 
 if t.TYPE_CHECKING:
     pass
@@ -47,7 +47,7 @@ class SelectAllPagination(Pagination):
         sub = select.options(sa_orm.lazyload("*")).order_by(None).subquery()
         session = self._query_args["session"]
         out = session.execute(sa.select(sa.func.count()).select_from(sub)).scalar()
-        return out  # type: ignore[no-any-return]
+        return out
 
 
 def paginate(

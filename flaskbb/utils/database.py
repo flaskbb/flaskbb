@@ -58,7 +58,7 @@ class CRUDMixin:
         # mapped by the declarative metaclass, which supplies __table__ and
         # the kwargs-only declarative constructor
         id: Mapped[int] = mapped_column(primary_key=True)
-        __table__: t.ClassVar[sa.Table]
+        __table__: t.ClassVar[sa.FromClause]
 
         def __init__(self, **kwargs: t.Any) -> None: ...
 
@@ -161,15 +161,17 @@ class HideableMixin:
     )
 
     @declared_attr
+    @classmethod
     def hidden_by_id(cls) -> Mapped[int | None]:
         return mapped_column(
-            sa.ForeignKey("users.id", name=f"fk_{cls.__name__}_hidden_by"),  # pyright: ignore
+            sa.ForeignKey("users.id", name=f"fk_{cls.__name__}_hidden_by"),
             nullable=True,
         )
 
     @declared_attr
+    @classmethod
     def hidden_by(cls) -> Mapped["User"]:
-        return relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])  # pyright: ignore
+        return relationship("User", uselist=False, foreign_keys=[cls.hidden_by_id])
 
     def hide(self, user: "User", *args: t.Any, **kwargs: t.Any) -> t.Self | None:
         from flaskbb.utils.helpers import time_utcnow

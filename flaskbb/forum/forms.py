@@ -13,7 +13,6 @@ import os
 
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileStorage, MultipleFileField
 from jinja2.filters import do_filesizeformat
@@ -33,6 +32,7 @@ from flaskbb.forum.models import Post, Report, Topic
 from flaskbb.forum.utils import handle_post_attachments, parse_attachment_types
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.requirements import CanPostAttachment
 
 logger = logging.getLogger(__name__)

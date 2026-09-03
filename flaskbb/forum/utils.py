@@ -14,12 +14,11 @@ import os
 from typing import TYPE_CHECKING
 
 from flask import current_app
-from flask_login import current_user
 from werkzeug.datastructures import FileStorage
-from werkzeug.local import LocalProxy
 from werkzeug.utils import secure_filename
 
 from flaskbb.extensions import db
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.uploads import (
     get_attachment_disk_path,
     get_image_info,
@@ -44,9 +43,7 @@ def force_login_if_needed():
         return current_app.login_manager.unauthorized()  # pyright: ignore
 
 
-def should_force_login(
-    user: "User | LocalProxy[User | None]", forum: "Forum | LocalProxy[Forum | None]"
-):
+def should_force_login(user: "User", forum: "Forum"):
     return not user.is_authenticated and not (
         {g.id for g in forum.groups} & {g.id for g in user.groups}
     )

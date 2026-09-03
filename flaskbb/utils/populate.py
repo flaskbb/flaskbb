@@ -280,7 +280,7 @@ def insert_bulk_data(topic_count: int = 10, post_count: int = 100):
     created_topics = 0
     posts: list[Post] = []
 
-    if not (user1 or user2 or forum):
+    if not (user1 and user2 and forum):
         return False
 
     with db.session.no_autoflush:
@@ -306,9 +306,9 @@ def insert_bulk_data(topic_count: int = 10, post_count: int = 100):
         db.session.bulk_save_objects(posts)
 
     # and finally, lets update some stats
-    forum.recalculate(last_post=True)  # pyright: ignore[reportOptionalMemberAccess]
-    user1.recalculate()  # pyright: ignore[reportOptionalMemberAccess]
-    user2.recalculate()  # pyright: ignore[reportOptionalMemberAccess]
+    forum.recalculate(last_post=True)
+    user1.recalculate()
+    user2.recalculate()
 
     return created_topics, created_posts
 

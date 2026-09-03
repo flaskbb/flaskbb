@@ -28,7 +28,7 @@ from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskbb.core.settings import flaskbb_config
-from flaskbb.extensions import cache, db
+from flaskbb.extensions import BaseModel, cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
 from flaskbb.utils.database import CRUDMixin, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
@@ -54,12 +54,12 @@ groups_users = db.Table(
 
 
 @make_comparable
-class Group(db.Model, CRUDMixin):
+class Group(BaseModel, CRUDMixin):
     __tablename__: str = "groups"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Group types
     admin: Mapped[bool] = mapped_column(default=False, nullable=False)
@@ -114,7 +114,7 @@ class Group(db.Model, CRUDMixin):
         ).scalar_one()
 
 
-class User(db.Model, UserMixin, CRUDMixin):
+class User(BaseModel, UserMixin, CRUDMixin):
     __tablename__: str = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)

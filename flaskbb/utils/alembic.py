@@ -64,9 +64,7 @@ class Alembic(FlaskAlembic):
         if hasattr(config, "_get_file_separator_char"):
             # Alembic >= 1.16.0
             # path_separator is always set above, so this is never None
-            return config._get_file_separator_char(  # pyright: ignore[reportReturnType]
-                "path_separator"
-            )
+            return t.cast(str, config._get_file_separator_char("path_separator"))
 
         join_on_path = {
             "space": " ",

@@ -36,10 +36,10 @@ def _select_plugins(plugin_name: str | None, all_plugins: bool) -> list[PluginRe
     if all_plugins == bool(plugin_name):
         raise FlaskBBCLIError("Either provide a PLUGIN_NAME or use '--all'.", fg="red")
 
-    if all_plugins:
+    if not plugin_name:
         return PluginRegistry.get_all()
 
-    validate_plugin(plugin_name)  # pyright: ignore[reportArgumentType]
+    validate_plugin(plugin_name)
     plugin = PluginRegistry.get(PluginRegistry.name == plugin_name)
     if plugin is None:
         raise click.Abort()

@@ -12,11 +12,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 from flaskbb.core.settings.forms import build_form
 from flaskbb.core.settings.models import display_key, Setting, SettingsDiff
 from flaskbb.core.settings.registry import setting_registry
-from flaskbb.extensions import db, pluggy
+from flaskbb.extensions import BaseModel, db, pluggy
 from flaskbb.utils.database import CRUDMixin
 
 
-class PluginRegistry(db.Model, CRUDMixin):
+class PluginRegistry(BaseModel, CRUDMixin):
     __tablename__ = "plugin_registry"
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -183,7 +183,7 @@ def new_group(
         _update_group_type(group, group_type)
 
     if description is not None:
-        group.description = description  # pyright: ignore[reportAttributeAccessIssue]
+        group.description = description
     _update_permissions(group, grant, revoke)
 
     try:
@@ -238,7 +238,7 @@ def update_group(
     if new_name is not None:
         group.name = new_name
     if description is not None:
-        group.description = description  # pyright: ignore[reportAttributeAccessIssue]
+        group.description = description
     _update_permissions(group, grant, revoke)
 
     try:

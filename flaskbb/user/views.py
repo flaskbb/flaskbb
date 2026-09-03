@@ -15,7 +15,7 @@ from attrs import define, field
 from flask import Blueprint, flash, Flask, jsonify, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
-from flask_login import current_user, login_required
+from flask_login import login_required
 from pluggy import HookimplMarker
 
 from flaskbb.user.forms import (
@@ -34,6 +34,7 @@ from flaskbb.user.services.update import (
     DefaultSettingsUpdateHandler,
 )
 from flaskbb.utils.helpers import real, register_view, render_template
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.uploads import delete_avatar_file
 
 from ..core.exceptions import PersistenceError, StopValidation

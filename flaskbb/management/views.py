@@ -29,7 +29,7 @@ from flask import (
 from flask.views import MethodView
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
-from flask_login import current_user, login_fresh
+from flask_login import login_fresh
 from flask_wtf.file import FileStorage
 from pluggy import HookimplMarker
 from sqlalchemy import select
@@ -68,6 +68,7 @@ from flaskbb.utils.helpers import (
     time_diff,
     time_utcnow,
 )
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.requirements import (
     CanBanTargetUser,
     CanBanUser,

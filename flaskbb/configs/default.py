@@ -11,6 +11,7 @@ You can override these configuration variables in another class.
 
 import datetime
 import os
+from typing import Any
 
 
 class DefaultConfig:
@@ -275,7 +276,7 @@ class DefaultConfig:
     REDIS_DATABASE = 0
 
     # Celery
-    CELERY_CONFIG = {
+    CELERY_CONFIG: dict[str, Any] = {
         "broker_url": "redis://localhost:6379",
         "result_backend": "redis://localhost:6379",
         "broker_transport_options": {"max_retries": 1},

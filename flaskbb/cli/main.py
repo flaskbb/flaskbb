@@ -13,7 +13,6 @@ import logging
 import os
 import sys
 import time
-import traceback
 from datetime import datetime, UTC
 from typing import Any, override
 
@@ -61,10 +60,7 @@ class FlaskBBGroup(FlaskGroup):
             pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception:
-            logger.error(
-                "Error while loading CLI Plugins",
-                exc_info=traceback.format_exc(),  # pyright: ignore[reportArgumentType]
-            )
+            logger.error("Error while loading CLI Plugins", exc_info=True)
         else:
             shell_context_processors = pluggy.hook.flaskbb_shell_context()
             for p in shell_context_processors:
@@ -87,20 +83,19 @@ def make_app():
     if ctx is not None:
         script_info = ctx.obj
 
-    config_file = getattr(script_info, "config_file", None)
-    instance_path = getattr(script_info, "instance_path", None)
-    return create_app(config_file, instance_path)
+    data = getattr(script_info, "data", {})
+    return create_app(data.get("config_file"), data.get("instance_path"))
 
 
 def set_config(ctx: click.Context, param: str, value: str):
     """This will pass the config file to the create_app function."""
-    ctx.ensure_object(ScriptInfo).config_file = value  # pyright: ignore[reportAttributeAccessIssue]
+    ctx.ensure_object(ScriptInfo).data["config_file"] = value
 
 
 def set_instance(ctx: click.Context, param: str, value: str):
     """This will pass the instance path on the script info which can then
     be used in 'make_app'."""
-    ctx.ensure_object(ScriptInfo).instance_path = value  # pyright: ignore[reportAttributeAccessIssue]
+    ctx.ensure_object(ScriptInfo).data["instance_path"] = value
 
 
 @click.group(
@@ -410,7 +405,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     if os.name == "nt":
         database_path = database_path.replace("\\", r"\\")
 
-    default_conf = {
+    default_conf: dict[str, bool | str | int] = {
         "is_debug": False,
         "server_name": "example.org",
         "use_https": True,

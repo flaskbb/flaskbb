@@ -9,7 +9,7 @@ The extensions that are used by FlaskBB.
 """
 
 import sqlite3
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from celery import Celery
 from flask_allows2 import Allows
@@ -48,6 +48,16 @@ metadata = MetaData(
     }
 )
 db = SQLAlchemy(metadata=metadata, session_options={"future": True})
+
+if TYPE_CHECKING:
+    from flask_sqlalchemy.model import Model as _FSAModel
+    from sqlalchemy.orm import DeclarativeBase
+
+    class BaseModel(_FSAModel, DeclarativeBase):
+        pass
+
+else:
+    BaseModel = db.Model
 
 
 def _enable_sqlite_foreign_keys(dbapi_connection: Any, connection_record: Any) -> None:

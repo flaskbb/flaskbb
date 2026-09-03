@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
-from wsgiref.types import WSGIEnvironment
+from wsgiref.types import StartResponse, WSGIEnvironment
 
 import unidecode
 from babel.core import get_locale_identifier
@@ -36,7 +36,6 @@ from flask import (
     Flask,
     redirect,
     request,
-    Response,
     session,
     url_for,
 )
@@ -44,7 +43,6 @@ from flask.typing import RouteCallable
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_limiter import Limiter
-from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from pytz import UTC
@@ -53,6 +51,7 @@ from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string, ImportStringError
 
 from flaskbb.extensions import babel, redis_store
+from flaskbb.utils.proxies import current_user
 
 if TYPE_CHECKING:
     from flaskbb.forum.models import Category, Forum, ForumsRead, Topic, TopicsRead
@@ -266,7 +265,7 @@ def _group_forums_by_category(
             yield CategoryForums(category, forum_rows)
     else:
         for category, rows in it:
-            forum_rows: list[ForumRow] = []
+            forum_rows = []
             for row in rows:
                 forum_rows.append(ForumRow(row[1], None))
             yield CategoryForums(category, forum_rows)
@@ -747,7 +746,7 @@ class ReverseProxyPathFix:
         self.app = app
         self.force_https = force_https
 
-    def __call__(self, environ: WSGIEnvironment, start_response: Response):
+    def __call__(self, environ: WSGIEnvironment, start_response: StartResponse):
         script_name = environ.get("HTTP_X_SCRIPT_NAME", "")
         if script_name:
             environ["SCRIPT_NAME"] = script_name
@@ -769,7 +768,7 @@ class ReverseProxyPathFix:
         if self.force_https:
             environ["wsgi.url_scheme"] = "https"
 
-        return self.app(environ, start_response)  # pyright: ignore[reportArgumentType]
+        return self.app(environ, start_response)
 
 
 @overload
@@ -846,11 +845,10 @@ def register_view(
     bp_or_app: Blueprint | Flask,
     routes: list[str],
     view_func: RouteCallable,
-    *args: Any,
     **kwargs: Any,
 ):
     for route in routes:
-        bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)  # noqa: B026
+        bp_or_app.add_url_rule(route, view_func=view_func, **kwargs)
 
 
 class FlashAndRedirect:

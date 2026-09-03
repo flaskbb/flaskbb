@@ -21,7 +21,6 @@ from typing import Any
 from celery import Celery
 from flask import flash, Flask, redirect, request, url_for
 from flask_babelplus import gettext as _
-from flask_login import current_user
 from jinja2.filters import do_filesizeformat
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -75,6 +74,7 @@ from flaskbb.utils.helpers import (
     time_utcnow,
     topic_is_unread,
 )
+from flaskbb.utils.proxies import current_user
 
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (
@@ -196,6 +196,7 @@ def configure_app(app: Flask, config: Any):
     # Setting up logging as early as possible
     configure_logging(app)
 
+    config_name: str | None
     if not isinstance(config, str) and config is not None:
         config_name = f"{config.__module__}.{config.__name__}"
     else:
@@ -259,7 +260,7 @@ def configure_celery_app(app: Flask, celery: Celery):
 
     TaskBase = celery.Task
 
-    class ContextTask(TaskBase):
+    class ContextTask(TaskBase):  # type: ignore[valid-type,misc]
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
@@ -311,7 +312,7 @@ def configure_extensions(app: Flask):
     login_manager.needs_refresh_message_category = app.config["REFRESH_MESSAGE_CATEGORY"]
     login_manager.anonymous_user = Guest
 
-    @login_manager.user_loader
+    @login_manager.user_loader  # type: ignore[untyped-decorator]
     def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
         user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()

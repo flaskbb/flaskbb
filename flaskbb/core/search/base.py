@@ -17,7 +17,7 @@ import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from flask import Flask
 from flask_sqlalchemy.model import Model
@@ -25,7 +25,13 @@ from markupsafe import escape, Markup
 from sqlalchemy import case, Select, select
 from sqlalchemy import false as sql_false
 
-ModelT = type[Model]
+if TYPE_CHECKING:
+    # importing at runtime would close the extensions -> core.search cycle
+    from flaskbb.utils.database import CRUDMixin
+
+    ModelT = type[CRUDMixin]
+else:
+    ModelT = type[Model]
 
 
 def ordered_by_ids(model: ModelT, ids: Sequence[int]) -> Select[Any]:
@@ -34,8 +40,6 @@ def ordered_by_ids(model: ModelT, ids: Sequence[int]) -> Select[Any]:
     from `search()` once it has resolved a ranked list of primary keys.
     An empty `ids` yields a statement that matches nothing.
     """
-    # ModelT is bound to flask_sqlalchemy's generic Model, which doesn't
-    # declare an `id` attribute - all searchable models use `id` as pk.
     pk_col = model.id
     if not ids:
         return select(model).where(sql_false())

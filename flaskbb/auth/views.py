@@ -19,7 +19,6 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (
     confirm_login,
-    current_user,
     login_fresh,
     login_required,
     login_user,
@@ -48,6 +47,7 @@ from flaskbb.utils.helpers import (
     requires_unactivated,
     time_utcnow,
 )
+from flaskbb.utils.proxies import current_user
 
 from ..core.auth.authentication import StopAuthentication
 from ..core.auth.registration import UserRegistrationInfo

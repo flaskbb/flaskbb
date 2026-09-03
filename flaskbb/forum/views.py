@@ -26,7 +26,7 @@ from flask import (
 from flask.views import MethodView
 from flask_allows2 import And, Permission
 from flask_babelplus import gettext as _
-from flask_login import current_user, login_required
+from flask_login import login_required
 from pluggy import HookimplMarker
 from sqlalchemy import asc, desc
 
@@ -63,6 +63,7 @@ from flaskbb.utils.helpers import (
     time_diff,
     time_utcnow,
 )
+from flaskbb.utils.proxies import current_user
 from flaskbb.utils.queries import first_or_404, paginate
 from flaskbb.utils.requirements import (
     CanAccessForum,
@@ -81,6 +82,18 @@ from .utils import force_login_if_needed
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
+
+
+def _category_url(*args: Any, **kwargs: Any) -> str:
+    return current_category.url if current_category else url_for("forum.index")
+
+
+def _forum_url(*args: Any, **kwargs: Any) -> str:
+    return current_forum.url if current_forum else url_for("forum.index")
+
+
+def _topic_url(*args: Any, **kwargs: Any) -> str:
+    return current_topic.url if current_topic else url_for("forum.index")
 
 
 class ForumIndex(MethodView):
@@ -132,7 +145,7 @@ class ViewForum(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         )
     ]
@@ -168,7 +181,7 @@ class ViewPost(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that topic"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         )
     ]
@@ -201,7 +214,7 @@ class ViewTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that topic"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         )
     ]
@@ -281,7 +294,7 @@ class NewTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to post a topic here"),
                 level="warning",
-                endpoint=lambda *a, **k: current_forum.url,
+                endpoint=_forum_url,
             ),
         ),
     ]
@@ -323,7 +336,7 @@ class EditTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that topic"),
                 level="warning",
-                endpoint=lambda *a, **k: current_forum.url,
+                endpoint=_forum_url,
             ),
         ),
     ]
@@ -376,10 +389,10 @@ class ManageForum(MethodView):
             return redirect(forum_instance.external)
 
         # remove the current forum from the select field (move).
-        available_forums = (
+        available_forums = list(
             db.session.execute(db.select(Forum).order_by(Forum.position)).unique().scalars().all()
         )
-        available_forums.remove(forum_instance)  # pyright: ignore
+        available_forums.remove(forum_instance)
         page = request.args.get("page", 1, type=int)
         topics = Forum.get_topics(
             forum_id=forum_instance.id,
@@ -577,7 +590,7 @@ class EditPost(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that post"),
                 level="danger",
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
         login_required,
@@ -756,7 +769,7 @@ class DeleteTopic(MethodView):
                 message=_("You are not allowed to delete this topic"),
                 level="danger",
                 # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -776,7 +789,7 @@ class LockTopic(MethodView):
                 message=_("You are not allowed to lock this topic"),
                 level="danger",
                 # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -797,7 +810,7 @@ class UnlockTopic(MethodView):
                 message=_("You are not allowed to unlock this topic"),
                 level="danger",
                 # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -818,7 +831,7 @@ class HighlightTopic(MethodView):
                 message=_("You are not allowed to highlight this topic"),
                 level="danger",
                 # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -839,7 +852,7 @@ class TrivializeTopic(MethodView):
                 message=_("You are not allowed to trivialize this topic"),
                 level="danger",
                 # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -859,7 +872,7 @@ class DeletePost(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to delete this post"),
                 level="danger",
-                endpoint=lambda *a, **k: current_topic.url,
+                endpoint=_topic_url,
             ),
         ),
     ]
@@ -885,7 +898,7 @@ class RawPost(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         ),
     ]
@@ -903,7 +916,7 @@ class MarkRead(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         ),
     ]
@@ -984,7 +997,7 @@ class TrackTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         ),
     ]
@@ -1004,7 +1017,7 @@ class UntrackTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
-                endpoint=lambda *a, **k: current_category.url,
+                endpoint=_category_url,
             ),
         ),
     ]

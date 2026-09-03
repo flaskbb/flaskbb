@@ -117,5 +117,8 @@ def search_snippet(instance: Topic | Post, query: str) -> Markup:
     """Returns a highlighted content preview of `instance` (a `Topic` or
     `Post` search result) for `query`, via the active search backend.
     """
-    content = instance.first_post.content if isinstance(instance, Topic) else instance.content
+    if isinstance(instance, Topic):
+        content = instance.first_post.content if instance.first_post else ""
+    else:
+        content = instance.content
     return flaskbb_search.snippet(type(instance), instance.id, content, query)

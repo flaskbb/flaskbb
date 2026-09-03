@@ -20,7 +20,7 @@ from typing import Any
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Mapped, mapped_column
 
-from flaskbb.extensions import cache, db
+from flaskbb.extensions import BaseModel, cache, db
 
 from .definitions import SettingDefinition
 from .registry import setting_registry
@@ -60,7 +60,7 @@ class SettingsDiff:
         return f"new: {', '.join(self.missing)}, obsolete: {', '.join(self.obsolete)}"
 
 
-class Setting(db.Model):
+class Setting(BaseModel):
     __tablename__ = "settings"
 
     key: Mapped[str] = mapped_column(db.String(255), primary_key=True, nullable=False)
@@ -80,16 +80,16 @@ class Setting(db.Model):
     def set_value(self, definition: SettingDefinition, value: Any) -> None:
         self.value = definition.serialize(value)
 
-    @classmethod
+    @staticmethod
     @cache.cached(key_prefix=_SETTINGS_CACHE_KEY)
-    def as_dict(cls) -> dict[str, Any]:
+    def as_dict() -> dict[str, Any]:
         """Load and deserialize every setting value from the DB.
 
         Core settings stay unprefixed (settings.PROJECT_TITLE),
         plugin settings are exposed prefixed with
         their group_key (settings.PORTAL_FORUM_IDS).
         """
-        settings = db.session.execute(select(cls)).scalars().all()
+        settings = db.session.execute(select(Setting)).scalars().all()
         config: dict[str, Any] = {}
 
         for s in settings:

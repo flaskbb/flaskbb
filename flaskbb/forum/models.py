@@ -31,7 +31,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import aliased, Mapped, mapped_column, relationship
 
-from flaskbb.extensions import db, pluggy
+from flaskbb.extensions import BaseModel, db, pluggy
 from flaskbb.utils.queries import hidden, paginate
 
 if TYPE_CHECKING:
@@ -110,7 +110,7 @@ forumgroups = Table(
 )
 
 
-class TopicsRead(db.Model, CRUDMixin):
+class TopicsRead(BaseModel, CRUDMixin):
     __tablename__ = "topicsread"
 
     user_id: Mapped[int] = mapped_column(
@@ -130,7 +130,7 @@ class TopicsRead(db.Model, CRUDMixin):
     )
 
 
-class ForumsRead(db.Model, CRUDMixin):
+class ForumsRead(BaseModel, CRUDMixin):
     __tablename__ = "forumsread"
 
     user_id: Mapped[int] = mapped_column(
@@ -157,7 +157,7 @@ class ForumsRead(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Report(db.Model, CRUDMixin):
+class Report(BaseModel, CRUDMixin):
     __tablename__ = "reports"
 
     # TODO: Store in addition to the info below topic title and username
@@ -206,7 +206,7 @@ class Report(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Attachment(db.Model, CRUDMixin):
+class Attachment(BaseModel, CRUDMixin):
     __tablename__ = "attachments"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -291,7 +291,7 @@ def _discard_pending_unlinks(session):
 
 
 @make_comparable
-class Post(HideableCRUDMixin, db.Model):
+class Post(HideableCRUDMixin, BaseModel):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -598,7 +598,7 @@ class Post(HideableCRUDMixin, db.Model):
 
 
 @make_comparable
-class Topic(HideableCRUDMixin, db.Model):
+class Topic(HideableCRUDMixin, BaseModel):
     __tablename__ = "topics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -1138,7 +1138,7 @@ class Topic(HideableCRUDMixin, db.Model):
 
 
 @make_comparable
-class Forum(db.Model, CRUDMixin):
+class Forum(BaseModel, CRUDMixin):
     __tablename__ = "forums"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -1592,7 +1592,7 @@ class Forum(db.Model, CRUDMixin):
 
 
 @make_comparable
-class Category(db.Model, CRUDMixin):
+class Category(BaseModel, CRUDMixin):
     __tablename__ = "categories"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -1664,7 +1664,7 @@ class Category(db.Model, CRUDMixin):
 
     # Classmethods
     @classmethod
-    def get_all(cls, user: "User"):
+    def get_all(cls, user: "User"):  # type: ignore[override]
         """Get all categories with all associated forums.
         It returns a list with tuples. Those tuples are containing the category
         and their associated forums (whose are stored in a list).

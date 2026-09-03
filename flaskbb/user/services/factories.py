@@ -12,7 +12,8 @@ These factories are provisional and considered private APIs.
 from itertools import chain
 
 from flask import current_app
-from flask_login import current_user
+
+from flaskbb.utils.proxies import current_user
 
 from ...extensions import db, pluggy
 from ...utils.helpers import get_available_languages, get_available_themes

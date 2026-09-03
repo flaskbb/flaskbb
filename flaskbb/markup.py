@@ -16,7 +16,6 @@ from urllib.parse import urlparse
 
 import mistune
 from flask import Flask, request, url_for
-from flask_login import current_user
 from markupsafe import Markup
 from mistune.plugins import PluginRef
 from mistune.plugins.abbr import abbr
@@ -42,6 +41,7 @@ from pygments.util import ClassNotFound
 
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import pluggy
+from flaskbb.utils.proxies import current_user
 
 impl = HookimplMarker("flaskbb")
 

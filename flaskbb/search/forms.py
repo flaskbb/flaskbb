@@ -9,9 +9,9 @@ The forms for the search page.
 """
 
 import logging
+from typing import Any, cast
 
 from flask_babelplus import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import DateField, HiddenField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
@@ -21,6 +21,7 @@ from flaskbb.forum.models import Forum
 from flaskbb.search.service import search_forums, search_users
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import real
+from flaskbb.utils.proxies import current_user
 
 logger = logging.getLogger(__name__)
 
@@ -87,8 +88,9 @@ class SearchForm(FlaskForm):
             self.user.is_authenticated and self.user.permissions.get("viewhidden")
         )
         if not has_viewhidden:
+            choices = cast("list[tuple[Any, str]]", self.state.choices or [])
             self.state.choices = [  # pyright: ignore[reportAttributeAccessIssue]
-                choice for choice in self.state.choices or [] if choice[0] != "hidden"
+                choice for choice in choices if choice[0] != "hidden"
             ]
 
     def get_results(self):
