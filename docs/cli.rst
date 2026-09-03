@@ -33,8 +33,10 @@ commands.
     Commands:
       celery        Preconfigured wrapper around the 'celery' command.
       db            Perform database migrations (Flask-Alembic).
+      groups        Create, update or delete groups.
       install       Installs flaskbb.
       makeconfig    Generates a FlaskBB configuration file.
+      permissions   Show or modify the permissions of the groups.
       plugins       Plugins command sub group.
       populate      Creates the necessary tables and groups for FlaskBB.
       reindex       Reindexes the search index.
@@ -58,7 +60,7 @@ Here you will find a detailed description of every command including all
 of their options and arguments.
 
 ``flaskbb install``
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Installs flaskbb. If no arguments are used, an interactive setup
 will be run.
@@ -88,7 +90,7 @@ will be run.
     Don't run the migrations for the default plugins.
 
 ``flaskbb populate``
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 Creates the necessary tables and groups for FlaskBB.
 
@@ -118,7 +120,7 @@ Creates the necessary tables and groups for FlaskBB.
     Initializes the database before populating it.
 
 ``flaskbb run``
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Runs a local development server (Flask's built-in ``run`` command). This
 server is for development purposes only - it does not provide the
@@ -203,19 +205,19 @@ can be set through a gunicorn configuration file.
     precedence over the ones in the configuration file.
 
 ``flaskbb celery CELERY_ARGS``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Starts celery. This is just a preconfigured wrapper around the ``celery``
 command. Additional arguments are directly passed to celery, e.g.
 ``flaskbb celery worker`` or ``flaskbb celery beat``.
 
 ``flaskbb shell``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 Creates a python shell with an app context.
 
 ``flaskbb urls``
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Lists all available routes.
 
@@ -232,7 +234,7 @@ Lists all available routes.
     Order by methods
 
 ``flaskbb routes``
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Flask's own built-in command for showing all registered routes with
 their endpoints and methods. Similar to ``flaskbb urls`` above, but comes
@@ -248,7 +250,7 @@ from Flask itself rather than FlaskBB.
     Show HEAD and OPTIONS methods too.
 
 ``flaskbb makeconfig``
-~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 
 Generates a FlaskBB configuration file.
 
@@ -266,12 +268,12 @@ Generates a FlaskBB configuration file.
     Overwrites any existing config file, if one exsits, WITHOUT asking.
 
 ``flaskbb reindex``
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Reindexes the search index.
 
 ``flaskbb db``
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 Runs database migrations. This sub group is provided by
 `Flask-Alembic <https://flask-alembic.readthedocs.io/>`_ and mirrors its
@@ -385,7 +387,7 @@ migration branch, keyed by the plugin's name.
     Create the migration directory if it does not exist.
 
 ``flaskbb translations``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Translations command sub group.
 
@@ -424,7 +426,7 @@ Translations command sub group.
         Compiles only the given plugin translation.
 
 ``flaskbb plugins``
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Plugins command sub group. See :ref:`plugins` for the full
 install/uninstall/enable/disable workflow.
@@ -537,7 +539,7 @@ install/uninstall/enable/disable workflow.
     environment.
 
 ``flaskbb themes``
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Themes command sub group.
 
@@ -574,7 +576,7 @@ Themes command sub group.
     Lists all installed themes.
 
 ``flaskbb users``
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 Create, update or delete users. Omit an option to be prompted for it
 interactively.
@@ -632,3 +634,141 @@ interactively.
     .. describe:: --force, -f
 
         Removes the user without asking for confirmation first.
+
+.. describe:: list
+
+    Lists all users.
+
+    .. describe:: --group GROUP, -g GROUP
+
+        Only show users who have ``GROUP`` as their primary or as one of
+        their secondary groups.
+
+    .. describe:: --banned, -b
+
+        Only show banned users.
+
+    .. describe:: --unactivated, -U
+
+        Only show users who haven't activated their account yet.
+
+.. describe:: show USERNAME
+
+    Shows a user including his groups and the permissions they grant him.
+
+.. describe:: ban USERNAME
+
+    Bans a user by moving him into the banned group.
+
+.. describe:: unban USERNAME
+
+    Unbans a user by moving him back into the member group. Note that this
+    doesn't restore the group the user was in before he got banned.
+
+.. describe:: activate USERNAME
+
+    Activates a user's account.
+
+.. describe:: deactivate USERNAME
+
+    Deactivates a user's account.
+
+.. describe:: set-group USERNAME GROUP
+
+    Sets the primary group of a user. If ``GROUP`` is one of the user's
+    secondary groups it is removed from those - a group is either the
+    primary or a secondary group, never both.
+
+.. describe:: add-group USERNAME GROUP
+
+    Adds a user to a secondary group.
+
+.. describe:: remove-group USERNAME GROUP
+
+    Removes a user from a secondary group.
+
+``flaskbb groups``
+~~~~~~~~~~~~~~~~~~
+
+Create, update or delete groups. The name of a group is case insensitive.
+
+.. describe:: list
+
+    Lists all groups including their type and how many members they have.
+
+.. describe:: show NAME
+
+    Shows a group including its permissions.
+
+.. describe:: new NAME
+
+    Creates a new group. Permissions that are neither granted nor revoked
+    are set to their default value, e.g.::
+
+        flaskbb groups new VIP --description "Trusted members" \
+            --grant viewhidden --revoke postattachment
+
+    .. describe:: --description TEXT, -d TEXT
+
+        The description of the group.
+
+    .. describe:: --type TYPE, -t TYPE
+
+        The type of the group, one of ``admin``, ``super_mod``, ``mod``,
+        ``banned`` or ``guest``. Omit it to create an ordinary member
+        group. There can only be one ``guest`` and one ``banned`` group.
+
+    .. describe:: --grant PERMISSION
+
+        A permission to grant. Can be used multiple times.
+
+    .. describe:: --revoke PERMISSION
+
+        A permission to revoke. Can be used multiple times.
+
+.. describe:: update NAME
+
+    Updates a group. Any option that is omitted is left unchanged. It takes
+    the same options as ``new`` plus:
+
+    .. describe:: --name NAME, -n NAME
+
+        The new name of the group.
+
+    ``--type`` additionally accepts ``member`` here, which turns a typed
+    group back into an ordinary one.
+
+.. describe:: delete NAME
+
+    Deletes a group. The six groups that are created during the
+    installation can't be deleted, neither can groups that still have
+    members.
+
+    .. describe:: --force, -f
+
+        Removes the group without asking for confirmation first.
+
+``flaskbb permissions``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Show or modify the permissions of the groups.
+
+.. describe:: list
+
+    Lists the permissions of every group as a table.
+
+    .. describe:: --group GROUP, -g GROUP
+
+        Only show the permissions of this group.
+
+.. describe:: show USERNAME
+
+    Shows the effective permissions of a user and which of his groups grant
+    them.
+
+.. describe:: set GROUP PERMISSION VALUE
+
+    Grants or revokes a single permission of a group, where ``VALUE`` is a
+    boolean, e.g.::
+
+        flaskbb permissions set Member deletepost true

@@ -101,13 +101,16 @@ class Group(db.Model, CRUDMixin):
     def get_member_group(cls) -> "Group":
         """Returns the first member group."""
         return db.session.execute(
-            db.select(cls).filter(
+            db.select(cls)
+            .filter(
                 cls.admin.is_(False),
                 cls.super_mod.is_(False),
                 cls.mod.is_(False),
                 cls.guest.is_(False),
                 cls.banned.is_(False),
             )
+            .order_by(cls.id.asc())
+            .limit(1)
         ).scalar_one()
 
 
@@ -420,15 +423,17 @@ class User(db.Model, UserMixin, CRUDMixin):
     def unban(self):
         """Unbans the user. Returns True upon success."""
         if self.get_permissions()["banned"]:
-            member_group = db.session.execute(
-                db.select(Group).filter(
+            member_group = db.session.scalar(
+                db.select(Group)
+                .filter(
                     Group.admin.is_(False),
                     Group.super_mod.is_(False),
                     Group.mod.is_(False),
                     Group.guest.is_(False),
                     Group.banned.is_(False),
                 )
-            ).scalar_one_or_none()
+                .order_by(Group.id.asc())
+            )
 
             if not member_group:
                 abort(404)

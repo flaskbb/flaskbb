@@ -13,6 +13,7 @@ import importlib.metadata
 import os
 import re
 import sys
+from collections import Counter
 from collections.abc import Callable
 from typing import Any, IO, override
 
@@ -22,10 +23,30 @@ from flask_themes2 import get_theme
 from jinja2 import Template
 
 from flaskbb import __version__
-from flaskbb.extensions import pluggy
+from flaskbb.extensions import db, pluggy
+from flaskbb.fixtures.groups import fixture
+from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.populate import create_user, update_user
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
+
+
+def _group_types() -> tuple[str, ...]:
+    """Derives the columns that mark what kind of group it is, as opposed to
+    what its members are allowed to do, from the default groups: every
+    default group is of exactly one type, so a type is a column that is only
+    ever true for a single one of them.
+
+    A permission that only one default group has would be mistaken for a
+    type - ``tests/unit/cli/test_utils.py`` guards against that.
+    """
+    columns = Counter(
+        column for group in fixture.values() for column, value in group.items() if value is True
+    )
+    return tuple(column for column, count in columns.items() if count == 1)
+
+
+GROUP_TYPES = _group_types()
 
 
 class FlaskBBCLIError(click.ClickException):
@@ -65,6 +86,72 @@ class EmailType(click.ParamType[str]):
     @override
     def __repr__(self):
         return "email"
+
+
+def group_permissions() -> list[str]:
+    """Returns the permission columns of the group model - everything that
+    is neither metadata nor one of the :data:`GROUP_TYPES`.
+    """
+    excluded = {"id", "name", "description", *GROUP_TYPES}
+    return [c for c in Group.__table__.columns.keys() if c not in excluded]
+
+
+def get_user(username: str) -> User:
+    """Returns the user with the given username or aborts the command."""
+    user = db.session.execute(db.select(User).filter_by(username=username)).scalar_one_or_none()
+    if user is None:
+        raise FlaskBBCLIError(f"The user with username {username} does not exist.", fg="red")
+    return user
+
+
+def get_group(name: str) -> Group:
+    """Returns the group with the given name or aborts the command.
+    The name is matched case insensitively.
+    """
+    group = db.session.execute(
+        db.select(Group).filter(db.func.lower(Group.name) == name.lower())
+    ).scalar_one_or_none()
+    if group is None:
+        raise FlaskBBCLIError(f"The group with name {name} does not exist.", fg="red")
+    return group
+
+
+def invalidate_permission_cache(group: Group):
+    """Drops the cached permissions of everyone who is affected by a change
+    on ``group``.
+    """
+    if group.guest:
+        Guest.invalidate_cache()
+
+    members = db.session.execute(
+        db.select(User).filter(
+            db.or_(
+                User.primary_group_id == group.id,
+                User.secondary_groups.any(Group.id == group.id),
+            )
+        )
+    ).scalars()
+    for member in members:
+        member.invalidate_cache()
+
+
+def print_table(headers: list[str], rows: list[list[str]]):
+    """Prints a left aligned table with a highlighted header."""
+    widths = [max(len(cell) for cell in column) for column in zip(headers, *rows, strict=True)]
+    template = "  ".join(f"{{:<{width}}}" for width in widths)
+
+    click.secho(template.format(*headers), fg="blue", bold=True)
+    click.secho("=" * (sum(widths) + 2 * (len(widths) - 1)), bold=True)
+    for row in rows:
+        click.echo(template.format(*row))
+
+
+def print_details(rows: list[tuple[str, str]]):
+    """Prints 'Label: Value' pairs with the labels aligned."""
+    width = max(len(label) for label, _ in rows)
+    for label, value in rows:
+        click.secho(f"{label + ':':<{width + 1}} ", fg="blue", bold=True, nl=False)
+        click.echo(value)
 
 
 def validate_plugin(plugin: str):

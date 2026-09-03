@@ -111,7 +111,10 @@ def create_user(username: str, password: str, email: str, groupname: str):
         group = Group.get_member_group()
     else:
         group = db.session.execute(
-            select(Group).filter(getattr(Group, groupname).is_(True))
+            select(Group)
+            .filter(getattr(Group, groupname).is_(True))
+            .order_by(Group.id.asc())
+            .limit(1)
         ).scalar_one()
 
     user = User.create(
@@ -153,7 +156,10 @@ def update_user(
             group = Group.get_member_group()
         else:
             group = db.session.execute(
-                select(Group).filter(getattr(Group, groupname).is_(True))
+                select(Group)
+                .filter(getattr(Group, groupname).is_(True))
+                .order_by(Group.id.asc())
+                .limit(1)
             ).scalar_one()
         user.primary_group_id = group.id
     return user.save()

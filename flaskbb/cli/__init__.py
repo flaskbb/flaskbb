@@ -16,6 +16,8 @@ cookiecutter first::
 """
 
 from flaskbb.cli.main import flaskbb  # noqa
+from flaskbb.cli.groups import groups  # noqa
+from flaskbb.cli.permissions import permissions  # noqa
 from flaskbb.cli.plugins import plugins  # noqa
 from flaskbb.cli.themes import themes  # noqa
 from flaskbb.cli.translations import translations  # noqa
