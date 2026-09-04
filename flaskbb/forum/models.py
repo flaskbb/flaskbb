@@ -11,7 +11,7 @@ It provides the models for the forum
 import logging
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import override, TYPE_CHECKING
+from typing import Any, override, TYPE_CHECKING
 
 import sqlalchemy as sa
 from flask import abort, url_for
@@ -1498,6 +1498,7 @@ class Forum(BaseModel, CRUDMixin):
         :param forumsread: The forumsread object for the forum, used to
                         determine unread state together with topicsread
         """
+        stmt: sa.Select[tuple[Any, ...]]
         if user.is_authenticated:
             # Now thats intersting - if i don't do the add_entity(Post)
             # the n+1 still exists when trying to access 'topic.last_post'
@@ -1517,7 +1518,7 @@ class Forum(BaseModel, CRUDMixin):
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
-            hidden(stmt)
+            stmt = hidden(stmt)
             topics = paginate(stmt, page=page, per_page=per_page)
 
             # Batch the first-unread-post lookup for the whole page instead

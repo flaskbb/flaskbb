@@ -51,7 +51,7 @@ class SelectAllPagination(Pagination):
 
 
 def paginate(
-    select: sa.sql.Select[*tuple[t.Any, ...]],
+    select: sa.sql.Select[tuple[t.Any, ...]],
     *,
     page: int | None = None,
     per_page: int | None = None,
@@ -98,7 +98,7 @@ def paginate(
 
 
 def hidden(
-    stmt: sa.Select[*tuple[t.Any, ...]],
+    stmt: sa.Select[tuple[t.Any, ...]],
     hidden: bool | None = None,
     *entities: type[HideableMixin],
 ):
