@@ -13,14 +13,29 @@ import typing as t
 from pluggy import HookspecMarker
 
 if t.TYPE_CHECKING:
+    from flask import Flask
+    from flask.cli import FlaskGroup
+    from flask_wtf import FlaskForm
+    from mistune.plugins import PluginRef
+
+    from flaskbb.core.auth.registration import UserRegistrationInfo
     from flaskbb.core.settings.models import SettingsDiff
+    from flaskbb.core.user.update import (
+        AvatarUpdate,
+        EmailUpdate,
+        SettingsUpdate,
+        UserDetailsChange,
+    )
+    from flaskbb.forum.models import Post, Topic
+    from flaskbb.plugins.manager import FlaskBBPluginManager
+    from flaskbb.user.models import Guest, User
 
 spec = HookspecMarker("flaskbb")
 
 
 # Setup Hooks
 @spec
-def flaskbb_extensions(app):
+def flaskbb_extensions(app: "Flask"):
     """Hook for initializing any plugin loaded extensions."""
 
 
@@ -35,7 +50,7 @@ def flaskbb_load_migrations():
 
 
 @spec
-def flaskbb_load_blueprints(app):
+def flaskbb_load_blueprints(app: "Flask"):
     """Hook for registering blueprints.
 
     :param app: The application object.
@@ -43,7 +58,7 @@ def flaskbb_load_blueprints(app):
 
 
 @spec
-def flaskbb_request_processors(app):
+def flaskbb_request_processors(app: "Flask"):
     """Hook for registering pre/post request processors.
 
     :param app: The application object.
@@ -51,7 +66,7 @@ def flaskbb_request_processors(app):
 
 
 @spec
-def flaskbb_errorhandlers(app):
+def flaskbb_errorhandlers(app: "Flask"):
     """Hook for registering error handlers.
 
     :param app: The application object.
@@ -59,7 +74,7 @@ def flaskbb_errorhandlers(app):
 
 
 @spec
-def flaskbb_jinja_directives(app):
+def flaskbb_jinja_directives(app: "Flask"):
     """Hook for registering jinja filters, context processors, etc.
 
     :param app: The application object.
@@ -67,7 +82,7 @@ def flaskbb_jinja_directives(app):
 
 
 @spec
-def flaskbb_current_user(app, user):
+def flaskbb_current_user(app: "Flask", user: "User | None"):
     """Hook for registering additional attributes on the current_user, etc.
 
     :param app: The application object.
@@ -76,7 +91,7 @@ def flaskbb_current_user(app, user):
 
 
 @spec
-def flaskbb_additional_setup(app, pluggy):
+def flaskbb_additional_setup(app: "Flask", pluggy: "FlaskBBPluginManager"):
     """Hook for any additional setup a plugin wants to do after all other
     application setup has finished.
 
@@ -278,7 +293,7 @@ def on_plugin_settings_changed(plugin_name: str, changed_keys: list[str]):
 
 
 @spec
-def flaskbb_load_post_markdown_class(app):
+def flaskbb_load_post_markdown_class(app: "Flask"):
     """
     Hook for loading a mistune renderer child class in order to render
     markdown on posts and user signatures. All classes returned by this hook
@@ -305,7 +320,7 @@ def flaskbb_load_post_markdown_class(app):
 
 
 @spec
-def flaskbb_load_nonpost_markdown_class(app):
+def flaskbb_load_nonpost_markdown_class(app: "Flask"):
     """
     Hook for loading a mistune renderer child class in order to render
     markdown in locations other than posts, for example in category or
@@ -333,7 +348,7 @@ def flaskbb_load_nonpost_markdown_class(app):
 
 
 @spec
-def flaskbb_load_post_markdown_plugins(plugins, app):
+def flaskbb_load_post_markdown_plugins(plugins: list["PluginRef"], app: "Flask"):
     """
     Hook for loading mistune renderer plugins used when rendering markdown on
     posts and user signatures. Implementations should modify the `plugins`
@@ -382,7 +397,7 @@ def flaskbb_load_post_markdown_plugins(plugins, app):
 
 
 @spec
-def flaskbb_load_nonpost_markdown_plugins(plugins, app):
+def flaskbb_load_nonpost_markdown_plugins(plugins: list["PluginRef"], app: "Flask"):
     """
     Hook for loading mistune renderer plugins used when rendering markdown in
     locations other than posts, for example in category or forum
@@ -398,7 +413,7 @@ def flaskbb_load_nonpost_markdown_plugins(plugins, app):
 
 
 @spec
-def flaskbb_cli(cli, app):
+def flaskbb_cli(cli: "FlaskGroup", app: "Flask"):
     """Hook for registering CLI commands.
 
     For example::
@@ -426,7 +441,7 @@ def flaskbb_shell_context():
 
 # Event hooks
 @spec
-def flaskbb_event_post_save_before(post):
+def flaskbb_event_post_save_before(post: "Post"):
     """Hook for handling a post before it has been saved.
 
     :param flaskbb.forum.models.Post post: The post which triggered the event.
@@ -434,7 +449,7 @@ def flaskbb_event_post_save_before(post):
 
 
 @spec
-def flaskbb_event_post_save_after(post, is_new):
+def flaskbb_event_post_save_after(post: "Post", is_new: bool):
     """Hook for handling a post after it has been saved.
 
     :param flaskbb.forum.models.Post post: The post which triggered the event.
@@ -443,7 +458,7 @@ def flaskbb_event_post_save_after(post, is_new):
 
 
 @spec
-def flaskbb_event_topic_save_before(topic):
+def flaskbb_event_topic_save_before(topic: "Topic"):
     """Hook for handling a topic before it has been saved.
 
     :param flaskbb.forum.models.Topic topic: The topic which triggered the
@@ -452,7 +467,7 @@ def flaskbb_event_topic_save_before(topic):
 
 
 @spec
-def flaskbb_event_topic_save_after(topic, is_new):
+def flaskbb_event_topic_save_after(topic: "Topic", is_new: bool):
     """Hook for handling a topic after it has been saved.
 
     :param flaskbb.forum.models.Topic topic: The topic which triggered the
@@ -463,7 +478,7 @@ def flaskbb_event_topic_save_after(topic, is_new):
 
 # TODO(anr): When pluggy 1.0 is released, mark this spec deprecated
 @spec
-def flaskbb_event_user_registered(username):
+def flaskbb_event_user_registered(username: str):
     """Hook for handling events after a user is registered
 
     .. warning::
@@ -506,7 +521,9 @@ def flaskbb_gather_registration_validators():
 
 
 @spec
-def flaskbb_registration_failure_handler(user_info, failures):
+def flaskbb_registration_failure_handler(
+    user_info: "UserRegistrationInfo", failures: list[tuple[str, str]]
+):
     """
     Hook for dealing with user registration failures, receives the info
     that user attempted to register with as well as the errors that failed
@@ -538,7 +555,7 @@ def flaskbb_registration_failure_handler(user_info, failures):
 
 
 @spec
-def flaskbb_registration_post_processor(user):
+def flaskbb_registration_post_processor(user: "User"):
     """
     Hook for handling actions after a user has successfully registered. This
     spec receives the user object after it has been successfully persisted
@@ -558,7 +575,7 @@ def flaskbb_registration_post_processor(user):
 
 
 @spec(firstresult=True)
-def flaskbb_authenticate(identifier, secret):
+def flaskbb_authenticate(identifier: str, secret: str):
     """Hook for authenticating users in FlaskBB.
     This hook should return either an instance of
     :class:`flaskbb.user.models.User` or None.
@@ -620,7 +637,7 @@ def flaskbb_authenticate(identifier, secret):
 
 
 @spec
-def flaskbb_post_authenticate(user):
+def flaskbb_post_authenticate(user: "User"):
     """Hook for handling actions that occur after a user is
     authenticated but before setting them as the current user.
 
@@ -650,7 +667,7 @@ def flaskbb_post_authenticate(user):
 
 
 @spec
-def flaskbb_authentication_failed(identifier):
+def flaskbb_authentication_failed(identifier: str):
     """Hook for handling authentication failure events.
     This hook will only be called when no authentication
     providers successfully return a user or a
@@ -680,7 +697,7 @@ def flaskbb_authentication_failed(identifier):
 
 
 @spec(firstresult=True)
-def flaskbb_reauth_attempt(user, secret):
+def flaskbb_reauth_attempt(user: "User", secret: str):
     """Hook for handling reauth in FlaskBB
 
     These hooks receive the currently authenticated user
@@ -717,7 +734,7 @@ def flaskbb_reauth_attempt(user, secret):
 
 
 @spec
-def flaskbb_post_reauth(user):
+def flaskbb_post_reauth(user: "User"):
     """Hook called after successfully reauthenticating.
 
     These hooks are called a user has passed the flaskbb_reauth_attempt
@@ -732,7 +749,7 @@ def flaskbb_post_reauth(user):
 
 
 @spec
-def flaskbb_reauth_failed(user):
+def flaskbb_reauth_failed(user: "User"):
     """Hook called if a reauth fails.
 
     These hooks will only be called if no implementation
@@ -750,7 +767,7 @@ def flaskbb_reauth_failed(user):
 
 # Form hooks
 @spec
-def flaskbb_form_post(form):
+def flaskbb_form_post(form: type["FlaskForm"]):
     """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     For example::
@@ -766,7 +783,7 @@ def flaskbb_form_post(form):
 
 
 @spec
-def flaskbb_form_post_save(form, post):
+def flaskbb_form_post_save(form: "FlaskForm", post: "Post"):
     """Hook for modifying the :class:`~flaskbb.forum.forms.ReplyForm`.
 
     This hook is called while populating the post object with
@@ -779,7 +796,7 @@ def flaskbb_form_post_save(form, post):
 
 
 @spec
-def flaskbb_form_topic(form):
+def flaskbb_form_topic(form: type["FlaskForm"]):
     """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`
 
     For example::
@@ -795,7 +812,7 @@ def flaskbb_form_topic(form):
 
 
 @spec
-def flaskbb_form_topic_save(form, topic):
+def flaskbb_form_topic_save(form: "FlaskForm", topic: "Topic"):
     """Hook for modifying the :class:`~flaskbb.forum.forms.NewTopicForm`.
 
     This hook is called while populating the topic object with
@@ -808,7 +825,7 @@ def flaskbb_form_topic_save(form, topic):
 
 
 @spec
-def flaskbb_form_registration(form):
+def flaskbb_form_registration(form: type["FlaskForm"]):
     """
     Hook for modifying the :class:`~flaskbb.auth.forms.RegisterForm`.
 
@@ -817,7 +834,7 @@ def flaskbb_form_registration(form):
 
 
 @spec
-def flaskbb_gather_password_validators(app):
+def flaskbb_gather_password_validators(app: "Flask"):
     """
     Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
     instances specialized for handling :class:`~flaskbb.core.user.update.PasswordUpdate`
@@ -845,7 +862,7 @@ def flaskbb_gather_password_validators(app):
 
 
 @spec
-def flaskbb_gather_email_validators(app):
+def flaskbb_gather_email_validators(app: "Flask"):
     """
     Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
     instances specialized for :class:`~flaskbb.core.user.update.EmailUpdate`.
@@ -872,7 +889,7 @@ def flaskbb_gather_email_validators(app):
 
 
 @spec
-def flaskbb_gather_details_update_validators(app):
+def flaskbb_gather_details_update_validators(app: "Flask"):
     """
     Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
     instances specialized for :class:`~flaskbb.core.user.update.UserDetailsChange`.
@@ -897,7 +914,7 @@ def flaskbb_gather_details_update_validators(app):
 
 
 @spec
-def flaskbb_gather_avatar_validators(app):
+def flaskbb_gather_avatar_validators(app: "Flask"):
     """
     Hook for gathering :class:`~flaskbb.core.changesets.ChangeSetValidator`
     instances specialized for :class:`~flaskbb.core.user.update.AvatarUpdate`.
@@ -907,7 +924,7 @@ def flaskbb_gather_avatar_validators(app):
 
 
 @spec
-def flaskbb_details_updated(user, details_update):
+def flaskbb_details_updated(user: "User", details_update: "UserDetailsChange"):
     """
     Hook for responding to a user updating their details. This hook is called
     after the details update has been persisted.
@@ -920,7 +937,7 @@ def flaskbb_details_updated(user, details_update):
 
 
 @spec
-def flaskbb_password_updated(user):
+def flaskbb_password_updated(user: "User"):
     """
     Hook for responding to a user updating their password. This hook is called
     after the password change has been persisted::
@@ -943,7 +960,7 @@ def flaskbb_password_updated(user):
 
 
 @spec
-def flaskbb_email_updated(user, email_update):
+def flaskbb_email_updated(user: "User", email_update: "EmailUpdate"):
     """
     Hook for responding to a user updating their email. This hook is called after
     the email change has been persisted::
@@ -966,7 +983,7 @@ def flaskbb_email_updated(user, email_update):
 
 
 @spec
-def flaskbb_settings_updated(user, settings_update):
+def flaskbb_settings_updated(user: "User", settings_update: "SettingsUpdate"):
     """
     Hook for responding to a user updating their settings. This hook is called after
     the settings change has been persisted.
@@ -979,7 +996,7 @@ def flaskbb_settings_updated(user, settings_update):
 
 
 @spec
-def flaskbb_avatar_updated(user, avatar_update):
+def flaskbb_avatar_updated(user: "User", avatar_update: "AvatarUpdate"):
     """
     Hook for responding to a user updating their avatar. This hook is called after
     the avatar change has been persisted.
@@ -1027,7 +1044,7 @@ def flaskbb_tpl_user_nav_loggedin_after():
 
 
 @spec
-def flaskbb_tpl_form_registration_before(form):
+def flaskbb_tpl_form_registration_before(form: "FlaskForm"):
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
 
@@ -1038,7 +1055,7 @@ def flaskbb_tpl_form_registration_before(form):
 
 
 @spec
-def flaskbb_tpl_form_registration_after(form):
+def flaskbb_tpl_form_registration_after(form: "FlaskForm"):
     """This hook is emitted in the Registration form **after** the last
     input field but before the submit field.
 
@@ -1049,7 +1066,7 @@ def flaskbb_tpl_form_registration_after(form):
 
 
 @spec
-def flaskbb_tpl_form_user_details_before(form):
+def flaskbb_tpl_form_user_details_before(form: "FlaskForm"):
     """This hook is emitted in the Change User Details form **before** an
     input field is rendered.
 
@@ -1060,7 +1077,7 @@ def flaskbb_tpl_form_user_details_before(form):
 
 
 @spec
-def flaskbb_tpl_form_user_details_after(form):
+def flaskbb_tpl_form_user_details_after(form: "FlaskForm"):
     """This hook is emitted in the Change User Details form **after** the last
     input field has been rendered but before the submit field.
 
@@ -1071,7 +1088,7 @@ def flaskbb_tpl_form_user_details_after(form):
 
 
 @spec
-def flaskbb_tpl_profile_settings_menu(user):
+def flaskbb_tpl_profile_settings_menu(user: "User | Guest"):
     """This hook is emitted on the user settings page in order to populate the
     side bar menu. Implementations of this hook should return a list of tuples
     that are view name and display text. The display text will be provided to
@@ -1107,7 +1124,7 @@ def flaskbb_tpl_profile_settings_menu(user):
 
 
 @spec
-def flaskbb_tpl_profile_sidebar_links(user):
+def flaskbb_tpl_profile_sidebar_links(user: "User"):
     """
     This hook is emitted on the user profile page in order to populate the
     sidebar menu. Implementations of this hook should return an iterable of
@@ -1148,7 +1165,7 @@ def flaskbb_tpl_profile_sidebar_links(user):
 
 
 @spec
-def flaskbb_tpl_admin_settings_menu(user):
+def flaskbb_tpl_admin_settings_menu(user: "User | Guest"):
     """This hook is emitted in the admin panel and used to add additional
     navigation links to the admin menu.
 
@@ -1177,7 +1194,7 @@ def flaskbb_tpl_admin_settings_menu(user):
 
 
 @spec
-def flaskbb_tpl_admin_settings_sidebar(user):
+def flaskbb_tpl_admin_settings_sidebar(user: "User | Guest"):
     """This hook is emitted in the admin panels setting tab and used
     to add additional navigation links to the sidebar settings menu.
 
@@ -1206,7 +1223,7 @@ def flaskbb_tpl_admin_settings_sidebar(user):
 
 
 @spec
-def flaskbb_tpl_profile_sidebar_stats(user):
+def flaskbb_tpl_profile_sidebar_stats(user: "User"):
     """This hook is emitted on the users profile page below the standard
     information. For example, it can be used to add additional items
     such as a link to the profile.
@@ -1218,7 +1235,7 @@ def flaskbb_tpl_profile_sidebar_stats(user):
 
 
 @spec
-def flaskbb_tpl_post_author_info_before(user, post):
+def flaskbb_tpl_post_author_info_before(user: "User | None", post: "Post"):
     """This hook is emitted before the information about the
     author of a post is displayed (but after the username).
 
@@ -1230,7 +1247,7 @@ def flaskbb_tpl_post_author_info_before(user, post):
 
 
 @spec
-def flaskbb_tpl_post_author_info_after(user, post):
+def flaskbb_tpl_post_author_info_after(user: "User | None", post: "Post"):
     """This hook is emitted after the information about the
     author of a post is displayed (but after the username).
 
@@ -1242,7 +1259,7 @@ def flaskbb_tpl_post_author_info_after(user, post):
 
 
 @spec
-def flaskbb_tpl_post_content_before(post):
+def flaskbb_tpl_post_content_before(post: "Post"):
     """Hook to do some stuff before the post content is rendered.
 
     in :file:`templates/forum/topic.html`
@@ -1252,7 +1269,7 @@ def flaskbb_tpl_post_content_before(post):
 
 
 @spec
-def flaskbb_tpl_post_content_after(post):
+def flaskbb_tpl_post_content_after(post: "Post"):
     """Hook to do some stuff after the post content is rendered.
 
     in :file:`templates/forum/topic.html`
@@ -1262,7 +1279,7 @@ def flaskbb_tpl_post_content_after(post):
 
 
 @spec
-def flaskbb_tpl_post_menu_before(post):
+def flaskbb_tpl_post_menu_before(post: "Post"):
     """Hook for inserting a new item at the beginning of the post menu.
 
     in :file:`templates/forum/topic.html`
@@ -1272,7 +1289,7 @@ def flaskbb_tpl_post_menu_before(post):
 
 
 @spec
-def flaskbb_tpl_post_menu_after(post):
+def flaskbb_tpl_post_menu_after(post: "Post"):
     """Hook for inserting a new item at the end of the post menu.
 
     in :file:`templates/forum/topic.html`
@@ -1282,7 +1299,7 @@ def flaskbb_tpl_post_menu_after(post):
 
 
 @spec
-def flaskbb_tpl_topic_controls(topic):
+def flaskbb_tpl_topic_controls(topic: "Topic"):
     """Hook for inserting additional topic moderation controls.
 
     in :file:`templates/forum/topic_controls.html`
@@ -1292,7 +1309,7 @@ def flaskbb_tpl_topic_controls(topic):
 
 
 @spec
-def flaskbb_tpl_form_new_post_before(form):
+def flaskbb_tpl_form_new_post_before(form: "FlaskForm"):
     """Hook for inserting a new form field before the first field is
     rendered.
 
@@ -1323,7 +1340,7 @@ def flaskbb_tpl_form_new_post_before(form):
 
 
 @spec
-def flaskbb_tpl_form_new_post_after(form):
+def flaskbb_tpl_form_new_post_after(form: "FlaskForm"):
     """Hook for inserting a new form field after the last field is
     rendered (but before the submit field).
 
@@ -1334,7 +1351,7 @@ def flaskbb_tpl_form_new_post_after(form):
 
 
 @spec
-def flaskbb_tpl_form_new_topic_before(form):
+def flaskbb_tpl_form_new_topic_before(form: "FlaskForm"):
     """Hook for inserting a new form field before the first field is
     rendered (but before the CSRF token).
 
@@ -1345,7 +1362,7 @@ def flaskbb_tpl_form_new_topic_before(form):
 
 
 @spec
-def flaskbb_tpl_form_new_topic_after(form):
+def flaskbb_tpl_form_new_topic_after(form: "FlaskForm"):
     """Hook for inserting a new form field after the last field is
     rendered (but before the submit button).
 

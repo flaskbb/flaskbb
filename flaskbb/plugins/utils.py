@@ -62,7 +62,7 @@ def remove_zombie_plugins_from_db():
     which exists in the database but isn't installed in the env anymore.
     Returns the names of the deleted plugins.
     """
-    d_fs_plugins: list[str] = [p[0] for p in pluggy.list_disabled_plugins()]
+    d_fs_plugins = set(pluggy.get_disabled_plugins())
     d_db_plugins = (
         db.session.execute(sa.select(PluginRegistry.name).filter_by(enabled=False)).scalars().all()
     )

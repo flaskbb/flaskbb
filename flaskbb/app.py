@@ -16,6 +16,7 @@ import time
 import warnings
 from collections.abc import Callable, Sequence
 from datetime import datetime, UTC
+from types import ModuleType
 from typing import Any
 
 import sqlalchemy as sa
@@ -578,7 +579,9 @@ def load_plugins(app: Flask):
     # we need a copy of it because of
     # RuntimeError: dictionary changed size during iteration
     tasks = celery.tasks.copy()
-    disabled_plugins = [p.__package__ for p in pluggy.get_disabled_plugins()]
+    disabled_plugins = [
+        p.__package__ for p in pluggy.list_disabled_plugins() if isinstance(p, ModuleType)
+    ]
     for task_name, task in tasks.items():
         if task.__module__.split(".")[0] in disabled_plugins:
             logger.debug(f"Unregistering task: '{task}'")
