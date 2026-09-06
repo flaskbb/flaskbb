@@ -9,108 +9,25 @@ It provides the forms that are needed for the forum views.
 """
 
 import logging
-import os
+from typing import Any, override
 
-from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileStorage, MultipleFileField
-from jinja2.filters import do_filesizeformat
 from wtforms import (
     BooleanField,
-    SelectMultipleField,
     StringField,
     SubmitField,
     TextAreaField,
-    widgets,
 )
-from wtforms.validators import DataRequired, Length, Optional, ValidationError
+from wtforms.validators import DataRequired, Length, Optional
 
-from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import flaskbb_search, pluggy
-from flaskbb.forum.models import Post, Report, Topic
-from flaskbb.forum.utils import handle_post_attachments, parse_attachment_types
+from flaskbb.forum.models import Forum, Post, Report, Topic
+from flaskbb.forum.utils import AttachmentFormMixin, handle_post_attachments
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
-from flaskbb.utils.proxies import current_user
-from flaskbb.utils.requirements import CanPostAttachment
 
 logger = logging.getLogger(__name__)
-
-
-class AttachmentFormMixin:
-    """Adds attachment upload/removal fields to a post or topic form.
-
-    The fields are deliberately not named ``attachments`` -
-    ``EditTopicForm.populate_obj`` populates every form field onto the
-    post object and would clobber the ORM relationship of the same name.
-    """
-
-    new_attachments = MultipleFileField(_("Attachments"))
-    delete_attachments = SelectMultipleField(
-        _("Delete attachments"),
-        coerce=int,
-        choices=[],
-        validators=[Optional()],
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-    )
-
-    def _existing_attachment_count(self) -> int:
-        return 0
-
-    def _set_attachment_choices(self, post: Post | None):
-        if post is not None and post.id:
-            self.delete_attachments.choices = [
-                (a.id, a.original_filename) for a in post.attachments
-            ]
-
-    def validate_new_attachments(self, field):
-        files = [f for f in (field.data or []) if isinstance(f, FileStorage) and f.filename]
-        if not files:
-            return
-
-        if not flaskbb_config["ATTACHMENTS_ENABLED"]:
-            raise ValidationError(_("Attachments are disabled."))
-
-        if not Permission(CanPostAttachment, identity=current_user):
-            raise ValidationError(_("You are not allowed to upload attachments."))
-
-        per_post = int(flaskbb_config["ATTACHMENTS_PER_POST"] or 0)
-        deleted = len(self.delete_attachments.data or [])
-        total = len(files) + self._existing_attachment_count() - deleted
-        if total > per_post:
-            raise ValidationError(
-                _(
-                    "Only %(amount)s attachments per post are allowed.",
-                    amount=per_post,
-                )
-            )
-
-        allowed_types = parse_attachment_types(flaskbb_config["ATTACHMENT_TYPES"])
-        max_size_kb = int(flaskbb_config["ATTACHMENT_MAX_SIZE"] or 0)
-        max_size = max_size_kb * 1024
-        for file in files:
-            ext = os.path.splitext(file.filename or "")[1].lstrip(".").lower()
-            if ext not in allowed_types:
-                raise ValidationError(
-                    _(
-                        "File type %(ext)s is not allowed. Allowed types are: %(types)s",
-                        ext=ext,
-                        types=", ".join(sorted(allowed_types)),
-                    )
-                )
-
-            file.stream.seek(0, os.SEEK_END)
-            size = file.stream.tell()
-            file.stream.seek(0)
-            if max_size and size > max_size:
-                raise ValidationError(
-                    _(
-                        "Attachments cannot be bigger than %(size)s.",
-                        size=do_filesizeformat(max_size),
-                    )
-                )
 
 
 class PostForm(FlaskForm, AttachmentFormMixin):
@@ -136,16 +53,20 @@ class QuickreplyForm(PostForm):
 class ReplyForm(PostForm):
     track_topic = BooleanField(_("Track this topic"), default=False, validators=[Optional()])
 
-    def __init__(self, *args, **kwargs):
-        self.post = kwargs.get("obj", None)
+    post: Post | None
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.post = kwargs.get("obj")
         PostForm.__init__(self, *args, **kwargs)
         self._set_attachment_choices(self.post)
 
-    def _existing_attachment_count(self):
+    @override
+    def _existing_attachment_count(self) -> int:
         if self.post is None or not self.post.id:
             return 0
         return len(self.post.attachments)
 
+    @override
     def save(self, user: User, topic: Topic):
         # new post
         if self.post is None:
@@ -180,7 +101,7 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
 
     submit = SubmitField(_("Post topic"))
 
-    def save(self, user, forum):
+    def save(self, user: User, forum: Forum):
         topic = Topic(title=self.title.data, content=self.content.data)
 
         if self.track_topic.data:
@@ -190,8 +111,7 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
 
         pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
         topic = topic.save(user=user, forum=forum)
-        if topic is not None:
-            handle_post_attachments(self, topic.first_post, user)
+        handle_post_attachments(self, topic.first_post, user)
         return topic
 
 
@@ -202,24 +122,32 @@ class NewTopicForm(TopicForm):
 class EditTopicForm(TopicForm):
     submit = SubmitField(_("Save topic"))
 
-    def __init__(self, *args, **kwargs):
-        self.topic = kwargs.get("obj").topic
+    # the form is always built from the topic's first post
+    post: Post
+    topic: Topic
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.post = kwargs["obj"]
+        self.topic = self.post.topic
         TopicForm.__init__(self, *args, **kwargs)
-        self._set_attachment_choices(self.topic.first_post)
+        self._set_attachment_choices(self.post)
 
-    def _existing_attachment_count(self):
-        return len(self.topic.first_post.attachments)
+    @override
+    def _existing_attachment_count(self) -> int:
+        return len(self.post.attachments)
 
-    def populate_obj(self, *objs):
+    @override
+    def populate_obj(self, obj: object, *objs: object) -> None:
         """
         Populates the attributes of the passed `obj`s with data from the
         form's fields. This is especially useful to populate the topic and
         post objects at the same time.
         """
-        for obj in objs:
-            super().populate_obj(obj)
+        for o in (obj, *objs):
+            super().populate_obj(o)
 
-    def save(self, user, forum):
+    @override
+    def save(self, user: User, forum: Forum):
         if self.track_topic.data:
             user.track_topic(self.topic)
         else:
@@ -231,13 +159,12 @@ class EditTopicForm(TopicForm):
         ):
             forum.last_post_title = self.title.data
 
-        self.topic.first_post.date_modified = time_utcnow()
-        self.topic.first_post.modified_by = user.username
+        self.post.date_modified = time_utcnow()
+        self.post.modified_by = user.username
 
         pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
         topic = self.topic.save(user=user, forum=forum)
-        if topic is not None:
-            handle_post_attachments(self, topic.first_post, user)
+        handle_post_attachments(self, self.post, user)
         return topic
 
 
@@ -249,7 +176,7 @@ class ReportForm(FlaskForm):
 
     submit = SubmitField(_("Report post"))
 
-    def save(self, user, post):
+    def save(self, user: User, post: Post):
         report = Report(reason=self.reason.data)
         return report.save(post=post, user=user)
 

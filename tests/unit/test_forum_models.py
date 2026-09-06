@@ -104,14 +104,14 @@ def test_category_get_forums(forum, user):
         assert cat == category
 
 
-def test_category_get_all(forum, user):
+def test_category_get_categories(forum, user):
     category = forum.category
 
     with current_app.test_request_context():
         # Test with logged in user
         login_user(user)
         assert current_user.is_authenticated
-        categories = Category.get_all(current_user)
+        categories = Category.get_categories(current_user)
 
         # All categories are stored in a list
         assert isinstance(categories, list)
@@ -123,7 +123,7 @@ def test_category_get_all(forum, user):
         # Test with logged out user
         logout_user()
         assert not current_user.is_authenticated
-        categories = Category.get_all(current_user)
+        categories = Category.get_categories(current_user)
 
         # All categories are stored in a list
         assert isinstance(categories, list)

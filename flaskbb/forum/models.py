@@ -17,6 +17,7 @@ import sqlalchemy as sa
 from flask import abort, url_for
 from sqlalchemy import (
     Column,
+    Connection,
     event,
     ForeignKey,
     Integer,
@@ -24,7 +25,16 @@ from sqlalchemy import (
     Table,
     Text,
 )
-from sqlalchemy.orm import aliased, backref, joinedload, Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    aliased,
+    backref,
+    joinedload,
+    Mapped,
+    mapped_column,
+    Mapper,
+    relationship,
+    Session,
+)
 
 from flaskbb.extensions import BaseModel, db, pluggy
 from flaskbb.utils.queries import hidden, paginate
@@ -32,6 +42,7 @@ from flaskbb.utils.queries import hidden, paginate
 if TYPE_CHECKING:
     from flaskbb.user.models import Group, User
 
+from flaskbb.core.exceptions import PersistenceError
 from flaskbb.core.settings import flaskbb_config
 from flaskbb.utils.database import (
     CRUDMixin,
@@ -262,6 +273,7 @@ class Attachment(BaseModel, CRUDMixin):
 
 
 _PENDING_UNLINK_KEY = "attachment_files_pending_unlink"
+type PendingUnlinks = list[tuple[int, str]]
 
 
 # Physical files must only be removed once the row deletion is committed --
@@ -270,18 +282,22 @@ _PENDING_UNLINK_KEY = "attachment_files_pending_unlink"
 # topic delete-orphan cascade over its posts) because they all go through
 # ORM-level deletes, never bulk DELETE statements.
 @event.listens_for(Attachment, "after_delete")
-def _queue_attachment_unlink(mapper, connection, target: Attachment):
-    db.session.info.setdefault(_PENDING_UNLINK_KEY, []).append((target.post_id, target.filename))
+def _queue_attachment_unlink(  # pyright: ignore[reportUnusedFunction]
+    mapper: Mapper[Attachment], connection: Connection, target: Attachment
+) -> None:
+    pending: PendingUnlinks = db.session.info.setdefault(_PENDING_UNLINK_KEY, [])
+    pending.append((target.post_id, target.filename))
 
 
 @event.listens_for(db.session, "after_commit")
-def _unlink_deleted_attachment_files(session):
-    for post_id, filename in session.info.pop(_PENDING_UNLINK_KEY, []):
+def _unlink_deleted_attachment_files(session: Session) -> None:  # pyright: ignore[reportUnusedFunction]
+    pending: PendingUnlinks = session.info.pop(_PENDING_UNLINK_KEY, [])
+    for post_id, filename in pending:
         delete_attachment_file(post_id, filename)
 
 
 @event.listens_for(db.session, "after_rollback")
-def _discard_pending_unlinks(session):
+def _discard_pending_unlinks(session: Session) -> None:  # pyright: ignore[reportUnusedFunction]
     session.info.pop(_PENDING_UNLINK_KEY, None)
 
 
@@ -414,6 +430,8 @@ class Post(HideableCRUDMixin, BaseModel):
             pluggy.hook.flaskbb_event_post_save_after(post=self, is_new=True)
             return self
 
+        raise PersistenceError("Can't create a post without a user and a topic")
+
     @override
     def delete(self):
         """Deletes a post and returns self."""
@@ -514,7 +532,7 @@ class Post(HideableCRUDMixin, BaseModel):
             ).scalar_one_or_none()
 
             self.topic.last_post = second_last_post or self.topic.first_post
-            self.topic.last_updated = self.topic.last_post.date_created
+            self.topic.last_updated = self.topic.last_post.date_created  # pyright: ignore[reportOptionalMemberAccess]
 
     def _update_counts(self):
         if self.hidden:
@@ -577,7 +595,6 @@ class Post(HideableCRUDMixin, BaseModel):
         # should never be None, but deal with it anyways to be safe
         if last_unhidden_post and self.date_created > last_unhidden_post.date_created:
             self.topic.last_post = self
-            self.second_last_post = last_unhidden_post  # TODO
 
             # if we're the newest in the topic again, we might be the newest
             # in the forum again only set if our parent topic isn't hidden
@@ -926,8 +943,7 @@ class Topic(HideableCRUDMixin, BaseModel):
             return self
 
         if forum is None or user is None:
-            logger.error("Cant create a topic without a user or forum")
-            return
+            raise PersistenceError("Can't create a topic without a user and a forum")
 
         with db.session.no_autoflush:
             # Set the forum and user id
@@ -1009,6 +1025,7 @@ class Topic(HideableCRUDMixin, BaseModel):
         db.session.commit()
         return self
 
+    @override
     def unhide(self):
         """Restores a hidden topic to a forum"""
         if not self.hidden:
@@ -1662,7 +1679,7 @@ class Category(BaseModel, CRUDMixin):
 
     # Classmethods
     @classmethod
-    def get_all(cls, user: "User"):  # type: ignore[override]
+    def get_categories(cls, user: "User"):
         """Get all categories with all associated forums.
         It returns a list with tuples. Those tuples are containing the category
         and their associated forums (whose are stored in a list).

@@ -177,6 +177,7 @@ reportUnusedParameter = false
 reportImplicitStringConcatenation = false
 reportAny = false
 reportExplicitAny = false
+reportMissingSuperCall = false
 
 [tool.pytest]
 minversion = "9.0"

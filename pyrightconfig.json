@@ -13,4 +13,5 @@
   "reportImplicitStringConcatenation": false,
   "reportAny": false,
   "reportExplicitAny": false,
+  "reportMissingSuperCall": false,
 }

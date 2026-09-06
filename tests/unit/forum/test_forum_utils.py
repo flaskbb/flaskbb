@@ -32,7 +32,7 @@ class TestForceLoginHelpers:
 
         application.test_client_class = FlaskLoginClient
         with application.test_client(user=None):
-            result = utils.force_login_if_needed()  # pyright: ignore[reportUnknownVariableType]
+            result = utils.force_login_if_needed()
             # use in rather than == because it can contain query params as well
             if result is None:
                 pytest.skip(

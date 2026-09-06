@@ -98,7 +98,7 @@ def _topic_url(*args: Any, **kwargs: Any) -> str:
 
 class ForumIndex(MethodView):
     def get(self):
-        categories = Category.get_all(user=real(current_user))
+        categories = Category.get_categories(user=real(current_user))
 
         # Fetch a few stats about the forum
         user_count = db.session.scalar(sa.select(sa.func.count(User.id)))
