@@ -56,10 +56,10 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
     many failed login attempts in place.
     """
 
-    def __init__(self, configuration):
+    def __init__(self, configuration: FailedLoginConfiguration):
         self.configuration = configuration
 
-    def authenticate(self, identifier, secret):
+    def authenticate(self, identifier: str, secret: str):
         user = db.session.execute(
             sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()

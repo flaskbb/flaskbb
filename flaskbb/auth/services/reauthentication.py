@@ -8,9 +8,11 @@ Tools for handling reauthentication needs inside FlaskBB.
 """
 
 import logging
-from typing import override
+from typing import override, TYPE_CHECKING
 
 from flask_babelplus import gettext as _
+from flask_sqlalchemy.session import Session
+from sqlalchemy.orm import scoped_session
 from werkzeug.security import check_password_hash
 
 from ...core.auth.authentication import (
@@ -22,6 +24,10 @@ from ...core.auth.authentication import (
 )
 from ...utils.helpers import time_utcnow
 
+if TYPE_CHECKING:
+    from flaskbb.plugins.manager import FlaskBBPluginManager
+    from flaskbb.user.models import User
+
 logger = logging.getLogger(__name__)
 
 
@@ -31,7 +37,7 @@ class DefaultFlaskBBReauthProvider(ReauthenticateProvider):
     password against the current user's hashed password.
     """
 
-    def reauthenticate(self, user, secret):
+    def reauthenticate(self, user: "User", secret: str | None):
         if check_password_hash(user.password, secret):  # pragma: no branch
             return True
 
@@ -42,7 +48,7 @@ class ClearFailedLoginsOnReauth(PostReauthenticateHandler):
     reauthentication.
     """
 
-    def handle_post_reauth(self, user):
+    def handle_post_reauth(self, user: "User"):
         user.login_attempts = 0
 
 
@@ -52,7 +58,7 @@ class MarkFailedReauth(ReauthenticateFailureHandler):
     and when it occurred.
     """
 
-    def handle_reauth_failure(self, user):
+    def handle_reauth_failure(self, user: "User"):
         user.login_attempts += 1
         user.last_failed_login = time_utcnow()
 
@@ -63,12 +69,12 @@ class PluginReauthenticationManager(ReauthenticateManager):
     to manage the reauthentication flow.
     """
 
-    def __init__(self, plugin_manager, session):
+    def __init__(self, plugin_manager: "FlaskBBPluginManager", session: scoped_session[Session]):
         self.plugin_manager = plugin_manager
         self.session = session
 
     @override
-    def reauthenticate(self, user, secret):
+    def reauthenticate(self, user: "User", secret: str | None):
         try:
             result = self.plugin_manager.hook.flaskbb_reauth_attempt(user=user, secret=secret)
             if not result:

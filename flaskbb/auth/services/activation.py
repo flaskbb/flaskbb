@@ -12,9 +12,10 @@ from flask_babelplus import gettext as _
 
 from ...core.auth.activation import AccountActivator as _AccountActivator
 from ...core.exceptions import ValidationError
-from ...core.tokens import Token, TokenActions, TokenError
+from ...core.tokens import Token, TokenActions, TokenError, TokenSerializer
 from ...email import send_activation_token
 from ...extensions import db
+from ...user.models import User
 
 
 class AccountActivator(_AccountActivator):
@@ -23,7 +24,7 @@ class AccountActivator(_AccountActivator):
     process through email.
     """
 
-    def __init__(self, token_serializer, users):
+    def __init__(self, token_serializer: TokenSerializer, users: type[User]):
         self.token_serializer = token_serializer
         self.users = users
 
@@ -42,12 +43,12 @@ class AccountActivator(_AccountActivator):
 
         send_activation_token.delay(token=token, username=user.username, email=user.email)
 
-    def activate_account(self, token):
-        token = self.token_serializer.loads(token)
-        if token.operation != TokenActions.ACTIVATE_ACCOUNT:
+    def activate_account(self, token: str):
+        parsed_token = self.token_serializer.loads(token)
+        if parsed_token.operation != TokenActions.ACTIVATE_ACCOUNT:
             raise TokenError.invalid()
         user = db.session.execute(
-            sa.select(self.users).filter_by(id=token.user_id)
+            sa.select(self.users).filter_by(id=parsed_token.user_id)
         ).scalar_one_or_none()
         if user is None:
             raise TokenError.invalid()

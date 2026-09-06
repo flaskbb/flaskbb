@@ -23,6 +23,7 @@ from pytz import UTC
 if t.TYPE_CHECKING:
     from flaskbb.plugins.manager import FlaskBBPluginManager
 
+from ...core.auth.activation import AccountActivator
 from ...core.auth.registration import (
     RegistrationPostProcessor,
     UserRegistrationInfo,
@@ -34,6 +35,7 @@ from ...core.exceptions import (
     StopValidation,
     ValidationError,
 )
+from ...core.settings.proxy import FlaskBBConfigProxy
 from ...extensions import db
 from ...user.models import User
 
@@ -97,7 +99,7 @@ class UsernameUniquenessValidator(UserValidator):
     Validates that the provided username is unique in the application.
     """
 
-    def __init__(self, users):
+    def __init__(self, users: type[User]):
         self.users = users
 
     def validate(self, user_info: UserRegistrationInfo):
@@ -121,7 +123,7 @@ class EmailUniquenessValidator(UserValidator):
     Validates that the provided email is unique in the application.
     """
 
-    def __init__(self, users):
+    def __init__(self, users: type[User]):
         self.users = users
 
     def validate(self, user_info: UserRegistrationInfo):
@@ -145,10 +147,10 @@ class SendActivationPostProcessor(RegistrationPostProcessor):
     :type account_activator: :class:`~flaskbb.core.auth.activation.AccountActivator`
     """  # noqa
 
-    def __init__(self, account_activator):
+    def __init__(self, account_activator: AccountActivator):
         self.account_activator = account_activator
 
-    def post_process(self, user):
+    def post_process(self, user: User):
         self.account_activator.initiate_account_activation(user.email)
         flash(
             _(
@@ -164,7 +166,7 @@ class AutologinPostProcessor(RegistrationPostProcessor):
     Automatically logs a user in after registration
     """
 
-    def post_process(self, user):
+    def post_process(self, user: User):
         login_user(user)
         flash(_("Thanks for registering."), "success")
 
@@ -178,11 +180,11 @@ class AutoActivateUserPostProcessor(RegistrationPostProcessor):
     :param config: Current flaskbb configuration object
     """
 
-    def __init__(self, db, config):
+    def __init__(self, db: SQLAlchemy, config: FlaskBBConfigProxy):
         self.db = db
         self.config = config
 
-    def post_process(self, user):
+    def post_process(self, user: User):
         if not self.config["ACTIVATE_ACCOUNT"]:
             user.activated = True
             self.db.session.commit()

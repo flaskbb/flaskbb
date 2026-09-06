@@ -7,12 +7,13 @@ Plugin implementations for FlaskBB auth hooks
 :license: BSD, see LICENSE for more details
 """
 
-from flask import flash, redirect, url_for
+from flask import flash, Flask, redirect, url_for
 from flask_login import logout_user
 
 from flaskbb.utils.proxies import current_user
 
 from ..core.auth.authentication import ForceLogout, PostAuthenticationHandler
+from ..core.auth.registration import RegistrationPostProcessor
 from ..core.settings import flaskbb_config
 from ..extensions import db
 from ..user.models import User
@@ -41,12 +42,12 @@ from .services.registration import (
 
 
 @impl(trylast=True)
-def flaskbb_authenticate(identifier, secret):
+def flaskbb_authenticate(identifier: str, secret: str):
     return DefaultFlaskBBAuthProvider().authenticate(identifier, secret)
 
 
 @impl(tryfirst=True)
-def flaskbb_post_authenticate(user):
+def flaskbb_post_authenticate(user: User):
     handlers: list[PostAuthenticationHandler] = [ClearFailedLogins()]
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
@@ -57,29 +58,29 @@ def flaskbb_post_authenticate(user):
 
 
 @impl
-def flaskbb_authentication_failed(identifier):
+def flaskbb_authentication_failed(identifier: str):
     MarkFailedLogin().handle_authentication_failure(identifier)
 
 
 @impl(trylast=True)
-def flaskbb_reauth_attempt(user, secret):
+def flaskbb_reauth_attempt(user: User, secret: str):
     return DefaultFlaskBBReauthProvider().reauthenticate(user, secret)
 
 
 @impl
-def flaskbb_reauth_failed(user):
+def flaskbb_reauth_failed(user: User):
     MarkFailedReauth().handle_reauth_failure(user)
 
 
 @impl
-def flaskbb_post_reauth(user):
+def flaskbb_post_reauth(user: User):
     ClearFailedLoginsOnReauth().handle_post_reauth(user)
 
 
 @impl
-def flaskbb_errorhandlers(app):
+def flaskbb_errorhandlers(app: Flask):
     @app.errorhandler(ForceLogout)
-    def handle_force_logout(error):
+    def handle_force_logout(error: ForceLogout):  # pyright: ignore[reportUnusedFunction]
         if current_user:
             logout_user()
             if error.reason:
@@ -105,8 +106,8 @@ def flaskbb_gather_registration_validators():
 
 
 @impl
-def flaskbb_registration_post_processor(user):
-    handlers = []
+def flaskbb_registration_post_processor(user: User):
+    handlers: list[RegistrationPostProcessor] = []
 
     if flaskbb_config["ACTIVATE_ACCOUNT"]:
         handlers.append(SendActivationPostProcessor(account_activator_factory()))
