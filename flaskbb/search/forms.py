@@ -89,9 +89,7 @@ class SearchForm(FlaskForm):
         )
         if not has_viewhidden:
             choices = cast("list[tuple[Any, str]]", self.state.choices or [])
-            self.state.choices = [  # pyright: ignore[reportAttributeAccessIssue]
-                choice for choice in choices if choice[0] != "hidden"
-            ]
+            self.state.choices = [choice for choice in choices if choice[0] != "hidden"]
 
     def get_results(self):
         query = self.search_query.data or ""

@@ -8,7 +8,7 @@ Token verifier implementations
 :license: BSD, see LICENSE for more details
 """
 
-from typing import override
+from typing import Any, override
 
 from sqlalchemy import select
 
@@ -16,7 +16,7 @@ from flaskbb.extensions import db
 from flaskbb.user.models import User
 
 from ..core.exceptions import ValidationError
-from ..core.tokens import TokenVerifier
+from ..core.tokens import Token, TokenVerifier
 
 
 class EmailMatchesUserToken(TokenVerifier):
@@ -27,11 +27,11 @@ class EmailMatchesUserToken(TokenVerifier):
     :param User: User model for querying against
     """
 
-    def __init__(self, users):
+    def __init__(self, users: type[User]):
         self.users = users
 
     @override
-    def verify_token(self, token, *, email, **kwargs):
+    def verify_token(self, token: Token, *, email: str, **kwargs: Any) -> None:
         user = db.session.execute(select(User).where(User.id == token.user_id)).scalar()
         if not user:
             raise ValidationError("email", "User not found")

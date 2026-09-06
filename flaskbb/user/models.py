@@ -350,7 +350,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         :param topic: The topic which should be checked.
         """
         stmt = self.tracked_topics.select().where(topictracker.c.topic_id == topic.id)
-        return db.session.execute(sa.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
     def add_to_group(self, group: Group):
         """Adds the user to the `group` if he isn't in it.
@@ -376,7 +376,7 @@ class User(BaseModel, UserMixin, CRUDMixin):
         :param group: The group which should be checked.
         """
         stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
-        return db.session.execute(sa.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
     @cache.memoize()
     def get_groups(self):

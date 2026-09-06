@@ -148,7 +148,7 @@ class ChangeUserDetailsForm(FlaskBBForm):
     notes = TextAreaField(_("Notes"), validators=[Optional(), Length(min=0, max=5000)])
     submit = SubmitField(_("Save"))
 
-    def validate_birthday(self, field):
+    def validate_birthday(self, field: DateField):
         if field.data is None:
             return True
 
