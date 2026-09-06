@@ -9,8 +9,10 @@ This module adds the functionality to send emails
 """
 
 import logging
-from typing import Any
+from collections.abc import Callable
+from typing import Any, cast
 
+from celery import Task
 from flask import render_template
 from flask_babelplus import lazy_gettext as _
 from flask_mail import Message
@@ -20,7 +22,14 @@ from flaskbb.extensions import celery, mail
 logger = logging.getLogger(__name__)
 
 
-@celery.task  # type: ignore[untyped-decorator]
+def task(fn: Callable[..., None]) -> Task:
+    """``celery.task`` is untyped, so a function decorated with it keeps its
+    plain function type and ``.delay()`` is invisible to the type checker.
+    """
+    return cast(Task, celery.task(fn))  # pyright: ignore[reportUnknownMemberType]
+
+
+@task
 def send_reset_token(token: str, username: str, email: str):
     """Sends the reset token to the user's email address.
 
@@ -36,7 +45,7 @@ def send_reset_token(token: str, username: str, email: str):
     )
 
 
-@celery.task  # type: ignore[untyped-decorator]
+@task
 def send_activation_token(token: str, username: str, email: str):
     """Sends the activation token to the user's email address.
 
@@ -52,7 +61,7 @@ def send_activation_token(token: str, username: str, email: str):
     )
 
 
-@celery.task  # type: ignore[untyped-decorator]
+@task
 def send_async_email(*args: Any, **kwargs: Any):
     send_email(*args, **kwargs)
 

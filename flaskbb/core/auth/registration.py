@@ -28,7 +28,7 @@ class UserRegistrationInfo:
     password: str = field(repr=False)
     email: str
     language: str
-    group: str
+    group: int
 
 
 class UserValidator(ABC):

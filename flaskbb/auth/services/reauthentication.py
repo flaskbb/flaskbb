@@ -37,8 +37,9 @@ class DefaultFlaskBBReauthProvider(ReauthenticateProvider):
     password against the current user's hashed password.
     """
 
-    def reauthenticate(self, user: "User", secret: str | None):
-        if check_password_hash(user.password, secret):  # pragma: no branch
+    @override
+    def reauthenticate(self, user: "User", secret: str):
+        if check_password_hash(user.password, secret):
             return True
 
 
@@ -48,6 +49,7 @@ class ClearFailedLoginsOnReauth(PostReauthenticateHandler):
     reauthentication.
     """
 
+    @override
     def handle_post_reauth(self, user: "User"):
         user.login_attempts = 0
 
@@ -58,6 +60,7 @@ class MarkFailedReauth(ReauthenticateFailureHandler):
     and when it occurred.
     """
 
+    @override
     def handle_reauth_failure(self, user: "User"):
         user.login_attempts += 1
         user.last_failed_login = time_utcnow()
@@ -74,7 +77,7 @@ class PluginReauthenticationManager(ReauthenticateManager):
         self.session = session
 
     @override
-    def reauthenticate(self, user: "User", secret: str | None):
+    def reauthenticate(self, user: "User", secret: str):
         try:
             result = self.plugin_manager.hook.flaskbb_reauth_attempt(user=user, secret=secret)
             if not result:

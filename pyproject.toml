@@ -164,7 +164,7 @@ allow-direct-references = true
 
 [tool.basedpyright]
 include = ["flaskbb"]
-exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs"]
+exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs", "flaskbb/migrations"]
 typeCheckingMode = "standard"
 pythonVersion = "3.12"
 defineConstant = { DEBUG = true }
@@ -248,6 +248,7 @@ exclude_also = [
 [tool.mypy]
 python_version = "3.12"
 files = ["flaskbb/"]
+exclude = ["^flaskbb/migrations/"]
 warn_unused_configs = true
 show_error_codes = true
 pretty = true

@@ -117,13 +117,13 @@ class CRUDMixin:
         instance = cls(**kwargs)
         return instance.save()
 
-    def save(self) -> t.Self | None:
+    def save(self) -> t.Self:
         """Saves the object to the database."""
         db.session.add(self)
         db.session.commit()
         return self
 
-    def delete(self) -> t.Self | None:
+    def delete(self) -> t.Self:
         """Delete the object from the database."""
         db.session.delete(self)
         db.session.commit()

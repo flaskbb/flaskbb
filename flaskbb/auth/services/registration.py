@@ -72,6 +72,7 @@ class UsernameValidator(UserValidator):
     def __init__(self, requirements: UsernameRequirements):
         self._requirements = requirements
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         if not (self._requirements.min <= len(user_info.username) <= self._requirements.max):
             raise ValidationError(
@@ -102,6 +103,7 @@ class UsernameUniquenessValidator(UserValidator):
     def __init__(self, users: type[User]):
         self.users = users
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             sa.select(sa.func.count(self.users.id)).filter(
@@ -126,6 +128,7 @@ class EmailUniquenessValidator(UserValidator):
     def __init__(self, users: type[User]):
         self.users = users
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             sa.select(sa.func.count(self.users.id)).filter(
@@ -150,6 +153,7 @@ class SendActivationPostProcessor(RegistrationPostProcessor):
     def __init__(self, account_activator: AccountActivator):
         self.account_activator = account_activator
 
+    @t.override
     def post_process(self, user: User):
         self.account_activator.initiate_account_activation(user.email)
         flash(
@@ -166,6 +170,7 @@ class AutologinPostProcessor(RegistrationPostProcessor):
     Automatically logs a user in after registration
     """
 
+    @t.override
     def post_process(self, user: User):
         login_user(user)
         flash(_("Thanks for registering."), "success")
@@ -184,6 +189,7 @@ class AutoActivateUserPostProcessor(RegistrationPostProcessor):
         self.db = db
         self.config = config
 
+    @t.override
     def post_process(self, user: User):
         if not self.config["ACTIVATE_ACCOUNT"]:
             user.activated = True

@@ -7,6 +7,8 @@ Handlers for activating accounts in FlaskBB
 :license: BSD, see LICENSE for more details
 """
 
+from typing import override
+
 import sqlalchemy as sa
 from flask_babelplus import gettext as _
 
@@ -28,6 +30,7 @@ class AccountActivator(_AccountActivator):
         self.token_serializer = token_serializer
         self.users = users
 
+    @override
     def initiate_account_activation(self, email: str):
         user = db.session.execute(sa.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
@@ -41,8 +44,9 @@ class AccountActivator(_AccountActivator):
             Token(user_id=user.id, operation=TokenActions.ACTIVATE_ACCOUNT)
         )
 
-        send_activation_token.delay(token=token, username=user.username, email=user.email)
+        send_activation_token.delay(token=token, username=user.username, email=user.email)  # pyright: ignore[reportUnknownMemberType]
 
+    @override
     def activate_account(self, token: str):
         parsed_token = self.token_serializer.loads(token)
         if parsed_token.operation != TokenActions.ACTIVATE_ACCOUNT:

@@ -183,7 +183,7 @@ class ReauthenticateManager(ABC):
     """
 
     @abstractmethod
-    def reauthenticate(self, user: "User", secret: str | None):
+    def reauthenticate(self, user: "User", secret: str):
         """
         This method is abstract.
 
@@ -229,7 +229,7 @@ class ReauthenticateProvider(ABC):
     """
 
     @abstractmethod
-    def reauthenticate(self, user: "User", secret: str | None) -> bool | None:
+    def reauthenticate(self, user: "User", secret: str) -> bool | None:
         """
         This method is abstract.
 
@@ -241,7 +241,7 @@ class ReauthenticateProvider(ABC):
 
         pass
 
-    def __call__(self, user: "User", secret: str | None):
+    def __call__(self, user: "User", secret: str):
         self.reauthenticate(user, secret)
 
 

@@ -315,7 +315,7 @@ def configure_extensions(app: Flask):
     login_manager.anonymous_user = Guest
 
     @login_manager.user_loader  # type: ignore[untyped-decorator]
-    def load_user(user_id: int):
+    def load_user(user_id: int):  # pyright: ignore[reportUnusedFunction]
         """Loads the user. Required by the `login` extension."""
         user = db.session.execute(sa.select(User).filter_by(id=user_id)).scalar_one_or_none()
         pluggy.hook.flaskbb_current_user(app=app, user=user)
@@ -380,14 +380,14 @@ def configure_context_processors(app: Flask):
     """Configures the context processors."""
 
     @app.context_processor
-    def inject_flaskbb_config():
+    def inject_flaskbb_config():  # pyright: ignore[reportUnusedFunction]
         """Injects the ``flaskbb_config`` config variable into the
         templates.
         """
         return dict(flaskbb_config=flaskbb_config, format_date=format_date)
 
     @app.context_processor
-    def inject_now():
+    def inject_now():  # pyright: ignore[reportUnusedFunction]
         """Injects the current time."""
         return dict(now=datetime.now(UTC))
 
@@ -396,7 +396,7 @@ def configure_before_handlers(app: Flask):
     """Configures the before request handlers."""
 
     @app.before_request
-    def update_lastseen():
+    def update_lastseen():  # pyright: ignore[reportUnusedFunction]
         """Updates `lastseen` before every reguest if the user is
         authenticated."""
         if current_user.is_authenticated:
@@ -407,7 +407,7 @@ def configure_before_handlers(app: Flask):
     if app.config["REDIS_ENABLED"]:
 
         @app.before_request
-        def mark_current_user_online():
+        def mark_current_user_online():  # pyright: ignore[reportUnusedFunction]
             if current_user.is_authenticated:
                 mark_online(current_user.username)
             else:
@@ -420,19 +420,19 @@ def configure_errorhandlers(app: Flask):
     """Configures the error handlers."""
 
     @app.errorhandler(403)
-    def forbidden_page(error):
+    def forbidden_page(error):  # pyright: ignore[reportUnusedFunction]
         return render_template("errors/forbidden_page.html"), 403
 
     @app.errorhandler(404)
-    def page_not_found(error):
+    def page_not_found(error):  # pyright: ignore[reportUnusedFunction]
         return render_template("errors/page_not_found.html"), 404
 
     @app.errorhandler(500)
-    def server_error_page(error):
+    def server_error_page(error):  # pyright: ignore[reportUnusedFunction]
         return render_template("errors/server_error.html"), 500
 
     @app.errorhandler(413)
-    def request_entity_too_large(error):
+    def request_entity_too_large(error):  # pyright: ignore[reportUnusedFunction]
         max_content_length = app.config.get("MAX_CONTENT_LENGTH")
         if max_content_length:
             message = _(

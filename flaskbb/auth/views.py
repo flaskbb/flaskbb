@@ -101,8 +101,11 @@ class Login(MethodView):
         if form.validate_on_submit():
             auth_manager = self.authentication_manager_factory()
             try:
+                # every field below is DataRequired/InputRequired, so once
+                # validate_on_submit() has passed .data is never empty - the
+                # 'or ""' is only to satisfy the type checker.
                 user = auth_manager.authenticate(
-                    identifier=form.login.data, secret=form.password.data
+                    identifier=form.login.data or "", secret=form.password.data or ""
                 )
                 login_user(user, remember=form.remember_me.data)
                 return redirect_or_next(url_for("forum.index"), False)
@@ -116,10 +119,12 @@ class Login(MethodView):
 
 class Reauth(MethodView):
     decorators = [login_required, limiter.exempt]
-    form = ReauthForm
 
     def __init__(self, reauthentication_factory: Callable[[], "PluginReauthenticationManager"]):
         self.reauthentication_factory = reauthentication_factory
+
+    def form(self):
+        return ReauthForm()
 
     def get(self):
         if not login_fresh():
@@ -131,7 +136,10 @@ class Reauth(MethodView):
         if form.validate_on_submit():
             reauth_manager = self.reauthentication_factory()
             try:
-                reauth_manager.reauthenticate(user=current_user, secret=form.password.data)
+                # password is DataRequired, so by the time validate_on_submit()
+                # has passed .data is never empty - the "or ''" is only to
+                # satisfy the type checker.
+                reauth_manager.reauthenticate(user=current_user, secret=form.password.data or "")
                 confirm_login()
                 flash(_("Reauthenticated."), "success")
                 return redirect_or_next(current_user.url)
@@ -154,7 +162,7 @@ class Register(MethodView):
         pluggy.hook.flaskbb_form_registration(form=RegisterForm)
         form = RegisterForm()
 
-        form.language.choices = get_available_languages()  # pyright: ignore
+        form.language.choices = get_available_languages()
         form.language.default = flaskbb_config["DEFAULT_LANGUAGE"]
         form.process(request.form)  # needed because a default is overriden
         return form
@@ -166,10 +174,10 @@ class Register(MethodView):
         form = self.form()
         if form.validate_on_submit():
             registration_info = UserRegistrationInfo(
-                username=form.username.data,
-                password=form.password.data,
+                username=form.username.data or "",
+                password=form.password.data or "",
                 group=4,
-                email=form.email.data,
+                email=form.email.data or "",
                 language=form.language.data,
             )
 
@@ -196,10 +204,12 @@ class Register(MethodView):
 
 class ForgotPassword(MethodView):
     decorators = [anonymous_required]
-    form = ForgotPasswordForm
 
     def __init__(self, password_reset_service_factory: Callable[[], "ResetPasswordService"]):
         self.password_reset_service_factory = password_reset_service_factory
+
+    def form(self):
+        return ForgotPasswordForm()
 
     def get(self):
         return render_template("auth/forgot_password.html", form=self.form())
@@ -209,7 +219,7 @@ class ForgotPassword(MethodView):
         if form.validate_on_submit():
             try:
                 service = self.password_reset_service_factory()
-                service.initiate_password_reset(form.email.data)
+                service.initiate_password_reset(form.email.data or "")
             except ValidationError:
                 flash(
                     _(
@@ -227,10 +237,12 @@ class ForgotPassword(MethodView):
 
 class ResetPassword(MethodView):
     decorators = [anonymous_required]
-    form = ResetPasswordForm
 
     def __init__(self, password_reset_service_factory: Callable[[], "ResetPasswordService"]):
         self.password_reset_service_factory = password_reset_service_factory
+
+    def form(self):
+        return ResetPasswordForm()
 
     def get(self, token: str):
         form = self.form()
@@ -242,7 +254,7 @@ class ResetPassword(MethodView):
         if form.validate_on_submit():
             try:
                 service = self.password_reset_service_factory()
-                service.reset_password(token, form.email.data, form.password.data)
+                service.reset_password(token, form.email.data or "", form.password.data or "")
             except TokenError as e:
                 flash(e.reason, "danger")
                 return redirect(url_for("auth.forgot_password"))
@@ -272,10 +284,12 @@ class ResetPassword(MethodView):
 
 class RequestActivationToken(MethodView):
     decorators = [requires_unactivated]
-    form = RequestActivationForm
 
     def __init__(self, account_activator_factory: Callable[[], "AccountActivator"]):
         self.account_activator_factory = account_activator_factory
+
+    def form(self):
+        return RequestActivationForm()
 
     def get(self):
         return render_template("auth/request_account_activation.html", form=self.form())
@@ -285,7 +299,7 @@ class RequestActivationToken(MethodView):
         if form.validate_on_submit():
             activator = self.account_activator_factory()
             try:
-                activator.initiate_account_activation(form.email.data)
+                activator.initiate_account_activation(form.email.data or "")
             except ValidationError as e:
                 form.populate_errors([(e.attribute, e.reason)])
             else:
@@ -338,10 +352,12 @@ class AutoActivateAccount(MethodView):
 
 class ActivateAccount(MethodView):
     decorators = [requires_unactivated]
-    form = AccountActivationForm
 
     def __init__(self, account_activator_factory: Callable[[], "AccountActivator"]):
         self.account_activator_factory = account_activator_factory
+
+    def form(self):
+        return AccountActivationForm()
 
     def get(self):
         return render_template("auth/account_activation.html", form=self.form())
@@ -349,7 +365,7 @@ class ActivateAccount(MethodView):
     def post(self):
         form = self.form()
         if form.validate_on_submit():
-            token = form.token.data
+            token = form.token.data or ""
             activator = self.account_activator_factory()
             try:
                 activator.activate_account(token)
@@ -408,7 +424,7 @@ def flaskbb_load_blueprints(app: Flask):
     auth = Blueprint("auth", __name__)
 
     @auth.before_request
-    def check_rate_limiting():
+    def check_rate_limiting():  # pyright: ignore[reportUnusedFunction]
         """Check the the rate limits for each request for this blueprint."""
         if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
             return None
@@ -416,7 +432,7 @@ def flaskbb_load_blueprints(app: Flask):
         # return limiter.check()
 
     @auth.errorhandler(429)
-    def login_rate_limit_error(error):
+    def login_rate_limit_error(error):  # pyright: ignore[reportUnusedFunction]
         """Register a custom error handler for a 'Too Many Requests'
         (HTTP CODE 429) error."""
         return (

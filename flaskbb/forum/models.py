@@ -1657,24 +1657,26 @@ class Category(BaseModel, CRUDMixin):
         db.session.delete(self)
         db.session.commit()
 
-        if not users:
-            return
+        # Update the users post count
+        if users:
+            user_ids = [user.id for user in users]
 
-        user_ids = [user.id for user in users]
-
-        post_count_subquery = (
-            sa.select(sa.func.count(Post.id))
-            .join(Topic, Post.topic_id == Topic.id)
-            .where(
-                Post.user_id == User.id,
-                Topic.hidden.is_(False),
-                Post.hidden.is_(False),
+            post_count_subquery = (
+                sa.select(sa.func.count(Post.id))
+                .join(Topic, Post.topic_id == Topic.id)
+                .where(
+                    Post.user_id == User.id,
+                    Topic.hidden.is_(False),
+                    Post.hidden.is_(False),
+                )
+                .scalar_subquery()
             )
-            .scalar_subquery()
-        )
 
-        stmt = sa.update(User).where(User.id.in_(user_ids)).values(post_count=post_count_subquery)
-        db.session.execute(stmt)
+            stmt = (
+                sa.update(User).where(User.id.in_(user_ids)).values(post_count=post_count_subquery)
+            )
+            db.session.execute(stmt)
+
         return self
 
     # Classmethods

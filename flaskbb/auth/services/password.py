@@ -9,6 +9,7 @@ Password reset manager
 """
 
 from collections.abc import Sequence
+from typing import override
 
 import sqlalchemy as sa
 from flask_babelplus import gettext as _
@@ -37,6 +38,7 @@ class ResetPasswordService(_ResetPasswordService):
         self.users = users
         self.token_verifiers = token_verifiers
 
+    @override
     def initiate_password_reset(self, email: str):
         user = db.session.execute(sa.select(self.users).filter_by(email=email)).scalar_one_or_none()
 
@@ -47,8 +49,9 @@ class ResetPasswordService(_ResetPasswordService):
             Token(user_id=user.id, operation=TokenActions.RESET_PASSWORD)
         )
 
-        send_reset_token.delay(token=token, username=user.username, email=user.email)
+        send_reset_token.delay(token=token, username=user.username, email=user.email)  # pyright: ignore[reportUnknownMemberType]
 
+    @override
     def reset_password(self, token: str, email: str, new_password: str):
         parsed_token = self.token_serializer.loads(token)
         if parsed_token.operation != TokenActions.RESET_PASSWORD:
