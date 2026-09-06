@@ -118,17 +118,16 @@ def list_plugins():
                 bold=True,
             )
 
-    disabled_plugins = pluggy.list_disabled_plugins()
+    disabled_plugins = pluggy.get_disabled_plugins()
     if len(disabled_plugins) > 0:
         click.secho("[+] Disabled Plugins:", fg="yellow", bold=True)
-        for plugin in disabled_plugins:
-            if not plugin:
-                click.secho(f"Plugin not found {plugin}")
+        for name in disabled_plugins:
+            p_dist = pluggy.get_metadata(name)
+            if p_dist is None:
+                click.secho(f"Plugin not found {name}")
                 continue
-            p_mod = plugin[0]  # pyright: ignore[reportIndexIssue, reportUnknownVariableType]
-            p_dist = plugin[1]  # pyright: ignore[reportIndexIssue, reportUnknownVariableType]
             click.secho(
-                f"\t- {p_mod.title()}\t({p_dist.key}), version {p_dist.version}",  # pyright: ignore[reportUnknownMemberType]
+                f"\t- {name.title()}\t({p_dist.package_name}), version {p_dist.version}",
                 bold=True,
             )
 
@@ -381,5 +380,5 @@ def new_plugin(template: str, out_dir: str | None, force: bool):
     if out_dir is None:
         out_dir = click.prompt("Saving plugin in", default=os.path.abspath("."))
 
-    r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+    r = cookiecutter(template, output_dir=out_dir, overwrite_if_exists=force)
     click.secho(f"[+] Created new plugin in {r}", fg="green", bold=True)

@@ -73,7 +73,7 @@ def new_user(username: str | None, email: str | None, password: str | None, grou
     help="The group of the user.",
     type=click.Choice(["admin", "super_mod", "mod", "member"]),
 )
-def change_user(username, email, password, group):
+def change_user(username: str | None, email: str | None, password: str | None, group: str | None):
     """Updates an user. Only the username is required; any other option
     that is omitted is left unchanged."""
 
@@ -93,7 +93,7 @@ def change_user(username, email, password, group):
     is_flag=True,
     help="Removes the user without asking for confirmation.",
 )
-def delete_user(username, force):
+def delete_user(username: str | None, force: bool):
     """Deletes an user."""
     if not username:
         username = click.prompt(

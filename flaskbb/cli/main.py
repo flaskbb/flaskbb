@@ -286,7 +286,7 @@ def reindex():
 @with_appcontext
 def start_celery(ctx: click.Context):
     """Preconfigured wrapper around the 'celery' command."""
-    celery.start(ctx.args)
+    celery.start(ctx.args)  # pyright: ignore[reportUnknownMemberType]
 
 
 @flaskbb.command("shell", short_help="Runs a shell in the app context.")
@@ -318,9 +318,7 @@ def shell_command():
 
     try:
         import IPython
-        from traitlets.config import (
-            get_config,  # pyright: ignore[reportPrivateImportUsage]
-        )
+        from traitlets.config import get_config
 
         c = get_config()
         # This makes the prompt to use colors again
@@ -668,7 +666,7 @@ def serve(
 ):
     """Starts a gunicorn server with FlaskBB."""
     try:
-        from gunicorn.app.base import Application
+        from gunicorn.app.base import Application  # pyright: ignore[reportMissingModuleSource]
     except ImportError:
         click.secho(
             "[!] gunicorn is not installed. "

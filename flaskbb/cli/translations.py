@@ -31,7 +31,7 @@ def translations():
 @translations.command("new")
 @click.option("--plugin", "-p", type=click.STRING, help="Adds a new language to a plugin.")
 @click.argument("lang")
-def new_translation(lang, plugin):
+def new_translation(lang: str, plugin: str | None):
     """Adds a new language to the translations. "lang" is the language code
     of the language, like, "de_AT"."""
     if plugin:
@@ -61,7 +61,7 @@ def new_translation(lang, plugin):
     type=click.STRING,
     help="Updates the language of the given plugin.",
 )
-def update_translation(is_all, plugin):
+def update_translation(is_all: bool, plugin: str | None):
     """Updates all translations."""
     if plugin is not None:
         validate_plugin(plugin)
@@ -87,7 +87,7 @@ def update_translation(is_all, plugin):
     type=click.STRING,
     help="Compiles the translations for a given plugin.",
 )
-def compile_translation(is_all, plugin):
+def compile_translation(is_all: bool, plugin: str | None):
     """Compiles the translations."""
     if plugin is not None:
         validate_plugin(plugin)

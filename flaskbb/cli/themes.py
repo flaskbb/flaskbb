@@ -68,7 +68,7 @@ def list_themes():
     default=False,
     help="Overwrite the contents of output directory if it exists",
 )
-def new_theme(template, out_dir, force):
+def new_theme(template: str, out_dir: str | None, force: bool):
     """Creates a new theme based on the cookiecutter theme
     template. Defaults to this template:
     https://github.com/sh4nks/cookiecutter-flaskbb-theme.
@@ -95,7 +95,7 @@ def new_theme(template, out_dir, force):
     is_flag=True,
     help="Removes the theme without asking for confirmation.",
 )
-def remove_theme(theme_identifier, force):
+def remove_theme(theme_identifier: str, force: bool):
     """Removes a theme from the filesystem."""
     validate_theme(theme_identifier)
     if not force and not click.confirm(click.style("Are you sure?", fg="magenta")):
@@ -103,4 +103,4 @@ def remove_theme(theme_identifier, force):
 
     theme = get_theme(theme_identifier)
     click.secho("[+] Removing theme from filesystem...", fg="cyan")
-    shutil.rmtree(theme.path, ignore_errors=False, onerror=None)
+    shutil.rmtree(theme.path)
