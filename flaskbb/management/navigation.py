@@ -8,6 +8,8 @@ Builds the navigation shown in the management panel sidebar.
 :license: BSD, see LICENSE for more details
 """
 
+from typing import TYPE_CHECKING
+
 from flask import request
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
@@ -23,10 +25,15 @@ from flaskbb.extensions import pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.requirements import IsAdmin
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from flaskbb.user.models import Guest, User
+
 ANCHOR = "management-content"
 
 
-def _settings_tree(user):
+def _settings_tree(user: "User | Guest") -> NavigationTree:
     on_settings = request.endpoint == "management.settings"
     view_args = request.view_args or {}
     slug = view_args.get("slug") if on_settings else None
@@ -68,7 +75,7 @@ def _settings_tree(user):
     )
 
 
-def _users_tree(user, current_endpoint):
+def _users_tree(user: "User | Guest", current_endpoint: str | None) -> NavigationTree:
     child_endpoints = ["management.users", "management.banned_users"]
 
     children = [
@@ -107,7 +114,13 @@ def _users_tree(user, current_endpoint):
     )
 
 
-def _simple_tree(endpoint, name, icon, current_endpoint, items):
+def _simple_tree(
+    endpoint: str,
+    name: str,
+    icon: str,
+    current_endpoint: str | None,
+    items: "Sequence[tuple[str, str]]",
+) -> NavigationLink | NavigationTree:
     """Builds a nav item from a static list of (endpoint, label) pairs.
 
     Returns a plain NavigationLink when there's only one item - a toggle
@@ -143,7 +156,9 @@ def _simple_tree(endpoint, name, icon, current_endpoint, items):
     )
 
 
-def get_management_navigation(user, active_override=None):
+def get_management_navigation(
+    user: "User | Guest", active_override: str | None = None
+) -> list[NavigationItem]:
     """Builds the list of NavigationItems shown in the management sidebar.
 
     :param user: The current user, used to filter admin-only links and to
@@ -155,7 +170,7 @@ def get_management_navigation(user, active_override=None):
     """
     current_endpoint = active_override or request.endpoint
 
-    nav = [
+    nav: list[NavigationItem] = [
         NavigationHeader(text=_("Core"), icon="fa fa-toolbox"),
         NavigationLink(
             endpoint="management.overview",

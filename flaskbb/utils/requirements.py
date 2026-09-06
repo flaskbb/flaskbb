@@ -180,7 +180,7 @@ class TopicNotLocked(Requirement):
             result = db.session.execute(
                 select(Topic.locked, Forum.locked)
                 .join(Forum, Forum.id == Topic.forum_id)
-                .where(Topic.id == current_topic.id)
+                .where(Topic.id == self._topic_id)
             ).first()
             if not result:
                 return False, False
@@ -189,7 +189,7 @@ class TopicNotLocked(Requirement):
             return self._get_topic_from_request()
 
     def _get_topic_from_request(self):
-        if current_topic:
+        if current_topic is not None and current_forum is not None:
             return current_topic.locked, current_forum.locked
         else:
             raise FlaskBBError("How did you get this to happen?")

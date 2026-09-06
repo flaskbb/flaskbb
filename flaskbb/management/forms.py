@@ -173,11 +173,12 @@ class UserForm(FlaskBBForm):
 
     activated = BooleanField(_("Is active?"), validators=[Optional()])
 
-    primary_group = QuerySelectField(
+    # ModeratorEditUserForm removes both fields by assigning None
+    primary_group: QuerySelectField | None = QuerySelectField(
         _("Primary group"), query_factory=select_primary_group, get_label="name"
     )
 
-    secondary_groups = QuerySelectMultipleField(
+    secondary_groups: QuerySelectMultipleField | None = QuerySelectMultipleField(
         _("Secondary groups"),
         # TODO: Template rendering errors "NoneType is not callable"
         #       without this, figure out why.
@@ -264,8 +265,8 @@ class SuperModeratorEditUserForm(EditUserForm):
 class ModeratorEditUserForm(SuperModeratorEditUserForm):
     """The edit form as seen by moderators, who may only clean up profiles."""
 
-    primary_group = None  # type: ignore[assignment]
-    secondary_groups = None  # type: ignore[assignment]
+    primary_group = None
+    secondary_groups = None
 
 
 class GroupForm(FlaskForm):

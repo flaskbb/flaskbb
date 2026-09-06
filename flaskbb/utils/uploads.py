@@ -14,8 +14,8 @@ import uuid
 from pathlib import Path
 
 from flask import current_app, Flask
-from flask_wtf.file import FileStorage
 from PIL import ImageFile
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
 from flaskbb.core.settings import flaskbb_config

@@ -8,10 +8,12 @@ Plugin implementations for the FlaskBB user module.
 :license: BSD, see LICENSE for details
 """
 
+from collections.abc import Generator, Iterable
 from itertools import chain
+from typing import Any
 
 from flask_babelplus import gettext as _
-from pluggy import HookimplMarker
+from pluggy import HookimplMarker, Result
 
 from ..display.navigation import NavigationLink
 from .models import User
@@ -28,7 +30,7 @@ impl = HookimplMarker("flaskbb")
 
 
 @impl(hookwrapper=True, tryfirst=True)
-def flaskbb_tpl_profile_settings_menu():
+def flaskbb_tpl_profile_settings_menu() -> Generator[None, Result[Iterable[Any]], None]:
     """
     Flattens the lists that come back from the hook
     into a single iterable that can be used to populate
@@ -47,7 +49,7 @@ def flaskbb_tpl_profile_settings_menu():
 
 
 @impl(hookwrapper=True, tryfirst=True)
-def flaskbb_tpl_profile_links(user: User):
+def flaskbb_tpl_profile_links(user: User) -> Generator[None, Result[Iterable[Any]], None]:
     results = [
         NavigationLink(
             endpoint="user.profile",

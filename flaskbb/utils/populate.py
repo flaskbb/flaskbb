@@ -14,9 +14,9 @@ from typing import Any
 
 import sqlalchemy as sa
 from alembic.util.exc import CommandError
-from sqlalchemy_utils.functions import (  # pyright: ignore[reportUnknownVariableType]
-    create_database,
-    database_exists,
+from sqlalchemy_utils.functions import (
+    create_database,  # pyright: ignore[reportPrivateLocalImportUsage, reportUnknownVariableType]
+    database_exists,  # pyright: ignore[reportPrivateLocalImportUsage, reportUnknownVariableType]
 )
 
 from flaskbb.core.settings import Setting, setting_registry

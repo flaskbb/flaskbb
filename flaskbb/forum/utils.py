@@ -49,9 +49,10 @@ def force_login_if_needed() -> Response | None:
     """
     if current_forum and should_force_login(current_user, current_forum):
         return cast(Response, login_manager.unauthorized())
+    return None
 
 
-def should_force_login(user: "User", forum: "Forum"):
+def should_force_login(user: "User", forum: "Forum") -> bool:
     return not user.is_authenticated and not (
         {g.id for g in forum.groups} & {g.id for g in user.groups}
     )
@@ -87,14 +88,15 @@ class AttachmentFormMixin:
     def _existing_attachment_count(self) -> int:
         return 0
 
-    def _set_attachment_choices(self, post: "Post | None"):
+    def _set_attachment_choices(self, post: "Post | None") -> None:
         if post is not None and post.id:
             self.delete_attachments.choices = [
                 (a.id, a.original_filename) for a in post.attachments
             ]
 
-    def validate_new_attachments(self, field: Field):
-        files = [f for f in (field.data or []) if isinstance(f, FileStorage) and f.filename]
+    def validate_new_attachments(self, field: Field) -> None:
+        uploads: list[object] = field.data or []
+        files = [f for f in uploads if isinstance(f, FileStorage) and f.filename]
         if not files:
             return
 
@@ -151,9 +153,8 @@ def handle_post_attachments(form: AttachmentFormMixin, post: "Post | None", user
     from flaskbb.forum.models import Attachment
 
     delete_ids = set(form.delete_attachments.data or [])
-    new_files = [
-        f for f in (form.new_attachments.data or []) if isinstance(f, FileStorage) and f.filename
-    ]
+    uploads: list[object] = form.new_attachments.data or []
+    new_files = [f for f in uploads if isinstance(f, FileStorage) and f.filename]
 
     if post is None or (not delete_ids and not new_files):
         return

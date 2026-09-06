@@ -13,7 +13,7 @@ import logging
 import os
 import sys
 from datetime import timedelta
-from typing import Any
+from typing import Any, cast
 
 import sqlalchemy as sa
 from celery import __version__ as celery_version
@@ -25,15 +25,16 @@ from flask import (
     jsonify,
     redirect,
     request,
+    Response,
     url_for,
 )
 from flask.views import MethodView
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 from flask_login import login_fresh
-from flask_wtf.file import FileStorage
 from pluggy import HookimplMarker
 from sqlalchemy.orm import joinedload
+from werkzeug.datastructures import FileStorage
 
 from flaskbb import __version__ as flaskbb_version
 from flaskbb.core.settings import flaskbb_config
@@ -1037,11 +1038,15 @@ class DeleteCategory(MethodView):
     def post(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
 
-        involved_users = User.query.filter(
-            Forum.category_id == category.id,
-            Topic.forum_id == Forum.id,
-            Post.user_id == User.id,
-        ).all()
+        involved_users = list(
+            db.session.execute(
+                sa.select(User).filter(
+                    Forum.category_id == category.id,
+                    Topic.forum_id == Forum.id,
+                    Post.user_id == User.id,
+                )
+            ).scalars()
+        )
 
         category.delete(involved_users)
         flash(_("Category with all associated forums deleted."), "success")
@@ -1104,7 +1109,7 @@ class MarkReportRead(MethodView):
         )
     ]
 
-    def post(self, report_id=None):
+    def post(self, report_id: int | None = None):
         # AJAX request
         json = request.get_json(silent=True)
         if json is not None:
@@ -1246,7 +1251,7 @@ class ManageAttachments(MethodView):
             .order_by(Attachment.id.desc())
         )
 
-    def _render(self, stmt, search_form):
+    def _render(self, stmt: sa.Select[tuple[Attachment]], search_form: AttachmentSearchForm):
         page = request.args.get("page", 1, type=int)
         attachments = db.paginate(
             stmt,
@@ -1432,9 +1437,9 @@ class CeleryStatus(MethodView):
     ]
 
     def get(self):
-        celery_inspect = celery.control.inspect()
+        celery_inspect = celery.control.inspect()  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
         try:
-            celery_running = True if celery_inspect.ping() else False
+            celery_running = True if celery_inspect.ping() else False  # pyright: ignore[reportUnknownMemberType]
         except Exception:
             # catching Exception is bad, and just catching ConnectionError
             # from redis is also bad because you can run celery with other
@@ -1603,11 +1608,12 @@ def flaskbb_load_blueprints(app: Flask):
     management = Blueprint("management", __name__)
 
     @management.before_request
-    def check_fresh_login():
+    def check_fresh_login() -> Response | None:  # pyright: ignore[reportUnusedFunction]
         """Checks if the login is fresh for the current user, otherwise the user
         has to reauthenticate."""
         if not login_fresh():
-            return login_manager.needs_refresh()
+            return cast(Response, login_manager.needs_refresh())
+        return None
 
     # Attachments
     register_view(
