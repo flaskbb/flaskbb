@@ -76,9 +76,9 @@ def settings_form_factory():
     if not form.is_submitted() or not form.validate_on_submit():
         form.theme.data = current_user.theme
         form.language.data = current_user.language
-        form.open_links_in_new_tab.data = {True: "yes", False: "no"}.get(
-            current_user.open_links_in_new_tab, "inherit"
-        )
+        form.open_links_in_new_tab.data = {True: "yes", False: "no", None: "inherit"}[
+            current_user.open_links_in_new_tab
+        ]
 
     return form
 
