@@ -30,6 +30,13 @@ __all__ = ["FlaskBBSearch", "SearchBackend", "SearchBackendRegistration"]
 
 _CORE_BACKENDS = ("sql", "postgresql", "sqlite")
 
+# what a flaskbb_load_search_backends implementation may return
+_HookResult = (
+    SearchBackendRegistration
+    | list[SearchBackendRegistration]
+    | tuple[SearchBackendRegistration, ...]
+)
+
 
 def _resolve_core(name: str) -> type[SearchBackend] | None:
     # Lazily import only the selected built-in: importing a backend module
@@ -57,7 +64,8 @@ def _plugin_backends(
     or with another plugin's backend raises `ValueError`.
     """
     registry: dict[str, type[SearchBackend]] = {}
-    for result in plugin_manager.hook.flaskbb_load_search_backends():
+    results: Sequence[_HookResult] = plugin_manager.hook.flaskbb_load_search_backends()
+    for result in results:
         regs = result if isinstance(result, (list, tuple)) else [result]
         for reg in regs:
             if reg.name in _CORE_BACKENDS:
@@ -87,11 +95,11 @@ class FlaskBBSearch(SearchBackend):
         plugins are loaded so `flaskbb_load_search_backends` contributions
         are available (see `configure_search_backend` in flaskbb/app.py).
         """
-        name = app.config.get("SEARCH_BACKEND", "sql")
+        name = app.config.get("SEARCH_BACKEND", "sql")  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
         # Always collected, so a plugin colliding with a built-in is caught
         # even when that built-in is the backend actually selected.
         plugins = _plugin_backends(self._plugin_manager) if self._plugin_manager is not None else {}
-        backend_cls = _resolve_core(name) or plugins.get(name)
+        backend_cls = _resolve_core(name) or plugins.get(name)  # pyright: ignore[reportUnknownArgumentType]
         if backend_cls is None:
             choices = sorted({*_CORE_BACKENDS, *plugins})
             raise ValueError(f"Unknown SEARCH_BACKEND {name!r}; choices: {choices}")

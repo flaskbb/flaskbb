@@ -29,7 +29,7 @@ class FlaskBBConfigProxy(MutableMapping[str, Any]):
             raise AttributeError(f"No such setting: {key!r}") from e
 
     @override
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> Any:
         try:
             return Setting.as_dict()[key.upper()]
         except KeyError:

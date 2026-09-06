@@ -80,7 +80,7 @@ def _emit_on_create(
     if bind.dialect.name != "sqlite":
         return False
     try:
-        return current_app.config.get("SEARCH_BACKEND") == "sqlite"
+        return current_app.config.get("SEARCH_BACKEND") == "sqlite"  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     except RuntimeError:
         return False
 

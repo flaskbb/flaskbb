@@ -14,7 +14,7 @@ from datetime import date
 from typing import Any
 
 from attrs import asdict, define, field
-from flask_wtf.file import FileStorage
+from werkzeug.datastructures import FileStorage
 
 from flaskbb.user.models import User
 
@@ -98,7 +98,7 @@ class UserSettingsUpdatePostProcessor(ABC):
     """
 
     @abstractmethod
-    def post_process_settings_update(self, user: User, settings_update):
+    def post_process_settings_update(self, user: User, settings_update: SettingsUpdate):
         """
         This method is abstract
         """

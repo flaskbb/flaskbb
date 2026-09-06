@@ -67,7 +67,7 @@ def _emit_on_create(
     if bind.dialect.name != "postgresql":
         return False
     try:
-        return current_app.config.get("SEARCH_BACKEND") == "postgresql"
+        return current_app.config.get("SEARCH_BACKEND") == "postgresql"  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     except RuntimeError:
         return False
 

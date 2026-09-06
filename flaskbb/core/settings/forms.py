@@ -19,9 +19,9 @@ def build_form(group: SettingGroup) -> type[FlaskBBForm]:
     """Dynamically create a FlaskForm subclass with one field per setting
     in the group. Field keys stay UPPER_CASE to match the setting keys.
     """
-    attrs = {setting.key: setting.wtf_field() for setting in group.settings}  # pyright: ignore[reportUnknownVariableType]
+    attrs = {setting.key: setting.wtf_field() for setting in group.settings}
     class_name = f"{group.key.title().replace('_', '')}SettingsForm"
-    return type(class_name, (FlaskBBForm,), attrs)  # pyright: ignore[reportUnknownArgumentType]
+    return type(class_name, (FlaskBBForm,), attrs)
 
 
 def populate_form(group: SettingGroup, current_values: dict[Any, Any]) -> FlaskBBForm:

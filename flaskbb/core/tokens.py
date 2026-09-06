@@ -10,6 +10,7 @@ with tokens in FlaskBB
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 import attr
 from flask_babelplus import gettext as _
@@ -88,7 +89,7 @@ class TokenSerializer(ABC):
     """ """
 
     @abstractmethod
-    def dumps(self, token) -> str:
+    def dumps(self, token: Token) -> str:
         """
         This method is abstract.
 
@@ -101,7 +102,7 @@ class TokenSerializer(ABC):
         pass
 
     @abstractmethod
-    def loads(self, raw_token) -> "Token":
+    def loads(self, raw_token: str) -> Token:
         """
         This method is abstract
 
@@ -127,7 +128,7 @@ class TokenVerifier(ABC):
     """
 
     @abstractmethod
-    def verify_token(self, token, **kwargs):
+    def verify_token(self, token: Token, **kwargs: Any) -> None:
         """
         This method is abstract.
 
@@ -137,5 +138,5 @@ class TokenVerifier(ABC):
         """
         pass
 
-    def __call__(self, token, **kwargs):
+    def __call__(self, token: Token, **kwargs: Any) -> None:
         return self.verify_token(token, **kwargs)

@@ -28,7 +28,7 @@ class SettingDefinition:
     name: str
     description: str
 
-    def wtf_field(self):  # pyright: ignore[reportUnknownParameterType]
+    def wtf_field(self) -> wtf_fields.Field:
         """Return a WTForms field instance for this setting."""
         raise NotImplementedError
 
@@ -47,7 +47,7 @@ class IntSetting(SettingDefinition):
 
     @override
     def wtf_field(self):
-        validators = []
+        validators: list[Any] = []
         if self.min is not None or self.max is not None:
             validators.append(wtf_validators.NumberRange(min=self.min, max=self.max))
         return wtf_fields.IntegerField(
@@ -72,7 +72,7 @@ class StringSetting(SettingDefinition):
 
     @override
     def wtf_field(self):
-        validators = []
+        validators: list[Any] = []
         if self.min is not None or self.max is not None:
             validators.append(wtf_validators.Length(min=self.min or 0, max=self.max or -1))
         return wtf_fields.StringField(
@@ -112,7 +112,7 @@ class SelectMultipleSetting(SelectSetting):
         )
 
     @override
-    def serialize(self, value):
+    def serialize(self, value: Any) -> str:
         return json.dumps(list(value))
 
 
