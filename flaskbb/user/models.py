@@ -121,7 +121,7 @@ class User(BaseModel, UserMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
-    _password: Mapped[str] = mapped_column("password", String(120), nullable=False)
+    _password: Mapped[str] = mapped_column("password", String(255), nullable=False)
     date_joined: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )

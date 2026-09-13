@@ -57,14 +57,16 @@ def upgrade():
         batch_op.drop_constraint(
             batch_op.f("fk_settings_settingsgroup_settingsgroup"), type_="foreignkey"
         )
-        batch_op.alter_column("group_key", existing_type=sa.String, nullable=False)
+        batch_op.alter_column("group_key", existing_type=sa.String(length=255), nullable=False)
         batch_op.drop_column("description")
         batch_op.drop_column("extra")
         batch_op.drop_column("value_type")
         batch_op.drop_column("name")
         batch_op.drop_column("settingsgroup")
         batch_op.drop_column("value")
-        batch_op.alter_column("value_json", new_column_name="value")
+        batch_op.alter_column(
+            "value_json", new_column_name="value", existing_type=sa.Text(), existing_nullable=True
+        )
 
         # make group_key + key unique and drop the old constraint
         batch_op.drop_constraint(batch_op.f("pk_settings"), type_="primary")
