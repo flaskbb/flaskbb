@@ -9,6 +9,8 @@ store for plugins.
 :license: BSD, see LICENSE for more details.
 """
 
+import traceback
+from types import ModuleType
 from typing import Any
 
 import sqlalchemy as sa
@@ -16,9 +18,10 @@ from flask import flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
 
-from flaskbb.extensions import db, pluggy
+from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.datastructures import TemplateEventResult
+from flaskbb.utils.populate import has_migrations
 
 
 def template_hook(name: str, silent: bool = True, is_markup: bool = True, **kwargs: Any):
@@ -78,3 +81,38 @@ def remove_zombie_plugins_from_db():
         db.session.execute(sa.delete(PluginRegistry).filter(PluginRegistry.name.in_(remove_me)))
         db.session.commit()
     return remove_me
+
+
+def plugin_has_pending_migrations(name: str) -> bool:
+    """Returns ``True`` if the head revision of the plugin's migration
+    branch hasn't been applied to the database yet.
+    """
+    if not has_migrations(pluggy.get_plugin(name)):
+        return False
+
+    script_directory = alembic.script_directory
+    current_heads = alembic.migration_context.get_current_heads()
+    applied = {
+        script.revision for script in script_directory.iterate_revisions(current_heads, "base")
+    }
+    return any(
+        script.revision not in applied for script in script_directory.get_revisions(f"{name}@head")
+    )
+
+
+def get_plugins_with_pending_migrations(error: BaseException) -> list[str]:
+    """Returns the names of the external plugins whose code raised ``error``
+    and whose migrations haven't been applied yet.
+    """
+    external = pluggy.get_external_plugins()
+    packages = {
+        plugin.__name__.split(".")[0]: name
+        for name, plugin in pluggy.list_name_plugin()
+        if plugin in external and isinstance(plugin, ModuleType)
+    }
+    raising = {
+        packages[package]
+        for frame, _lineno in traceback.walk_tb(error.__traceback__)
+        if (package := frame.f_globals.get("__name__", "").split(".")[0]) in packages
+    }
+    return sorted(name for name in raising if plugin_has_pending_migrations(name))

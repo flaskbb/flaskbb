@@ -23,6 +23,7 @@ from typing import Any, cast
 import sqlalchemy as sa
 from celery import Celery
 from flask import flash, redirect, request, url_for
+from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
 from sqlalchemy import event
@@ -50,7 +51,11 @@ from flaskbb.extensions import (
 )
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.utils import remove_zombie_plugins_from_db, template_hook
+from flaskbb.plugins.utils import (
+    get_plugins_with_pending_migrations,
+    remove_zombie_plugins_from_db,
+    template_hook,
+)
 from flaskbb.search.service import search_snippet
 from flaskbb.settings import (
     fixture as fixture,
@@ -450,6 +455,33 @@ def configure_errorhandlers(app: FlaskBB):
 
         flash(message, "danger")
         return redirect(request.referrer or url_for("forum.index"))
+
+    @app.errorhandler(OperationalError)
+    @app.errorhandler(ProgrammingError)
+    def plugin_migrations_pending(error: OperationalError | ProgrammingError):  # pyright: ignore[reportUnusedFunction]
+        db.session.rollback()
+        plugins = get_plugins_with_pending_migrations(error)
+        if not plugins:
+            raise error
+
+        is_admin = Permission(IsAdmin, identity=current_user)
+        endpoint = "management.overview" if is_admin else "forum.index"
+        # the plugin can also fail on the redirect target, i.e. in a template hook
+        if request.endpoint == endpoint:
+            raise error
+
+        if is_admin:
+            flash(
+                _(
+                    "The migrations of %(plugins)s have not been applied yet. "
+                    "Apply them with 'flaskbb plugins install --migrations-only <plugin>'.",
+                    plugins=", ".join(plugins),
+                ),
+                "danger",
+            )
+        else:
+            flash(_("This page is currently unavailable."), "danger")
+        return redirect(url_for(endpoint))
 
     pluggy.hook.flaskbb_errorhandlers(app=app)
 
