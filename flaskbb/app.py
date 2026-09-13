@@ -139,8 +139,7 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     app = FlaskBB("flaskbb", instance_path=instance_path, instance_relative_config=True)
 
     # instance folders are not automatically created by flask
-    if not os.path.exists(app.instance_path):
-        os.makedirs(app.instance_path)
+    os.makedirs(app.instance_path, exist_ok=True)
 
     configure_app(app, config)
     configure_celery_app(app, celery)
