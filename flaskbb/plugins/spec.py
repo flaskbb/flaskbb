@@ -1235,6 +1235,18 @@ def flaskbb_tpl_profile_stats(user: "User"):
 
 
 @spec
+def flaskbb_tpl_profile_actions(user: "User"):
+    """This hook is emitted on the users profile page after the moderation
+    actions (ban/unban). For example, it can be used to add a button to send
+    the user a private message.
+
+    in :file:`templates/user/profile_layout.html`
+
+    :param user: The user object for whom the profile is currently visited.
+    """
+
+
+@spec
 def flaskbb_tpl_post_author_info_before(user: "User | None", post: "Post"):
     """This hook is emitted before the information about the
     author of a post is displayed (but after the username).

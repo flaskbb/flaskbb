@@ -117,6 +117,7 @@ dev = [
     "ruff",
     "tox>=4.39",
     "tox-uv",
+    "cookiecutter",
     {include-group = "pre-commit"},
     {include-group = "docs"},
     {include-group = "tests"},
