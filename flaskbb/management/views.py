@@ -53,7 +53,7 @@ from flaskbb.management.forms import (
     SuperModeratorEditUserForm,
 )
 from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.utils import validate_plugin
+from flaskbb.plugins.utils import plugin_has_pending_migrations, validate_plugin
 from flaskbb.settings import flaskbb_config
 from flaskbb.settings.forms import build_form
 from flaskbb.settings.models import Setting
@@ -1462,7 +1462,10 @@ class PluginsView(MethodView):
 
     def get(self):
         plugins = PluginRegistry.get_all()
-        return render_template("management/plugins.html", plugins=plugins)
+        pending_migrations = {p.name for p in plugins if plugin_has_pending_migrations(p.name)}
+        return render_template(
+            "management/plugins.html", plugins=plugins, pending_migrations=pending_migrations
+        )
 
 
 class EnablePlugin(MethodView):

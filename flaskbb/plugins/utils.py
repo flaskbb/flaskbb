@@ -87,7 +87,9 @@ def plugin_has_pending_migrations(name: str) -> bool:
     """Returns ``True`` if the head revision of the plugin's migration
     branch hasn't been applied to the database yet.
     """
-    if not has_migrations(pluggy.get_plugin(name)):
+    plugin = pluggy.get_plugin(name)
+    # disabled plugins are blocked, so their migrations aren't loaded
+    if plugin is None or not has_migrations(plugin):
         return False
 
     script_directory = alembic.script_directory

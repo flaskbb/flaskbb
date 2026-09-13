@@ -4,7 +4,9 @@ import pytest
 from flask import get_flashed_messages, url_for
 from flask_login import login_user
 from flaskbb.extensions import pluggy
+from flaskbb.management import views
 from flaskbb.plugins import utils
+from flaskbb.plugins.models import PluginRegistry
 from sqlalchemy.exc import OperationalError
 
 PLUGIN_SOURCE = """
@@ -50,6 +52,23 @@ def test_plugin_error_is_ignored_when_migrations_are_applied(plugin_error, monke
     monkeypatch.setattr(utils, "plugin_has_pending_migrations", lambda name: False)
 
     assert utils.get_plugins_with_pending_migrations(plugin_error) == []
+
+
+def test_disabled_plugin_has_no_pending_migrations(application):
+    assert not utils.plugin_has_pending_migrations("not_loaded_plugin")
+
+
+def test_plugins_overview_shows_migrations_badge(
+    application, admin_user, failing_plugin, monkeypatch
+):
+    monkeypatch.setattr(views, "plugin_has_pending_migrations", lambda name: True)
+    PluginRegistry("failing_plugin").save()
+
+    with application.test_request_context("/management/plugins"):
+        login_user(admin_user)
+        html = views.PluginsView().get()
+
+    assert "requires migrations" in html
 
 
 def test_core_error_is_not_attributed_to_plugin(failing_plugin, pending_migrations):

@@ -31,15 +31,19 @@
                 {% for plugin in plugins %}
                 <div class="row settings-row hover with-border-bottom">
                     <div class="col-md-4 col-sm-4 col-4">
-                    {{ plugin.name.title() }}
-                    (
-                    {%- if plugin.info.url -%}
+                        {{ plugin.name.title() }}
+                        (
+                        {%- if plugin.info.url -%}
                         <a href="{{ plugin.info.url }}">{{ plugin.info.package_name }}</a>
-                    {%- else -%}
+                        {%- else -%}
                         {{ plugin.info.name }}
-                    {%- endif -%}
-                    )
-
+                        {%- endif -%}
+                        )
+                        {% if plugin.name in pending_migrations %}
+                        <span class="badge rounded-pill text-bg-warning"
+                              data-bs-toggle="tooltip" data-bs-placement="top"
+                              title="{% trans name=plugin.name %}Apply them with 'flaskbb plugins install --migrations-only {{ name }}'{% endtrans %}">{% trans %}requires migrations{% endtrans %}</span>
+                        {% endif %}
                     </div>
                     <div class="col-md-4 col-sm-4 col-4">
                         <div class="plugin-version">{% trans %}Version{% endtrans %}: {{ plugin.info.version }}</div>
@@ -53,14 +57,15 @@
                             <button class="btn btn-success">{% trans %}Enable{% endtrans %}</button>
                         </form>
                         {% else %}
-                        <form class="d-inline" method="post" action="{{ url_for('management.disable_plugin', name=plugin.name) }}">
+                        <form class="d-inline" method="post"
+                              action="{{ url_for('management.disable_plugin', name=plugin.name) }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                             <button class="btn btn-warning">{% trans %}Disable{% endtrans %}</button>
                         </form>
                         {% endif %}
 
                         {% if plugin.is_installed and plugin.needs_setting_upgrade() %}
-                            {{
+                        {{
                                 action_confirm(
                                     id="plugin-inst-" ~ plugin.name,
                                     url=url_for('management.upgrade_plugin', name=plugin.name),
@@ -73,7 +78,7 @@
 
                         {% if plugin.is_installable and not plugin.is_installed %}
 
-                            {{
+                        {{
                                 action_confirm(
                                     id="plugin-inst-" ~ plugin.name,
                                     url=url_for('management.install_plugin', name=plugin.name),
@@ -85,7 +90,7 @@
 
                         {% elif plugin.is_installable and plugin.is_installed %}
 
-                            {{
+                        {{
                                 action_confirm(
                                     id="plugin-uninst-" ~ plugin.name,
                                     url=url_for('management.uninstall_plugin', name=plugin.name),
@@ -94,7 +99,8 @@
                                     icon_only=False
                                 )
                             }}
-                        <a class="btn btn-outline-dark" href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
+                        <a class="btn btn-outline-dark"
+                           href="{{ url_for('management.settings', plugin=plugin.name) }}">Settings</a>
                         {% endif %}
                     </div>
                 </div>
