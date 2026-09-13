@@ -231,16 +231,17 @@ order-by-type = false
 
 [tool.coverage.run]
 branch = true
-source = ["flaskbb", "tests"]
+relative_files = true
+source_pkgs = ["flaskbb"]
 omit = [
-    "flaskbb/flaskbb/static/*",
-    "flaskbb/flaskbb/templates/*",
-    "flaskbb/flaskbb/themes/*",
-    "flaskbb/flaskbb/migrations/*"
+    "*/flaskbb/static/*",
+    "*/flaskbb/templates/*",
+    "*/flaskbb/themes/*",
+    "*/flaskbb/migrations/*"
 ]
 
 [tool.coverage.paths]
-source = ["flaskbb"]
+source = ["flaskbb", "*/site-packages/flaskbb"]
 
 [tool.coverage.report]
 exclude_also = [
@@ -312,6 +313,7 @@ commands = [
     ["pybabel", "compile", "-d", "{envsitepackagesdir}/flaskbb/translations"],
     [
         "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
+        "--cov", "--cov-report=xml", "--cov-report=term",
         {replace = "posargs", default = [], extend = true},
     ],
 ]
