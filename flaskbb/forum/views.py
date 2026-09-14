@@ -631,16 +631,18 @@ class ReportView(MethodView):
     form = ReportForm
 
     def get(self, post_id: int):
-        return render_template("forum/report_post.html", form=self.form())
+        return render_template("forum/report_post.html", form=self.form(), post_id=post_id)
 
     def post(self, post_id: int):
         form = self.form()
         if form.validate_on_submit():
             post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
             form.save(real(current_user), post)
-            flash(_("Thanks for reporting."), "success")
+            return render_template(
+                "forum/report_post.html", form=form, post_id=post_id, reported=True
+            )
 
-        return render_template("forum/report_post.html", form=form)
+        return render_template("forum/report_post.html", form=form, post_id=post_id)
 
 
 class MemberList(MethodView):
@@ -975,7 +977,7 @@ class MarkRead(MethodView):
                 "success",
             )
 
-            return redirect(forum_instance.url)
+            return redirect_or_reload(redirect_url(forum_instance.url))
 
         # Mark all forums as read
 

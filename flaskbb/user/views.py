@@ -12,7 +12,7 @@ and the user settings from a signed in user.
 import logging
 
 from attrs import define, field
-from flask import Blueprint, flash, jsonify, redirect, request, url_for
+from flask import Blueprint, flash, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import login_required
@@ -195,33 +195,13 @@ class ChangeAvatar(MethodView):
 class DeleteAvatar(MethodView):
     decorators = [login_required]
 
-    def post(self, user_id: int | None = None):
-        json = request.get_json(silent=True)
-
-        user = None
-        if json is None and user_id is not None:
-            user = User.get_by(id=user_id)
-        elif json is not None:
-            user_id = json.get("user")
-            if user_id:
-                user_id = int(user_id)
-                user = User.get_by(id=user_id)
-
-        if user is None or current_user.id != user.id:
-            return jsonify(
-                message=_("You cannot delete an avatar from someone else."),
-                category="danger",
-                status=403,
-            )
-
+    def post(self):
+        user = real(current_user)
         delete_avatar_file(user.avatar)
         user.avatar = None
         user.save()
-        return jsonify(
-            message=_("Avatar deleted."),
-            category="success",
-            status=200,
-        )
+        flash(_("Avatar deleted."), "success")
+        return redirect(url_for("user.change_avatar"))
 
 
 @define(frozen=True, repr=True, eq=False, order=False, hash=False)

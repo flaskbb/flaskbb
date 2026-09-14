@@ -9,9 +9,6 @@ import twemoji from "twemoji";
 import { isHidden } from "./utils";
 
 
-// get the csrf token from the header
-let csrf_token = document.querySelector("meta[name=csrf-token]").content;
-
 export function show_management_search() {
     let form = document.querySelector(".search-form");
 
@@ -23,102 +20,13 @@ export function show_management_search() {
     }
 }
 
-function flash_message(message) {
-    let container = document.getElementById("flashed-messages");
-
-    let flashed_message = `<div class="alert alert-${message.category} alert-dismissible fade show">`;
-
-    if (message.category === "success") {
-        flashed_message += '<span class="fas fa-check me-2"></span>';
-    } else if (message.category === "danger" || message.category === "error") {
-        flashed_message += '<span class="fas fa-xmark me-2"></span>';
-    } else {
-        flashed_message += '<span class="fas fa-info me-2"></span>';
+// content htmx swaps into a modal, like the report form, opens that modal
+document.addEventListener("htmx:afterSwap", (event) => {
+    const modal = event.detail.target.closest(".modal");
+    if (modal) {
+        Modal.getOrCreateInstance(modal).show();
     }
-    flashed_message += `
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
-        ${message.message}
-    </div>`;
-    container.insertAdjacentHTML("beforeend", flashed_message);
-}
-
-class BaseAction {
-    confirm(endpoint, data, callback = undefined) {
-        const modalEl = document.getElementById("confirmModal");
-        const modal = Modal.getOrCreateInstance(modalEl);
-        modal.show();
-
-        const confirmBtn = modalEl.querySelector(".confirmBtn");
-        confirmBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            modal.hide();
-            sendData(endpoint, data, callback);
-        }, { once: true });
-    }
-}
-
-export class Actions {
-    execute(endpoint, data, callback = undefined, showConfirm = false) {
-        if (!data) {
-            return false;
-        }
-
-        const action = () => sendData(endpoint, data, callback);
-        if (showConfirm) {
-            showConfirmModal(action);
-        } else {
-            action();
-        }
-        return false;
-    }
-}
-
-async function makeRequest(endpoint, data) {
-    try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrf_token,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
-        const resData = await response.json();
-        flash_message(resData);
-        return resData;
-    } catch (error) {
-        console.error("error: ", error);
-        flash_message(error);
-        return null;
-    }
-}
-
-
-function showConfirmModal(onConfirm) {
-    const modalEl = document.getElementById("confirmModal");
-    const modal = Modal.getOrCreateInstance(modalEl);
-    modal.show();
-
-    const confirmBtn = modalEl.querySelector(".confirmBtn");
-    // do not add duplicated eventlisteners
-    if (confirmBtn.getAttribute('confirmListener') !== 'true') {
-        confirmBtn.setAttribute('confirmListener', 'true');
-        confirmBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            modal.hide();
-            onConfirm();
-        }, { once: true });
-    }
-}
-
-
-export async function sendData(endpoint_url, data, callback) {
-    const resData = await makeRequest(endpoint_url, data);
-    if (resData && typeof callback === 'function') {
-        callback(resData);
-    }
-}
+});
 
 
 export function parse_emoji(value) {
@@ -144,40 +52,6 @@ export function parse_emoji(value) {
         folder: "svg",
         ext: ".svg",
     });
-}
-
-function celery_not_running_notification(notification) {
-    let no_notifications = document.getElementById("overview-no-notifications");
-    let notifications = document.querySelector(".overview-notifications");
-
-    // replace the no notifications notice with ours
-    if (no_notifications == null) {
-        no_notifications.outerHTML = notification;
-    } else {
-        notifications.innerHTML = notification;
-    }
-}
-
-export function check_overview_status(endpoint, notification, running, not_running) {
-    let celerystatus = document.getElementById("celery-status");
-    fetch(endpoint, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        }
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.celery_running) {
-                celerystatus.outerHTML = running;
-            } else {
-                celerystatus.outerHTML = not_running;
-                celery_not_running_notification(notification);
-            }
-        })
-        .catch((error) => {
-            flash_message(error);
-        });
 }
 
 document.addEventListener("DOMContentLoaded", function (_event) {
@@ -297,22 +171,16 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         });
     });
 
-    document.querySelectorAll(".action-checkbox").forEach((el) => {
-        el.addEventListener("click", (event) => {
-            event.stopPropagation()
-        })
-    }
-    );
-
-    // listen on set-checkbox to check the nearest checkbox
-    document.querySelectorAll(".set-checkbox").forEach((el) => {
-        el.addEventListener("click", (event) => {
-            event.preventDefault();
-            const cb = el.querySelector("input.action-checkbox");
-            cb.checked = !cb.checked;
-        })
-    }
-    );
+    // a click on a set-checkbox row toggles its checkbox, unless the click was
+    // on the checkbox itself. delegated, so it keeps working on lists htmx
+    // swapped in
+    document.addEventListener("click", (event) => {
+        const row = event.target.closest(".set-checkbox");
+        if (!row || event.target.matches("input.action-checkbox")) return;
+        event.preventDefault();
+        const cb = row.querySelector("input.action-checkbox");
+        cb.checked = !cb.checked;
+    });
 
 });
 

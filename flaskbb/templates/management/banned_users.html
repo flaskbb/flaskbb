@@ -31,7 +31,7 @@
         <div class="card-body settings-body">
 
             <div class="settings-search">
-                <form class="search-form" role="form" method="post">
+                <form class="search-form" role="form" method="post" hx-post="{{ url_for('management.banned_users') }}" hx-trigger="input delay:300ms, submit" hx-target="next .settings-content" hx-select=".settings-content" hx-swap="outerHTML">
                     {{ search_form.hidden_tag() }}
                     <div class="input-group">
                         {{ render_input_field(search_form.search_query, class="form-control") }}

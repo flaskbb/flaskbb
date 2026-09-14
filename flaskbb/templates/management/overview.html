@@ -26,12 +26,12 @@
                                 <p>{% trans url=url_for('management.unread_reports') %}You have <a
                                        href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
                             </div>
-                            {% else %}
-                            <div id="overview-no-notifications" class="alert-message alert-message-success">
+                            {% endif %}
+                            {# rendered even when hidden, a stopped celery puts its warning in its place #}
+                            <div id="overview-no-notifications" class="alert-message alert-message-success"{% if unread_reports > 0 %} hidden{% endif %}>
                                 <h4>{% trans %}Everything seems alright.{% endtrans %}</h4>
                                 <p>{% trans %}No new notifications.{% endtrans %}</p>
                             </div>
-                            {% endif %}
                         </div>
                     </div>
                     <div class="row stats-row">
@@ -120,7 +120,7 @@
                             <div class="row">
                                 <div class="col">Celery</div>
                                 <div class="col text-end">
-                                    <span id="celery-status" class="text-warning">{% trans %}checking status{% endtrans %}</span>
+                                    <span id="celery-status" class="text-warning" hx-get="{{ url_for('management.celery_status') }}" hx-trigger="load" hx-swap="outerHTML">{% trans %}checking status{% endtrans %}</span>
                                     {{ celery_version }}
                                 </div>
                             </div>
@@ -170,25 +170,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-
-    // TOOD: Put this into management.celery_status
-    const running = "<span id='celery-status' class='text-success'><strong>{% trans %}running{% endtrans %}</strong></span>";
-    const not_running = "<span id='celery-status' class='text-danger'><strong>{% trans %}not running{% endtrans %}</strong></span>";
-
-    const notification = `
-    <div class='alert-message alert-message-danger'>
-        <h4>{% trans %}There is a problem.{% endtrans %}</h4>
-        <p class="mb-0">{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
-        <p class="mb-0">{% trans %}You can start celery with this command:{% endtrans %}</p>
-        <pre>flaskbb --config {{ current_app.config["CONFIG_PATH"] }} celery worker</pre>
-    </div>
-`;
-    const endpoint = "{{ url_for('management.celery_status') }}";
-
-    window.app.check_overview_status(endpoint, notification, running, not_running);
-</script>
 {% endblock %}

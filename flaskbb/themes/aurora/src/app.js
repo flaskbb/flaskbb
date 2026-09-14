@@ -9,11 +9,16 @@ import "./app/flaskbb.js";
 
 
 import "./scss/styles.scss";
-export { Actions, check_overview_status, show_management_search } from "./app/flaskbb.js";
+export { show_management_search } from "./app/flaskbb.js";
 
 // htmx has to be reachable via window. plugins register extensions against it and
 // templates outside this bundle call into it.
 window.htmx = htmx;
+
+// without a history cache htmx keeps no page snapshots, and the CSRF token in
+// them, in localStorage. going back to a page htmx navigated to reloads it
+htmx.config.historyCacheSize = 0
+htmx.config.refreshOnHistoryMiss = true
 
 var flaskbbAllowList = Tooltip.Default.allowList
 // allow <time> elements

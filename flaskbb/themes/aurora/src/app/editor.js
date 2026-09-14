@@ -123,21 +123,15 @@ function autoresize(element) {
     );
 }
 
-function setupEditor() {
-    document.querySelectorAll(".flaskbb-editor").forEach((el) => {
-        autocomplete(el);
-    });
+// delegated, so it also works for editors htmx swapped in
+document.addEventListener("click", (event) => {
+    const button = event.target.closest(".preview-btn");
+    if (!button) return;
+    event.preventDefault();
+    markdownPreview(button);
+});
 
-    document.querySelectorAll(".preview-btn").forEach((el) => {
-        el.addEventListener("click", (event) => {
-            event.preventDefault();
-            markdownPreview(el);
-        })
-    });
-
-    document.querySelectorAll("[data-autoresize=true]").forEach((el) => {
-        autoresize(el);
-    });
-}
-
-setupEditor();
+htmx.onLoad((root) => {
+    root.querySelectorAll(".flaskbb-editor").forEach((el) => autocomplete(el));
+    root.querySelectorAll("[data-autoresize=true]").forEach((el) => autoresize(el));
+});

@@ -20,7 +20,6 @@ from celery import __version__ as celery_version
 from flask import (
     Blueprint,
     flash,
-    jsonify,
     redirect,
     request,
     Response,
@@ -1319,7 +1318,7 @@ class CeleryStatus(MethodView):
             # brokers as well.
             celery_running = False
 
-        return jsonify(celery_running=celery_running, status=200)
+        return render_template("management/_celery_status.html", celery_running=celery_running)
 
 
 class PluginsView(MethodView):

@@ -209,7 +209,7 @@
 
                             {% if current_user.is_authenticated %}
                             <!-- Report post -->
-                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;" class="btn btn-icon far fa-flag text-orange" data-bs-toggle="tooltip" title="{% trans %}Report this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.report_post', post_id=post.id) }}" hx-get="{{ url_for('forum.report_post', post_id=post.id) }}" hx-target="#report-dialog .modal-content" hx-select="#report-form" hx-swap="innerHTML" hx-select-oob="unset" class="btn btn-icon far fa-flag text-orange" data-bs-toggle="tooltip" title="{% trans %}Report this post{% endtrans %}"></a>
                             {% endif %}
 
                             <!-- Hide Post -->
@@ -268,5 +268,12 @@
     </form>
     {% endif %}
 
+</div>
+
+{# outside of .topic-view, so the report form does not inherit its hx-* attributes #}
+<div class="modal fade" id="report-dialog" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content"></div>
+    </div>
 </div>
 {% endblock %}
