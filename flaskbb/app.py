@@ -8,6 +8,7 @@ manages the app creation and configuration process
 :license: BSD, see LICENSE for more details.
 """
 
+import importlib.metadata
 import logging
 import logging.config
 import os
@@ -17,7 +18,6 @@ import warnings
 from collections.abc import Callable, Sequence
 from datetime import datetime, UTC
 from email.utils import formataddr
-from types import ModuleType
 from typing import Any, cast
 
 import sqlalchemy as sa
@@ -605,9 +605,13 @@ def load_plugins(app: FlaskBB):
         pluggy.load_setuptools_entrypoints("flaskbb_plugins")
         return
 
+    # newly installed plugins stay disabled until they are enabled explicitly
+    enabled_names = {p.name for p in plugins if p.enabled}
+    for entry_point in importlib.metadata.entry_points(group="flaskbb_plugins"):
+        if entry_point.name not in enabled_names:
+            pluggy.set_blocked(entry_point.name)
+
     for plugin in plugins:
-        if not plugin.enabled:
-            pluggy.set_blocked(plugin.name)
         if plugin.is_updatable:
             logger.info(f"Updating installed plugin: {plugin.name}")
             plugin.add_settings()
@@ -615,13 +619,11 @@ def load_plugins(app: FlaskBB):
     pluggy.load_setuptools_entrypoints("flaskbb_plugins")
     pluggy.hook.flaskbb_extensions(app=app)
 
-    loaded_names = set([p[0] for p in pluggy.list_name_plugin()])
-    registered_names: set[str] = set([p.name for p in plugins])
+    registered_names = {p.name for p in plugins}
     unregistered = [
         PluginRegistry(name=name)
-        for name in loaded_names - registered_names
-        # ignore internal FlaskBB modules
-        if not name.startswith("flaskbb.") and name != "flaskbb"
+        for name in pluggy.get_disabled_plugins()
+        if name not in registered_names
     ]
     with app.app_context():
         db.session.add_all(unregistered)
@@ -635,9 +637,7 @@ def load_plugins(app: FlaskBB):
     # we need a copy of it because of
     # RuntimeError: dictionary changed size during iteration
     tasks = celery.tasks.copy()  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
-    disabled_plugins = [
-        p.__package__ for p in pluggy.list_disabled_plugins() if isinstance(p, ModuleType)
-    ]
+    disabled_plugins = [ep.module.split(".")[0] for ep in pluggy.list_disabled_plugins()]
     for task_name, task in tasks.items():  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
         if task.__module__.split(".")[0] in disabled_plugins:  # pyright: ignore[reportUnknownMemberType]
             logger.debug(f"Unregistering task: '{task}'")

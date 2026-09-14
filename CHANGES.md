@@ -25,6 +25,7 @@ Unreleased
 - Settings are now stored as JSON instead of being pickled. They are typed now.
 - A Plugin's setting can now be upgraded from the admin panel or the CLI.
 - Installed plugins settings are upgraded automatically when the app starts (migrations are not applied!).
+- Newly installed plugins are disabled until they are enabled, and disabled plugins are no longer imported.
 - New plugin lifecycle hooks: `on_plugin_install`, `on_plugin_uninstall`, `on_plugin_upgrade` and `on_plugin_settings_changed`. (#508)
 - New hooks let plugins add buttons to the markdown editor toolbar. (#464)
 

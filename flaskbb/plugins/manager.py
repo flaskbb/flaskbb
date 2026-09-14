@@ -10,7 +10,7 @@ Plugin Manager for FlaskBB
 
 import logging
 import string
-from importlib.metadata import Distribution, PackageMetadata
+from importlib.metadata import Distribution, EntryPoint, PackageMetadata
 from typing import override
 
 import pluggy
@@ -93,7 +93,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
     def __init__(self, project_name: str):
         super().__init__(project_name=project_name)
         self._plugin_metadata: dict[str, DistMeta] = {}
-        self._disabled_plugins: dict[str, _Plugin] = {}
+        self._disabled_plugins: dict[str, EntryPoint] = {}
 
         # we maintain a seperate dict for flaskbb.* internal plugins
         self._internal_name2plugin: dict[str, _Plugin] = {}
@@ -186,13 +186,16 @@ class FlaskBBPluginManager(pluggy.PluginManager):
                 ):
                     continue
 
-                plugin = ep.load()
-                self._plugin_distinfo.append((plugin, DistFacade(dist)))
                 self._plugin_metadata[ep.name] = DistMeta(dist, ep.name)
 
+                # importing a disabled plugin would already run its module level
+                # code, e.g. adding columns to core models that aren't migrated
                 if self.is_blocked(ep.name):
+                    self._disabled_plugins[ep.name] = ep
                     continue
 
+                plugin = ep.load()
+                self._plugin_distinfo.append((plugin, DistFacade(dist)))
                 self.register(plugin, name=ep.name)
 
                 count += 1
@@ -221,7 +224,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
         return self._plugin_metadata
 
     def list_disabled_plugins(self):
-        """Returns a name/distinfo tuple pairs of disabled plugins."""
+        """Returns the entry points of the disabled plugins. They are never imported."""
         return self._disabled_plugins.values()
 
     def get_disabled_plugins(self):

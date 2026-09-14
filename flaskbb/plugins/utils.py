@@ -53,11 +53,11 @@ def validate_plugin(name: str):
     """Tries to look up the plugin by name. Upon failure it will flash
     a message and abort. Returns the plugin module on success.
     """
-    plugin_module = pluggy.get_plugin(name)
-    if plugin_module is None:
+    # list_name also holds the disabled plugins, get_plugin returns None for them
+    if name not in pluggy.list_name():
         flash(_("Plugin %(plugin)s not found.", plugin=name), "error")
         return redirect(url_for("management.plugins"))
-    return plugin_module
+    return pluggy.get_plugin(name)
 
 
 def remove_zombie_plugins_from_db():

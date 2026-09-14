@@ -24,7 +24,7 @@ class PluginRegistry(BaseModel):
     # flaskbb_load_setting_groups hookimpl must register a group with
     # key == this name for settings/get_settings_form/etc. to find it.
     name: Mapped[str] = mapped_column(sa.String(255), unique=True)
-    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
     def __init__(self, name: str) -> None:
         self.name = name

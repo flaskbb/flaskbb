@@ -87,6 +87,10 @@ Once installed, confirm FlaskBB sees your plugin::
 
     $ uv run flaskbb plugins list
 
+Newly installed plugins are disabled, so enable it first::
+
+    $ uv run flaskbb plugins enable your_plugin_name
+
 Then install its settings and, if it ships any, its migrations - see
 :ref:`the CLI reference <commandline>` for the full ``flaskbb plugins`` and
 ``flaskbb db`` command groups::
