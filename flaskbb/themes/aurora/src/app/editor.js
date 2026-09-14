@@ -1,10 +1,9 @@
 import { TextareaEditor } from "@textcomplete/textarea";
 import { Textcomplete } from "@textcomplete/core";
+import htmx from "htmx.org";
 import EMOJIS from "./emoji";
 import { hideElement, isHidden, showElement } from "./utils";
 import { parse_emoji } from "./flaskbb";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
 
 const buttonSelectors = [
     "md-header",
@@ -43,26 +42,28 @@ function markdownPreview(element) {
         `#${editorId}-preview`
     );
 
-    const content = markdownContainer.value;
-    let renderedContent = "";
-    if (isHidden(previewContainer)) {
-        renderedContent = marked(content);
-        renderedContent = DOMPurify.sanitize(renderedContent);
-        renderedContent = parse_emoji(renderedContent);
+    if (!isHidden(previewContainer)) {
+        activateButtons(toolbar);
+        showElement(markdownContainer);
+        hideElement(previewContainer);
+        return;
+    }
 
+    // rendered by the server with the same renderer and markdown plugins as the
+    // saved post. no source element, so the request inherits hx-* attributes
+    // from <body> only and not from the page the editor sits in
+    htmx.ajax("POST", element.dataset.previewUrl, {
+        target: previewContainer,
+        swap: "innerHTML",
+        values: { text: markdownContainer.value },
+    }).then(() => {
         previewContainer.style.minHeight = `${markdownContainer.scrollHeight}px`;
         previewContainer.style.height = "auto";
-
-        previewContainer.innerHTML = renderedContent;
 
         disableButtons(toolbar);
         hideElement(markdownContainer);
         showElement(previewContainer);
-    } else {
-        activateButtons(toolbar);
-        showElement(markdownContainer);
-        hideElement(previewContainer);
-    }
+    });
 }
 
 function autocomplete(element) {

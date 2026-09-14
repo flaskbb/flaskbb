@@ -47,7 +47,7 @@ from flaskbb.forum.models import (
     TopicsRead,
     topictracker,
 )
-from flaskbb.markup import make_renderer
+from flaskbb.markup import nonpost_renderer, post_renderer
 from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
@@ -1128,16 +1128,12 @@ class UnhidePost(MethodView):
 
 class MarkdownPreview(MethodView):
     def post(self, mode: str | None = None):
-        text = request.data.decode("utf-8")
-
-        if mode == "nonpost":
-            render_classes = pluggy.hook.flaskbb_load_nonpost_markdown_class(app=current_app)
-        else:
-            render_classes = pluggy.hook.flaskbb_load_post_markdown_class(app=current_app)
-
-        renderer = make_renderer(render_classes)
-        preview = renderer(text)
-        return preview
+        # built like the markup filters the templates display posts and
+        # descriptions with, so the preview includes the markdown plugins too
+        renderer = (
+            nonpost_renderer(current_app) if mode == "nonpost" else post_renderer(current_app)
+        )
+        return renderer(request.form.get("text", ""))
 
 
 @impl(tryfirst=True)

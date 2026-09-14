@@ -30,9 +30,7 @@
     "@textcomplete/textarea": "^0.1.13",
     "bootstrap": "^5.3.8",
     "core-js": "^3.50.0",
-    "dompurify": "^3.4.13",
     "htmx.org": "^2.0.10",
-    "marked": "^18.0.9",
     "twemoji": "^14.0.2"
   },
   "devDependencies": {

@@ -92,7 +92,8 @@
 {%- endmacro -%}
 
 
-{%- macro render_editor_field(field, div_class='') -%}
+{# markdown: 'post' or 'nonpost', the renderer the preview uses #}
+{%- macro render_editor_field(field, div_class='', markdown='post') -%}
 {% if div_class %}
 <div class="{{ div_class }}">
 {% endif %}
@@ -127,7 +128,7 @@
 
                     {{ run_hook("flaskbb_tpl_markdown_toolbar_buttons") }}
 
-                    <button class="btn btn-sm btn-primary me-2 preview-btn" data-preview="{{ field.id }}">Preview</button>
+                    <button type="button" class="btn btn-sm btn-primary me-2 preview-btn" data-preview="{{ field.id }}" data-preview-url="{{ url_for('forum.markdown_preview', mode=markdown) }}">Preview</button>
                     <button type="button" class="btn btn-sm btn-white help-btn" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
                 </markdown-toolbar>
 
