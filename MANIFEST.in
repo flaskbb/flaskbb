@@ -1,6 +1,6 @@
 include LICENSE
 include AUTHORS
-include CHANGES
+include CHANGES.md
 include README.md
 include CONTRIBUTING.md
 include NOTICE

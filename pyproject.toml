@@ -80,7 +80,7 @@ Homepage = "https://github.com/flaskbb/flaskbb"
 Documentation = "https://flaskbb.readthedocs.io/en/latest/"
 Repository = "https://github.com/flaskbb/flaskbb"
 Issues = "https://github.com/flaskbb/flaskbb/issues"
-Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES"
+Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES.md"
 
 [project.scripts]
 flaskbb = "flaskbb.cli.main:flaskbb"
@@ -138,6 +138,7 @@ docs = [
     "sphinx-tabs",
     "sphinx-intl>=2.3.1",
     "sphinxcontrib-log-cabinet",
+    "myst-parser"
 ]
 tests = [
     "pytest",

@@ -31,7 +31,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
+    "myst_parser",
+    "sphinx_issues",
 ]
+
+issues_github_path = "flaskbb/flaskbb"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
