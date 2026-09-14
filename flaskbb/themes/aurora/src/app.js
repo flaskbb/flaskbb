@@ -30,10 +30,21 @@ htmx.onLoad(function (root) {
   })
 })
 
-// a tooltip still open on an element htmx removes would stay on screen
+// a tooltip still open on an element htmx removes would stay on screen. only an
+// idle tooltip (no tip element) is disposed right away: disposing one that is
+// showing or fading out nulls the instance under its pending transition
+// callback, so that one is hidden first and disposed once it is hidden
 document.addEventListener('htmx:beforeCleanupElement', function (event) {
   var tooltip = Tooltip.getInstance(event.target)
-  if (tooltip) tooltip.dispose()
+  if (!tooltip) return
+  if (!tooltip.tip) {
+    tooltip.dispose()
+    return
+  }
+  event.target.addEventListener('hidden.bs.tooltip', function () {
+    tooltip.dispose()
+  }, { once: true })
+  tooltip.hide()
 })
 
 document.addEventListener('click', function (event) {
