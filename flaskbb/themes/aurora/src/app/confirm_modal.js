@@ -25,22 +25,21 @@ if (confirmModalElement) {
 
         // the confirm button of the modal
         let confirmButton = confirmModalElement.querySelector(".confirmBtn");
+        // dropped when the modal closes, so a cancelled dialog does not also
+        // submit its form once the next one is confirmed
+        const listeners = new AbortController();
         confirmButton.addEventListener(
             "click",
             function(e) {
                 e.preventDefault();
-                if (form.checkValidity()) {
-                    form.submit();
-                    confirmModal.hide();
-                } else {
-                    confirmModal.hide();
-                    form.reportValidity();
-                }
+                confirmModal.hide();
+                // unlike submit(), requestSubmit() validates the form and fires
+                // the submit event htmx listens for
+                form.requestSubmit();
             },
-            {
-                once: true,
-            }
+            { signal: listeners.signal }
         );
+        confirmModalElement.addEventListener("hidden.bs.modal", () => listeners.abort(), { once: true });
     });
 }
 

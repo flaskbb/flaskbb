@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
+from urllib.parse import urlsplit
 from wsgiref.types import StartResponse, WSGIEnvironment
 
 import unidecode
@@ -98,14 +99,17 @@ def slugify(text: str, delim: str = "-"):
 
 def redirect_url(endpoint: str | None, use_referrer: bool = True):
     """
-    Generates a redirect url via the ``next`` query-string parameter, the HTTP referrer
-    from the ``endpoint`` if neither is present or safe to redirect to.
+    Generates a redirect url via the ``next`` query-string parameter, the page an htmx
+    request was sent from, the HTTP referrer or from the ``endpoint`` if none of them is
+    present or safe to redirect to.
 
     :param endpoint: The trusted fallback URL to redirect to (e.g. built
         with ``url_for``). If not provided 'forum.index' will be used.
     """
     allowed_hosts = current_app.config["ALLOWED_HOSTS"]
-    targets = [request.args.get("next"), request.referrer if use_referrer else None]
+    targets = [request.args.get("next")]
+    if use_referrer:
+        targets += [_htmx_current_page(), request.referrer]
     return get_first_safe_redirect_url(
         *targets,
         allowed_hosts=allowed_hosts,
@@ -141,6 +145,32 @@ def render_template(template: str, **context: Any):  # pragma: no cover
 def is_htmx_request() -> bool:
     """Whether the current request came from htmx."""
     return request.headers.get("HX-Request") == "true"
+
+
+def _htmx_current_page() -> str | None:
+    """The page an htmx request was sent from, relative so that it is safe to
+    redirect to without ALLOWED_HOSTS, unlike the absolute referrer.
+    """
+    if not is_htmx_request():
+        return None
+
+    current = urlsplit(request.headers.get("HX-Current-URL", ""))
+    if current.query:
+        return f"{current.path}?{current.query}"
+    return current.path
+
+
+def redirect_or_reload(location: str):
+    """Redirects to ``location``. htmx swaps parts of the page a request was
+    sent from, so an htmx request headed anywhere else gets a full page load.
+    """
+    current = urlsplit(request.headers.get("HX-Current-URL", ""))
+    target = urlsplit(location)
+    if is_htmx_request() and (target.path, target.query) != (current.path, current.query):
+        response = current_app.response_class(status=204)
+        response.headers["HX-Redirect"] = location
+        return response
+    return redirect(location)
 
 
 # TODO(anr): clean this up

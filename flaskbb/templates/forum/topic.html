@@ -6,7 +6,8 @@
 {% from theme('_macros/pagination.html') import render_pagination, generate_obj_id, generate_post_url %}
 {% from theme('_macros/form.html') import render_input_field, render_editor_field, render_submit_field %}
 
-<div class="topic-view">
+{# htmx actions in here refresh the posts, both control bars and the flashed messages #}
+<div class="topic-view" hx-target="#topic-posts" hx-select="#topic-posts" hx-swap="outerHTML" hx-select-oob="#topic-header,#topic-footer,#flashed-messages">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
         <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
         <li class="breadcrumb-item"><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
@@ -14,17 +15,19 @@
         <li class="breadcrumb-item active">{{ topic.title }}</li>
     </ol>
 
-    {% include theme('forum/topic_controls.html') %}
+    <div id="topic-header">
+        {% include theme('forum/topic_controls.html') %}
 
-    {% if topic.hidden %}
-    <div class="alert alert-warning">
-        <span class="fas fa-user-secret"></span>
-        {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+        {% if topic.hidden %}
+        <div class="alert alert-warning">
+            <span class="fas fa-user-secret"></span>
+            {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 
 
-    <div class="card topic">
+    <div class="card topic" id="topic-posts">
         <div class="card-header topic-header">
             <a href="{{ topic.url }}">{{ topic.title }}</a>
         </div>
@@ -196,7 +199,7 @@
                                 {% endif %}
                             {% else %}
                                 {% if current_user|delete_post(post) %}
-                                <form class="d-inline" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}">
+                                <form class="d-inline" method="post" action="{{ url_for('forum.delete_post', post_id=post.id) }}" hx-post="{{ url_for('forum.delete_post', post_id=post.id) }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                     <button  class="btn btn-icon far fa-trash-alt text-red" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" title="{% trans %}Delete this post{% endtrans %}"></button>
                                 </form>
@@ -213,24 +216,24 @@
                             {% if current_user.permissions.get('makehidden') %}
                                 {% if topic.first_post_id == post.id %}
                                     {% if topic.hidden %}
-                                    <form class="d-inline" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
+                                    <form class="d-inline" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}" hx-post="{{ url_for('forum.unhide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="unhide" title="{% trans %}Unhide this topic{% endtrans %}"></button>
                                     </form>
                                     {% else %}
-                                    <form class="d-inline" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
+                                    <form class="d-inline" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id) }}" hx-post="{{ url_for('forum.hide_topic', topic_id=topic.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="hide" title="{% trans %}Hide this topic{% endtrans %}"></button>
                                     </form>
                                     {% endif %}
                                 {% else %}
                                     {% if post.hidden %}
-                                    <form class="d-inline" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}">
+                                    <form class="d-inline" method="post" action="{{ url_for('forum.unhide_post', post_id=post.id) }}" hx-post="{{ url_for('forum.unhide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon far fa-eye" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="unhide" title="{% trans %}Unhide this post{% endtrans %}"></button>
                                     </form>
                                     {% else %}
-                                    <form class="d-inline" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}">
+                                    <form class="d-inline" method="post" action="{{ url_for('forum.hide_post', post_id=post.id) }}" hx-post="{{ url_for('forum.hide_post', post_id=post.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-icon far fa-eye-slash" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal" data-tooltip="tooltip" name="hide" title="{% trans %}Hide this post{% endtrans %}"></button>
                                     </form>
@@ -249,7 +252,7 @@
         </div> <!-- end topic-body -->
     </div> <!-- end topic -->
 
-    <div class="pt-2">
+    <div class="pt-2" id="topic-footer">
         {% include theme('forum/topic_controls.html') %}
     </div>
 

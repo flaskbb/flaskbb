@@ -25,6 +25,12 @@ htmx.onLoad(function (root) {
   })
 })
 
+// a tooltip still open on an element htmx removes would stay on screen
+document.addEventListener('htmx:beforeCleanupElement', function (event) {
+  var tooltip = Tooltip.getInstance(event.target)
+  if (tooltip) tooltip.dispose()
+})
+
 document.addEventListener('click', function (event) {
   var toggle = event.target.closest('.tree-toggle')
   if (!toggle) return

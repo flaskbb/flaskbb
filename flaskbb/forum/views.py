@@ -57,6 +57,8 @@ from flaskbb.utils.helpers import (
     get_online_users,
     memberlist_enabled,
     real,
+    redirect_or_reload,
+    redirect_url,
     register_view,
     render_template,
     time_diff,
@@ -93,6 +95,23 @@ def _forum_url(*args: Any, **kwargs: Any) -> str:
 
 def _topic_url(*args: Any, **kwargs: Any) -> str:
     return current_topic.url if current_topic else url_for("forum.index")
+
+
+def _post_url_in_topic(post: Post) -> str:
+    """The url of the topic page ``post`` is on, anchored to the post."""
+    post_in_topic = db.session.execute(
+        sa.select(sa.func.count(Post.id)).where(Post.topic_id == post.topic_id, Post.id <= post.id)
+    ).scalar_one()
+    page = int(math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"])))
+
+    url_kwargs: dict[str, Any] = {"topic_id": post.topic.id, "_anchor": f"pid{post.id}"}
+    # topic.url, which most topic links use, has no page argument for the first page
+    if page > 1:
+        url_kwargs["page"] = page
+    if post.topic.slug:
+        url_kwargs["slug"] = post.topic.slug
+
+    return url_for("forum.view_topic", **url_kwargs)
 
 
 class ForumIndex(MethodView):
@@ -188,22 +207,7 @@ class ViewPost(MethodView):
     def get(self, post_id: int):
         """Redirects to a post in a topic."""
         post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
-        post_in_topic = db.session.execute(
-            sa.select(sa.func.count(Post.id)).where(
-                Post.topic_id == post.topic_id, Post.id <= post_id
-            )
-        ).scalar_one()
-        page = int(math.ceil(post_in_topic / float(flaskbb_config["POSTS_PER_PAGE"])))
-
-        url_kwargs: dict[str, Any] = {
-            "topic_id": post.topic.id,
-            "page": page,
-            "_anchor": f"pid{post.id}",
-        }
-        if post.topic.slug:
-            url_kwargs["slug"] = post.topic.slug
-
-        return redirect(url_for("forum.view_topic", **url_kwargs))
+        return redirect(_post_url_in_topic(post))
 
 
 class ViewTopic(MethodView):
@@ -797,7 +801,7 @@ class LockTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         topic.locked = True
         topic.save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class UnlockTopic(MethodView):
@@ -818,7 +822,7 @@ class UnlockTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         topic.locked = False
         topic.save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class HighlightTopic(MethodView):
@@ -839,7 +843,7 @@ class HighlightTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         topic.important = True
         topic.save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class TrivializeTopic(MethodView):
@@ -860,7 +864,7 @@ class TrivializeTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         topic.important = False
         topic.save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class DeletePost(MethodView):
@@ -878,15 +882,32 @@ class DeletePost(MethodView):
 
     def post(self, post_id: int):
         post: Post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
-        topic_url = post.topic.url
+        topic_id = post.topic_id
         forum_url = post.topic.forum.url
 
         post.delete()
 
         # If the post was the first post in the topic, redirect to the forums
         if post.is_first_post():
-            return redirect(forum_url)
-        return redirect(topic_url)
+            return redirect_or_reload(forum_url)
+
+        # the next post moves up into the deleted one's place and so stays on the
+        # page the reader is on - unless the deleted post was the topic's last
+        neighbour = (
+            db.session.scalars(
+                sa.select(Post)
+                .where(Post.topic_id == topic_id, Post.id > post_id)
+                .order_by(Post.id.asc())
+                .limit(1)
+            ).first()
+            or db.session.scalars(
+                sa.select(Post)
+                .where(Post.topic_id == topic_id, Post.id < post_id)
+                .order_by(Post.id.desc())
+                .limit(1)
+            ).one()
+        )
+        return redirect_or_reload(_post_url_in_topic(neighbour))
 
 
 class RawPost(MethodView):
@@ -1005,7 +1026,7 @@ class TrackTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         real(current_user).track_topic(topic)
         real(current_user).save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class UntrackTopic(MethodView):
@@ -1025,7 +1046,7 @@ class UntrackTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         real(current_user).untrack_topic(topic)
         real(current_user).save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class HideTopic(MethodView):
@@ -1036,13 +1057,13 @@ class HideTopic(MethodView):
 
         if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)):
             flash(_("You do not have permission to hide this topic"), "danger")
-            return redirect(topic.url)
+            return redirect_or_reload(redirect_url(topic.url))
         topic.hide(user=current_user)
         topic.save()
 
         if Permission(Has("viewhidden")):
-            return redirect(topic.url)
-        return redirect(topic.forum.url)
+            return redirect_or_reload(redirect_url(topic.url))
+        return redirect_or_reload(topic.forum.url)
 
 
 class UnhideTopic(MethodView):
@@ -1052,10 +1073,10 @@ class UnhideTopic(MethodView):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
         if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)):
             flash(_("You do not have permission to unhide this topic"), "danger")
-            return redirect(topic.url)
+            return redirect_or_reload(redirect_url(topic.url))
         topic.unhide()
         topic.save()
-        return redirect(topic.url)
+        return redirect_or_reload(redirect_url(topic.url))
 
 
 class HidePost(MethodView):
@@ -1066,11 +1087,11 @@ class HidePost(MethodView):
 
         if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)):
             flash(_("You do not have permission to hide this post"), "danger")
-            return redirect(post.topic.url)
+            return redirect_or_reload(redirect_url(post.topic.url))
 
         if post.hidden:
             flash(_("Post is already hidden"), "warning")
-            return redirect(post.topic.url)
+            return redirect_or_reload(redirect_url(post.topic.url))
 
         post.hide(current_user)
         post.save()
@@ -1081,8 +1102,8 @@ class HidePost(MethodView):
             flash(_("Post hidden"), "success")
 
         if post.is_first_post() and not Permission(Has("viewhidden")):
-            return redirect(post.topic.forum.url)
-        return redirect(post.topic.url)
+            return redirect_or_reload(post.topic.forum.url)
+        return redirect_or_reload(redirect_url(post.topic.url))
 
 
 class UnhidePost(MethodView):
@@ -1093,16 +1114,16 @@ class UnhidePost(MethodView):
 
         if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)):
             flash(_("You do not have permission to unhide this post"), "danger")
-            return redirect(post.topic.url)
+            return redirect_or_reload(redirect_url(post.topic.url))
 
         if not post.hidden:
             flash(_("Post is already unhidden"), "warning")
-            redirect(post.topic.url)
+            return redirect_or_reload(redirect_url(post.topic.url))
 
         post.unhide()
         post.save()
         flash(_("Post unhidden"), "success")
-        return redirect(post.topic.url)
+        return redirect_or_reload(redirect_url(post.topic.url))
 
 
 class MarkdownPreview(MethodView):

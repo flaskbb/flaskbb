@@ -7,10 +7,48 @@ from flaskbb.utils.helpers import (
     format_quote,
     forum_is_unread,
     is_online,
+    redirect_or_reload,
+    redirect_url,
     slugify,
     time_utcnow,
     topic_is_unread,
 )
+
+HTMX_TOPIC_PAGE = {"HX-Request": "true", "HX-Current-URL": "http://localhost/topic/1-hello?page=2"}
+
+
+def test_redirect_or_reload_redirects_back_to_the_htmx_page(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        response = redirect_or_reload("/topic/1-hello?page=2#pid5")
+
+    assert response.status_code == 302
+
+
+def test_redirect_or_reload_loads_other_pages_in_full(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        response = redirect_or_reload("/forum/1-general")
+
+    assert response.status_code == 204
+    assert response.headers["HX-Redirect"] == "/forum/1-general"
+
+
+def test_redirect_or_reload_without_htmx(application):
+    with application.test_request_context():
+        response = redirect_or_reload("/forum/1-general")
+
+    assert response.status_code == 302
+
+
+def test_redirect_url_prefers_the_htmx_page(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        assert redirect_url("/fallback") == "/topic/1-hello?page=2"
+
+
+def test_redirect_url_rejects_a_scheme_relative_htmx_page(application):
+    headers = {"HX-Request": "true", "HX-Current-URL": "http://localhost//evil.example/x"}
+
+    with application.test_request_context(headers=headers):
+        assert redirect_url("/fallback") == "/fallback"
 
 
 def test_slugify():
