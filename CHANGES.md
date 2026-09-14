@@ -2,6 +2,50 @@
 
 Here you can see the full list of changes between each release.
 
+## Version 3.0.0
+
+Unreleased
+
+### Features
+
+#### Users and content
+- **Avatars**: Users can upload and delete avatars
+- **Attachments**: Posts and topics can have attachments. Admins can manage all attachments from the Admin CP.
+- Links can open in a new tab. (#671)
+- Admins can delete all posts of a user. (#534)
+- The member list can be hidden. (#625)
+
+#### Search
+- **Search** was rewritten and can be extended via plugins.
+- **SQLite** and **PostgreSQL** **Full-Text** search backends are supported out of the box.
+  The whoosh backend was removed as it was unmaintained.
+- The results page was redesigned and highlights the search terms (got inspired by discourse :) )
+
+#### Settings and plugins
+- Settings are now stored as JSON instead of being pickled. They are typed now.
+- A Plugin's setting can now be upgraded from the admin panel or the CLI.
+- Installed plugins settings are upgraded automatically when the app starts (migrations are not applied!).
+- New plugin lifecycle hooks: `on_plugin_install`, `on_plugin_uninstall`, `on_plugin_upgrade` and `on_plugin_settings_changed`. (#508)
+- New hooks let plugins add buttons to the markdown editor toolbar. (#464)
+
+
+#### Admin panel
+- The admin layout was redesigned because adding a new item broke the whole nav. Instead they
+  we use a sidenav now with an optional settings tree that can be toggled.
+- Admins are asked to confirm before editing their own account.
+
+#### Appearance
+- A dark version of the Aurora theme was added.
+
+#### CLI
+- New `flaskbb serve` command runs FlaskBB with gunicorn.
+- New CLI commands manage users, groups and permissions. (#466)
+- `flaskbb plugins` can run plugin migrations.
+- `flaskbb upgrade` was removed. Migrations and plugin installs now handle setting fixtures.
+
+#### Improvements
+- htmx is now supported and used for various actions.
+
 
 ## Version 2.2.1
 
