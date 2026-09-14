@@ -28,7 +28,8 @@ from flaskbb.cli.utils import (
     prompt_save_user,
     write_config,
 )
-from flaskbb.extensions import celery, db, flaskbb_search, pluggy
+from flaskbb.extensions import celery, db, pluggy
+from flaskbb.search import flaskbb_search
 from flaskbb.utils.database import database_exists, drop_all
 from flaskbb.utils.populate import (
     create_default_groups,

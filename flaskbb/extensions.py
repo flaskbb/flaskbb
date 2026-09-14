@@ -29,7 +29,6 @@ from sqlalchemy.engine import Engine
 
 from flaskbb.exceptions import AuthorizationRequired
 from flaskbb.plugins.manager import FlaskBBPluginManager
-from flaskbb.search import FlaskBBSearch
 from flaskbb.utils.alembic import Alembic
 
 # PluginManager
@@ -68,9 +67,6 @@ def _enable_sqlite_foreign_keys(dbapi_connection: Any, connection_record: Any) -
 
 event.listen(Engine, "connect", _enable_sqlite_foreign_keys)
 
-
-# Search backend (pluggable full-text search; see flaskbb/search/)
-flaskbb_search = FlaskBBSearch(pluggy)
 
 # Login
 login_manager = LoginManager()

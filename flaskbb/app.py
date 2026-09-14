@@ -41,7 +41,6 @@ from flaskbb.extensions import (
     csrf,
     db,
     debugtoolbar,
-    flaskbb_search,
     limiter,
     login_manager,
     mail,
@@ -56,6 +55,7 @@ from flaskbb.plugins.utils import (
     remove_zombie_plugins_from_db,
     template_hook,
 )
+from flaskbb.search import flaskbb_search
 from flaskbb.search.service import search_snippet
 from flaskbb.settings import (
     fixture as fixture,
@@ -105,7 +105,6 @@ from flaskbb.utils.requirements import (
 from flaskbb.utils.translations import FlaskBBDomain
 from flaskbb.utils.uploads import create_upload_directory
 
-from . import markup  # noqa  # pyright: ignore[reportUnusedImport]
 from .auth import views as auth_views  # noqa  # pyright: ignore[reportUnusedImport]
 from .deprecation import FlaskBBDeprecation
 from .display.navigation import NavigationContentType

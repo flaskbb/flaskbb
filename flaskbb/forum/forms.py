@@ -21,9 +21,10 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Optional
 
-from flaskbb.extensions import flaskbb_search, pluggy
+from flaskbb.extensions import pluggy
 from flaskbb.forum.models import Forum, Post, Report, Topic
 from flaskbb.forum.utils import AttachmentFormMixin, handle_post_attachments
+from flaskbb.search import flaskbb_search
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
 

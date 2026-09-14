@@ -17,6 +17,7 @@ from flask_sqlalchemy.model import Model
 from markupsafe import Markup
 from sqlalchemy import Select
 
+from flaskbb.extensions import pluggy
 from flaskbb.search.base import (
     ModelT,
     SearchBackend,
@@ -26,7 +27,7 @@ from flaskbb.search.base import (
 if TYPE_CHECKING:
     from flaskbb.plugins.manager import FlaskBBPluginManager
 
-__all__ = ["FlaskBBSearch", "SearchBackend", "SearchBackendRegistration"]
+__all__ = ["FlaskBBSearch", "SearchBackend", "SearchBackendRegistration", "flaskbb_search"]
 
 _CORE_BACKENDS = ("sql", "postgresql", "sqlite")
 
@@ -83,9 +84,8 @@ def _plugin_backends(
 
 class FlaskBBSearch(SearchBackend):
     def __init__(self, plugin_manager: "FlaskBBPluginManager | None" = None) -> None:
-        # plugin_manager is injected (see flaskbb/extensions.py) rather than
-        # imported, to avoid a flaskbb.search <-> extensions import cycle -
-        # the same dependency-injection the settings registry uses.
+        # plugin_manager is injected so a  backend can be resolved without
+        # the global plugin manager.
         self._impl: SearchBackend | None = None
         self._plugin_manager = plugin_manager
 
@@ -138,3 +138,6 @@ class FlaskBBSearch(SearchBackend):
     @override
     def snippet(self, model: ModelT, pk: int, content: str, query: str) -> Markup:
         return self._get_impl().snippet(model, pk, content, query)
+
+
+flaskbb_search = FlaskBBSearch(pluggy)

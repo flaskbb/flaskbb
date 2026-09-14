@@ -18,8 +18,8 @@ from sqlalchemy import Select
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.elements import ColumnElement
 
-from flaskbb.extensions import flaskbb_search
 from flaskbb.forum.models import Forum, Post, Topic
+from flaskbb.search import flaskbb_search
 from flaskbb.user.models import User
 from flaskbb.utils.queries import hidden
 
