@@ -50,15 +50,15 @@ knows how to render itself as a WTForms field
 how to serialize/deserialize its value to/from the JSON text stored in the
 DB.
 
-================================================================= =========================================== =================
-Definition                                                        Rendered As                                 Parsed & Saved as
-================================================================= =========================================== =================
+============================================================ =========================================== =================
+Definition                                                   Rendered As                                 Parsed & Saved as
+============================================================ =========================================== =================
 :class:`~flaskbb.settings.definitions.StringSetting`         :class:`wtforms.fields.StringField`         :class:`str`
 :class:`~flaskbb.settings.definitions.IntSetting`            :class:`wtforms.fields.IntegerField`        :class:`int`
 :class:`~flaskbb.settings.definitions.BoolSetting`           :class:`wtforms.fields.BooleanField`        :class:`bool`
 :class:`~flaskbb.settings.definitions.SelectSetting`         :class:`wtforms.fields.SelectField`         single value
 :class:`~flaskbb.settings.definitions.SelectMultipleSetting` :class:`wtforms.fields.SelectMultipleField` :class:`list`
-================================================================= =========================================== =================
+============================================================ =========================================== =================
 
 .. autoclass:: flaskbb.settings.definitions.SettingDefinition
     :members:

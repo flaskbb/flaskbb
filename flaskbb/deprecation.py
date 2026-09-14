@@ -41,21 +41,21 @@ class FlaskBBDeprecation(DeprecationWarning, FlaskBBWarning, ABC):
     version: tuple[int, int, int]
 
 
-class RemovedInFlaskBB3(FlaskBBDeprecation):
+class RemovedInFlaskBB4(FlaskBBDeprecation):
     """
-    warning for features removed in FlaskBB3
+    warning for features removed in FlaskBB4
     """
 
-    version = (3, 0, 0)
+    version = (4, 0, 0)
 
 
-def deprecated(message: str = "", category: type[FlaskBBDeprecation] = RemovedInFlaskBB3):
+def deprecated(message: str = "", category: type[FlaskBBDeprecation] = RemovedInFlaskBB4):
     """
     Flags a function or method as deprecated, should not be used on
     classes as it will break inheritance and introspection.
 
     :param message: Optional message to display along with deprecation warning.
-    :param category: Warning category to use, defaults to RemovedInFlaskBB3,
+    :param category: Warning category to use, defaults to RemovedInFlaskBB4,
         if provided must be a subclass of FlaskBBDeprecation.
     """
 

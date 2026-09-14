@@ -46,5 +46,5 @@ Helpers
 
 .. autoclass:: FlaskBBWarning
 .. autoclass:: FlaskBBDeprecation
-.. autoclass:: RemovedInFlaskBB3
+.. autoclass:: RemovedInFlaskBB4
 .. autofunction:: deprecated

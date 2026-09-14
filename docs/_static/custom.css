@@ -21,6 +21,15 @@ h6 {
   font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+/* keep the navbar font in sync with FlaskBB and flaskbb-website */
+.flaskbb-navbar,
+.flaskbb-navbar .navbar-nav,
+.flaskbb-navbar .nav-item,
+.flaskbb-navbar .nav-link,
+.flaskbb-navbar .navbar-brand {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 h1 {
   font-size: 42px;
   font-weight: 500;

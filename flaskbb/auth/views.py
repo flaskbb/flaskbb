@@ -198,7 +198,6 @@ class Register(MethodView):
 
                 return render_template("auth/register.html", form=form)
 
-            pluggy.hook.flaskbb_event_user_registered(username=registration_info.username)
             return redirect_or_next(url_for("forum.index"))
 
         return render_template("auth/register.html", form=form)

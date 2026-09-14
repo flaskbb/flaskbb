@@ -26,7 +26,7 @@ Currently, following features are implemented:
 ## Quickstart
 
 For a complete installation guide please visit the installation documentation
-[here](https://flaskbb.readthedocs.org/en/latest/installation.html).
+[here](https://flaskbb.readthedocs.io/en/latest/production/deployment.html).
 
 This is how you set up an development instance of FlaskBB:
 

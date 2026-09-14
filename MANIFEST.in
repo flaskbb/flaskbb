@@ -7,10 +7,6 @@ include NOTICE
 include celery_worker.py
 include wsgi.py
 include babel.cfg
-include pytest.ini
-include setup.cfg
-include requirements.txt
-include requirements-dev.txt
 
 graft flaskbb
 graft tests

@@ -79,7 +79,7 @@ gunicorn = [
 Homepage = "https://github.com/flaskbb/flaskbb"
 Documentation = "https://flaskbb.readthedocs.io/en/latest/"
 Repository = "https://github.com/flaskbb/flaskbb"
-Issues = "https://github.com/flaskbb/flaskbb"
+Issues = "https://github.com/flaskbb/flaskbb/issues"
 Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES"
 
 [project.scripts]
@@ -109,7 +109,11 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["flaskbb", "wsgi.py", "celery_worker.py"]
+packages = ["flaskbb"]
+artifacts = ["flaskbb/translations/*/LC_MESSAGES/messages.mo"]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+dependencies = ["Babel>=2.18.0"]
 
 [dependency-groups]
 dev = [
@@ -310,7 +314,6 @@ use_frozen_constraints = true
 dependency_groups = ["tests"]
 env_tmp_dir = "{toxworkdir}/tmp/{envname}"
 commands = [
-    ["pybabel", "compile", "-d", "{envsitepackagesdir}/flaskbb/translations"],
     [
         "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
         "--cov", "--cov-report=xml", "--cov-report=term",

@@ -476,20 +476,6 @@ def flaskbb_event_topic_save_after(topic: "Topic", is_new: bool):
     """
 
 
-# TODO(anr): When pluggy 1.0 is released, mark this spec deprecated
-@spec
-def flaskbb_event_user_registered(username: str):
-    """Hook for handling events after a user is registered
-
-    .. warning::
-
-        This hook is deprecated in favor of
-        :func:`~flaskbb.plugins.spec.flaskbb_registration_post_processor`
-
-    :param username: The username of the newly registered user.
-    """
-
-
 @spec
 def flaskbb_gather_registration_validators():
     """
