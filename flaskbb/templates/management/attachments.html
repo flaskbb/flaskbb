@@ -13,7 +13,7 @@
 
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import render_input_field, action_confirm -%}
+{%- from theme('_macros/form.html') import render_input_field, action_confirm, bulk_action -%}
 
 <div class="col-md-12 settings-col">
     <div class="card settings">
@@ -80,13 +80,7 @@
                                 {% trans %}Actions{% endtrans %}
                             </a>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <button class="dropdown-item btn btn-sm"
-                                            onclick="return bulk_actions.execute('{{ url_for('management.delete_attachment') }}')">
-                                        <span class="far fa-fw fa-trash-alt text-danger"></span>
-                                        {% trans %}Delete selected Attachments{% endtrans %}
-                                    </button>
-                                </li>
+                                {{ bulk_action(url_for('management.delete_attachment'), _("Delete selected Attachments"), "far fa-fw fa-trash-alt text-danger") }}
                             </ul>
                         </div>
                     </div>
@@ -144,10 +138,4 @@
     </div>
 </div>
 {% include theme('_partials/confirm_dialog.html') %}
-{% endblock %}
-
-{% block scripts %}
-<script>
-    var bulk_actions = new window.app.BulkActions();
-</script>
 {% endblock %}

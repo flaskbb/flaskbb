@@ -12,7 +12,7 @@
 
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import render_input_field -%}
+{%- from theme('_macros/form.html') import render_input_field, bulk_action -%}
 
 <div class="col-md-12 settings-col">
     <div class="card settings">
@@ -55,12 +55,7 @@
                             </a>
 
                             <ul class="dropdown-menu">
-                                <li>
-                                    <button class="dropdown-item btn btn-sm" onclick="return bulk_actions.execute('{{ url_for('management.unban_user') }}')">
-                                        <span class="fas fa-fw fa-flag text-success"></span>
-                                        {% trans %}Unban selected Users{% endtrans %}
-                                    </button>
-                                </li>
+                                {{ bulk_action(url_for('management.unban_user'), _("Unban selected Users"), "fas fa-fw fa-flag text-success") }}
                             </ul>
                         </div>
                     </div>
@@ -106,10 +101,4 @@
     </div>
 </div>
 {% include theme('_partials/confirm_dialog.html') %}
-{% endblock %}
-
-{% block scripts %}
-    <script>
-    var bulk_actions = new window.app.BulkActions();
-    </script>
 {% endblock %}

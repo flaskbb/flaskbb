@@ -13,7 +13,7 @@ import logging
 import os
 import sys
 from datetime import timedelta
-from typing import Any, cast
+from typing import cast
 
 import sqlalchemy as sa
 from celery import __version__ as celery_version
@@ -394,35 +394,19 @@ class DeleteUser(MethodView):
     ]
 
     def post(self, user_id: int | None = None):
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for user in User.get_all(User.id.in_(ids)):
                 # do not delete current user
                 if current_user.id == user.id:
                     continue
 
                 if user.delete():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} users deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.users"))
 
         user = User.get_by_or_404(id=user_id)
 
@@ -568,16 +552,10 @@ class BanUser(MethodView):
             flash(_("You do not have the permissions to ban this user."), "danger")
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
-            users = User.get_all(User.id.in_(ids))
-            for user in users:
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            banned = 0
+            for user in User.get_all(User.id.in_(ids)):
                 # don't let a user ban himself and do not allow banning a user
                 # who is not outranked by the acting user
                 if current_user.id == user.id or not Permission(
@@ -585,23 +563,11 @@ class BanUser(MethodView):
                 ):
                     continue
 
-                elif user.ban():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "ban",
-                            "reverse": "unban",
-                            "reverse_name": _("Unban"),
-                            "reverse_url": url_for("management.unban_user", user_id=user.id),
-                        }
-                    )
+                if user.ban():
+                    banned += 1
 
-            return jsonify(
-                message=f"{len(data)} users banned.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users banned.", count=banned), "success")
+            return redirect_or_next(url_for("management.banned_users"))
 
         user = User.get_by_or_404(id=user_id)
         # Do not allow banning a user who is not outranked by the acting user
@@ -634,14 +600,9 @@ class UnbanUser(MethodView):
             flash(_("You do not have the permissions to unban this user."), "danger")
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            unbanned = 0
             for user in User.get_all(User.id.in_(ids)):
                 # unban() drops the user into the member group, so it needs the
                 # same target check as banning
@@ -649,22 +610,10 @@ class UnbanUser(MethodView):
                     continue
 
                 if user.unban():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "ban",
-                            "reverse": "ban",
-                            "reverse_name": _("Ban"),
-                            "reverse_url": url_for("management.ban_user", user_id=user.id),
-                        }
-                    )
+                    unbanned += 1
 
-            return jsonify(
-                message=f"{len(data)} users unbanned.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users unbanned.", count=unbanned), "success")
+            return redirect_or_next(url_for("management.users"))
 
         user = User.get_by_or_404(id=user_id)
 
@@ -778,44 +727,19 @@ class DeleteGroup(MethodView):
     ]
 
     def post(self, group_id: int | None = None):
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids: list[Any] = json.get("ids", [])
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            if any(id <= PROTECTED_GROUP_ID for id in ids):
+                flash(_("You cannot delete one of the standard groups."), "danger")
+                return redirect_or_next(url_for("management.groups"))
 
-            try:
-                id_list = [int(id) for id in ids]
-            except (ValueError, TypeError):
-                return jsonify(message="No valid ids provided.", category="error", status=404)
-
-            if any(id <= PROTECTED_GROUP_ID for id in id_list):
-                return jsonify(
-                    message=_("You cannot delete one of the standard groups."),
-                    category="danger",
-                    data=None,
-                    status=404,
-                )
-
-            data: list[dict[str, Any]] = []
-            for group in Group.get_all(Group.id.in_(id_list)):
+            deleted = 0
+            for group in Group.get_all(Group.id.in_(ids)):
                 group.delete()
-                data.append(
-                    {
-                        "id": group.id,
-                        "type": "delete",
-                        "reverse": False,
-                        "reverse_name": None,
-                        "reverse_url": None,
-                    }
-                )
+                deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} groups deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s groups deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.groups"))
 
         if group_id is not None:
             if group_id <= PROTECTED_GROUP_ID:  # there are 6 standard groups
@@ -1109,34 +1033,17 @@ class MarkReportRead(MethodView):
     ]
 
     def post(self, report_id: int | None = None):
-        # AJAX request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            marked = 0
             for report in Report.get_all(Report.id.in_(ids)):
                 report.zapped_by = current_user.id
                 report.zapped = time_utcnow()
                 report.save()
-                data.append(
-                    {
-                        "id": report.id,
-                        "type": "read",
-                        "reverse": False,
-                        "reverse_name": None,
-                        "reverse_url": None,
-                    }
-                )
+                marked += 1
 
-            return jsonify(
-                message=f"{len(data)} reports marked as read.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s reports marked as read.", count=marked), "success")
+            return redirect_or_next(url_for("management.reports"))
 
         # mark single report as read
         if report_id:
@@ -1182,31 +1089,15 @@ class DeleteReport(MethodView):
     ]
 
     def post(self, report_id: int | None = None):
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for report in Report.get_all(Report.id.in_(ids)):
                 if report.delete():
-                    data.append(
-                        {
-                            "id": report.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} reports deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s reports deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.reports"))
 
         report = Report.get_by_or_404(id=report_id)
         report.delete()
@@ -1288,32 +1179,15 @@ class DeleteAttachment(MethodView):
     ]
 
     def post(self, attachment_id: int | None = None):
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for attachment in Attachment.get_all(Attachment.id.in_(ids)):
                 if attachment.delete():
-                    data.append(
-                        {
-                            "id": attachment.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} attachments deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s attachments deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.attachments"))
 
         attachment = Attachment.get_by_or_404(id=attachment_id)
         attachment.delete()

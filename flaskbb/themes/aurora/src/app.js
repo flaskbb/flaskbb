@@ -9,7 +9,7 @@ import "./app/flaskbb.js";
 
 
 import "./scss/styles.scss";
-export { Actions, BulkActions, check_overview_status, show_management_search } from "./app/flaskbb.js";
+export { Actions, check_overview_status, show_management_search } from "./app/flaskbb.js";
 
 // htmx has to be reachable via window. plugins register extensions against it and
 // templates outside this bundle call into it.
@@ -19,9 +19,10 @@ var flaskbbAllowList = Tooltip.Default.allowList
 // allow <time> elements
 flaskbbAllowList.time = []
 
-var tooltips = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip="tooltip"]'))
-var tooltipList = tooltips.map(function (el) {
-  return new Tooltip(el)
+htmx.onLoad(function (root) {
+  root.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip="tooltip"]').forEach(function (el) {
+    Tooltip.getOrCreateInstance(el)
+  })
 })
 
 document.addEventListener('click', function (event) {

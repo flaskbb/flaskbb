@@ -43,3 +43,26 @@ if (confirmModalElement) {
         );
     });
 }
+
+// hx-confirm asks through the same modal instead of window.confirm()
+document.addEventListener("htmx:confirm", (event) => {
+    const modalElement = document.getElementById("confirmModal");
+    if (!modalElement || !event.detail.elt.hasAttribute("hx-confirm")) {
+        return;
+    }
+    event.preventDefault();
+
+    const modal = Modal.getOrCreateInstance(modalElement);
+    const listeners = new AbortController();
+    modalElement.querySelector(".confirmBtn").addEventListener(
+        "click",
+        (e) => {
+            e.preventDefault();
+            modal.hide();
+            event.detail.issueRequest(true);
+        },
+        { signal: listeners.signal }
+    );
+    modalElement.addEventListener("hidden.bs.modal", () => listeners.abort(), { once: true });
+    modal.show();
+});

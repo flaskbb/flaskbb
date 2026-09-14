@@ -24,8 +24,8 @@ def no_csrf(application):
     application.config["WTF_CSRF_ENABLED"] = previous
 
 
-def _post(view, actor, json=None, **kwargs):
-    with views.current_app.test_request_context(method="POST", json=json):
+def _post(view, actor, data=None, **kwargs):
+    with views.current_app.test_request_context(method="POST", data=data):
         login_user(actor)
         response = view(**kwargs)
         messages = get_flashed_messages(with_categories=True)
@@ -71,19 +71,10 @@ def test_bulk_delete_attachments(
     on_disk = attachment_upload_path / str(attachment.post_id) / attachment.filename
     view = views.DeleteAttachment.as_view("delete_attachment")
 
-    response, _messages = _post(view, moderator_user, json={"ids": [attachment.id]})
+    response, messages = _post(view, moderator_user, data={"rowid": [str(attachment.id)]})
 
-    payload = response.get_json()
-    assert payload["status"] == 200
-    assert payload["data"] == [
-        {
-            "id": attachment.id,
-            "type": "delete",
-            "reverse": False,
-            "reverse_name": None,
-            "reverse_url": None,
-        }
-    ]
+    assert response.status_code == 302
+    assert ("success", "1 attachments deleted.") in messages
     assert Attachment.query.count() == 0
     assert not on_disk.exists()
 

@@ -218,3 +218,21 @@
     </button>
 </form>
 {% endmacro %}
+
+
+{# Posts the checked .action-checkbox rows and swaps the refreshed list in. #}
+{% macro bulk_action(url, title, icon) %}
+<li>
+    <button type="button" class="dropdown-item btn btn-sm"
+            hx-post="{{ url }}"
+            hx-trigger="click[document.querySelector('input.action-checkbox:checked')]"
+            hx-include="input.action-checkbox:checked"
+            hx-confirm="{{ _('Are you sure?') }}"
+            hx-target="closest .settings-col"
+            hx-select=".settings-col"
+            hx-swap="outerHTML"
+            hx-select-oob="#flashed-messages">
+        <span class="{{ icon }}"></span> {{ title }}
+    </button>
+</li>
+{% endmacro %}

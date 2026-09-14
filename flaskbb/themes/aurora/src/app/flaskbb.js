@@ -4,6 +4,7 @@
  * License: BSD - See LICENSE for more details.
  */
 import { Modal } from "bootstrap";
+import htmx from "htmx.org";
 import twemoji from "twemoji";
 import { isHidden } from "./utils";
 
@@ -73,17 +74,6 @@ export class Actions {
     }
 }
 
-export class BulkActions {
-    execute(endpoint) {
-        const selected = document.querySelectorAll("input.action-checkbox:checked");
-        if (selected.length === 0) return false;
-
-        const data = { ids: Array.from(selected, input => input.value) };
-        showConfirmModal(() => sendBulkData(endpoint, data));
-        return false;
-    }
-}
-
 async function makeRequest(endpoint, data) {
     try {
         const response = await fetch(endpoint, {
@@ -127,34 +117,6 @@ export async function sendData(endpoint_url, data, callback) {
     const resData = await makeRequest(endpoint_url, data);
     if (resData && typeof callback === 'function') {
         callback(resData);
-    }
-}
-
-
-export async function sendBulkData(endpoint_url, data) {
-    const resData = await makeRequest(endpoint_url, data);
-    if (!resData?.data) return;
-
-    const iconMap = {
-        ban: { color: "text-success", icon: "fa-flag" },
-        unban: { color: "text-warning", icon: "fa-flag" }
-    };
-
-    for (const obj of resData.data) {
-        const form = document.querySelector(`#${obj.type}-${obj.id}`);
-        if (!form) continue;
-
-        if (obj.reverse) {
-            form.setAttribute("action", obj.reverse_url);
-
-            const config = iconMap[obj.reverse];
-            if (config) {
-                form.querySelector("button").innerHTML =
-                    `<span class="fas ${config.icon} ${config.color}" data-bs-toggle="tooltip" title="${obj.reverse_name}"></span>`;
-            }
-        } else if (obj.type === "delete") {
-            form.closest('tr')?.remove() || form.parentNode.parentNode.remove();
-        }
     }
 }
 
@@ -326,16 +288,14 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         })
     );
 
-    // listen on the action-checkall checkbox to un/check all
-    document.querySelectorAll(".action-checkall").forEach((el) => {
-        el.addEventListener("change", (event) => {
-            const cbs = document.querySelectorAll("input.action-checkbox");
-            for (var i = 0; i < cbs.length; i++) {
-                cbs[i].checked = event.target.checked;
-            }
-        })
-    }
-    );
+    // listen on the action-checkall checkbox to un/check all. delegated, so it
+    // keeps working on lists htmx swapped in
+    document.addEventListener("change", (event) => {
+        if (!event.target.matches(".action-checkall")) return;
+        document.querySelectorAll("input.action-checkbox").forEach((cb) => {
+            cb.checked = event.target.checked;
+        });
+    });
 
     document.querySelectorAll(".action-checkbox").forEach((el) => {
         el.addEventListener("click", (event) => {
@@ -354,7 +314,11 @@ document.addEventListener("DOMContentLoaded", function (_event) {
     }
     );
 
-    document.querySelectorAll("time").forEach((el) => {
+    parse_emoji(document.body);
+});
+
+htmx.onLoad((root) => {
+    root.querySelectorAll("time").forEach((el) => {
         let date = new Date(el.getAttribute("datetime"));
         const options = {
             weekday: undefined,
@@ -379,6 +343,4 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         }
         el.textContent = date.toLocaleString(undefined, options);
     });
-
-    parse_emoji(document.body);
 });
