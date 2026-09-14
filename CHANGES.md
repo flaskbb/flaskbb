@@ -1,0 +1,110 @@
+# Changelog
+
+Here you can see the full list of changes between each release.
+
+
+## Version 2.2.1
+
+Released July 4th, 2026
+
+This is a bugfix release which contains some bug fixes and
+updates dependencies to its latest version.
+
+
+## Version 2.2.0
+
+Released February 18th, 2026
+
+After a long pause, we are back with a new release
+
+- Update all dependencies to its latest version - including SQLAlchemy 2
+- Recaptcha can now only be enabled/disabled via the admin panel.
+  The secret key and site key have to be provided via the
+  flaskbb.cfg and/or via the corresponding environment variables.
+- ... and a lot of things to brought the update with it
+
+The next release will have some features as well.
+
+
+## Version 2.1.0
+
+Released September 9th, 2021
+
+The most notable changes are following:
+
+- Reimplemented User views using services
+- Services for changing email, password, settings and details
+- Hooks for email, password, settings and details updates
+- Hook for user profile sidebar links
+- Added helper for generating dynamic navbar content
+- Gender is now a text field rather than a dropdown
+- Upgrade to Flask 2.0 and SQLAlchemy 1.4
+- Upgrade Bootstrap 3 to Bootstrap 5
+- Remove JQuery dependency by rewriting some parts to be plain JS
+- Replace Bootstrap-Markdown editor with GitHub-Markdown-Toolbar
+- ... and lots of other fixes and improvements
+
+
+## Version 2.0.2
+
+Released July 15th, 2018
+
+- Fix issue with declaring log config file path
+
+
+## Version 2.0.1
+
+Released June 21st, 2018
+
+- Fix issue where activation tokens would fail with an exception
+
+
+## Version 2.0.0
+
+Released on May 16th, 2018.
+
+- Improved management panel load time by requesting celery status async (PR #429)
+- Migrated FlaskBB internal behavior to use plugin hook system (PRs
+  #369, #413, #419, #423, #426, #435, #436)
+- Migrated behavior in flaskbb.auth from living in route handlers and into
+  services (PRs #421, #424)
+- Improved emoji support (PR #417)
+- Migrated private messages into a
+  [plugin](https://github.com/sh4nks/flaskbb-plugins/tree/master/conversations)
+  (PR #414)
+- Fixed issue where user could not re-select having the default theme (PR #387)
+- Fixed issue where a reinstall would attempt to drop the entire database
+  instead of just the tables associated with FlaskBB (PR #364)
+- Added ability to hide and unhide topics and posts, preventing unprivileged
+  users from viewing them (PR #325)
+- Fixed issue where password was not required when editing a user in the admin
+  panel (PR #321)
+- Migrated from Flask-Plugins to Pluggy as plugin system for plugins.
+  Plugins are now loaded via entry points and thus have to be installed
+  into the same environment as FlaskBB. During this migration we also moved
+  the [portal plugin](https://github.com/sh4nks/flaskbb-plugins) into its own
+  python package which can be installed via
+  `pip install flaskbb-plugin-portal`. (PR #311)
+- Adds the functionality to "soft delete" posts and topics. (PR #325)
+- Improve logging. (PR #327)
+- Prefixes migrations with a timestamp which will sort them by creation date. (PR #353)
+- Transform views into Class-based Views. (PR #324)
+- Drop the tables instead of dropping the database when uninstalling FlaskBB. (PR #364)
+- Create the database using SQLAlchemy's `db.create_all` and stamp it as
+  'latest' instead of going through all migrations.
+- Fixes a bug that prevented users to activate their accounts via the form
+  input.
+- Fixes a translations bug that wouldn't take the territory code into account
+  when choosing a language (#299).
+- Fixes a bug which would not show all conversations in the conversations view.
+- Fixes a bug that made a forum section inaccessible when the `last_post_id`
+  of a topic was set to None.
+- Various translations updated.
+- Multiple permission fixes and various other fixes.
+
+
+## Version 1.0
+
+Released on May 5th, 2017.
+
+- First release of FlaskBB
