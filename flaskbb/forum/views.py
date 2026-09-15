@@ -51,6 +51,7 @@ from flaskbb.markup import nonpost_renderer, post_renderer
 from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
+    count_online_users,
     do_topic_action,
     FlashAndRedirect,
     format_quote,
@@ -123,19 +124,7 @@ class ForumIndex(MethodView):
         topic_count = db.session.scalar(sa.select(sa.func.count(Topic.id)))
         post_count = db.session.scalar(sa.select(sa.func.count(Post.id)))
         newest_user = db.session.scalar(sa.select(User).order_by(User.id.desc()))
-
-        # Check if we use redis or not
-        if not current_app.config["REDIS_ENABLED"]:
-            online_users = db.session.scalar(
-                sa.select(sa.func.count(User.id)).where(User.lastseen >= time_diff())
-            )
-
-            # Because we do not have server side sessions,
-            # we cannot check if there are online guests
-            online_guests = None
-        else:
-            online_users = len(get_online_users())
-            online_guests = len(get_online_users(guest=True))
+        online_users, online_guests = count_online_users()
 
         return render_template(
             "forum/index.html",
@@ -1004,10 +993,7 @@ class MarkRead(MethodView):
 
 class WhoIsOnline(MethodView):
     def get(self):
-        if current_app.config["REDIS_ENABLED"]:
-            online_users = get_online_users()
-        else:
-            online_users = db.session.scalars(sa.select(User).where(User.lastseen >= time_diff()))
+        online_users = get_online_users()
         return render_template("forum/online_users.html", online_users=online_users)
 
 

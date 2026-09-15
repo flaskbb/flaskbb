@@ -19,7 +19,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
+from typing import Any, cast, Literal, overload, TYPE_CHECKING, TypeVar
 from urllib.parse import urlsplit
 from wsgiref.types import StartResponse, WSGIEnvironment
 
@@ -46,11 +46,12 @@ from flask_limiter import Limiter
 from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from pytz import UTC
-from sqlalchemy import Row
+from redis import Redis, RedisError
+from sqlalchemy import Row, select
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string, ImportStringError
 
-from flaskbb.extensions import babel, redis_store
+from flaskbb.extensions import babel, db
 from flaskbb.utils.proxies import current_app, current_user
 
 if TYPE_CHECKING:
@@ -66,20 +67,6 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
-
-
-def to_bytes(text: str | int | bytes, encoding: str = "utf-8"):
-    """Transform string to bytes."""
-    if isinstance(text, str):
-        text = text.encode(encoding)
-    return text
-
-
-def to_unicode(input_bytes: str | bytes, encoding: str = "utf-8"):
-    """Decodes input_bytes to text if needed."""
-    if not isinstance(input_bytes, str):
-        input_bytes = input_bytes.decode(encoding)
-    return input_bytes
 
 
 def slugify(text: str, delim: str = "-"):
@@ -449,51 +436,6 @@ def topic_is_unread(
     return topicsread.last_read < topic.last_updated
 
 
-def mark_online(user_id: str | int | None, guest: bool = False):  # pragma: no cover
-    """Marks a user as online
-
-    :param user_id: The id from the user who should be marked as online
-
-    :param guest: If set to True, it will add the user to the guest activity
-                  instead of the user activity.
-
-    Ref: http://flask.pocoo.org/snippets/71/
-    """
-    if user_id is None:
-        return
-
-    user = to_bytes(user_id)
-    now = int(time.time())
-    expires = now + (flaskbb_config["ONLINE_LAST_MINUTES"] * 60) + 10
-    if guest:
-        all_users_key = f"online-guests/{now // 60}"
-        user_key = f"guest-activity/{user}"
-    else:
-        all_users_key = f"online-users/{now // 60}"
-        user_key = f"user-activity/{user}"
-    p = redis_store.pipeline()
-    p.sadd(all_users_key, user)
-    p.set(user_key, now)
-    p.expireat(all_users_key, expires)
-    p.expireat(user_key, expires)
-    p.execute()
-
-
-def get_online_users(guest: bool = False):  # pragma: no cover
-    """Returns all online users within a specified time range
-
-    :param guest: If True, it will return the online guests
-    """
-    current = int(time.time()) // 60
-    minutes = range(flaskbb_config["ONLINE_LAST_MINUTES"])
-    if guest:
-        users = redis_store.sunion([f"online-guests/{current - x}" for x in minutes])
-    else:
-        users = redis_store.sunion([f"online-users/{current - x}" for x in minutes])
-
-    return [to_unicode(u) for u in users]
-
-
 def crop_title(title: str, length: int | None = None, suffix: str = "..."):
     """Crops the title to a specified length
 
@@ -508,6 +450,78 @@ def crop_title(title: str, length: int | None = None, suffix: str = "..."):
         return title
 
     return title[:length].rsplit(" ", 1)[0] + suffix
+
+
+ONLINE_USERS_KEY = "flaskbb:online-users"
+ONLINE_GUESTS_KEY = "flaskbb:online-guests"
+
+
+def _online_window():
+    return (flaskbb_config["ONLINE_LAST_MINUTES"] or 15) * 60
+
+
+def mark_online(member: int | str, guest: bool = False):
+    """Marks a user or a guest as online. Requires ``REDIS_ENABLED``.
+
+    :param member: The id of the user or the address of the guest.
+    :param guest: If set to True, ``member`` is added to the online guests
+                  instead of the online users.
+    """
+    key = ONLINE_GUESTS_KEY if guest else ONLINE_USERS_KEY
+    redis_client: Redis = current_app.extensions["redis"]
+    now = time.time()
+    window = _online_window()
+    try:
+        with redis_client.pipeline() as pipe:  # pyright: ignore[reportUnknownMemberType]
+            pipe.zadd(key, {str(member): now})
+            pipe.zremrangebyscore(key, "-inf", now - window)
+            pipe.expire(key, window)
+            pipe.execute()
+    except RedisError:
+        logger.warning("Could not mark %s as online", member, exc_info=True)
+
+
+def get_online_users() -> Sequence["User"]:
+    """Returns the users that were online within ONLINE_LAST_MINUTES."""
+    from flaskbb.user.models import User
+
+    stmt = select(User).order_by(User.username)
+    if current_app.config["REDIS_ENABLED"]:
+        redis_client: Redis = current_app.extensions["redis"]
+        try:
+            user_ids = cast(
+                list[bytes],
+                redis_client.zrangebyscore(  # pyright: ignore[reportUnknownMemberType]
+                    ONLINE_USERS_KEY, time.time() - _online_window(), "+inf"
+                ),
+            )
+            return db.session.scalars(
+                stmt.where(User.id.in_([int(user_id) for user_id in user_ids]))
+            ).all()
+        except RedisError:
+            logger.warning("Could not get the online users", exc_info=True)
+    return db.session.scalars(stmt.where(User.lastseen >= time_diff())).all()
+
+
+def count_online_users() -> tuple[int, int | None]:
+    """Returns the number of users and guests that were online within
+    ONLINE_LAST_MINUTES. The guests are ``None`` without ``REDIS_ENABLED``
+    as they can only be tracked with redis.
+    """
+    from flaskbb.user.models import User
+
+    if current_app.config["REDIS_ENABLED"]:
+        redis_client: Redis = current_app.extensions["redis"]
+        since = time.time() - _online_window()
+        try:
+            with redis_client.pipeline(transaction=False) as pipe:  # pyright: ignore[reportUnknownMemberType]
+                pipe.zcount(ONLINE_USERS_KEY, since, "+inf")
+                pipe.zcount(ONLINE_GUESTS_KEY, since, "+inf")
+                online_users, online_guests = pipe.execute()
+            return online_users, online_guests
+        except RedisError:
+            logger.warning("Could not count the online users", exc_info=True)
+    return User.count(User.lastseen >= time_diff()), None
 
 
 def is_online(user: "User"):

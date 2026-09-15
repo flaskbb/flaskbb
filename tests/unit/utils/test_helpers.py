@@ -3,9 +3,11 @@ import datetime as dt
 from flaskbb.forum.models import Forum
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.helpers import (
+    count_online_users,
     crop_title,
     format_quote,
     forum_is_unread,
+    get_online_users,
     is_online,
     redirect_or_reload,
     redirect_url,
@@ -138,6 +140,16 @@ def test_crop_title(default_settings):
 
 def test_is_online(default_settings, user):
     assert is_online(user)
+
+
+def test_get_online_users_without_redis(default_settings, user):
+    assert user in get_online_users()
+
+
+def test_count_online_users_without_redis(default_settings, user):
+    online_users, online_guests = count_online_users()
+    assert online_users >= 1
+    assert online_guests is None
 
 
 def test_format_quote(topic):

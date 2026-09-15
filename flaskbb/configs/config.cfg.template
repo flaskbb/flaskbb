@@ -98,6 +98,7 @@ SEARCH_BACKEND = "sql"
 #   - Sending non blocking emails via Celery (Task Queue)
 #   - Caching
 #   - Rate Limiting
+#   - Counting the online users and guests
 REDIS_ENABLED = {{ redis_enabled }}
 REDIS_URL = "{{ redis_uri }}"
 REDIS_DATABASE = 0
@@ -123,9 +124,8 @@ CELERY_CONFIG = {
 #   memory:// (default)
 #   redis://host:port
 #   memcached://host:port
-# Using the redis storage requires the installation of the redis package,
-# which will be installed if you enable REDIS_ENABLE while memcached
-# relies on the pymemcache package.
+# The redis storage uses the redis package that is installed with FlaskBB,
+# while memcached relies on the pymemcache package.
 RATELIMIT_STORAGE_URI = "{% if redis_enabled %}{{ redis_uri }}{% else %}memory://{% endif %}"
 
 

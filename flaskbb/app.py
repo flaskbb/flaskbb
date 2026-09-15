@@ -27,6 +27,7 @@ from flask import flash, redirect, request, url_for
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
+from redis import Redis
 from sqlalchemy import event
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -46,7 +47,6 @@ from flaskbb.extensions import (
     login_manager,
     mail,
     pluggy,
-    redis_store,
     themes,
 )
 from flaskbb.plugins import spec
@@ -290,7 +290,7 @@ def configure_extensions(app: FlaskBB):
     allows.identity_loader(lambda: current_user)
 
     # Flask-WTF CSRF
-    csrf.init_app(app)
+    csrf.init_app(app)  # pyright: ignore[reportUnknownMemberType]
 
     # Flask-SQLAlchemy
     db.init_app(app)
@@ -308,10 +308,13 @@ def configure_extensions(app: FlaskBB):
     debugtoolbar.init_app(app)
 
     # Flask-Themes
-    themes.init_themes(app, app_identifier="flaskbb")
+    themes.init_themes(app, app_identifier="flaskbb")  # pyright: ignore[reportUnknownMemberType]
 
-    # Flask-And-Redis
-    redis_store.init_app(app)
+    # redis-py
+    if app.config["REDIS_ENABLED"]:
+        app.extensions["redis"] = Redis.from_url(  # pyright: ignore[reportUnknownMemberType]
+            app.config["REDIS_URL"], db=app.config["REDIS_DATABASE"]
+        )
 
     # Flask-Limiter
     limiter.init_app(app)
@@ -324,14 +327,14 @@ def configure_extensions(app: FlaskBB):
     login_manager.needs_refresh_message_category = app.config["REFRESH_MESSAGE_CATEGORY"]
     login_manager.anonymous_user = Guest
 
-    @login_manager.user_loader  # type: ignore[untyped-decorator]
-    def load_user(user_id: int):  # pyright: ignore[reportUnusedFunction]
+    @login_manager.user_loader  # type: ignore[untyped-decorator]  # pyright: ignore[reportUnknownMemberType]
+    def load_user(user_id: int):
         """Loads the user. Required by the `login` extension."""
         user = db.session.execute(sa.select(User).filter_by(id=user_id)).scalar_one_or_none()
         pluggy.hook.flaskbb_current_user(app=app, user=user)
         return user
 
-    login_manager.init_app(app)
+    login_manager.init_app(app)  # pyright: ignore[reportUnknownMemberType]
 
 
 def configure_search_backend(app: FlaskBB):
@@ -390,14 +393,14 @@ def configure_context_processors(app: FlaskBB):
     """Configures the context processors."""
 
     @app.context_processor
-    def inject_flaskbb_config():  # pyright: ignore[reportUnusedFunction]
+    def inject_flaskbb_config():
         """Injects the ``flaskbb_config`` config variable into the
         templates.
         """
         return dict(flaskbb_config=flaskbb_config, format_date=format_date)
 
     @app.context_processor
-    def inject_now():  # pyright: ignore[reportUnusedFunction]
+    def inject_now():
         """Injects the current time."""
         return dict(now=datetime.now(UTC))
 
@@ -406,7 +409,7 @@ def configure_before_handlers(app: FlaskBB):
     """Configures the before request handlers."""
 
     @app.before_request
-    def update_lastseen():  # pyright: ignore[reportUnusedFunction]
+    def update_lastseen():
         """Updates `lastseen` before every reguest if the user is
         authenticated."""
         if current_user.is_authenticated:
@@ -417,10 +420,10 @@ def configure_before_handlers(app: FlaskBB):
     if app.config["REDIS_ENABLED"]:
 
         @app.before_request
-        def mark_current_user_online():  # pyright: ignore[reportUnusedFunction]
+        def mark_current_user_online():
             if current_user.is_authenticated:
-                mark_online(current_user.username)
-            else:
+                mark_online(current_user.id)
+            elif request.remote_addr:
                 mark_online(request.remote_addr, guest=True)
 
     pluggy.hook.flaskbb_request_processors(app=app)
@@ -430,19 +433,19 @@ def configure_errorhandlers(app: FlaskBB):
     """Configures the error handlers."""
 
     @app.errorhandler(403)
-    def forbidden_page(error: Forbidden):  # pyright: ignore[reportUnusedFunction]
+    def forbidden_page(error: Forbidden):
         return render_template("errors/forbidden_page.html"), 403
 
     @app.errorhandler(404)
-    def page_not_found(error: NotFound):  # pyright: ignore[reportUnusedFunction]
+    def page_not_found(error: NotFound):
         return render_template("errors/page_not_found.html"), 404
 
     @app.errorhandler(500)
-    def server_error_page(error: InternalServerError):  # pyright: ignore[reportUnusedFunction]
+    def server_error_page(error: InternalServerError):
         return render_template("errors/server_error.html"), 500
 
     @app.errorhandler(413)
-    def request_entity_too_large(error: RequestEntityTooLarge):  # pyright: ignore[reportUnusedFunction]
+    def request_entity_too_large(error: RequestEntityTooLarge):
         max_content_length = app.config.get("MAX_CONTENT_LENGTH")
         if max_content_length:
             message = _(
@@ -457,7 +460,7 @@ def configure_errorhandlers(app: FlaskBB):
 
     @app.errorhandler(OperationalError)
     @app.errorhandler(ProgrammingError)
-    def plugin_migrations_pending(error: OperationalError | ProgrammingError):  # pyright: ignore[reportUnusedFunction]
+    def plugin_migrations_pending(error: OperationalError | ProgrammingError):
         db.session.rollback()
         plugins = get_plugins_with_pending_migrations(error)
         if not plugins:
@@ -515,7 +518,7 @@ def configure_translations(app: FlaskBB):
     babel.init_app(app=app, default_domain=FlaskBBDomain(app))
 
     @babel.localeselector
-    def get_locale():  # pyright: ignore[reportUnusedFunction]
+    def get_locale():
         # if a user is logged in, use the locale from the user settings
         if current_user and current_user.is_authenticated and current_user.language:
             return current_user.language
@@ -535,7 +538,7 @@ def configure_logging(app: FlaskBB):
     if app.config["SQLALCHEMY_ECHO"]:
         # Ref: http://stackoverflow.com/a/8428546
         @event.listens_for(Engine, "before_cursor_execute")
-        def before_cursor_execute(  # pyright: ignore[reportUnusedFunction]
+        def before_cursor_execute(
             conn: Connection,
             cursor: Any,
             statement: str,
@@ -546,7 +549,7 @@ def configure_logging(app: FlaskBB):
             conn.info.setdefault("query_start_time", []).append(time.time())
 
         @event.listens_for(Engine, "after_cursor_execute")
-        def after_cursor_execute(  # pyright: ignore[reportUnusedFunction]
+        def after_cursor_execute(
             conn: Connection,
             cursor: Any,
             statement: str,

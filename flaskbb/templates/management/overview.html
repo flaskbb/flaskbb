@@ -84,6 +84,12 @@
                                 <div class="col">{% trans %}Online users{% endtrans %}</div>
                                 <div class="col text-end">{{ online_users }}</div>
                             </div>
+                            {% if online_guests is not none %}
+                            <div class="row">
+                                <div class="col">{% trans %}Online guests{% endtrans %}</div>
+                                <div class="col text-end">{{ online_guests }}</div>
+                            </div>
+                            {% endif %}
                             <div class="row">
                                 <div class="col">{% trans %}Banned users{% endtrans %}</div>
                                 <div class="col text-end">{{ banned_users }}</div>

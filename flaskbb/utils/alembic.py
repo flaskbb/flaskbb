@@ -79,7 +79,7 @@ class Alembic(FlaskAlembic):
         def do_upgrade(
             revision: str | list[str] | tuple[str, ...], context: MigrationContext
         ) -> list[MigrationStep]:
-            return self.script_directory._upgrade_revs(heads, revision)  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
+            return self.script_directory._upgrade_revs(heads, revision)  # type: ignore[arg-type,return-value]  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
 
         self.run_migrations(do_upgrade)
 

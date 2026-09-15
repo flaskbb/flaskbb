@@ -59,12 +59,11 @@ from flaskbb.settings.models import Setting
 from flaskbb.settings.registry import setting_registry
 from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.helpers import (
+    count_online_users,
     FlashAndRedirect,
-    get_online_users,
     redirect_or_next,
     register_view,
     render_template,
-    time_diff,
     time_utcnow,
 )
 from flaskbb.utils.proxies import current_app, current_user
@@ -116,10 +115,7 @@ class ManagementOverview(MethodView):
     def get(self):
         # user and group stats
         banned_users = User.count(clause=[Group.banned == True, Group.id == User.primary_group_id])
-        if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.count(User.lastseen >= time_diff())
-        else:
-            online_users = len(get_online_users())
+        online_users, online_guests = count_online_users()
 
         unread_reports = Report.count(Report.zapped == None)
 
@@ -132,6 +128,7 @@ class ManagementOverview(MethodView):
             "all_users": User.count(),
             "banned_users": banned_users,
             "online_users": online_users,
+            "online_guests": online_guests,
             "all_groups": Group.count(),
             "report_count": Report.count(),
             "topic_count": Topic.count(),

@@ -20,7 +20,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
 from flask_wtf.csrf import CSRFProtect
@@ -76,9 +75,6 @@ mail = Mail()
 
 # Caching
 cache = Cache()
-
-# Redis
-redis_store = FlaskRedis()
 
 # Debugtoolbar
 debugtoolbar = DebugToolbarExtension()

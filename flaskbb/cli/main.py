@@ -450,7 +450,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     default_conf["server_name"] = click.prompt(
         click.style("Server Name", fg="magenta"),
         type=str,
-        default=default_conf.get("server_name"),
+        default=str(default_conf["server_name"]),
     )
 
     # HTTPS or HTTP
@@ -473,7 +473,7 @@ def generate_config(development: bool, output: str | None, force: bool):
         default=default_conf.get("database_uri"),
     )
 
-    # REDIS_ENABLED
+    # Redis
     click.secho(
         "Redis will be used for things such as the task queue, caching and rate limiting.",
         fg="cyan",

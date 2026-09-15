@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-14 20:34+0200\n"
+"POT-Creation-Date: 2026-09-16 21:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: flaskbb/app.py:448
+#: flaskbb/app.py:452
 #, python-format
 msgid "The upload is too large. A request cannot be bigger than %(size)s."
 msgstr ""
 
-#: flaskbb/app.py:452
+#: flaskbb/app.py:456
 msgid "The upload is too large."
 msgstr ""
 
-#: flaskbb/app.py:474
+#: flaskbb/app.py:478
 #, python-format
 msgid ""
 "The migrations of %(plugins)s have not been applied yet. Apply them with "
 "'flaskbb plugins install --migrations-only <plugin>'."
 msgstr ""
 
-#: flaskbb/app.py:481
+#: flaskbb/app.py:485
 msgid "This page is currently unavailable."
 msgstr ""
 
@@ -354,7 +354,7 @@ msgstr ""
 #: flaskbb/templates/management/attachments.html:1
 #: flaskbb/templates/management/attachments.html:10
 #: flaskbb/templates/management/attachments.html:23
-#: flaskbb/templates/management/overview.html:104
+#: flaskbb/templates/management/overview.html:110
 msgid "Attachments"
 msgstr ""
 
@@ -386,178 +386,178 @@ msgstr ""
 msgid "Attachments cannot be bigger than %(size)s."
 msgstr ""
 
-#: flaskbb/forum/views.py:164 flaskbb/forum/views.py:921
-#: flaskbb/forum/views.py:939 flaskbb/forum/views.py:1020
-#: flaskbb/forum/views.py:1040
+#: flaskbb/forum/views.py:153 flaskbb/forum/views.py:910
+#: flaskbb/forum/views.py:928 flaskbb/forum/views.py:1006
+#: flaskbb/forum/views.py:1026
 msgid "You are not allowed to access that forum"
 msgstr ""
 
-#: flaskbb/forum/views.py:200 flaskbb/forum/views.py:218
+#: flaskbb/forum/views.py:189 flaskbb/forum/views.py:207
 msgid "You are not allowed to access that topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:260
+#: flaskbb/forum/views.py:249
 msgid "You are not allowed to post a reply to this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:273
+#: flaskbb/forum/views.py:262
 msgid "Cannot post reply"
 msgstr ""
 
-#: flaskbb/forum/views.py:298
+#: flaskbb/forum/views.py:287
 msgid "You are not allowed to post a topic here"
 msgstr ""
 
-#: flaskbb/forum/views.py:340
+#: flaskbb/forum/views.py:329
 msgid "You are not allowed to edit that topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:378
+#: flaskbb/forum/views.py:367
 msgid "You are not allowed to manage this forum"
 msgstr ""
 
-#: flaskbb/forum/views.py:428
+#: flaskbb/forum/views.py:417
 msgid "In order to perform this action you have to select at least one topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:442
+#: flaskbb/forum/views.py:431
 #, python-format
 msgid "%(count)s topics locked."
 msgstr ""
 
-#: flaskbb/forum/views.py:452
+#: flaskbb/forum/views.py:441
 #, python-format
 msgid "%(count)s topics unlocked."
 msgstr ""
 
-#: flaskbb/forum/views.py:463
+#: flaskbb/forum/views.py:452
 #, python-format
 msgid "%(count)s topics highlighted."
 msgstr ""
 
-#: flaskbb/forum/views.py:473
+#: flaskbb/forum/views.py:462
 #, python-format
 msgid "%(count)s topics trivialized."
 msgstr ""
 
-#: flaskbb/forum/views.py:484
+#: flaskbb/forum/views.py:473
 #, python-format
 msgid "%(count)s topics deleted."
 msgstr ""
 
-#: flaskbb/forum/views.py:492
+#: flaskbb/forum/views.py:481
 msgid "Please choose a new forum for the topics."
 msgstr ""
 
-#: flaskbb/forum/views.py:497 flaskbb/utils/helpers.py:200
+#: flaskbb/forum/views.py:486 flaskbb/utils/helpers.py:187
 msgid "Please modify topics in only one forum at a time."
 msgstr ""
 
-#: flaskbb/forum/views.py:509
+#: flaskbb/forum/views.py:498
 msgid "You do not have the permissions to move this topic."
 msgstr ""
 
-#: flaskbb/forum/views.py:513
+#: flaskbb/forum/views.py:502
 msgid "Topics moved."
 msgstr ""
 
-#: flaskbb/forum/views.py:515
+#: flaskbb/forum/views.py:504
 msgid "Failed to move topics."
 msgstr ""
 
-#: flaskbb/forum/views.py:524
+#: flaskbb/forum/views.py:513
 #, python-format
 msgid "%(count)s topics hidden."
 msgstr ""
 
-#: flaskbb/forum/views.py:534
+#: flaskbb/forum/views.py:523
 #, python-format
 msgid "%(count)s topics unhidden."
 msgstr ""
 
-#: flaskbb/forum/views.py:538
+#: flaskbb/forum/views.py:527
 msgid "Unknown action requested"
 msgstr ""
 
-#: flaskbb/forum/views.py:549
+#: flaskbb/forum/views.py:538
 msgid "You are not allowed to post a reply"
 msgstr ""
 
-#: flaskbb/forum/views.py:594
+#: flaskbb/forum/views.py:583
 msgid "You are not allowed to edit that post"
 msgstr ""
 
-#: flaskbb/forum/views.py:762
+#: flaskbb/forum/views.py:751
 #, python-format
 msgid "%(topic_count)s topics untracked."
 msgstr ""
 
-#: flaskbb/forum/views.py:774
+#: flaskbb/forum/views.py:763
 msgid "You are not allowed to delete this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:794
+#: flaskbb/forum/views.py:783
 msgid "You are not allowed to lock this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:815
+#: flaskbb/forum/views.py:804
 msgid "You are not allowed to unlock this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:836
+#: flaskbb/forum/views.py:825
 msgid "You are not allowed to highlight this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:857
+#: flaskbb/forum/views.py:846
 msgid "You are not allowed to trivialize this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:878
+#: flaskbb/forum/views.py:867
 msgid "You are not allowed to delete this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:976
+#: flaskbb/forum/views.py:965
 #, python-format
 msgid "Forum %(forum)s marked as read."
 msgstr ""
 
-#: flaskbb/forum/views.py:1000
+#: flaskbb/forum/views.py:989
 msgid "All forums marked as read."
 msgstr ""
 
-#: flaskbb/forum/views.py:1061
+#: flaskbb/forum/views.py:1047
 msgid "You do not have permission to hide this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:1077
+#: flaskbb/forum/views.py:1063
 msgid "You do not have permission to unhide this topic"
 msgstr ""
 
-#: flaskbb/forum/views.py:1091
+#: flaskbb/forum/views.py:1077
 msgid "You do not have permission to hide this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:1095
+#: flaskbb/forum/views.py:1081
 msgid "Post is already hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:1102
+#: flaskbb/forum/views.py:1088
 msgid "Topic hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:1104
+#: flaskbb/forum/views.py:1090
 msgid "Post hidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:1118
+#: flaskbb/forum/views.py:1104
 msgid "You do not have permission to unhide this post"
 msgstr ""
 
-#: flaskbb/forum/views.py:1122
+#: flaskbb/forum/views.py:1108
 msgid "Post is already unhidden"
 msgstr ""
 
-#: flaskbb/forum/views.py:1127
+#: flaskbb/forum/views.py:1113
 msgid "Post unhidden"
 msgstr ""
 
@@ -891,8 +891,8 @@ msgstr ""
 msgid "Banned Users"
 msgstr ""
 
-#: flaskbb/management/navigation.py:101 flaskbb/management/views.py:469
-#: flaskbb/management/views.py:478
+#: flaskbb/management/navigation.py:101 flaskbb/management/views.py:466
+#: flaskbb/management/views.py:475
 msgid "Add User"
 msgstr ""
 
@@ -913,7 +913,7 @@ msgid "Overview"
 msgstr ""
 
 #: flaskbb/management/navigation.py:184
-#: flaskbb/templates/management/overview.html:108
+#: flaskbb/templates/management/overview.html:114
 #: flaskbb/templates/management/reports.html:1
 #: flaskbb/templates/management/reports.html:9
 #: flaskbb/templates/management/reports.html:20
@@ -935,7 +935,7 @@ msgstr ""
 #: flaskbb/management/navigation.py:207
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:20
-#: flaskbb/templates/management/overview.html:92
+#: flaskbb/templates/management/overview.html:98
 msgid "Groups"
 msgstr ""
 
@@ -945,8 +945,8 @@ msgstr ""
 msgid "Manage Groups"
 msgstr ""
 
-#: flaskbb/management/navigation.py:212 flaskbb/management/views.py:669
-#: flaskbb/management/views.py:678
+#: flaskbb/management/navigation.py:212 flaskbb/management/views.py:666
+#: flaskbb/management/views.py:675
 #: flaskbb/templates/management/group_form.html:2
 msgid "Add Group"
 msgstr ""
@@ -962,309 +962,309 @@ msgstr ""
 msgid "Manage Forums"
 msgstr ""
 
-#: flaskbb/management/navigation.py:222 flaskbb/management/views.py:843
-#: flaskbb/management/views.py:860
+#: flaskbb/management/navigation.py:222 flaskbb/management/views.py:840
+#: flaskbb/management/views.py:857
 #: flaskbb/templates/management/forum_form.html:2
 #: flaskbb/templates/management/forums.html:34
 msgid "Add Forum"
 msgstr ""
 
-#: flaskbb/management/navigation.py:223 flaskbb/management/views.py:901
-#: flaskbb/management/views.py:912
+#: flaskbb/management/navigation.py:223 flaskbb/management/views.py:898
+#: flaskbb/management/views.py:909
 #: flaskbb/templates/management/category_form.html:2
 msgid "Add Category"
 msgstr ""
 
 #: flaskbb/management/navigation.py:229 flaskbb/management/navigation.py:239
-#: flaskbb/templates/management/overview.html:138
+#: flaskbb/templates/management/overview.html:144
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
 msgstr ""
 
-#: flaskbb/management/views.py:109
+#: flaskbb/management/views.py:108
 msgid "You are not allowed to access the management panel"
 msgstr ""
 
-#: flaskbb/management/views.py:157 flaskbb/management/views.py:1304
+#: flaskbb/management/views.py:154 flaskbb/management/views.py:1301
 msgid "You are not allowed to access the management settings"
 msgstr ""
 
-#: flaskbb/management/views.py:208
+#: flaskbb/management/views.py:205
 msgid "Upgrade the plugin first to update its setting!"
 msgstr ""
 
-#: flaskbb/management/views.py:229 flaskbb/management/views.py:278
-#: flaskbb/management/views.py:388 flaskbb/management/views.py:426
-#: flaskbb/management/views.py:460 flaskbb/management/views.py:486
-#: flaskbb/management/views.py:542 flaskbb/management/views.py:590
+#: flaskbb/management/views.py:226 flaskbb/management/views.py:275
+#: flaskbb/management/views.py:385 flaskbb/management/views.py:423
+#: flaskbb/management/views.py:457 flaskbb/management/views.py:483
+#: flaskbb/management/views.py:539 flaskbb/management/views.py:587
 msgid "You are not allowed to manage users"
 msgstr ""
 
-#: flaskbb/management/views.py:332 flaskbb/management/views.py:345
+#: flaskbb/management/views.py:329 flaskbb/management/views.py:342
 msgid "You are not allowed to edit this user."
 msgstr ""
 
-#: flaskbb/management/views.py:339 flaskbb/management/views.py:379
+#: flaskbb/management/views.py:336 flaskbb/management/views.py:376
 msgid "Edit User"
 msgstr ""
 
-#: flaskbb/management/views.py:375
+#: flaskbb/management/views.py:372
 msgid "User updated."
 msgstr ""
 
-#: flaskbb/management/views.py:407
+#: flaskbb/management/views.py:404
 #, python-format
 msgid "%(count)s users deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:413
+#: flaskbb/management/views.py:410
 msgid "You cannot delete yourself."
 msgstr ""
 
-#: flaskbb/management/views.py:417
+#: flaskbb/management/views.py:414
 msgid "User deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:449
+#: flaskbb/management/views.py:446
 #, python-format
 msgid "All posts by %(user)s have been deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:475
+#: flaskbb/management/views.py:472
 msgid "User added."
 msgstr ""
 
-#: flaskbb/management/views.py:551
+#: flaskbb/management/views.py:548
 msgid "You do not have the permissions to ban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:568
+#: flaskbb/management/views.py:565
 #, python-format
 msgid "%(count)s users banned."
 msgstr ""
 
-#: flaskbb/management/views.py:574
+#: flaskbb/management/views.py:571
 msgid "You are not allowed to ban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:578
+#: flaskbb/management/views.py:575
 msgid "User is now banned."
 msgstr ""
 
-#: flaskbb/management/views.py:580
+#: flaskbb/management/views.py:577
 msgid "Could not ban user."
 msgstr ""
 
-#: flaskbb/management/views.py:599
+#: flaskbb/management/views.py:596
 msgid "You do not have the permissions to unban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:614
+#: flaskbb/management/views.py:611
 #, python-format
 msgid "%(count)s users unbanned."
 msgstr ""
 
-#: flaskbb/management/views.py:620
+#: flaskbb/management/views.py:617
 msgid "You are not allowed to unban this user."
 msgstr ""
 
-#: flaskbb/management/views.py:624
+#: flaskbb/management/views.py:621
 msgid "User is now unbanned."
 msgstr ""
 
-#: flaskbb/management/views.py:626
+#: flaskbb/management/views.py:623
 msgid "Could not unban user."
 msgstr ""
 
-#: flaskbb/management/views.py:636 flaskbb/management/views.py:660
-#: flaskbb/management/views.py:686 flaskbb/management/views.py:721
+#: flaskbb/management/views.py:633 flaskbb/management/views.py:657
+#: flaskbb/management/views.py:683 flaskbb/management/views.py:718
 msgid "You are not allowed to modify groups."
 msgstr ""
 
-#: flaskbb/management/views.py:675
+#: flaskbb/management/views.py:672
 msgid "Group added."
 msgstr ""
 
-#: flaskbb/management/views.py:697 flaskbb/management/views.py:713
+#: flaskbb/management/views.py:694 flaskbb/management/views.py:710
 msgid "Edit Group"
 msgstr ""
 
-#: flaskbb/management/views.py:710
+#: flaskbb/management/views.py:707
 msgid "Group updated."
 msgstr ""
 
-#: flaskbb/management/views.py:732
+#: flaskbb/management/views.py:729
 msgid "You cannot delete one of the standard groups."
 msgstr ""
 
-#: flaskbb/management/views.py:740
+#: flaskbb/management/views.py:737
 #, python-format
 msgid "%(count)s groups deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:746
+#: flaskbb/management/views.py:743
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr ""
 
-#: flaskbb/management/views.py:753
+#: flaskbb/management/views.py:750
 msgid "Group deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:756
+#: flaskbb/management/views.py:753
 msgid "No group chosen."
 msgstr ""
 
-#: flaskbb/management/views.py:765 flaskbb/management/views.py:784
-#: flaskbb/management/views.py:826
+#: flaskbb/management/views.py:762 flaskbb/management/views.py:781
+#: flaskbb/management/views.py:823
 msgid "You are not allowed to modify forums."
 msgstr ""
 
-#: flaskbb/management/views.py:802 flaskbb/management/views.py:818
+#: flaskbb/management/views.py:799 flaskbb/management/views.py:815
 #: flaskbb/templates/management/forums.html:152
 msgid "Edit Forum"
 msgstr ""
 
-#: flaskbb/management/views.py:810
+#: flaskbb/management/views.py:807
 msgid "Forum updated."
 msgstr ""
 
-#: flaskbb/management/views.py:850
+#: flaskbb/management/views.py:847
 msgid "Forum added."
 msgstr ""
 
-#: flaskbb/management/views.py:868
+#: flaskbb/management/views.py:865
 msgid "You are not allowed to modify forums"
 msgstr ""
 
-#: flaskbb/management/views.py:882
+#: flaskbb/management/views.py:879
 msgid "Forum deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:891 flaskbb/management/views.py:920
-#: flaskbb/management/views.py:953
+#: flaskbb/management/views.py:888 flaskbb/management/views.py:917
+#: flaskbb/management/views.py:950
 msgid "You are not allowed to modify categories"
 msgstr ""
 
-#: flaskbb/management/views.py:909
+#: flaskbb/management/views.py:906
 msgid "Category added."
 msgstr ""
 
-#: flaskbb/management/views.py:933 flaskbb/management/views.py:945
+#: flaskbb/management/views.py:930 flaskbb/management/views.py:942
 #: flaskbb/templates/management/forums.html:37
 msgid "Edit Category"
 msgstr ""
 
-#: flaskbb/management/views.py:942
+#: flaskbb/management/views.py:939
 msgid "Category updated."
 msgstr ""
 
-#: flaskbb/management/views.py:974
+#: flaskbb/management/views.py:971
 msgid "Category with all associated forums deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:983 flaskbb/management/views.py:1004
-#: flaskbb/management/views.py:1027 flaskbb/management/views.py:1083
+#: flaskbb/management/views.py:980 flaskbb/management/views.py:1001
+#: flaskbb/management/views.py:1024 flaskbb/management/views.py:1080
 msgid "You are not allowed to view reports."
 msgstr ""
 
-#: flaskbb/management/views.py:1044
+#: flaskbb/management/views.py:1041
 #, python-format
 msgid "%(count)s reports marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:1052
+#: flaskbb/management/views.py:1049
 #, python-format
 msgid "Report %(id)s is already marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:1060
+#: flaskbb/management/views.py:1057
 #, python-format
 msgid "Report %(id)s marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:1074
+#: flaskbb/management/views.py:1071
 msgid "All reports were marked as read."
 msgstr ""
 
-#: flaskbb/management/views.py:1098
+#: flaskbb/management/views.py:1095
 #, python-format
 msgid "%(count)s reports deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:1103
+#: flaskbb/management/views.py:1100
 msgid "Report deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:1112 flaskbb/management/views.py:1173
-#: flaskbb/management/views.py:1202 flaskbb/management/views.py:1261
+#: flaskbb/management/views.py:1109 flaskbb/management/views.py:1170
+#: flaskbb/management/views.py:1199 flaskbb/management/views.py:1258
 msgid "You are not allowed to manage attachments"
 msgstr ""
 
-#: flaskbb/management/views.py:1188
+#: flaskbb/management/views.py:1185
 #, python-format
 msgid "%(count)s attachments deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:1193
+#: flaskbb/management/views.py:1190
 msgid "Attachment deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:1246
+#: flaskbb/management/views.py:1243
 #, python-format
 msgid ""
 "Removed %(rows)s attachment(s) with a missing file and %(files)s orphaned"
 " file(s)."
 msgstr ""
 
-#: flaskbb/management/views.py:1290
+#: flaskbb/management/views.py:1287
 #, python-format
 msgid "Purged %(rows)s attachment(s) and %(files)s leftover file(s)."
 msgstr ""
 
-#: flaskbb/management/views.py:1329 flaskbb/management/views.py:1349
-#: flaskbb/management/views.py:1382 flaskbb/management/views.py:1414
-#: flaskbb/management/views.py:1435 flaskbb/management/views.py:1456
+#: flaskbb/management/views.py:1326 flaskbb/management/views.py:1346
+#: flaskbb/management/views.py:1379 flaskbb/management/views.py:1411
+#: flaskbb/management/views.py:1432 flaskbb/management/views.py:1453
 msgid "You are not allowed to modify plugins"
 msgstr ""
 
-#: flaskbb/management/views.py:1361
+#: flaskbb/management/views.py:1358
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
 msgstr ""
 
-#: flaskbb/management/views.py:1369
+#: flaskbb/management/views.py:1366
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
 msgstr ""
 
-#: flaskbb/management/views.py:1394
+#: flaskbb/management/views.py:1391
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
 msgstr ""
 
-#: flaskbb/management/views.py:1401
+#: flaskbb/management/views.py:1398
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
 msgstr ""
 
-#: flaskbb/management/views.py:1426
+#: flaskbb/management/views.py:1423
 msgid "Plugin has been installed."
 msgstr ""
 
-#: flaskbb/management/views.py:1447
+#: flaskbb/management/views.py:1444
 msgid "Plugin has been uninstalled."
 msgstr ""
 
-#: flaskbb/management/views.py:1469
+#: flaskbb/management/views.py:1466
 msgid "This plugin has no settings to upgrade."
 msgstr ""
 
-#: flaskbb/management/views.py:1473
+#: flaskbb/management/views.py:1470
 msgid "This plugin's settings are already up to date."
 msgstr ""
 
-#: flaskbb/management/views.py:1477
+#: flaskbb/management/views.py:1474
 msgid "Plugin settings have been upgraded."
 msgstr ""
 
@@ -1281,7 +1281,7 @@ msgid "Content type"
 msgstr ""
 
 #: flaskbb/search/forms.py:43 flaskbb/templates/forum/category_layout.html:9
-#: flaskbb/templates/management/overview.html:96
+#: flaskbb/templates/management/overview.html:102
 #: flaskbb/templates/user/all_topics.html:8 flaskbb/user/plugins.py:62
 msgid "Topics"
 msgstr ""
@@ -1293,7 +1293,7 @@ msgstr ""
 #: flaskbb/templates/forum/topic_horizontal.html:60
 #: flaskbb/templates/forum/topictracker.html:32
 #: flaskbb/templates/management/banned_users.html:47
-#: flaskbb/templates/management/overview.html:100
+#: flaskbb/templates/management/overview.html:106
 #: flaskbb/templates/management/users.html:47
 #: flaskbb/templates/search/search_result.html:86
 #: flaskbb/templates/user/all_posts.html:8 flaskbb/user/plugins.py:68
@@ -2031,31 +2031,35 @@ msgstr ""
 msgid "Online users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:88
+#: flaskbb/templates/management/overview.html:89
+msgid "Online guests"
+msgstr ""
+
+#: flaskbb/templates/management/overview.html:94
 msgid "Banned users"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:114
+#: flaskbb/templates/management/overview.html:120
 msgid "Components"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:123
+#: flaskbb/templates/management/overview.html:129
 msgid "checking status"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:152
+#: flaskbb/templates/management/overview.html:158
 msgid "not enabled"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:155
+#: flaskbb/templates/management/overview.html:161
 msgid "enabled &amp; installed"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:157
+#: flaskbb/templates/management/overview.html:163
 msgid "enabled"
 msgstr ""
 
-#: flaskbb/templates/management/overview.html:159
+#: flaskbb/templates/management/overview.html:165
 msgid "not installed"
 msgstr ""
 
@@ -2396,27 +2400,27 @@ msgstr ""
 msgid "Could not retrieve avatar"
 msgstr ""
 
-#: flaskbb/utils/helpers.py:207
+#: flaskbb/utils/helpers.py:194
 msgid "You do not have the permissions to execute this action."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:225
+#: flaskbb/utils/helpers.py:212
 msgid "You do not have the permissions to delete these topics."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:237
+#: flaskbb/utils/helpers.py:224
 msgid "You do not have the permissions to hide these topics."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:251
+#: flaskbb/utils/helpers.py:238
 msgid "You do not have the permissions to unhide these topics."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:845
+#: flaskbb/utils/helpers.py:859
 msgid "The registration has been disabled."
 msgstr ""
 
-#: flaskbb/utils/helpers.py:866
+#: flaskbb/utils/helpers.py:880
 msgid "This account is already activated."
 msgstr ""
 

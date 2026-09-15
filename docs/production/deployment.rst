@@ -146,10 +146,11 @@ Redis (optional)
 
 We have one optional dependency, redis (the python package is installed
 automatically). If you want to use it, make sure that a redis-server is
-running. Redis will be used as the default result and caching backend for
-celery (celery is a task queue which FlaskBB uses to send non blocking
-emails). The feature for tracking the `online guests` and `online users` do
-also require redis (although `online users` works without redis as well).
+running (Valkey works as well). Redis will be used as the default result and
+caching backend for celery (celery is a task queue which FlaskBB uses to send
+non blocking emails). The feature for tracking the `online guests` and `online
+users` do also require redis (although `online users` works without redis as
+well).
 To install redis, just use your distributions package manager. For Arch
 Linux this is `pacman` and for Debian/Ubuntu based systems this is
 `apt-get`.
