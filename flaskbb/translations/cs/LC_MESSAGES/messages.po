@@ -1189,9 +1189,9 @@ msgid "You are not allowed to view reports."
 msgstr "Nemáte oprávnění zobrazit hlášení."
 
 #: flaskbb/management/views.py:1044
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s reports marked as read."
-msgstr "Hlášení %(id)s bylo označeno jako přečtené."
+msgstr "Počet hlášení označených jako přečtené: %(count)s"
 
 #: flaskbb/management/views.py:1052
 #, python-format
@@ -2234,12 +2234,12 @@ msgid "Search results for Posts:"
 msgstr ""
 
 #: flaskbb/templates/search/search_result.html:45
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> in forum <a"
 " href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
-"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> ve fóru <a"
+"<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> ve fóru <a"
 " href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:71
