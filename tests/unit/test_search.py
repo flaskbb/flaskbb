@@ -2,6 +2,8 @@ import importlib.util
 from pathlib import Path
 
 import pytest
+from alembic.operations import Operations
+from alembic.runtime.migration import MigrationContext
 from flaskbb.extensions import db, pluggy
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.plugins.models import PluginRegistry
@@ -49,17 +51,16 @@ def _all(stmt):
     return db.session.scalars(stmt).unique().all()
 
 
-def _load_fts_migration():
-    path = (
-        Path(__file__).parents[2]
-        / "flaskbb"
-        / "migrations"
-        / "202607211500_1784625534_add_fts_search_indexes.py"
-    )
-    spec = importlib.util.spec_from_file_location("_fts_migration", path)
+def _load_migration(filename):
+    path = Path(__file__).parents[2] / "flaskbb" / "migrations" / filename
+    spec = importlib.util.spec_from_file_location(f"_migration_{path.stem}", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _load_fts_migration():
+    return _load_migration("202607211500_1784625534_add_fts_search_indexes.py")
 
 
 @pytest.fixture()
@@ -395,6 +396,29 @@ def test_sqlite_lifecycle_write_methods_are_noops(sqlite_fts, user):
     assert backend.index(user) is None
     assert backend.update(user) is None
     assert backend.remove(user) is None
+
+
+@pytest.mark.parametrize("direction", ["upgrade", "downgrade"])
+def test_widen_user_password_migration_keeps_sqlite_search_triggers(
+    sqlite_fts, default_groups, direction
+):
+    migration = _load_migration(
+        "202609132130_1789335000_widen_user_password_and_not_null_columns.py"
+    )
+    with Operations.context(MigrationContext.configure(db.session.connection())):
+        getattr(migration, direction)()
+    db.session.commit()
+
+    user = User(
+        username="after_migration",
+        email="after_migration@example.org",
+        password="test",
+        primary_group=default_groups[3],
+        activated=True,
+    )
+    user.save()
+
+    assert user in _all(SQLiteSearchBackend().search(User, "after_migration"))
 
 
 def test_create_all_builds_sqlite_fts_schema(application):

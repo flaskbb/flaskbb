@@ -1,4 +1,5 @@
 import pytest
+from flask import g
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
 from flaskbb.extensions import cache, db
@@ -34,6 +35,19 @@ def clear_cache(application):
     """
     yield
     cache.clear()
+
+
+@pytest.fixture(autouse=True)
+def clear_logged_in_user(application):
+    """Forgets the logged in user between tests.
+
+    Request contexts reuse the package-scoped app context and with it ``g``,
+    where ``login_user`` caches the user. Without this, a user logged in by
+    one test is still ``current_user`` in the next one, detached from the
+    session the earlier test closed.
+    """
+    yield
+    g.pop("_login_user", None)
 
 
 @pytest.fixture()

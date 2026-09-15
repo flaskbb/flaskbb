@@ -63,8 +63,9 @@ class SettingsDiff:
 
 class Setting(BaseModel):
     __tablename__ = "settings"
+    __table_args__ = (sa.PrimaryKeyConstraint("group_key", "key"),)
 
-    key: Mapped[str] = mapped_column(sa.String(255), primary_key=True, nullable=False)
+    key: Mapped[str] = mapped_column(sa.String(255), nullable=False)
     value: Mapped[str | None] = mapped_column(sa.Text)  # JSON-encoded
     group_key: Mapped[str] = mapped_column(sa.String(255), index=True)
 

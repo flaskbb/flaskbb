@@ -42,7 +42,6 @@ def upgrade():
         sa.select(settings_table.c.key, settings_table.c.value, settings_table.c.settingsgroup)
     ).fetchall()
     for key, raw_value, group_key in rows:
-        print(group_key, key, raw_value)
         try:
             python_value = pickle.loads(raw_value)
         except Exception as e:
@@ -53,7 +52,15 @@ def upgrade():
             .values(value_json=json.dumps(python_value), group_key=group_key)
         )
 
+    # FlaskBB 2.0 and 2.1 created a CHECK constraint for the value_type enum on
+    # SQLite, which the table rebuild would copy after value_type is dropped
+    has_value_type_check = "settingvaluetype" in {
+        constraint["name"] for constraint in sa.inspect(conn).get_check_constraints("settings")
+    }
+
     with op.batch_alter_table("settings", schema=None) as batch_op:
+        if has_value_type_check:
+            batch_op.drop_constraint("settingvaluetype", type_="check")
         batch_op.drop_constraint(
             batch_op.f("fk_settings_settingsgroup_settingsgroup"), type_="foreignkey"
         )

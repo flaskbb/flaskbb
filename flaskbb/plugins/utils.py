@@ -88,7 +88,7 @@ def plugin_has_pending_migrations(name: str) -> bool:
     branch hasn't been applied to the database yet.
     """
     plugin = pluggy.get_plugin(name)
-    # disabled plugins are blocked, so their migrations aren't loaded
+    # disabled plugins are never imported and their migrations only run once enabled
     if plugin is None or not has_migrations(plugin):
         return False
 

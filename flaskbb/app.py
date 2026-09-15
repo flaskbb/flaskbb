@@ -9,6 +9,7 @@ manages the app creation and configuration process
 """
 
 import importlib.metadata
+import importlib.util
 import logging
 import logging.config
 import os
@@ -485,11 +486,25 @@ def configure_errorhandlers(app: FlaskBB):
 
 
 def configure_migrations(app: FlaskBB):
-    """Configure migrations."""
-    plugin_dirs = pluggy.hook.flaskbb_load_migrations()
-    version_locations = get_alembic_locations(plugin_dirs)
+    """Configure migrations.
 
-    app.config["ALEMBIC"]["version_locations"] = version_locations
+    Disabled plugins are never imported, so they can't answer
+    ``flaskbb_load_migrations``. Their migrations are looked up next to the
+    package instead, the convention ``has_migrations`` relies on as well, so
+    the revisions they already applied (e.g. during ``flaskbb install``) resolve.
+    """
+    plugin_dirs = pluggy.hook.flaskbb_load_migrations()
+    disabled_dirs: list[str] = []
+    for entry_point in pluggy.list_disabled_plugins():
+        package = importlib.util.find_spec(entry_point.module.split(".")[0])
+        if package is None or not package.submodule_search_locations:
+            continue
+        migrations = os.path.join(next(iter(package.submodule_search_locations)), "migrations")
+        if os.path.isdir(migrations):
+            disabled_dirs.append(migrations)
+
+    app.config["ALEMBIC"]["version_locations"] = get_alembic_locations(plugin_dirs + disabled_dirs)
+    app.config["ALEMBIC"]["disabled_version_locations"] = disabled_dirs
 
 
 def configure_translations(app: FlaskBB):

@@ -324,7 +324,9 @@ migration branch, keyed by the plugin's name.
 
     Run migrations to downgrade the database, e.g.
     ``flaskbb db downgrade portal@base`` to undo all of a plugin's
-    migrations.
+    migrations. A number goes back that many revisions, e.g.
+    ``flaskbb db downgrade 2``, unless it is a revision id such as
+    ``1789335000``.
 
 .. describe:: stamp [TARGET]
 

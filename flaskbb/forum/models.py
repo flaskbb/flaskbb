@@ -220,7 +220,7 @@ class Attachment(BaseModel):
         ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
-    filename: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
     original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
     content_type: Mapped[str] = mapped_column(String(255), nullable=False)
     size: Mapped[int] = mapped_column(nullable=False)  # bytes
