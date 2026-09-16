@@ -242,7 +242,8 @@ omit = [
     "*/flaskbb/static/*",
     "*/flaskbb/templates/*",
     "*/flaskbb/themes/*",
-    "*/flaskbb/migrations/*"
+    "*/flaskbb/migrations/*",
+    "*/flaskbb/translations/*"
 ]
 
 [tool.coverage.paths]
