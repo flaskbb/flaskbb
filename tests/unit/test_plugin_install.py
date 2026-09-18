@@ -272,5 +272,5 @@ def test_applied_migrations_badge(
         login_user(admin_user)
         html = views.PluginsView().get()
 
-    assert ("migrations applied" in html) is applied_badge
+    assert (">migrations</span>" in html) is applied_badge
     assert ("requires migrations" in html) is pending

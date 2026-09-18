@@ -41,7 +41,7 @@ from flaskbb.utils.populate import (
     run_plugin_migrations,
 )
 from flaskbb.utils.proxies import current_app
-from flaskbb.utils.translations import compile_translations
+from flaskbb.utils.translations import compile_translations, translations_are_compiled
 
 logger = logging.getLogger(__name__)
 
@@ -208,8 +208,10 @@ def install(
         click.secho("[+] Installing default plugins...", fg="cyan")
         run_plugin_migrations()
 
-    click.secho("[+] Compiling translations...", fg="cyan")
-    compile_translations()
+    # installed packages ship them, only source checkouts have to compile
+    if not translations_are_compiled():
+        click.secho("[+] Compiling translations...", fg="cyan")
+        compile_translations()
 
     click.secho("[+] FlaskBB has been successfully installed!", fg="green", bold=True)
 

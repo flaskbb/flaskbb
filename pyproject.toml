@@ -10,7 +10,7 @@ dependencies = [
   "click>=8.5.0",
   "click-log>=0.4.0",
   "click-plugins>=1.1.1.2",
-  "click-repl>=0.3.0",
+  "click-repl>=0.4.0",
   "email-validator>=2.3.0",
   "Flask>=3.1.3",
   "Flask-Alembic>=3.2.0",
@@ -25,7 +25,7 @@ dependencies = [
   "Flask-SQLAlchemy>=3.1.1",
   "Flask-Themes2>=1.0.1",
   "Flask-WTF>=1.3.0",
-  "flaskbb-plugin-conversations>=3.0.1",
+  "flaskbb-plugin-conversations>=3.0.2",
   "flaskbb-plugin-portal>=3.0.1",
   "Jinja2>=3.1.6",
   "MarkupSafe>=3.0.3",
@@ -73,6 +73,12 @@ classifiers = [
 [project.optional-dependencies]
 gunicorn = [
   "gunicorn>=26.0.0",
+]
+postgres = [
+  "psycopg[binary]>=3.3.0",
+]
+mysql = [
+  "pymysql>=1.2.0",
 ]
 
 [project.urls]

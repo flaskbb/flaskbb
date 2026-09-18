@@ -8,6 +8,7 @@ This module contains the translation Domain used by FlaskBB.
 :license: BSD, see LICENSE for more details.
 """
 
+import glob
 import logging
 import os
 import subprocess
@@ -132,6 +133,14 @@ def add_translations(translation: str):
             "-l",
             translation,
         ]
+    )
+
+
+def translations_are_compiled() -> bool:
+    translations_folder = os.path.join(current_app.root_path, "translations")
+    return all(
+        os.path.exists(os.path.splitext(po_file)[0] + ".mo")
+        for po_file in glob.glob(os.path.join(translations_folder, "*/LC_MESSAGES/messages.po"))
     )
 
 
