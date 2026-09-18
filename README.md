@@ -116,14 +116,8 @@ uv run flaskbb plugins install like
 uv run flaskbb plugins enable like
 ```
 
-| Plugin | Description |
-| --- | --- |
-| [portal](https://github.com/flaskbb/flaskbb-plugin-portal) | A simple portal page for the forum. Installed by default. |
-| [conversations](https://github.com/flaskbb/flaskbb-plugin-conversations) | Private messages between users. Installed by default. |
-| [like](https://github.com/flaskbb/flaskbb-plugin-like) | Let users like posts and see who liked them. |
-| [vote](https://github.com/flaskbb/flaskbb-plugin-vote) | Single or multiple choice polls on topics and posts. |
-| [ranks](https://github.com/flaskbb/flaskbb-plugin-ranks) | User ranks. |
-| [inviteonly](https://github.com/flaskbb/flaskbb-plugin-inviteonly) | Invite-only registration, even while registration is closed. |
+Browse available plugins and themes in the
+[extension registry](https://flaskbb.com/registry/).
 
 To write your own, start with the
 [plugin development guide](https://flaskbb.readthedocs.io/en/latest/development/plugin/index.html)
