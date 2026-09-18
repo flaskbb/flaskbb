@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-16 21:19+0200\n"
+"POT-Creation-Date: 2026-09-18 23:49+0200\n"
 "PO-Revision-Date: 2026-02-25 13:24+0000\n"
 "Last-Translator: Peter Justin <peter@peterjustin.me>\n"
 "Language: de\n"
@@ -21,23 +21,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: flaskbb/app.py:452
+#: flaskbb/app.py:454
 #, python-format
 msgid "The upload is too large. A request cannot be bigger than %(size)s."
 msgstr ""
 
-#: flaskbb/app.py:456
+#: flaskbb/app.py:458
 msgid "The upload is too large."
 msgstr ""
 
-#: flaskbb/app.py:478
+#: flaskbb/app.py:480
 #, python-format
 msgid ""
 "The migrations of %(plugins)s have not been applied yet. Apply them with "
 "'flaskbb plugins install --migrations-only <plugin>'."
 msgstr ""
 
-#: flaskbb/app.py:485
+#: flaskbb/app.py:487
 msgid "This page is currently unavailable."
 msgstr ""
 
@@ -54,6 +54,25 @@ msgstr "Bestätigung der Passwortwiederherstellung"
 #: flaskbb/templates/auth/account_activation.html:10
 msgid "Account Activation"
 msgstr "Account aktivierung"
+
+#: flaskbb/markup.py:296 flaskbb/templates/forum/topic.html:270
+#, fuzzy
+msgid "Quote"
+msgstr "Notizen"
+
+#: flaskbb/markup.py:312
+msgid "Show full quote"
+msgstr ""
+
+#: flaskbb/markup.py:321
+#, python-format
+msgid "%(author)s wrote:"
+msgstr ""
+
+#: flaskbb/markup.py:327
+#, fuzzy
+msgid "Go to quoted post"
+msgstr "Beitrag zitieren"
 
 #: flaskbb/auth/forms.py:36 flaskbb/management/forms.py:61
 msgid "You can only use letters, numbers or dashes."
@@ -81,7 +100,7 @@ msgid "Remember me"
 msgstr "Merken"
 
 #: flaskbb/auth/forms.py:53 flaskbb/templates/auth/login.html:1
-#: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:187
+#: flaskbb/templates/auth/login.html:10 flaskbb/templates/layout.html:193
 msgid "Login"
 msgstr "Login"
 
@@ -135,7 +154,7 @@ msgid "Please accept the TOS."
 msgstr "Die AGBs müssen akzeptiert werden."
 
 #: flaskbb/auth/forms.py:92 flaskbb/templates/auth/register.html:1
-#: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:210
+#: flaskbb/templates/auth/register.html:10 flaskbb/templates/layout.html:216
 msgid "Register"
 msgstr "Registrieren"
 
@@ -352,7 +371,7 @@ msgstr "Beitrag melden"
 #: flaskbb/forum/forms.py:186 flaskbb/forum/forms.py:188
 #: flaskbb/management/forms.py:109 flaskbb/management/forms.py:111
 #: flaskbb/search/forms.py:79 flaskbb/templates/forum/memberlist.html:26
-#: flaskbb/templates/layout.html:88
+#: flaskbb/templates/layout.html:94
 #: flaskbb/templates/management/attachments.html:49
 #: flaskbb/templates/management/banned_users.html:26
 #: flaskbb/templates/management/users.html:26
@@ -363,7 +382,7 @@ msgstr "Beitrag melden"
 msgid "Search"
 msgstr "Suche"
 
-#: flaskbb/forum/utils.py:78 flaskbb/management/navigation.py:195
+#: flaskbb/forum/utils.py:78 flaskbb/management/navigation.py:216
 #: flaskbb/templates/forum/topic.html:138
 #: flaskbb/templates/management/attachments.html:1
 #: flaskbb/templates/management/attachments.html:10
@@ -402,9 +421,9 @@ msgstr ""
 msgid "Attachments cannot be bigger than %(size)s."
 msgstr ""
 
-#: flaskbb/forum/views.py:153 flaskbb/forum/views.py:910
-#: flaskbb/forum/views.py:928 flaskbb/forum/views.py:1006
-#: flaskbb/forum/views.py:1026
+#: flaskbb/forum/views.py:153 flaskbb/forum/views.py:914
+#: flaskbb/forum/views.py:936 flaskbb/forum/views.py:1014
+#: flaskbb/forum/views.py:1034
 msgid "You are not allowed to access that forum"
 msgstr "Du hast keinen Zugriff auf dieses Forum"
 
@@ -467,7 +486,7 @@ msgstr "%(count)s Themen gelöscht."
 msgid "Please choose a new forum for the topics."
 msgstr "Bitte wähle ein neues Forum für die Themen aus."
 
-#: flaskbb/forum/views.py:486 flaskbb/utils/helpers.py:187
+#: flaskbb/forum/views.py:486 flaskbb/utils/helpers.py:194
 msgid "Please modify topics in only one forum at a time."
 msgstr ""
 
@@ -501,81 +520,81 @@ msgstr "Unbekannte Aktion angefordert"
 msgid "You are not allowed to post a reply"
 msgstr "Du bist nicht berechtigt einen Beitrag zu senden"
 
-#: flaskbb/forum/views.py:583
+#: flaskbb/forum/views.py:587
 msgid "You are not allowed to edit that post"
 msgstr "Du bist nicht berechtigt diesen Beitrag zu bearbeiten"
 
-#: flaskbb/forum/views.py:751
+#: flaskbb/forum/views.py:755
 #, python-format
 msgid "%(topic_count)s topics untracked."
 msgstr "%(topic_count)s Themen nicht verfolgt."
 
-#: flaskbb/forum/views.py:763
+#: flaskbb/forum/views.py:767
 msgid "You are not allowed to delete this topic"
 msgstr "Du bist nicht berechtigt dieses Thema zu löschen"
 
-#: flaskbb/forum/views.py:783
+#: flaskbb/forum/views.py:787
 msgid "You are not allowed to lock this topic"
 msgstr "Du bist nicht berechtigt dieses Thema zu schließen"
 
-#: flaskbb/forum/views.py:804
+#: flaskbb/forum/views.py:808
 msgid "You are not allowed to unlock this topic"
 msgstr "Du bist nicht berechtigt dieses Thema zu öffnen"
 
-#: flaskbb/forum/views.py:825
+#: flaskbb/forum/views.py:829
 msgid "You are not allowed to highlight this topic"
 msgstr "Du bist nicht berechtigt dieses Thema hervorzuheben"
 
-#: flaskbb/forum/views.py:846
+#: flaskbb/forum/views.py:850
 msgid "You are not allowed to trivialize this topic"
 msgstr "Du bist nicht berechtigt dieses Thema zu trivialisieren"
 
-#: flaskbb/forum/views.py:867
+#: flaskbb/forum/views.py:871
 msgid "You are not allowed to delete this post"
 msgstr "Du bist nicht berechtigt diesen Beitrag zu löschen"
 
-#: flaskbb/forum/views.py:965
+#: flaskbb/forum/views.py:973
 #, python-format
 msgid "Forum %(forum)s marked as read."
 msgstr "Forum %(forum)s als gelesen markiert."
 
-#: flaskbb/forum/views.py:989
+#: flaskbb/forum/views.py:997
 msgid "All forums marked as read."
 msgstr "Es wurden alle Foren als gelesen markiert."
 
-#: flaskbb/forum/views.py:1047
+#: flaskbb/forum/views.py:1055
 msgid "You do not have permission to hide this topic"
 msgstr "Du bist nicht berechtigt dieses Thema zu verstecken"
 
-#: flaskbb/forum/views.py:1063
+#: flaskbb/forum/views.py:1071
 msgid "You do not have permission to unhide this topic"
 msgstr "Du bist nicht berechtigt dieses Thema einzublenden"
 
-#: flaskbb/forum/views.py:1077
+#: flaskbb/forum/views.py:1085
 msgid "You do not have permission to hide this post"
 msgstr "Du bist nicht berechtigt diesen Beitrag zu verstecken"
 
-#: flaskbb/forum/views.py:1081
+#: flaskbb/forum/views.py:1089
 msgid "Post is already hidden"
 msgstr "Beitrag ist bereits versteckt"
 
-#: flaskbb/forum/views.py:1088
+#: flaskbb/forum/views.py:1096
 msgid "Topic hidden"
 msgstr "Thema wurde versteckt"
 
-#: flaskbb/forum/views.py:1090
+#: flaskbb/forum/views.py:1098
 msgid "Post hidden"
 msgstr "Beitrag wurde versteckt"
 
-#: flaskbb/forum/views.py:1104
+#: flaskbb/forum/views.py:1112
 msgid "You do not have permission to unhide this post"
 msgstr "Du bist nicht berechtigt diesen Post einzublenden"
 
-#: flaskbb/forum/views.py:1108
+#: flaskbb/forum/views.py:1116
 msgid "Post is already unhidden"
 msgstr "Beitrag ist bereits eingeblendet"
 
-#: flaskbb/forum/views.py:1113
+#: flaskbb/forum/views.py:1121
 msgid "Post unhidden"
 msgstr "Beitrag wurde eingeblendet"
 
@@ -900,52 +919,52 @@ msgstr "Bitte gib einen Titel für die Kategorie ein."
 msgid "Please enter a position for the category."
 msgstr "Bitte gib eine Position für die Kategorie ein."
 
-#: flaskbb/management/navigation.py:56
+#: flaskbb/management/navigation.py:57
 #, fuzzy
 msgid "Plugin settings"
 msgstr "Allgemeine Einstellungen"
 
-#: flaskbb/management/navigation.py:70 flaskbb/templates/layout.html:142
+#: flaskbb/management/navigation.py:71 flaskbb/templates/layout.html:148
 #: flaskbb/templates/user/settings_layout.html:10
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: flaskbb/management/navigation.py:84
+#: flaskbb/management/navigation.py:85
 #: flaskbb/templates/management/banned_users.html:9
 #: flaskbb/templates/management/user_form.html:10
 #: flaskbb/templates/management/users.html:9
 msgid "Manage Users"
 msgstr "Benutzer verwalten"
 
-#: flaskbb/management/navigation.py:90
+#: flaskbb/management/navigation.py:91
 #: flaskbb/templates/management/banned_users.html:1
 #: flaskbb/templates/management/banned_users.html:22
 msgid "Banned Users"
 msgstr "Verbannte Benutzer"
 
-#: flaskbb/management/navigation.py:101 flaskbb/management/views.py:466
-#: flaskbb/management/views.py:475
+#: flaskbb/management/navigation.py:102 flaskbb/management/views.py:475
+#: flaskbb/management/views.py:484
 msgid "Add User"
 msgstr "Benutzer hinzufügen"
 
-#: flaskbb/management/navigation.py:109 flaskbb/search/forms.py:35
+#: flaskbb/management/navigation.py:110 flaskbb/search/forms.py:35
 #: flaskbb/templates/management/users.html:1
 #: flaskbb/templates/management/users.html:22
 msgid "Users"
 msgstr "Benutzer"
 
-#: flaskbb/management/navigation.py:174
+#: flaskbb/management/navigation.py:195
 #, fuzzy
 msgid "Core"
 msgstr "Schließen"
 
-#: flaskbb/management/navigation.py:177
+#: flaskbb/management/navigation.py:198
 #: flaskbb/templates/management/overview.html:1
 #: flaskbb/templates/management/overview.html:16 flaskbb/user/plugins.py:56
 msgid "Overview"
 msgstr "Übersicht"
 
-#: flaskbb/management/navigation.py:184
+#: flaskbb/management/navigation.py:205
 #: flaskbb/templates/management/overview.html:114
 #: flaskbb/templates/management/reports.html:1
 #: flaskbb/templates/management/reports.html:9
@@ -953,356 +972,390 @@ msgstr "Übersicht"
 msgid "Reports"
 msgstr "Berichte"
 
-#: flaskbb/management/navigation.py:188
+#: flaskbb/management/navigation.py:209
 msgid "Show all Reports"
 msgstr "Alle Berichte anzeigen"
 
-#: flaskbb/management/navigation.py:189
+#: flaskbb/management/navigation.py:210
 msgid "Show unread Reports"
 msgstr "Ungelesene Berichte anzeigen"
 
-#: flaskbb/management/navigation.py:198
+#: flaskbb/management/navigation.py:219
 msgid "All Attachments"
 msgstr ""
 
-#: flaskbb/management/navigation.py:207
+#: flaskbb/management/navigation.py:228
 #: flaskbb/templates/management/groups.html:1
 #: flaskbb/templates/management/groups.html:20
 #: flaskbb/templates/management/overview.html:98
 msgid "Groups"
 msgstr "Gruppen"
 
-#: flaskbb/management/navigation.py:211
+#: flaskbb/management/navigation.py:232
 #: flaskbb/templates/management/group_form.html:10
 #: flaskbb/templates/management/groups.html:9
 msgid "Manage Groups"
 msgstr "Gruppen verwalten"
 
-#: flaskbb/management/navigation.py:212 flaskbb/management/views.py:666
-#: flaskbb/management/views.py:675
+#: flaskbb/management/navigation.py:233 flaskbb/management/views.py:675
+#: flaskbb/management/views.py:684
 #: flaskbb/templates/management/group_form.html:2
 msgid "Add Group"
 msgstr "Gruppe hinzufügen"
 
-#: flaskbb/management/navigation.py:217 flaskbb/search/forms.py:35
+#: flaskbb/management/navigation.py:238 flaskbb/search/forms.py:35
 #: flaskbb/templates/management/forums.html:1
 #: flaskbb/templates/management/forums.html:9
 msgid "Forums"
 msgstr "Foren"
 
-#: flaskbb/management/navigation.py:221
+#: flaskbb/management/navigation.py:242
 #: flaskbb/templates/management/forums.html:20
 msgid "Manage Forums"
 msgstr "Foren verwalten"
 
-#: flaskbb/management/navigation.py:222 flaskbb/management/views.py:840
-#: flaskbb/management/views.py:857
+#: flaskbb/management/navigation.py:243 flaskbb/management/views.py:849
+#: flaskbb/management/views.py:866
 #: flaskbb/templates/management/forum_form.html:2
 #: flaskbb/templates/management/forums.html:34
 msgid "Add Forum"
 msgstr "Forum hinzufügen"
 
-#: flaskbb/management/navigation.py:223 flaskbb/management/views.py:898
-#: flaskbb/management/views.py:909
+#: flaskbb/management/navigation.py:244 flaskbb/management/views.py:907
+#: flaskbb/management/views.py:918
 #: flaskbb/templates/management/category_form.html:2
 msgid "Add Category"
 msgstr "Kategorie hinzufügen"
 
-#: flaskbb/management/navigation.py:229 flaskbb/management/navigation.py:239
+#: flaskbb/management/navigation.py:250 flaskbb/management/navigation.py:260
 #: flaskbb/templates/management/overview.html:144
 #: flaskbb/templates/management/plugins.html:1
 #: flaskbb/templates/management/plugins.html:9
 msgid "Plugins"
 msgstr "Plugins"
 
-#: flaskbb/management/views.py:108
+#: flaskbb/management/views.py:117
 msgid "You are not allowed to access the management panel"
 msgstr "Du hast keinen Zugriff auf das Verwaltungspanel"
 
-#: flaskbb/management/views.py:154 flaskbb/management/views.py:1301
+#: flaskbb/management/views.py:163 flaskbb/management/views.py:1310
 msgid "You are not allowed to access the management settings"
 msgstr "Du bist nicht berechtigt die Administratoreinstellungen zu öffnen"
 
-#: flaskbb/management/views.py:205
+#: flaskbb/management/views.py:214
 msgid "Upgrade the plugin first to update its setting!"
 msgstr ""
 
-#: flaskbb/management/views.py:226 flaskbb/management/views.py:275
-#: flaskbb/management/views.py:385 flaskbb/management/views.py:423
-#: flaskbb/management/views.py:457 flaskbb/management/views.py:483
-#: flaskbb/management/views.py:539 flaskbb/management/views.py:587
+#: flaskbb/management/views.py:235 flaskbb/management/views.py:284
+#: flaskbb/management/views.py:394 flaskbb/management/views.py:432
+#: flaskbb/management/views.py:466 flaskbb/management/views.py:492
+#: flaskbb/management/views.py:548 flaskbb/management/views.py:596
 msgid "You are not allowed to manage users"
 msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
 
-#: flaskbb/management/views.py:329 flaskbb/management/views.py:342
+#: flaskbb/management/views.py:338 flaskbb/management/views.py:351
 #, fuzzy
 msgid "You are not allowed to edit this user."
 msgstr "Du bist nicht berechtigt diesen Beitrag zu bearbeiten"
 
-#: flaskbb/management/views.py:336 flaskbb/management/views.py:376
+#: flaskbb/management/views.py:345 flaskbb/management/views.py:385
 msgid "Edit User"
 msgstr "Benutzer bearbeiten"
 
-#: flaskbb/management/views.py:372
+#: flaskbb/management/views.py:381
 msgid "User updated."
 msgstr "Benutzer aktualisiert."
 
-#: flaskbb/management/views.py:404
+#: flaskbb/management/views.py:413
 #, fuzzy, python-format
 msgid "%(count)s users deleted."
 msgstr "%(count)s Themen gelöscht."
 
-#: flaskbb/management/views.py:410
+#: flaskbb/management/views.py:419
 msgid "You cannot delete yourself."
 msgstr "Du kannst dich nicht selbst löschen."
 
-#: flaskbb/management/views.py:414
+#: flaskbb/management/views.py:423
 msgid "User deleted."
 msgstr "Benutzer gelöscht."
 
-#: flaskbb/management/views.py:446
+#: flaskbb/management/views.py:455
 #, python-format
 msgid "All posts by %(user)s have been deleted."
 msgstr ""
 
-#: flaskbb/management/views.py:472
+#: flaskbb/management/views.py:481
 msgid "User added."
 msgstr "Benutzer hinzugefügt."
 
-#: flaskbb/management/views.py:548
+#: flaskbb/management/views.py:557
 msgid "You do not have the permissions to ban this user."
 msgstr "Du bist nicht berechtigt diesen Benutzer zu verbannen."
 
-#: flaskbb/management/views.py:565
+#: flaskbb/management/views.py:574
 #, fuzzy, python-format
 msgid "%(count)s users banned."
 msgstr "%(count)s Themen entsperrt."
 
-#: flaskbb/management/views.py:571
+#: flaskbb/management/views.py:580
 #, fuzzy
 msgid "You are not allowed to ban this user."
 msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
 
-#: flaskbb/management/views.py:575
+#: flaskbb/management/views.py:584
 msgid "User is now banned."
 msgstr "Benutzer ist entbannt."
 
-#: flaskbb/management/views.py:577
+#: flaskbb/management/views.py:586
 msgid "Could not ban user."
 msgstr "Konnte Benutzer nicht verbannen."
 
-#: flaskbb/management/views.py:596
+#: flaskbb/management/views.py:605
 msgid "You do not have the permissions to unban this user."
 msgstr "Du bist nicht berechtigt diesen Benutzer zu entbannen."
 
-#: flaskbb/management/views.py:611
+#: flaskbb/management/views.py:620
 #, fuzzy, python-format
 msgid "%(count)s users unbanned."
 msgstr "%(count)s Themen entsperrt."
 
-#: flaskbb/management/views.py:617
+#: flaskbb/management/views.py:626
 #, fuzzy
 msgid "You are not allowed to unban this user."
 msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
 
-#: flaskbb/management/views.py:621
+#: flaskbb/management/views.py:630
 msgid "User is now unbanned."
 msgstr "Benutzer ist nun entbannt."
 
-#: flaskbb/management/views.py:623
+#: flaskbb/management/views.py:632
 msgid "Could not unban user."
 msgstr "Konnte Benutzer nicht entbannen."
 
-#: flaskbb/management/views.py:633 flaskbb/management/views.py:657
-#: flaskbb/management/views.py:683 flaskbb/management/views.py:718
+#: flaskbb/management/views.py:642 flaskbb/management/views.py:666
+#: flaskbb/management/views.py:692 flaskbb/management/views.py:727
 msgid "You are not allowed to modify groups."
 msgstr "Du bist nicht berechtigt Gruppen zu bearbeiten."
 
-#: flaskbb/management/views.py:672
+#: flaskbb/management/views.py:681
 msgid "Group added."
 msgstr "Gruppe hinzugefügt."
 
-#: flaskbb/management/views.py:694 flaskbb/management/views.py:710
+#: flaskbb/management/views.py:703 flaskbb/management/views.py:719
 msgid "Edit Group"
 msgstr "Gruppe bearbeiten"
 
-#: flaskbb/management/views.py:707
+#: flaskbb/management/views.py:716
 msgid "Group updated."
 msgstr "Gruppe aktualisiert."
 
-#: flaskbb/management/views.py:729
+#: flaskbb/management/views.py:738
 msgid "You cannot delete one of the standard groups."
 msgstr "Du kannst keine der Standardgruppen löschen."
 
-#: flaskbb/management/views.py:737
+#: flaskbb/management/views.py:746
 #, fuzzy, python-format
 msgid "%(count)s groups deleted."
 msgstr "%(count)s Themen gelöscht."
 
-#: flaskbb/management/views.py:743
+#: flaskbb/management/views.py:752
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr "Du kannst keine Standardgruppen löschen. Versuche sie umzubenennen."
 
-#: flaskbb/management/views.py:750
+#: flaskbb/management/views.py:759
 msgid "Group deleted."
 msgstr "Gruppe gelöscht."
 
-#: flaskbb/management/views.py:753
+#: flaskbb/management/views.py:762
 msgid "No group chosen."
 msgstr "Keine Gruppe ausgewählt."
 
-#: flaskbb/management/views.py:762 flaskbb/management/views.py:781
-#: flaskbb/management/views.py:823
+#: flaskbb/management/views.py:771 flaskbb/management/views.py:790
+#: flaskbb/management/views.py:832
 msgid "You are not allowed to modify forums."
 msgstr "Du bist nicht berechtigt Foren zu bearbeiten."
 
-#: flaskbb/management/views.py:799 flaskbb/management/views.py:815
+#: flaskbb/management/views.py:808 flaskbb/management/views.py:824
 #: flaskbb/templates/management/forums.html:152
 msgid "Edit Forum"
 msgstr "Forum bearbeiten"
 
-#: flaskbb/management/views.py:807
+#: flaskbb/management/views.py:816
 msgid "Forum updated."
 msgstr "Forum aktualisiert."
 
-#: flaskbb/management/views.py:847
+#: flaskbb/management/views.py:856
 msgid "Forum added."
 msgstr "Forum hinzugefügt."
 
-#: flaskbb/management/views.py:865
+#: flaskbb/management/views.py:874
 msgid "You are not allowed to modify forums"
 msgstr "Du bist nicht berechtigt Foren zu bearbeiten"
 
-#: flaskbb/management/views.py:879
+#: flaskbb/management/views.py:888
 msgid "Forum deleted."
 msgstr "Forum gelöscht."
 
-#: flaskbb/management/views.py:888 flaskbb/management/views.py:917
-#: flaskbb/management/views.py:950
+#: flaskbb/management/views.py:897 flaskbb/management/views.py:926
+#: flaskbb/management/views.py:959
 msgid "You are not allowed to modify categories"
 msgstr "Du bist nicht berechtigt Kategorien zu bearbeiten"
 
-#: flaskbb/management/views.py:906
+#: flaskbb/management/views.py:915
 msgid "Category added."
 msgstr "Kategorie hinzugefügt."
 
-#: flaskbb/management/views.py:930 flaskbb/management/views.py:942
+#: flaskbb/management/views.py:939 flaskbb/management/views.py:951
 #: flaskbb/templates/management/forums.html:37
 msgid "Edit Category"
 msgstr "Kategorie bearbeiten"
 
-#: flaskbb/management/views.py:939
+#: flaskbb/management/views.py:948
 msgid "Category updated."
 msgstr "Kategorie aktualisiert."
 
-#: flaskbb/management/views.py:971
+#: flaskbb/management/views.py:980
 msgid "Category with all associated forums deleted."
 msgstr "Kategorie mit allen dazugehörigen Foren gelöscht."
 
-#: flaskbb/management/views.py:980 flaskbb/management/views.py:1001
-#: flaskbb/management/views.py:1024 flaskbb/management/views.py:1080
+#: flaskbb/management/views.py:989 flaskbb/management/views.py:1010
+#: flaskbb/management/views.py:1033 flaskbb/management/views.py:1089
 msgid "You are not allowed to view reports."
 msgstr "Du bist nicht berechtigt um Meldungen einzusehen."
 
-#: flaskbb/management/views.py:1041
+#: flaskbb/management/views.py:1050
 #, python-format
 msgid "%(count)s reports marked as read."
 msgstr "%(count)s Berichte als gelesen markiert."
 
-#: flaskbb/management/views.py:1049
+#: flaskbb/management/views.py:1058
 #, python-format
 msgid "Report %(id)s is already marked as read."
 msgstr "Der Bericht %(id)s ist bereits als gelesen markiert."
 
-#: flaskbb/management/views.py:1057
+#: flaskbb/management/views.py:1066
 #, python-format
 msgid "Report %(id)s marked as read."
 msgstr "Bericht %(id)s als gelesen markiert."
 
-#: flaskbb/management/views.py:1071
+#: flaskbb/management/views.py:1080
 msgid "All reports were marked as read."
 msgstr "Alle Berichte wurden als gelesen markiert."
 
-#: flaskbb/management/views.py:1095
+#: flaskbb/management/views.py:1104
 #, fuzzy, python-format
 msgid "%(count)s reports deleted."
 msgstr "%(count)s Themen gelöscht."
 
-#: flaskbb/management/views.py:1100
+#: flaskbb/management/views.py:1109
 msgid "Report deleted."
 msgstr "Bericht gelöscht."
 
-#: flaskbb/management/views.py:1109 flaskbb/management/views.py:1170
-#: flaskbb/management/views.py:1199 flaskbb/management/views.py:1258
+#: flaskbb/management/views.py:1118 flaskbb/management/views.py:1179
+#: flaskbb/management/views.py:1208 flaskbb/management/views.py:1267
 #, fuzzy
 msgid "You are not allowed to manage attachments"
 msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
 
-#: flaskbb/management/views.py:1185
+#: flaskbb/management/views.py:1194
 #, fuzzy, python-format
 msgid "%(count)s attachments deleted."
 msgstr "%(count)s Themen gelöscht."
 
-#: flaskbb/management/views.py:1190
+#: flaskbb/management/views.py:1199
 #, fuzzy
 msgid "Attachment deleted."
 msgstr "Bericht gelöscht."
 
-#: flaskbb/management/views.py:1243
+#: flaskbb/management/views.py:1252
 #, python-format
 msgid ""
 "Removed %(rows)s attachment(s) with a missing file and %(files)s orphaned"
 " file(s)."
 msgstr ""
 
-#: flaskbb/management/views.py:1287
+#: flaskbb/management/views.py:1296
 #, python-format
 msgid "Purged %(rows)s attachment(s) and %(files)s leftover file(s)."
 msgstr ""
 
-#: flaskbb/management/views.py:1326 flaskbb/management/views.py:1346
-#: flaskbb/management/views.py:1379 flaskbb/management/views.py:1411
-#: flaskbb/management/views.py:1432 flaskbb/management/views.py:1453
+#: flaskbb/management/views.py:1335 flaskbb/management/views.py:1362
+#: flaskbb/management/views.py:1410 flaskbb/management/views.py:1442
+#: flaskbb/management/views.py:1498 flaskbb/management/views.py:1545
 msgid "You are not allowed to modify plugins"
 msgstr "Du bist nicht berechtigt Plugins zu bearbeiten"
 
-#: flaskbb/management/views.py:1358
+#: flaskbb/management/views.py:1374
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
 msgstr "Plugin %(plugin)s ist bereits aktiviert."
 
-#: flaskbb/management/views.py:1366
+#: flaskbb/management/views.py:1384
+#, python-format
+msgid "Couldn't apply the migrations of %(plugin)s, it stays disabled: %(error)s"
+msgstr ""
+
+#: flaskbb/management/views.py:1397
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
 msgstr "Plugin %(plugin)s aktiviert. Bitte starte FlaskBB neu."
 
-#: flaskbb/management/views.py:1391
+#: flaskbb/management/views.py:1422
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
 msgstr "Plugin %(plugin)s ist bereits deaktiviert."
 
-#: flaskbb/management/views.py:1398
+#: flaskbb/management/views.py:1429
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
 msgstr "Plugin %(plugin)s deaktiviert. Bitte starte FlaskBB jetzt neu."
 
-#: flaskbb/management/views.py:1423
+#: flaskbb/management/views.py:1455
+#, fuzzy, python-format
+msgid "Plugin %(plugin)s has to be enabled first."
+msgstr "Plugin %(plugin)s ist bereits aktiviert."
+
+#: flaskbb/management/views.py:1466
+#, python-format
+msgid "Couldn't apply the migrations of %(plugin)s: %(error)s"
+msgstr ""
+
+#: flaskbb/management/views.py:1481
+#, python-format
+msgid ""
+"The migrations of %(plugin)s have been applied. Restart FlaskBB to load "
+"it and install its settings."
+msgstr ""
+
+#: flaskbb/management/views.py:1489
 msgid "Plugin has been installed."
 msgstr "Plugn wurde installiert."
 
-#: flaskbb/management/views.py:1444
+#: flaskbb/management/views.py:1512
+#, python-format
+msgid ""
+"Disable %(plugin)s and restart FlaskBB before uninstalling it, its tables"
+" are still in use."
+msgstr ""
+
+#: flaskbb/management/views.py:1526
+#, python-format
+msgid "Couldn't revert the migrations of %(plugin)s: %(error)s"
+msgstr ""
+
+#: flaskbb/management/views.py:1536
 msgid "Plugin has been uninstalled."
 msgstr "Plugin wurde deinstalliert."
 
-#: flaskbb/management/views.py:1466
+#: flaskbb/management/views.py:1558
 msgid "This plugin has no settings to upgrade."
 msgstr ""
 
-#: flaskbb/management/views.py:1470
+#: flaskbb/management/views.py:1562
 msgid "This plugin's settings are already up to date."
 msgstr ""
 
-#: flaskbb/management/views.py:1474
+#: flaskbb/management/views.py:1566
 #, fuzzy
 msgid "Plugin settings have been upgraded."
 msgstr "Plugin wurde deinstalliert."
@@ -1351,7 +1404,7 @@ msgstr "Beiträge"
 #: flaskbb/templates/forum/topic.html:12
 #: flaskbb/templates/forum/topic_horizontal.html:10
 #: flaskbb/templates/forum/topictracker.html:14
-#: flaskbb/templates/layout.html:81
+#: flaskbb/templates/layout.html:87
 #: flaskbb/templates/management/attachments.html:8
 #: flaskbb/templates/management/banned_users.html:7
 #: flaskbb/templates/management/category_form.html:8
@@ -1424,18 +1477,18 @@ msgstr "Verstecken"
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:14
-#: flaskbb/templates/forum/memberlist.html:34 flaskbb/templates/layout.html:85
+#: flaskbb/templates/forum/memberlist.html:34 flaskbb/templates/layout.html:91
 msgid "Memberlist"
 msgstr "Benutzerliste"
 
 #: flaskbb/templates/forum/topictracker.html:1
 #: flaskbb/templates/forum/topictracker.html:15
 #: flaskbb/templates/forum/topictracker.html:26
-#: flaskbb/templates/layout.html:126
+#: flaskbb/templates/layout.html:132
 msgid "Topic Tracker"
 msgstr "Themen-Tracker"
 
-#: flaskbb/templates/layout.html:155
+#: flaskbb/templates/layout.html:161
 #: flaskbb/templates/management/attachments.html:9
 #: flaskbb/templates/management/banned_users.html:8
 #: flaskbb/templates/management/category_form.html:9
@@ -1452,17 +1505,17 @@ msgstr "Themen-Tracker"
 msgid "Management"
 msgstr "Verwaltung"
 
-#: flaskbb/templates/layout.html:172
+#: flaskbb/templates/layout.html:178
 msgid "Logout"
 msgstr "Ausloggen"
 
 #: flaskbb/templates/auth/reset_password.html:1
 #: flaskbb/templates/auth/reset_password.html:10
-#: flaskbb/templates/layout.html:222
+#: flaskbb/templates/layout.html:228
 msgid "Reset Password"
 msgstr "Passwort zurücksetzen"
 
-#: flaskbb/templates/layout.html:235
+#: flaskbb/templates/layout.html:241
 msgid "Activate Account"
 msgstr "Konto aktivieren"
 
@@ -1597,7 +1650,7 @@ msgstr "Alles auswählen"
 #: flaskbb/templates/forum/category_layout.html:106
 #: flaskbb/templates/forum/topictracker.html:68
 #: flaskbb/templates/forum/topictracker.html:90
-#: flaskbb/templates/management/plugins.html:51
+#: flaskbb/templates/management/plugins.html:54
 #: flaskbb/templates/search/search_result.html:20
 #: flaskbb/templates/search/search_result.html:58
 msgid "by"
@@ -1893,6 +1946,11 @@ msgstr "Diesen Beitrag einblenden"
 msgid "Hide this post"
 msgstr "Diesen Beitrag verstecken"
 
+#: flaskbb/templates/forum/topic.html:269 flaskbb/utils/helpers.py:648
+#, fuzzy
+msgid "view post"
+msgstr "Neuer Beitrag"
+
 #: flaskbb/templates/forum/topic_controls.html:12
 msgid "Moderate"
 msgstr "Moderieren"
@@ -2133,36 +2191,40 @@ msgstr "Information"
 msgid "Manage"
 msgstr "Verwalten"
 
-#: flaskbb/templates/management/plugins.html:45
-#, python-format
-msgid "Apply them with 'flaskbb plugins install --migrations-only %(name)s'"
+#: flaskbb/templates/management/plugins.html:44
+msgid "Apply them with the install button"
 msgstr ""
 
 #: flaskbb/templates/management/plugins.html:45
 msgid "requires migrations"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:49
+#: flaskbb/templates/management/plugins.html:48
+#, fuzzy
+msgid "migrations"
+msgstr "Aktionen"
+
+#: flaskbb/templates/management/plugins.html:52
 msgid "Version"
 msgstr "Version"
 
-#: flaskbb/templates/management/plugins.html:57
+#: flaskbb/templates/management/plugins.html:60
 msgid "Enable"
 msgstr "Aktivieren"
 
-#: flaskbb/templates/management/plugins.html:63
+#: flaskbb/templates/management/plugins.html:66
 msgid "Disable"
 msgstr "Deaktivieren"
 
-#: flaskbb/templates/management/plugins.html:72
+#: flaskbb/templates/management/plugins.html:75
 msgid "Upgrade"
 msgstr ""
 
-#: flaskbb/templates/management/plugins.html:85
+#: flaskbb/templates/management/plugins.html:87
 msgid "Install"
 msgstr "Installieren"
 
-#: flaskbb/templates/management/plugins.html:97
+#: flaskbb/templates/management/plugins.html:99
 msgid "Uninstall"
 msgstr "Deinstallieren"
 
@@ -2401,50 +2463,50 @@ msgstr ""
 msgid "Forum Signature"
 msgstr "Forumsignatur"
 
-#: flaskbb/user/views.py:81
+#: flaskbb/user/views.py:87
 msgid "Error while updating user settings"
 msgstr "Fehler beim Aktualisieren der Benutzereinstellungen"
 
-#: flaskbb/user/views.py:84
+#: flaskbb/user/views.py:90
 msgid "Settings updated."
 msgstr "Einstellungen aktualisiert."
 
-#: flaskbb/user/views.py:115
+#: flaskbb/user/views.py:121
 msgid "Error while changing password"
 msgstr "Fehler beim Ändern des Passworts"
 
-#: flaskbb/user/views.py:118
+#: flaskbb/user/views.py:124
 msgid "Password updated."
 msgstr "Passwort aktualisiert."
 
-#: flaskbb/user/views.py:147
+#: flaskbb/user/views.py:153
 msgid "Error while updating email"
 msgstr "Fehler beim Ändern der E-Mail Adresse"
 
-#: flaskbb/user/views.py:150
+#: flaskbb/user/views.py:156
 msgid "Email address updated."
 msgstr "E-Mail-Adresse aktualisiert."
 
-#: flaskbb/user/views.py:181
+#: flaskbb/user/views.py:187
 #, fuzzy
 msgid "Error while updating avatar"
 msgstr "Fehler beim Ändern der E-Mail Adresse"
 
-#: flaskbb/user/views.py:184
+#: flaskbb/user/views.py:190
 #, fuzzy
 msgid "Avatar updated."
 msgstr "Kategorie aktualisiert."
 
-#: flaskbb/user/views.py:203
+#: flaskbb/user/views.py:209
 #, fuzzy
 msgid "Avatar deleted."
 msgstr "Benutzer gelöscht."
 
-#: flaskbb/user/views.py:227
+#: flaskbb/user/views.py:233
 msgid "Error while updating user details"
 msgstr "Fehler beim Aktualisieren der Benutzerdetails"
 
-#: flaskbb/user/views.py:230
+#: flaskbb/user/views.py:236
 msgid "User details updated."
 msgstr "Benutzerdetails aktualisiert."
 
@@ -2468,27 +2530,27 @@ msgstr "Das alte Passwort ist falsch"
 msgid "Could not retrieve avatar"
 msgstr "Konnte Profilbild nicht holen"
 
-#: flaskbb/utils/helpers.py:194
+#: flaskbb/utils/helpers.py:201
 msgid "You do not have the permissions to execute this action."
 msgstr "Du hast nicht die Berechtigung zum Ausführen dieser Aktion."
 
-#: flaskbb/utils/helpers.py:212
+#: flaskbb/utils/helpers.py:219
 msgid "You do not have the permissions to delete these topics."
 msgstr "Du hast nicht die Berechtigung zum Löschen dieser Themen."
 
-#: flaskbb/utils/helpers.py:224
+#: flaskbb/utils/helpers.py:231
 msgid "You do not have the permissions to hide these topics."
 msgstr "Du hast nicht die Berechtigung zum Verstecken dieser Themen."
 
-#: flaskbb/utils/helpers.py:238
+#: flaskbb/utils/helpers.py:245
 msgid "You do not have the permissions to unhide these topics."
 msgstr "Du hast nicht die Berechtigung zum Sichtbarmachen dieser Themen."
 
-#: flaskbb/utils/helpers.py:859
+#: flaskbb/utils/helpers.py:870
 msgid "The registration has been disabled."
 msgstr "Die Registrierung wurde deaktiviert."
 
-#: flaskbb/utils/helpers.py:880
+#: flaskbb/utils/helpers.py:891
 msgid "This account is already activated."
 msgstr "Dieses Konto ist bereits aktiviert."
 
@@ -3740,4 +3802,7 @@ msgstr "Captcha"
 
 #~ msgid "This account is already activated."
 #~ msgstr "Dieses Konto ist bereits aktiviert."
+
+#~ msgid "Apply them with 'flaskbb plugins install --migrations-only %(name)s'"
+#~ msgstr ""
 
