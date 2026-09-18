@@ -144,7 +144,7 @@ make test
 make format
 ```
 
-Translations are managed on [Transifex](https://www.transifex.com). See the
+Translations are managed on [Weblate](https://hosted.weblate.org/projects/flaskbb/). See the
 [localization guide](https://flaskbb.readthedocs.io/en/latest/development/localization.html)
 for adding a new language.
 
