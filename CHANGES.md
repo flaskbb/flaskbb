@@ -14,6 +14,9 @@ Unreleased
 - Links can open in a new tab. (#671)
 - Admins can delete all posts of a user. (#534)
 - The member list can be hidden. (#625)
+- Quotes are styled and show a header with the quoted user and a link to the quoted post, including quotes in existing posts.
+- Long quotes are shortened until expanded, and quotes nested deeper than two levels are collapsed.
+- Typing `@` and three characters in the editor suggests usernames to mention.
 
 #### Search
 - **Search** was rewritten and can be extended via plugins.
@@ -26,8 +29,10 @@ Unreleased
 - A Plugin's setting can now be upgraded from the admin panel or the CLI.
 - Installed plugins settings are upgraded automatically when the app starts (migrations are not applied!).
 - Newly installed plugins are disabled until they are enabled, and disabled plugins are no longer imported.
+- Enabling a plugin applies its migrations first, and the admin panel's install and uninstall buttons apply or revert its migrations along with the settings. An enabled plugin with pending migrations stays disabled at startup until they are applied.
 - New plugin lifecycle hooks: `on_plugin_install`, `on_plugin_uninstall`, `on_plugin_upgrade` and `on_plugin_settings_changed`. (#508)
 - New hooks let plugins add buttons to the markdown editor toolbar. (#464)
+- Plugins can add a quote to the editor with `window.app.insertQuote(editor, markdown)`.
 
 
 #### Admin panel
@@ -37,15 +42,21 @@ Unreleased
 
 #### Appearance
 - A dark version of the Aurora theme was added.
+- New favicon based on the FlaskBB logo that adapts to light and dark browser themes.
 
 #### CLI
 - New `flaskbb serve` command runs FlaskBB with gunicorn.
+- New `flaskbb bootstrap` command waits for the database, then installs or migrates it and enables the given plugins. The container images run it on every start. `python -m flaskbb` runs the CLI as well.
 - New CLI commands manage users, groups and permissions. (#466)
 - `flaskbb plugins` can run plugin migrations.
 - `flaskbb upgrade` was removed. Migrations and plugin installs now handle setting fixtures.
 
 #### Improvements
 - htmx is now supported and used for various actions.
+- A full docker setup is now supported.
+- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`.
+- The release docker-compose stack installs, enables and migrates the plugins declared in `docker/.env`.
+- Online users and guests are tracked with redis-py instead of `flask-redis`
 
 
 ## Version 2.2.1
