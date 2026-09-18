@@ -322,7 +322,7 @@ appearance_group = SettingGroup(
     settings=(
         SelectSetting(
             key="DEFAULT_THEME",
-            value="aurora",
+            value="aurora_dark",
             choices=get_available_themes,
             coerce=str,
             name="Default Theme",

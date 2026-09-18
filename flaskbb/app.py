@@ -53,6 +53,8 @@ from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import (
     get_plugins_with_pending_migrations,
+    plugin_migrations_dir,
+    plugins_with_pending_migrations,
     remove_zombie_plugins_from_db,
     template_hook,
 )
@@ -491,22 +493,26 @@ def configure_errorhandlers(app: FlaskBB):
 def configure_migrations(app: FlaskBB):
     """Configure migrations.
 
-    Disabled plugins are never imported, so they can't answer
+    Blocked plugins are never imported, so they can't answer
     ``flaskbb_load_migrations``. Their migrations are looked up next to the
-    package instead, the convention ``has_migrations`` relies on as well, so
-    the revisions they already applied (e.g. during ``flaskbb install``) resolve.
+    package instead, so the revisions they already applied (e.g. during
+    ``flaskbb install``) resolve. ``upgrade heads`` leaves out the disabled
+    ones, but not the enabled ones that are held back because of their
+    pending migrations.
     """
     plugin_dirs = pluggy.hook.flaskbb_load_migrations()
+    held_back = cast(set[str], app.extensions.get("flaskbb_held_back_plugins", set()))
+    blocked_dirs: list[str] = []
     disabled_dirs: list[str] = []
     for entry_point in pluggy.list_disabled_plugins():
-        package = importlib.util.find_spec(entry_point.module.split(".")[0])
-        if package is None or not package.submodule_search_locations:
+        migrations = plugin_migrations_dir(entry_point)
+        if migrations is None:
             continue
-        migrations = os.path.join(next(iter(package.submodule_search_locations)), "migrations")
-        if os.path.isdir(migrations):
+        blocked_dirs.append(migrations)
+        if entry_point.name not in held_back:
             disabled_dirs.append(migrations)
 
-    app.config["ALEMBIC"]["version_locations"] = get_alembic_locations(plugin_dirs + disabled_dirs)
+    app.config["ALEMBIC"]["version_locations"] = get_alembic_locations(plugin_dirs + blocked_dirs)
     app.config["ALEMBIC"]["disabled_version_locations"] = disabled_dirs
 
 
@@ -625,8 +631,19 @@ def load_plugins(app: FlaskBB):
 
     # newly installed plugins stay disabled until they are enabled explicitly
     enabled_names = {p.name for p in plugins if p.enabled}
-    for entry_point in importlib.metadata.entry_points(group="flaskbb_plugins"):
-        if entry_point.name not in enabled_names:
+    entry_points = importlib.metadata.entry_points(group="flaskbb_plugins")
+    # a plugin whose tables are missing can break every page once it is loaded
+    held_back = plugins_with_pending_migrations(app, entry_points, enabled_names)
+    for name in sorted(held_back):
+        logger.warning(
+            f"Plugin '{name}' stays disabled until its migrations are applied. Apply them "
+            f"with the install button in the admin panel or with "
+            f"'flaskbb plugins install --migrations-only {name}' and restart FlaskBB."
+        )
+    app.extensions["flaskbb_held_back_plugins"] = held_back
+
+    for entry_point in entry_points:
+        if entry_point.name not in enabled_names or entry_point.name in held_back:
             pluggy.set_blocked(entry_point.name)
 
     for plugin in plugins:

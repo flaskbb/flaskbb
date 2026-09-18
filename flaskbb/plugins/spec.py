@@ -1155,8 +1155,9 @@ def flaskbb_tpl_admin_settings_menu(user: "User | Guest"):
     """This hook is emitted in the admin panel and used to add additional
     navigation links to the admin menu.
 
-    Implementations of this hook should return a list of tuples
-    that are view name, display text and optionally an icon.
+    Implementations of this hook should return a list of
+    :class:`~flaskbb.display.navigation.NavigationLink` objects or of tuples
+    that are view name, display text and an icon.
     The display text will be provided to the translation service so it
     is unnecessary to supply translated text.
 
@@ -1167,7 +1168,10 @@ def flaskbb_tpl_admin_settings_menu(user: "User | Guest"):
             # only add this item if the user is an admin
             if Permission(IsAdmin, identity=current_user):
                 return [
-                    ("myplugin.foobar", "Foobar", "fa fa-foobar")
+                    NavigationLink(
+                        endpoint="myplugin.foobar", name="Foobar", icon="fa fa-foobar"
+                    ),
+                    ("myplugin.bar", "Bar", "fa fa-bar"),
                 ]
 
     Hookwrappers for this spec should not be registered as FlaskBB

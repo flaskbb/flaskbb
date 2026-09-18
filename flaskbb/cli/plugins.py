@@ -13,13 +13,20 @@ import os
 import click
 from alembic.util.exc import CommandError
 from flask.cli import with_appcontext
+from sqlalchemy.exc import SQLAlchemyError
 
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import FlaskBBCLIError, get_cookiecutter, validate_plugin
 from flaskbb.extensions import alembic, pluggy
 from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.utils import remove_zombie_plugins_from_db
-from flaskbb.utils.populate import has_migrations
+from flaskbb.plugins.utils import (
+    apply_plugin_migrations,
+    plugin_has_applied_migrations,
+    plugin_has_migrations,
+    plugin_tables_in_use,
+    remove_zombie_plugins_from_db,
+    revert_plugin_migrations,
+)
 
 
 @flaskbb.group()
@@ -59,16 +66,8 @@ def _select_scope(settings_only: bool, migrations_only: bool) -> tuple[bool, boo
     return not migrations_only, not settings_only
 
 
-def _plugin_has_migrations(plugin_name: str) -> bool:
-    """A disabled plugin is blocked on pluggy, so its migrations aren't
-    part of alembic's version locations and can't be run.
-    """
-    plugin = pluggy.get_plugin(plugin_name)
-    return plugin is not None and has_migrations(plugin)
-
-
 def _apply_migrations(plugin_name: str):
-    if not _plugin_has_migrations(plugin_name):
+    if not plugin_has_migrations(plugin_name):
         return
 
     try:
@@ -79,12 +78,9 @@ def _apply_migrations(plugin_name: str):
 
 
 def _revert_migrations(plugin_name: str):
-    if not _plugin_has_migrations(plugin_name):
-        return
-
     try:
-        alembic.downgrade(target=f"{plugin_name}@base")
-        click.secho(f"[+] Reverted the migrations of '{plugin_name}'.", fg="green")
+        if revert_plugin_migrations(plugin_name):
+            click.secho(f"[+] Reverted the migrations of '{plugin_name}'.", fg="green")
     except CommandError as exc:
         click.secho(f"[!] Couldn't revert the migrations of '{plugin_name}': {exc}", fg="red")
 
@@ -144,6 +140,17 @@ def enable_plugin(plugin_name: str):
 
     if plugin.enabled:
         click.secho(f"Plugin '{plugin.name}' is already enabled.")
+        return
+
+    # a plugin whose tables are missing can break every page once it is loaded
+    try:
+        if apply_plugin_migrations(plugin.name):
+            click.secho(f"[+] Applied the migrations of '{plugin.name}'.", fg="green")
+    except (CommandError, SQLAlchemyError) as exc:
+        raise FlaskBBCLIError(
+            f"Couldn't apply the migrations of '{plugin.name}', it stays disabled: {exc}",
+            fg="red",
+        ) from exc
 
     plugin.enabled = True
     plugin.save()
@@ -162,6 +169,7 @@ def disable_plugin(plugin_name: str):
 
     if not plugin.enabled:
         click.secho(f"Plugin '{plugin.name}' is already disabled.")
+        return
 
     plugin.enabled = False
     plugin.save()
@@ -211,7 +219,10 @@ def install(
             )
             continue
 
-        if do_settings:
+        # held back at startup because of its pending migrations
+        held_back = pluggy.get_plugin(plugin.name) is None
+
+        if do_settings and not held_back:
             if plugin.is_installable:
                 plugin.add_settings(force)
                 click.secho(f"[+] Plugin '{plugin.name}' has been installed.", fg="green")
@@ -220,6 +231,13 @@ def install(
 
         if do_migrations:
             _apply_migrations(plugin.name)
+
+        if do_settings and held_back:
+            click.secho(
+                f"[!] '{plugin.name}' wasn't loaded because of its pending migrations. "
+                "Run the install again to install its settings.",
+                fg="yellow",
+            )
 
 
 @plugins.command("uninstall")
@@ -258,7 +276,17 @@ def uninstall(
     do_settings, do_migrations = _select_scope(settings_only, migrations_only)
     selected = _select_plugins(plugin_name, all_plugins)
 
-    with_migrations = [p.name for p in selected if _plugin_has_migrations(p.name)]
+    if do_migrations:
+        in_use = [p for p in selected if plugin_tables_in_use(p.name)]
+        for plugin in in_use:
+            click.secho(
+                f"[!] Can't uninstall '{plugin.name}', its tables are still in use. "
+                "Disable it and restart FlaskBB first.",
+                fg="red",
+            )
+        selected = [p for p in selected if p not in in_use]
+
+    with_migrations = [p.name for p in selected if plugin_has_applied_migrations(p.name)]
     if do_migrations and with_migrations and not force:
         click.confirm(
             click.style(
@@ -275,7 +303,7 @@ def uninstall(
             _revert_migrations(plugin.name)
 
         if do_settings:
-            if plugin.is_installed:
+            if plugin.has_stored_settings:
                 plugin.remove_settings()
                 click.secho(f"[+] Plugin '{plugin.name}' has been uninstalled.", fg="green")
             else:

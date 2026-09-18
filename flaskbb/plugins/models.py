@@ -82,6 +82,14 @@ class PluginRegistry(BaseModel):
             return False
 
     @property
+    def has_stored_settings(self) -> bool:
+        """Unlike ``is_installed`` this doesn't need the plugin's SettingGroup,
+        so it also works for disabled plugins."""
+        return db.session.execute(
+            sa.select(sa.exists().where(Setting.group_key == self.name))
+        ).scalar_one()
+
+    @property
     def settings(self) -> dict[str, Any]:
         """This plugin's current setting values, prefixed with this plugin's
         group_key (e.g. {"PORTAL_FORUM_IDS": [...]})

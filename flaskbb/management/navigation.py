@@ -8,6 +8,7 @@ Builds the navigation shown in the management panel sidebar.
 :license: BSD, see LICENSE for more details
 """
 
+from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from flask import request
@@ -156,6 +157,26 @@ def _simple_tree(
     )
 
 
+def _plugin_link(
+    item: "NavigationLink | tuple[str, str, str]", current_endpoint: str | None
+) -> NavigationLink:
+    if isinstance(item, NavigationLink):
+        return replace(
+            item,
+            active=item.active or item.endpoint == current_endpoint,
+            urlforkwargs={"_anchor": ANCHOR, **item.urlforkwargs},
+        )
+
+    endpoint, text, icon = item
+    return NavigationLink(
+        endpoint=endpoint,
+        name=text,
+        icon=icon,
+        active=endpoint == current_endpoint,
+        urlforkwargs={"_anchor": ANCHOR},
+    )
+
+
 def get_management_navigation(
     user: "User | Guest", active_override: str | None = None
 ) -> list[NavigationItem]:
@@ -237,15 +258,6 @@ def get_management_navigation(
     plugin_items = list(pluggy.hook.flaskbb_tpl_admin_settings_menu(user=user))
     if plugin_items:
         nav.append(NavigationHeader(text=_("Plugins"), icon="fa fa-grip"))
-        nav.extend(
-            NavigationLink(
-                endpoint=endpoint,
-                name=text,
-                icon=icon,
-                active=endpoint == current_endpoint,
-                urlforkwargs={"_anchor": ANCHOR},
-            )
-            for endpoint, text, icon in plugin_items
-        )
+        nav.extend(_plugin_link(item, current_endpoint) for item in plugin_items)
 
     return nav

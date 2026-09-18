@@ -51,7 +51,7 @@
                     {{ run_hook("flaskbb_tpl_post_author_info_before", user=user, post=post) }}
 
                     {% if user.avatar %}
-                        <div class="author-avatar"><img src="{{ user.avatar }}" alt="avatar"></div>
+                        <div class="author-avatar"><img src="{{ user.avatar_url }}" alt="avatar"></div>
                     {% endif %}
 
                     <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date }}</div>
@@ -259,8 +259,8 @@
     {% if form %}
     <form class="form" method="post">
         {{ form.hidden_tag() }}
-        <div class="row">
-            <div class="offset-md-2 offset-sm-3 col-md-10 col-sm-9 col-12">
+        <div class="row g-0 reply-row">
+            <div class="reply-box col-12">
                 {{ render_editor_field(form.content, rows=6) }}
                 {{ render_submit_field(form.submit, div_class="mt-2 float-end") }}
             </div>

@@ -62,7 +62,9 @@ def test_plugins_overview_shows_migrations_badge(
     application, admin_user, failing_plugin, monkeypatch
 ):
     monkeypatch.setattr(views, "plugin_has_pending_migrations", lambda name: True)
-    PluginRegistry("failing_plugin").save()
+    registry = PluginRegistry("failing_plugin")
+    registry.enabled = True
+    registry.save()
 
     with application.test_request_context("/management/plugins"):
         login_user(admin_user)

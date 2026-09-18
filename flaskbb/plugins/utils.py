@@ -9,19 +9,79 @@ store for plugins.
 :license: BSD, see LICENSE for more details.
 """
 
+import importlib.metadata
+import importlib.util
+import logging
+import os
 import traceback
+from collections.abc import Iterable
 from types import ModuleType
-from typing import Any
+from typing import Any, cast
 
 import sqlalchemy as sa
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from alembic.script.revision import RevisionError
 from flask import flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
 
+from flaskbb.core.app import FlaskBB
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils.datastructures import TemplateEventResult
-from flaskbb.utils.populate import has_migrations
+
+logger = logging.getLogger(__name__)
+
+
+def plugin_migrations_dir(entry_point: importlib.metadata.EntryPoint) -> str | None:
+    """Looks up the plugin's migrations next to its package without importing
+    it, the convention ``has_migrations`` relies on as well.
+    """
+    package = importlib.util.find_spec(entry_point.module.split(".")[0])
+    if package is None or not package.submodule_search_locations:
+        return None
+    migrations = os.path.join(next(iter(package.submodule_search_locations)), "migrations")
+    return migrations if os.path.isdir(migrations) else None
+
+
+def plugins_with_pending_migrations(
+    app: FlaskBB,
+    entry_points: Iterable[importlib.metadata.EntryPoint],
+    names: set[str],
+) -> set[str]:
+    """Returns the plugins out of ``names`` with migrations that haven't been
+    applied yet. The plugins aren't loaded and alembic isn't configured yet,
+    so the revisions are read from the migration directories directly.
+    """
+    if not names:
+        return set()
+
+    script_location = cast(str, app.config["ALEMBIC"]["script_location"])
+    if not os.path.isabs(script_location) and ":" not in script_location:
+        script_location = os.path.join(app.root_path, script_location)
+    plugin_dirs = [d for ep in entry_points if (d := plugin_migrations_dir(ep)) is not None]
+    script_directory = ScriptDirectory(
+        script_location, version_locations=[script_location, *plugin_dirs]
+    )
+
+    with app.app_context(), db.engine.connect() as connection:
+        current_heads = MigrationContext.configure(connection).get_current_heads()
+
+    try:
+        applied = {
+            script.revision for script in script_directory.iterate_revisions(current_heads, "base")
+        }
+        return {
+            name
+            for script in script_directory.walk_revisions()
+            if script.revision not in applied
+            for name in names & script.branch_labels
+        }
+    except RevisionError as exc:
+        # e.g. the database holds a revision of a plugin that was removed from the env
+        logger.warning("Couldn't check the plugins for pending migrations.", exc_info=exc)
+        return set()
 
 
 def template_hook(name: str, silent: bool = True, is_markup: bool = True, **kwargs: Any):
@@ -83,23 +143,79 @@ def remove_zombie_plugins_from_db():
     return remove_me
 
 
+def plugin_has_migrations(name: str) -> bool:
+    """Returns ``True`` if the plugin ships a migration branch. Unlike
+    ``has_migrations`` this works for disabled plugins as well, because their
+    migrations are part of alembic's version locations too.
+    """
+    return any(name in script.branch_labels for script in alembic.script_directory.walk_revisions())
+
+
+def apply_plugin_migrations(name: str) -> bool:
+    """Upgrades the plugin's migration branch to its head. Returns ``False``
+    if the plugin has no migrations.
+    """
+    if not plugin_has_migrations(name):
+        return False
+
+    alembic.upgrade(target=f"{name}@head")
+    return True
+
+
+def revert_plugin_migrations(name: str) -> bool:
+    """Downgrades the plugin's migration branch to its base, which drops its
+    tables and data. Returns ``False`` if the plugin has no migrations.
+    """
+    if not plugin_has_migrations(name):
+        return False
+
+    alembic.downgrade(target=f"{name}@base")
+    return True
+
+
 def plugin_has_pending_migrations(name: str) -> bool:
     """Returns ``True`` if the head revision of the plugin's migration
     branch hasn't been applied to the database yet.
     """
-    plugin = pluggy.get_plugin(name)
-    # disabled plugins are never imported and their migrations only run once enabled
-    if plugin is None or not has_migrations(plugin):
+    if not plugin_has_migrations(name):
         return False
 
-    script_directory = alembic.script_directory
-    current_heads = alembic.migration_context.get_current_heads()
-    applied = {
-        script.revision for script in script_directory.iterate_revisions(current_heads, "base")
-    }
+    applied = _applied_revisions()
     return any(
-        script.revision not in applied for script in script_directory.get_revisions(f"{name}@head")
+        script.revision not in applied
+        for script in alembic.script_directory.get_revisions(f"{name}@head")
     )
+
+
+def plugin_has_applied_migrations(name: str) -> bool:
+    """Returns ``True`` if any revision of the plugin's migration branch has
+    been applied to the database. Works for disabled plugins as well.
+    """
+    if not plugin_has_migrations(name):
+        return False
+
+    applied = _applied_revisions()
+    return any(
+        script.revision in applied
+        for script in alembic.script_directory.walk_revisions()
+        if name in script.branch_labels
+    )
+
+
+def plugin_tables_in_use(name: str) -> bool:
+    """Returns ``True`` if the plugin is loaded in this process and its tables
+    exist. Its running code keeps using them, e.g. the columns a plugin adds
+    to users would break every page once dropped.
+    """
+    return pluggy.get_plugin(name) is not None and plugin_has_applied_migrations(name)
+
+
+def _applied_revisions() -> set[str]:
+    current_heads = alembic.migration_context.get_current_heads()
+    return {
+        script.revision
+        for script in alembic.script_directory.iterate_revisions(current_heads, "base")
+    }
 
 
 def get_plugins_with_pending_migrations(error: BaseException) -> list[str]:

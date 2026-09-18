@@ -253,6 +253,7 @@
             border-radius: 0.25em;
             height: auto;
             width: 8em;
+            max-width: 100%;
         }
     }
 
@@ -279,10 +280,42 @@
     }
 }
 
+$author-min-width: 10rem;
+
+// matches the post-row edges inside the topic card border
+.reply-row {
+    margin: 0 1px;
+}
+
+@include media-breakpoint-up(sm) {
+    .post-row > .author:not(.author-horizontal) {
+        min-width: $author-min-width;
+
+        + .post-box {
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+        }
+    }
+
+    .reply-row > .reply-box {
+        flex: 1 1 0;
+        width: auto;
+        margin-left: max(25%, #{$author-min-width});
+    }
+}
+
+@include media-breakpoint-up(md) {
+    .reply-row > .reply-box {
+        margin-left: max(16.666667%, #{$author-min-width});
+    }
+}
+
 .author-name h4,
 h4.author-name {
     float: left;
     margin-bottom: 0;
+    font-size: 1.25rem;
 }
 
 .author-title h5,

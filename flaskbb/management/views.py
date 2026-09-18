@@ -16,6 +16,7 @@ from datetime import timedelta
 from typing import cast
 
 import sqlalchemy as sa
+from alembic.util.exc import CommandError
 from celery import __version__ as celery_version
 from flask import (
     Blueprint,
@@ -30,12 +31,13 @@ from flask_allows2 import Permission
 from flask_babelplus import gettext as _
 from flask_login import login_fresh
 from pluggy import HookimplMarker
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import FileStorage
 
 from flaskbb._version import __version__ as flaskbb_version
 from flaskbb.core.app import FlaskBB
-from flaskbb.extensions import allows, celery, db, login_manager
+from flaskbb.extensions import allows, celery, db, login_manager, pluggy
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Attachment, Category, Forum, Post, Report, Topic
 from flaskbb.management.forms import (
@@ -52,7 +54,14 @@ from flaskbb.management.forms import (
     SuperModeratorEditUserForm,
 )
 from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.utils import plugin_has_pending_migrations, validate_plugin
+from flaskbb.plugins.utils import (
+    apply_plugin_migrations,
+    plugin_has_applied_migrations,
+    plugin_has_pending_migrations,
+    plugin_tables_in_use,
+    revert_plugin_migrations,
+    validate_plugin,
+)
 from flaskbb.settings import flaskbb_config
 from flaskbb.settings.forms import build_form
 from flaskbb.settings.models import Setting
@@ -1332,9 +1341,16 @@ class PluginsView(MethodView):
 
     def get(self):
         plugins = PluginRegistry.get_all()
-        pending_migrations = {p.name for p in plugins if plugin_has_pending_migrations(p.name)}
+        # disabled plugins get their migrations applied once they are enabled
+        pending_migrations = {
+            p.name for p in plugins if p.enabled and plugin_has_pending_migrations(p.name)
+        }
+        applied_migrations = {p.name for p in plugins if plugin_has_applied_migrations(p.name)}
         return render_template(
-            "management/plugins.html", plugins=plugins, pending_migrations=pending_migrations
+            "management/plugins.html",
+            plugins=plugins,
+            pending_migrations=pending_migrations,
+            applied_migrations=applied_migrations,
         )
 
 
@@ -1356,6 +1372,21 @@ class EnablePlugin(MethodView):
 
         if plugin.enabled:
             flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
+            return redirect(url_for("management.plugins"))
+
+        # a plugin whose tables are missing can break every page once it is loaded
+        try:
+            apply_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't apply the migrations of %(plugin)s, it stays disabled: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
             return redirect(url_for("management.plugins"))
 
         plugin.enabled = True
@@ -1418,7 +1449,42 @@ class InstallPlugin(MethodView):
     def post(self, name: str):
         validate_plugin(name)
         plugin = PluginRegistry.get_by_or_404(name=name)
-        plugin.add_settings()
+
+        if not plugin.enabled:
+            flash(
+                _("Plugin %(plugin)s has to be enabled first.", plugin=plugin.name),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        try:
+            apply_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't apply the migrations of %(plugin)s: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        if plugin.is_installable and not plugin.is_installed:
+            plugin.add_settings()
+
+        # held back at startup because of its pending migrations
+        if pluggy.get_plugin(plugin.name) is None:
+            flash(
+                _(
+                    "The migrations of %(plugin)s have been applied. Restart FlaskBB to load "
+                    "it and install its settings.",
+                    plugin=plugin.name,
+                ),
+                "success",
+            )
+            return redirect(url_for("management.plugins"))
 
         flash(_("Plugin has been installed."), "success")
         return redirect(url_for("management.plugins"))
@@ -1439,6 +1505,32 @@ class UninstallPlugin(MethodView):
     def post(self, name: str):
         validate_plugin(name)
         plugin = PluginRegistry.get_by_or_404(name=name)
+
+        if plugin_tables_in_use(plugin.name):
+            flash(
+                _(
+                    "Disable %(plugin)s and restart FlaskBB before uninstalling it, "
+                    "its tables are still in use.",
+                    plugin=plugin.name,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        try:
+            revert_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't revert the migrations of %(plugin)s: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
         plugin.remove_settings()
 
         flash(_("Plugin has been uninstalled."), "success")
