@@ -4,6 +4,19 @@
     href="{{ pathto('_static/custom.css', 1) }}"
     type="text/css"
 />
+<meta name="color-scheme" content="light dark" />
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/dark.css', 1) }}"
+    type="text/css"
+    media="(prefers-color-scheme: dark)"
+/>
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/custom-dark.css', 1) }}"
+    type="text/css"
+    media="(prefers-color-scheme: dark)"
+/>
 {% if theme_touch_icon %}
 <link
     rel="apple-touch-icon"

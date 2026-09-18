@@ -72,6 +72,11 @@ code {
   line-height: 1.3;
 }
 
+.page-sidebar ul {
+  margin-left: 10px;
+  padding-left: .5rem;
+}
+
 .page-sidebarwrapper ul li a {
   display: block;
   padding: 3px 0;
@@ -95,6 +100,11 @@ a.reference:active {
 
 a:visited {
     text-decoration: none;
+}
+
+/* basic.css colors visited links, which the navbar should not inherit */
+:where(.flaskbb-navbar) a:visited {
+    color: var(--bs-nav-link-color, var(--bs-navbar-brand-color));
 }
 
 a:hover {

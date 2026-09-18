@@ -1,0 +1,62 @@
+{# Changes to the original: github-button script instead of the ghbtns iframe #}
+{% if theme_logo %}
+<p class="logo">
+  <a href="{{ pathto(master_doc) }}">
+    <img class="logo" src="{{ pathto('_static/' ~ theme_logo, 1) }}" alt="Logo" />
+    {% if theme_logo_name|lower == 'true' %}
+    <h1 class="logo logo-name">{{ project }}</h1>
+    {% elif theme_logo_name|lower != 'false' %}
+    <h1 class="logo logo-name">{{ theme_logo_name }}</h1>
+    {% endif %}
+  </a>
+</p>
+{% else %}
+<h1 class="logo"><a href="{{ pathto(master_doc) }}">{{ project }}</a></h1>
+{% endif %}
+
+{% if theme_description %}
+<p class="blurb">{{ theme_description }}</p>
+{% endif %}
+
+{% if theme_github_user and theme_github_repo %}
+{% if theme_github_button|lower == 'true' %}
+<p>
+<a class="github-button" href="https://github.com/{{ theme_github_user }}/{{ theme_github_repo }}"
+  data-icon="octicon-star" data-size="large" data-show-count="{{ theme_github_count }}"
+  aria-label="Star {{ theme_github_user }}/{{ theme_github_repo }} on GitHub">Star</a>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+</p>
+{% endif %}
+{% endif %}
+
+{% if theme_travis_button|lower != 'false' %}
+{% if theme_travis_button|lower == 'true' %}
+    {% set path = theme_github_user + '/' + theme_github_repo %}
+{% else %}
+    {% set path = theme_travis_button %}
+{% endif %}
+<p>
+<a class="badge" href="https://travis-ci.org/{{ path }}">
+    <img
+        alt="https://secure.travis-ci.org/{{ path }}.svg?branch={{ theme_badge_branch }}"
+        src="https://secure.travis-ci.org/{{ path }}.svg?branch={{ theme_badge_branch }}"
+    />
+</a>
+</p>
+{% endif %}
+
+{% if theme_codecov_button|lower != 'false' %}
+{% if theme_codecov_button|lower == 'true' %}
+    {% set path = theme_github_user + '/' + theme_github_repo %}
+{% else %}
+    {% set path = theme_codecov_button %}
+{% endif %}
+<p>
+<a class="badge" href="https://codecov.io/github/{{ path }}">
+    <img
+    alt="https://codecov.io/github/{{ path }}/coverage.svg?branch={{ theme_badge_branch }}"
+    src="https://codecov.io/github/{{ path }}/coverage.svg?branch={{ theme_badge_branch }}"
+    />
+</a>
+</p>
+{% endif %}
