@@ -11,14 +11,17 @@ and the user settings from a signed in user.
 
 import logging
 
+import sqlalchemy as sa
 from attrs import define, field
-from flask import Blueprint, flash, redirect, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, request, url_for
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import login_required
 from pluggy import HookimplMarker
 
 from flaskbb.core.app import FlaskBB
+from flaskbb.extensions import db, limiter
+from flaskbb.markup import MENTIONABLE_USERNAME_REGEX
 from flaskbb.user.forms import (
     ChangeAvatarForm,
     ChangeEmailForm,
@@ -34,7 +37,7 @@ from flaskbb.user.services.update import (
     DefaultPasswordUpdateHandler,
     DefaultSettingsUpdateHandler,
 )
-from flaskbb.utils.helpers import real, register_view, render_template
+from flaskbb.utils.helpers import escape_like, real, register_view, render_template
 from flaskbb.utils.proxies import current_user
 from flaskbb.utils.uploads import delete_avatar_file
 
@@ -55,6 +58,9 @@ from .services.factories import (
 impl = HookimplMarker("flaskbb")
 
 logger = logging.getLogger(__name__)
+
+USER_LOOKUP_MIN_LENGTH = 3
+USER_LOOKUP_MAX_RESULTS = 10
 
 
 @define(frozen=True, eq=False, order=False, hash=False, repr=True)
@@ -260,6 +266,42 @@ class UserProfile(MethodView):  # pragma: no cover
         return render_template("user/profile.html", user=user)
 
 
+class UserLookup(MethodView):
+    decorators = [login_required, limiter.limit("60/minute")]
+
+    def get(self):
+        term = request.args.get("q", "").strip()
+        if len(term) < USER_LOOKUP_MIN_LENGTH or not MENTIONABLE_USERNAME_REGEX.fullmatch(term):
+            return jsonify([])
+
+        stmt = (
+            sa.select(User.username, User.avatar)
+            .where(
+                User.username.ilike(f"{escape_like(term)}%", escape="\\"),
+                User.activated.is_(True),
+            )
+            .order_by(sa.func.length(User.username), User.username)
+            .limit(USER_LOOKUP_MAX_RESULTS)
+        )
+        if request.args.get("exclude_self") == "1":
+            stmt = stmt.where(User.id != real(current_user).id)
+
+        default_avatar = url_for("static", filename="avatar100x100.png")
+        return jsonify(
+            [
+                {
+                    "username": username,
+                    "url": url_for("user.profile", username=username),
+                    "avatar_url": url_for("uploads.avatar", avatar=avatar)
+                    if avatar
+                    else default_avatar,
+                }
+                for username, avatar in db.session.execute(stmt)
+                if MENTIONABLE_USERNAME_REGEX.fullmatch(username)
+            ]
+        )
+
+
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app: FlaskBB):
     user = Blueprint("user", __name__)
@@ -296,6 +338,7 @@ def flaskbb_load_blueprints(app: FlaskBB):
         view_func=AllUserTopics.as_view("view_all_topics"),
     )
 
+    register_view(user, routes=["/lookup/usernames"], view_func=UserLookup.as_view("lookup"))
     register_view(user, routes=["/<username>"], view_func=UserProfile.as_view("profile"))
 
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])

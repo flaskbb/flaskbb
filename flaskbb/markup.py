@@ -50,7 +50,9 @@ impl = HookimplMarker("flaskbb")
 logger = logging.getLogger(__name__)
 
 # MENTION_PATTERN = r"@(?:(?<!\\)(?:\\\\)*\\|\w+|\\ \.)(?: |$|)"
-MENTION_REGEX = re.compile(r"\B@([\w\-]+)")
+MENTIONABLE_USERNAME_PATTERN = r"[\w\-]+"
+MENTIONABLE_USERNAME_REGEX = re.compile(MENTIONABLE_USERNAME_PATTERN)
+MENTION_REGEX = re.compile(rf"\B@({MENTIONABLE_USERNAME_PATTERN})")
 
 
 def replace_mention_with_linktag(m: re.Match[str]) -> str:

@@ -66,13 +66,83 @@ function markdownPreview(element) {
     });
 }
 
-function autocomplete(element) {
-    const config = {
-        dropdown: {
-            maxCount: 5,
-        },
-    };
+// the server enforces the same minimum and only returns usernames that
+// markup.MENTION_REGEX would turn into a profile link
+const USER_LOOKUP_MIN_LENGTH = 3;
+const USERNAME_CHARS = "[\\p{L}\\p{N}_\\-]";
 
+function notInCode(text) {
+    const blockmatch = text.match(/`{3}/g);
+    if (blockmatch && blockmatch.length % 2) {
+        // Cursor is in a code block
+        return false;
+    }
+    const inlinematch = text.match(/`/g);
+    if (inlinematch && inlinematch.length % 2) {
+        // Cursor is in a inline code
+        return false;
+    }
+    return true;
+}
+
+function lookupUsers({ excludeSelf = false } = {}) {
+    let timer = null;
+    let controller = null;
+    return (term, callback) => {
+        clearTimeout(timer);
+        controller?.abort();
+        timer = setTimeout(() => {
+            controller = new AbortController();
+            const params = new URLSearchParams({ q: term });
+            if (excludeSelf) {
+                params.set("exclude_self", "1");
+            }
+            fetch(`${document.body.dataset.userLookupUrl}?${params}`, {
+                signal: controller.signal,
+                headers: { Accept: "application/json" },
+            })
+                .then((response) => (response.ok ? response.json() : []))
+                .then(callback)
+                .catch((error) => {
+                    if (error.name !== "AbortError") {
+                        callback([]);
+                    }
+                });
+        }, 200);
+    };
+}
+
+function renderUser(user) {
+    const item = document.createElement("span");
+    const avatar = document.createElement("img");
+    avatar.src = user.avatar_url;
+    avatar.alt = "";
+    avatar.width = 20;
+    avatar.height = 20;
+    avatar.className = "rounded-circle me-2";
+    item.append(avatar, user.username);
+    return item.innerHTML;
+}
+
+function mentionStrategy() {
+    return {
+        id: "mention",
+        match: new RegExp(`\\B@(${USERNAME_CHARS}{${USER_LOOKUP_MIN_LENGTH},})$`, "u"),
+        search: lookupUsers(),
+        cache: true,
+        replace: (user) => `@${user.username} `,
+        template: renderUser,
+        context: notInCode,
+    };
+}
+
+const AUTOCOMPLETE_CONFIG = {
+    dropdown: {
+        maxCount: 5,
+    },
+};
+
+function autocomplete(element) {
     const emojiStrategy = {
         id: "emoji",
         match: /\B:([\-+\w]*)$/,
@@ -91,21 +161,25 @@ function autocomplete(element) {
         template: (value) => {
             return parse_emoji(value.character) + " " + value.name;
         },
-        context: (text) => {
-            const blockmatch = text.match(/`{3}/g);
-            if (blockmatch && blockmatch.length % 2) {
-                // Cursor is in a code block
-                return false;
-            }
-            const inlinematch = text.match(/`/g);
-            if (inlinematch && inlinematch.length % 2) {
-                // Cursor is in a inline code
-                return false;
-            }
-            return true;
-        },
+        context: notInCode,
     };
-    return new Textcomplete(new TextareaEditor(element), [emojiStrategy], config);
+    const strategies = [emojiStrategy];
+    if (document.body.dataset.userLookupUrl) {
+        strategies.push(mentionStrategy());
+    }
+    return new Textcomplete(new TextareaEditor(element), strategies, AUTOCOMPLETE_CONFIG);
+}
+
+function userLookupInput(element) {
+    const strategy = {
+        id: "user-lookup",
+        match: new RegExp(`^(${USERNAME_CHARS}{${USER_LOOKUP_MIN_LENGTH},})$`, "u"),
+        search: lookupUsers({ excludeSelf: true }),
+        cache: true,
+        replace: (user) => user.username,
+        template: renderUser,
+    };
+    return new Textcomplete(new TextareaEditor(element), [strategy], AUTOCOMPLETE_CONFIG);
 }
 
 function autoresize(element) {
@@ -133,5 +207,8 @@ document.addEventListener("click", (event) => {
 
 htmx.onLoad((root) => {
     root.querySelectorAll(".flaskbb-editor").forEach((el) => autocomplete(el));
+    if (document.body.dataset.userLookupUrl) {
+        root.querySelectorAll("input[data-user-lookup]").forEach((el) => userLookupInput(el));
+    }
     root.querySelectorAll("[data-autoresize=true]").forEach((el) => autoresize(el));
 });

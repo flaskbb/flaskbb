@@ -69,6 +69,13 @@ T = TypeVar("T")
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 
+def escape_like(term: str) -> str:
+    """Escape LIKE metacharacters in a user-supplied search term so
+    literal `%`/`_` in the input aren't interpreted as SQL wildcards.
+    """
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 def slugify(text: str, delim: str = "-"):
     """Generates an slightly worse ASCII-only slug.
      Taken from the Flask Snippets page.

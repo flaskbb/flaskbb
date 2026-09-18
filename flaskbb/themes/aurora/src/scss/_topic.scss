@@ -324,7 +324,12 @@ h5.author-title {
     @include post-quotes;
 }
 
-// posts listed outside of topics, like a user's posts and topics
-.topic-content {
+// post markdown outside of topic posts: listed posts, signatures, profile
+// notes and the conversations plugin's messages
+.topic-content,
+.post-signature,
+.profile-field,
+.message-content,
+.conversation-content {
     @include post-quotes;
 }

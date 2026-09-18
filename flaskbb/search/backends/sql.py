@@ -20,13 +20,7 @@ from sqlalchemy.sql.elements import ColumnElement
 from flaskbb.forum.models import Forum, Post, Topic
 from flaskbb.search.base import ModelT, SearchBackend
 from flaskbb.user.models import User
-
-
-def _escape_like(term: str) -> str:
-    """Escape LIKE metacharacters in a user-supplied search term so
-    literal `%`/`_` in the input aren't interpreted as SQL wildcards.
-    """
-    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+from flaskbb.utils.helpers import escape_like
 
 
 def _post_clause(term: str) -> ColumnElement[bool]:
@@ -90,5 +84,5 @@ class SQLSearchBackend(SearchBackend):
         filter_fn = self._FILTERS.get(model)
         if filter_fn is None:
             raise ValueError(f"{model.__name__} is not a searchable model")
-        term = f"%{_escape_like(query)}%"
+        term = f"%{escape_like(query)}%"
         return select(model).where(filter_fn(term))
