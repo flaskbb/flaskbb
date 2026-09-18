@@ -44,10 +44,6 @@ div.sphinxsidebar input {
   border: 1px solid #30363d;
 }
 
-img.logo {
-  filter: invert(0.85);
-}
-
 a,
 a.reference,
 a.footnote-reference {

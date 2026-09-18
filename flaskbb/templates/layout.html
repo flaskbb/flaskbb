@@ -10,8 +10,14 @@
         <meta name="author" content="FlaskBB Team" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <link
-            rel="shortcut icon"
+            rel="icon"
             href="{{ url_for('static', filename='favicon.ico') }}"
+            sizes="48x48"
+        />
+        <link
+            rel="icon"
+            href="{{ url_for('static', filename='favicon.svg') }}"
+            type="image/svg+xml"
         />
 
         <title>

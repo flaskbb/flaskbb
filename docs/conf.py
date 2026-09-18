@@ -54,7 +54,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "alabaster"
 
 html_theme_options = {
-    "logo": "logo-full.png",
+    "logo": "logo-full-light.svg",
     "github_banner": True,
     "github_user": "sh4nks",
     "github_repo": "flaskbb",
