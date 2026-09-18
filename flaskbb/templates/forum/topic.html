@@ -117,7 +117,7 @@
                         </div>
                     </div>
 
-                        <div class="post-content" id="pid{{ post.id }}">
+                        <div class="post-content" id="pid{{ post.id }}" data-quote-author="{{ post.username }}" data-quote-author-url="{{ url_for('user.profile', username=post.username) }}" data-quote-post-url="{{ url_for('forum.view_post', post_id=post.id) }}">
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
@@ -174,7 +174,7 @@
 
                             {% if current_user|post_reply(topic) %}
                                 <!-- Quick quote -->
-                                <a href="#" class="btn btn-icon fas fa-reply text-blue quote-btn" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" title="{% trans %}Quote this post{% endtrans %}"></a>
+                                <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon fas fa-reply text-blue quote-btn" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" title="{% trans %}Quote this post{% endtrans %}"></a>
                                 <!-- Full quote/reply -->
                                 <a href="{{ url_for('forum.reply_post', topic_id=topic.id, post_id=post.id) }}" class="btn btn-icon fas fa-reply-all text-light-blue" data-bs-toggle="tooltip" title="{% trans %}Full Reply{% endtrans %}"></a>
                             {% endif %}
@@ -266,6 +266,9 @@
             </div>
         </div>
     </form>
+    <button type="button" class="btn btn-sm btn-primary selection-quote-btn" data-link-text="{% trans %}view post{% endtrans %}" hidden>
+        <span class="fas fa-quote-left"></span> {% trans %}Quote{% endtrans %}
+    </button>
     {% endif %}
 
 </div>

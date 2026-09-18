@@ -1,3 +1,51 @@
+@mixin post-quotes {
+    blockquote {
+        font-size: 1em;
+        margin: 0.75em 0;
+        padding: 0.5em 0.9em;
+        color: $quote-color;
+        background-color: $quote-bg;
+        border-left: 4px solid $quote-border;
+        border-radius: 0 $border-radius $border-radius 0;
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+
+        .post-quote-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5em;
+            margin-bottom: 0.5em;
+            padding-bottom: 0.35em;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: $quote-header-color;
+            border-bottom: 1px solid $quote-header-border;
+        }
+
+        .post-quote-source {
+            margin-left: auto;
+            color: $quote-header-color;
+
+            &:hover {
+                color: $link-color;
+                text-decoration: none;
+            }
+        }
+
+        blockquote {
+            background-color: $quote-nested-bg;
+            border-left-color: $quote-nested-border;
+
+            blockquote {
+                background-color: $quote-bg;
+                border-left-color: $quote-border;
+            }
+        }
+    }
+}
+
 .topic {
     margin-bottom: 0;
 
@@ -57,51 +105,7 @@
             max-height: 100%;
         }
 
-        blockquote {
-            font-size: 1em;
-            margin: 0.75em 0;
-            padding: 0.5em 0.9em;
-            color: $quote-color;
-            background-color: $quote-bg;
-            border-left: 4px solid $quote-border;
-            border-radius: 0 $border-radius $border-radius 0;
-
-            > :last-child {
-                margin-bottom: 0;
-            }
-
-            .post-quote-header {
-                display: flex;
-                align-items: baseline;
-                gap: 0.5em;
-                margin-bottom: 0.5em;
-                padding-bottom: 0.35em;
-                font-size: 0.9em;
-                font-weight: 600;
-                color: $quote-header-color;
-                border-bottom: 1px solid $quote-header-border;
-            }
-
-            .post-quote-source {
-                margin-left: auto;
-                color: $quote-header-color;
-
-                &:hover {
-                    color: $link-color;
-                    text-decoration: none;
-                }
-            }
-
-            blockquote {
-                background-color: $quote-nested-bg;
-                border-left-color: $quote-nested-border;
-
-                blockquote {
-                    background-color: $quote-bg;
-                    border-left-color: $quote-border;
-                }
-            }
-        }
+        @include post-quotes;
     }
 
     .post-attachments {
@@ -227,4 +231,34 @@ h5.author-title {
     font-weight: 600;
     margin-top: 0;
     clear: both;
+}
+
+.selection-quote-btn {
+    position: fixed;
+    z-index: $zindex-dropdown;
+    transform: translate(-50%, calc(-100% - 0.5rem));
+    box-shadow: $box-shadow-sm;
+    white-space: nowrap;
+
+    &.below {
+        transform: translate(-50%, 0.5rem);
+    }
+}
+
+.flaskbb-editor.quote-inserted {
+    animation: quote-inserted 1.2s ease-out;
+}
+
+@keyframes quote-inserted {
+    from {
+        box-shadow: inset 0 0 0 2px $quote-border;
+    }
+    to {
+        box-shadow: inset 0 0 0 2px transparent;
+    }
+}
+
+// the editor preview renders with the post renderer
+.preview {
+    @include post-quotes;
 }

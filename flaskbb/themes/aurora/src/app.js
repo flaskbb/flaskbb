@@ -6,10 +6,13 @@ import "./app/confirm_modal.js";
 import "./app/editor.js";
 import "./app/emoji.js";
 import "./app/flaskbb.js";
+import "./app/quote.js";
 
 
 import "./scss/styles.scss";
 export { show_management_search } from "./app/flaskbb.js";
+// plugins call this as window.app.insertQuote(editor, markdown)
+export { insertQuote } from "./app/quote.js";
 
 // htmx has to be reachable via window. plugins register extensions against it and
 // templates outside this bundle call into it.

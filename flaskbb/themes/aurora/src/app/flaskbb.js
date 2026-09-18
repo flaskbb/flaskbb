@@ -135,33 +135,6 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         event.target.after(fresh);
     });
 
-    // Reply to post. delegated, so it keeps working on posts htmx swapped in
-    document.addEventListener("click", (event) => {
-        const button = event.target.closest(".quote-btn");
-        if (!button) return;
-        event.preventDefault();
-        const post_id = button.dataset.postId;
-        const urlprefix =
-            typeof FORUM_URL_PREFIX !== 'undefined'
-                ? FORUM_URL_PREFIX
-                : "";
-        const url = `${urlprefix}/post/${post_id}/raw`;
-
-        const editor = document.querySelector(".flaskbb-editor");
-        fetch(url)
-            .then((response) => response.text())
-            .then((data) => {
-                editor.value = data;
-                editor.selectionStart = editor.selectionEnd =
-                    editor.value.length;
-                editor.scrollTop = editor.scrollHeight;
-                window.location.href = "#content";
-            })
-            .catch((error) => {
-                console.error("something bad happened", error);
-            });
-    });
-
     // listen on the action-checkall checkbox to un/check all. delegated, so it
     // keeps working on lists htmx swapped in
     document.addEventListener("change", (event) => {
