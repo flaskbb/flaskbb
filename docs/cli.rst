@@ -89,6 +89,44 @@ will be run.
 
     Don't run the migrations for the default plugins.
 
+``flaskbb bootstrap``
+~~~~~~~~~~~~~~~~~~~~~
+
+Prepares the database before FlaskBB starts and is safe to run before every
+start, which is what the container images do. It waits until the database
+accepts connections and then installs FlaskBB into an empty database or
+runs ``flaskbb db upgrade`` on an existing one, which also applies the new
+migrations of the enabled plugins. Finally it enables and installs the
+given plugins that aren't enabled yet.
+
+Every option can also be set through the environment variable in brackets.
+
+.. describe:: --wait-only
+
+    Only waits for the database.
+
+.. describe:: --timeout SECONDS (FLASKBB_DB_TIMEOUT)
+
+    How long to wait for the database. Defaults to ``60``.
+
+.. describe:: --username USERNAME (ADMIN_USERNAME)
+
+    The administrator created by the install. Without the administrator's
+    username, email and password an empty database is an error.
+
+.. describe:: --email EMAIL (ADMIN_EMAIL)
+
+    The administrator's email address.
+
+.. describe:: --password PASSWORD (ADMIN_PASSWORD)
+
+    The administrator's password.
+
+.. describe:: --enable-plugins NAMES (FLASKBB_ENABLE_PLUGINS)
+
+    Comma separated names of the plugins to enable and install, as listed
+    by ``flaskbb plugins list``.
+
 ``flaskbb populate``
 ~~~~~~~~~~~~~~~~~~~~
 

@@ -15,6 +15,7 @@ cookiecutter first::
 :license: BSD, see LICENSE for more details.
 """
 
+from flaskbb.cli.bootstrap import bootstrap
 from flaskbb.cli.db import db
 from flaskbb.cli.groups import groups
 from flaskbb.cli.main import flaskbb
@@ -25,6 +26,7 @@ from flaskbb.cli.translations import translations
 from flaskbb.cli.users import users
 
 __all__ = [
+    "bootstrap",
     "db",
     "flaskbb",
     "groups",
