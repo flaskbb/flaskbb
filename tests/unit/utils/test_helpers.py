@@ -154,7 +154,17 @@ def test_count_online_users_without_redis(default_settings, user):
 
 def test_format_quote(topic):
     expected_markdown = (
-        "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
+        "> **[test_normal](http://localhost:5000/user/test_normal) wrote:**\n>\n"
+        "> Test Content Normal\n\n"
     )
     actual = format_quote(topic.first_post.username, topic.first_post.content)
+    assert actual == expected_markdown
+
+
+def test_format_quote_links_the_quoted_post(topic):
+    expected_markdown = (
+        "> **[test_normal](http://localhost:5000/user/test_normal) wrote:** "
+        "[view post](/post/1)\n>\n> first line\n> second line\n\n"
+    )
+    actual = format_quote(topic.first_post.username, "first line\nsecond line\n", "/post/1")
     assert actual == expected_markdown

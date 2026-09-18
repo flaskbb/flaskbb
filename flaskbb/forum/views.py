@@ -552,7 +552,11 @@ class NewPost(MethodView):
 
         if post_id is not None:
             post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
-            form.content.data = format_quote(post.username, post.content)
+            form.content.data = format_quote(
+                post.username,
+                post.content,
+                url_for("forum.view_post", post_id=post.id),
+            )
 
         return render_template("forum/new_post.html", topic=topic, form=form)
 
@@ -916,7 +920,11 @@ class RawPost(MethodView):
 
     def get(self, post_id: int):
         post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
-        return format_quote(username=post.username, content=post.content)
+        return format_quote(
+            username=post.username,
+            content=post.content,
+            post_url=url_for("forum.view_post", post_id=post.id),
+        )
 
 
 class MarkRead(MethodView):

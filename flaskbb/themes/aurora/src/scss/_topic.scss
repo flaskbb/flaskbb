@@ -70,6 +70,28 @@
                 margin-bottom: 0;
             }
 
+            .post-quote-header {
+                display: flex;
+                align-items: baseline;
+                gap: 0.5em;
+                margin-bottom: 0.5em;
+                padding-bottom: 0.35em;
+                font-size: 0.9em;
+                font-weight: 600;
+                color: $quote-header-color;
+                border-bottom: 1px solid $quote-header-border;
+            }
+
+            .post-quote-source {
+                margin-left: auto;
+                color: $quote-header-color;
+
+                &:hover {
+                    color: $link-color;
+                    text-decoration: none;
+                }
+            }
+
             blockquote {
                 background-color: $quote-nested-bg;
                 border-left-color: $quote-nested-border;

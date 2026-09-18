@@ -628,15 +628,19 @@ def time_since(time: datetime | None):  # pragma: no cover
     return format_timedelta(delta, add_direction=True)
 
 
-def format_quote(username: str, content: str):
+def format_quote(username: str, content: str, post_url: str | None = None):
     """Returns a formatted quote depending on the markup language.
 
     :param username: The username of a user.
     :param content: The content of the quote
+    :param post_url: The URL of the quoted post, linked from the quote header.
     """
     profile_url = url_for("user.profile", username=username)
+    attribution = f"**[{username}]({profile_url}) wrote:**"
+    if post_url is not None:
+        attribution += f" [{_('view post')}]({post_url})"
     content = "\n> ".join(content.strip().split("\n"))
-    quote = f"**[{username}]({profile_url}) wrote:**\n> {content}\n"
+    quote = f"> {attribution}\n>\n> {content}\n\n"
 
     return quote
 

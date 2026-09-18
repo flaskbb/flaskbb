@@ -10,13 +10,14 @@ A module for all markup related stuff.
 
 import logging
 import re
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from typing import Any, override
 from urllib.parse import urlparse
 
 import mistune
-from flask import Flask, request, url_for
-from markupsafe import Markup
+from flask import current_app, Flask, request, url_for
+from flask_babelplus import gettext as _
+from markupsafe import escape, Markup
 from mistune.plugins import PluginRef
 from mistune.plugins.abbr import abbr
 from mistune.plugins.def_list import def_list
@@ -38,6 +39,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
+from werkzeug.exceptions import HTTPException
 
 from flaskbb.extensions import pluggy
 from flaskbb.settings import flaskbb_config
@@ -71,6 +73,149 @@ def plugin_mention(md: mistune.Markdown):
     md.before_parse_hooks.append(process_mentions)
 
 
+QUOTE_ATTRIBUTION_SUFFIX = " wrote:"
+LINE_BREAKS = ("linebreak", "softbreak")
+
+
+def match_local_url(url: str) -> tuple[Any, Mapping[str, Any]] | None:
+    parsed = urlparse(url)
+    if parsed.scheme not in ("", "http", "https"):
+        return None
+    if parsed.netloc and parsed.netloc.lower() != request.host.lower():
+        return None
+
+    path = parsed.path
+    if request.script_root:
+        if not path.startswith(request.script_root):
+            return None
+        path = path[len(request.script_root) :]
+
+    adapter = current_app.url_map.bind_to_environ(request.environ)
+    try:
+        return adapter.match(path, method="GET")
+    except HTTPException:
+        return None
+
+
+def link_target(token: dict[str, Any], endpoint: str, argument: str) -> Any:
+    if token["type"] != "link":
+        return None
+    match = match_local_url(token["attrs"]["url"])
+    if match is None or match[0] != endpoint:
+        return None
+    return match[1][argument]
+
+
+def parse_quote_attribution(
+    paragraph: dict[str, Any], md: mistune.Markdown, state: mistune.BlockState
+) -> tuple[dict[str, Any], list[dict[str, Any]]] | None:
+    """Parses a ``**[user](profile) wrote:** [view post](post)`` paragraph.
+
+    Returns the attribution attrs and whatever content followed the
+    attribution on the next lines of the same paragraph.
+    """
+    if "text" in paragraph:
+        # inline parsing normally happens at render time
+        if QUOTE_ATTRIBUTION_SUFFIX not in paragraph["text"]:
+            return None
+        text = paragraph.pop("text").strip(" \r\n\t\f")
+        paragraph["children"] = md.inline(text, state.env)
+
+    children = paragraph["children"]
+    if not children or children[0]["type"] != "strong":
+        return None
+
+    strong = children[0]["children"]
+    if len(strong) != 2 or strong[1] != {"type": "text", "raw": QUOTE_ATTRIBUTION_SUFFIX}:
+        return None
+    author = link_target(strong[0], "user.profile", "username")
+    if author is None:
+        return None
+    attrs: dict[str, Any] = {"author": author}
+
+    rest = children[1:]
+    if len(rest) >= 2 and rest[0] == {"type": "text", "raw": " "}:
+        post_id = link_target(rest[1], "forum.view_post", "post_id")
+        if post_id is not None:
+            attrs["post_id"] = post_id
+            rest = rest[2:]
+
+    if rest and rest[0]["type"] not in LINE_BREAKS:
+        return None
+    return attrs, rest[1:]
+
+
+def next_block(tokens: list[dict[str, Any]], index: int) -> int:
+    index += 1
+    while index < len(tokens) and tokens[index]["type"] == "blank_line":
+        index += 1
+    return index
+
+
+def attach_quote_attributions(
+    tokens: list[dict[str, Any]], md: mistune.Markdown, state: mistune.BlockState
+):
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        following = next_block(tokens, index)
+
+        # Legacy quotes put the attribution paragraph in front of the quote.
+        if (
+            token["type"] == "paragraph"
+            and following < len(tokens)
+            and tokens[following]["type"] == "block_quote"
+            and "attrs" not in tokens[following]
+        ):
+            attribution = parse_quote_attribution(token, md, state)
+            if attribution is not None and not attribution[1]:
+                tokens[following]["attrs"] = attribution[0]
+                del tokens[index:following]
+                continue
+
+        if token["type"] == "block_quote" and "attrs" not in token:
+            attach_leading_attribution(token, md, state)
+
+        if token["type"] in ("block_quote", "list", "list_item"):
+            attach_quote_attributions(token["children"], md, state)
+        index += 1
+
+
+def attach_leading_attribution(
+    quote: dict[str, Any], md: mistune.Markdown, state: mistune.BlockState
+):
+    children = quote["children"]
+    first = next_block(children, -1)
+    if first >= len(children) or children[first]["type"] != "paragraph":
+        return
+    # A paragraph directly followed by a quote attributes that inner quote.
+    after = first + 1
+    if after < len(children) and children[after]["type"] == "block_quote":
+        return
+
+    attribution = parse_quote_attribution(children[first], md, state)
+    if attribution is None:
+        return
+    attrs, remaining = attribution
+    quote["attrs"] = attrs
+    if remaining:
+        children[first]["children"] = remaining
+    else:
+        del children[first]
+
+
+def quote_attribution(md: mistune.Markdown):
+    """
+    Mistune plugin that turns a ``**[user](profile) wrote:**`` line at the
+    start of a quote, or directly in front of it, into a quote header.
+    Usernames and post ids are taken from the link targets, never from the
+    link text, so a header always names the user it links to.
+    """
+    md.before_render_hooks.append(
+        lambda md, state: attach_quote_attributions(state.tokens, md, state)
+    )
+
+
 DEFAULT_PLUGINS = [
     plugin_mention,
     url,
@@ -87,6 +232,8 @@ DEFAULT_PLUGINS = [
     footnotes,
     speedup,
 ]
+
+POST_PLUGINS = [*DEFAULT_PLUGINS, quote_attribution]
 
 
 def should_open_in_new_tab() -> bool:
@@ -114,6 +261,27 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
             return f"\n<pre><code>{mistune.escape(code)}</code></pre>\n"
         formatter = HtmlFormatter()  # pyright: ignore
         return highlight(code, lexer, formatter)
+
+    @override
+    def block_quote(self, text: str, author: str | None = None, post_id: int | None = None) -> str:
+        if author is None:
+            return super().block_quote(text)
+
+        author_link = Markup('<a class="post-quote-author" href="{}">{}</a>').format(
+            url_for("user.profile", username=author), author
+        )
+        attribution = escape(_("%(author)s wrote:")) % {"author": author_link}
+        header = Markup('<span class="post-quote-attribution">{}</span>').format(attribution)
+        if post_id is not None:
+            header += Markup(
+                '<a class="post-quote-source" href="{}" title="{}">'
+                '<span class="fas fa-arrow-up"></span></a>'
+            ).format(url_for("forum.view_post", post_id=post_id), _("Go to quoted post"))
+
+        return (
+            f'<blockquote class="post-quote">\n<header class="post-quote-header">{header}'
+            f"</header>\n{text}</blockquote>\n"
+        )
 
     @override
     def link(self, text: str, url: str, title: str | None = None) -> str:
@@ -149,7 +317,7 @@ def flaskbb_jinja_directives(app: Flask):
 
 def post_renderer(app: Flask) -> Callable[[str], Markup]:
     render_classes = pluggy.hook.flaskbb_load_post_markdown_class(app=app)
-    plugins = DEFAULT_PLUGINS[:]
+    plugins = POST_PLUGINS[:]
     pluggy.hook.flaskbb_load_post_markdown_plugins(plugins=plugins, app=app)
     return make_renderer(render_classes, plugins)
 
@@ -157,7 +325,7 @@ def post_renderer(app: Flask) -> Callable[[str], Markup]:
 def nonpost_renderer(app: Flask) -> Callable[[str], Markup]:
     render_classes = pluggy.hook.flaskbb_load_nonpost_markdown_class(app=app)
     plugins = DEFAULT_PLUGINS[:]
-    plugins = pluggy.hook.flaskbb_load_nonpost_markdown_plugins(plugins=plugins, app=app)
+    pluggy.hook.flaskbb_load_nonpost_markdown_plugins(plugins=plugins, app=app)
     return make_renderer(render_classes, plugins)
 
 
