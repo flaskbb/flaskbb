@@ -59,7 +59,26 @@
 
         blockquote {
             font-size: 1em;
-            padding: 0.25em 0.75em;
+            margin: 0.75em 0;
+            padding: 0.5em 0.9em;
+            color: $quote-color;
+            background-color: $quote-bg;
+            border-left: 4px solid $quote-border;
+            border-radius: 0 $border-radius $border-radius 0;
+
+            > :last-child {
+                margin-bottom: 0;
+            }
+
+            blockquote {
+                background-color: $quote-nested-bg;
+                border-left-color: $quote-nested-border;
+
+                blockquote {
+                    background-color: $quote-bg;
+                    border-left-color: $quote-border;
+                }
+            }
         }
     }
 
