@@ -8,6 +8,8 @@ import pytest
 import sqlalchemy as sa
 from alembic.operations import Operations
 from alembic.runtime.migration import MigrationContext
+from alembic.util.exc import CommandError
+from flask_alembic import Alembic as FlaskAlembic
 from flaskbb.app import configure_migrations
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.plugins.utils import plugins_with_pending_migrations
@@ -191,3 +193,54 @@ def test_attachment_filename_index_matches_the_migration(database):
     ]
 
     assert ("ix_attachments_filename", ["filename"], True) in indexes
+
+
+@pytest.fixture
+def second_plugin_branch(application, monkeypatch, pending_plugin):
+    monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
+    monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    configure_migrations(application)
+    monkeypatch.setattr(alembic._get_cache(), "config", None)
+    monkeypatch.setattr(alembic._get_cache(), "script", None)
+
+
+@pytest.fixture
+def created(monkeypatch):
+    calls = []
+    monkeypatch.setattr(FlaskAlembic, "revision", lambda self, *args: calls.append(args))
+    monkeypatch.setattr(FlaskAlembic, "merge", lambda self, *args: calls.append(args))
+    return calls
+
+
+def test_plugin_revision_can_not_depend_on_another_plugin(application, created):
+    with pytest.raises(CommandError, match="conversations"):
+        alembic.revision("add column", empty=True, branch="portal", depend=["1785520254"])
+
+    with pytest.raises(CommandError, match="conversations"):
+        alembic.revision("add column", empty=True, branch="portal", parent=["conversations@head"])
+
+    assert created == []
+
+
+def test_core_revision_can_not_depend_on_a_plugin(application, created):
+    with pytest.raises(CommandError, match="conversations"):
+        alembic.revision("add column", empty=True, depend=["1785520254"])
+
+    assert created == []
+
+
+def test_plugin_revision_can_depend_on_core_and_its_own_branch(application, created):
+    alembic.revision(
+        "add column", empty=True, branch="conversations", depend=["1783713047", "1770409336"]
+    )
+
+    assert len(created) == 1
+
+
+def test_merge_can_not_join_plugins(application, second_plugin_branch, created):
+    with pytest.raises(CommandError, match="conversations, pending_plugin"):
+        alembic.merge(["conversations@head", "pending_plugin@head"])
+
+    alembic.merge(["conversations@head", "default@head"])
+
+    assert len(created) == 1

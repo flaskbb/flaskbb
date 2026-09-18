@@ -7,8 +7,10 @@ import typing as t
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext, MigrationStep
 from alembic.script import Script
+from alembic.util.exc import CommandError
 from flask import current_app
 from flask_alembic import Alembic as FlaskAlembic
+from flask_alembic.extension import t_rev
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +84,66 @@ class Alembic(FlaskAlembic):
             return self.script_directory._upgrade_revs(heads, revision)  # type: ignore[arg-type,return-value]  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
 
         self.run_migrations(do_upgrade)
+
+    @t.override
+    def revision(
+        self,
+        message: str,
+        empty: bool = False,
+        branch: str = "default",
+        parent: t_rev = "head",
+        splice: bool = False,
+        depend: t_rev | None = None,
+        label: str | list[str] | None = None,
+        path: str | None = None,
+    ) -> list[Script | None]:
+        """Creates a new revision. It may only build on FlaskBB's and its own
+        branch's revisions, a plugin never on the revisions of another plugin.
+        """
+        # Flask-Alembic points these at the revision's own branch
+        references = [
+            rev
+            for rev in self._simplify_rev(parent) + self._simplify_rev(depend or [])
+            if rev not in ("base", "head")
+        ]
+        foreign = self._plugin_branches(references) - {branch}
+        if foreign:
+            raise CommandError(
+                f"The revision of '{branch}' would depend on the migrations of "
+                f"{', '.join(sorted(foreign))}. Plugin migrations may only depend on "
+                "FlaskBB's and their own. If the plugins go hand in hand, add the "
+                "dependency to the revision by hand and require the other plugin "
+                "in pyproject.toml."
+            )
+
+        return super().revision(message, empty, branch, parent, splice, depend, label, path)
+
+    @t.override
+    def merge(
+        self,
+        revisions: t_rev = "heads",
+        message: str | None = None,
+        label: str | list[str] | None = None,
+    ) -> Script | None:
+        """Creates a merge revision. It may only merge the revisions of one
+        plugin, optionally with FlaskBB's.
+        """
+        plugins = self._plugin_branches(self._simplify_rev(revisions))
+        if len(plugins) > 1:
+            raise CommandError(
+                f"A merge revision would join the migrations of {', '.join(sorted(plugins))}. "
+                "Merge the heads of one plugin at a time, e.g. 'flaskbb db merge <plugin>@head'."
+            )
+
+        return super().merge(revisions, message, label)
+
+    def _plugin_branches(self, revisions: list[str]) -> set[str]:
+        return {
+            label
+            for script in self.script_directory.get_revisions(tuple(revisions))
+            for label in script.branch_labels
+            if label != "default"
+        }
 
     @property
     @t.override

@@ -8,17 +8,30 @@ This module contains all plugin commands.
 :license: BSD, see LICENSE for more details.
 """
 
+from typing import Any, override
+
 import click
 import flask_alembic.cli as alembic_cli
 from alembic.script.revision import ResolutionError
+from alembic.util.exc import CommandError
 from flask import current_app
 from flask.cli import with_appcontext
 
 from flaskbb.cli.main import flaskbb
+from flaskbb.cli.utils import FlaskBBCLIError
 from flaskbb.utils.alembic import Alembic
 
 
-@flaskbb.group()
+class AlembicGroup(click.Group):
+    @override
+    def invoke(self, ctx: click.Context) -> Any:
+        try:
+            return super().invoke(ctx)
+        except CommandError as exc:
+            raise FlaskBBCLIError(str(exc), fg="red") from exc
+
+
+@flaskbb.group(cls=AlembicGroup)
 @with_appcontext
 @click.pass_context
 def db(ctx: click.Context):

@@ -21,7 +21,7 @@ from typing import Any, cast
 import sqlalchemy as sa
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from alembic.script.revision import RevisionError
+from alembic.script.revision import ResolutionError, RevisionError
 from flask import flash, redirect, url_for
 from flask_babelplus import gettext as _
 from markupsafe import Markup
@@ -70,7 +70,10 @@ def plugins_with_pending_migrations(
 
     try:
         applied = {
-            script.revision for script in script_directory.iterate_revisions(current_heads, "base")
+            script.revision
+            for script in script_directory.iterate_revisions(
+                _known_heads(script_directory, current_heads), "base"
+            )
         }
         return {
             name
@@ -79,9 +82,26 @@ def plugins_with_pending_migrations(
             for name in names & script.branch_labels
         }
     except RevisionError as exc:
-        # e.g. the database holds a revision of a plugin that was removed from the env
+        # e.g. a plugin's migration branch points at a revision that doesn't exist
         logger.warning("Couldn't check the plugins for pending migrations.", exc_info=exc)
         return set()
+
+
+def _known_heads(script_directory: ScriptDirectory, heads: Iterable[str]) -> tuple[str, ...]:
+    known_heads: list[str] = []
+    for head in heads:
+        try:
+            script_directory.revision_map.get_revision(head)
+        except ResolutionError:
+            # e.g. the database holds a revision of a plugin that was removed from the env
+            logger.warning(
+                "The database holds the unknown revision %r, ignoring it. "
+                "Was the plugin providing it uninstalled?",
+                head,
+            )
+        else:
+            known_heads.append(head)
+    return tuple(known_heads)
 
 
 def template_hook(name: str, silent: bool = True, is_markup: bool = True, **kwargs: Any):
@@ -211,10 +231,13 @@ def plugin_tables_in_use(name: str) -> bool:
 
 
 def _applied_revisions() -> set[str]:
+    script_directory = alembic.script_directory
     current_heads = alembic.migration_context.get_current_heads()
     return {
         script.revision
-        for script in alembic.script_directory.iterate_revisions(current_heads, "base")
+        for script in script_directory.iterate_revisions(
+            _known_heads(script_directory, current_heads), "base"
+        )
     }
 
 

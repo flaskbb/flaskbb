@@ -330,7 +330,8 @@ migration branch, keyed by the plugin's name.
 
     .. describe:: --parent REVISION, -p REVISION
 
-        Parent revision(s) of this revision.
+        Parent revision(s) of this revision. Only FlaskBB's and the
+        branch's own revisions are accepted.
 
     .. describe:: --empty
 
@@ -342,7 +343,9 @@ migration branch, keyed by the plugin's name.
 
     .. describe:: --depend REVISION, -d REVISION
 
-        Revision(s) this revision depends on.
+        Revision(s) this revision depends on. Only FlaskBB's and the
+        branch's own revisions are accepted, a plugin never depends on
+        another plugin's migrations.
 
     .. describe:: --label LABEL, -l LABEL
 
