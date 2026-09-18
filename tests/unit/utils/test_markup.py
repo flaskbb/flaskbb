@@ -236,7 +236,7 @@ def test_quote_without_valid_attribution_renders_plain(
         result = post_markdown(source)
 
     assert "<blockquote>" in result
-    assert "post-quote" not in result
+    assert "post-quote-header" not in result
 
 
 def test_quote_headers_are_only_rendered_in_posts(database, default_settings, application):
@@ -263,3 +263,38 @@ def test_nonpost_renderer_applies_markdown_plugins(application):
 
     assert "<del>strike</del>" in result
     assert "<table>" in result
+
+
+def test_only_top_level_quotes_can_be_expanded(database, default_settings, application):
+    with application.test_request_context():
+        result = post_markdown("> outer\n>\n> > inner\n")
+
+    assert result.count('class="btn btn-sm btn-light post-quote-expand" hidden>') == 1
+    assert result.index("post-quote-expand") < result.index("<p>outer</p>")
+
+
+def test_deeply_nested_quotes_are_collapsed(database, default_settings, application):
+    source = (
+        f"> {attribution('alice', 3)}\n>\n"
+        f"> > {attribution('bob', 2)}\n> >\n"
+        f"> > > {attribution('carol', 1)}\n> > >\n"
+        "> > > > fourth\n> > >\n"
+        "> > > third\n"
+    )
+
+    with application.test_request_context():
+        result = post_markdown(source)
+
+    assert result.count('<details class="post-quote-collapsed">') == 2
+    assert result.index('<details class="post-quote-collapsed">') < result.index(">carol</a>")
+    assert result.index(">bob</a>") < result.index('<details class="post-quote-collapsed">')
+    assert '<summary class="post-quote-header">' in result
+    caret = '<span class="fas fa-chevron-right post-quote-caret"></span>'
+    assert f'<summary class="post-quote-header">{caret}Quote</summary>' in result
+
+
+def test_quotes_inside_lists_keep_their_depth(database, default_settings, application):
+    with application.test_request_context():
+        result = post_markdown("> - item\n>\n>   > > nested\n")
+
+    assert result.count("<details") == 1

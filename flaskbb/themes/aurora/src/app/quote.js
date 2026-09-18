@@ -1,3 +1,4 @@
+import htmx from "htmx.org";
 import { isHidden } from "./utils";
 
 function replyEditor() {
@@ -150,4 +151,54 @@ document.addEventListener("click", (event) => {
         .catch((error) => {
             console.error("could not load the quoted post", error);
         });
+});
+
+// quotes are clipped only when that hides more than a couple of lines
+const MIN_HIDDEN_HEIGHT = 80;
+
+function clipLongQuote(button) {
+    const quote = button.parentElement;
+    if (quote.dataset.expanded) return;
+
+    quote.classList.add("is-clipped");
+    const clipped = quote.scrollHeight - quote.clientHeight > MIN_HIDDEN_HEIGHT;
+    quote.classList.toggle("is-clipped", clipped);
+    button.hidden = !clipped;
+}
+
+htmx.onLoad((root) => {
+    root.querySelectorAll(".post-quote-expand").forEach(clipLongQuote);
+});
+
+// images load after the quotes were measured and can make them long
+document.addEventListener(
+    "load",
+    (event) => {
+        if (event.target.tagName !== "IMG") return;
+        const quote = event.target.closest("blockquote");
+        if (!quote) return;
+        quote
+            .closest(".post-content, .preview")
+            ?.querySelectorAll(".post-quote-expand")
+            .forEach(clipLongQuote);
+    },
+    true,
+);
+
+function expandQuote(quote) {
+    quote.dataset.expanded = "true";
+    quote.classList.remove("is-clipped");
+    quote.querySelector(":scope > .post-quote-expand").hidden = true;
+}
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest(".post-quote-expand");
+    if (button) expandQuote(button.parentElement);
+});
+
+// a link in the clipped part that receives keyboard focus has to be visible
+document.addEventListener("focusin", (event) => {
+    if (event.target.matches(".post-quote-expand")) return;
+    const quote = event.target.closest(".is-clipped");
+    if (quote) expandQuote(quote);
 });

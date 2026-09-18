@@ -43,6 +43,67 @@
                 border-left-color: $quote-border;
             }
         }
+
+        // long top level quotes, clipped by the theme's JavaScript
+        &.is-clipped {
+            position: relative;
+            max-height: 20rem;
+            // unlike hidden, clip cannot be scrolled by focus or scrollIntoView
+            overflow: clip;
+
+            &::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                height: 5rem;
+                background: linear-gradient(rgba($quote-bg, 0), $quote-bg 80%);
+                pointer-events: none;
+            }
+        }
+
+        .post-quote-expand {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            z-index: 1;
+            transform: translateX(-50%);
+            border-color: $quote-header-border;
+            box-shadow: $box-shadow-sm;
+            user-select: none;
+        }
+    }
+
+    // deeply nested quotes, collapsed to their header
+    .post-quote-collapsed {
+        > summary {
+            cursor: pointer;
+            list-style: none;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+        }
+
+        &:not([open]) > summary {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        &[open] > summary .post-quote-caret {
+            transform: rotate(90deg);
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .post-quote-caret {
+        font-size: 0.75em;
+        transition: transform 0.15s ease-out;
     }
 }
 
@@ -260,5 +321,10 @@ h5.author-title {
 
 // the editor preview renders with the post renderer
 .preview {
+    @include post-quotes;
+}
+
+// posts listed outside of topics, like a user's posts and topics
+.topic-content {
     @include post-quotes;
 }

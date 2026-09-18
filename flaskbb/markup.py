@@ -74,6 +74,7 @@ def plugin_mention(md: mistune.Markdown):
 
 
 QUOTE_ATTRIBUTION_SUFFIX = " wrote:"
+COLLAPSED_QUOTE_DEPTH = 3
 LINE_BREAKS = ("linebreak", "softbreak")
 
 
@@ -152,8 +153,15 @@ def next_block(tokens: list[dict[str, Any]], index: int) -> int:
     return index
 
 
+def is_attributed(token: dict[str, Any]) -> bool:
+    return "author" in token.get("attrs", {})
+
+
 def attach_quote_attributions(
-    tokens: list[dict[str, Any]], md: mistune.Markdown, state: mistune.BlockState
+    tokens: list[dict[str, Any]],
+    md: mistune.Markdown,
+    state: mistune.BlockState,
+    depth: int = 1,
 ):
     index = 0
     while index < len(tokens):
@@ -165,19 +173,21 @@ def attach_quote_attributions(
             token["type"] == "paragraph"
             and following < len(tokens)
             and tokens[following]["type"] == "block_quote"
-            and "attrs" not in tokens[following]
+            and not is_attributed(tokens[following])
         ):
             attribution = parse_quote_attribution(token, md, state)
             if attribution is not None and not attribution[1]:
-                tokens[following]["attrs"] = attribution[0]
+                tokens[following].setdefault("attrs", {}).update(attribution[0])
                 del tokens[index:following]
                 continue
 
-        if token["type"] == "block_quote" and "attrs" not in token:
-            attach_leading_attribution(token, md, state)
-
-        if token["type"] in ("block_quote", "list", "list_item"):
-            attach_quote_attributions(token["children"], md, state)
+        if token["type"] == "block_quote":
+            if not is_attributed(token):
+                attach_leading_attribution(token, md, state)
+            token.setdefault("attrs", {})["depth"] = depth
+            attach_quote_attributions(token["children"], md, state, depth + 1)
+        elif token["type"] in ("list", "list_item"):
+            attach_quote_attributions(token["children"], md, state, depth)
         index += 1
 
 
@@ -197,7 +207,7 @@ def attach_leading_attribution(
     if attribution is None:
         return
     attrs, remaining = attribution
-    quote["attrs"] = attrs
+    quote.setdefault("attrs", {}).update(attrs)
     if remaining:
         children[first]["children"] = remaining
     else:
@@ -210,6 +220,9 @@ def quote_attribution(md: mistune.Markdown):
     start of a quote, or directly in front of it, into a quote header.
     Usernames and post ids are taken from the link targets, never from the
     link text, so a header always names the user it links to.
+
+    It also records each quote's nesting depth, so that the renderer can
+    collapse deeply nested quotes and offer to expand long top level ones.
     """
     md.before_render_hooks.append(
         lambda md, state: attach_quote_attributions(state.tokens, md, state)
@@ -263,10 +276,43 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
         return highlight(code, lexer, formatter)
 
     @override
-    def block_quote(self, text: str, author: str | None = None, post_id: int | None = None) -> str:
-        if author is None:
+    def block_quote(
+        self,
+        text: str,
+        author: str | None = None,
+        post_id: int | None = None,
+        depth: int | None = None,
+    ) -> str:
+        if depth is None:
             return super().block_quote(text)
 
+        header = self.quote_header(author, post_id) if author is not None else None
+        opening = '<blockquote class="post-quote">' if header else "<blockquote>"
+
+        if depth >= COLLAPSED_QUOTE_DEPTH:
+            caret = Markup('<span class="fas fa-chevron-right post-quote-caret"></span>')
+            summary = header or escape(_("Quote"))
+            return (
+                f'{opening}\n<details class="post-quote-collapsed">'
+                f'<summary class="post-quote-header">{caret}{summary}</summary>\n'
+                f"{text}</details>\n</blockquote>\n"
+            )
+
+        html = f"{opening}\n"
+        if header:
+            html += f'<header class="post-quote-header">{header}</header>\n'
+        if depth == 1:
+            # revealed by the theme's JavaScript when the quote is clipped
+            html += str(
+                Markup(
+                    '<button type="button" class="btn btn-sm btn-light post-quote-expand" '
+                    "hidden>{}</button>\n"
+                ).format(_("Show full quote"))
+            )
+        return f"{html}{text}</blockquote>\n"
+
+    @staticmethod
+    def quote_header(author: str, post_id: int | None) -> Markup:
         author_link = Markup('<a class="post-quote-author" href="{}">{}</a>').format(
             url_for("user.profile", username=author), author
         )
@@ -277,11 +323,7 @@ class FlaskBBRenderer(mistune.HTMLRenderer):
                 '<a class="post-quote-source" href="{}" title="{}">'
                 '<span class="fas fa-arrow-up"></span></a>'
             ).format(url_for("forum.view_post", post_id=post_id), _("Go to quoted post"))
-
-        return (
-            f'<blockquote class="post-quote">\n<header class="post-quote-header">{header}'
-            f"</header>\n{text}</blockquote>\n"
-        )
+        return header
 
     @override
     def link(self, text: str, url: str, title: str | None = None) -> str:
