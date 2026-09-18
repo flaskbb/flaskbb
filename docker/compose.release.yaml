@@ -1,0 +1,98 @@
+# Release stack: the latest stable FlaskBB from PyPI, served by gunicorn.
+# Meant to run behind a reverse proxy that terminates TLS.
+#
+#   docker compose -f docker/compose.release.yaml up -d --build
+#
+name: flaskbb
+
+# Everything in .env reaches the containers through env_file, these are the
+# values that are derived from it or need a release specific default.
+x-flaskbb-env: &flaskbb-env
+  DATABASE_URI: postgresql+psycopg://${POSTGRES_USER:-flaskbb}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in docker/.env}@postgres:5432/${POSTGRES_DB:-flaskbb}
+  REDIS_URL: redis://redis:6379
+  SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in docker/.env}
+  WEB_CONCURRENCY: ${WEB_CONCURRENCY:-4}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+services:
+  postgres:
+    image: docker.io/library/postgres:18-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-flaskbb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in docker/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-flaskbb}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flaskbb} -d ${POSTGRES_DB:-flaskbb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: docker.io/valkey/valkey:9-alpine
+    restart: unless-stopped
+    logging: *logging
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flaskbb: &flaskbb
+    build:
+      context: .
+      dockerfile: Dockerfile.release
+      args:
+        FLASKBB_VERSION: ${FLASKBB_VERSION:-}
+        FLASKBB_PLUGINS: ${FLASKBB_PLUGINS:-}
+    image: flaskbb:${FLASKBB_VERSION:-latest}
+    restart: unless-stopped
+    logging: *logging
+    # gunicorn and celery finish running requests and tasks before exiting
+    stop_grace_period: 60s
+    env_file:
+      - path: .env
+        required: false
+    environment: *flaskbb-env
+    volumes:
+      - flaskbb-storage:/var/lib/flaskbb
+    ports:
+      - "${FLASKBB_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery:
+    <<: *flaskbb
+    ports: []
+    command: ["flaskbb", "celery", "worker", "--loglevel", "info"]
+    environment:
+      <<: *flaskbb-env
+      FLASKBB_BOOTSTRAP: skip
+    # the web check of the image doesn't apply, the worker serves no http
+    healthcheck:
+      test: ["CMD-SHELL", "flaskbb celery inspect ping --destination celery@$$HOSTNAME"]
+      interval: 30s
+      timeout: 20s
+      start_period: 60s
+      retries: 3
+    depends_on:
+      flaskbb:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  redis-data:
+  flaskbb-storage:

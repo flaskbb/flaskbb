@@ -1,0 +1,56 @@
+# Development image: FlaskBB master, installed from the checked out source
+# tree. The build context is the repository root:
+#
+#   docker build -f docker/Dockerfile.dev -t flaskbb:dev .
+#
+ARG PYTHON_VERSION=3.14
+ARG UV_VERSION=0.12
+
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
+
+FROM python:${PYTHON_VERSION}-slim-trixie
+
+COPY --from=uv /uv /uvx /usr/local/bin/
+
+ENV PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH=/opt/venv/bin:$PATH \
+    FLASKBB_SETTINGS=/etc/flaskbb/flaskbb.cfg
+
+# The source tree is bind mounted into the container, so the user inside
+# has to own the files outside: --build-arg USER_UID=$(id -u)
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+# The venv belongs to root, the app only writes to its storage and to the
+# source tree (translations, instance folder).
+RUN groupadd --gid ${USER_GID} flaskbb \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home flaskbb \
+    && install -d -o flaskbb -g flaskbb \
+        /app /var/lib/flaskbb /var/lib/flaskbb/avatars /var/lib/flaskbb/attachments
+
+WORKDIR /app
+
+# Dependencies first, they change far less often than the source tree.
+COPY pyproject.toml uv.lock README.md /app/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-project --extra gunicorn --extra postgres --extra mysql
+
+COPY --chown=flaskbb:flaskbb . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --extra gunicorn --extra postgres --extra mysql
+
+COPY docker/flaskbb.cfg /etc/flaskbb/flaskbb.cfg
+COPY docker/healthcheck.py /usr/local/lib/flaskbb-docker/healthcheck.py
+COPY docker/entrypoint.sh /usr/local/bin/flaskbb-entrypoint
+
+USER flaskbb
+EXPOSE 5000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=40s --retries=10 \
+    CMD ["python", "/usr/local/lib/flaskbb-docker/healthcheck.py", "5000"]
+
+ENTRYPOINT ["flaskbb-entrypoint"]
+CMD ["flaskbb", "run", "--host", "0.0.0.0", "--port", "5000", "--reload", "--debugger"]

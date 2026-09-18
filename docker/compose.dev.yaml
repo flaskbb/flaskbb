@@ -1,0 +1,80 @@
+# Development stack: FlaskBB master from the source tree next to this file,
+# served by the Flask development server with the reloader enabled. The
+# database is SQLite, stored in the flaskbb-storage volume.
+#
+#   docker compose -f docker/compose.dev.yaml up --build
+#
+name: flaskbb-dev
+
+# Only these values are taken from .env, the rest of it (mail, https, proxy,
+# plugins) belongs to the release stack and would break this one.
+x-flaskbb-env: &flaskbb-env
+  DATABASE_URI: ${DATABASE_URI:-sqlite:////var/lib/flaskbb/flaskbb.sqlite}
+  REDIS_URL: redis://redis:6379
+  SECRET_KEY: ${SECRET_KEY:-insecure-development-key}
+  SERVER_NAME: ${SERVER_NAME:-}
+  TRUSTED_HOSTS: ${TRUSTED_HOSTS:-}
+  SEARCH_BACKEND: ${SEARCH_BACKEND:-sqlite}
+  LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
+  DEBUG: ${DEBUG:-true}
+  MAIL_SERVER: mailpit
+  MAIL_PORT: 1025
+  ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.org}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:-test1234}
+  WERKZEUG_DEBUG_PIN: "off"
+
+services:
+  redis:
+    image: docker.io/valkey/valkey:9-alpine
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.31
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+
+  flaskbb: &flaskbb
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    image: flaskbb:dev
+    environment: *flaskbb-env
+    volumes:
+      - ..:/app
+      # the image has a copy as well, the mount makes edits apply on restart
+      - ./flaskbb.cfg:/etc/flaskbb/flaskbb.cfg:ro
+      - flaskbb-storage:/var/lib/flaskbb
+    ports:
+      - "${FLASKBB_PORT:-5000}:5000"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  celery:
+    <<: *flaskbb
+    ports: []
+    command: ["flaskbb", "celery", "worker", "--loglevel", "info"]
+    environment:
+      <<: *flaskbb-env
+      FLASKBB_BOOTSTRAP: skip
+    # the web check of the image doesn't apply, the worker serves no http
+    healthcheck:
+      test: ["CMD-SHELL", "flaskbb celery inspect ping --destination celery@$$HOSTNAME"]
+      interval: 30s
+      timeout: 20s
+      start_period: 60s
+      retries: 3
+    depends_on:
+      flaskbb:
+        condition: service_healthy
+
+volumes:
+  redis-data:
+  flaskbb-storage:
