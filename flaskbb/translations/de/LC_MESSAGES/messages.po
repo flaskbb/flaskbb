@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-09-18 23:49+0200\n"
 "PO-Revision-Date: 2026-09-19 09:53+0000\n"
-"Last-Translator: Peter Justin <peter.justin@outlook.com>\n"
+"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
 "Language: de\n"
 "Language-Team: German <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
 "de/>\n"
@@ -40,7 +40,7 @@ msgstr ""
 
 #: flaskbb/app.py:487
 msgid "This page is currently unavailable."
-msgstr ""
+msgstr "Diese Seite ist momentan nicht verfügbar."
 
 #: flaskbb/deprecation.py:71
 #, python-format
@@ -390,37 +390,36 @@ msgstr "Suche"
 #: flaskbb/templates/management/attachments.html:23
 #: flaskbb/templates/management/overview.html:110
 msgid "Attachments"
-msgstr ""
+msgstr "Anhänge"
 
 #: flaskbb/forum/utils.py:80
-#, fuzzy
 msgid "Delete attachments"
-msgstr "Kategorie löschen"
+msgstr "Anhänge löschen"
 
 #: flaskbb/forum/utils.py:104
 msgid "Attachments are disabled."
-msgstr ""
+msgstr "Anhänge sind deaktiviert."
 
 #: flaskbb/forum/utils.py:107
-#, fuzzy
 msgid "You are not allowed to upload attachments."
-msgstr "Du bist nicht berechtigt ein Thema in diesem Forum zu veröffentlichen"
+msgstr "Du bist nicht berechtigt Anhänge hochzuladen."
 
 #: flaskbb/forum/utils.py:115 flaskbb/templates/forum/_attachment_fields.html:8
 #, python-format
 msgid "Only %(amount)s attachments per post are allowed."
-msgstr ""
+msgstr "Pro Beitrag sind nur %(amount)s) Anhänge zulässig."
 
 #: flaskbb/forum/utils.py:128
 #, python-format
 msgid "File type %(ext)s is not allowed. Allowed types are: %(types)s"
 msgstr ""
+"Der Dateityp %(ext)s ist nicht zulässig. Zulässige Typen sind: %(types)s"
 
 #: flaskbb/forum/utils.py:140
 #: flaskbb/templates/forum/_attachment_fields.html:10
 #, python-format
 msgid "Attachments cannot be bigger than %(size)s."
-msgstr ""
+msgstr "Anhänge dürfen nicht größer als %(size)s sein."
 
 #: flaskbb/forum/views.py:153 flaskbb/forum/views.py:914
 #: flaskbb/forum/views.py:936 flaskbb/forum/views.py:1014
@@ -759,7 +758,7 @@ msgstr "Dies anhaken falls Benutzer dieser Gruppe Beiträge senden dürfen."
 
 #: flaskbb/management/forms.py:327
 msgid "Can upload attachments"
-msgstr ""
+msgstr "Kann Anhänge hochladen"
 
 #: flaskbb/management/forms.py:328
 #, fuzzy
@@ -920,9 +919,8 @@ msgid "Please enter a position for the category."
 msgstr "Bitte gib eine Position für die Kategorie ein."
 
 #: flaskbb/management/navigation.py:57
-#, fuzzy
 msgid "Plugin settings"
-msgstr "Allgemeine Einstellungen"
+msgstr "Plugin-Einstellungen"
 
 #: flaskbb/management/navigation.py:71 flaskbb/templates/layout.html:148
 #: flaskbb/templates/user/settings_layout.html:10
@@ -954,9 +952,8 @@ msgid "Users"
 msgstr "Benutzer"
 
 #: flaskbb/management/navigation.py:195
-#, fuzzy
 msgid "Core"
-msgstr "Schließen"
+msgstr "Kern"
 
 #: flaskbb/management/navigation.py:198
 #: flaskbb/templates/management/overview.html:1
@@ -982,7 +979,7 @@ msgstr "Ungelesene Berichte anzeigen"
 
 #: flaskbb/management/navigation.py:219
 msgid "All Attachments"
-msgstr ""
+msgstr "Alle Anhänge"
 
 #: flaskbb/management/navigation.py:228
 #: flaskbb/templates/management/groups.html:1
@@ -1054,9 +1051,8 @@ msgid "You are not allowed to manage users"
 msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
 
 #: flaskbb/management/views.py:338 flaskbb/management/views.py:351
-#, fuzzy
 msgid "You are not allowed to edit this user."
-msgstr "Du bist nicht berechtigt diesen Beitrag zu bearbeiten"
+msgstr "Du bist nicht berechtigt diesen Benutzer zu bearbeiten."
 
 #: flaskbb/management/views.py:345 flaskbb/management/views.py:385
 msgid "Edit User"
@@ -1067,9 +1063,9 @@ msgid "User updated."
 msgstr "Benutzer aktualisiert."
 
 #: flaskbb/management/views.py:413
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s users deleted."
-msgstr "%(count)s Themen gelöscht."
+msgstr "%(count)s Benutzer gelöscht."
 
 #: flaskbb/management/views.py:419
 msgid "You cannot delete yourself."
@@ -1082,7 +1078,7 @@ msgstr "Benutzer gelöscht."
 #: flaskbb/management/views.py:455
 #, python-format
 msgid "All posts by %(user)s have been deleted."
-msgstr ""
+msgstr "Alle Beiträge von %(user)s wurden gelöscht."
 
 #: flaskbb/management/views.py:481
 msgid "User added."
@@ -1154,9 +1150,9 @@ msgid "You cannot delete one of the standard groups."
 msgstr "Du kannst keine der Standardgruppen löschen."
 
 #: flaskbb/management/views.py:746
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s groups deleted."
-msgstr "%(count)s Themen gelöscht."
+msgstr "%(count)s Gruppen gelöscht."
 
 #: flaskbb/management/views.py:752
 msgid "You cannot delete the standard groups. Try renaming it instead."
@@ -1243,9 +1239,9 @@ msgid "All reports were marked as read."
 msgstr "Alle Berichte wurden als gelesen markiert."
 
 #: flaskbb/management/views.py:1104
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s reports deleted."
-msgstr "%(count)s Themen gelöscht."
+msgstr "%(count)s Berichte gelöscht."
 
 #: flaskbb/management/views.py:1109
 msgid "Report deleted."
@@ -1253,19 +1249,17 @@ msgstr "Bericht gelöscht."
 
 #: flaskbb/management/views.py:1118 flaskbb/management/views.py:1179
 #: flaskbb/management/views.py:1208 flaskbb/management/views.py:1267
-#, fuzzy
 msgid "You are not allowed to manage attachments"
-msgstr "Du bist nicht berechtigt Benutzer zu verwalten"
+msgstr "Du bist nicht berechtigt Anhänge zu verwalten"
 
 #: flaskbb/management/views.py:1194
-#, fuzzy, python-format
+#, python-format
 msgid "%(count)s attachments deleted."
-msgstr "%(count)s Themen gelöscht."
+msgstr "%(count)s Anhänge gelöscht."
 
 #: flaskbb/management/views.py:1199
-#, fuzzy
 msgid "Attachment deleted."
-msgstr "Bericht gelöscht."
+msgstr "Anhang gelöscht."
 
 #: flaskbb/management/views.py:1252
 #, python-format
@@ -1356,23 +1350,20 @@ msgid "This plugin's settings are already up to date."
 msgstr ""
 
 #: flaskbb/management/views.py:1566
-#, fuzzy
 msgid "Plugin settings have been upgraded."
-msgstr "Plugin wurde deinstalliert."
+msgstr "Plugin-Einstellungen wurden aktualisiert."
 
 #: flaskbb/search/forms.py:30
 msgid "Criteria"
 msgstr "Kriterium"
 
 #: flaskbb/search/forms.py:33
-#, fuzzy
 msgid "Search in"
-msgstr "Suche"
+msgstr "Suchen in"
 
 #: flaskbb/search/forms.py:41
-#, fuzzy
 msgid "Content type"
-msgstr "Inhalt"
+msgstr "Inhaltstyp"
 
 #: flaskbb/search/forms.py:43 flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/management/overview.html:102
@@ -1428,32 +1419,28 @@ msgid "Forum"
 msgstr "Forum"
 
 #: flaskbb/search/forms.py:51
-#, fuzzy
 msgid "All forums"
-msgstr "Foren"
+msgstr "Alle Foren"
 
 #: flaskbb/search/forms.py:55
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: flaskbb/search/forms.py:57
-#, fuzzy
 msgid "From"
-msgstr "Forum"
+msgstr "Von"
 
 #: flaskbb/search/forms.py:59
 msgid "To"
-msgstr ""
+msgstr "An"
 
 #: flaskbb/search/forms.py:62
-#, fuzzy
 msgid "State"
-msgstr "Speichern"
+msgstr "Zustand"
 
 #: flaskbb/search/forms.py:65
-#, fuzzy
 msgid "Any"
-msgstr "Verbannen"
+msgstr "Alle"
 
 #: flaskbb/search/forms.py:66 flaskbb/templates/forum/forum.html:31
 #: flaskbb/templates/forum/topic_controls.html:113
@@ -1461,19 +1448,16 @@ msgid "Locked"
 msgstr "Gesperrt"
 
 #: flaskbb/search/forms.py:67
-#, fuzzy
 msgid "Not locked"
-msgstr "Gesperrt"
+msgstr "Nicht gesperrt"
 
 #: flaskbb/search/forms.py:68
-#, fuzzy
 msgid "Pinned"
-msgstr "Registriert"
+msgstr "Angeheftet"
 
 #: flaskbb/search/forms.py:69
-#, fuzzy
 msgid "Hidden"
-msgstr "Verstecken"
+msgstr "Versteckt"
 
 #: flaskbb/templates/forum/memberlist.html:1
 #: flaskbb/templates/forum/memberlist.html:14
@@ -2016,24 +2000,23 @@ msgstr "Du kannst celery mit diesem Befehl starten:"
 
 #: flaskbb/templates/management/attachments.html:31
 msgid "Cleanup"
-msgstr ""
+msgstr "Bereinigen"
 
 #: flaskbb/templates/management/attachments.html:41
 msgid "Purge all"
-msgstr ""
+msgstr "Alles bereinigen"
 
 #: flaskbb/templates/management/attachments.html:71
 msgid "File"
-msgstr ""
+msgstr "Datei"
 
 #: flaskbb/templates/management/attachments.html:72
 msgid "Uploader"
-msgstr ""
+msgstr "Hochlader"
 
 #: flaskbb/templates/management/attachments.html:74
-#, fuzzy
 msgid "Date"
-msgstr "Moderieren"
+msgstr "Datum"
 
 #: flaskbb/templates/management/attachments.html:80
 #: flaskbb/templates/management/banned_users.html:54
@@ -2044,17 +2027,16 @@ msgid "Actions"
 msgstr "Aktionen"
 
 #: flaskbb/templates/management/attachments.html:83
-#, fuzzy
 msgid "Delete selected Attachments"
-msgstr "Ausgewählte Berichte löschen"
+msgstr "Ausgewählte Anhänge löschen"
 
 #: flaskbb/templates/management/attachments.html:97
 msgid "file missing"
-msgstr ""
+msgstr "Datei fehlt"
 
 #: flaskbb/templates/management/attachments.html:130
 msgid "No attachments found."
-msgstr ""
+msgstr "Keine Anhänge gefunden."
 
 #: flaskbb/templates/management/banned_users.html:58
 #: flaskbb/templates/management/users.html:59
@@ -2196,7 +2178,7 @@ msgstr ""
 
 #: flaskbb/templates/management/plugins.html:45
 msgid "requires migrations"
-msgstr ""
+msgstr "erfordert Migrationen"
 
 #: flaskbb/templates/management/plugins.html:48
 #, fuzzy
@@ -2249,19 +2231,17 @@ msgstr "Keine Berichte."
 
 #: flaskbb/templates/management/user_form.html:63
 #: flaskbb/templates/user/change_avatar.html:20
-#, fuzzy
 msgid "Current Avatar"
-msgstr "Konnte Profilbild nicht holen"
+msgstr "Aktueller Avatar"
 
 #: flaskbb/templates/management/user_form.html:72
 #: flaskbb/templates/user/change_avatar.html:37
-#, fuzzy
 msgid "Delete Avatar"
-msgstr "Kategorie löschen"
+msgstr "Avatar löschen"
 
 #: flaskbb/templates/management/user_form.html:98
 msgid "Change your own account?"
-msgstr ""
+msgstr "Dein eigenes Konto ändern?"
 
 #: flaskbb/templates/management/user_form.html:99
 msgid ""
@@ -2279,9 +2259,8 @@ msgid "Delete selected Users"
 msgstr "Ausgewählte Benutzer löschen"
 
 #: flaskbb/templates/management/users.html:108
-#, fuzzy
 msgid "Delete all posts"
-msgstr "Diesen Beitrag löschen"
+msgstr "Alle Beiträge löschen"
 
 #: flaskbb/templates/management/users.html:128
 #: flaskbb/templates/search/search_result.html:100
@@ -2291,11 +2270,11 @@ msgstr ""
 
 #: flaskbb/templates/search/search_form.html:33
 msgid "Advanced filters"
-msgstr ""
+msgstr "Erweiterte Filter"
 
 #: flaskbb/templates/search/search_result.html:2
 msgid "Search results for Topics:"
-msgstr ""
+msgstr "Suchergebnisse für Themen:"
 
 #: flaskbb/templates/search/search_result.html:7
 #: flaskbb/templates/user/all_topics.html:18
@@ -2313,7 +2292,7 @@ msgstr "Es wurden keine Themen gefunden, die deinen Suchkriterien entsprechen."
 
 #: flaskbb/templates/search/search_result.html:40
 msgid "Search results for Posts:"
-msgstr ""
+msgstr "Suchergebnisse für Beiträge:"
 
 #: flaskbb/templates/search/search_result.html:45
 #, python-format
@@ -2321,8 +2300,8 @@ msgid ""
 "<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> in forum <a"
 " href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
-"<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> in Forum <a"
-" href=\"%(forum_url)s\">%(forum_title)s</a>"
+"<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> in Forum <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:71
 msgid "No posts found matching your search criteria."
@@ -2331,7 +2310,7 @@ msgstr ""
 
 #: flaskbb/templates/search/search_result.html:79
 msgid "Search results for Users:"
-msgstr ""
+msgstr "Suchergebnisse für Benutzer:"
 
 #: flaskbb/templates/user/all_posts.html:18
 #, python-format
@@ -2347,13 +2326,12 @@ msgid "No topics yet"
 msgstr "Es existieren noch keine Themen"
 
 #: flaskbb/templates/user/change_avatar.html:9
-#, fuzzy
 msgid "Change Avatar"
-msgstr "Passwort ändern"
+msgstr "Avatar ändern"
 
 #: flaskbb/templates/user/change_avatar.html:31
 msgid "Are you sure?"
-msgstr ""
+msgstr "Bist du sicher?"
 
 #: flaskbb/templates/user/change_email.html:7
 msgid "Change E-Mail Address"
@@ -2403,21 +2381,19 @@ msgstr "Theme"
 
 #: flaskbb/user/forms.py:59
 msgid "Open Links in a New Tab"
-msgstr ""
+msgstr "Links in einem neuen Tab öffnen"
 
 #: flaskbb/user/forms.py:61
-#, fuzzy
 msgid "Use forum default"
-msgstr "Forum gelöscht."
+msgstr "Forum-Standardeinstellung verwenden"
 
 #: flaskbb/user/forms.py:62
 msgid "Always"
-msgstr ""
+msgstr "Immer"
 
 #: flaskbb/user/forms.py:63
-#, fuzzy
 msgid "Never"
-msgstr "Noch nie gesehen"
+msgstr "Nie"
 
 #: flaskbb/user/forms.py:78
 msgid "Old email address"
@@ -2448,17 +2424,16 @@ msgid "Confirm new password"
 msgstr "Neues Passwort bestätigen"
 
 #: flaskbb/user/forms.py:131
-#, fuzzy
 msgid "New Avatar"
-msgstr "Profilbild"
+msgstr "Neuer Avatar"
 
 #: flaskbb/user/forms.py:133
 msgid "A avatar image must be provided."
-msgstr ""
+msgstr "Es muss ein Avatar-Bild bereitgestellt werden."
 
 #: flaskbb/user/forms.py:134
 msgid "This file type is not supported for avatar images"
-msgstr ""
+msgstr "Dieser Dateityp wird für Avatar-Bilder nicht unterstützt"
 
 #: flaskbb/user/forms.py:151
 msgid "Forum Signature"
@@ -2489,19 +2464,16 @@ msgid "Email address updated."
 msgstr "E-Mail-Adresse aktualisiert."
 
 #: flaskbb/user/views.py:187
-#, fuzzy
 msgid "Error while updating avatar"
-msgstr "Fehler beim Ändern der E-Mail Adresse"
+msgstr "Fehler beim Hochladen des Avatars"
 
 #: flaskbb/user/views.py:190
-#, fuzzy
 msgid "Avatar updated."
-msgstr "Kategorie aktualisiert."
+msgstr "Avatar aktualisiert."
 
 #: flaskbb/user/views.py:209
-#, fuzzy
 msgid "Avatar deleted."
-msgstr "Benutzer gelöscht."
+msgstr "Avatar gelöscht."
 
 #: flaskbb/user/views.py:233
 msgid "Error while updating user details"
