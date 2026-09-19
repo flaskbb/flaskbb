@@ -8,7 +8,8 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  /*padding-top: 50px; */ /* uncomment if navbar should be fixed */
+  /* match flaskbb-website and override alabaster's small-screen body padding */
+  padding: 50px 0 0;
 }
 
 body,
