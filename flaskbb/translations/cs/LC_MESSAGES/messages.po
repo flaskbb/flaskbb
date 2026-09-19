@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-09-18 23:49+0200\n"
-"PO-Revision-Date: 2026-07-27 22:33+0000\n"
+"PO-Revision-Date: 2026-09-19 09:54+0000\n"
 "Last-Translator: Michal Várady <miko.vaji@gmail.com>\n"
 "Language: cs\n"
-"Language-Team: Czech "
-"<https://hosted.weblate.org/projects/flaskbb/flaskbb/cs/>\n"
+"Language-Team: Czech <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"cs/>\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: flaskbb/app.py:454
 #, python-format
@@ -214,8 +215,8 @@ msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
-"Zadali jste uživatelské jméno nebo e-mailovou adresu, které nejsou "
-"propojeny s vaším účtem."
+"Zadali jste uživatelské jméno nebo e-mailovou adresu, které nejsou propojeny "
+"s vaším účtem."
 
 #: flaskbb/auth/views.py:233
 msgid "Email sent! Please check your inbox."
@@ -261,8 +262,8 @@ msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
-"Abyste mohli používat svůj účet, musíte jej aktivovat pomocí odkazu, "
-"který jsme vám odeslali na e-mailovou adresu."
+"Abyste mohli používat svůj účet, musíte jej aktivovat pomocí odkazu, který "
+"jsme vám odeslali na e-mailovou adresu."
 
 #: flaskbb/auth/services/authentication.py:169
 msgid "Wrong username or password."
@@ -761,8 +762,8 @@ msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
-"Povolit moderátorům upravovat profil jiného uživatele včetně změn hesla a"
-" e-mailu."
+"Povolit moderátorům upravovat profil jiného uživatele včetně změn hesla a e-"
+"mailu."
 
 #: flaskbb/management/forms.py:339
 msgid "Moderators can ban users"
@@ -1599,8 +1600,8 @@ msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
-"Abychom zabránili útokům hrubou silou na účty, omezili jsme počet "
-"požadavků na tuto cestu."
+"Abychom zabránili útokům hrubou silou na účty, omezili jsme počet požadavků "
+"na tuto cestu."
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid "Please try again in"
@@ -1869,8 +1870,7 @@ msgstr "Upravit"
 #, python-format
 msgid "Last modified: %(date)s by <a href=\"%(user_url)s\">%(user)s</a>"
 msgstr ""
-"Naposledy upraveno: %(date)s uživatelem <a "
-"href=\"%(user_url)s\">%(user)s</a>"
+"Naposledy upraveno: %(date)s uživatelem <a href=\"%(user_url)s\">%(user)s</a>"
 
 #: flaskbb/templates/forum/topic.html:124
 #, python-format
@@ -2050,7 +2050,8 @@ msgstr "Zrušit zákaz vybraným uživatelům"
 
 #: flaskbb/templates/management/banned_users.html:91
 msgid "No banned users found matching your search criteria."
-msgstr "Nenalezeni žádní zakázaní uživatelé odpovídající vašim kritériím hledání."
+msgstr ""
+"Nenalezeni žádní zakázaní uživatelé odpovídající vašim kritériím hledání."
 
 #: flaskbb/templates/management/forums.html:43
 msgid "Delete Category"
@@ -2290,8 +2291,8 @@ msgid ""
 "<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in forum "
 "<a href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
-"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> ve fóru <a"
-" href=\"%(forum_url)s\">%(forum_title)s</a>"
+"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> ve fóru <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:33
 msgid "No topics found matching your search criteria."
@@ -2566,4 +2567,3 @@ msgstr "CAPTCHA"
 
 #~ msgid "Apply them with 'flaskbb plugins install --migrations-only %(name)s'"
 #~ msgstr ""
-
