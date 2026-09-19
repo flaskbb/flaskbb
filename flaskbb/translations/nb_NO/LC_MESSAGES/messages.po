@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-09-18 23:49+0200\n"
-"PO-Revision-Date: 2021-09-25 00:28+0000\n"
+"PO-Revision-Date: 2026-09-19 09:54+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language: nb_NO\n"
-"Language-Team: Norwegian Bokmål "
-"<https://hosted.weblate.org/projects/flaskbb/flaskbb/nb_NO/>\n"
+"Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/flaskbb/"
+"flaskbb/nb_NO/>\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: flaskbb/app.py:454
 #, python-format
@@ -3869,4 +3870,3 @@ msgstr ""
 
 #~ msgid "Apply them with 'flaskbb plugins install --migrations-only %(name)s'"
 #~ msgstr ""
-
