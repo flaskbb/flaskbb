@@ -7,19 +7,20 @@
 # Toshiki Wulf <webmedia@toshiki.de>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version:  FlaskBB\n"
+"Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-09-18 23:49+0200\n"
-"PO-Revision-Date: 2026-02-25 13:24+0000\n"
-"Last-Translator: Peter Justin <peter@peterjustin.me>\n"
+"PO-Revision-Date: 2026-09-19 09:53+0000\n"
+"Last-Translator: Peter Justin <peter.justin@outlook.com>\n"
 "Language: de\n"
-"Language-Team: German "
-"<https://hosted.weblate.org/projects/flaskbb/flaskbb/de/>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/flaskbb/flaskbb/"
+"de/>\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: flaskbb/app.py:454
 #, python-format
@@ -218,8 +219,8 @@ msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
-"Du hast einen Benutzernamen oder eine E-Mail-Adresse eingegeben, die "
-"nicht mit deinem Konto verknüpft ist."
+"Du hast einen Benutzernamen oder eine E-Mail-Adresse eingegeben, die nicht "
+"mit deinem Konto verknüpft ist."
 
 #: flaskbb/auth/views.py:233
 msgid "Email sent! Please check your inbox."
@@ -235,13 +236,13 @@ msgstr "Dein Passwort wurde aktualisiert."
 
 #: flaskbb/auth/views.py:308
 msgid "A new account activation token has been sent to your email address."
-msgstr "Ein neues Kontoaktivierungs-Token wurde an deine E-Mail-Adresse gesendet."
+msgstr ""
+"Ein neues Kontoaktivierungs-Token wurde an deine E-Mail-Adresse gesendet."
 
 #: flaskbb/auth/views.py:341 flaskbb/auth/views.py:387
 msgid "Could not activate account due to an unrecoverable error"
 msgstr ""
-"Konto konnte aufgrund eines nicht behebbaren Fehlers nicht aktiviert "
-"werden"
+"Konto konnte aufgrund eines nicht behebbaren Fehlers nicht aktiviert werden"
 
 #: flaskbb/auth/views.py:348 flaskbb/auth/views.py:395
 msgid "Your account has been activated and you can now login."
@@ -267,8 +268,8 @@ msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
-"Um dein Konto nutzen zu können, musst du es über den Link aktivieren, den"
-" wir dir per E-Mail zugesendet haben."
+"Um dein Konto nutzen zu können, musst du es über den Link aktivieren, den "
+"wir dir per E-Mail zugesendet haben."
 
 #: flaskbb/auth/services/authentication.py:169
 msgid "Wrong username or password."
@@ -686,8 +687,7 @@ msgid ""
 "Check this, if the users in this group are allowed to moderate every "
 "forum."
 msgstr ""
-"Dies anhaken, wenn die Benutzer dieser Gruppe jedes Forum moderieren "
-"dürfen."
+"Dies anhaken, wenn die Benutzer dieser Gruppe jedes Forum moderieren dürfen."
 
 #: flaskbb/management/forms.py:293
 msgid "Is 'Moderator' group?"
@@ -775,8 +775,8 @@ msgid ""
 "Allow moderators to edit another user's profile including password and "
 "email changes."
 msgstr ""
-"Erlaube Moderatoren Benutzerprofile bearbeiten inklusive Passwort und "
-"E-Mail Änderungen."
+"Erlaube Moderatoren Benutzerprofile bearbeiten inklusive Passwort und E-Mail "
+"Änderungen."
 
 #: flaskbb/management/forms.py:339
 msgid "Moderators can ban users"
@@ -865,8 +865,8 @@ msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
-"Durch Komma getrennte Benutzernamen. Leer lassen, wenn du keine "
-"Moderatoren festlegen willst."
+"Durch Komma getrennte Benutzernamen. Leer lassen, wenn du keine Moderatoren "
+"festlegen willst."
 
 #: flaskbb/management/forms.py:490
 msgid "Show moderators"
@@ -895,8 +895,8 @@ msgstr "Wählen die Gruppen aus, die auf dieses Forum zugreifen können."
 #: flaskbb/management/forms.py:511
 msgid "You cannot convert a forum that contains topics into an external link."
 msgstr ""
-"Ein Forum, das Themen enthält, kann nicht in einen externen Link "
-"umgewandelt werden."
+"Ein Forum, das Themen enthält, kann nicht in einen externen Link umgewandelt "
+"werden."
 
 #: flaskbb/management/forms.py:516
 msgid "You also need to specify some moderators."
@@ -1615,8 +1615,8 @@ msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
-"Um Brute-Force-Angriffe auf Konten zu verhindern, haben wir die Anzahl "
-"der Anfragen über diese Route begrenzt."
+"Um Brute-Force-Angriffe auf Konten zu verhindern, haben wir die Anzahl der "
+"Anfragen über diese Route begrenzt."
 
 #: flaskbb/templates/errors/too_many_logins.html:10
 msgid "Please try again in"
@@ -1773,9 +1773,8 @@ msgid "Registered users online"
 msgstr "Registrierte Benutzer online"
 
 #: flaskbb/templates/forum/index.html:25
-#, fuzzy
 msgid "Guests online"
-msgstr "online"
+msgstr "Gäste online"
 
 #: flaskbb/templates/forum/memberlist.html:43
 #: flaskbb/templates/management/banned_users.html:48
@@ -2287,7 +2286,8 @@ msgstr "Diesen Beitrag löschen"
 #: flaskbb/templates/management/users.html:128
 #: flaskbb/templates/search/search_result.html:100
 msgid "No users found matching your search criteria."
-msgstr "Es wurden keine Benutzer gefunden, die deinen Suchkriterien entsprechen."
+msgstr ""
+"Es wurden keine Benutzer gefunden, die deinen Suchkriterien entsprechen."
 
 #: flaskbb/templates/search/search_form.html:33
 msgid "Advanced filters"
@@ -2304,8 +2304,8 @@ msgid ""
 "<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in forum "
 "<a href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
-"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in Forum "
-"<a href=\"%(forum_url)s\">%(forum_title)s</a>"
+"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in Forum <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:33
 msgid "No topics found matching your search criteria."
@@ -2326,7 +2326,8 @@ msgstr ""
 
 #: flaskbb/templates/search/search_result.html:71
 msgid "No posts found matching your search criteria."
-msgstr "Es wurden keine Beiträge gefunden, die deinen Suchkriterien entsprechen."
+msgstr ""
+"Es wurden keine Beiträge gefunden, die deinen Suchkriterien entsprechen."
 
 #: flaskbb/templates/search/search_result.html:79
 msgid "Search results for Users:"
@@ -3805,4 +3806,3 @@ msgstr "Captcha"
 
 #~ msgid "Apply them with 'flaskbb plugins install --migrations-only %(name)s'"
 #~ msgstr ""
-
