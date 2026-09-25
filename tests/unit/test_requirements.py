@@ -125,6 +125,32 @@ def test_member_cannot_post_topic_in_locked_forum(user, forum_locked, request_co
     assert not r.CanPostTopic(user)
 
 
+def test_admin_can_post_topic_in_locked_forum(admin_user, forum_locked, request_context):
+    push_onto_request_context(forum=forum_locked, topic=None, post=None)
+    assert r.CanPostTopic(admin_user)
+
+
+def test_super_moderator_cannot_post_topic_in_locked_forum(
+    super_moderator_user, forum_locked, request_context
+):
+    push_onto_request_context(forum=forum_locked, topic=None, post=None)
+    assert not r.CanPostTopic(super_moderator_user)
+
+
+def test_post_topic_filter_denies_super_moderator_in_locked_forum(
+    super_moderator_user, forum_locked, request_context
+):
+    assert not r.can_post_topic(super_moderator_user, forum_locked)
+
+
+def test_post_topic_filter_allows_admin_in_locked_forum(admin_user, forum_locked, request_context):
+    assert r.can_post_topic(admin_user, forum_locked)
+
+
+def test_post_topic_filter_denies_member_in_locked_forum(user, forum_locked, request_context):
+    assert not r.can_post_topic(user, forum_locked)
+
+
 def test_IsMorePrivilegedThan_ranks_mod_over_member(moderator_user, user):
     assert r.IsMorePrivilegedThan(user)(moderator_user)
 

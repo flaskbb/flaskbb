@@ -294,9 +294,15 @@ CanPostAttachment = Or(
 )
 
 CanPostTopic = Or(
-    And(CanAccessForum(), Has("posttopic"), ForumNotLocked()),
-    IsAtleastSuperModerator,
-    IsModeratorInForum(),
+    IsAdmin,
+    And(
+        ForumNotLocked(),
+        Or(
+            And(CanAccessForum(), Has("posttopic")),
+            IsAtleastSuperModerator,
+            IsModeratorInForum(),
+        ),
+    ),
 )
 
 CanDeleteTopic = Or(
@@ -409,9 +415,15 @@ def can_post_topic(user: User, forum: Forum | int | None):
 
     return Permission(
         Or(
-            IsAtleastSuperModerator,
-            IsModeratorInForum(**kwargs),
-            And(Has("posttopic"), ForumNotLocked(**kwargs)),
+            IsAdmin,
+            And(
+                ForumNotLocked(**kwargs),
+                Or(
+                    IsAtleastSuperModerator,
+                    IsModeratorInForum(**kwargs),
+                    Has("posttopic"),
+                ),
+            ),
         ),
         identity=user,
     )

@@ -23,7 +23,7 @@ from flask import (
     url_for,
 )
 from flask.views import MethodView
-from flask_allows2 import And, Permission
+from flask_allows2 import And, Or, Permission
 from flask_babelplus import gettext as _
 from flask_login import login_required
 from pluggy import HookimplMarker
@@ -323,7 +323,7 @@ class EditTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanPostTopic,
+            Or(CanPostTopic, IsAtleastModeratorInForum()),
             CanEditPost,
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that topic"),
