@@ -88,7 +88,7 @@ jobs:
       - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: docker
-          file: docker/Dockerfile.release
+          file: docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           build-args: FLASKBB_VERSION=${{ steps.meta.outputs.version }}
           push: true

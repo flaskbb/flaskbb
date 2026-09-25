@@ -1,10 +1,7 @@
-# Release image: the latest stable FlaskBB from PyPI, served by gunicorn.
+# Release image: FlaskBB 3 from PyPI, served by gunicorn.
 # The build context is this directory:
 #
-#   docker build -f docker/Dockerfile.release -t flaskbb:release docker/
-#
-# 2.2.0 annotates with a TYPE_CHECKING-only import in plugins/manager.py,
-# which only imports on 3.14 (deferred annotations).
+#   docker build -f docker/Dockerfile -t flaskbb:release docker/
 ARG PYTHON_VERSION=3.14
 ARG UV_VERSION=0.12
 
@@ -17,11 +14,6 @@ COPY --from=uv /uv /uvx /usr/local/bin/
 # Empty installs the latest release on PyPI. Pin one with
 # --build-arg FLASKBB_VERSION=2.2.0 to stay on a known version.
 ARG FLASKBB_VERSION=""
-
-# Plugins from PyPI, resolved together with FlaskBB so only plugin versions
-# that support it are picked, e.g.
-# --build-arg FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
-ARG FLASKBB_PLUGINS=""
 
 ENV PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
@@ -38,12 +30,9 @@ RUN groupadd --gid 1000 flaskbb \
         "$VIRTUAL_ENV/var/flaskbb-instance" \
         /var/lib/flaskbb /var/lib/flaskbb/avatars /var/lib/flaskbb/attachments
 
-# The extras exist since 3.0, see "Known issues" in README.md.
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --allow-existing "$VIRTUAL_ENV" \
-    && uv pip install \
-        "flaskbb[gunicorn,postgres,mysql]${FLASKBB_VERSION:+==${FLASKBB_VERSION}}" \
-        $FLASKBB_PLUGINS
+    && uv pip install "flaskbb[gunicorn,postgres,mysql]${FLASKBB_VERSION:+==${FLASKBB_VERSION}}"
 
 WORKDIR /app
 

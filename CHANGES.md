@@ -17,6 +17,7 @@ Unreleased
 - Quotes are styled and show a header with the quoted user and a link to the quoted post, including quotes in existing posts.
 - Long quotes are shortened until expanded, and quotes nested deeper than two levels are collapsed.
 - Typing `@` and three characters in the editor suggests usernames to mention.
+- Admins can create new topics in locked forums.
 
 #### Search
 - **Search** was rewritten and can be extended via plugins.

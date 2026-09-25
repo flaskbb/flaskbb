@@ -1,7 +1,7 @@
-# Release stack: the latest stable FlaskBB from PyPI, served by gunicorn.
+# Release stack: FlaskBB 3 from PyPI, served by gunicorn.
 # Meant to run behind a reverse proxy that terminates TLS.
 #
-#   docker compose -f docker/compose.release.yaml up -d --build
+#   docker compose -f docker/docker-compose.yaml up -d
 #
 name: flaskbb
 
@@ -49,13 +49,7 @@ services:
       retries: 5
 
   flaskbb: &flaskbb
-    build:
-      context: .
-      dockerfile: Dockerfile.release
-      args:
-        FLASKBB_VERSION: ${FLASKBB_VERSION:-}
-        FLASKBB_PLUGINS: ${FLASKBB_PLUGINS:-}
-    image: flaskbb:${FLASKBB_VERSION:-latest}
+    image: ${FLASKBB_IMAGE:-ghcr.io/flaskbb/flaskbb:latest}
     restart: unless-stopped
     logging: *logging
     # gunicorn and celery finish running requests and tasks before exiting

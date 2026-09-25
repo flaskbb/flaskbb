@@ -2,7 +2,7 @@
 # served by the Flask development server with the reloader enabled. The
 # database is SQLite, stored in the flaskbb-storage volume.
 #
-#   docker compose -f docker/compose.dev.yaml up --build
+#   docker compose -f docker/docker-compose.dev.yaml up --build
 #
 name: flaskbb-dev
 

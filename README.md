@@ -77,12 +77,12 @@ Set `SECRET_KEY`, `POSTGRES_PASSWORD` and the `ADMIN_*` variables in
 `docker/.env`, then start it:
 
 ```bash
-docker compose -f docker/compose.release.yaml up -d --build
+docker compose -f docker/docker-compose.yaml up -d
 ```
 
-The forum is served on [localhost:8000](http://localhost:8000). See
-[docker/README.md](docker/README.md) for the development stack, configuration
-and reverse proxy setup.
+The forum is served on [localhost:8000](http://localhost:8000). See the
+[release guide](docker/README.md) for configuration and reverse proxy setup,
+or the [development guide](docker/DEVELOPMENT.md) to run from this checkout.
 
 ### Running from source
 

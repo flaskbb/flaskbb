@@ -1,4 +1,4 @@
-# Build context of Dockerfile.release, only what it copies
+# Build context of Dockerfile, only what it copies
 *
 !wsgi.py
 !flaskbb.cfg
