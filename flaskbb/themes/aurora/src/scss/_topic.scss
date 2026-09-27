@@ -327,18 +327,6 @@ h5.author-title {
     clear: both;
 }
 
-.selection-quote-btn {
-    position: fixed;
-    z-index: $zindex-dropdown;
-    transform: translate(-50%, calc(-100% - 0.5rem));
-    box-shadow: $box-shadow-sm;
-    white-space: nowrap;
-
-    &.below {
-        transform: translate(-50%, 0.5rem);
-    }
-}
-
 .flaskbb-editor.quote-inserted {
     animation: quote-inserted 1.2s ease-out;
 }

@@ -25,15 +25,12 @@ def quoting_topic(forum, user, topic):
 
 
 def test_topic_page_renders_quote_headers(client, quoting_topic):
-    post = quoting_topic.first_post
-
     response = client.get(f"/topic/{quoting_topic.id}")
     html = response.get_data(as_text=True)
 
     assert response.status_code == 200
     assert QUOTE_HEADER in html
-    assert f'data-quote-post-url="/post/{post.id}"' in html
-    assert 'class="btn btn-sm btn-primary selection-quote-btn"' in html
+    assert "selection-quote-btn" not in html
 
 
 @pytest.mark.parametrize("page", ["posts", "topics"])
