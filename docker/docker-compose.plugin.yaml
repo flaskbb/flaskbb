@@ -1,6 +1,6 @@
 services:
   flaskbb:
-    image: ${FLASKBB_PLUGIN_IMAGE:-flaskbb:plugins}
+    image: flaskbb:plugins
     build:
       context: .
       dockerfile: Dockerfile.plugin
@@ -9,4 +9,4 @@ services:
         FLASKBB_PLUGINS: ${FLASKBB_PLUGINS:?set FLASKBB_PLUGINS in docker/.env}
 
   celery:
-    image: ${FLASKBB_PLUGIN_IMAGE:-flaskbb:plugins}
+    image: flaskbb:plugins

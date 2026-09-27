@@ -111,10 +111,28 @@ additional plugin layer. Web and Celery use the same derived image. On startup,
 `FLASKBB_ENABLE_PLUGINS` enables and initializes plugins that are not already
 enabled.
 
-For pull-only production updates, set `FLASKBB_PLUGIN_IMAGE` to an image in
-your registry, build and push it from CI, and use both Compose files on the
-server. The server can then update with the same `down`, `pull`, `up -d`
-workflow. Rebuild the plugin image whenever its FlaskBB base image changes.
+### Updating a plugin image
+
+Back up PostgreSQL and the `flaskbb-storage` volume before upgrading. If
+`FLASKBB_IMAGE` is pinned, update its tag in `.env`; no edit is needed when it
+uses `latest`. Pull the base image and rebuild the plugin layer:
+
+```bash
+docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml build --pull flaskbb
+```
+
+Optionally pull updates for PostgreSQL and Valkey, then recreate the services:
+
+```bash
+docker compose -f docker/docker-compose.yaml pull postgres redis
+docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml up -d
+```
+
+FlaskBB applies database and enabled-plugin migrations before starting.
+Running `down` first is not required. Never use `down -v` during an update
+because it removes the data volumes.
+
+### Plugin commands
 
 To remove a plugin, take it out of `FLASKBB_ENABLE_PLUGINS` first, otherwise
 the next start enables it again. Then uninstall it while it is still
@@ -126,4 +144,4 @@ docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninst
 docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
 ```
 
-The prebuilt images on ghcr.io come without plugins.
+The prebuilt images on ghcr.io comes only with the portal and conversation plugins.
