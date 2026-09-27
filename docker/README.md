@@ -90,13 +90,10 @@ docker run -d -p 8000:8000 -v flaskbb-storage:/var/lib/flaskbb \
 ## Plugins
 
 `Dockerfile.plugin` adds plugin packages on top of the published FlaskBB image.
-List the PyPI packages and their FlaskBB registration names in `.env`:
+List the PyPI packages in `.env`:
 
 ```
-# PyPI packages that are installed into the image
 FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
-# the names they register as, see 'flaskbb plugins list'
-FLASKBB_ENABLE_PLUGINS=portal,conversations
 ```
 
 Build and start the derived image by applying the plugin Compose file after the
@@ -107,9 +104,26 @@ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yam
 ```
 
 The build keeps the FlaskBB version from `FLASKBB_IMAGE` and installs only the
-additional plugin layer. Web and Celery use the same derived image. On startup,
-`FLASKBB_ENABLE_PLUGINS` enables and initializes plugins that are not already
-enabled.
+additional plugin layer. Enable and install the plugins through the admin panel
+or the CLI, then restart the web and worker processes so they load them:
+
+```bash
+docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml exec flaskbb flaskbb plugins enable portal
+docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml exec flaskbb flaskbb plugins install portal
+docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml restart flaskbb celery
+```
+
+To remove a plugin, uninstall it while it is still enabled, which drops its
+settings and reverts its migrations. Then disable it, remove the package from
+`FLASKBB_PLUGINS` and rebuild:
+
+```bash
+docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninstall portal
+docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
+```
+
+The prebuilt images on ghcr.io comes only with the portal and conversation plugins.
+
 
 ### Updating a plugin image
 
@@ -131,17 +145,3 @@ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yam
 FlaskBB applies database and enabled-plugin migrations before starting.
 Running `down` first is not required. Never use `down -v` during an update
 because it removes the data volumes.
-
-### Plugin commands
-
-To remove a plugin, take it out of `FLASKBB_ENABLE_PLUGINS` first, otherwise
-the next start enables it again. Then uninstall it while it is still
-enabled, which drops its settings and reverts its migrations, disable it,
-remove the package from `FLASKBB_PLUGINS` and rebuild:
-
-```bash
-docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninstall portal
-docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
-```
-
-The prebuilt images on ghcr.io comes only with the portal and conversation plugins.

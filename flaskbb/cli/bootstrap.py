@@ -20,7 +20,6 @@ from sqlalchemy.exc import OperationalError
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.utils import FlaskBBCLIError
 from flaskbb.extensions import db
-from flaskbb.plugins.models import PluginRegistry
 from flaskbb.user.models import User
 from flaskbb.utils.proxies import current_app
 
@@ -44,9 +43,8 @@ and ADMIN_PASSWORD), or install FlaskBB interactively with 'flaskbb install'."""
 @click.option("--password", envvar="ADMIN_PASSWORD", help="The administrator's password.")
 @click.option(
     "--enable-plugins",
-    envvar="FLASKBB_ENABLE_PLUGINS",
     default="",
-    help="Comma separated plugins to enable and install unless they are enabled.",
+    help="Comma separated plugins to enable and install after a fresh installation.",
 )
 @with_appcontext
 def bootstrap(
@@ -58,14 +56,15 @@ def bootstrap(
     enable_plugins: str,
 ):
     """Waits for the database and then installs FlaskBB into an empty
-    database or migrates an existing one, and enables the given plugins.
-    Safe to run before every start of FlaskBB.
+    database or migrates an existing one. Plugins can be seeded during a
+    fresh installation. Safe to run before every start of FlaskBB.
     """
     wait_for_database(timeout)
     if wait_only:
         return
 
-    if is_installed():
+    installed = is_installed()
+    if installed:
         # also applies the new migrations of every enabled plugin
         run_flaskbb("Migrating the database", "db", "upgrade")
     elif username and email and password:
@@ -83,15 +82,13 @@ def bootstrap(
     else:
         raise FlaskBBCLIError(INSTALL_HINT, fg="red")
 
+    if installed:
+        return
+
     names = [name.strip() for name in enable_plugins.split(",") if name.strip()]
-    with db.engine.connect() as connection:
-        enabled = set(
-            connection.scalars(sa.select(PluginRegistry.name).where(PluginRegistry.enabled))
-        )
     for name in names:
-        if name not in enabled:
-            run_flaskbb(f"Enabling plugin '{name}'", "plugins", "enable", name)
-            run_flaskbb(f"Installing plugin '{name}'", "plugins", "install", name)
+        run_flaskbb(f"Enabling plugin '{name}'", "plugins", "enable", name)
+        run_flaskbb(f"Installing plugin '{name}'", "plugins", "install", name)
 
 
 def wait_for_database(timeout: int):

@@ -43,20 +43,35 @@ def test_migrates_installed_database(cli_runner, user, steps):
     assert steps == [("db", "upgrade")]
 
 
-def test_enables_only_plugins_that_are_not_enabled(cli_runner, user, steps):
-    portal = PluginRegistry("portal")
-    portal.enabled = True
-    portal.save()
-    PluginRegistry("vote").save()
-
-    result = cli_runner.invoke(bootstrap, ["--enable-plugins", "portal, vote,"])
+def test_enables_plugins_after_initial_install(cli_runner, database, steps):
+    result = cli_runner.invoke(bootstrap, [*ADMIN, "--enable-plugins", "portal, vote,"])
 
     assert result.exit_code == 0, result.output
     assert steps == [
-        ("db", "upgrade"),
+        ("install", "--force", *ADMIN),
+        ("plugins", "enable", "portal"),
+        ("plugins", "install", "portal"),
         ("plugins", "enable", "vote"),
         ("plugins", "install", "vote"),
     ]
+
+
+def test_does_not_enable_plugins_on_later_bootstrap(cli_runner, user, steps):
+    PluginRegistry("vote").save()
+
+    result = cli_runner.invoke(bootstrap, ["--enable-plugins", "vote"])
+
+    assert result.exit_code == 0, result.output
+    assert steps == [("db", "upgrade")]
+
+
+def test_does_not_read_plugins_from_environment(cli_runner, database, steps, monkeypatch):
+    monkeypatch.setenv("FLASKBB_ENABLE_PLUGINS", "vote")
+
+    result = cli_runner.invoke(bootstrap, ADMIN)
+
+    assert result.exit_code == 0, result.output
+    assert steps == [("install", "--force", *ADMIN)]
 
 
 def test_reads_the_environment(cli_runner, database, steps, monkeypatch):

@@ -96,10 +96,11 @@ Prepares the database before FlaskBB starts and is safe to run before every
 start, which is what the container images do. It waits until the database
 accepts connections and then installs FlaskBB into an empty database or
 runs ``flaskbb db upgrade`` on an existing one, which also applies the new
-migrations of the enabled plugins. Finally it enables and installs the
-given plugins that aren't enabled yet.
+migrations of the enabled plugins. When creating a new installation, it can
+also enable and install an initial set of plugins.
 
-Every option can also be set through the environment variable in brackets.
+Options with an environment variable shown in brackets can also be set through
+that variable.
 
 .. describe:: --wait-only
 
@@ -122,10 +123,12 @@ Every option can also be set through the environment variable in brackets.
 
     The administrator's password.
 
-.. describe:: --enable-plugins NAMES (FLASKBB_ENABLE_PLUGINS)
+.. describe:: --enable-plugins NAMES
 
-    Comma separated names of the plugins to enable and install, as listed
-    by ``flaskbb plugins list``.
+    Comma separated names of plugins to enable and install when creating a new
+    installation, as listed by ``flaskbb plugins list``. This option is ignored
+    when the database is already installed; use ``flaskbb plugins enable`` and
+    ``flaskbb plugins disable`` to change an existing installation.
 
 ``flaskbb populate``
 ~~~~~~~~~~~~~~~~~~~~

@@ -47,7 +47,7 @@ Unreleased
 
 #### CLI
 - New `flaskbb serve` command runs FlaskBB with gunicorn.
-- New `flaskbb bootstrap` command waits for the database, then installs or migrates it and enables the given plugins. The container images run it on every start. `python -m flaskbb` runs the CLI as well.
+- New `flaskbb bootstrap` command waits for the database, then installs or migrates it and can seed plugins during the initial installation. The container images run it on every start. `python -m flaskbb` runs the CLI as well.
 - New CLI commands manage users, groups and permissions. (#466)
 - `flaskbb plugins` can run plugin migrations.
 - `flaskbb upgrade` was removed. Migrations and plugin installs now handle setting fixtures.
@@ -56,7 +56,7 @@ Unreleased
 - htmx is now supported and used for various actions.
 - A full docker setup is now supported.
 - Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`.
-- The release docker-compose stack installs, enables and migrates the plugins declared in `docker/.env`.
+- The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
 - Online users and guests are tracked with redis-py instead of `flask-redis`
 
 
