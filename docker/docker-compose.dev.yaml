@@ -48,8 +48,6 @@ services:
     environment: *flaskbb-env
     volumes:
       - ..:/app
-      # the image has a copy as well, the mount makes edits apply on restart
-      - ./flaskbb.cfg:/etc/flaskbb/flaskbb.cfg:ro
       - flaskbb-storage:/var/lib/flaskbb
     ports:
       - "${FLASKBB_PORT:-5000}:5000"

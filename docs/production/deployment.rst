@@ -8,6 +8,8 @@ Production & Deployment
 -  `Servers`_
 -  `systemd Unit Files`_
 
+For the maintained container stack, see :doc:`Docker Deployment <docker>`.
+
 
 Setup & Prerequisites
 -----------------------

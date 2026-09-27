@@ -20,7 +20,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     VIRTUAL_ENV=/opt/venv \
     PATH=/opt/venv/bin:$PATH \
-    FLASKBB_SETTINGS=/etc/flaskbb/flaskbb.cfg
+    FLASKBB_SETTINGS=flaskbb.configs.docker.DockerConfig
 
 # Flask creates its instance folder next to the venv, the app writes there
 # and to its storage, everything else belongs to root.
@@ -37,7 +37,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 WORKDIR /app
 
 COPY wsgi.py /app/wsgi.py
-COPY flaskbb.cfg /etc/flaskbb/flaskbb.cfg
 COPY healthcheck.py /usr/local/lib/flaskbb-docker/healthcheck.py
 COPY entrypoint.sh /usr/local/bin/flaskbb-entrypoint
 

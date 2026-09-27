@@ -17,7 +17,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH=/opt/venv/bin:$PATH \
-    FLASKBB_SETTINGS=/etc/flaskbb/flaskbb.cfg
+    FLASKBB_SETTINGS=flaskbb.configs.docker.DockerConfig
 
 # The source tree is bind mounted into the container, so the user inside
 # has to own the files outside: --build-arg USER_UID=$(id -u)
@@ -42,7 +42,6 @@ COPY --chown=flaskbb:flaskbb . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --extra gunicorn --extra postgres --extra mysql
 
-COPY docker/flaskbb.cfg /etc/flaskbb/flaskbb.cfg
 COPY docker/healthcheck.py /usr/local/lib/flaskbb-docker/healthcheck.py
 COPY docker/entrypoint.sh /usr/local/bin/flaskbb-entrypoint
 

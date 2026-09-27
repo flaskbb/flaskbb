@@ -1,7 +1,8 @@
 """WSGI entry point for the container images.
 
 The configuration is picked up from the FLASKBB_SETTINGS environment
-variable, see docker/flaskbb.cfg.
+variable, which defaults to flaskbb.configs.docker.DockerConfig in the
+container images.
 """
 
 import os

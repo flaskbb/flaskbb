@@ -41,9 +41,9 @@ docker compose -f docker/docker-compose.dev.yaml down -v
 
 ## Configuration
 
-The image contains `flaskbb.cfg` as `/etc/flaskbb/flaskbb.cfg`, read through
-`FLASKBB_SETTINGS`. The Compose file mounts `docker/flaskbb.cfg`, so edits to
-that file apply on the next restart.
+The image loads `flaskbb.configs.docker.DockerConfig` through
+`FLASKBB_SETTINGS`. The source tree is mounted into the container, so edits to
+`flaskbb/configs/docker.py` apply on the next restart.
 
 The Compose file uses SQLite, debug mode, Mailpit and verbose logging by
 default. It reads database, secret, host, search, log level and administrator

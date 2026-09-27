@@ -34,19 +34,22 @@ docker compose -f docker/docker-compose.yaml run --rm -e FLASKBB_BOOTSTRAP=skip 
 
 ## Configuration
 
-The image contains `flaskbb.cfg` as `/etc/flaskbb/flaskbb.cfg`, read through
-`FLASKBB_SETTINGS`. It takes values from the environment and defaults to
-production values.
+The image loads `flaskbb.configs.docker.DockerConfig` through
+`FLASKBB_SETTINGS`. This configuration takes values from the environment and
+provides production defaults.
 
 Our docker-compose config passes every variable of `.env` to its containers, so
 most settings can be changed there. See `.env.example` for the full list, then
 apply the changes by running `up -d`. Anything not covered can be set as a
-`FLASKBB_<CONFIG_KEY>` environment variable. To replace the config file, mount
-your own over it:
+`FLASKBB_<CONFIG_KEY>` environment variable. To use a custom configuration
+file, mount it and set `FLASKBB_SETTINGS` for both the `flaskbb` and `celery`
+services:
 
 ```yaml
+    environment:
+      FLASKBB_SETTINGS: /etc/flaskbb/custom.cfg
     volumes:
-      - ./my-flaskbb.cfg:/etc/flaskbb/flaskbb.cfg:ro
+      - ./my-flaskbb.cfg:/etc/flaskbb/custom.cfg:ro
 ```
 
 This setup keeps at most 30 MB of logs per container (three rotated

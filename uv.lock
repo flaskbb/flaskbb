@@ -995,7 +995,7 @@ requires-dist = [
     { name = "pytz", specifier = ">=2026.2" },
     { name = "redis", specifier = ">=8.1.0" },
     { name = "requests", specifier = ">=2.34.2" },
-    { name = "sqlalchemy", specifier = ">=2.1.0" },
+    { name = "sqlalchemy", specifier = ">=2.1.1" },
     { name = "typing-extensions", specifier = ">=4.16" },
     { name = "unidecode", specifier = ">=1.4.0" },
     { name = "werkzeug", specifier = ">=3.1.8" },
