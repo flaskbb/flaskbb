@@ -27,6 +27,9 @@ frontend: ## Runs the webpack server which watches for changes in flaskbb/themes
 frontend-dark: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
 	cd flaskbb/themes/aurora && npm run watch
 
+frontend-build: ## Builds both themes
+	cd flaskbb/themes/aurora && npm run build && cd ../aurora_dark && npm run build
+
 dev-plugins: ## Install the plugins as editable
 	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote -e ../flaskbb-plugin-ranks -e ../flaskbb-plugin-test-mail -e ../flaskbb-plugin-stopforumspam
 

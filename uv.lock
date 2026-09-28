@@ -651,11 +651,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "4.0.4"
+version = "4.0.5"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c8/d7/37691dc5063438a448b646f6f2442b4beebf16cc0e18d8cdfa7aeec60b8c/filelock-4.0.4.tar.gz", hash = "sha256:90999ed63a26ccf86b93b959ab10cf1017f422d816be454ed54cbed263e71ab5", size = 244639, upload-time = "2026-09-26T15:19:12.105Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/95/31/fbad823d8dfc56e2ff694db0319959382bdb01f2fe40c382e34c6f672392/filelock-4.0.5.tar.gz", hash = "sha256:2b155f098c4f285fb41954a22c616c4e8a0635b78c184338ba3023c1c91a4b4d", size = 247758, upload-time = "2026-09-28T05:07:19.736Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bc/ac/8b9c6dc2aa7e9cf5582e20a337006c3428c3d752c2255dbaca2c78a8be45/filelock-4.0.4-py3-none-any.whl", hash = "sha256:0df72be195ca7892216d16f2edce8d9b93a571f02402972020a8cff84c594c7b", size = 108629, upload-time = "2026-09-26T15:19:10.603Z" },
+    { url = "https://files.pythonhosted.org/packages/62/34/d90d7e7ef972900e09f45b9c0661376dd03e77fece26ee83ec93b7719bae/filelock-4.0.5-py3-none-any.whl", hash = "sha256:be9166068623636cedcad7b2ef735b04e5fb4344d978e09fd6fbd6ede06f14f0", size = 108976, upload-time = "2026-09-28T05:07:18.341Z" },
 ]
 
 [[package]]
@@ -980,8 +980,8 @@ requires-dist = [
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
     { name = "flask-themes2", specifier = ">=1.0.1" },
     { name = "flask-wtf", specifier = ">=1.3.0" },
-    { name = "flaskbb-plugin-conversations", specifier = ">=3.0.2" },
-    { name = "flaskbb-plugin-portal", specifier = ">=3.0.1" },
+    { name = "flaskbb-plugin-conversations", specifier = ">=3.0.4" },
+    { name = "flaskbb-plugin-portal", specifier = ">=3.0.2" },
     { name = "gunicorn", marker = "extra == 'gunicorn'", specifier = ">=26.0.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "markupsafe", specifier = ">=3.0.3" },
@@ -1072,26 +1072,26 @@ typing = [
 
 [[package]]
 name = "flaskbb-plugin-conversations"
-version = "3.0.3"
+version = "3.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/3c/5233760a5ba251e02bf60282cf0e4356e86c8d8e55ba09c6c04cc459fa17/flaskbb_plugin_conversations-3.0.3.tar.gz", hash = "sha256:26fd82f01c4cb3a289e2885df7fd6f5fae28e5347a7ea83fefa1609f3a1470a9", size = 18114, upload-time = "2026-09-19T18:31:42.43Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/03/c9b67c2632232a41a004ef24b11901de153158e9ed0efb0a2848d50aacb6/flaskbb_plugin_conversations-3.0.4.tar.gz", hash = "sha256:ee99dcf5786ec96ae94b6ea7325ba7e99fcd9ede95d3bfc09ac8407e302882be", size = 18118, upload-time = "2026-09-28T19:34:17.842Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/0a/04621133386354a9fb7d5793b2b29ee8eac3da4432e34c1e87b646f7cace/flaskbb_plugin_conversations-3.0.3-py3-none-any.whl", hash = "sha256:b7d210736fd93d2c9054f808f343316fda5eab64e9f3541d2def9c179e5b1ea3", size = 23136, upload-time = "2026-09-19T18:31:41.104Z" },
+    { url = "https://files.pythonhosted.org/packages/85/1a/41be0205b4d0f89bc99c17d15753b92fb0ebd5835d9fdf757fea49fa6e20/flaskbb_plugin_conversations-3.0.4-py3-none-any.whl", hash = "sha256:c418eb7e46734f337240b359f6d4acc2b3c0be09624b9d0b778c7b15832632a7", size = 23141, upload-time = "2026-09-28T19:34:16.423Z" },
 ]
 
 [[package]]
 name = "flaskbb-plugin-portal"
-version = "3.0.1"
+version = "3.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c7/52/88cfc196fe9b541ccb6186b338dc697c63393ea8ef53d685f7ad4967aea4/flaskbb_plugin_portal-3.0.1.tar.gz", hash = "sha256:cf65054abb39bcea5fe209c7735aae928004396cf9ae688d449b36844b89f4fa", size = 8308, upload-time = "2026-09-16T19:26:50.203Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ac/ba/bf717408e628f091cdabc189d1691047a8b9b0afd6b755e174d7ddc4c216/flaskbb_plugin_portal-3.0.2.tar.gz", hash = "sha256:5dbf492be2171783190535b35a556badf1a386d780766967a34fa47cbcfd3a2b", size = 8307, upload-time = "2026-09-28T19:33:20.153Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/77/934502d788b2685aa52ccf8404bc017f21bf3caf4d3d82b2b1e73ee027d1/flaskbb_plugin_portal-3.0.1-py3-none-any.whl", hash = "sha256:70c95e434ee028e819400c146da7a31cda5064d18398f8c4c6601b94b9a5467e", size = 11417, upload-time = "2026-09-16T19:26:48.468Z" },
+    { url = "https://files.pythonhosted.org/packages/55/53/dc0b028a1afd54a843b4c06a227a3c3979e06beaffb60f46d73d9a7c906e/flaskbb_plugin_portal-3.0.2-py3-none-any.whl", hash = "sha256:b5ae76d1b0f540e759e25cae4cba03a7713c1fd1faaf52c82b2ade403e6f0a1c", size = 11417, upload-time = "2026-09-28T19:33:18.351Z" },
 ]
 
 [[package]]
@@ -1752,11 +1752,11 @@ wheels = [
 
 [[package]]
 name = "platformdirs"
-version = "4.12.0"
+version = "4.12.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/23/4d/e78afe1b449720c481884ca0a2f960f85f9ffdaa34b2d127b5427422c564/platformdirs-4.12.0.tar.gz", hash = "sha256:095be5c143382b1bee917c4f3e9987a0d8d6a582261f1d061ad0c403b7695b5b", size = 58964, upload-time = "2026-09-26T15:26:00.937Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/8a/84ef03c1c83eacd7cc4540b05428a93b5cd4e42f62fb0b98ac2cb6ed3a6d/platformdirs-4.12.1.tar.gz", hash = "sha256:38da801a4af303033cbffccb39030db22bf0473e6414309b02acebeee7ca8bf1", size = 59427, upload-time = "2026-09-28T05:05:16.264Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/60/3a/723ad221b7fef91ccd947f9fddbe84d38fa573e2723317aaa67bfde41015/platformdirs-4.12.0-py3-none-any.whl", hash = "sha256:f6fb2960f2f2eb0870f820f7e49e49e6c0f0589c637f34d33b260b07591327c9", size = 32965, upload-time = "2026-09-26T15:25:59.496Z" },
+    { url = "https://files.pythonhosted.org/packages/40/31/1521c38d175108ac395941adbcb9f11e085340bed81ad166e8ad8c21c17b/platformdirs-4.12.1-py3-none-any.whl", hash = "sha256:7f251621befae78b2cb74616f9fc99d3fa3db0afba5035987731f8dcd430337d", size = 33011, upload-time = "2026-09-28T05:05:15.06Z" },
 ]
 
 [[package]]
@@ -1935,11 +1935,11 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.15.0"
+version = "2.15.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/02/a5/5197bfd06417837ac079921c66fa6393f1dea3557272a263cebfef69e432/pyjwt-2.15.0.tar.gz", hash = "sha256:b11c5f9791d7bf51c2b39a81ed669f6b2dbbd669df2942f6c60167e9e3d1abe4", size = 120513, upload-time = "2026-09-23T16:56:00.689Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz", hash = "sha256:4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8", size = 121252, upload-time = "2026-09-28T18:40:42.598Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/55/40e45bf052ee8ee12a4dfd785519660f8effa7b065442b91646ec6828619/pyjwt-2.15.0-py3-none-any.whl", hash = "sha256:7a3742debf6b879e912dbb9819ceec1594be812452b78c5f2e2dfc56564954f8", size = 33680, upload-time = "2026-09-23T16:55:59.241Z" },
+    { url = "https://files.pythonhosted.org/packages/50/ca/44de4e75f8aadc457f0634be3b542815078ded46dca30efb960edeecad6e/pyjwt-2.15.1-py3-none-any.whl", hash = "sha256:42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193", size = 33860, upload-time = "2026-09-28T18:40:41.429Z" },
 ]
 
 [[package]]
