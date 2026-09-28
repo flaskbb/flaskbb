@@ -10,4 +10,4 @@ from here as the project version, see ``[tool.hatch.version]``.
 :license: BSD, see LICENSE for more details.
 """
 
-__version__ = "3.0.0"
+__version__ = "3.0.0rc1"

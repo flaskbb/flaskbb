@@ -42,8 +42,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
   publish-pypi:
     needs: [build]
-    # Wait for approval before attempting to upload to PyPI. This allows reviewing the
-    # files in the draft release.
     environment:
       name: publish
       url: https://pypi.org/project/FlaskBB/${{ github.ref_name }}
@@ -55,10 +53,6 @@ jobs:
         with:
           name: artifact
           path: artifact/
-      - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          packages-dir: artifact/
       - uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           packages-dir: artifact/
