@@ -120,6 +120,7 @@ def set_instance(ctx: click.Context, param: str, value: str):
     "--instance",
     expose_value=False,
     callback=set_instance,
+    envvar="FLASKBB_INSTANCE_PATH",
     required=False,
     is_flag=False,
     is_eager=True,

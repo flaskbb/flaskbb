@@ -17,7 +17,8 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH=/opt/venv/bin:$PATH \
-    FLASKBB_SETTINGS=flaskbb.configs.docker.DockerConfig
+    FLASKBB_SETTINGS=flaskbb.configs.docker.DockerConfig \
+    FLASKBB_INSTANCE_PATH=/var/lib/flaskbb/instance
 
 # The source tree is bind mounted into the container, so the user inside
 # has to own the files outside: --build-arg USER_UID=$(id -u)
@@ -25,7 +26,7 @@ ARG USER_UID=1000
 ARG USER_GID=1000
 
 # The venv belongs to root, the app only writes to its storage and to the
-# source tree (translations, instance folder).
+# source tree (translations).
 RUN groupadd --gid ${USER_GID} flaskbb \
     && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home flaskbb \
     && install -d -o flaskbb -g flaskbb \
