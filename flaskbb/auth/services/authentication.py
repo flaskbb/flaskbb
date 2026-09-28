@@ -11,9 +11,10 @@ in FlaskBB
 
 import logging
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 import attr
+import sqlalchemy as sa
 from flask_babelplus import gettext as _
 from flask_sqlalchemy.session import Session
 from pytz import UTC
@@ -55,12 +56,13 @@ class BlockTooManyFailedLogins(AuthenticationProvider):
     many failed login attempts in place.
     """
 
-    def __init__(self, configuration):
+    def __init__(self, configuration: FailedLoginConfiguration):
         self.configuration = configuration
 
-    def authenticate(self, identifier, secret):
+    @override
+    def authenticate(self, identifier: str, secret: str):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -86,9 +88,10 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
     in response time from not matching a password hash.
     """
 
+    @override
     def authenticate(self, identifier: str, secret: str):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -106,9 +109,10 @@ class MarkFailedLogin(AuthenticationFailureHandler):
     last failed date when it happened.
     """
 
+    @override
     def handle_authentication_failure(self, identifier: str):
         user = db.session.execute(
-            db.select(User).filter(db.or_(User.username == identifier, User.email == identifier))
+            sa.select(User).filter(sa.or_(User.username == identifier, User.email == identifier))
         ).scalar_one_or_none()
 
         if user is not None:
@@ -122,6 +126,7 @@ class BlockUnactivatedUser(PostAuthenticationHandler):
     authentication check but has not actually activated their account yet.
     """
 
+    @override
     def handle_post_auth(self, user: "User"):
         if not user.activated:  # pragma: no branch
             raise StopAuthentication(
@@ -139,6 +144,7 @@ class ClearFailedLogins(PostAuthenticationHandler):
     account.
     """
 
+    @override
     def handle_post_auth(self, user: "User"):
         user.login_attempts = 0
 
@@ -153,6 +159,7 @@ class PluginAuthenticationManager(AuthenticationManager):
         self.plugin_manager = plugin_manager
         self.session = session
 
+    @override
     def authenticate(self, identifier: str, secret: str):
         try:
             user = self.plugin_manager.hook.flaskbb_authenticate(

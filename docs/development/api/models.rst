@@ -65,7 +65,7 @@ The user modules contains all related models for the users.
 Settings Models
 ---------------
 
-.. module:: flaskbb.core.settings.models
+.. module:: flaskbb.settings.models
 
 This module owns storage and caching for setting values. See the
 :ref:`settings` chapter for how setting groups and definitions are

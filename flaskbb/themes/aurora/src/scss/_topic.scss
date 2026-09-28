@@ -1,3 +1,112 @@
+@mixin post-quotes {
+    blockquote {
+        font-size: 1em;
+        margin: 0.75em 0;
+        padding: 0.5em 0.9em;
+        color: $quote-color;
+        background-color: $quote-bg;
+        border-left: 4px solid $quote-border;
+        border-radius: 0 $border-radius $border-radius 0;
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+
+        .post-quote-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5em;
+            margin-bottom: 0.5em;
+            padding-bottom: 0.35em;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: $quote-header-color;
+            border-bottom: 1px solid $quote-header-border;
+        }
+
+        .post-quote-source {
+            margin-left: auto;
+            color: $quote-header-color;
+
+            &:hover {
+                color: $link-color;
+                text-decoration: none;
+            }
+        }
+
+        blockquote {
+            background-color: $quote-nested-bg;
+            border-left-color: $quote-nested-border;
+
+            blockquote {
+                background-color: $quote-bg;
+                border-left-color: $quote-border;
+            }
+        }
+
+        // long top level quotes, clipped by the theme's JavaScript
+        &.is-clipped {
+            position: relative;
+            max-height: 20rem;
+            // unlike hidden, clip cannot be scrolled by focus or scrollIntoView
+            overflow: clip;
+
+            &::after {
+                content: "";
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                height: 5rem;
+                background: linear-gradient(rgba($quote-bg, 0), $quote-bg 80%);
+                pointer-events: none;
+            }
+        }
+
+        .post-quote-expand {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            z-index: 1;
+            transform: translateX(-50%);
+            border-color: $quote-header-border;
+            box-shadow: $box-shadow-sm;
+            user-select: none;
+        }
+    }
+
+    // deeply nested quotes, collapsed to their header
+    .post-quote-collapsed {
+        > summary {
+            cursor: pointer;
+            list-style: none;
+
+            &::-webkit-details-marker {
+                display: none;
+            }
+        }
+
+        &:not([open]) > summary {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        &[open] > summary .post-quote-caret {
+            transform: rotate(90deg);
+        }
+
+        > :last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .post-quote-caret {
+        font-size: 0.75em;
+        transition: transform 0.15s ease-out;
+    }
+}
+
 .topic {
     margin-bottom: 0;
 
@@ -57,10 +166,7 @@
             max-height: 100%;
         }
 
-        blockquote {
-            font-size: 1em;
-            padding: 0.25em 0.75em;
-        }
+        @include post-quotes;
     }
 
     .post-attachments {
@@ -147,6 +253,7 @@
             border-radius: 0.25em;
             height: auto;
             width: 8em;
+            max-width: 100%;
         }
     }
 
@@ -173,10 +280,42 @@
     }
 }
 
+$author-min-width: 10rem;
+
+// matches the post-row edges inside the topic card border
+.reply-row {
+    margin: 0 1px;
+}
+
+@include media-breakpoint-up(sm) {
+    .post-row > .author:not(.author-horizontal) {
+        min-width: $author-min-width;
+
+        + .post-box {
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+        }
+    }
+
+    .reply-row > .reply-box {
+        flex: 1 1 0;
+        width: auto;
+        margin-left: max(25%, #{$author-min-width});
+    }
+}
+
+@include media-breakpoint-up(md) {
+    .reply-row > .reply-box {
+        margin-left: max(16.666667%, #{$author-min-width});
+    }
+}
+
 .author-name h4,
 h4.author-name {
     float: left;
     margin-bottom: 0;
+    font-size: 1.25rem;
 }
 
 .author-title h5,
@@ -186,4 +325,32 @@ h5.author-title {
     font-weight: 600;
     margin-top: 0;
     clear: both;
+}
+
+.flaskbb-editor.quote-inserted {
+    animation: quote-inserted 1.2s ease-out;
+}
+
+@keyframes quote-inserted {
+    from {
+        box-shadow: inset 0 0 0 2px $quote-border;
+    }
+    to {
+        box-shadow: inset 0 0 0 2px transparent;
+    }
+}
+
+// the editor preview renders with the post renderer
+.preview {
+    @include post-quotes;
+}
+
+// post markdown outside of topic posts: listed posts, signatures, profile
+// notes and the conversations plugin's messages
+.topic-content,
+.post-signature,
+.profile-field,
+.message-content,
+.conversation-content {
+    @include post-quotes;
 }

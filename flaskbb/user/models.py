@@ -12,10 +12,10 @@ import logging
 from datetime import datetime
 from typing import override
 
+import sqlalchemy as sa
 from flask import url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
     DynamicMapped,
     Mapped,
@@ -27,39 +27,40 @@ from sqlalchemy.orm import (
 from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
-from flaskbb.utils.database import CRUDMixin, make_comparable, UTCDateTime
+from flaskbb.settings import flaskbb_config
+from flaskbb.utils.database import BaseModel, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 
 logger = logging.getLogger(__name__)
 
 
-groups_users = db.Table(
+groups_users = sa.Table(
     "groups_users",
-    db.Column(
+    db.metadata,
+    sa.Column(
         "user_id",
-        db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+        sa.Integer,
+        sa.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    db.Column(
+    sa.Column(
         "group_id",
-        db.Integer,
-        db.ForeignKey("groups.id", ondelete="CASCADE"),
+        sa.Integer,
+        sa.ForeignKey("groups.id", ondelete="CASCADE"),
         nullable=False,
     ),
 )
 
 
 @make_comparable
-class Group(db.Model, CRUDMixin):
+class Group(BaseModel):
     __tablename__: str = "groups"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    description: Mapped[Text] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Group types
     admin: Mapped[bool] = mapped_column(default=False, nullable=False)
@@ -91,33 +92,36 @@ class Group(db.Model, CRUDMixin):
 
     @classmethod
     def selectable_groups_choices(cls):
-        return db.session.execute(db.select(cls.id, cls.name).order_by(cls.name.asc())).all()
+        return db.session.execute(sa.select(cls.id, cls.name).order_by(cls.name.asc())).all()
 
     @classmethod
     def get_guest_group(cls) -> "Group":
-        return db.session.execute(db.select(cls).filter(cls.guest.is_(True))).scalar_one()
+        return db.session.execute(sa.select(cls).filter(cls.guest.is_(True))).scalar_one()
 
     @classmethod
     def get_member_group(cls) -> "Group":
         """Returns the first member group."""
         return db.session.execute(
-            db.select(cls).filter(
+            sa.select(cls)
+            .filter(
                 cls.admin.is_(False),
                 cls.super_mod.is_(False),
                 cls.mod.is_(False),
                 cls.guest.is_(False),
                 cls.banned.is_(False),
             )
+            .order_by(cls.id.asc())
+            .limit(1)
         ).scalar_one()
 
 
-class User(db.Model, UserMixin, CRUDMixin):
+class User(BaseModel, UserMixin):
     __tablename__: str = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
-    _password: Mapped[str] = mapped_column("password", String(120), nullable=False)
+    _password: Mapped[str] = mapped_column("password", String(255), nullable=False)
     date_joined: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
@@ -144,7 +148,7 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     post_count: Mapped[int] = mapped_column(default=0)
 
-    primary_group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), nullable=False)
+    primary_group_id: Mapped[int] = mapped_column(sa.ForeignKey("groups.id"), nullable=False)
 
     posts: Mapped[list[Post]] = relationship(
         "Post",
@@ -198,7 +202,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     def last_post(self):
         """Returns the latest post from the user."""
         return db.session.execute(
-            db.select(Post).filter(Post.user_id == self.id).order_by(Post.date_created.desc())
+            sa.select(Post).filter(Post.user_id == self.id).order_by(Post.date_created.desc())
         ).scalar_one_or_none()
 
     @property
@@ -232,7 +236,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     def topic_count(self):
         """Returns the thread count."""
         return db.session.execute(
-            db.select(db.func.count()).select_from(Topic).filter(Topic.user_id == self.id)
+            sa.select(sa.func.count()).select_from(Topic).filter(Topic.user_id == self.id)
         ).scalar_one()
 
     @property
@@ -276,7 +280,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     def recalculate(self):
         """Recalculates the post count from the user."""
         self.post_count = db.session.execute(
-            db.select(db.func.count()).select_from(Post).filter_by(user_id=self.id)
+            sa.select(sa.func.count()).select_from(Post).filter_by(user_id=self.id)
         ).scalar_one()
         self.save()
         return self
@@ -291,7 +295,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         """
         group_ids = [g.id for g in viewer.groups]
         stmt = (
-            db.select(Topic)
+            sa.select(Topic)
             .where(
                 Topic.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
@@ -311,7 +315,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         """
         group_ids = [g.id for g in viewer.groups]
         stmt = (
-            db.select(Post)
+            sa.select(Post)
             .where(
                 Post.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
@@ -346,7 +350,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         :param topic: The topic which should be checked.
         """
         stmt = self.tracked_topics.select().where(topictracker.c.topic_id == topic.id)
-        return db.session.execute(db.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
     def add_to_group(self, group: Group):
         """Adds the user to the `group` if he isn't in it.
@@ -372,7 +376,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         :param group: The group which should be checked.
         """
         stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
-        return db.session.execute(db.select(stmt.exists())).scalar()
+        return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
     @cache.memoize()
     def get_groups(self):
@@ -405,7 +409,7 @@ class User(db.Model, UserMixin, CRUDMixin):
         """Bans the user. Returns True upon success."""
         if not self.get_permissions()["banned"]:
             banned_group = db.session.execute(
-                db.select(Group).filter(Group.banned.is_(True))
+                sa.select(Group).filter(Group.banned.is_(True))
             ).scalar_one_or_none()
 
             if not banned_group:
@@ -420,15 +424,17 @@ class User(db.Model, UserMixin, CRUDMixin):
     def unban(self):
         """Unbans the user. Returns True upon success."""
         if self.get_permissions()["banned"]:
-            member_group = db.session.execute(
-                db.select(Group).filter(
+            member_group = db.session.scalar(
+                sa.select(Group)
+                .filter(
                     Group.admin.is_(False),
                     Group.super_mod.is_(False),
                     Group.mod.is_(False),
                     Group.guest.is_(False),
                     Group.banned.is_(False),
                 )
-            ).scalar_one_or_none()
+                .order_by(Group.id.asc())
+            )
 
             if not member_group:
                 abort(404)
@@ -487,7 +493,7 @@ class Guest(AnonymousUserMixin):
 
     @cache.memoize()
     def get_groups(self):
-        stmt = db.select(Group).where(Group.guest == True)
+        stmt = sa.select(Group).where(Group.guest == True)
         result = db.session.execute(stmt).scalars().all()
         return result
 

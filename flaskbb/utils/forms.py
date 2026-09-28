@@ -16,7 +16,7 @@ from flask_wtf import FlaskForm
 
 class FlaskBBForm(FlaskForm):
     @override
-    def populate_obj(self, obj, exclude: Iterable[str] | None = None):
+    def populate_obj(self, obj: object, exclude: Iterable[str] | None = None):
         """Populates the attributes of the passed `obj` with data from the
         form's fields, skipping any field names listed in `exclude`.
 
@@ -29,15 +29,14 @@ class FlaskBBForm(FlaskForm):
                 field.populate_obj(obj, name)
 
     def populate_errors(self, errors: list[tuple[str, str]]):
+        # Form.errors is rebuilt from the fields on every access, so the
+        # error has to be recorded on the field itself
         for attribute, reason in errors:
-            self.errors.setdefault(attribute, []).append(reason)  # pyright: ignore
             field = getattr(self, attribute, None)
             if field:
                 field.errors.append(reason)
 
     def disable_all(self):
         for field in self:
-            # Preserve existing render_kw attributes if any exist
-            if field.render_kw is None:
-                field.render_kw = {}
-            field.render_kw["disabled"] = "disabled"
+            # wtforms' stubs type render_kw as a dict, but it defaults to None
+            field.render_kw = {**(field.render_kw or {}), "disabled": "disabled"}

@@ -24,8 +24,9 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_form_new_topic_before
 .. autofunction:: flaskbb_tpl_form_new_topic_after
 .. autofunction:: flaskbb_tpl_profile_settings_menu
-.. autofunction:: flaskbb_tpl_profile_sidebar_stats
-.. autofunction:: flaskbb_tpl_profile_sidebar_links
+.. autofunction:: flaskbb_tpl_profile_stats
+.. autofunction:: flaskbb_tpl_profile_actions
+.. autofunction:: flaskbb_tpl_profile_links
 .. autofunction:: flaskbb_tpl_post_author_info_before
 .. autofunction:: flaskbb_tpl_post_author_info_after
 .. autofunction:: flaskbb_tpl_post_content_before

@@ -9,10 +9,9 @@ microframework Flask.
 :license: BSD, see LICENSE for more details.
 """
 
-__version__ = "2.2.1"
-
 import logging
 
-logger = logging.getLogger(__name__)
+from flaskbb._version import __version__ as __version__
+from flaskbb.app import create_app as create_app
 
-from flaskbb.app import create_app  # noqa
+logger = logging.getLogger(__name__)

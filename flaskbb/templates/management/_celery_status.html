@@ -1,0 +1,12 @@
+{% if celery_running %}
+<span id="celery-status" class="text-success"><strong>{% trans %}running{% endtrans %}</strong></span>
+{% else %}
+<span id="celery-status" class="text-danger"><strong>{% trans %}not running{% endtrans %}</strong></span>
+
+<div id="overview-no-notifications" class="alert-message alert-message-danger" hx-swap-oob="true">
+    <h4>{% trans %}There is a problem.{% endtrans %}</h4>
+    <p class="mb-0">{% trans %}Celery is <strong>not</strong> running.{% endtrans %}</p>
+    <p class="mb-0">{% trans %}You can start celery with this command:{% endtrans %}</p>
+    <pre>flaskbb --config {{ config["CONFIG_PATH"] }} celery worker</pre>
+</div>
+{% endif %}

@@ -1,6 +1,6 @@
 import pytest
-from flaskbb.core.settings import flaskbb_config
 from flaskbb.forum import views
+from flaskbb.settings import flaskbb_config
 from werkzeug.exceptions import NotFound
 
 

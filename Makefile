@@ -5,9 +5,9 @@ help: ## Displays this help message.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 
-dependencies:requirements.txt
+dependencies:
 	@echo "Installing dependencies..."
-	@pip install -r requirements.txt 1>/dev/null
+	@uv sync 1>/dev/null
 
 clean: ## Remove unwanted stuff such as __pycache__, etc...
 	find . -name '*.pyc' -exec rm -f {} +
@@ -28,7 +28,7 @@ frontend-dark: ## Runs the webpack server which watches for changes in flaskbb/t
 	cd flaskbb/themes/aurora && npm run watch
 
 dev-plugins: ## Install the plugins as editable
-	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote
+	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote -e ../flaskbb-plugin-ranks -e ../flaskbb-plugin-test-mail -e ../flaskbb-plugin-stopforumspam
 
 devconfig:dependencies ## Generates a development config
 	uv run flaskbb makeconfig -d

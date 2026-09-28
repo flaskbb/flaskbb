@@ -11,6 +11,7 @@ You can override these configuration variables in another class.
 
 import datetime
 import os
+from typing import Any
 
 
 class DefaultConfig:
@@ -229,9 +230,8 @@ class DefaultConfig:
     #   memory:// (default)
     #   redis://host:port
     #   memcached://host:port
-    # Using the redis storage requires the installation of the redis package,
-    # which will be installed if you enable REDIS_ENABLE while memcached
-    # relies on the pymemcache package.
+    # The redis storage uses the redis package that is installed with FlaskBB,
+    # while memcached relies on the pymemcache package.
     # RATELIMIT_STORAGE_URI = "redis://localhost:6379"
 
     # Caching
@@ -270,12 +270,13 @@ class DefaultConfig:
     #   - Sending non blocking emails via Celery (Task Queue)
     #   - Caching
     #   - Rate Limiting
+    #   - Counting the online users and guests
     REDIS_ENABLED = False
     REDIS_URL = "redis://localhost:6379"  # or with a password: "redis://:password@localhost:6379"
     REDIS_DATABASE = 0
 
     # Celery
-    CELERY_CONFIG = {
+    CELERY_CONFIG: dict[str, Any] = {
         "broker_url": "redis://localhost:6379",
         "result_backend": "redis://localhost:6379",
         "broker_transport_options": {"max_retries": 1},

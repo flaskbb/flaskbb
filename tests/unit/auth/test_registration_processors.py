@@ -6,7 +6,7 @@ from flaskbb.auth.services.registration import (
     SendActivationPostProcessor,
 )
 from flaskbb.core.auth.activation import AccountActivator
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.settings import flaskbb_config
 
 
 class TestAutoActivateUserPostProcessor:

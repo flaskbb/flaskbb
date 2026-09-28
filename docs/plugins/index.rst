@@ -161,6 +161,12 @@ to target a specific revision or are developing a plugin:
     the first migration or with just a few words that will describe the
     changes of the revision.
 
+    A plugin's revisions may only depend on FlaskBB's and its own, so
+    ``--parent`` and ``--depend`` refuse the revisions of other plugins.
+    If two plugins really go hand in hand, add the dependency to the
+    revision by hand and require the other plugin in ``pyproject.toml``,
+    otherwise uninstalling it breaks every migration.
+
 * Applying revisions
     ``flaskbb db upgrade <plugin_name>@head``
 

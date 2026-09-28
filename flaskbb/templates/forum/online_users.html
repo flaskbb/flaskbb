@@ -12,11 +12,7 @@
 
 <legend>{% trans %}Online Users{% endtrans %}</legend>
 {% for user in online_users %}
-    {% if config["REDIS_ENABLED"] %}
-    <a href="{{ url_for('user.profile', username=user) }}">{{ user }}<a>{% if not loop.last %}, {% endif %}
-    {% else %}
-    <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}<a>{% if not loop.last %}, {% endif %}
-    {% endif %}
+    <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a>{% if not loop.last %}, {% endif %}
 {% endfor %}
 
 {% endblock %}

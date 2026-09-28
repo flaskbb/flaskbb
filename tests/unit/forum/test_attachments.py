@@ -7,7 +7,7 @@ from flask_login import login_user, logout_user
 from flaskbb.forum.forms import ReplyForm
 from flaskbb.forum.models import Attachment
 from flaskbb.forum.utils import parse_attachment_types
-from flaskbb.utils.settings import flaskbb_config
+from flaskbb.settings import flaskbb_config
 from werkzeug.datastructures import FileStorage, MultiDict
 
 

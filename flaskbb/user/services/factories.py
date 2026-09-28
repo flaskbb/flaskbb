@@ -12,7 +12,8 @@ These factories are provisional and considered private APIs.
 from itertools import chain
 
 from flask import current_app
-from flask_login import current_user
+
+from flaskbb.utils.proxies import current_user
 
 from ...extensions import db, pluggy
 from ...utils.helpers import get_available_languages, get_available_themes
@@ -75,9 +76,9 @@ def settings_form_factory():
     if not form.is_submitted() or not form.validate_on_submit():
         form.theme.data = current_user.theme
         form.language.data = current_user.language
-        form.open_links_in_new_tab.data = {True: "yes", False: "no"}.get(
-            current_user.open_links_in_new_tab, "inherit"
-        )
+        form.open_links_in_new_tab.data = {True: "yes", False: "no", None: "inherit"}[
+            current_user.open_links_in_new_tab
+        ]
 
     return form
 

@@ -8,6 +8,8 @@ Production & Deployment
 -  `Servers`_
 -  `systemd Unit Files`_
 
+For the maintained container stack, see :doc:`Docker Deployment <docker>`.
+
 
 Setup & Prerequisites
 -----------------------
@@ -96,15 +98,15 @@ Database Setup
 Point ``SQLALCHEMY_DATABASE_URI`` in your generated config at the database
 you want to use before continuing.
 
-**MySQL users:** Make sure that you create the database using the ``utf8``
+**MySQL users:** Make sure that you create the database using the ``utf8mb4``
 charset::
 
-    CREATE DATABASE flaskbb CHARACTER SET utf8;
+    CREATE DATABASE flaskbb CHARACTER SET utf8mb4;
 
-Even though the ``utf8mb4`` charset is prefered today
-(see `this <https://dba.stackexchange.com/a/152383>`_ SO answer), we have to
-create our database using the ``utf8`` charset. A good explanation about
-this issue can be found `here <https://stackoverflow.com/a/31474509>`_.
+``utf8`` (an alias for ``utf8mb3``) cannot store emoji, which FlaskBB writes
+directly into posts. ``utf8mb4`` requires the ``DYNAMIC`` row format, the
+default since MySQL 5.7.7 and MariaDB 10.2.2 - on older servers the 767 byte
+index prefix limit is too small for FlaskBB's unique ``VARCHAR(255)`` indexes.
 
 For a guided install, which creates the database tables, default groups,
 and your admin user, run::
@@ -146,10 +148,11 @@ Redis (optional)
 
 We have one optional dependency, redis (the python package is installed
 automatically). If you want to use it, make sure that a redis-server is
-running. Redis will be used as the default result and caching backend for
-celery (celery is a task queue which FlaskBB uses to send non blocking
-emails). The feature for tracking the `online guests` and `online users` do
-also require redis (although `online users` works without redis as well).
+running (Valkey works as well). Redis will be used as the default result and
+caching backend for celery (celery is a task queue which FlaskBB uses to send
+non blocking emails). The feature for tracking the `online guests` and `online
+users` do also require redis (although `online users` works without redis as
+well).
 To install redis, just use your distributions package manager. For Arch
 Linux this is `pacman` and for Debian/Ubuntu based systems this is
 `apt-get`.

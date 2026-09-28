@@ -20,6 +20,6 @@ Checklist:
 
 - [ ] Add tests that demonstrate the correct behavior of the change. Tests should fail without the change.
 - [ ] Add or update relevant docs, in the docs folder and in code.
-- [ ] Add an entry in `CHANGES` summarizing the change and linking to the issue.
+- [ ] Add an entry in `CHANGES.md` summarizing the change and linking to the issue.
 - [ ] Run `pre-commit` hooks and fix any issues.
 - [ ] Run `pytest` and `tox`, no tests failed.

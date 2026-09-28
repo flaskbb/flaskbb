@@ -8,6 +8,7 @@ flaskbb.tokens.serializer
 """
 
 import datetime
+from typing import override
 
 import jwt
 
@@ -44,12 +45,15 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
 
         if isinstance(expiry, datetime.timedelta):
             self.expiry = datetime.datetime.now(datetime.UTC) + expiry
-        elif isinstance(expiry, datetime.datetime):
+        elif isinstance(expiry, datetime.datetime):  # pyright: ignore[reportUnnecessaryIsInstance]
             self.expiry = expiry
         else:
-            raise TypeError("'expiry' must be of type timedelta or datetime")
+            raise TypeError(  # pyright: ignore[reportUnreachable]
+                "'expiry' must be of type timedelta or datetime"
+            )
 
-    def dumps(self, token):
+    @override
+    def dumps(self, token: tokens.Token) -> str:
         """
         Transforms an instance of flaskbb.core.tokens.Token into
         a text serialized JWT.
@@ -57,13 +61,14 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         :flaskbb.core.tokens.Token token: Token to transformed into a JWT
         :returns str: A fully serialized token
         """
-        return jwt.encode(
+        return jwt.encode(  # pyright: ignore[reportUnknownMemberType]
             payload={"id": token.user_id, "op": token.operation, "exp": self.expiry},
             key=self.secret_key,
             algorithm=self.algorithm,
         )
 
-    def loads(self, raw_token):
+    @override
+    def loads(self, raw_token: str) -> tokens.Token:
         """
         Transforms a JWT into a flaskbb.core.tokens.Token.
 
@@ -76,7 +81,9 @@ class FlaskBBTokenSerializer(tokens.TokenSerializer):
         :returns flaskbb.core.tokens.Token: Parsed token
         """
         try:
-            parsed = jwt.decode(raw_token, key=self.secret_key, algorithms=[self.algorithm])
+            parsed = jwt.decode(  # pyright: ignore[reportUnknownMemberType]
+                raw_token, key=self.secret_key, algorithms=[self.algorithm]
+            )
         except jwt.ExpiredSignatureError as e:
             raise tokens.TokenError.expired() from e
         except jwt.DecodeError as e:  # pragma: no branch

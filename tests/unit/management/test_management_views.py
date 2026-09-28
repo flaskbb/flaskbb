@@ -228,6 +228,54 @@ def test_moderator_cannot_unban_user_holding_admin_via_secondary_group(
     assert user.permissions["banned"]
 
 
+def _bulk(view_cls, actor, ids):
+    view = view_cls.as_view("bulk")
+
+    with views.current_app.test_request_context(
+        method="POST", data={"rowid": [str(id) for id in ids]}
+    ):
+        login_user(actor)
+        response = view()
+        messages = get_flashed_messages(with_categories=True)
+        logout_user()
+
+    return response, messages
+
+
+def test_bulk_ban_skips_self_and_outranked_users(
+    default_settings, moderator_user, super_moderator_user, user
+):
+    response, messages = _bulk(
+        views.BanUser, moderator_user, [moderator_user.id, super_moderator_user.id, user.id]
+    )
+
+    assert response.status_code == 302
+    assert ("success", "1 users banned.") in messages
+    assert user.permissions["banned"]
+    assert not moderator_user.permissions["banned"]
+    assert not super_moderator_user.permissions["banned"]
+
+
+def test_bulk_delete_groups(default_settings, admin_user, default_groups, plain_group):
+    response, messages = _bulk(views.DeleteGroup, admin_user, [plain_group.id])
+
+    assert response.status_code == 302
+    assert ("success", "1 groups deleted.") in messages
+    assert db.session.get(Group, plain_group.id) is None
+
+
+def test_bulk_delete_groups_refuses_standard_groups(
+    default_settings, admin_user, default_groups, plain_group
+):
+    response, messages = _bulk(
+        views.DeleteGroup, admin_user, [plain_group.id, default_groups[3].id]
+    )
+
+    assert response.status_code == 302
+    assert ("danger", "You cannot delete one of the standard groups.") in messages
+    assert db.session.get(Group, plain_group.id) is not None
+
+
 def _render(view, actor, **kwargs):
     with views.current_app.test_request_context():
         login_user(actor)
@@ -254,12 +302,15 @@ def test_users_list_renders_for_moderator(default_settings, moderator_user, admi
     assert admin_user.username in response
     assert _edit_link(user) in response
     assert _edit_link(admin_user) not in response
+    assert 'hx-post="/admin/users/ban"' in response
+    assert 'hx-post="/admin/users/delete"' not in response
 
 
 def test_users_list_renders_for_admin(default_settings, admin_user, moderator_user):
     response = _render(views.ManageUsers.as_view("users"), admin_user)
 
     assert _edit_link(moderator_user) in response
+    assert 'hx-post="/admin/users/delete"' in response
 
 
 def test_banned_users_list_renders_for_moderator(default_settings, moderator_user, user):

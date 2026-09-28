@@ -13,7 +13,7 @@
 
 {% block management_content %}
 {%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import render_input_field, action_confirm -%}
+{%- from theme('_macros/form.html') import render_input_field, action_confirm, bulk_action -%}
 
 <div class="col-md-12 settings-col">
     <div class="card settings">
@@ -54,7 +54,7 @@
         <div class="card-body settings-body">
 
             <div class="settings-search">
-                <form class="search-form" role="form" method="post">
+                <form class="search-form" role="form" method="post" hx-post="{{ url_for('management.attachments') }}" hx-trigger="input delay:300ms, submit" hx-target="next .settings-content" hx-select=".settings-content" hx-swap="outerHTML">
                     {{ search_form.hidden_tag() }}
                     <div class="input-group">
                         {{ render_input_field(search_form.search_query, class="form-control") }}
@@ -80,13 +80,7 @@
                                 {% trans %}Actions{% endtrans %}
                             </a>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <button class="dropdown-item btn btn-sm"
-                                            onclick="return bulk_actions.execute('{{ url_for('management.delete_attachment') }}')">
-                                        <span class="far fa-fw fa-trash-alt text-danger"></span>
-                                        {% trans %}Delete selected Attachments{% endtrans %}
-                                    </button>
-                                </li>
+                                {{ bulk_action(url_for('management.delete_attachment'), _("Delete selected Attachments"), "far fa-fw fa-trash-alt text-danger") }}
                             </ul>
                         </div>
                     </div>
@@ -96,7 +90,9 @@
                     <div class="col-auto"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ attachment.id }}"
                                title="Select Attachment" /></div>
                     <div class="col-lg-4 col-md-4 col-sm-4">
-                        <a href="{{ attachment.url }}" target="_blank">{{ attachment.original_filename }}</a>
+                        <a href="{{ attachment.url }}" data-bs-toggle="tooltip" data-placement="top"
+                           title="{{ attachment.original_filename }}"
+                           target="_blank">{{ attachment.original_filename|truncate(32, killwords=True, leeway=0) }}</a>
                         {% if attachment.id in missing %}
                         <span class="badge bg-danger">{% trans %}file missing{% endtrans %}</span>
                         {% endif %}
@@ -114,7 +110,7 @@
                         {% if attachment.post.topic %}
                         <a href="{{ attachment.post.url }}" data-bs-toggle="tooltip" data-placement="top"
                            title="{{ attachment.post.topic.title }}"
-                           target="_blank">{{ attachment.post.topic.title | truncate(18, killwords=True)}}</a>
+                           target="_blank">{{ attachment.post.topic.title|truncate(18, killwords=True, leeway=0) }}</a>
                         {% endif %}
                     </div>
                     <div class="col-md-2 d-none d-lg-block">{{ attachment.date_created|format_date }}</div>
@@ -142,10 +138,4 @@
     </div>
 </div>
 {% include theme('_partials/confirm_dialog.html') %}
-{% endblock %}
-
-{% block scripts %}
-<script>
-    var bulk_actions = new window.app.BulkActions();
-</script>
 {% endblock %}

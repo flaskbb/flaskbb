@@ -4,6 +4,25 @@
     href="{{ pathto('_static/custom.css', 1) }}"
     type="text/css"
 />
+<link rel="icon" href="{{ pathto('_static/favicon.ico', 1) }}" sizes="48x48" />
+<link
+    rel="icon"
+    href="{{ pathto('_static/favicon.svg', 1) }}"
+    type="image/svg+xml"
+/>
+<meta name="color-scheme" content="light dark" />
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/dark.css', 1) }}"
+    type="text/css"
+    media="(prefers-color-scheme: dark)"
+/>
+<link
+    rel="stylesheet"
+    href="{{ pathto('_static/custom-dark.css', 1) }}"
+    type="text/css"
+    media="(prefers-color-scheme: dark)"
+/>
 {% if theme_touch_icon %}
 <link
     rel="apple-touch-icon"
@@ -38,7 +57,7 @@ in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
         </button>
 
         <div class="collapse navbar-collapse" id="topnav-collapse">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
                 <li class="nav-item">
                     <a class="nav-link" href="https://flaskbb.com">Home</a>
                 </li>
@@ -149,9 +168,5 @@ in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
     </div>
 </footer>
 <!-- Latest compiled and minified JavaScript -->
-<link
-    rel="stylesheet"
-    href="{{ pathto('_static/main.js', 1) }}"
-    type="text/css"
-/>
+<script src="{{ pathto('_static/main.js', 1) }}"></script>
 {%- endblock %}

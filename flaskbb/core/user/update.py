@@ -11,14 +11,15 @@ across FlaskBB.
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from attrs import asdict, define, field
-from flask_wtf.file import FileStorage
-
-from flaskbb.user.models import User
+from werkzeug.datastructures import FileStorage
 
 from ..changesets import empty, EmptyValue, is_empty
+
+if TYPE_CHECKING:
+    from flaskbb.user.models import User
 
 
 def _should_assign(current: Any, new: Any):
@@ -38,7 +39,7 @@ class UserDetailsChange:
     signature: str | None | EmptyValue = field(default=empty)
     notes: str | None | EmptyValue = field(default=empty)
 
-    def assign_to_user(self, user: User):
+    def assign_to_user(self, user: "User"):
         for name, value in asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
@@ -83,7 +84,7 @@ class SettingsUpdate:
     theme: str = field()
     open_links_in_new_tab: bool | None = field(default=None)
 
-    def assign_to_user(self, user: User):
+    def assign_to_user(self, user: "User"):
         for name, value in asdict(self).items():
             if _should_assign(getattr(user, name), value):
                 setattr(user, name, value)
@@ -98,7 +99,7 @@ class UserSettingsUpdatePostProcessor(ABC):
     """
 
     @abstractmethod
-    def post_process_settings_update(self, user: User, settings_update):
+    def post_process_settings_update(self, user: "User", settings_update: SettingsUpdate):
         """
         This method is abstract
         """

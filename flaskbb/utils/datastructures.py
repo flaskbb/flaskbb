@@ -20,7 +20,7 @@ class TemplateEventResult(list[object]):
 
     @override
     def __init__(self, items: Iterable[str]):
-        list.__init__(self, items)
+        super().__init__(items)
 
     def __unicode__(self):
         return "".join(map(str, self))

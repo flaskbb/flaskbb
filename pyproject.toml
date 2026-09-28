@@ -1,40 +1,39 @@
 [project]
 name = "FlaskBB"
-version = "3.0.0"
+dynamic = ["version"]
 dependencies = [
-  "alembic>=1.18.5",
+  "alembic>=1.20.0",
   "attrs>=26.1.0",
   "Babel>=2.18.0",
-  "blinker>=1.9",
+  "blinker>=1.9.0",
   "celery>=5.6.3",
-  "click>=8.4.2",
+  "click>=8.5.0",
   "click-log>=0.4.0",
   "click-plugins>=1.1.1.2",
-  "click-repl>=0.3.0",
+  "click-repl>=0.4.0",
   "email-validator>=2.3.0",
   "Flask>=3.1.3",
   "Flask-Alembic>=3.2.0",
-  "Flask-Allows2>=1.2.0",
-  "Flask-BabelPlus>=2.4.1",
-  "Flask-Caching>=2.4.0",
+  "Flask-Allows2>=1.3.0",
+  "Flask-BabelPlus>=2.5.0",
+  "Flask-Caching>=2.5.1",
   "Flask-DebugToolbar>=0.16.0",
   "flask-debugtoolbar-warnings>=0.1.0",
   "Flask-Limiter>=4.1.1",
   "Flask-Login>=0.6.3",
   "Flask-Mail>=0.10.0",
-  "flask-redis>=0.4.0",
   "Flask-SQLAlchemy>=3.1.1",
   "Flask-Themes2>=1.0.1",
   "Flask-WTF>=1.3.0",
-  "flaskbb-plugin-conversations>=2.0.2",
-  "flaskbb-plugin-portal==2.1.0.dev1",
+  "flaskbb-plugin-conversations>=3.0.2",
+  "flaskbb-plugin-portal>=3.0.1",
   "Jinja2>=3.1.6",
   "MarkupSafe>=3.0.3",
-  "mistune>=3.3.2",
+  "mistune>=3.3.4",
   "Pillow>=12.3.0",
   "pluggy>=1.6.0",
-  "Pygments>=2.20.0",
-  "PyJWT>=2.12.1",
+  "Pygments>=2.21.0",
+  "PyJWT>=2.14.0",
   "pytz>=2026.2",
   "SQLAlchemy>=2.0.51,<2.1.0",
   "SQLAlchemy-Utils>=0.42.1",
@@ -74,13 +73,19 @@ classifiers = [
 gunicorn = [
   "gunicorn>=26.0.0",
 ]
+postgres = [
+  "psycopg[binary]>=3.3.0",
+]
+mysql = [
+  "pymysql>=1.2.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/flaskbb/flaskbb"
 Documentation = "https://flaskbb.readthedocs.io/en/latest/"
 Repository = "https://github.com/flaskbb/flaskbb"
-Issues = "https://github.com/flaskbb/flaskbb"
-Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES"
+Issues = "https://github.com/flaskbb/flaskbb/issues"
+Changelog = "https://github.com/flaskbb/flaskbb/blob/master/CHANGES.md"
 
 [project.scripts]
 flaskbb = "flaskbb.cli.main:flaskbb"
@@ -88,6 +93,9 @@ flaskbb = "flaskbb.cli.main:flaskbb"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "flaskbb/_version.py"
 
 [tool.hatch.build]
 # Themes ship compiled only:
@@ -106,14 +114,19 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["flaskbb", "wsgi.py", "celery_worker.py"]
+packages = ["flaskbb"]
+artifacts = ["flaskbb/translations/*/LC_MESSAGES/messages.mo"]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+dependencies = ["Babel>=2.18.0"]
 
 [dependency-groups]
 dev = [
-    "ipython>=9.9.0",
+    "ipython>=9.17.1",
     "ruff",
-    "tox>=4.39",
+    "tox>=4.61.0",
     "tox-uv",
+    "cookiecutter",
     {include-group = "pre-commit"},
     {include-group = "docs"},
     {include-group = "tests"},
@@ -130,6 +143,7 @@ docs = [
     "sphinx-tabs",
     "sphinx-intl>=2.3.1",
     "sphinxcontrib-log-cabinet",
+    "myst-parser"
 ]
 tests = [
     "pytest",
@@ -164,7 +178,7 @@ allow-direct-references = true
 
 [tool.basedpyright]
 include = ["flaskbb"]
-exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs"]
+exclude = ["**/node_modules", "**/resources", "**/__pycache__", "**/docs", "flaskbb/migrations"]
 typeCheckingMode = "standard"
 pythonVersion = "3.12"
 defineConstant = { DEBUG = true }
@@ -177,6 +191,7 @@ reportUnusedParameter = false
 reportImplicitStringConcatenation = false
 reportAny = false
 reportExplicitAny = false
+reportMissingSuperCall = false
 
 [tool.pytest]
 minversion = "9.0"
@@ -226,16 +241,18 @@ order-by-type = false
 
 [tool.coverage.run]
 branch = true
-source = ["flaskbb", "tests"]
+relative_files = true
+source_pkgs = ["flaskbb"]
 omit = [
-    "flaskbb/flaskbb/static/*",
-    "flaskbb/flaskbb/templates/*",
-    "flaskbb/flaskbb/themes/*",
-    "flaskbb/flaskbb/migrations/*"
+    "*/flaskbb/static/*",
+    "*/flaskbb/templates/*",
+    "*/flaskbb/themes/*",
+    "*/flaskbb/migrations/*",
+    "*/flaskbb/translations/*"
 ]
 
 [tool.coverage.paths]
-source = ["flaskbb"]
+source = ["flaskbb", "*/site-packages/flaskbb"]
 
 [tool.coverage.report]
 exclude_also = [
@@ -247,6 +264,7 @@ exclude_also = [
 [tool.mypy]
 python_version = "3.12"
 files = ["flaskbb/"]
+exclude = ["^flaskbb/migrations/"]
 warn_unused_configs = true
 show_error_codes = true
 pretty = true
@@ -263,19 +281,15 @@ warn_unused_ignores = true
 # warn_return_any = true
 # no_implicit_reexport = true
 strict_equality = true
-strict_concatenate = true
+extra_checks = true
 
 # No py.typed and no stubs on typeshed
 [[tool.mypy.overrides]]
 module = [
     "celery.*",
-    "flask_allows2.*",
-    "flask_babelplus.*",
     "flask_login.*",
-    "flask_redis.*",
     "flask_themes2.*",
     "flask_wtf.*",
-    "sqlalchemy_utils.*",
     "wtforms_sqlalchemy.*",
 ]
 follow_untyped_imports = true
@@ -306,9 +320,9 @@ use_frozen_constraints = true
 dependency_groups = ["tests"]
 env_tmp_dir = "{toxworkdir}/tmp/{envname}"
 commands = [
-    ["pybabel", "compile", "-d", "{envsitepackagesdir}/flaskbb/translations"],
     [
         "pytest", "-v", "--capture=tee-sys", "--tb=short", "--basetemp={env_tmp_dir}",
+        "--cov", "--cov-report=xml", "--cov-report=term",
         {replace = "posargs", default = [], extend = true},
     ],
 ]

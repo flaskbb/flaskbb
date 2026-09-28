@@ -31,7 +31,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
+    "myst_parser",
+    "sphinx_issues",
 ]
+
+issues_github_path = "flaskbb/flaskbb"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -50,7 +54,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "alabaster"
 
 html_theme_options = {
-    "logo": "logo-full.png",
+    "logo": "logo-full-light.svg",
     "github_banner": True,
     "github_user": "sh4nks",
     "github_repo": "flaskbb",

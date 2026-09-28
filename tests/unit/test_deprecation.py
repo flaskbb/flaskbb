@@ -1,9 +1,9 @@
 import warnings
 
 import pytest
-from flaskbb.deprecation import deprecated, RemovedInFlaskBB3
+from flaskbb.deprecation import deprecated, RemovedInFlaskBB4
 
-NEXT_VERSION_STRING = ".".join([str(x) for x in RemovedInFlaskBB3.version])
+NEXT_VERSION_STRING = ".".join([str(x) for x in RemovedInFlaskBB4.version])
 
 
 @deprecated("This is only a drill")
@@ -22,12 +22,12 @@ def default_deprecation():
 
 class TestDeprecation:
     def test_emits_default_deprecation_warning(self, recwarn):
-        warnings.simplefilter("default", RemovedInFlaskBB3)
+        warnings.simplefilter("default", RemovedInFlaskBB4)
         default_deprecation()
 
         assert len(recwarn) == 1
         assert "default_deprecation is deprecated" in str(recwarn[0].message)
-        assert recwarn[0].category == RemovedInFlaskBB3
+        assert recwarn[0].category == RemovedInFlaskBB4
         assert recwarn[0].filename == __file__
         # assert on the next line is conditional on the position of the call
         # to default_deprecation please don't jiggle it around too much
@@ -35,7 +35,7 @@ class TestDeprecation:
         assert "only_a_drill is deprecated" in only_a_drill.__doc__
 
     def tests_emits_specialized_message(self, recwarn):
-        warnings.simplefilter("default", RemovedInFlaskBB3)
+        warnings.simplefilter("default", RemovedInFlaskBB4)
         only_a_drill()
 
         expected = "only_a_drill is deprecated and will be removed in version {}. This is only a drill".format(  # noqa
@@ -54,7 +54,7 @@ class TestDeprecation:
         assert "Expected subclass of FlaskBBDeprecation" in str(excinfo.value)
 
     def tests_deprecated_decorator_work_with_method(self, recwarn):
-        warnings.simplefilter("default", RemovedInFlaskBB3)
+        warnings.simplefilter("default", RemovedInFlaskBB4)
         self.deprecated_instance_method()
 
         assert len(recwarn) == 1

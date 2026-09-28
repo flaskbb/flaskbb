@@ -167,6 +167,37 @@ keyboard navigation skips over it instead of stopping on a button that
 cannot do anything.
 
 
+Inserting a quote
+-----------------
+
+A plugin with its own quotable content, like private messages, can reuse the
+editor's quoting behavior through ``window.app.insertQuote(editor, markdown)``:
+
+.. sourcecode:: javascript
+
+    const editor = document.querySelector(".flaskbb-editor")
+    fetch(rawUrl)
+      .then((response) => response.text())
+      .then((quote) => window.app.insertQuote(editor, quote))
+
+It inserts ``markdown`` at the caret without replacing what the user has
+already written, or at the end if the editor was never focused, and separates
+it from the text before it with a blank line. If the editor shows its preview,
+it switches back first. The insertion goes onto the undo stack, and the editor
+is focused, scrolled into view and briefly highlighted.
+
+Build the quote on the server with ``flaskbb.utils.helpers.format_quote``.
+The ``**[user](profile) wrote:**`` line it starts with is what the post
+renderer turns into a quote header. Its optional ``post_url`` argument adds a
+link to the quoted post and only applies to forum posts:
+
+.. sourcecode:: python
+
+    from flaskbb.utils.helpers import format_quote
+
+    format_quote(message.user.username, message.message)
+
+
 A complete example
 ------------------
 

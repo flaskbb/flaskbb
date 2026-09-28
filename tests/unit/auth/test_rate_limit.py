@@ -5,8 +5,8 @@ import pytest
 from flask_limiter import RateLimitExceeded
 from flaskbb.auth.forms import LoginForm
 from flaskbb.auth.views import Login, login_rate_limit, login_rate_limit_message
-from flaskbb.core.settings import flaskbb_config
 from flaskbb.extensions import limiter
+from flaskbb.settings import flaskbb_config
 from flaskbb.utils.helpers import enforce_recaptcha, time_utcnow
 
 pytestmark = pytest.mark.usefixtures("default_settings")

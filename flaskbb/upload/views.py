@@ -12,10 +12,11 @@ and the user settings from a signed in user.
 import logging
 import os
 
-from flask import Blueprint, Flask, send_from_directory
+from flask import Blueprint, send_from_directory
 from flask.views import MethodView
 from pluggy import HookimplMarker
 
+from flaskbb.core.app import FlaskBB
 from flaskbb.forum.models import Attachment
 from flaskbb.utils.helpers import register_view
 from flaskbb.utils.uploads import get_attachment_upload_path, get_avatar_upload_path
@@ -50,7 +51,7 @@ class UploadedAttachment(MethodView):
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app: Flask):
+def flaskbb_load_blueprints(app: FlaskBB):
     uploads = Blueprint("uploads", __name__)
     register_view(
         uploads,

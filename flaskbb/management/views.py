@@ -13,34 +13,31 @@ import logging
 import os
 import sys
 from datetime import timedelta
-from typing import Any
+from typing import cast
 
+import sqlalchemy as sa
+from alembic.util.exc import CommandError
 from celery import __version__ as celery_version
 from flask import (
     Blueprint,
-    current_app,
     flash,
-    Flask,
-    jsonify,
     redirect,
     request,
+    Response,
     url_for,
 )
 from flask.views import MethodView
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
-from flask_login import current_user, login_fresh
-from flask_wtf.file import FileStorage
+from flask_login import login_fresh
 from pluggy import HookimplMarker
-from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
+from werkzeug.datastructures import FileStorage
 
-from flaskbb import __version__ as flaskbb_version
-from flaskbb.core.settings import flaskbb_config
-from flaskbb.core.settings.forms import build_form
-from flaskbb.core.settings.models import Setting
-from flaskbb.core.settings.registry import setting_registry
-from flaskbb.extensions import allows, celery, db, login_manager
+from flaskbb._version import __version__ as flaskbb_version
+from flaskbb.core.app import FlaskBB
+from flaskbb.extensions import allows, celery, db, login_manager, pluggy
 from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Attachment, Category, Forum, Post, Report, Topic
 from flaskbb.management.forms import (
@@ -57,17 +54,28 @@ from flaskbb.management.forms import (
     SuperModeratorEditUserForm,
 )
 from flaskbb.plugins.models import PluginRegistry
-from flaskbb.plugins.utils import validate_plugin
+from flaskbb.plugins.utils import (
+    apply_plugin_migrations,
+    plugin_has_applied_migrations,
+    plugin_has_pending_migrations,
+    plugin_tables_in_use,
+    revert_plugin_migrations,
+    validate_plugin,
+)
+from flaskbb.settings import flaskbb_config
+from flaskbb.settings.forms import build_form
+from flaskbb.settings.models import Setting
+from flaskbb.settings.registry import setting_registry
 from flaskbb.user.models import Group, Guest, User
 from flaskbb.utils.helpers import (
+    count_online_users,
     FlashAndRedirect,
-    get_online_users,
     redirect_or_next,
     register_view,
     render_template,
-    time_diff,
     time_utcnow,
 )
+from flaskbb.utils.proxies import current_app, current_user
 from flaskbb.utils.requirements import (
     CanBanTargetUser,
     CanBanUser,
@@ -116,10 +124,7 @@ class ManagementOverview(MethodView):
     def get(self):
         # user and group stats
         banned_users = User.count(clause=[Group.banned == True, Group.id == User.primary_group_id])
-        if not current_app.config["REDIS_ENABLED"]:
-            online_users = User.count(User.lastseen >= time_diff())
-        else:
-            online_users = len(get_online_users())
+        online_users, online_guests = count_online_users()
 
         unread_reports = Report.count(Report.zapped == None)
 
@@ -132,6 +137,7 @@ class ManagementOverview(MethodView):
             "all_users": User.count(),
             "banned_users": banned_users,
             "online_users": online_users,
+            "online_guests": online_guests,
             "all_groups": Group.count(),
             "report_count": Report.count(),
             "topic_count": Topic.count(),
@@ -239,7 +245,7 @@ class ManageUsers(MethodView):
         form = self.form()
 
         users = db.paginate(
-            select(User).order_by(User.id.asc()),
+            sa.select(User).order_by(User.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -261,7 +267,7 @@ class ManageUsers(MethodView):
             return render_template("management/users.html", users=users, search_form=form)
 
         users = db.paginate(
-            select(User).order_by(User.id.asc()),
+            sa.select(User).order_by(User.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -393,35 +399,19 @@ class DeleteUser(MethodView):
     ]
 
     def post(self, user_id: int | None = None):
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for user in User.get_all(User.id.in_(ids)):
                 # do not delete current user
                 if current_user.id == user.id:
                     continue
 
                 if user.delete():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} users deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.users"))
 
         user = User.get_by_or_404(id=user_id)
 
@@ -455,7 +445,7 @@ class DeleteUserPosts(MethodView):
         # Re-querying the lowest remaining id each time sidesteps that.
         while True:
             post = db.session.execute(
-                db.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
+                sa.select(Post).where(Post.user_id == user.id).order_by(Post.id).limit(1)
             ).scalar_one_or_none()
             if post is None:
                 break
@@ -512,7 +502,9 @@ class BannedUsers(MethodView):
         search_form = self.form()
 
         users = db.paginate(
-            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
+            sa.select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -525,7 +517,9 @@ class BannedUsers(MethodView):
         search_form = self.form()
 
         users = db.paginate(
-            select(User).join(Group, Group.id == User.primary_group_id).where(Group.banned == True),
+            sa.select(User)
+            .join(Group, Group.id == User.primary_group_id)
+            .where(Group.banned == True),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -563,16 +557,10 @@ class BanUser(MethodView):
             flash(_("You do not have the permissions to ban this user."), "danger")
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
-            users = User.get_all(User.id.in_(ids))
-            for user in users:
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            banned = 0
+            for user in User.get_all(User.id.in_(ids)):
                 # don't let a user ban himself and do not allow banning a user
                 # who is not outranked by the acting user
                 if current_user.id == user.id or not Permission(
@@ -580,23 +568,11 @@ class BanUser(MethodView):
                 ):
                     continue
 
-                elif user.ban():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "ban",
-                            "reverse": "unban",
-                            "reverse_name": _("Unban"),
-                            "reverse_url": url_for("management.unban_user", user_id=user.id),
-                        }
-                    )
+                if user.ban():
+                    banned += 1
 
-            return jsonify(
-                message=f"{len(data)} users banned.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users banned.", count=banned), "success")
+            return redirect_or_next(url_for("management.banned_users"))
 
         user = User.get_by_or_404(id=user_id)
         # Do not allow banning a user who is not outranked by the acting user
@@ -629,14 +605,9 @@ class UnbanUser(MethodView):
             flash(_("You do not have the permissions to unban this user."), "danger")
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            unbanned = 0
             for user in User.get_all(User.id.in_(ids)):
                 # unban() drops the user into the member group, so it needs the
                 # same target check as banning
@@ -644,22 +615,10 @@ class UnbanUser(MethodView):
                     continue
 
                 if user.unban():
-                    data.append(
-                        {
-                            "id": user.id,
-                            "type": "ban",
-                            "reverse": "ban",
-                            "reverse_name": _("Ban"),
-                            "reverse_url": url_for("management.ban_user", user_id=user.id),
-                        }
-                    )
+                    unbanned += 1
 
-            return jsonify(
-                message=f"{len(data)} users unbanned.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s users unbanned.", count=unbanned), "success")
+            return redirect_or_next(url_for("management.users"))
 
         user = User.get_by_or_404(id=user_id)
 
@@ -691,7 +650,7 @@ class Groups(MethodView):
         page = request.args.get("page", 1, type=int)
 
         groups = db.paginate(
-            select(Group).order_by(Group.id.asc()),
+            sa.select(Group).order_by(Group.id.asc()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -773,44 +732,19 @@ class DeleteGroup(MethodView):
     ]
 
     def post(self, group_id: int | None = None):
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids: list[Any] = json.get("ids", [])
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            if any(id <= PROTECTED_GROUP_ID for id in ids):
+                flash(_("You cannot delete one of the standard groups."), "danger")
+                return redirect_or_next(url_for("management.groups"))
 
-            try:
-                id_list = [int(id) for id in ids]
-            except (ValueError, TypeError):
-                return jsonify(message="No valid ids provided.", category="error", status=404)
-
-            if any(id <= PROTECTED_GROUP_ID for id in id_list):
-                return jsonify(
-                    message=_("You cannot delete one of the standard groups."),
-                    category="danger",
-                    data=None,
-                    status=404,
-                )
-
-            data: list[dict[str, Any]] = []
-            for group in Group.get_all(Group.id.in_(id_list)):
+            deleted = 0
+            for group in Group.get_all(Group.id.in_(ids)):
                 group.delete()
-                data.append(
-                    {
-                        "id": group.id,
-                        "type": "delete",
-                        "reverse": False,
-                        "reverse_name": None,
-                        "reverse_url": None,
-                    }
-                )
+                deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} groups deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s groups deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.groups"))
 
         if group_id is not None:
             if group_id <= PROTECTED_GROUP_ID:  # there are 6 standard groups
@@ -843,7 +777,7 @@ class Forums(MethodView):
 
     def get(self):
         categories = db.session.execute(
-            select(Category).order_by(Category.position.asc())
+            sa.select(Category).order_by(Category.position.asc())
         ).scalars()
         return render_template("management/forums.html", categories=categories)
 
@@ -906,7 +840,7 @@ class AddForum(MethodView):
     def get(self, category_id: int | None = None):
         form = self.form()
 
-        form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
+        form.groups.data = db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars()
 
         if category_id:
             category = Category.get_by(id=category_id)
@@ -922,7 +856,9 @@ class AddForum(MethodView):
             flash(_("Forum added."), "success")
             return redirect(url_for("management.forums"))
         else:
-            form.groups.data = db.session.execute(select(Group).order_by(Group.id.asc())).scalars()
+            form.groups.data = db.session.execute(
+                sa.select(Group).order_by(Group.id.asc())
+            ).scalars()
             if category_id:
                 category = Category.get_by(id=category_id)
                 form.category.data = category
@@ -1030,11 +966,15 @@ class DeleteCategory(MethodView):
     def post(self, category_id: int):
         category = Category.get_by_or_404(id=category_id)
 
-        involved_users = User.query.filter(
-            Forum.category_id == category.id,
-            Topic.forum_id == Forum.id,
-            Post.user_id == User.id,
-        ).all()
+        involved_users = list(
+            db.session.execute(
+                sa.select(User).filter(
+                    Forum.category_id == category.id,
+                    Topic.forum_id == Forum.id,
+                    Post.user_id == User.id,
+                )
+            ).scalars()
+        )
 
         category.delete(involved_users)
         flash(_("Category with all associated forums deleted."), "success")
@@ -1097,35 +1037,18 @@ class MarkReportRead(MethodView):
         )
     ]
 
-    def post(self, report_id=None):
-        # AJAX request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+    def post(self, report_id: int | None = None):
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            marked = 0
             for report in Report.get_all(Report.id.in_(ids)):
                 report.zapped_by = current_user.id
                 report.zapped = time_utcnow()
                 report.save()
-                data.append(
-                    {
-                        "id": report.id,
-                        "type": "read",
-                        "reverse": False,
-                        "reverse_name": None,
-                        "reverse_url": None,
-                    }
-                )
+                marked += 1
 
-            return jsonify(
-                message=f"{len(data)} reports marked as read.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s reports marked as read.", count=marked), "success")
+            return redirect_or_next(url_for("management.reports"))
 
         # mark single report as read
         if report_id:
@@ -1171,31 +1094,15 @@ class DeleteReport(MethodView):
     ]
 
     def post(self, report_id: int | None = None):
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for report in Report.get_all(Report.id.in_(ids)):
                 if report.delete():
-                    data.append(
-                        {
-                            "id": report.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} reports deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s reports deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.reports"))
 
         report = Report.get_by_or_404(id=report_id)
         report.delete()
@@ -1231,7 +1138,7 @@ class ManageAttachments(MethodView):
         # id order is the insertion order and unlike date_created it is
         # backed by the primary key index
         return (
-            select(Attachment)
+            sa.select(Attachment)
             .options(
                 joinedload(Attachment.user),
                 joinedload(Attachment.post).joinedload(Post.topic),
@@ -1239,7 +1146,7 @@ class ManageAttachments(MethodView):
             .order_by(Attachment.id.desc())
         )
 
-    def _render(self, stmt, search_form):
+    def _render(self, stmt: sa.Select[tuple[Attachment]], search_form: AttachmentSearchForm):
         page = request.args.get("page", 1, type=int)
         attachments = db.paginate(
             stmt,
@@ -1277,32 +1184,15 @@ class DeleteAttachment(MethodView):
     ]
 
     def post(self, attachment_id: int | None = None):
-        # ajax request
-        json = request.get_json(silent=True)
-        if json is not None:
-            ids = json.get("ids")
-            if not ids:
-                return jsonify(message="No ids provided.", category="error", status=404)
-
-            data: list[dict[str, Any]] = []
+        ids = request.form.getlist("rowid", type=int)
+        if ids:
+            deleted = 0
             for attachment in Attachment.get_all(Attachment.id.in_(ids)):
                 if attachment.delete():
-                    data.append(
-                        {
-                            "id": attachment.id,
-                            "type": "delete",
-                            "reverse": False,
-                            "reverse_name": None,
-                            "reverse_url": None,
-                        }
-                    )
+                    deleted += 1
 
-            return jsonify(
-                message=f"{len(data)} attachments deleted.",
-                category="success",
-                data=data,
-                status=200,
-            )
+            flash(_("%(count)s attachments deleted.", count=deleted), "success")
+            return redirect_or_next(url_for("management.attachments"))
 
         attachment = Attachment.get_by_or_404(id=attachment_id)
         attachment.delete()
@@ -1331,7 +1221,7 @@ class CleanupAttachments(MethodView):
         known: dict[str, set[str]] = {}
         stale_rows: list[int] = []
         rows = db.session.execute(
-            select(
+            sa.select(
                 Attachment.id,
                 Attachment.post_id,
                 Attachment.filename,
@@ -1387,7 +1277,7 @@ class PurgeAttachments(MethodView):
         deleted_rows = 0
         while True:
             batch = db.session.scalars(
-                select(Attachment).order_by(Attachment.id).limit(ATTACHMENT_DELETE_BATCH)
+                sa.select(Attachment).order_by(Attachment.id).limit(ATTACHMENT_DELETE_BATCH)
             ).all()
             if not batch:
                 break
@@ -1425,16 +1315,16 @@ class CeleryStatus(MethodView):
     ]
 
     def get(self):
-        celery_inspect = celery.control.inspect()
+        celery_inspect = celery.control.inspect()  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
         try:
-            celery_running = True if celery_inspect.ping() else False
+            celery_running = True if celery_inspect.ping() else False  # pyright: ignore[reportUnknownMemberType]
         except Exception:
             # catching Exception is bad, and just catching ConnectionError
             # from redis is also bad because you can run celery with other
             # brokers as well.
             celery_running = False
 
-        return jsonify(celery_running=celery_running, status=200)
+        return render_template("management/_celery_status.html", celery_running=celery_running)
 
 
 class PluginsView(MethodView):
@@ -1451,7 +1341,17 @@ class PluginsView(MethodView):
 
     def get(self):
         plugins = PluginRegistry.get_all()
-        return render_template("management/plugins.html", plugins=plugins)
+        # disabled plugins get their migrations applied once they are enabled
+        pending_migrations = {
+            p.name for p in plugins if p.enabled and plugin_has_pending_migrations(p.name)
+        }
+        applied_migrations = {p.name for p in plugins if plugin_has_applied_migrations(p.name)}
+        return render_template(
+            "management/plugins.html",
+            plugins=plugins,
+            pending_migrations=pending_migrations,
+            applied_migrations=applied_migrations,
+        )
 
 
 class EnablePlugin(MethodView):
@@ -1472,6 +1372,21 @@ class EnablePlugin(MethodView):
 
         if plugin.enabled:
             flash(_("Plugin %(plugin)s is already enabled.", plugin=plugin.name), "info")
+            return redirect(url_for("management.plugins"))
+
+        # a plugin whose tables are missing can break every page once it is loaded
+        try:
+            apply_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't apply the migrations of %(plugin)s, it stays disabled: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
             return redirect(url_for("management.plugins"))
 
         plugin.enabled = True
@@ -1534,7 +1449,42 @@ class InstallPlugin(MethodView):
     def post(self, name: str):
         validate_plugin(name)
         plugin = PluginRegistry.get_by_or_404(name=name)
-        plugin.add_settings()
+
+        if not plugin.enabled:
+            flash(
+                _("Plugin %(plugin)s has to be enabled first.", plugin=plugin.name),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        try:
+            apply_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't apply the migrations of %(plugin)s: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        if plugin.is_installable and not plugin.is_installed:
+            plugin.add_settings()
+
+        # held back at startup because of its pending migrations
+        if pluggy.get_plugin(plugin.name) is None:
+            flash(
+                _(
+                    "The migrations of %(plugin)s have been applied. Restart FlaskBB to load "
+                    "it and install its settings.",
+                    plugin=plugin.name,
+                ),
+                "success",
+            )
+            return redirect(url_for("management.plugins"))
 
         flash(_("Plugin has been installed."), "success")
         return redirect(url_for("management.plugins"))
@@ -1555,6 +1505,32 @@ class UninstallPlugin(MethodView):
     def post(self, name: str):
         validate_plugin(name)
         plugin = PluginRegistry.get_by_or_404(name=name)
+
+        if plugin_tables_in_use(plugin.name):
+            flash(
+                _(
+                    "Disable %(plugin)s and restart FlaskBB before uninstalling it, "
+                    "its tables are still in use.",
+                    plugin=plugin.name,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
+        try:
+            revert_plugin_migrations(plugin.name)
+        except (CommandError, SQLAlchemyError) as exc:
+            db.session.rollback()
+            flash(
+                _(
+                    "Couldn't revert the migrations of %(plugin)s: %(error)s",
+                    plugin=plugin.name,
+                    error=exc,
+                ),
+                "danger",
+            )
+            return redirect(url_for("management.plugins"))
+
         plugin.remove_settings()
 
         flash(_("Plugin has been uninstalled."), "success")
@@ -1592,15 +1568,16 @@ class UpgradePlugin(MethodView):
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app: Flask):
+def flaskbb_load_blueprints(app: FlaskBB):
     management = Blueprint("management", __name__)
 
     @management.before_request
-    def check_fresh_login():
+    def check_fresh_login() -> Response | None:  # pyright: ignore[reportUnusedFunction]
         """Checks if the login is fresh for the current user, otherwise the user
         has to reauthenticate."""
         if not login_fresh():
-            return login_manager.needs_refresh()
+            return cast(Response, login_manager.needs_refresh())
+        return None
 
     # Attachments
     register_view(

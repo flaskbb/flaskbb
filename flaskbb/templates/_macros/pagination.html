@@ -1,5 +1,6 @@
 {% macro render_pagination(page_obj, url, ul_class='', sort_by=None, asc=True) %}
-<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}'>
+{# page links load the next page's content into #page-content #}
+<ul class='{%- if ul_class -%}{{ ul_class }}{%- else -%}pagination{%- endif -%}' hx-boost="true" hx-target="#page-content" hx-select="#page-content" hx-swap="outerHTML show:window:top" hx-select-oob="unset">
     {% set ordering = 'asc' if asc == True else 'desc' %}
     {% set sorting = '&sort_by='+(sort_by|urlencode)+'&order_by='+ordering if sort_by is string else '' %}
     <li class="page-item disabled"><a class="page-link" href="#"><span class="pages-label">{% trans %}Pages{% endtrans %}</span></a></li>

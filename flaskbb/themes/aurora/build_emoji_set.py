@@ -18,7 +18,7 @@ def get_annotations():
             )
 
 
-def format_name(name):
+def format_name(name: str):
     # name is somthing like: E11_big_smile
     # --> convert it to big_smile
     return "_".join(name.split("_")[1:])

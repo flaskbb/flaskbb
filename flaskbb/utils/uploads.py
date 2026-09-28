@@ -13,20 +13,22 @@ import os
 import uuid
 from pathlib import Path
 
-from flask import current_app, Flask
-from flask_wtf.file import FileStorage
+from flask import Flask
 from PIL import ImageFile
+from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
-from flaskbb.core.settings import flaskbb_config
+from flaskbb.settings import flaskbb_config
+from flaskbb.utils.proxies import current_app
 
 logger = logging.getLogger(__name__)
 
 
 def get_avatar_upload_path() -> str:
-    if current_app.config.get("AVATAR_UPLOAD_PATH", None) is None:
+    upload_path = current_app.config["AVATAR_UPLOAD_PATH"]
+    if upload_path is None:
         return os.path.join(current_app.static_folder or "static", "uploads", "avatar")
-    return current_app.config["AVATAR_UPLOAD_PATH"]
+    return upload_path
 
 
 def get_avatar_filename(username: str, filename: str | None) -> str:
@@ -53,9 +55,10 @@ def delete_avatar_file(filename: str | None):
 
 
 def get_attachment_upload_path() -> str:
-    if current_app.config.get("ATTACHMENT_UPLOAD_PATH", None) is None:
+    upload_path = current_app.config["ATTACHMENT_UPLOAD_PATH"]
+    if upload_path is None:
         return os.path.join(current_app.static_folder or "static", "uploads", "attachments")
-    return current_app.config["ATTACHMENT_UPLOAD_PATH"]
+    return upload_path
 
 
 def make_attachment_filename() -> str:
@@ -211,7 +214,7 @@ def validate_image(file: FileStorage):
     ):
         error = "Image type {} is not allowed. Allowed types are: {}".format(
             img_info["content_type"],
-            ", ".join(current_app.config["AVATAR_EXTENSIONS"]),  # pyright: ignore[reportUnknownArgumentType]
+            ", ".join(current_app.config["AVATAR_EXTENSIONS"]),
         )
         return error, False
 

@@ -27,7 +27,7 @@
             {% if current_user|can_moderate(topic.forum) %}
                 {% if not topic.locked %}
                 <li>
-                    <form class="d-inline" method="post" action="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}">
+                    <form class="d-inline" method="post" action="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="dropdown-item">
                             <span class="fas fa-lock fa-fw"></span> {% trans %}Lock Topic{% endtrans %}
@@ -36,7 +36,7 @@
                 </li>
                 {% else %}
                 <li>
-                    <form class="d-inline" method="post" action="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}">
+                    <form class="d-inline" method="post" action="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="dropdown-item">
                             <span class="fas fa-unlock fa-fw"></span> {% trans %}Unlock Topic{% endtrans %}
@@ -47,7 +47,7 @@
 
                 {% if not topic.important %}
                 <li>
-                    <form class="d-inline" method="post" action="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}">
+                    <form class="d-inline" method="post" action="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="dropdown-item">
                             <span class="fas fa-star fa-fw"></span> {% trans %}Highlight Topic{% endtrans %}
@@ -56,7 +56,7 @@
                 </li>
                 {% else %}
                 <li>
-                    <form class="d-inline" method="post" action="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}">
+                    <form class="d-inline" method="post" action="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="dropdown-item">
                             <span class="far fa-star fa-fw"></span> {% trans %}Trivialize Topic{% endtrans %}
@@ -68,14 +68,14 @@
             {% if current_user | can_moderate(topic.forum) and current_user.permissions.get('makehidden', False) %}
             <li>
                 {% if topic.hidden %}
-                <form class="d-inline" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id, slug=topic.slug) }}">
+                <form class="d-inline" method="post" action="{{ url_for('forum.unhide_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.unhide_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button class="dropdown-item">
                         <span class="fas fa-user fa-fw"></span> {% trans %}Unhide Topic{% endtrans %}
                     </button>
                 </form>
                 {% else %}
-                <form class="d-inline" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id, slug=topic.slug) }}">
+                <form class="d-inline" method="post" action="{{ url_for('forum.hide_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.hide_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button class="dropdown-item">
                         <span class="fas fa-user-secret fa-fw"></span> {% trans %}Hide Topic{% endtrans %}
@@ -90,14 +90,14 @@
         {% endif %}
 
         {% if current_user.is_tracking_topic(topic) %}
-        <form class="d-inline" method="post" action="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}">
+        <form class="d-inline" method="post" action="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button class="btn btn-outline-dark">
                 <span class="fas fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Untrack Topic{% endtrans %}
             </button>
         </form>
         {% else %}
-        <form class="d-inline" method="post" action="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}">
+        <form class="d-inline" method="post" action="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}" hx-post="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button class="btn btn-outline-dark">
                 <span class="fas fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Track Topic{% endtrans %}

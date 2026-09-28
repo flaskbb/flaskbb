@@ -20,14 +20,12 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import event, MetaData
 from sqlalchemy.engine import Engine
 
-from flaskbb.core.search import FlaskBBSearch
 from flaskbb.exceptions import AuthorizationRequired
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.utils.alembic import Alembic
@@ -69,9 +67,6 @@ def _enable_sqlite_foreign_keys(dbapi_connection: Any, connection_record: Any) -
 event.listen(Engine, "connect", _enable_sqlite_foreign_keys)
 
 
-# Search backend (pluggable full-text search; see flaskbb/core/search/)
-flaskbb_search = FlaskBBSearch(pluggy)
-
 # Login
 login_manager = LoginManager()
 
@@ -80,9 +75,6 @@ mail = Mail()
 
 # Caching
 cache = Cache()
-
-# Redis
-redis_store = FlaskRedis()
 
 # Debugtoolbar
 debugtoolbar = DebugToolbarExtension()

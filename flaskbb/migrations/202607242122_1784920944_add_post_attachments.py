@@ -19,7 +19,7 @@ down_revision = "1784625534"
 branch_labels = ()
 depends_on = None
 
-# must stay in sync with attachments_group in flaskbb/core/settings/fixture.py
+# must stay in sync with attachments_group in flaskbb/settings/fixture.py
 ATTACHMENT_SETTINGS = {
     "ATTACHMENTS_ENABLED": True,
     "ATTACHMENT_IMAGE_PREVIEWS": True,

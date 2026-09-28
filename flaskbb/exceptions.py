@@ -13,7 +13,7 @@ from werkzeug.exceptions import Forbidden, HTTPException
 from .core.exceptions import BaseFlaskBBError
 
 
-class FlaskBBHTTPError(BaseFlaskBBError, HTTPException):
+class FlaskBBHTTPError(BaseFlaskBBError, HTTPException):  # pyright: ignore[reportUnsafeMultipleInheritance]
     description = "An internal error has occured"
 
 

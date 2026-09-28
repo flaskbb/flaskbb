@@ -17,7 +17,7 @@ down_revision = "1785353838"
 branch_labels = ()
 depends_on = None
 
-# must stay in sync with general_group in flaskbb/core/settings/fixture.py
+# must stay in sync with general_group in flaskbb/settings/fixture.py
 SETTING_KEY = "MEMBERLIST_ENABLED"
 SETTING_VALUE = True
 GROUP_KEY = "general"

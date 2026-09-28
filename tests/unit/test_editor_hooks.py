@@ -68,6 +68,20 @@ def test_toolbar_renders_without_plugins(request_context, default_settings):
     assert "<md-bold" in render_editor()
 
 
+def test_preview_uses_the_post_renderer_by_default(request_context, default_settings):
+    assert 'data-preview-url="/markdown/post"' in render_editor()
+
+
+def test_preview_uses_the_nonpost_renderer_when_asked(request_context, default_settings):
+    rendered = render_template_string(
+        "{% from '_macros/form.html' import render_editor_field %}"
+        "{{ render_editor_field(form.content, markdown='nonpost') }}",
+        form=EditorForm(),
+    )
+
+    assert 'data-preview-url="/markdown/nonpost"' in rendered
+
+
 def test_toolbar_renders_plugin_button(request_context, default_settings, editor_plugin):
     rendered = render_editor()
 

@@ -9,6 +9,7 @@ It provides the forms that are needed for the user views.
 """
 
 import logging
+from typing import Any, TYPE_CHECKING
 
 from flask_babelplus import lazy_gettext as _
 from flask_wtf.file import FileField, FileRequired
@@ -42,6 +43,9 @@ from ..core.user.update import (
     SettingsUpdate,
     UserDetailsChange,
 )
+
+if TYPE_CHECKING:
+    from flaskbb.user.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +95,7 @@ class ChangeEmailForm(FlaskBBForm):
     )
     submit = SubmitField(_("Save"))
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user: "User", *args: Any, **kwargs: Any):
         self.user = user
         kwargs["obj"] = self.user
         super().__init__(*args, **kwargs)
@@ -148,7 +152,7 @@ class ChangeUserDetailsForm(FlaskBBForm):
     notes = TextAreaField(_("Notes"), validators=[Optional(), Length(min=0, max=5000)])
     submit = SubmitField(_("Save"))
 
-    def validate_birthday(self, field):
+    def validate_birthday(self, field: DateField):
         if field.data is None:
             return True
 

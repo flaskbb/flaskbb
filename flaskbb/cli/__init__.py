@@ -15,9 +15,24 @@ cookiecutter first::
 :license: BSD, see LICENSE for more details.
 """
 
-from flaskbb.cli.main import flaskbb  # noqa
-from flaskbb.cli.plugins import plugins  # noqa
-from flaskbb.cli.themes import themes  # noqa
-from flaskbb.cli.translations import translations  # noqa
-from flaskbb.cli.users import users  # noqa
-from flaskbb.cli.db import db  # noqa
+from flaskbb.cli.bootstrap import bootstrap
+from flaskbb.cli.db import db
+from flaskbb.cli.groups import groups
+from flaskbb.cli.main import flaskbb
+from flaskbb.cli.permissions import permissions
+from flaskbb.cli.plugins import plugins
+from flaskbb.cli.themes import themes
+from flaskbb.cli.translations import translations
+from flaskbb.cli.users import users
+
+__all__ = [
+    "bootstrap",
+    "db",
+    "flaskbb",
+    "groups",
+    "permissions",
+    "plugins",
+    "themes",
+    "translations",
+    "users",
+]

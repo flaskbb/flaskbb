@@ -10,6 +10,7 @@ FlaskBB.
 :license: BSD, see LICENSE for more details
 """
 
+from collections.abc import Callable, Iterable
 from typing import Any
 
 
@@ -69,7 +70,9 @@ class PersistenceError(BaseFlaskBBError):
     """
 
 
-def accumulate_errors(caller, validators, throw: bool = True) -> list[tuple[str, str]]:
+def accumulate_errors[T](
+    caller: Callable[[T], Any], validators: Iterable[T], throw: bool = True
+) -> list[tuple[str, str]]:
     errors: list[tuple[str, str]] = []
 
     for validator in validators:

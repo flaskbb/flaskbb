@@ -1,7 +1,31 @@
 # some tests have been taking from
 # https://github.com/pytest-dev/pluggy/blob/master/testing/test_pluginmanager.py
 # and are licensed under the MIT License.
+import importlib.metadata
+from email.message import Message
+from importlib.metadata import EntryPoint
+from types import SimpleNamespace
+
 import pytest
+
+
+def test_blocked_entrypoint_is_not_imported(plugin_manager, monkeypatch):
+    entry_point = EntryPoint(
+        name="unimportable", value="unimportable_plugin", group="flaskbb_plugins"
+    )
+    dist = SimpleNamespace(
+        name="flaskbb-plugin-unimportable",
+        version="1.0.0",
+        metadata=Message(),
+        entry_points=[entry_point],
+    )
+    monkeypatch.setattr(importlib.metadata, "distributions", lambda: [dist])
+
+    plugin_manager.set_blocked("unimportable")
+
+    assert plugin_manager.load_setuptools_entrypoints("flaskbb_plugins") == 0
+    assert list(plugin_manager.get_disabled_plugins()) == ["unimportable"]
+    assert plugin_manager.get_metadata("unimportable").version == "1.0.0"
 
 
 def test_pluginmanager(plugin_manager):

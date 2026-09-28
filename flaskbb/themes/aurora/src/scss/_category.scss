@@ -44,6 +44,21 @@
             padding-right: 0.5em;
         }
 
+        // a floated icon lets the last line wrap underneath it and out of the row
+        &:has(> .forum-status) {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-content: start;
+
+            > .forum-status {
+                grid-row: span 3;
+            }
+
+            > :not(.forum-status) {
+                grid-column: 2;
+            }
+        }
+
         .forum-name {
             font-weight: bold;
         }

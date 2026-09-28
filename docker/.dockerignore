@@ -1,0 +1,5 @@
+# Build context of Dockerfile, only what it copies
+*
+!wsgi.py
+!entrypoint.sh
+!healthcheck.py

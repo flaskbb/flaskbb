@@ -1,14 +1,150 @@
 from __future__ import annotations
 
+import logging
 import os
 import typing as t
 
 from alembic.config import Config
+from alembic.runtime.migration import MigrationContext, MigrationStep
+from alembic.script import Script
+from alembic.util.exc import CommandError
 from flask import current_app
 from flask_alembic import Alembic as FlaskAlembic
+from flask_alembic.extension import t_rev
+
+logger = logging.getLogger(__name__)
 
 
 class Alembic(FlaskAlembic):
+    @t.override
+    def run_migrations(
+        self,
+        fn: t.Callable[[str | list[str] | tuple[str, ...], MigrationContext], list[MigrationStep]],
+        **kwargs: t.Any,
+    ) -> None:
+        """Runs the migrations with foreign key enforcement suspended on SQLite.
+
+        SQLite can't alter most columns in place, so batch operations copy a
+        table, drop the original and rename the copy. Dropping a table that
+        other rows still reference fails while foreign keys are enforced.
+        """
+        connections = [
+            context.connection
+            for context in self.migration_contexts.values()
+            if context.connection is not None and context.connection.dialect.name == "sqlite"
+        ]
+        for connection in connections:
+            connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+
+        try:
+            super().run_migrations(fn, **kwargs)
+        finally:
+            for connection in connections:
+                # the connection goes back to the pool, where the connect
+                # listener that normally turns this on will not run again
+                connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+
+        # databases from before 3.0 never enforced foreign keys on SQLite
+        for connection in connections:
+            for table, rowid, parent, _ in connection.exec_driver_sql("PRAGMA foreign_key_check"):
+                logger.warning(
+                    "Foreign key violation: %s row %s references a missing row in %s",
+                    table,
+                    rowid,
+                    parent,
+                )
+
+    @t.override
+    def upgrade(self, target: int | str | Script = "heads") -> None:
+        """Runs migrations to upgrade the database.
+
+        The migrations of disabled plugins are loaded so the revisions they
+        already applied still resolve, but ``heads`` leaves them out. They run
+        once the plugin is enabled.
+        """
+        if target != "heads":
+            super().upgrade(target)
+            return
+
+        disabled_locations = tuple(
+            os.path.join(location, "")
+            for location in t.cast(
+                list[str], current_app.config["ALEMBIC"]["disabled_version_locations"]
+            )
+        )
+        heads = [
+            script.revision
+            for script in self.script_directory.get_revisions("heads")
+            if not script.path.startswith(disabled_locations)
+        ]
+
+        def do_upgrade(
+            revision: str | list[str] | tuple[str, ...], context: MigrationContext
+        ) -> list[MigrationStep]:
+            return self.script_directory._upgrade_revs(heads, revision)  # type: ignore[arg-type,return-value]  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
+
+        self.run_migrations(do_upgrade)
+
+    @t.override
+    def revision(
+        self,
+        message: str,
+        empty: bool = False,
+        branch: str = "default",
+        parent: t_rev = "head",
+        splice: bool = False,
+        depend: t_rev | None = None,
+        label: str | list[str] | None = None,
+        path: str | None = None,
+    ) -> list[Script | None]:
+        """Creates a new revision. It may only build on FlaskBB's and its own
+        branch's revisions, a plugin never on the revisions of another plugin.
+        """
+        # Flask-Alembic points these at the revision's own branch
+        references = [
+            rev
+            for rev in self._simplify_rev(parent) + self._simplify_rev(depend or [])
+            if rev not in ("base", "head")
+        ]
+        foreign = self._plugin_branches(references) - {branch}
+        if foreign:
+            raise CommandError(
+                f"The revision of '{branch}' would depend on the migrations of "
+                f"{', '.join(sorted(foreign))}. Plugin migrations may only depend on "
+                "FlaskBB's and their own. If the plugins go hand in hand, add the "
+                "dependency to the revision by hand and require the other plugin "
+                "in pyproject.toml."
+            )
+
+        return super().revision(message, empty, branch, parent, splice, depend, label, path)
+
+    @t.override
+    def merge(
+        self,
+        revisions: t_rev = "heads",
+        message: str | None = None,
+        label: str | list[str] | None = None,
+    ) -> Script | None:
+        """Creates a merge revision. It may only merge the revisions of one
+        plugin, optionally with FlaskBB's.
+        """
+        plugins = self._plugin_branches(self._simplify_rev(revisions))
+        if len(plugins) > 1:
+            raise CommandError(
+                f"A merge revision would join the migrations of {', '.join(sorted(plugins))}. "
+                "Merge the heads of one plugin at a time, e.g. 'flaskbb db merge <plugin>@head'."
+            )
+
+        return super().merge(revisions, message, label)
+
+    def _plugin_branches(self, revisions: list[str]) -> set[str]:
+        return {
+            label
+            for script in self.script_directory.get_revisions(tuple(revisions))
+            for label in script.branch_labels
+            if label != "default"
+        }
+
     @property
     @t.override
     def config(self) -> Config:
@@ -21,15 +157,15 @@ class Alembic(FlaskAlembic):
             return cache.config
 
         cache.config = c = Config()
-        script_location = current_app.config["ALEMBIC"]["script_location"]
+        script_location = t.cast(str, current_app.config["ALEMBIC"]["script_location"])
 
         if not os.path.isabs(script_location) and ":" not in script_location:
             script_location = os.path.join(current_app.root_path, script_location)
 
-        version_locations = [script_location]
+        version_locations: list[str] = [script_location]
 
         for item in current_app.config["ALEMBIC"]["version_locations"]:
-            version_location = item if isinstance(item, str) else item[1]
+            version_location = t.cast(str, item if isinstance(item, str) else item[1])
 
             if not os.path.isabs(version_location) and ":" not in version_location:
                 version_location = os.path.join(current_app.root_path, version_location)
@@ -38,14 +174,20 @@ class Alembic(FlaskAlembic):
 
         c.set_main_option("script_location", script_location)
         c.set_main_option("path_separator", current_app.config["ALEMBIC"]["path_separator"])
-        path_sep = self._get_file_separator_char(c)
+        # path_separator is always set above, so this is never None
+        path_sep = t.cast(str, c._get_file_separator_char("path_separator"))
         c.set_main_option(
             "version_locations",
             path_sep.join(version_locations),
         )
 
         for key, value in current_app.config["ALEMBIC"].items():
-            if key in ("script_location", "version_locations", "path_separator"):
+            if key in (
+                "script_location",
+                "version_locations",
+                "disabled_version_locations",
+                "path_separator",
+            ):
                 continue
 
             if isinstance(value, dict):
@@ -59,20 +201,3 @@ class Alembic(FlaskAlembic):
             c.set_main_option("databases", ", ".join(self.metadatas))
 
         return cache.config
-
-    def _get_file_separator_char(self, config: Config) -> str:
-        if hasattr(config, "_get_file_separator_char"):
-            # Alembic >= 1.16.0
-            # path_separator is always set above, so this is never None
-            return config._get_file_separator_char(  # pyright: ignore[reportReturnType]
-                "path_separator"
-            )
-
-        join_on_path = {
-            "space": " ",
-            "newline": "\n",
-            "os": os.pathsep,
-            ":": ":",
-            ";": ";",
-        }
-        return join_on_path.get(current_app.config["ALEMBIC"].get("version_path_separator"), ",")

@@ -19,8 +19,9 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Literal, overload, TYPE_CHECKING, TypeVar
-from wsgiref.types import WSGIEnvironment
+from typing import Any, cast, Literal, overload, TYPE_CHECKING, TypeVar
+from urllib.parse import urlsplit
+from wsgiref.types import StartResponse, WSGIEnvironment
 
 import unidecode
 from babel.core import get_locale_identifier
@@ -31,12 +32,10 @@ from babel.dates import format_timedelta as babel_format_timedelta
 from flask import (
     abort,
     Blueprint,
-    current_app,
     flash,
     Flask,
     redirect,
     request,
-    Response,
     session,
     url_for,
 )
@@ -44,21 +43,22 @@ from flask.typing import RouteCallable
 from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_limiter import Limiter
-from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
 from markupsafe import Markup
 from pytz import UTC
-from sqlalchemy import Row
+from redis import Redis, RedisError
+from sqlalchemy import Row, select
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string, ImportStringError
 
-from flaskbb.extensions import babel, redis_store
+from flaskbb.extensions import babel, db
+from flaskbb.utils.proxies import current_app, current_user
 
 if TYPE_CHECKING:
     from flaskbb.forum.models import Category, Forum, ForumsRead, Topic, TopicsRead
     from flaskbb.user.models import User
 
-from flaskbb.core.settings import flaskbb_config
+from flaskbb.settings import flaskbb_config
 from flaskbb.utils.http import get_first_safe_redirect_url
 
 logger = logging.getLogger(__name__)
@@ -69,18 +69,11 @@ T = TypeVar("T")
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 
-def to_bytes(text: str | int | bytes, encoding: str = "utf-8"):
-    """Transform string to bytes."""
-    if isinstance(text, str):
-        text = text.encode(encoding)
-    return text
-
-
-def to_unicode(input_bytes: str | bytes, encoding: str = "utf-8"):
-    """Decodes input_bytes to text if needed."""
-    if not isinstance(input_bytes, str):
-        input_bytes = input_bytes.decode(encoding)
-    return input_bytes
+def escape_like(term: str) -> str:
+    """Escape LIKE metacharacters in a user-supplied search term so
+    literal `%`/`_` in the input aren't interpreted as SQL wildcards.
+    """
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def slugify(text: str, delim: str = "-"):
@@ -100,14 +93,17 @@ def slugify(text: str, delim: str = "-"):
 
 def redirect_url(endpoint: str | None, use_referrer: bool = True):
     """
-    Generates a redirect url via the ``next`` query-string parameter, the HTTP referrer
-    from the ``endpoint`` if neither is present or safe to redirect to.
+    Generates a redirect url via the ``next`` query-string parameter, the page an htmx
+    request was sent from, the HTTP referrer or from the ``endpoint`` if none of them is
+    present or safe to redirect to.
 
     :param endpoint: The trusted fallback URL to redirect to (e.g. built
         with ``url_for``). If not provided 'forum.index' will be used.
     """
-    allowed_hosts: list[str] = current_app.config["ALLOWED_HOSTS"]
-    targets = [request.args.get("next"), request.referrer if use_referrer else None]
+    allowed_hosts = current_app.config["ALLOWED_HOSTS"]
+    targets = [request.args.get("next")]
+    if use_referrer:
+        targets += [_htmx_current_page(), request.referrer]
     return get_first_safe_redirect_url(
         *targets,
         allowed_hosts=allowed_hosts,
@@ -140,8 +136,39 @@ def render_template(template: str, **context: Any):  # pragma: no cover
     return render_theme_template(theme, template, **context)
 
 
+def is_htmx_request() -> bool:
+    """Whether the current request came from htmx."""
+    return request.headers.get("HX-Request") == "true"
+
+
+def _htmx_current_page() -> str | None:
+    """The page an htmx request was sent from, relative so that it is safe to
+    redirect to without ALLOWED_HOSTS, unlike the absolute referrer.
+    """
+    if not is_htmx_request():
+        return None
+
+    current = urlsplit(request.headers.get("HX-Current-URL", ""))
+    if current.query:
+        return f"{current.path}?{current.query}"
+    return current.path
+
+
+def redirect_or_reload(location: str):
+    """Redirects to ``location``. htmx swaps parts of the page a request was
+    sent from, so an htmx request headed anywhere else gets a full page load.
+    """
+    current = urlsplit(request.headers.get("HX-Current-URL", ""))
+    target = urlsplit(location)
+    if is_htmx_request() and (target.path, target.query) != (current.path, current.query):
+        response = current_app.response_class(status=204)
+        response.headers["HX-Redirect"] = location
+        return response
+    return redirect(location)
+
+
 # TODO(anr): clean this up
-def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):  # noqa: C901
+def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):
     """Executes a specific action for topics. Returns a list with the modified
     topic objects.
 
@@ -248,7 +275,7 @@ class CategoryForums:
 
 
 def _group_forums_by_category(
-    query_result: Iterable[Row[Any]],
+    query_result: Iterable[Row[tuple[Any, ...]]],
     user: "User",
 ) -> Iterable[CategoryForums]:
     it = itertools.groupby(query_result, operator.itemgetter(0))
@@ -261,14 +288,14 @@ def _group_forums_by_category(
             yield CategoryForums(category, forum_rows)
     else:
         for category, rows in it:
-            forum_rows: list[ForumRow] = []
+            forum_rows = []
             for row in rows:
                 forum_rows.append(ForumRow(row[1], None))
             yield CategoryForums(category, forum_rows)
 
 
 def get_categories_and_forums(
-    query_result: Iterable[Row[Any]],
+    query_result: Iterable[Row[tuple[Any, ...]]],
     user: "User",
 ) -> list[CategoryForums]:
     """Returns a list with categories. Every category has a list for all
@@ -305,7 +332,7 @@ def get_categories_and_forums(
 
 
 def get_forums(
-    query_result: Iterable[Row[Any]],
+    query_result: Iterable[Row[tuple[Any, ...]]],
     user: "User",
 ) -> CategoryForums:
     """Returns a tuple which contains the category and the forums as list.
@@ -416,51 +443,6 @@ def topic_is_unread(
     return topicsread.last_read < topic.last_updated
 
 
-def mark_online(user_id: str | int | None, guest: bool = False):  # pragma: no cover
-    """Marks a user as online
-
-    :param user_id: The id from the user who should be marked as online
-
-    :param guest: If set to True, it will add the user to the guest activity
-                  instead of the user activity.
-
-    Ref: http://flask.pocoo.org/snippets/71/
-    """
-    if user_id is None:
-        return
-
-    user = to_bytes(user_id)
-    now = int(time.time())
-    expires = now + (flaskbb_config["ONLINE_LAST_MINUTES"] * 60) + 10
-    if guest:
-        all_users_key = f"online-guests/{now // 60}"
-        user_key = f"guest-activity/{user}"
-    else:
-        all_users_key = f"online-users/{now // 60}"
-        user_key = f"user-activity/{user}"
-    p = redis_store.pipeline()
-    p.sadd(all_users_key, user)
-    p.set(user_key, now)
-    p.expireat(all_users_key, expires)
-    p.expireat(user_key, expires)
-    p.execute()
-
-
-def get_online_users(guest: bool = False):  # pragma: no cover
-    """Returns all online users within a specified time range
-
-    :param guest: If True, it will return the online guests
-    """
-    current = int(time.time()) // 60
-    minutes = range(flaskbb_config["ONLINE_LAST_MINUTES"])
-    if guest:
-        users = redis_store.sunion([f"online-guests/{current - x}" for x in minutes])
-    else:
-        users = redis_store.sunion([f"online-users/{current - x}" for x in minutes])
-
-    return [to_unicode(u) for u in users]
-
-
 def crop_title(title: str, length: int | None = None, suffix: str = "..."):
     """Crops the title to a specified length
 
@@ -475,6 +457,78 @@ def crop_title(title: str, length: int | None = None, suffix: str = "..."):
         return title
 
     return title[:length].rsplit(" ", 1)[0] + suffix
+
+
+ONLINE_USERS_KEY = "flaskbb:online-users"
+ONLINE_GUESTS_KEY = "flaskbb:online-guests"
+
+
+def _online_window():
+    return (flaskbb_config["ONLINE_LAST_MINUTES"] or 15) * 60
+
+
+def mark_online(member: int | str, guest: bool = False):
+    """Marks a user or a guest as online. Requires ``REDIS_ENABLED``.
+
+    :param member: The id of the user or the address of the guest.
+    :param guest: If set to True, ``member`` is added to the online guests
+                  instead of the online users.
+    """
+    key = ONLINE_GUESTS_KEY if guest else ONLINE_USERS_KEY
+    redis_client: Redis = current_app.extensions["redis"]
+    now = time.time()
+    window = _online_window()
+    try:
+        with redis_client.pipeline() as pipe:  # pyright: ignore[reportUnknownMemberType]
+            pipe.zadd(key, {str(member): now})
+            pipe.zremrangebyscore(key, "-inf", now - window)
+            pipe.expire(key, window)
+            pipe.execute()
+    except RedisError:
+        logger.warning("Could not mark %s as online", member, exc_info=True)
+
+
+def get_online_users() -> Sequence["User"]:
+    """Returns the users that were online within ONLINE_LAST_MINUTES."""
+    from flaskbb.user.models import User
+
+    stmt = select(User).order_by(User.username)
+    if current_app.config["REDIS_ENABLED"]:
+        redis_client: Redis = current_app.extensions["redis"]
+        try:
+            user_ids = cast(
+                list[bytes],
+                redis_client.zrangebyscore(  # pyright: ignore[reportUnknownMemberType]
+                    ONLINE_USERS_KEY, time.time() - _online_window(), "+inf"
+                ),
+            )
+            return db.session.scalars(
+                stmt.where(User.id.in_([int(user_id) for user_id in user_ids]))
+            ).all()
+        except RedisError:
+            logger.warning("Could not get the online users", exc_info=True)
+    return db.session.scalars(stmt.where(User.lastseen >= time_diff())).all()
+
+
+def count_online_users() -> tuple[int, int | None]:
+    """Returns the number of users and guests that were online within
+    ONLINE_LAST_MINUTES. The guests are ``None`` without ``REDIS_ENABLED``
+    as they can only be tracked with redis.
+    """
+    from flaskbb.user.models import User
+
+    if current_app.config["REDIS_ENABLED"]:
+        redis_client: Redis = current_app.extensions["redis"]
+        since = time.time() - _online_window()
+        try:
+            with redis_client.pipeline(transaction=False) as pipe:  # pyright: ignore[reportUnknownMemberType]
+                pipe.zcount(ONLINE_USERS_KEY, since, "+inf")
+                pipe.zcount(ONLINE_GUESTS_KEY, since, "+inf")
+                online_users, online_guests = pipe.execute()
+            return online_users, online_guests
+        except RedisError:
+            logger.warning("Could not count the online users", exc_info=True)
+    return User.count(User.lastseen >= time_diff()), None
 
 
 def is_online(user: "User"):
@@ -581,15 +635,19 @@ def time_since(time: datetime | None):  # pragma: no cover
     return format_timedelta(delta, add_direction=True)
 
 
-def format_quote(username: str, content: str):
+def format_quote(username: str, content: str, post_url: str | None = None):
     """Returns a formatted quote depending on the markup language.
 
     :param username: The username of a user.
     :param content: The content of the quote
+    :param post_url: The URL of the quoted post, linked from the quote header.
     """
     profile_url = url_for("user.profile", username=username)
+    attribution = f"**[{username}]({profile_url}) wrote:**"
+    if post_url is not None:
+        attribution += f" [{_('view post')}]({post_url})"
     content = "\n> ".join(content.strip().split("\n"))
-    quote = f"**[{username}]({profile_url}) wrote:**\n> {content}\n"
+    quote = f"> {attribution}\n>\n> {content}\n\n"
 
     return quote
 
@@ -742,7 +800,7 @@ class ReverseProxyPathFix:
         self.app = app
         self.force_https = force_https
 
-    def __call__(self, environ: WSGIEnvironment, start_response: Response):
+    def __call__(self, environ: WSGIEnvironment, start_response: StartResponse):
         script_name = environ.get("HTTP_X_SCRIPT_NAME", "")
         if script_name:
             environ["SCRIPT_NAME"] = script_name
@@ -764,7 +822,7 @@ class ReverseProxyPathFix:
         if self.force_https:
             environ["wsgi.url_scheme"] = "https"
 
-        return self.app(environ, start_response)  # pyright: ignore[reportArgumentType]
+        return self.app(environ, start_response)
 
 
 @overload
@@ -775,19 +833,19 @@ def real[T](obj: LocalProxy[T]) -> "User": ...
 def real[T](obj: T) -> T: ...
 
 
-def real(obj):
+def real(obj: Any) -> Any:
     """Unwraps a werkzeug.local.LocalProxy object if given one,
     else returns the object.
     """
     if isinstance(obj, LocalProxy):
-        return obj._get_current_object()
+        return obj._get_current_object()  # pyright: ignore[reportPrivateUsage]
     return obj
 
 
 def anonymous_required(f: Any):
     @wraps(f)
     def wrapper(*a: Any, **k: Any):
-        if current_user is not None and current_user.is_authenticated:
+        if current_user is not None and current_user.is_authenticated:  # pyright: ignore[reportUnnecessaryComparison]
             return redirect_or_next(url_for("forum.index"))
         return f(*a, **k)
 
@@ -841,11 +899,10 @@ def register_view(
     bp_or_app: Blueprint | Flask,
     routes: list[str],
     view_func: RouteCallable,
-    *args: Any,
     **kwargs: Any,
 ):
     for route in routes:
-        bp_or_app.add_url_rule(route, view_func=view_func, *args, **kwargs)  # noqa: B026
+        bp_or_app.add_url_rule(route, view_func=view_func, **kwargs)
 
 
 class FlashAndRedirect:

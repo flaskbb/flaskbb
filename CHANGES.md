@@ -1,0 +1,167 @@
+# Changelog
+
+Here you can see the full list of changes between each release.
+
+## Version 3.0.0
+
+Unreleased
+
+### Features
+
+#### Users and content
+- **Avatars**: Users can upload and delete avatars
+- **Attachments**: Posts and topics can have attachments. Admins can manage all attachments from the Admin CP.
+- Links can open in a new tab. (#671)
+- Admins can delete all posts of a user. (#534)
+- The member list can be hidden. (#625)
+- Quotes are styled and show a header with the quoted user and a link to the quoted post, including quotes in existing posts.
+- Long quotes are shortened until expanded, and quotes nested deeper than two levels are collapsed.
+- Typing `@` and three characters in the editor suggests usernames to mention.
+- Admins can create new topics in locked forums.
+
+#### Search
+- **Search** was rewritten and can be extended via plugins.
+- **SQLite** and **PostgreSQL** **Full-Text** search backends are supported out of the box.
+  The whoosh backend was removed as it was unmaintained.
+- The results page was redesigned and highlights the search terms (got inspired by discourse :) )
+
+#### Settings and plugins
+- Settings are now stored as JSON instead of being pickled. They are typed now.
+- A Plugin's setting can now be upgraded from the admin panel or the CLI.
+- Installed plugins settings are upgraded automatically when the app starts (migrations are not applied!).
+- Newly installed plugins are disabled until they are enabled, and disabled plugins are no longer imported.
+- Enabling a plugin applies its migrations first, and the admin panel's install and uninstall buttons apply or revert its migrations along with the settings. An enabled plugin with pending migrations stays disabled at startup until they are applied.
+- New plugin lifecycle hooks: `on_plugin_install`, `on_plugin_uninstall`, `on_plugin_upgrade` and `on_plugin_settings_changed`. (#508)
+- New hooks let plugins add buttons to the markdown editor toolbar. (#464)
+- Plugins can add a quote to the editor with `window.app.insertQuote(editor, markdown)`.
+
+
+#### Admin panel
+- The admin layout was redesigned because adding a new item broke the whole nav. Instead they
+  we use a sidenav now with an optional settings tree that can be toggled.
+- Admins are asked to confirm before editing their own account.
+
+#### Appearance
+- A dark version of the Aurora theme was added.
+- New favicon based on the FlaskBB logo that adapts to light and dark browser themes.
+
+#### CLI
+- New `flaskbb serve` command runs FlaskBB with gunicorn.
+- New `flaskbb bootstrap` command waits for the database, then installs or migrates it and can seed plugins during the initial installation. The container images run it on every start. `python -m flaskbb` runs the CLI as well.
+- New CLI commands manage users, groups and permissions. (#466)
+- `flaskbb plugins` can run plugin migrations.
+- `flaskbb upgrade` was removed. Migrations and plugin installs now handle setting fixtures.
+
+#### Improvements
+- htmx is now supported and used for various actions.
+- A full docker setup is now supported.
+- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`.
+- The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
+- Online users and guests are tracked with redis-py instead of `flask-redis`
+
+
+## Version 2.2.1
+
+Released July 4th, 2026
+
+This is a bugfix release which contains some bug fixes and
+updates dependencies to its latest version.
+
+
+## Version 2.2.0
+
+Released February 18th, 2026
+
+After a long pause, we are back with a new release
+
+- Update all dependencies to its latest version - including SQLAlchemy 2
+- Recaptcha can now only be enabled/disabled via the admin panel.
+  The secret key and site key have to be provided via the
+  flaskbb.cfg and/or via the corresponding environment variables.
+- ... and a lot of things to brought the update with it
+
+The next release will have some features as well.
+
+
+## Version 2.1.0
+
+Released September 9th, 2021
+
+The most notable changes are following:
+
+- Reimplemented User views using services
+- Services for changing email, password, settings and details
+- Hooks for email, password, settings and details updates
+- Hook for user profile sidebar links
+- Added helper for generating dynamic navbar content
+- Gender is now a text field rather than a dropdown
+- Upgrade to Flask 2.0 and SQLAlchemy 1.4
+- Upgrade Bootstrap 3 to Bootstrap 5
+- Remove JQuery dependency by rewriting some parts to be plain JS
+- Replace Bootstrap-Markdown editor with GitHub-Markdown-Toolbar
+- ... and lots of other fixes and improvements
+
+
+## Version 2.0.2
+
+Released July 15th, 2018
+
+- Fix issue with declaring log config file path
+
+
+## Version 2.0.1
+
+Released June 21st, 2018
+
+- Fix issue where activation tokens would fail with an exception
+
+
+## Version 2.0.0
+
+Released on May 16th, 2018.
+
+- Improved management panel load time by requesting celery status async (PR #429)
+- Migrated FlaskBB internal behavior to use plugin hook system (PRs
+  #369, #413, #419, #423, #426, #435, #436)
+- Migrated behavior in flaskbb.auth from living in route handlers and into
+  services (PRs #421, #424)
+- Improved emoji support (PR #417)
+- Migrated private messages into a
+  [plugin](https://github.com/sh4nks/flaskbb-plugins/tree/master/conversations)
+  (PR #414)
+- Fixed issue where user could not re-select having the default theme (PR #387)
+- Fixed issue where a reinstall would attempt to drop the entire database
+  instead of just the tables associated with FlaskBB (PR #364)
+- Added ability to hide and unhide topics and posts, preventing unprivileged
+  users from viewing them (PR #325)
+- Fixed issue where password was not required when editing a user in the admin
+  panel (PR #321)
+- Migrated from Flask-Plugins to Pluggy as plugin system for plugins.
+  Plugins are now loaded via entry points and thus have to be installed
+  into the same environment as FlaskBB. During this migration we also moved
+  the [portal plugin](https://github.com/sh4nks/flaskbb-plugins) into its own
+  python package which can be installed via
+  `pip install flaskbb-plugin-portal`. (PR #311)
+- Adds the functionality to "soft delete" posts and topics. (PR #325)
+- Improve logging. (PR #327)
+- Prefixes migrations with a timestamp which will sort them by creation date. (PR #353)
+- Transform views into Class-based Views. (PR #324)
+- Drop the tables instead of dropping the database when uninstalling FlaskBB. (PR #364)
+- Create the database using SQLAlchemy's `db.create_all` and stamp it as
+  'latest' instead of going through all migrations.
+- Fixes a bug that prevented users to activate their accounts via the form
+  input.
+- Fixes a translations bug that wouldn't take the territory code into account
+  when choosing a language (#299).
+- Fixes a bug which would not show all conversations in the conversations view.
+- Fixes a bug that made a forum section inaccessible when the `last_post_id`
+  of a topic was set to None.
+- Various translations updated.
+- Multiple permission fixes and various other fixes.
+
+
+## Version 1.0
+
+Released on May 5th, 2017.
+
+- First release of FlaskBB

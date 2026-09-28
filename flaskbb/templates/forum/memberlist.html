@@ -19,7 +19,7 @@
             {{ render_pagination(users, url_for('forum.memberlist'), sort_by=sort_by, asc=(order_by == 'desc')) }}
         </div>
         <div class="col-auto g-0">
-            <form class="d-inline" role="form" method="post">
+            <form class="d-inline" role="form" method="post" hx-post="{{ url_for('forum.memberlist') }}" hx-trigger="input delay:300ms, submit" hx-target="#memberlist" hx-select="#memberlist" hx-swap="outerHTML">
                 {{ search_form.hidden_tag() }}
                 <div class="input-group mb-3">
                     {{ render_input_field(search_form.search_query) }}
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="card page">
+    <div class="card page" id="memberlist">
         <div class="card-header page-header">
             <a href="{{ url_for('forum.memberlist') }}">{% trans %}Memberlist{% endtrans %}</a>
         </div>

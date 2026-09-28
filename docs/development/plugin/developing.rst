@@ -87,6 +87,10 @@ Once installed, confirm FlaskBB sees your plugin::
 
     $ uv run flaskbb plugins list
 
+Newly installed plugins are disabled, so enable it first::
+
+    $ uv run flaskbb plugins enable your_plugin_name
+
 Then install its settings and, if it ships any, its migrations - see
 :ref:`the CLI reference <commandline>` for the full ``flaskbb plugins`` and
 ``flaskbb db`` command groups::
@@ -165,8 +169,8 @@ Plugins can create settings which integrate with the 'Plugin Settings'
 section of the Admin Panel.
 
 Settings are declared as a
-:class:`~flaskbb.core.settings.definitions.SettingGroup` of
-:class:`~flaskbb.core.settings.definitions.SettingDefinition` instances
+:class:`~flaskbb.settings.definitions.SettingGroup` of
+:class:`~flaskbb.settings.definitions.SettingDefinition` instances
 (``StringSetting``, ``IntSetting``, ``BoolSetting``, ``SelectSetting``,
 ``SelectMultipleSetting``) and registered by implementing the
 ``flaskbb_load_setting_groups`` hook. The group's ``key`` must be unique
@@ -176,7 +180,7 @@ upgrading or uninstalling the plugin.
 
 ::
 
-    from flaskbb.core.settings import IntSetting, SelectMultipleSetting, SettingGroup
+    from flaskbb.settings import IntSetting, SelectMultipleSetting, SettingGroup
     from pluggy import HookimplMarker
 
     impl = HookimplMarker("flaskbb")
@@ -223,7 +227,7 @@ upgrading or uninstalling the plugin.
     def flaskbb_load_setting_groups():
         return SETTINGS
 
-.. currentmodule:: flaskbb.core.settings.definitions
+.. currentmodule:: flaskbb.settings.definitions
 
 .. table:: Available Setting Definitions
     :widths: auto

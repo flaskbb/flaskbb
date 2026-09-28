@@ -8,7 +8,8 @@ html {
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
-  /*padding-top: 50px; */ /* uncomment if navbar should be fixed */
+  /* match flaskbb-website and override alabaster's small-screen body padding */
+  padding: 50px 0 0;
 }
 
 body,
@@ -19,6 +20,15 @@ h4,
 h5,
 h6 {
   font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* keep the navbar font in sync with FlaskBB and flaskbb-website */
+.flaskbb-navbar,
+.flaskbb-navbar .navbar-nav,
+.flaskbb-navbar .nav-item,
+.flaskbb-navbar .nav-link,
+.flaskbb-navbar .navbar-brand {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 h1 {
@@ -63,6 +73,11 @@ code {
   line-height: 1.3;
 }
 
+.page-sidebar ul {
+  margin-left: 10px;
+  padding-left: .5rem;
+}
+
 .page-sidebarwrapper ul li a {
   display: block;
   padding: 3px 0;
@@ -86,6 +101,11 @@ a.reference:active {
 
 a:visited {
     text-decoration: none;
+}
+
+/* basic.css colors visited links, which the navbar should not inherit */
+:where(.flaskbb-navbar) a:visited {
+    color: var(--bs-nav-link-color, var(--bs-navbar-brand-color));
 }
 
 a:hover {

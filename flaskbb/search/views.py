@@ -10,10 +10,11 @@ The global search view.
 
 import logging
 
-from flask import Blueprint, Flask
+from flask import Blueprint
 from flask.views import MethodView
 from pluggy import HookimplMarker
 
+from flaskbb.core.app import FlaskBB
 from flaskbb.extensions import db
 from flaskbb.search.forms import SearchForm
 from flaskbb.utils.helpers import register_view, render_template
@@ -42,7 +43,7 @@ class Search(MethodView):
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app: Flask):
+def flaskbb_load_blueprints(app: FlaskBB):
     search = Blueprint("search", __name__)
     register_view(search, routes=["/search"], view_func=Search.as_view("search"))
 

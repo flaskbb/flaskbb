@@ -1,0 +1,47 @@
+name: Docker
+
+on:
+  push:
+    branches: [master, "*.x"]
+    paths:
+      - "docker/**"
+      - ".dockerignore"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/docker.yaml"
+  pull_request:
+    branches: [master, "*.x"]
+    paths:
+      - "docker/**"
+      - ".dockerignore"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/docker.yaml"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SECRET_KEY: smoke-test
+      POSTGRES_PASSWORD: smoke-test
+      FLASKBB_PLUGINS: flaskbb-plugin-portal
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Validate Compose files
+        run: |
+          docker compose --env-file /dev/null -f docker/docker-compose.yaml config --quiet
+          docker compose --env-file /dev/null -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml config --quiet
+          docker compose --env-file /dev/null -f docker/docker-compose.dev.yaml config --quiet
+      - name: Check release Dockerfile
+        run: docker build --check -f docker/Dockerfile docker
+      - name: Start development stack
+        run: docker compose --env-file /dev/null -f docker/docker-compose.dev.yaml up --build --wait --wait-timeout 180
+      - name: Probe forum
+        run: curl --fail --silent --show-error --output /dev/null http://127.0.0.1:5000/static/favicon.ico
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose --env-file /dev/null -f docker/docker-compose.dev.yaml logs --no-color
+      - name: Stop development stack
+        if: always()
+        run: docker compose --env-file /dev/null -f docker/docker-compose.dev.yaml down -v

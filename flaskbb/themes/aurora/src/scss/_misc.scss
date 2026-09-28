@@ -72,6 +72,16 @@ body {
         padding-bottom: 0;
     }
 
+    @include media-breakpoint-down(lg) {
+        .navbar-collapse {
+            padding-bottom: 1rem;
+        }
+
+        .navbar-nav .dropdown-menu {
+            margin-bottom: 0.5rem;
+        }
+    }
+
     .nav-link {
         padding: 1rem 1rem;
 

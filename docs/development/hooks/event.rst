@@ -21,7 +21,6 @@ Post and Topic Events
 Registration Events
 -------------------
 
-.. autofunction:: flaskbb_event_user_registered
 .. autofunction:: flaskbb_gather_registration_validators
 .. autofunction:: flaskbb_registration_post_processor
 .. autofunction:: flaskbb_registration_failure_handler

@@ -13,15 +13,12 @@ import logging
 import os
 import sys
 import time
-import traceback
 from datetime import datetime, UTC
 from typing import Any, override
 
 import click
-from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, with_appcontext
 from jinja2 import Environment, FileSystemLoader
-from sqlalchemy_utils.functions import database_exists
 
 from flaskbb.app import create_app
 from flaskbb.cli.utils import (
@@ -31,8 +28,9 @@ from flaskbb.cli.utils import (
     prompt_save_user,
     write_config,
 )
-from flaskbb.extensions import celery, db, flaskbb_search, pluggy
-from flaskbb.utils.database import drop_all
+from flaskbb.extensions import celery, db, pluggy
+from flaskbb.search import flaskbb_search
+from flaskbb.utils.database import database_exists, drop_all
 from flaskbb.utils.populate import (
     create_default_groups,
     create_default_settings,
@@ -42,7 +40,8 @@ from flaskbb.utils.populate import (
     insert_bulk_data,
     run_plugin_migrations,
 )
-from flaskbb.utils.translations import compile_translations
+from flaskbb.utils.proxies import current_app
+from flaskbb.utils.translations import compile_translations, translations_are_compiled
 
 logger = logging.getLogger(__name__)
 
@@ -61,10 +60,7 @@ class FlaskBBGroup(FlaskGroup):
             pluggy.hook.flaskbb_cli(cli=self, app=app)
             self._loaded_flaskbb_plugins = True
         except Exception:
-            logger.error(
-                "Error while loading CLI Plugins",
-                exc_info=traceback.format_exc(),  # pyright: ignore[reportArgumentType]
-            )
+            logger.error("Error while loading CLI Plugins", exc_info=True)
         else:
             shell_context_processors = pluggy.hook.flaskbb_shell_context()
             for p in shell_context_processors:
@@ -87,20 +83,19 @@ def make_app():
     if ctx is not None:
         script_info = ctx.obj
 
-    config_file = getattr(script_info, "config_file", None)
-    instance_path = getattr(script_info, "instance_path", None)
-    return create_app(config_file, instance_path)
+    data = getattr(script_info, "data", {})
+    return create_app(data.get("config_file"), data.get("instance_path"))
 
 
 def set_config(ctx: click.Context, param: str, value: str):
     """This will pass the config file to the create_app function."""
-    ctx.ensure_object(ScriptInfo).config_file = value  # pyright: ignore[reportAttributeAccessIssue]
+    ctx.ensure_object(ScriptInfo).data["config_file"] = value
 
 
 def set_instance(ctx: click.Context, param: str, value: str):
     """This will pass the instance path on the script info which can then
     be used in 'make_app'."""
-    ctx.ensure_object(ScriptInfo).instance_path = value  # pyright: ignore[reportAttributeAccessIssue]
+    ctx.ensure_object(ScriptInfo).data["instance_path"] = value
 
 
 @click.group(
@@ -213,8 +208,10 @@ def install(
         click.secho("[+] Installing default plugins...", fg="cyan")
         run_plugin_migrations()
 
-    click.secho("[+] Compiling translations...", fg="cyan")
-    compile_translations()
+    # installed packages ship them, only source checkouts have to compile
+    if not translations_are_compiled():
+        click.secho("[+] Compiling translations...", fg="cyan")
+        compile_translations()
 
     click.secho("[+] FlaskBB has been successfully installed!", fg="green", bold=True)
 
@@ -291,7 +288,7 @@ def reindex():
 @with_appcontext
 def start_celery(ctx: click.Context):
     """Preconfigured wrapper around the 'celery' command."""
-    celery.start(ctx.args)
+    celery.start(ctx.args)  # pyright: ignore[reportUnknownMemberType]
 
 
 @flaskbb.command("shell", short_help="Runs a shell in the app context.")
@@ -323,9 +320,7 @@ def shell_command():
 
     try:
         import IPython
-        from traitlets.config import (
-            get_config,  # pyright: ignore[reportPrivateImportUsage]
-        )
+        from traitlets.config import get_config
 
         c = get_config()
         # This makes the prompt to use colors again
@@ -410,7 +405,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     if os.name == "nt":
         database_path = database_path.replace("\\", r"\\")
 
-    default_conf = {
+    default_conf: dict[str, bool | str | int] = {
         "is_debug": False,
         "server_name": "example.org",
         "use_https": True,
@@ -457,7 +452,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     default_conf["server_name"] = click.prompt(
         click.style("Server Name", fg="magenta"),
         type=str,
-        default=default_conf.get("server_name"),
+        default=str(default_conf["server_name"]),
     )
 
     # HTTPS or HTTP
@@ -480,7 +475,7 @@ def generate_config(development: bool, output: str | None, force: bool):
         default=default_conf.get("database_uri"),
     )
 
-    # REDIS_ENABLED
+    # Redis
     click.secho(
         "Redis will be used for things such as the task queue, caching and rate limiting.",
         fg="cyan",
@@ -673,7 +668,7 @@ def serve(
 ):
     """Starts a gunicorn server with FlaskBB."""
     try:
-        from gunicorn.app.base import Application
+        from gunicorn.app.base import Application  # pyright: ignore[reportMissingModuleSource]
     except ImportError:
         click.secho(
             "[!] gunicorn is not installed. "

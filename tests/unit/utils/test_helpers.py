@@ -1,16 +1,56 @@
 import datetime as dt
 
 from flaskbb.forum.models import Forum
+from flaskbb.settings import flaskbb_config
 from flaskbb.utils.helpers import (
+    count_online_users,
     crop_title,
     format_quote,
     forum_is_unread,
+    get_online_users,
     is_online,
+    redirect_or_reload,
+    redirect_url,
     slugify,
     time_utcnow,
     topic_is_unread,
 )
-from flaskbb.utils.settings import flaskbb_config
+
+HTMX_TOPIC_PAGE = {"HX-Request": "true", "HX-Current-URL": "http://localhost/topic/1-hello?page=2"}
+
+
+def test_redirect_or_reload_redirects_back_to_the_htmx_page(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        response = redirect_or_reload("/topic/1-hello?page=2#pid5")
+
+    assert response.status_code == 302
+
+
+def test_redirect_or_reload_loads_other_pages_in_full(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        response = redirect_or_reload("/forum/1-general")
+
+    assert response.status_code == 204
+    assert response.headers["HX-Redirect"] == "/forum/1-general"
+
+
+def test_redirect_or_reload_without_htmx(application):
+    with application.test_request_context():
+        response = redirect_or_reload("/forum/1-general")
+
+    assert response.status_code == 302
+
+
+def test_redirect_url_prefers_the_htmx_page(application):
+    with application.test_request_context(headers=HTMX_TOPIC_PAGE):
+        assert redirect_url("/fallback") == "/topic/1-hello?page=2"
+
+
+def test_redirect_url_rejects_a_scheme_relative_htmx_page(application):
+    headers = {"HX-Request": "true", "HX-Current-URL": "http://localhost//evil.example/x"}
+
+    with application.test_request_context(headers=headers):
+        assert redirect_url("/fallback") == "/fallback"
 
 
 def test_slugify():
@@ -102,9 +142,29 @@ def test_is_online(default_settings, user):
     assert is_online(user)
 
 
+def test_get_online_users_without_redis(default_settings, user):
+    assert user in get_online_users()
+
+
+def test_count_online_users_without_redis(default_settings, user):
+    online_users, online_guests = count_online_users()
+    assert online_users >= 1
+    assert online_guests is None
+
+
 def test_format_quote(topic):
     expected_markdown = (
-        "**[test_normal](http://localhost:5000/user/test_normal) wrote:**\n> Test Content Normal\n"  # noqa
+        "> **[test_normal](http://localhost:5000/user/test_normal) wrote:**\n>\n"
+        "> Test Content Normal\n\n"
     )
     actual = format_quote(topic.first_post.username, topic.first_post.content)
+    assert actual == expected_markdown
+
+
+def test_format_quote_links_the_quoted_post(topic):
+    expected_markdown = (
+        "> **[test_normal](http://localhost:5000/user/test_normal) wrote:** "
+        "[view post](/post/1)\n>\n> first line\n> second line\n\n"
+    )
+    actual = format_quote(topic.first_post.username, "first line\nsecond line\n", "/post/1")
     assert actual == expected_markdown

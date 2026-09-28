@@ -2,7 +2,7 @@
   "venvPath": ".",
   "venv": ".venv",
   "include": ["flaskbb"],
-  "exclude": ["**/node_modules", "**/resources", "**/__pycache__"],
+  "exclude": ["**/node_modules", "**/resources", "**/__pycache__", "flaskbb/migrations"],
   "defineConstant": { "DEBUG": true },
   "reportIgnoreCommentWithoutRule": false,
   "reportMissingImports": "error",
@@ -13,4 +13,5 @@
   "reportImplicitStringConcatenation": false,
   "reportAny": false,
   "reportExplicitAny": false,
+  "reportMissingSuperCall": false,
 }

@@ -4,7 +4,7 @@
 {%- from theme("_macros/form.html") import horizontal_field, field_label, render_input_field %}
 {%- from theme("_macros/utils.html") import avatar_img %}
 
-<div class="card page">
+<div class="card page" id="change-avatar">
     <div class="card-header page-header">
         {% trans %}Change Avatar{% endtrans %}
     </div>
@@ -24,8 +24,15 @@
                     </div>
                     {% if user.avatar %}
                     <div class="d-flex justify-content-center align-items-center deleteavatar">
-                        <button class="btn btn-sm"
-                            onclick="return actions.execute('{{ url_for('user.delete_avatar') }}', {'user': '{{ user.id }}'}, resetProfilePicture, true)">
+                        {# hx-params="none" keeps the surrounding form, and a picked file, out of the request #}
+                        <button type="button" class="btn btn-sm"
+                            hx-post="{{ url_for('user.delete_avatar') }}"
+                            hx-params="none"
+                            hx-confirm="{{ _('Are you sure?') }}"
+                            hx-target="#change-avatar"
+                            hx-select="#change-avatar"
+                            hx-swap="outerHTML"
+                            hx-select-oob="#flashed-messages">
                             <span class="fas fa-fw fa-trash text-danger"></span>
                             {% trans %}Delete Avatar{% endtrans %}
                         </button>
@@ -39,22 +46,4 @@
         </form>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript">
-    const actions = new window.app.Actions();
-    const defaultAvatar = "{{ url_for('static', filename='avatar100x100.png') }}"
-
-    function resetProfilePicture(data) {
-        const profilePicutre = document.querySelector(".profilepicture");
-        profilePicutre.setAttribute("src", defaultAvatar);
-
-        const deleteAvatarBtn = document.querySelector(".deleteavatar");
-        if(deleteAvatarBtn) {
-            console.log(deleteAvatarBtn);
-            deleteAvatarBtn.remove()
-        }
-    }
-</script>
 {% endblock %}

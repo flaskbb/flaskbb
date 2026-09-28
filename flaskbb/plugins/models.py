@@ -9,22 +9,22 @@ from typing import Any
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 
-from flaskbb.core.settings.forms import build_form
-from flaskbb.core.settings.models import display_key, Setting, SettingsDiff
-from flaskbb.core.settings.registry import setting_registry
 from flaskbb.extensions import db, pluggy
-from flaskbb.utils.database import CRUDMixin
+from flaskbb.settings.forms import build_form
+from flaskbb.settings.models import display_key, Setting, SettingsDiff
+from flaskbb.settings.registry import setting_registry
+from flaskbb.utils.database import BaseModel
 
 
-class PluginRegistry(db.Model, CRUDMixin):
+class PluginRegistry(BaseModel):
     __tablename__ = "plugin_registry"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # A plugin's name doubles as its SettingGroup.key - the plugin's
     # flaskbb_load_setting_groups hookimpl must register a group with
     # key == this name for settings/get_settings_form/etc. to find it.
-    name: Mapped[str] = mapped_column(db.String(255), unique=True)
-    enabled: Mapped[bool] = mapped_column(db.Boolean, default=True)
+    name: Mapped[str] = mapped_column(sa.String(255), unique=True)
+    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=False)
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -80,6 +80,14 @@ class PluginRegistry(db.Model, CRUDMixin):
             return True
         except KeyError:
             return False
+
+    @property
+    def has_stored_settings(self) -> bool:
+        """Unlike ``is_installed`` this doesn't need the plugin's SettingGroup,
+        so it also works for disabled plugins."""
+        return db.session.execute(
+            sa.select(sa.exists().where(Setting.group_key == self.name))
+        ).scalar_one()
 
     @property
     def settings(self) -> dict[str, Any]:

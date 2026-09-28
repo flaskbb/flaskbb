@@ -13,16 +13,17 @@ from dataclasses import dataclass
 from datetime import datetime
 from itertools import chain
 
+import sqlalchemy as sa
 from flask import flash
 from flask_babelplus import gettext as _
 from flask_login import login_user
 from flask_sqlalchemy import SQLAlchemy
 from pytz import UTC
-from sqlalchemy import func
 
 if t.TYPE_CHECKING:
     from flaskbb.plugins.manager import FlaskBBPluginManager
 
+from ...core.auth.activation import AccountActivator
 from ...core.auth.registration import (
     RegistrationPostProcessor,
     UserRegistrationInfo,
@@ -35,6 +36,7 @@ from ...core.exceptions import (
     ValidationError,
 )
 from ...extensions import db
+from ...settings.proxy import FlaskBBConfigProxy
 from ...user.models import User
 
 __all__ = (
@@ -70,6 +72,7 @@ class UsernameValidator(UserValidator):
     def __init__(self, requirements: UsernameRequirements):
         self._requirements = requirements
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         if not (self._requirements.min <= len(user_info.username) <= self._requirements.max):
             raise ValidationError(
@@ -97,13 +100,14 @@ class UsernameUniquenessValidator(UserValidator):
     Validates that the provided username is unique in the application.
     """
 
-    def __init__(self, users):
+    def __init__(self, users: type[User]):
         self.users = users
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
-            db.select(func.count(self.users.id)).filter(
-                func.lower(self.users.username) == user_info.username
+            sa.select(sa.func.count(self.users.id)).filter(
+                sa.func.lower(self.users.username) == user_info.username
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch
@@ -121,13 +125,14 @@ class EmailUniquenessValidator(UserValidator):
     Validates that the provided email is unique in the application.
     """
 
-    def __init__(self, users):
+    def __init__(self, users: type[User]):
         self.users = users
 
+    @t.override
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
-            db.select(func.count(self.users.id)).filter(
-                func.lower(self.users.email) == user_info.email
+            sa.select(sa.func.count(self.users.id)).filter(
+                sa.func.lower(self.users.email) == user_info.email
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch
@@ -145,10 +150,11 @@ class SendActivationPostProcessor(RegistrationPostProcessor):
     :type account_activator: :class:`~flaskbb.core.auth.activation.AccountActivator`
     """  # noqa
 
-    def __init__(self, account_activator):
+    def __init__(self, account_activator: AccountActivator):
         self.account_activator = account_activator
 
-    def post_process(self, user):
+    @t.override
+    def post_process(self, user: User):
         self.account_activator.initiate_account_activation(user.email)
         flash(
             _(
@@ -164,7 +170,8 @@ class AutologinPostProcessor(RegistrationPostProcessor):
     Automatically logs a user in after registration
     """
 
-    def post_process(self, user):
+    @t.override
+    def post_process(self, user: User):
         login_user(user)
         flash(_("Thanks for registering."), "success")
 
@@ -178,11 +185,12 @@ class AutoActivateUserPostProcessor(RegistrationPostProcessor):
     :param config: Current flaskbb configuration object
     """
 
-    def __init__(self, db, config):
+    def __init__(self, db: SQLAlchemy, config: FlaskBBConfigProxy):
         self.db = db
         self.config = config
 
-    def post_process(self, user):
+    @t.override
+    def post_process(self, user: User):
         if not self.config["ACTIVATE_ACCOUNT"]:
             user.activated = True
             self.db.session.commit()
