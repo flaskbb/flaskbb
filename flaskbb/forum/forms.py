@@ -22,6 +22,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Optional
 
+from flaskbb.exceptions import FlaskBBError
 from flaskbb.extensions import pluggy
 from flaskbb.forum.models import Forum, Post, Report, Topic
 from flaskbb.forum.utils import AttachmentFormMixin, handle_post_attachments
@@ -176,8 +177,13 @@ class EditTopicForm(TopicForm):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.topic = kwargs["obj"]
+
+        if self.topic.first_post is None:
+            raise FlaskBBError("First post cannot be None when editing a topic")
+
         self.post = self.topic.first_post
         kwargs.setdefault("content", self.post.content)
+
         TopicForm.__init__(self, *args, **kwargs)
         self._set_attachment_choices(self.post)
 
@@ -187,6 +193,9 @@ class EditTopicForm(TopicForm):
 
     @override
     def save(self, user: User, forum: Forum):
+        title = self.title.data
+        content = self.content.data
+
         can_moderate = bool(Permission(IsAtleastModeratorInForum(forum=forum), identity=user))
         can_hide = bool(
             Permission(
@@ -196,8 +205,9 @@ class EditTopicForm(TopicForm):
             )
         )
 
-        self.topic.title = self.title.data
-        self.post.content = self.content.data
+        # cannot be None as it was already checked using the Required validators
+        self.topic.title = title  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]
+        self.post.content = content  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]
 
         if self.track_topic.data:
             user.track_topic(self.topic)
@@ -208,11 +218,8 @@ class EditTopicForm(TopicForm):
             self.topic.important = bool(self.important.data)
             self.topic.locked = bool(self.locked.data)
 
-        if (
-            self.topic.last_post_id == forum.last_post_id
-            and self.title.data != forum.last_post_title
-        ):
-            forum.last_post_title = self.title.data
+        if self.topic.last_post_id == forum.last_post_id and title != forum.last_post_title:
+            forum.last_post_title = title
 
         self.post.date_modified = time_utcnow()
         self.post.modified_by = user.username
