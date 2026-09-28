@@ -1,4 +1,4 @@
-# Release image: FlaskBB 3 from PyPI, served by gunicorn.
+# Release image: FlaskBB from a wheel, served by gunicorn.
 # The build context is this directory:
 #
 #   docker build -f docker/Dockerfile -t flaskbb:release docker/
@@ -11,9 +11,9 @@ FROM python:${PYTHON_VERSION}-slim-trixie
 
 COPY --from=uv /uv /uvx /usr/local/bin/
 
-# Empty installs the latest release on PyPI. Pin one with
-# --build-arg FLASKBB_VERSION=2.2.0 to stay on a known version.
-ARG FLASKBB_VERSION=""
+ARG FLASKBB_VERSION
+
+COPY artifact/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl /tmp/
 
 ENV PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
@@ -32,7 +32,7 @@ RUN groupadd --gid 1000 flaskbb \
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --allow-existing "$VIRTUAL_ENV" \
-    && uv pip install "flaskbb[gunicorn,postgres,mysql]${FLASKBB_VERSION:+==${FLASKBB_VERSION}}"
+    && uv pip install "/tmp/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl[gunicorn,postgres,mysql]"
 
 WORKDIR /app
 

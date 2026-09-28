@@ -3,3 +3,5 @@
 !wsgi.py
 !entrypoint.sh
 !healthcheck.py
+!artifact/
+!artifact/*.whl
