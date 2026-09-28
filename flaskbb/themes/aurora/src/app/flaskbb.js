@@ -91,6 +91,118 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         return max - (existing - deleted) - selected;
     };
 
+    const attachmentToken = () => crypto.randomUUID().split("-").join("");
+
+    const selectedAttachments = (container) => {
+        const attachments = [];
+        for (const input of container.querySelectorAll('input[type="file"]')) {
+            const serializedTokens = input.dataset.attachmentTokens;
+            let tokens = serializedTokens ? serializedTokens.split(",") : [];
+            if (tokens.length !== input.files.length) {
+                tokens = Array.from(input.files, attachmentToken);
+                input.dataset.attachmentTokens = tokens.join(",");
+            }
+            Array.from(input.files).forEach((file, index) => {
+                attachments.push({ file, input, index, token: tokens[index] });
+            });
+        }
+        return attachments;
+    };
+
+    const syncSelectedAttachments = (container) => {
+        const attachments = selectedAttachments(container);
+        const form = container.closest("form");
+        form.elements.new_attachment_tokens.value = attachments.map(({ token }) => token).join(",");
+
+        const list = container.querySelector(".selected-attachments");
+        list.replaceChildren();
+        for (const { file, input, index, token } of attachments) {
+            const row = document.createElement("div");
+            row.className = "attachment-row";
+
+            const icon = document.createElement("span");
+            icon.className = "fas fa-paperclip";
+            icon.setAttribute("aria-hidden", "true");
+
+            const name = document.createElement("span");
+            name.className = "attachment-name";
+            name.textContent = `${file.name} (${formatFileSize(file.size)})`;
+
+            const actions = document.createElement("div");
+            actions.className = "attachment-actions";
+
+            const insert = document.createElement("button");
+            insert.type = "button";
+            insert.className = "btn btn-sm btn-outline-secondary insert-attachment";
+            insert.dataset.attachmentReference = `attachment:${token}`;
+            insert.dataset.attachmentFilename = file.name;
+            insert.dataset.attachmentImage = file.type.startsWith("image/") ? "true" : "false";
+            insert.textContent = container.dataset.insertLabel;
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "btn btn-sm btn-link text-danger remove-attachment";
+            remove.textContent = container.dataset.removeLabel;
+            remove.addEventListener("click", () => {
+                const transfer = new DataTransfer();
+                const tokens = input.dataset.attachmentTokens.split(",");
+                Array.from(input.files).forEach((candidate, candidateIndex) => {
+                    if (candidateIndex !== index) transfer.items.add(candidate);
+                });
+                input.files = transfer.files;
+                input.dataset.attachmentTokens = tokens
+                    .filter((_candidate, candidateIndex) => candidateIndex !== index)
+                    .join(",");
+                syncSelectedAttachments(container);
+            });
+
+            actions.append(insert, remove);
+            row.append(icon, name, actions);
+            list.append(row);
+        }
+    };
+
+    const formatFileSize = (bytes) => {
+        if (bytes < 1024) return `${bytes} B`;
+        const units = ["KB", "MB", "GB"];
+        let value = bytes / 1024;
+        let unit = units[0];
+        for (let index = 1; value >= 1024 && index < units.length; index++) {
+            value /= 1024;
+            unit = units[index];
+        }
+        return `${value.toFixed(value < 10 ? 1 : 0)} ${unit}`;
+    };
+
+    const markdownLabel = (filename) => {
+        let escaped = "";
+        for (let index = 0; index < filename.length; index++) {
+            const character = filename[index];
+            if (character === "\\" || character === "[" || character === "]") escaped += "\\";
+            escaped += character;
+        }
+        return escaped;
+    };
+
+    document.addEventListener("click", (event) => {
+        const button = event.target.closest(".insert-attachment");
+        if (!button) return;
+
+        const editor = button.closest("form").querySelector(".flaskbb-editor");
+        const label = markdownLabel(button.dataset.attachmentFilename);
+        const reference = button.dataset.attachmentReference;
+        const markdown =
+            button.dataset.attachmentImage === "true"
+                ? `![${label}](${reference})`
+                : `[${label}](${reference})`;
+
+        editor.focus();
+        editor.setRangeText(markdown, editor.selectionStart, editor.selectionEnd, "end");
+        editor.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    document.querySelectorAll(".attachment-fields").forEach(syncSelectedAttachments);
+
     document.addEventListener("change", (event) => {
         const form = event.target.closest("form");
         const container = form && form.querySelector(".attachment-fields");
@@ -121,6 +233,8 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         const slots = attachmentSlotsLeft(container);
         error.style.display = rejected || slots < 0 ? "block" : "none";
 
+        syncSelectedAttachments(container);
+
         if (!isFileInput || event.target.files.length === 0) return;
         if (slots <= 0) return;
 
@@ -130,6 +244,7 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         const fresh = event.target.cloneNode();
         fresh.value = "";
         fresh.removeAttribute("id");
+        fresh.removeAttribute("data-attachment-tokens");
         fresh.classList.remove("is-invalid");
         fresh.classList.add("mt-2");
         event.target.after(fresh);

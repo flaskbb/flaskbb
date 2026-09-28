@@ -1,0 +1,261 @@
+.topic-composer-heading {
+    margin-bottom: 1.25rem;
+
+    h1 {
+        margin-bottom: 0.25rem;
+        font-size: 1.75rem;
+    }
+
+    p {
+        margin-bottom: 0;
+        color: $gray;
+    }
+}
+
+.topic-composer-card {
+    box-shadow: $box-shadow-sm;
+
+    > .card-body {
+        padding: 0;
+    }
+}
+
+.topic-composer-main {
+    padding: 1.5rem;
+}
+
+.topic-title-field {
+    margin-bottom: 1.5rem;
+}
+
+.topic-content-field {
+    margin-bottom: 0;
+
+    > .card {
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn-toolbar,
+    markdown-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0;
+    }
+
+    .flaskbb-editor,
+    .preview {
+        min-height: 18rem;
+    }
+}
+
+.editor-mode-tabs {
+    margin-left: auto;
+}
+
+.attachment-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid $border-color;
+}
+
+.attachment-section-heading {
+    margin-bottom: 0.75rem;
+
+    h2 {
+        margin-bottom: 0.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    p {
+        margin-bottom: 0;
+        color: $gray;
+        font-size: 0.875rem;
+    }
+}
+
+.attachment-picker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 5rem;
+    padding: 1rem;
+    overflow: hidden;
+    color: $gray;
+    text-align: center;
+    background-color: $fbb-bg-dark;
+    border: 1px dashed $border-color;
+    border-radius: $border-radius;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-within {
+        color: $body-color;
+        background-color: $page-hover;
+        border-color: $blue;
+    }
+}
+
+.attachment-picker-icon {
+    color: $blue;
+}
+
+.attachment-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.selected-attachments,
+.existing-attachments {
+    margin-top: 0.75rem;
+}
+
+.existing-attachments h3 {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.attachment-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid $border-color;
+}
+
+.attachment-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.attachment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.remove-attachment {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.topic-options {
+    border-top: 1px solid $border-color;
+
+    .accordion-item {
+        border: 0;
+        border-radius: 0;
+    }
+
+    .accordion-button {
+        font-weight: 600;
+        box-shadow: none;
+
+        &:not(.collapsed) {
+            color: var(--bs-accordion-btn-color);
+            background-color: var(--bs-accordion-btn-bg);
+        }
+    }
+}
+
+.topic-option-group {
+    &:not(:last-child) {
+        margin-bottom: 1.5rem;
+    }
+
+    h3 {
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: $gray;
+        text-transform: uppercase;
+    }
+}
+
+.topic-option {
+    &:not(:last-child) {
+        margin-bottom: 1rem;
+    }
+
+    .form-text {
+        margin-top: 0.125rem;
+    }
+}
+
+.topic-composer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background-color: $page-head-bg;
+    border-top: 1px solid $border-color;
+}
+
+@include media-breakpoint-down(sm) {
+    .topic-composer-card {
+        margin-right: -0.75rem;
+        margin-left: -0.75rem;
+        border-right: 0;
+        border-left: 0;
+        box-shadow: none;
+    }
+
+    .topic-composer-main {
+        padding: 1rem;
+    }
+
+    .topic-content-field markdown-toolbar {
+        .btn-group {
+            margin-bottom: 0.25rem;
+        }
+
+        .editor-mode-tabs {
+            width: calc(100% - 2.5rem);
+            margin-top: 0.25rem;
+            margin-right: 0.25rem !important;
+            margin-left: 0;
+
+            .btn {
+                flex: 1;
+            }
+        }
+    }
+
+    .attachment-picker {
+        align-items: flex-start;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .attachment-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .attachment-actions {
+        width: 100%;
+        margin-left: 1.625rem;
+    }
+
+    .topic-composer-actions {
+        padding: 1rem;
+
+        .btn,
+        input.btn {
+            flex: 1;
+        }
+    }
+}

@@ -11,6 +11,7 @@ It provides the forms that are needed for the forum views.
 import logging
 from typing import Any, override
 
+from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -27,6 +28,7 @@ from flaskbb.forum.utils import AttachmentFormMixin, handle_post_attachments
 from flaskbb.search import flaskbb_search
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
+from flaskbb.utils.requirements import Has, IsAtleastModeratorInForum
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +54,12 @@ class QuickreplyForm(PostForm):
 
 
 class ReplyForm(PostForm):
-    track_topic = BooleanField(_("Track this topic"), default=False, validators=[Optional()])
+    track_topic = BooleanField(
+        _("Track this topic"),
+        default=False,
+        description=_("Add this topic to your Topic Tracker."),
+        validators=[Optional()],
+    )
 
     post: Post | None
 
@@ -98,12 +105,50 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
         validators=[DataRequired(message=_("You cannot post a reply without content."))],
     )
 
-    track_topic = BooleanField(_("Track this topic"), default=False, validators=[Optional()])
+    track_topic = BooleanField(
+        _("Track this topic"),
+        default=False,
+        description=_("Add this topic to your Topic Tracker."),
+        validators=[Optional()],
+    )
+
+    important = BooleanField(
+        _("Highlight topic"),
+        default=False,
+        description=_("Keep this topic above regular topics in the forum."),
+        validators=[Optional()],
+    )
+
+    locked = BooleanField(
+        _("Lock topic"),
+        default=False,
+        description=_("Prevent regular members from replying."),
+        validators=[Optional()],
+    )
+
+    hidden = BooleanField(
+        _("Hide topic"),
+        default=False,
+        description=_("Hide this topic from regular forum listings."),
+        validators=[Optional()],
+    )
 
     submit = SubmitField(_("Post topic"))
 
     def save(self, user: User, forum: Forum):
         topic = Topic(title=self.title.data, content=self.content.data)
+        can_moderate = bool(Permission(IsAtleastModeratorInForum(forum=forum), identity=user))
+        can_hide = bool(
+            Permission(
+                Has("makehidden"),
+                IsAtleastModeratorInForum(forum=forum),
+                identity=user,
+            )
+        )
+
+        if can_moderate:
+            topic.important = bool(self.important.data)
+            topic.locked = bool(self.locked.data)
 
         if self.track_topic.data:
             user.track_topic(topic)
@@ -113,6 +158,8 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
         pluggy.hook.flaskbb_form_topic_save(form=self, topic=topic)
         topic = topic.save(user=user, forum=forum)
         handle_post_attachments(self, topic.first_post, user)
+        if can_hide and self.hidden.data:
+            topic.hide(user)
         return topic
 
 
@@ -128,8 +175,9 @@ class EditTopicForm(TopicForm):
     topic: Topic
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.post = kwargs["obj"]
-        self.topic = self.post.topic
+        self.topic = kwargs["obj"]
+        self.post = self.topic.first_post
+        kwargs.setdefault("content", self.post.content)
         TopicForm.__init__(self, *args, **kwargs)
         self._set_attachment_choices(self.post)
 
@@ -138,21 +186,27 @@ class EditTopicForm(TopicForm):
         return len(self.post.attachments)
 
     @override
-    def populate_obj(self, obj: object, *objs: object) -> None:
-        """
-        Populates the attributes of the passed `obj`s with data from the
-        form's fields. This is especially useful to populate the topic and
-        post objects at the same time.
-        """
-        for o in (obj, *objs):
-            super().populate_obj(o)
-
-    @override
     def save(self, user: User, forum: Forum):
+        can_moderate = bool(Permission(IsAtleastModeratorInForum(forum=forum), identity=user))
+        can_hide = bool(
+            Permission(
+                Has("makehidden"),
+                IsAtleastModeratorInForum(forum=forum),
+                identity=user,
+            )
+        )
+
+        self.topic.title = self.title.data
+        self.post.content = self.content.data
+
         if self.track_topic.data:
             user.track_topic(self.topic)
         else:
             user.untrack_topic(self.topic)
+
+        if can_moderate:
+            self.topic.important = bool(self.important.data)
+            self.topic.locked = bool(self.locked.data)
 
         if (
             self.topic.last_post_id == forum.last_post_id
@@ -166,6 +220,11 @@ class EditTopicForm(TopicForm):
         pluggy.hook.flaskbb_form_topic_save(form=self, topic=self.topic)
         topic = self.topic.save(user=user, forum=forum)
         handle_post_attachments(self, self.post, user)
+        if can_hide and self.hidden.data != topic.hidden:
+            if self.hidden.data:
+                topic.hide(user)
+            else:
+                topic.unhide()
         return topic
 
 

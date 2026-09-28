@@ -11,6 +11,7 @@ Utilities specific to the FlaskBB forums module
 import logging
 import mimetypes
 import os
+import re
 from typing import cast, TYPE_CHECKING
 
 from flask import Response
@@ -20,7 +21,7 @@ from flask_wtf.file import MultipleFileField
 from jinja2.filters import do_filesizeformat
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
-from wtforms import Field, SelectMultipleField, widgets
+from wtforms import Field, HiddenField, SelectMultipleField, widgets
 from wtforms.validators import Optional, ValidationError
 
 from flaskbb.extensions import db, login_manager
@@ -40,6 +41,9 @@ if TYPE_CHECKING:
 from .locals import current_forum
 
 logger = logging.getLogger(__name__)
+
+ATTACHMENT_TOKEN_RE = re.compile(r"^[0-9a-f]{32}$")
+INLINE_ATTACHMENT_RE = re.compile(r"!?\[(?:\\.|[^\]])*\]\(attachment:[0-9a-f]{32}\)")
 
 
 def force_login_if_needed() -> Response | None:
@@ -71,11 +75,12 @@ class AttachmentFormMixin:
     """Adds attachment upload/removal fields to a post or topic form.
 
     The fields are deliberately not named ``attachments`` -
-    ``EditTopicForm.populate_obj`` populates every form field onto the
-    post object and would clobber the ORM relationship of the same name.
+    post edit forms populate form fields onto the post object and would
+    otherwise clobber the ORM relationship of the same name.
     """
 
     new_attachments = MultipleFileField(_("Attachments"))
+    new_attachment_tokens = HiddenField()
     delete_attachments = SelectMultipleField(
         _("Delete attachments"),
         coerce=int,
@@ -155,15 +160,25 @@ def handle_post_attachments(form: AttachmentFormMixin, post: "Post | None", user
     delete_ids = set(form.delete_attachments.data or [])
     uploads: list[object] = form.new_attachments.data or []
     new_files = [f for f in uploads if isinstance(f, FileStorage) and f.filename]
+    tokens = (form.new_attachment_tokens.data or "").split(",")
+    if len(tokens) != len(new_files) or len(set(tokens)) != len(tokens):
+        tokens = []
 
-    if post is None or (not delete_ids and not new_files):
+    if post is None:
+        return
+
+    if not delete_ids and not new_files:
+        content = INLINE_ATTACHMENT_RE.sub("", post.content)
+        if content != post.content:
+            post.content = content
+            db.session.commit()
         return
 
     for attachment in post.attachments:
         if attachment.id in delete_ids:
             db.session.delete(attachment)
 
-    for file in new_files:
+    for index, file in enumerate(new_files):
         stored_filename = make_attachment_filename()
         disk_path = get_attachment_disk_path(post.id, stored_filename)
 
@@ -201,4 +216,11 @@ def handle_post_attachments(form: AttachmentFormMixin, post: "Post | None", user
         )
         db.session.add(attachment)
 
+        if tokens and ATTACHMENT_TOKEN_RE.fullmatch(tokens[index]):
+            post.content = post.content.replace(
+                f"attachment:{tokens[index]}",
+                attachment.url,
+            )
+
+    post.content = INLINE_ATTACHMENT_RE.sub("", post.content)
     db.session.commit()

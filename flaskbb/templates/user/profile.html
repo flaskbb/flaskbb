@@ -31,14 +31,10 @@
             {% endif %}
 
             {% if user.signature %}
-            <div class="card page">
-                <div class="card-header page-header">{% trans %}Signature{% endtrans %}</div>
-                <div class="card-body page-body">
-                    <div class="col-12 profile-field">
-                        {{ user.signature|markup }}
-                    </div>
-                </div>
-            </div> <!-- end profile widget -->
+            <div class="post-signature">
+                <hr />
+                {{ user.signature|markup }}
+            </div>
             {% endif %}
 
         </div>

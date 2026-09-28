@@ -304,7 +304,8 @@ class NewTopic(MethodView):
         forum_instance = first_or_404(sa.select(Forum).where(Forum.id == forum_id))
         form = self.form()
         if form.validate_on_submit():
-            topic = form.save(real(current_user), forum_instance)
+            user = real(current_user)
+            topic = form.save(user, forum_instance)
             return redirect(topic.url)
 
         return render_template(
@@ -335,23 +336,34 @@ class EditTopic(MethodView):
 
     def get(self, topic_id: int, slug: str | None = None):
         topic = Topic.get_topic(topic_id, True)
-        form = self.form(obj=topic.first_post, title=topic.title)
+        form = self.form(obj=topic)
         form.track_topic.data = current_user.is_tracking_topic(topic)
 
-        return render_template("forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True)
+        return render_template(
+            "forum/new_topic.html",
+            forum=topic.forum,
+            topic=topic,
+            form=form,
+            edit_mode=True,
+        )
 
     def post(self, topic_id: int, slug: str | None = None):
         topic = Topic.get_topic(topic_id, True)
-        post = topic.first_post
-        form = self.form(obj=post, title=topic.title)
+        form = self.form(obj=topic)
 
         if form.validate_on_submit():
-            form.populate_obj(topic, post)
-            topic = form.save(real(current_user), topic.forum)
+            user = real(current_user)
+            topic = form.save(user, topic.forum)
 
             return redirect(topic.url)
 
-        return render_template("forum/new_topic.html", forum=topic.forum, form=form, edit_mode=True)
+        return render_template(
+            "forum/new_topic.html",
+            forum=topic.forum,
+            topic=topic,
+            form=form,
+            edit_mode=True,
+        )
 
     def form(self, **kwargs):
         pluggy.hook.flaskbb_form_topic(form=NewTopicForm)

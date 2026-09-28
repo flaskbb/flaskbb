@@ -155,7 +155,7 @@ class Setting(BaseModel):
         """
         group = setting_registry.group(group_key)
         group_setting_keys = {s.key.lower() for s in group.settings}
-        existing_keys_lower = set(
+        existing_keys_lower: set[str] = set(
             db.session.execute(
                 sa.select(sa.func.lower(cls.key)).where(cls.group_key == group_key)
             ).scalars()
@@ -193,7 +193,7 @@ class Setting(BaseModel):
         """
         group = setting_registry.group(group_key)
         group_setting_keys = {s.key.lower() for s in group.settings}
-        existing_keys_lower = set(
+        existing_keys_lower: set[str] = set(
             db.session.execute(
                 sa.select(sa.func.lower(cls.key)).where(
                     cls.group_key == group_key,

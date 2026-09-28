@@ -32,6 +32,32 @@ function activateButtons(toolbar) {
     }
 }
 
+function setEditorMode(toolbar, editor, preview, mode) {
+    const writeButton = toolbar.querySelector(".write-btn");
+    const previewButton = toolbar.querySelector(".preview-btn");
+
+    if (mode === "write") {
+        activateButtons(toolbar);
+        showElement(editor);
+        hideElement(preview);
+    } else {
+        disableButtons(toolbar);
+        hideElement(editor);
+        showElement(preview);
+    }
+
+    if (!writeButton) return;
+    const isWriting = mode === "write";
+    writeButton.classList.toggle("btn-primary", isWriting);
+    writeButton.classList.toggle("btn-white", !isWriting);
+    writeButton.classList.toggle("active", isWriting);
+    writeButton.setAttribute("aria-pressed", isWriting.toString());
+    previewButton.classList.toggle("btn-primary", !isWriting);
+    previewButton.classList.toggle("btn-white", isWriting);
+    previewButton.classList.toggle("active", !isWriting);
+    previewButton.setAttribute("aria-pressed", (!isWriting).toString());
+}
+
 function markdownPreview(element) {
     const editorId = element.dataset.preview
     const toolbar = document.querySelector(`markdown-toolbar[for="${editorId}"]`)
@@ -42,10 +68,12 @@ function markdownPreview(element) {
         `#${editorId}-preview`
     );
 
+    if (!isHidden(previewContainer) && toolbar.querySelector(".write-btn")) {
+        return;
+    }
+
     if (!isHidden(previewContainer)) {
-        activateButtons(toolbar);
-        showElement(markdownContainer);
-        hideElement(previewContainer);
+        setEditorMode(toolbar, markdownContainer, previewContainer, "write");
         return;
     }
 
@@ -60,9 +88,7 @@ function markdownPreview(element) {
         previewContainer.style.minHeight = `${markdownContainer.scrollHeight}px`;
         previewContainer.style.height = "auto";
 
-        disableButtons(toolbar);
-        hideElement(markdownContainer);
-        showElement(previewContainer);
+        setEditorMode(toolbar, markdownContainer, previewContainer, "preview");
     });
 }
 
@@ -203,6 +229,18 @@ document.addEventListener("click", (event) => {
     if (!button) return;
     event.preventDefault();
     markdownPreview(button);
+});
+
+document.addEventListener("click", (event) => {
+    const button = event.target.closest(".write-btn");
+    if (!button) return;
+    event.preventDefault();
+
+    const editor = document.querySelector(`#${button.dataset.editor}`);
+    const preview = document.querySelector(`#${button.dataset.editor}-preview`);
+    const toolbar = button.closest("markdown-toolbar");
+    setEditorMode(toolbar, editor, preview, "write");
+    editor.focus();
 });
 
 htmx.onLoad((root) => {

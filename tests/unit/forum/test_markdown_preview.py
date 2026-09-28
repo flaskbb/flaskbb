@@ -23,3 +23,13 @@ def test_preview_escapes_html(default_settings):
 
 def test_preview_renders_nonpost_markdown(default_settings):
     assert "<em>italic</em>" in _preview("*italic*", mode="nonpost")
+
+
+def test_preview_keeps_content_after_mention_and_quote(default_settings):
+    source = "@administrator\n\n> hi lkjl\n\nwhere is my quote\n\nhoooo?"
+
+    preview = _preview(source)
+
+    assert '<a href="/user/administrator">@administrator</a>' in preview
+    assert "<blockquote>" in preview
+    assert "<p>hoooo?</p>" in preview

@@ -20,8 +20,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col d-flex flex-column flex-sm-row justify-content-between mb-3">
-                    <div class="text-sm-left mb-2 mb-sm-0">
+                <div class="col d-flex flex-column flex-md-row justify-content-between mb-3">
+                    <div class="text-start mb-2 mb-md-0">
                         <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap author-name">{{ user.username }}</h4>
                         <h5 class="author-title mb-0">{{ user.primary_group.name }}</h5>
                         <div class="text-muted">
@@ -72,21 +72,20 @@
 
                         </div>
                     </div>
-                    <div class="text-sm-right col-2 profile-stats">
-                        <!-- TODO: Make this nicer -->
+                    <div class="col-12 col-md-auto profile-stats">
                         <div class="row">
-                            <div class="col text-end text-nowrap" style="max-width: 80px;">Joined:</div>
-                            <div class="col ps-0 float-start text-nowrap">
+                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Joined:</div>
+                            <div class="col-auto ps-0 text-start text-nowrap">
                                 {{ user.date_joined|format_date }}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col text-end text-nowrap" style="max-width: 80px;">Posts:</div>
-                            <div class="col ps-0 text-start text-nowrap">{{ user.post_count }}</div>
+                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Posts:</div>
+                            <div class="col-auto ps-0 text-start text-nowrap">{{ user.post_count }}</div>
                         </div>
                         <div class="row">
-                            <div class="col text-end text-nowrap" style="max-width: 80px;">Topics:</div>
-                            <div class="col ps-0 float-start text-nowrap">{{ user.topic_count }}</div>
+                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Topics:</div>
+                            <div class="col-auto ps-0 text-start text-nowrap">{{ user.topic_count }}</div>
                         </div>
 
                         {{ run_hook("flaskbb_tpl_profile_stats", user=user) }}

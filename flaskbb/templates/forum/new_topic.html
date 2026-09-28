@@ -11,42 +11,104 @@
 
 {% block content %}
 {% from theme("_macros/form.html") import render_field, render_submit_field %}
+{% set can_moderate = current_user|can_moderate(forum) %}
+{% set can_hide = can_moderate and current_user.permissions.get('makehidden', False) %}
 
-<div class="page-view">
+<div class="page-view topic-composer-view">
     <ol class="breadcrumb flaskbb-breadcrumb bg-light">
         <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
         <li class="breadcrumb-item"><a href="{{ forum.url }}">{{ forum.title }}</a></li>
         <li class="breadcrumb-item active">
             {{ title }}
         </li>
     </ol>
 
+    <header class="topic-composer-heading">
+        <h1>{{ title }}</h1>
+        <p>{{ gettext("Posting in %(forum)s", forum=forum.title) }}</p>
+    </header>
 
-    <form class="form-horizontal" role="form" method="post" enctype="multipart/form-data">
+    <form class="topic-composer" method="post" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
-        <div class="card page">
-            <div class="card-header page-header">
-                {{ title }}
-            </div>
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <div class="fw-semibold">{% trans %}Please correct the highlighted fields.{% endtrans %}</div>
+            <ul class="mb-0 mt-2">
+                {% for field_name, errors in form.errors.items() %}
+                    {% for error in errors %}
+                    <li>{{ form[field_name].label.text }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
 
-            <div class="card-body page-body">
-                <div class="row p-3">
-                    {{ render_field(form.title) }}
+        <div class="card topic-composer-card">
+            <div class="card-body">
+                <div class="topic-composer-main">
+                    {{ render_field(
+                        form.title,
+                        div_class="topic-title-field",
+                        class="form-control",
+                        placeholder=_("A short, descriptive title")
+                    ) }}
 
                     {{ run_hook("flaskbb_tpl_form_new_topic_before", form=form) }}
 
-                    {{ render_field(form.content, rows=6) }}
-                    {{ render_field(form.track_topic) }}
+                    {{ render_field(
+                        form.content,
+                        div_class="topic-content-field",
+                        rows=14,
+                        mode_tabs=True,
+                        placeholder=_("Write your topic...")
+                    ) }}
 
                     {% include theme("forum/_attachment_fields.html") %}
 
                     {{ run_hook("flaskbb_tpl_form_new_topic_after", form=form) }}
+                </div>
 
-                    {{ render_field(form.submit) }}
+                <div class="accordion topic-options" id="topic-options">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button{{ '' if can_moderate else ' collapsed' }}" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#topic-options-body"
+                                    aria-expanded="{{ 'true' if can_moderate else 'false' }}"
+                                    aria-controls="topic-options-body">
+                                {% trans %}Options{% endtrans %}
+                            </button>
+                        </h2>
+                        <div id="topic-options-body" class="accordion-collapse collapse{{ ' show' if can_moderate }}">
+                            <div class="accordion-body">
+                                <section class="topic-option-group">
+                                    <h3>{% trans %}Your preferences{% endtrans %}</h3>
+                                    {{ render_field(form.track_topic, div_class="topic-option") }}
+                                </section>
+
+                                {% if can_moderate %}
+                                <section class="topic-option-group">
+                                    <h3>{% trans %}Moderation{% endtrans %}</h3>
+                                    {{ render_field(form.important, div_class="topic-option") }}
+                                    {{ render_field(form.locked, div_class="topic-option") }}
+                                    {% if can_hide %}
+                                    {{ render_field(form.hidden, div_class="topic-option") }}
+                                    {% endif %}
+                                </section>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topic-composer-actions">
+                    <a class="btn btn-outline-secondary" href="{{ topic.url if edit_mode else forum.url }}">
+                        {% trans %}Cancel{% endtrans %}
+                    </a>
+                    {{ render_submit_field(form.submit, class="btn btn-primary") }}
                 </div>
             </div>
         </div>
-
     </form>
 </div>
 {% endblock %}

@@ -275,7 +275,7 @@ class CategoryForums:
 
 
 def _group_forums_by_category(
-    query_result: Iterable[Row[tuple[Any, ...]]],
+    query_result: Iterable[Row[*tuple[Any, ...]]],
     user: "User",
 ) -> Iterable[CategoryForums]:
     it = itertools.groupby(query_result, operator.itemgetter(0))

@@ -62,7 +62,7 @@ def replace_mention_with_linktag(m: re.Match[str]) -> str:
 
 
 def process_mentions(md: mistune.Markdown, state: mistune.BlockState):
-    state.src = MENTION_REGEX.sub(replace_mention_with_linktag, state.src)
+    state.process(MENTION_REGEX.sub(replace_mention_with_linktag, state.src))
 
 
 def plugin_mention(md: mistune.Markdown):

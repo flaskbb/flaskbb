@@ -186,18 +186,6 @@
         }
     }
 
-    .post-signature {
-        margin-top: 2em;
-        hr {
-            height: 1px;
-            color: $post-signature-border;
-            background-color: $post-signature-border;
-            border: none;
-            margin: 0;
-            width: 25%;
-        }
-    }
-
     // post footer
     .post-footer {
         border-top: 1px solid $post-footer-border;
@@ -215,6 +203,19 @@
                 background-color: $fbb-navigation-hover-color;
             }
         }
+    }
+}
+
+.post-signature {
+    margin-top: 2em;
+
+    hr {
+        height: 1px;
+        color: $post-signature-border;
+        background-color: $post-signature-border;
+        border: none;
+        margin: 0;
+        width: 25%;
     }
 }
 

@@ -11,7 +11,7 @@ It provides the models for the forum
 import logging
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import Any, override, TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 import sqlalchemy as sa
 from flask import abort, url_for
@@ -342,6 +342,10 @@ class Post(HideableMixin, BaseModel):
     def url(self):
         """Returns the url for the post."""
         return url_for("forum.view_post", post_id=self.id)
+
+    @property
+    def unembedded_attachments(self):
+        return [attachment for attachment in self.attachments if attachment.url not in self.content]
 
     # Methods
     def __init__(
@@ -1484,13 +1488,14 @@ class Forum(BaseModel):
                 abort(404)
             forum, forumsread = item
         else:
-            forum = (
+            guest_forum = (
                 db.session.execute(sa.select(cls).filter(cls.id == forum_id))
                 .unique()
                 .scalar_one_or_none()
             )
-            if not forum:
+            if not guest_forum:
                 abort(404)
+            forum = guest_forum
             forumsread = None
 
         return forum, forumsread
@@ -1515,14 +1520,13 @@ class Forum(BaseModel):
         :param forumsread: The forumsread object for the forum, used to
                         determine unread state together with topicsread
         """
-        stmt: sa.Select[tuple[Any, ...]]
         if user.is_authenticated:
             # Now thats intersting - if i don't do the add_entity(Post)
             # the n+1 still exists when trying to access 'topic.last_post'
             # but without it it will fire another query.
             # This way I don't have to use the last_post object when I
             # iterate over the result set.
-            stmt = (
+            authenticated_stmt = (
                 sa.select(Topic, Post, TopicsRead)
                 .outerjoin(
                     TopicsRead,
@@ -1535,8 +1539,8 @@ class Forum(BaseModel):
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
-            stmt = hidden(stmt)
-            topics = paginate(stmt, page=page, per_page=per_page)
+            authenticated_stmt = hidden(authenticated_stmt)
+            topics = paginate(authenticated_stmt, page=page, per_page=per_page)
 
             # Batch the first-unread-post lookup for the whole page instead
             # of one query per unread topic (see Topic.first_unread).
@@ -1575,14 +1579,14 @@ class Forum(BaseModel):
                 for topic, last_post, topicsread in topics.items
             ]
         else:
-            stmt = (
+            guest_stmt = (
                 sa.select(Topic, Post)
                 .outerjoin(Post, Topic.last_post_id == Post.id)
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
-            stmt = hidden(stmt)
-            topics = paginate(stmt, page=page, per_page=per_page)
+            guest_stmt = hidden(guest_stmt)
+            topics = paginate(guest_stmt, page=page, per_page=per_page)
             topics.items = [
                 (topic, last_post, None, topic.url) for topic, last_post in topics.items
             ]

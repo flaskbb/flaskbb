@@ -28,10 +28,12 @@ def _upload(filename, content=b"x"):
     return FileStorage(stream=BytesIO(content), filename=filename)
 
 
-def _reply_form(files, obj=None, **formdata):
+def _reply_form(files, obj=None, tokens=None, **formdata):
     data = MultiDict(formdata)
     for file in files:
         data.add("new_attachments", file)
+    if tokens is not None:
+        data.add("new_attachment_tokens", ",".join(tokens))
     kwargs = {"formdata": data, "meta": {"csrf": False}}
     if obj is not None:
         kwargs["obj"] = obj
@@ -63,6 +65,71 @@ def test_reply_form_saves_attachment(member_request, topic, attachment_upload_pa
     assert "." not in attachment.filename
     assert attachment.size == 1
     assert (attachment_upload_path / str(post.id) / attachment.filename).exists()
+
+
+def test_reply_form_embeds_attachment_at_placeholder(member_request, topic):
+    token = "a" * 32
+    form = _reply_form(
+        [_upload("a.png")],
+        tokens=[token],
+        content=f"before\n\n![a](attachment:{token})\n\nafter",
+    )
+
+    assert form.validate()
+    post = form.save(member_request, topic)
+    attachment = post.attachments[0]
+
+    assert f"![a]({attachment.url})" in post.content
+    assert f"attachment:{token}" not in post.content
+    assert post.unembedded_attachments == []
+
+
+def test_reply_form_leaves_unembedded_attachment_in_list(member_request, topic):
+    form = _reply_form([_upload("a.png")], content="test content")
+
+    assert form.validate()
+    post = form.save(member_request, topic)
+
+    assert post.unembedded_attachments == post.attachments
+
+
+def test_reply_form_maps_duplicate_filenames_by_token(member_request, topic):
+    first_token = "a" * 32
+    second_token = "b" * 32
+    form = _reply_form(
+        [_upload("same.png"), _upload("same.png")],
+        tokens=[first_token, second_token],
+        content=(f"![first](attachment:{first_token})\n\n![second](attachment:{second_token})"),
+    )
+
+    assert form.validate()
+    post = form.save(member_request, topic)
+
+    assert f"![first]({post.attachments[0].url})" in post.content
+    assert f"![second]({post.attachments[1].url})" in post.content
+
+
+def test_reply_form_removes_unmatched_attachment_placeholder(member_request, topic):
+    token = "a" * 32
+    form = _reply_form([], content=f"before\n\n![missing](attachment:{token})\n\nafter")
+
+    assert form.validate()
+    post = form.save(member_request, topic)
+
+    assert "attachment:" not in post.content
+    assert "before" in post.content
+    assert "after" in post.content
+
+
+def test_topic_does_not_repeat_embedded_attachment(application, topic, attachment):
+    with application.test_request_context():
+        topic.first_post.content = f"![image]({attachment.url})"
+        topic.first_post.save()
+
+    response = application.test_client().get(f"/topic/{topic.id}")
+
+    assert response.status_code == 200
+    assert 'class="post-attachments"' not in response.get_data(as_text=True)
 
 
 def test_reply_form_rejects_bad_extension(member_request, topic):

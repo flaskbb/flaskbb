@@ -50,8 +50,8 @@ class SelectAllPagination(Pagination):
         return out
 
 
-def paginate(
-    select: sa.sql.Select[tuple[t.Any, ...]],
+def paginate[*Ts](
+    select: sa.sql.Select[*Ts],
     *,
     page: int | None = None,
     per_page: int | None = None,
@@ -97,11 +97,11 @@ def paginate(
     )
 
 
-def hidden(
-    stmt: sa.Select[tuple[t.Any, ...]],
+def hidden[*Ts](
+    stmt: sa.Select[*Ts],
     hidden: bool | None = None,
     *entities: type[HideableMixin],
-):
+) -> sa.Select[*Ts]:
     """Applies filtering for hidden items to a select statement.
 
     :param stmt: The SQLAlchemy select statement.

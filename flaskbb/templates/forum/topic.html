@@ -50,14 +50,18 @@
 
                     {{ run_hook("flaskbb_tpl_post_author_info_before", user=user, post=post) }}
 
-                    {% if user.avatar %}
+                    <div class="author-details d-flex d-sm-block align-items-start justify-content-between gap-3">
+                        {% if user.avatar %}
                         <div class="author-avatar"><img src="{{ user.avatar_url }}" alt="avatar"></div>
-                    {% endif %}
+                        {% endif %}
 
-                    <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date }}</div>
-                    <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
+                        <div class="author-stats pt-2 pt-sm-0">
+                            <div class="author-registered">{% trans %}Joined{% endtrans %}: {{ user.date_joined|format_date }}</div>
+                            <div class="author-posts">{% trans %}Posts{% endtrans %}: {{ user.post_count }}</div>
 
-                    {{ run_hook("flaskbb_tpl_post_author_info_after", user=user, post=post) }}
+                            {{ run_hook("flaskbb_tpl_post_author_info_after", user=user, post=post) }}
+                        </div>
+                    </div>
 
                     {% else %}
                     <!-- user deleted or guest -->
@@ -132,12 +136,13 @@
                         {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
 
                         <!-- Attachments Begin -->
-                        {% if post.attachments %}
+                        {% set attachments = post.unembedded_attachments %}
+                        {% if attachments %}
                         <div class="post-attachments">
                             <hr />
                             <h6 class="post-attachments-heading text-muted">{% trans %}Attachments{% endtrans %}</h6>
                             <ul class="list-unstyled">
-                            {% for attachment in post.attachments %}
+                            {% for attachment in attachments %}
                                 <li>
                                     {% if attachment.is_image and flaskbb_config["ATTACHMENT_IMAGE_PREVIEWS"] %}
                                     <div>

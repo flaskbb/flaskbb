@@ -48,7 +48,7 @@ class DefaultConfig:
     # A List of allowed hosts who will be considered "safe" when redirecting
     # urls. If set to None only the host currently serving this website
     # will be considered "safe".
-    ALLOWED_HOSTS = None
+    ALLOWED_HOSTS: list[str] | None = None
 
     # Trusted Hosts
     # A list of Host header values Flask will accept. Requests with any
@@ -60,7 +60,7 @@ class DefaultConfig:
     # [SERVER_NAME] (see configure_app() in app.py). Set explicitly for
     # multiple hosts, e.g. TRUSTED_HOSTS = ["forums.flaskbb.com"]
     # See https://flask.palletsprojects.com/en/stable/config/#TRUSTED_HOSTS
-    TRUSTED_HOSTS = None
+    TRUSTED_HOSTS: list[str] | None = None
 
     # Logging Settings
     # ------------------------------
@@ -215,7 +215,7 @@ class DefaultConfig:
     # Limits the “Remember Me” cookie to a certain path.
     REMEMBER_COOKIE_PATH = "/"
     # Restricts the “Remember Me” cookie’s scope to secure channels (typically HTTPS).
-    REMEMBER_COOKIE_SECURE = None
+    REMEMBER_COOKIE_SECURE: bool | None = None
     # Prevents the “Remember Me” cookie from being accessed by client-side scripts.
     REMEMBER_COOKIE_HTTPONLY = False
 
@@ -300,10 +300,10 @@ class DefaultConfig:
 
     # Uploads
     AVATAR_EXTENSIONS = ["jpg", "png", "gif"]
-    AVATAR_UPLOAD_PATH = None  # defaults to static_folder/uploads/avatar
-    ATTACHMENT_UPLOAD_PATH = None  # defaults to static_folder/uploads/attachments
+    AVATAR_UPLOAD_PATH: str | None = None  # defaults to static_folder/uploads/avatar
+    ATTACHMENT_UPLOAD_PATH: str | None = None  # defaults to static_folder/uploads/attachments
 
     # Hard request size cap enforced by Flask before the view runs.
     # Per-file/per-post attachment limits are runtime settings
     # (ATTACHMENT_MAX_SIZE, ATTACHMENTS_PER_POST) and must fit below this.
-    MAX_CONTENT_LENGTH = 32 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # 32 MB
