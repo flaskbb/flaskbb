@@ -22,7 +22,6 @@ from flask import abort
 from flask_sqlalchemy.session import Session
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm import (
-    declarative_mixin,
     declared_attr,
     InstrumentedAttribute,
     Mapped,
@@ -177,7 +176,6 @@ class UTCDateTime(types.TypeDecorator[datetime.datetime]):
         return value
 
 
-@declarative_mixin
 class HideableMixin:
     hidden: Mapped[bool] = mapped_column(default=False, nullable=False)
     hidden_at: Mapped[datetime.datetime | None] = mapped_column(

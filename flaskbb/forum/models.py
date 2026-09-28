@@ -1562,9 +1562,7 @@ class Forum(BaseModel):
                         sa.select(Post.topic_id, sa.func.min(Post.id))
                         .where(sa.or_(*conditions))
                         .group_by(Post.topic_id)
-                    )
-                    .tuples()
-                    .all()
+                    ).all()
                 )
 
             topics.items = [
