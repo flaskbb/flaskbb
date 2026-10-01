@@ -17,6 +17,7 @@ cookiecutter first::
 
 from flaskbb.cli.bootstrap import bootstrap
 from flaskbb.cli.db import db
+from flaskbb.cli.emoji import download_emoji
 from flaskbb.cli.groups import groups
 from flaskbb.cli.main import flaskbb
 from flaskbb.cli.permissions import permissions
@@ -28,6 +29,7 @@ from flaskbb.cli.users import users
 __all__ = [
     "bootstrap",
     "db",
+    "download_emoji",
     "flaskbb",
     "groups",
     "permissions",

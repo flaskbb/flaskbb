@@ -4,10 +4,11 @@ import htmx from 'htmx.org';
 
 import "./app/confirm_modal.js";
 import "./app/editor.js";
-import "./app/emoji.js";
 import "./app/flaskbb.js";
 import "./app/quote.js";
+import { renderEmoji } from "./app/emoji/renderer.js";
 
+htmx.onLoad(renderEmoji);
 
 import "./scss/styles.scss";
 export { show_management_search } from "./app/flaskbb.js";

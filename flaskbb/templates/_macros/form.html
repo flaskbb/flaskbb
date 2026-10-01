@@ -124,6 +124,7 @@
                         <md-unordered-list class="btn btn-white" data-tooltip="tooltip" title="Unordered List"><span class="fas fa-list-ul"></span></md-unordered-list>
                         <md-ordered-list class="btn btn-white" data-tooltip="tooltip" title="Ordered List"><span class="fas fa-list-ol"></span></md-ordered-list>
                         <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
+                        <button type="button" class="btn btn-white emoji-picker-btn" data-editor="{{ field.id }}" aria-haspopup="dialog" aria-controls="emoji-picker" aria-label="{{ _('Insert emoji') }}" title="{{ _('Insert emoji') }}"><span class="far fa-smile" aria-hidden="true"></span></button>
                     </div>
 
                     {{ run_hook("flaskbb_tpl_markdown_toolbar_buttons") }}

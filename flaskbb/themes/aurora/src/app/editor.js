@@ -1,9 +1,9 @@
 import { TextareaEditor } from "@textcomplete/textarea";
 import { Textcomplete } from "@textcomplete/core";
 import htmx from "htmx.org";
-import EMOJIS from "./emoji";
+import { emojiStrategy } from "./emoji/autocomplete.js";
+import "./emoji/picker.js";
 import { hideElement, isHidden, showElement } from "./utils";
-import { parse_emoji } from "./flaskbb";
 
 const buttonSelectors = [
     "md-header",
@@ -19,6 +19,7 @@ const buttonSelectors = [
     "md-mention",
     "md-strikethrough",
     ".help-btn",
+    ".emoji-picker-btn",
 ];
 function disableButtons(toolbar) {
     for (const button of toolbar.querySelectorAll(buttonSelectors.join(", "))) {
@@ -169,27 +170,7 @@ const AUTOCOMPLETE_CONFIG = {
 };
 
 function autocomplete(element) {
-    const emojiStrategy = {
-        id: "emoji",
-        match: /\B:([\-+\w]*)$/,
-        search: (term, callback) => {
-            callback(
-                EMOJIS.map((value) => {
-                    return value[0].indexOf(term) !== -1
-                        ? { character: value[1], name: value[0] }
-                        : null;
-                })
-            );
-        },
-        replace: (value) => {
-            return `${value.character} `;
-        },
-        template: (value) => {
-            return parse_emoji(value.character) + " " + value.name;
-        },
-        context: notInCode,
-    };
-    const strategies = [emojiStrategy];
+    const strategies = [emojiStrategy()];
     if (document.body.dataset.userLookupUrl) {
         strategies.push(mentionStrategy());
     }
@@ -243,10 +224,24 @@ document.addEventListener("click", (event) => {
     editor.focus();
 });
 
+const editorCompletions = new WeakMap();
+
 htmx.onLoad((root) => {
-    root.querySelectorAll(".flaskbb-editor").forEach((el) => autocomplete(el));
+    const editors = [...root.querySelectorAll(".flaskbb-editor")];
+    if (root.matches?.(".flaskbb-editor")) editors.unshift(root);
+    editors.forEach((element) => {
+        if (!editorCompletions.has(element)) editorCompletions.set(element, autocomplete(element));
+    });
     if (document.body.dataset.userLookupUrl) {
         root.querySelectorAll("input[data-user-lookup]").forEach((el) => userLookupInput(el));
     }
     root.querySelectorAll("[data-autoresize=true]").forEach((el) => autoresize(el));
+});
+
+document.addEventListener("htmx:beforeCleanupElement", (event) => {
+    const completion = editorCompletions.get(event.detail.elt);
+    if (completion) {
+        completion.destroy();
+        editorCompletions.delete(event.detail.elt);
+    }
 });

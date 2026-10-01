@@ -39,3 +39,34 @@ npm run build
 
 See the [theming](https://flaskbb.readthedocs.io/en/latest/theming.html)
 documentation.
+
+# Emoji
+
+Emoji remain Unicode in stored posts. Rendered pages, previews, autocomplete
+suggestions, and the picker use the same Twemoji 17.0.3 SVG artwork. Code and editable
+fields remain plain text. Failed images display `[emoji]` instead of switching to
+the user's system emoji font.
+
+Use the smile button to choose a common emoji or search the catalog. It inserts
+Unicode at the cursor, replacing any selected text. You can also type `:smile`
+and select a completion with Enter or Tab. Search uses the
+[emojilib](https://github.com/muan/emojilib) keyword catalog and the short aliases
+in `src/app/emoji/aliases.json`. The catalog is bundled with the theme; no catalog
+generation, browser preferences, or separate data downloads are needed.
+
+Artwork is served from jsDelivr by default. To host it yourself:
+
+1. Download the [Twemoji 17.0.3 source archive](https://github.com/jdecked/twemoji/archive/refs/tags/v17.0.3.tar.gz).
+2. Copy the contents of `assets/svg/` into your installation's
+   `flaskbb/static/emoji/` directory, and retain `LICENSE-GRAPHICS` with the assets.
+3. Set `EMOJI_BASE_URL = None` in `instance/flaskbb.cfg` and restart FlaskBB.
+
+FlaskBB generates the local static URL, including any deployment URL prefix.
+Alternatively, set `EMOJI_BASE_URL = "/emoji/twemoji-17.0.3/"` to use a directory
+served by your web server, or provide an absolute URL for another asset host.
+The URL must point directly to the SVG files. No frontend rebuild is needed when
+changing this setting, and local hosting does not fall back to a CDN.
+
+Twemoji graphics are copyright Twitter, Inc. and other contributors, licensed
+under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Emojilib is MIT licensed.

@@ -292,6 +292,9 @@ class DefaultConfig:
     AUTH_URL_PREFIX = "/auth"
     ADMIN_URL_PREFIX = "/admin"
 
+    # None serves SVGs from static/emoji/; a URL can point to another host or path.
+    EMOJI_BASE_URL: str | None = "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/"
+
     # Remove dead plugins - useful if you want to migrate your instance
     # somewhere else and forgot to reinstall the plugins.
     # If set to `False` it will NOT remove plugins that are NOT installed on

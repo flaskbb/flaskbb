@@ -9,11 +9,22 @@ body {
     margin-bottom: 60px;
 }
 
-.emoji {
+img.emoji {
     height: 1em;
     width: 1em;
-    margin: 0 .05em 0 .1em;
+    margin: 0 0.05em 0 0.1em;
     vertical-align: -0.1em;
+}
+
+.emoji-picker-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+    gap: 0.25rem;
+
+    .btn {
+        padding: 0.5rem 0;
+        font-size: 1.5rem;
+    }
 }
 
 .flaskbb-footer {
@@ -128,13 +139,11 @@ p.flaskbb-stats {
     width: 25px;
 }
 
-.conversation-content img,
-.message-content img {
-    &:not(.emoji) {
-        width: 100%;
-        height: 100%;
-        object-fit: scale-down;
-    }
+.conversation-content img:not(.emoji),
+.message-content img:not(.emoji) {
+    width: 100%;
+    height: 100%;
+    object-fit: scale-down;
 }
 
 .cheatsheet {

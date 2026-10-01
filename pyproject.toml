@@ -111,7 +111,7 @@ exclude = [
   "flaskbb/themes/*/webpack.*.js",
   "flaskbb/themes/*/tsconfig.json",
   "flaskbb/themes/*/Makefile",
-  "flaskbb/themes/*/build_emoji_set.py",
+  "flaskbb/themes/*/test",
 ]
 
 [tool.hatch.build.targets.wheel]

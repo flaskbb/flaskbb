@@ -137,6 +137,13 @@ def test_user_inherits_system_default_when_override_unset(
 post_markdown = make_renderer([FlaskBBRenderer], POST_PLUGINS)
 
 
+@pytest.mark.parametrize("emoji", ["😄", "👍🏽", "👨‍👩‍👧‍👦", "🇦🇹", "❤️"])
+@pytest.mark.parametrize("render", [markdown, post_markdown])
+def test_emoji_remains_unicode_in_markdown(emoji, render):
+    assert render(emoji) == f"<p>{emoji}</p>\n"
+    assert render(f"`{emoji}`") == f"<p><code>{emoji}</code></p>\n"
+
+
 def attribution(username, post_id=None):
     line = f"**[{username}]({url_for('user.profile', username=username)}) wrote:**"
     if post_id is not None:

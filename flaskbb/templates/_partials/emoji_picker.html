@@ -1,0 +1,16 @@
+<div class="modal" id="emoji-picker" tabindex="-1" aria-labelledby="emoji-picker-title">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emoji-picker-title">{{ _('Insert emoji') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <label for="emoji-search" class="visually-hidden">{{ _('Search emojis') }}</label>
+                <input type="search" id="emoji-search" class="form-control mb-3" placeholder="{{ _('Search emojis') }}" autocomplete="off" spellcheck="false">
+                <div class="emoji-picker-results" role="group" aria-label="{{ _('Emojis') }}"></div>
+                <p class="emoji-picker-empty text-muted mb-0" role="status" hidden>{{ _('No emojis found.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>

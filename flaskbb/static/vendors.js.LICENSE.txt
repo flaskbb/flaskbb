@@ -3,5 +3,3 @@
   * Copyright 2011-2025 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
-
-/*! Copyright Twitter Inc. and other contributors. Licensed under MIT */

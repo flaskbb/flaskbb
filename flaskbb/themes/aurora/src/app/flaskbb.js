@@ -5,7 +5,6 @@
  */
 import { Modal } from "bootstrap";
 import htmx from "htmx.org";
-import twemoji from "twemoji";
 import { isHidden } from "./utils";
 
 
@@ -28,31 +27,6 @@ document.addEventListener("htmx:afterSwap", (event) => {
     }
 });
 
-
-export function parse_emoji(value) {
-    // use this instead of twemoji.parse
-    return twemoji.parse(value, {
-        callback: function (icon, options, variant) {
-            // exclude some characters
-            switch (icon) {
-                case "a9": // © copyright
-                case "ae": // ® registered trademark
-                case "2122": // ™ trademark
-                    return false;
-            }
-            return "".concat(
-                options.base,
-                options.size,
-                "/",
-                icon,
-                options.ext
-            );
-        },
-        // use svg instead of the default png
-        folder: "svg",
-        ext: ".svg",
-    });
-}
 
 document.addEventListener("DOMContentLoaded", function (_event) {
     // attachment inputs: once an input has a file, offer another (empty)
@@ -273,8 +247,6 @@ document.addEventListener("DOMContentLoaded", function (_event) {
 });
 
 htmx.onLoad((root) => {
-    parse_emoji(root);
-
     root.querySelectorAll("time").forEach((el) => {
         let date = new Date(el.getAttribute("datetime"));
         const options = {

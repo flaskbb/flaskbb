@@ -68,6 +68,32 @@ def test_toolbar_renders_without_plugins(request_context, default_settings):
     assert "<md-bold" in render_editor()
 
 
+def test_toolbar_has_an_emoji_picker_for_its_field(request_context, default_settings):
+    rendered = render_editor()
+
+    assert 'emoji-picker-btn" data-editor="content"' in rendered
+    assert 'aria-controls="emoji-picker"' in rendered
+
+
+@pytest.mark.parametrize(
+    ("base_url", "expected"),
+    [
+        (None, "/prefix/static/emoji/"),
+        ("/artwork/twemoji/", "/artwork/twemoji/"),
+        ("https://assets.example/emoji/", "https://assets.example/emoji/"),
+    ],
+)
+def test_layout_configures_emoji_artwork_url(
+    application, default_settings, monkeypatch, base_url, expected
+):
+    monkeypatch.setitem(application.config, "EMOJI_BASE_URL", base_url)
+    with application.test_request_context(environ_overrides={"SCRIPT_NAME": "/prefix"}):
+        rendered = render_themed_template("layout.html")
+
+    assert f'data-emoji-base="{expected}"' in rendered
+    assert rendered.count('id="emoji-picker"') == 1
+
+
 def test_preview_uses_the_post_renderer_by_default(request_context, default_settings):
     assert 'data-preview-url="/markdown/post"' in render_editor()
 
