@@ -165,8 +165,12 @@ Frontend (Aurora theme)
 
     make frontend
 
-Runs the webpack watcher for the default Aurora theme's JS/CSS under
+Runs the Vite build watcher for the default Aurora theme's JS/CSS under
 ``flaskbb/themes/aurora``.
+
+Use ``make frontend-dark`` to watch Aurora Dark's stylesheet, or
+``make frontend-build`` to build both themes for production. Flask serves the
+generated static files; refresh the browser after a rebuild.
 
 
 Running Everything with tox

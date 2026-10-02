@@ -9,7 +9,7 @@ clean: ## Remove unwanted stuff such as node_modules, etc...
 	find . -name 'node_modules' -exec rm -rf {} +
 
 
-run: ## Runs the webpack server which watches for changes
+run: ## Runs the Vite watcher
 	npm run watch
 
 

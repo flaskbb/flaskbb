@@ -108,7 +108,7 @@ exclude = [
   "flaskbb/themes/*/.sass-cache",
   "flaskbb/themes/*/package.json",
   "flaskbb/themes/*/package-lock.json",
-  "flaskbb/themes/*/webpack.*.js",
+  "flaskbb/themes/*/vite.config.mjs",
   "flaskbb/themes/*/tsconfig.json",
   "flaskbb/themes/*/Makefile",
   "flaskbb/themes/*/test",

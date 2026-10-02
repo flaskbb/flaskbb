@@ -37,8 +37,8 @@ test("production bundle renders consistent artwork and manages HTMX editors", {
                 <p class="emoji-picker-empty" hidden>No emojis found.</p>
             </div></div>
         </div>
-        <script src="/prefix/static/vendors.js"></script>
-        <script src="/prefix/static/app.js"></script></body>`,
+        <script src="/prefix/static/app.js"></script>
+        <script>window.pluginApp = window.app; window.pluginHtmx = window.htmx;</script></body>`,
         {
             url: "https://forum.example/prefix/",
             runScripts: "dangerously",
@@ -62,6 +62,10 @@ test("production bundle renders consistent artwork and manages HTMX editors", {
         await new Promise((resolve) => dom.window.addEventListener("load", resolve));
         await ready;
         const { document, htmx } = dom.window;
+        assert.equal(dom.window.pluginHtmx, htmx);
+        assert.equal(dom.window.pluginApp, dom.window.app);
+        assert.equal(typeof dom.window.pluginApp.insertQuote, "function");
+        assert.equal(typeof dom.window.pluginApp.show_management_search, "function");
         assert.deepEqual(errors, []);
         assert.equal(document.querySelector(".post-content img").alt, "😄");
         assert.equal(

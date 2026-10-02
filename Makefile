@@ -21,11 +21,11 @@ test: ## Runs the testsuite
 run: ## Runs the development server with the development config
 	WERKZEUG_DEBUG_PIN=off uv run flaskbb run --debugger --reload --debug
 
-frontend: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
+frontend: ## Runs the Vite watcher for Aurora
 	cd flaskbb/themes/aurora && npm run watch
 
-frontend-dark: ## Runs the webpack server which watches for changes in flaskbb/themes/aurora
-	cd flaskbb/themes/aurora && npm run watch
+frontend-dark: ## Runs the Vite watcher for Aurora Dark
+	cd flaskbb/themes/aurora_dark && npm run watch
 
 frontend-build: ## Builds both themes
 	cd flaskbb/themes/aurora && npm run build && cd ../aurora_dark && npm run build

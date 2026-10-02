@@ -213,7 +213,7 @@ Prerequisites
 ~~~~~~~~~~~~~
 
 To use the same build tools, which we also use to develop the Aurora theme,
-you have to make sure that you have npm installed. You can install npm by
+you need Node.js 22.12 or newer and npm. You can install npm by
 following the official
 `installation guide <https://docs.npmjs.com/getting-started/installing-node>`_.
 
@@ -248,38 +248,23 @@ used::
     Available tasks
       clean
         rm -f node_modules
-      autoprefixer
-        postcss -u autoprefixer -r static/css/*
-      scss
-        ./tools/build_css
-      uglify
-        ./tools/build_js
-      imagemin
-        imagemin src/img/* -o static/img
-      fonts
-        ./tools/build_fonts
-      build:css
-        npm run scss && npm run autoprefixer
-      build:js
-        npm run uglify
-      build:images
-        npm run imagemin && npm run fonts
-      build:all
-        npm run build:css && npm run build:js && npm run build:images
-      watch:css
-        onchange 'src/scss' -- npm run build:css
-      watch:js
-        onchange 'src/js' -- npm run build:js
-      watch:all
-        npm-run-all -p watch:css watch:js
+      build
+        vite build
+      watch
+        vite build --watch --mode development
+      test
+        node --test test/*.test.mjs
+      check
+        biome check ../../..
 
 
 For example, to watch for changes in our JS and SCSS files,
 you just have to run::
 
-    npm run watch:all
+    npm run watch
 
-and upon changes it will automatically rebuild the files.
+and upon changes it will automatically rebuild the files. Flask serves the
+generated assets; refresh the browser after a rebuild.
 
 
 .. _Jinja2: http://jinja.pocoo.org/

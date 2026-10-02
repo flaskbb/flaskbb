@@ -223,7 +223,6 @@
 {% include theme("_partials/emoji_picker.html") %}
 
 {% block javascript %}
-    <script src="{{ url_for('static', filename='vendors.js') }}"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 
     <script>const FORUM_URL_PREFIX = "{{ config['FORUM_URL_PREFIX'] }}";</script>

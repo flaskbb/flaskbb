@@ -6,7 +6,7 @@
   "author": "Peter Justin <peter.justin@outlook.com>",
   "url": "https://flaskbb.com",
   "private": true,
-  "main": "src/styles.js",
+  "main": "src/scss/styles.scss",
   "repository": {
     "type": "git",
     "url": "https://github.com/flaskbb/flaskbb"
@@ -19,8 +19,8 @@
     "dark"
   ],
   "scripts": {
-    "build": "NODE_PATH=../aurora/node_modules node ../aurora/node_modules/webpack/bin/webpack.js --config webpack.prod.js",
-    "watch": "NODE_PATH=../aurora/node_modules node ../aurora/node_modules/webpack/bin/webpack.js --config webpack.dev.js --watch"
+    "build": "node ../aurora/node_modules/vite/bin/vite.js build",
+    "watch": "node ../aurora/node_modules/vite/bin/vite.js build --watch --mode development"
   },
   "comments": {
     "dependencies": "Aurora Dark ships CSS only and reuses the default Aurora theme's installed dependencies at build time. It requires to build the Aurora theme first."

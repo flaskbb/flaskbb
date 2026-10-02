@@ -1,6 +1,6 @@
 # FlaskBB's Default Theme
 
-Make sure that you have npm (nodejs) installed. You can get it from
+Make sure that you have Node.js 22.12 or newer and npm installed. You can get them from
 [here](https://nodejs.org).
 
 Before you can compile the source, you need to get a few dependencies first.
@@ -19,9 +19,9 @@ npm for it.
       clean
         rm -f node_modules
       build
-        npx webpack --config webpack.prod.js
+        vite build
       watch
-        npx webpack --config webpack.dev.js --watch
+        vite build --watch --mode development
 
 
 To watch for changes in our JS and SCSS files, you just have to run:
@@ -30,10 +30,15 @@ npm run watch
 ```
 and upon changes it will automatically rebuild the files.
 
-To build a production bundle, you have to run webpack with the prod config:
+To build a production bundle with Vite:
 ```bash
 npm run build
 ```
+
+Vite writes `app.js`, `app.css`, fonts, and images to `flaskbb/static/`.
+Flask serves these files in both development and production. The watcher rebuilds
+files on disk; browser pages need to be refreshed after changes. Builds preserve
+other static files, including uploads and locally hosted emoji artwork.
 
 # Create your own theme
 

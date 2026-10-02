@@ -4,16 +4,14 @@ import htmx from "htmx.org";
 
 import "./app/confirm_modal.js";
 import "./app/editor.js";
-import "./app/flaskbb.js";
-import "./app/quote.js";
 import { initializeEmoji } from "./app/emoji.js";
+import { show_management_search } from "./app/flaskbb.js";
+import { insertQuote } from "./app/quote.js";
 
 initializeEmoji({ htmx, Modal });
 
 import "./scss/styles.scss";
-export { show_management_search } from "./app/flaskbb.js";
-// plugins call this as window.app.insertQuote(editor, markdown)
-export { insertQuote } from "./app/quote.js";
+window.app = { show_management_search, insertQuote };
 
 // htmx has to be reachable via window. plugins register extensions against it and
 // templates outside this bundle call into it.
@@ -67,9 +65,3 @@ document.addEventListener("click", (event) => {
     var expanded = parent.classList.toggle("expanded");
     toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
 });
-
-// import all assets in ./assets
-function importAll(r) {
-    return r.keys().map(r);
-}
-importAll(require.context("./assets", false, /\.(png|jpe?g|svg|ico)$/));
