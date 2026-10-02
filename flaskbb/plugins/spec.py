@@ -996,6 +996,22 @@ def flaskbb_avatar_updated(user: "User", avatar_update: "AvatarUpdate"):
 
 # Template Hooks
 @spec
+def flaskbb_tpl_index_before():
+    """Hook for displaying content before the forums.
+
+    in :file:`templates/forum/index.html`.
+    """
+
+
+@spec
+def flaskbb_tpl_index_after():
+    """Hook for displaying content after the forums.
+
+    in :file:`templates/forum/index.html`.
+    """
+
+
+@spec
 def flaskbb_tpl_navigation_before():
     """Hook for registering additional navigation items.
 

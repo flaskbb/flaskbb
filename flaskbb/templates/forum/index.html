@@ -1,6 +1,7 @@
 {% extends theme("layout.html") %}
 {% block content %}
 
+    {{ run_hook("flaskbb_tpl_index_before") }}
     <div class="index-view">
         {% for category, forums in categories %}
             {% include theme("forum/category_layout.html") %}
@@ -30,4 +31,5 @@
             </div>
         </div>
     </div>
+    {{ run_hook("flaskbb_tpl_index_after") }}
 {% endblock %}

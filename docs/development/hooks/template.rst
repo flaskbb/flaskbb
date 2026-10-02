@@ -11,6 +11,8 @@ Template Hooks
     hidden CSRF token field and before an submit field.
 
 
+.. autofunction:: flaskbb_tpl_index_before
+.. autofunction:: flaskbb_tpl_index_after
 .. autofunction:: flaskbb_tpl_navigation_before
 .. autofunction:: flaskbb_tpl_navigation_after
 .. autofunction:: flaskbb_tpl_user_nav_loggedin_before
