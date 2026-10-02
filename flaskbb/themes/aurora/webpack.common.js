@@ -1,5 +1,4 @@
-const path = require("path");
-const webpack = require("webpack");
+const path = require("node:path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
@@ -12,8 +11,8 @@ module.exports = {
         path: path.resolve("./static/"),
         library: "[name]",
         libraryTarget: "umd",
-        assetModuleFilename: '[name][ext]',
-        devtoolModuleFilenameTemplate: 'http://[resource-path]?[loaders]',
+        assetModuleFilename: "[name][ext]",
+        devtoolModuleFilenameTemplate: "http://[resource-path]?[loaders]",
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"],
@@ -30,12 +29,9 @@ module.exports = {
             minSize: 0,
             cacheGroups: {
                 vendor: {
-                    test(mod, chunks) {
+                    test(mod) {
                         // exclude anything outside of node_modules
-                        if (
-                            mod.resource &&
-                            !mod.resource.includes("node_modules")
-                        ) {
+                        if (mod.resource && !mod.resource.includes("node_modules")) {
                             return false;
                         }
 
@@ -62,13 +58,16 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: [
-                            "@babel/preset-env",
-                            "@babel/preset-typescript",
-                        ],
+                        presets: ["@babel/preset-env", "@babel/preset-typescript"],
                         plugins: [
                             // "@babel/plugin-syntax-dynamic-import",
-                            ["polyfill-corejs3", { "method": "usage-global", "version": require("core-js/package.json").version }],
+                            [
+                                "polyfill-corejs3",
+                                {
+                                    method: "usage-global",
+                                    version: require("core-js/package.json").version,
+                                },
+                            ],
                             "@babel/plugin-transform-class-properties",
                             "@babel/plugin-transform-object-rest-spread",
                         ],
@@ -84,18 +83,14 @@ module.exports = {
                         loader: "css-loader",
                         options: {
                             sourceMap: true,
-                        }
+                        },
                     },
                     {
                         loader: "postcss-loader",
                         options: {
                             sourceMap: true,
                             postcssOptions: {
-                                plugins: [
-                                    [
-                                        "autoprefixer"
-                                    ],
-                                ],
+                                plugins: [["autoprefixer"]],
                             },
                         },
                     },
@@ -103,7 +98,7 @@ module.exports = {
                         loader: "sass-loader",
                         options: {
                             sourceMap: true,
-                        }
+                        },
                     },
                 ],
             },
@@ -115,12 +110,12 @@ module.exports = {
 
             {
                 test: /\.(png|svg|jpg|jpeg|gif|ico)$/i,
-                type: 'asset/resource',
+                type: "asset/resource",
             },
 
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                type: 'asset/resource',
+                type: "asset/resource",
             },
         ],
     },

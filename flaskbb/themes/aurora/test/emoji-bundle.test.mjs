@@ -3,22 +3,29 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { JSDOM, requestInterceptor, VirtualConsole } from "jsdom";
 
-test("production bundle renders consistent artwork and manages HTMX editors", { timeout: 5000 }, async () => {
+test("production bundle renders consistent artwork and manages HTMX editors", {
+    timeout: 5000,
+}, async () => {
     const requests = [];
     const errors = [];
     let initialized;
-    const ready = new Promise((resolve) => { initialized = resolve; });
+    const ready = new Promise((resolve) => {
+        initialized = resolve;
+    });
     const assets = requestInterceptor(async ({ url }) => {
         requests.push(url);
         if (url.startsWith("https://forum.example/prefix/static/")) {
-            const content = await readFile(new URL(`../static/${url.split("/").at(-1)}`, import.meta.url));
+            const content = await readFile(
+                new URL(`../static/${url.split("/").at(-1)}`, import.meta.url),
+            );
             return new Response(content, { headers: { "Content-Type": "application/javascript" } });
         }
         return new Response(null, { status: 404 });
     });
     const console = new VirtualConsole();
     console.on("jsdomError", (error) => errors.push(error.message));
-    const dom = new JSDOM(`<!doctype html><body data-emoji-base="/prefix/emoji/">
+    const dom = new JSDOM(
+        `<!doctype html><body data-emoji-base="/prefix/emoji/">
         <div class="post-content">😄 <code>👍</code></div>
         <button type="button" class="emoji-picker-btn" data-editor="content">Emoji</button>
         <textarea id="content" class="flaskbb-editor"></textarea>
@@ -31,27 +38,36 @@ test("production bundle renders consistent artwork and manages HTMX editors", { 
             </div></div>
         </div>
         <script src="/prefix/static/vendors.js"></script>
-        <script src="/prefix/static/app.js"></script></body>`, {
-        url: "https://forum.example/prefix/",
-        runScripts: "dangerously",
-        resources: { interceptors: [assets] },
-        virtualConsole: console,
-        beforeParse(window) {
-            window.document.addEventListener("htmx:load", initialized, { once: true });
-            window.document.execCommand = () => false;
-            const evaluate = window.XPathExpression.prototype.evaluate;
-            window.XPathExpression.prototype.evaluate = function (context, type = 0, result = null) {
-                return evaluate.call(this, context, type, result);
-            };
+        <script src="/prefix/static/app.js"></script></body>`,
+        {
+            url: "https://forum.example/prefix/",
+            runScripts: "dangerously",
+            resources: { interceptors: [assets] },
+            virtualConsole: console,
+            beforeParse(window) {
+                window.document.addEventListener("htmx:load", initialized, { once: true });
+                window.document.execCommand = () => false;
+                const evaluate = window.XPathExpression.prototype.evaluate;
+                window.XPathExpression.prototype.evaluate = function (
+                    context,
+                    type = 0,
+                    result = null,
+                ) {
+                    return evaluate.call(this, context, type, result);
+                };
+            },
         },
-    });
+    );
     try {
         await new Promise((resolve) => dom.window.addEventListener("load", resolve));
         await ready;
         const { document, htmx } = dom.window;
         assert.deepEqual(errors, []);
         assert.equal(document.querySelector(".post-content img").alt, "😄");
-        assert.equal(document.querySelector(".post-content img").src, "https://forum.example/prefix/emoji/1f604.svg");
+        assert.equal(
+            document.querySelector(".post-content img").src,
+            "https://forum.example/prefix/emoji/1f604.svg",
+        );
         assert.equal(document.querySelector("code").textContent, "👍");
         assert.ok(!requests.some((url) => url.includes("emoji-catalog")));
         assert.equal(document.querySelectorAll(".textcomplete-dropdown").length, 1);
@@ -84,7 +100,11 @@ test("production bundle renders consistent artwork and manages HTMX editors", { 
         opener.click();
         assert.equal(document.activeElement, search);
         assert.equal(picker.querySelectorAll("button[data-emoji]").length, 24);
-        assert.ok([...picker.querySelectorAll("img")].every((image) => image.src.startsWith("https://forum.example/prefix/emoji/")));
+        assert.ok(
+            [...picker.querySelectorAll("img")].every((image) =>
+                image.src.startsWith("https://forum.example/prefix/emoji/"),
+            ),
+        );
         search.value = "no_such_emoji";
         search.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
         assert.equal(picker.querySelector(".emoji-picker-empty").hidden, false);
@@ -98,7 +118,9 @@ test("production bundle renders consistent artwork and manages HTMX editors", { 
         assert.equal(picker.classList.contains("show"), false);
         opener.click();
         assert.equal(search.value, "");
-        search.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        search.dispatchEvent(
+            new dom.window.KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        );
         assert.equal(editor.value, "before 👍 after");
         assert.equal(document.activeElement, editor);
         opener.classList.add("disabled");

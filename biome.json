@@ -1,0 +1,26 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+    "files": {
+        "includes": [
+            "flaskbb/themes/**/*.{js,mjs,cjs}",
+            "!!**/node_modules",
+            "!!**/static"
+        ]
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 100
+    },
+    "linter": {
+        "rules": {
+            "preset": "recommended",
+            "style": {
+                "useBlockStatements": "error"
+            }
+        }
+    },
+    "assist": {
+        "enabled": false
+    }
+}

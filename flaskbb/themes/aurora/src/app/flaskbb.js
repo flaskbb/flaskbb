@@ -7,9 +7,8 @@ import { Modal } from "bootstrap";
 import htmx from "htmx.org";
 import { isHidden } from "./utils";
 
-
 export function show_management_search() {
-    let form = document.querySelector(".search-form");
+    const form = document.querySelector(".search-form");
 
     if (isHidden(form)) {
         form.style.display = "block";
@@ -27,8 +26,7 @@ document.addEventListener("htmx:afterSwap", (event) => {
     }
 });
 
-
-document.addEventListener("DOMContentLoaded", function (_event) {
+document.addEventListener("DOMContentLoaded", (_event) => {
     // attachment inputs: once an input has a file, offer another (empty)
     // input so more files can be picked from a different location, and
     // reject picks that are too big or would exceed the per-post attachment
@@ -37,13 +35,19 @@ document.addEventListener("DOMContentLoaded", function (_event) {
     // again.
     const dropOversizedFiles = (input, container) => {
         const maxSize = parseInt(container.dataset.maxSize, 10) || 0;
-        if (!maxSize) return false;
+        if (!maxSize) {
+            return false;
+        }
 
         const kept = new DataTransfer();
         for (const file of input.files) {
-            if (file.size <= maxSize) kept.items.add(file);
+            if (file.size <= maxSize) {
+                kept.items.add(file);
+            }
         }
-        if (kept.files.length === input.files.length) return false;
+        if (kept.files.length === input.files.length) {
+            return false;
+        }
 
         // keep the files that do fit, so only the offending ones are lost
         input.files = kept.files;
@@ -52,16 +56,19 @@ document.addEventListener("DOMContentLoaded", function (_event) {
 
     const attachmentSlotsLeft = (container) => {
         const max = parseInt(container.dataset.maxAttachments, 10) || 0;
-        if (!max) return Infinity;
+        if (!max) {
+            return Infinity;
+        }
 
         const existing = parseInt(container.dataset.existingAttachments, 10) || 0;
         const form = container.closest("form");
         const deleted = form
             ? form.querySelectorAll('input[name="delete_attachments"]:checked').length
             : 0;
-        const selected = Array.from(
-            container.querySelectorAll('input[type="file"]')
-        ).reduce((n, el) => n + el.files.length, 0);
+        const selected = Array.from(container.querySelectorAll('input[type="file"]')).reduce(
+            (n, el) => n + el.files.length,
+            0,
+        );
         return max - (existing - deleted) - selected;
     };
 
@@ -121,7 +128,9 @@ document.addEventListener("DOMContentLoaded", function (_event) {
                 const transfer = new DataTransfer();
                 const tokens = input.dataset.attachmentTokens.split(",");
                 Array.from(input.files).forEach((candidate, candidateIndex) => {
-                    if (candidateIndex !== index) transfer.items.add(candidate);
+                    if (candidateIndex !== index) {
+                        transfer.items.add(candidate);
+                    }
                 });
                 input.files = transfer.files;
                 input.dataset.attachmentTokens = tokens
@@ -137,7 +146,9 @@ document.addEventListener("DOMContentLoaded", function (_event) {
     };
 
     const formatFileSize = (bytes) => {
-        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024) {
+            return `${bytes} B`;
+        }
         const units = ["KB", "MB", "GB"];
         let value = bytes / 1024;
         let unit = units[0];
@@ -152,7 +163,9 @@ document.addEventListener("DOMContentLoaded", function (_event) {
         let escaped = "";
         for (let index = 0; index < filename.length; index++) {
             const character = filename[index];
-            if (character === "\\" || character === "[" || character === "]") escaped += "\\";
+            if (character === "\\" || character === "[" || character === "]") {
+                escaped += "\\";
+            }
             escaped += character;
         }
         return escaped;
@@ -160,7 +173,9 @@ document.addEventListener("DOMContentLoaded", function (_event) {
 
     document.addEventListener("click", (event) => {
         const button = event.target.closest(".insert-attachment");
-        if (!button) return;
+        if (!button) {
+            return;
+        }
 
         const editor = button.closest("form").querySelector(".flaskbb-editor");
         const label = markdownLabel(button.dataset.attachmentFilename);
@@ -179,16 +194,16 @@ document.addEventListener("DOMContentLoaded", function (_event) {
 
     document.addEventListener("change", (event) => {
         const form = event.target.closest("form");
-        const container = form && form.querySelector(".attachment-fields");
-        if (!container) return;
+        const container = form?.querySelector(".attachment-fields");
+        if (!container) {
+            return;
+        }
 
-        const isFileInput = event.target.matches(
-            '.attachment-fields input[type="file"]'
-        );
-        const isDeleteCheckbox = event.target.matches(
-            'input[name="delete_attachments"]'
-        );
-        if (!isFileInput && !isDeleteCheckbox) return;
+        const isFileInput = event.target.matches('.attachment-fields input[type="file"]');
+        const isDeleteCheckbox = event.target.matches('input[name="delete_attachments"]');
+        if (!isFileInput && !isDeleteCheckbox) {
+            return;
+        }
 
         const error = container.querySelector(".attachment-limit-error");
         const sizeError = container.querySelector(".attachment-size-error");
@@ -209,11 +224,17 @@ document.addEventListener("DOMContentLoaded", function (_event) {
 
         syncSelectedAttachments(container);
 
-        if (!isFileInput || event.target.files.length === 0) return;
-        if (slots <= 0) return;
+        if (!isFileInput || event.target.files.length === 0) {
+            return;
+        }
+        if (slots <= 0) {
+            return;
+        }
 
         const inputs = container.querySelectorAll('input[type="file"]');
-        if (Array.from(inputs).some((el) => el.files.length === 0)) return;
+        if (Array.from(inputs).some((el) => el.files.length === 0)) {
+            return;
+        }
 
         const fresh = event.target.cloneNode();
         fresh.value = "";
@@ -227,7 +248,9 @@ document.addEventListener("DOMContentLoaded", function (_event) {
     // listen on the action-checkall checkbox to un/check all. delegated, so it
     // keeps working on lists htmx swapped in
     document.addEventListener("change", (event) => {
-        if (!event.target.matches(".action-checkall")) return;
+        if (!event.target.matches(".action-checkall")) {
+            return;
+        }
         document.querySelectorAll("input.action-checkbox").forEach((cb) => {
             cb.checked = event.target.checked;
         });
@@ -238,17 +261,18 @@ document.addEventListener("DOMContentLoaded", function (_event) {
     // swapped in
     document.addEventListener("click", (event) => {
         const row = event.target.closest(".set-checkbox");
-        if (!row || event.target.matches("input.action-checkbox")) return;
+        if (!row || event.target.matches("input.action-checkbox")) {
+            return;
+        }
         event.preventDefault();
         const cb = row.querySelector("input.action-checkbox");
         cb.checked = !cb.checked;
     });
-
 });
 
 htmx.onLoad((root) => {
     root.querySelectorAll("time").forEach((el) => {
-        let date = new Date(el.getAttribute("datetime"));
+        const date = new Date(el.getAttribute("datetime"));
         const options = {
             weekday: undefined,
             era: undefined,
@@ -257,10 +281,10 @@ htmx.onLoad((root) => {
             day: "numeric",
             second: undefined,
         };
-        if (el.dataset.what_to_display == "date-only") {
+        if (el.dataset.what_to_display === "date-only") {
             options.hour = undefined;
             options.minute = undefined;
-        } else if (el.dataset.what_to_display == "time-only") {
+        } else if (el.dataset.what_to_display === "time-only") {
             options.year = undefined;
             options.month = undefined;
             options.day = undefined;

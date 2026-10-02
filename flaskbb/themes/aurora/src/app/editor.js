@@ -1,8 +1,7 @@
 import { TextareaEditor } from "@textcomplete/textarea";
 import { Textcomplete } from "@textcomplete/core";
 import htmx from "htmx.org";
-import { emojiStrategy } from "./emoji/autocomplete.js";
-import "./emoji/picker.js";
+import { emojiStrategy } from "./emoji.js";
 import { hideElement, isHidden, showElement } from "./utils";
 
 const buttonSelectors = [
@@ -47,7 +46,9 @@ function setEditorMode(toolbar, editor, preview, mode) {
         showElement(preview);
     }
 
-    if (!writeButton) return;
+    if (!writeButton) {
+        return;
+    }
     const isWriting = mode === "write";
     writeButton.classList.toggle("btn-primary", isWriting);
     writeButton.classList.toggle("btn-white", !isWriting);
@@ -60,14 +61,10 @@ function setEditorMode(toolbar, editor, preview, mode) {
 }
 
 function markdownPreview(element) {
-    const editorId = element.dataset.preview
-    const toolbar = document.querySelector(`markdown-toolbar[for="${editorId}"]`)
-    const markdownContainer = document.querySelector(
-        `#${editorId}`
-    );
-    const previewContainer = document.querySelector(
-        `#${editorId}-preview`
-    );
+    const editorId = element.dataset.preview;
+    const toolbar = document.querySelector(`markdown-toolbar[for="${editorId}"]`);
+    const markdownContainer = document.querySelector(`#${editorId}`);
+    const previewContainer = document.querySelector(`#${editorId}-preview`);
 
     if (!isHidden(previewContainer) && toolbar.querySelector(".write-btn")) {
         return;
@@ -190,31 +187,32 @@ function userLookupInput(element) {
 }
 
 function autoresize(element) {
-    element.setAttribute(
-        "style",
-        "height:" + element.scrollHeight + "px;overflow-y:hidden;"
-    );
+    element.setAttribute("style", `height:${element.scrollHeight}px;overflow-y:hidden;`);
     element.addEventListener(
         "input",
-        function (e) {
+        (e) => {
             e.target.style.height = "auto";
-            e.target.style.height = e.target.scrollHeight + "px";
+            e.target.style.height = `${e.target.scrollHeight}px`;
         },
-        false
+        false,
     );
 }
 
 // delegated, so it also works for editors htmx swapped in
 document.addEventListener("click", (event) => {
     const button = event.target.closest(".preview-btn");
-    if (!button) return;
+    if (!button) {
+        return;
+    }
     event.preventDefault();
     markdownPreview(button);
 });
 
 document.addEventListener("click", (event) => {
     const button = event.target.closest(".write-btn");
-    if (!button) return;
+    if (!button) {
+        return;
+    }
     event.preventDefault();
 
     const editor = document.querySelector(`#${button.dataset.editor}`);
@@ -228,14 +226,22 @@ const editorCompletions = new WeakMap();
 
 htmx.onLoad((root) => {
     const editors = [...root.querySelectorAll(".flaskbb-editor")];
-    if (root.matches?.(".flaskbb-editor")) editors.unshift(root);
+    if (root.matches?.(".flaskbb-editor")) {
+        editors.unshift(root);
+    }
     editors.forEach((element) => {
-        if (!editorCompletions.has(element)) editorCompletions.set(element, autocomplete(element));
+        if (!editorCompletions.has(element)) {
+            editorCompletions.set(element, autocomplete(element));
+        }
     });
     if (document.body.dataset.userLookupUrl) {
-        root.querySelectorAll("input[data-user-lookup]").forEach((el) => userLookupInput(el));
+        root.querySelectorAll("input[data-user-lookup]").forEach((el) => {
+            userLookupInput(el);
+        });
     }
-    root.querySelectorAll("[data-autoresize=true]").forEach((el) => autoresize(el));
+    root.querySelectorAll("[data-autoresize=true]").forEach((el) => {
+        autoresize(el);
+    });
 });
 
 document.addEventListener("htmx:beforeCleanupElement", (event) => {

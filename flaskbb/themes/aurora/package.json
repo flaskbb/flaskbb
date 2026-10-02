@@ -21,6 +21,9 @@
     "clean": "rm -f node_modules",
     "build": "npx webpack --config webpack.prod.js",
     "watch": "npx webpack --config webpack.dev.js --watch",
+    "lint": "biome lint ../../..",
+    "format": "biome format --write ../../..",
+    "check": "biome check ../../..",
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
@@ -42,6 +45,7 @@
     "@babel/plugin-transform-object-rest-spread": "^8.0.1",
     "@babel/preset-env": "^8.0.6",
     "@babel/preset-typescript": "^8.0.1",
+    "@biomejs/biome": "2.5.15",
     "autoprefixer": "^10.6.1",
     "babel-loader": "^10.1.1",
     "babel-plugin-polyfill-corejs3": "^1.0.0",

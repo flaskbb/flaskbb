@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { test } from "node:test";
-import { emojiContext, emojiStrategy } from "../src/app/emoji/autocomplete.js";
-import { searchEmoji } from "../src/app/emoji/catalog.js";
+import { emojiContext, emojiStrategy, searchEmoji } from "../src/app/emoji.js";
 
 const require = createRequire(import.meta.url);
 const { Strategy } = require("@textcomplete/core/dist/Strategy");
@@ -33,7 +32,10 @@ test("emoji triggers require a boundary and preserve it during insertion", () =>
         const match = strategy.matchWithContext(text);
         assert.equal(match[2], "smile");
         const result = new SearchResult(emoji, "smile", strategy);
-        assert.deepEqual(result.replace(text, "after"), [text.slice(0, text.indexOf(":")) + "😄 ", "after"]);
+        assert.deepEqual(result.replace(text, "after"), [
+            `${text.slice(0, text.indexOf(":"))}😄 `,
+            "after",
+        ]);
     }
     for (const text of ["https:", "https://host/:smile", "12:30", "word:smile", "\\:smile"]) {
         assert.equal(strategy.matchWithContext(text), null, text);
@@ -42,14 +44,24 @@ test("emoji triggers require a boundary and preserve it during insertion", () =>
 
 test("completion stays out of Markdown code, including escaped and nested backticks", () => {
     for (const text of [
-        "`:smile", "``text ` :smile", "```python\n:smile", "~~~\n:smile",
-        "````\n```\n:smile", "> ```\n> :smile", "    :smile", "\t:smile",
+        "`:smile",
+        "``text ` :smile",
+        "```python\n:smile",
+        "~~~\n:smile",
+        "````\n```\n:smile",
+        "> ```\n> :smile",
+        "    :smile",
+        "\t:smile",
     ]) {
         assert.equal(emojiContext(text), false, text);
     }
     for (const text of [
-        "`done` :smile", "``a ` b`` :smile", "\\` :smile", "```\ncode\n```\n:smile",
-        "~~~\ncode\n~~~\n:smile", "> ```\n> code\n> ```\n:smile",
+        "`done` :smile",
+        "``a ` b`` :smile",
+        "\\` :smile",
+        "```\ncode\n```\n:smile",
+        "~~~\ncode\n~~~\n:smile",
+        "> ```\n> code\n> ```\n:smile",
     ]) {
         assert.equal(emojiContext(text), true, text);
     }

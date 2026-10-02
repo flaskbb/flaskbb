@@ -2,8 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { afterEach, test } from "node:test";
 import { JSDOM } from "jsdom";
-import { emojiStrategy } from "../src/app/emoji/autocomplete.js";
-import { renderEmoji } from "../src/app/emoji/renderer.js";
+import { emojiStrategy, renderEmoji } from "../src/app/emoji.js";
 import keywords from "emojilib" with { type: "json" };
 
 const require = createRequire(import.meta.url);
@@ -13,11 +12,20 @@ const { Textcomplete } = require("@textcomplete/core");
 const { TextareaEditor } = require("@textcomplete/textarea");
 dom.window.close();
 
-
 function page(html) {
     dom = new JSDOM(html, { url: "https://forum.example/" });
-    dom.window.document.body.dataset.emojiBase = "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/";
-    for (const key of ["window", "document", "NodeFilter", "Image", "CustomEvent", "getComputedStyle", "localStorage", "HTMLTextAreaElement"]) {
+    dom.window.document.body.dataset.emojiBase =
+        "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/";
+    for (const key of [
+        "window",
+        "document",
+        "NodeFilter",
+        "Image",
+        "CustomEvent",
+        "getComputedStyle",
+        "localStorage",
+        "HTMLTextAreaElement",
+    ]) {
         Object.defineProperty(globalThis, key, { configurable: true, value: dom.window[key] });
     }
     dom.window.document.execCommand = () => false;
@@ -33,7 +41,9 @@ test("page rendering uses one artwork set and preserves code, links, and inputs"
         </div><div class="post-signature">❤️</div><div data-emoji>🇦🇹</div>`);
     const link = doc.querySelector("a");
     let clicked = false;
-    link.addEventListener("click", () => { clicked = true; });
+    link.addEventListener("click", () => {
+        clicked = true;
+    });
     renderEmoji(doc.body);
     assert.equal(doc.querySelectorAll("img.emoji").length, 5);
     for (const selector of ["code", "pre", "textarea", "[contenteditable]"]) {
@@ -44,7 +54,10 @@ test("page rendering uses one artwork set and preserves code, links, and inputs"
     assert.ok(clicked);
     const image = doc.querySelector("img");
     assert.equal(image.alt, "😄");
-    assert.equal(image.src, "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/1f604.svg");
+    assert.equal(
+        image.src,
+        "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/1f604.svg",
+    );
     assert.equal(image.draggable, false);
     renderEmoji(doc.body);
     assert.equal(doc.querySelectorAll("img.emoji").length, 5);
@@ -58,10 +71,15 @@ test("HTMX fragment roots inside content are rendered, including preview roots",
 });
 
 test("local artwork is used in content, previews, and completions without a CDN fallback", () => {
-    const doc = page('<div class="post-content">😄</div><div class="preview">👍</div><div id="completion"></div>');
+    const doc = page(
+        '<div class="post-content">😄</div><div class="preview">👍</div><div id="completion"></div>',
+    );
     doc.body.dataset.emojiBase = "/prefix/static/emoji";
     renderEmoji(doc.body);
-    doc.querySelector("#completion").innerHTML = emojiStrategy().template({ character: "😄", name: "smile" });
+    doc.querySelector("#completion").innerHTML = emojiStrategy().template({
+        character: "😄",
+        name: "smile",
+    });
     for (const image of doc.querySelectorAll("img")) {
         assert.ok(image.src.startsWith("https://forum.example/prefix/static/emoji/"));
         image.dispatchEvent(new dom.window.Event("error"));
@@ -81,7 +99,10 @@ test("failed images never switch to the system emoji font", () => {
     const doc = page('<body><div class="message-content">👍🏽</div></body>');
     renderEmoji(doc.body);
     const image = doc.querySelector("img");
-    assert.equal(image.src, "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/1f44d-1f3fd.svg");
+    assert.equal(
+        image.src,
+        "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/svg/1f44d-1f3fd.svg",
+    );
     image.dispatchEvent(new dom.window.Event("error"));
     assert.equal(doc.querySelector(".message-content").textContent, "[emoji]");
     assert.equal(doc.querySelector("img"), null);
@@ -90,7 +111,16 @@ test("failed images never switch to the system emoji font", () => {
 test("keyword catalog and skin-tone sequences render as complete images", () => {
     const doc = page("<div></div>");
     const element = doc.querySelector("div");
-    for (const character of [...Object.keys(keywords), "👍🏽", "👩🏿‍💻", "🫱🏻‍🫲🏿", "🇦🇹", "❤️", "🏳️‍🌈", "👨‍👩‍👧‍👦"]) {
+    for (const character of [
+        ...Object.keys(keywords),
+        "👍🏽",
+        "👩🏿‍💻",
+        "🫱🏻‍🫲🏿",
+        "🇦🇹",
+        "❤️",
+        "🏳️‍🌈",
+        "👨‍👩‍👧‍👦",
+    ]) {
         element.textContent = character;
         renderEmoji(element);
         assert.equal(element.childNodes.length, 1, character);
@@ -101,7 +131,10 @@ test("keyword catalog and skin-tone sequences render as complete images", () => 
 
 test("completion templates escape labels and render artwork", () => {
     const doc = page("<div></div>");
-    doc.querySelector("div").innerHTML = emojiStrategy().template({ character: "😄", name: '<img src=x onerror="alert(1)">' });
+    doc.querySelector("div").innerHTML = emojiStrategy().template({
+        character: "😄",
+        name: '<img src=x onerror="alert(1)">',
+    });
     assert.equal(doc.querySelectorAll("img").length, 1);
     assert.ok(doc.querySelector("div").textContent.includes("<img src=x"));
 });

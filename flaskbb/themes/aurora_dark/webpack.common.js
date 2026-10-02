@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("node:path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 // Aurora Dark reuses the default Aurora theme's installed dependencies

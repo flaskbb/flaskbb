@@ -23,3 +23,10 @@ repos:
         files: ^flaskbb/templates/.*\.html$
       - id: djlint
         files: ^flaskbb/templates/.*\.html$
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.0.6
+    hooks:
+      - id: biome-check
+        additional_dependencies: ["@biomejs/biome@2.5.15"]
+        files: ^flaskbb/themes/.*\.(js|mjs|cjs)$
+        exclude: /static/

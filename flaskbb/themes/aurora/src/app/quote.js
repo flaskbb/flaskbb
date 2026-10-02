@@ -6,13 +6,17 @@ function replyEditor() {
 }
 
 function showEditor(editor) {
-    if (!isHidden(editor)) return;
+    if (!isHidden(editor)) {
+        return;
+    }
     // the preview button toggles the editor back from its preview
     document.querySelector(`.preview-btn[data-preview="${editor.id}"]`)?.click();
 }
 
 function leadingNewlines(before) {
-    if (before === "" || before.endsWith("\n\n")) return "";
+    if (before === "" || before.endsWith("\n\n")) {
+        return "";
+    }
     return before.endsWith("\n") ? "\n" : "\n\n";
 }
 
@@ -43,11 +47,15 @@ export function insertQuote(editor, quote) {
 // quote a whole post. delegated, so it keeps working on posts htmx swapped in
 document.addEventListener("click", (event) => {
     const button = event.target.closest(".quote-btn");
-    if (!button) return;
+    if (!button) {
+        return;
+    }
 
     // without a reply editor on the page the link opens the full reply form
     const editor = replyEditor();
-    if (!editor) return;
+    if (!editor) {
+        return;
+    }
     event.preventDefault();
 
     const urlprefix = typeof FORUM_URL_PREFIX !== "undefined" ? FORUM_URL_PREFIX : "";
@@ -59,11 +67,15 @@ document.addEventListener("click", (event) => {
                 window.location.href = button.href;
                 return null;
             }
-            if (!response.ok) throw new Error(response.statusText);
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
             return response.text();
         })
         .then((quote) => {
-            if (quote !== null) insertQuote(editor, quote);
+            if (quote !== null) {
+                insertQuote(editor, quote);
+            }
         })
         .catch((error) => {
             console.error("could not load the quoted post", error);
@@ -75,7 +87,9 @@ const MIN_HIDDEN_HEIGHT = 80;
 
 function clipLongQuote(button) {
     const quote = button.parentElement;
-    if (quote.dataset.expanded) return;
+    if (quote.dataset.expanded) {
+        return;
+    }
 
     quote.classList.add("is-clipped");
     const clipped = quote.scrollHeight - quote.clientHeight > MIN_HIDDEN_HEIGHT;
@@ -91,9 +105,13 @@ htmx.onLoad((root) => {
 document.addEventListener(
     "load",
     (event) => {
-        if (event.target.tagName !== "IMG") return;
+        if (event.target.tagName !== "IMG") {
+            return;
+        }
         const quote = event.target.closest("blockquote");
-        if (!quote) return;
+        if (!quote) {
+            return;
+        }
         quote
             .closest(".post-content, .preview")
             ?.querySelectorAll(".post-quote-expand")
@@ -110,12 +128,18 @@ function expandQuote(quote) {
 
 document.addEventListener("click", (event) => {
     const button = event.target.closest(".post-quote-expand");
-    if (button) expandQuote(button.parentElement);
+    if (button) {
+        expandQuote(button.parentElement);
+    }
 });
 
 // a link in the clipped part that receives keyboard focus has to be visible
 document.addEventListener("focusin", (event) => {
-    if (event.target.matches(".post-quote-expand")) return;
+    if (event.target.matches(".post-quote-expand")) {
+        return;
+    }
     const quote = event.target.closest(".is-clipped");
-    if (quote) expandQuote(quote);
+    if (quote) {
+        expandQuote(quote);
+    }
 });
