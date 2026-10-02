@@ -1,21 +1,17 @@
+{% extends theme("layout.html") %}
 {% set page_title = _("Online Users") %}
 
-{% extends theme("layout.html") %}
+{% block header %}{% endblock %}
 
-{% block header %}
-{% endblock %}
-
-{% block navigation %}
-{% endblock %}
+{% block navigation %}{% endblock %}
 
 {% block content %}
 
-<legend>{% trans %}Online Users{% endtrans %}</legend>
-{% for user in online_users %}
-    <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a>{% if not loop.last %}, {% endif %}
-{% endfor %}
+    <legend>{% trans %}Online Users{% endtrans %}</legend>
+    {% for user in online_users %}
+        <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a>{% if not loop.last %}, {% endif %}
+    {% endfor %}
 
 {% endblock %}
 
-{% block footer %}
-{% endblock %}
+{% block footer %}{% endblock %}

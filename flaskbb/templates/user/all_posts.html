@@ -2,47 +2,42 @@
 {%- from theme("_macros/pagination.html") import render_pagination, topic_pages %}
 
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb bg-light">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ user.url }}">{{ user.username }}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Posts{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ user.url }}">{{ user.username }}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Posts{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block profile_content %}
-<div class="col-12 profile-content">
+    <div class="col-12 profile-content">
 
-    {% for post in posts.items %}
-    <div class="card page mb-3">
-        <div class="card-header page-header topic-header  fw-normal">
-            <a href="{{ post.url }}">{% trans topic_title=post.topic.title %}<strong>{{ topic_title }}</strong>{% endtrans %}</a>
-        </div>
-        <div class="card-body page-body topic-content">
-            <div class="col-12 ps-3">
-                <div class="topic-created">
-                    {{ post.date_created|format_datetime }}
+        {% for post in posts.items %}
+            <div class="card page mb-3">
+                <div class="card-header page-header topic-header fw-normal">
+                    <a href="{{ post.url }}">{% trans topic_title=post.topic.title %}<strong>{{ topic_title }}</strong>{% endtrans %}</a>
                 </div>
-                <div class="topic-content">
-                    {{ post.content|markup }}
+                <div class="card-body page-body topic-content">
+                    <div class="col-12 ps-3">
+                        <div class="topic-created">{{ post.date_created|format_datetime }}</div>
+                        <div class="topic-content">{{ post.content|markup }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="row">
-        <div class="col-12">
-            <div class="alert-message alert-message-info" role="alert">
-                {% trans %}No posts yet{% endtrans %}
+        {% else %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert-message alert-message-info"
+                         role="alert">{% trans %}No posts yet{% endtrans %}</div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
 
-    {% if posts.items %}
-    <div class="col-12 controls-col">
-        {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
-    </div>
-    {% endif %}
+        {% if posts.items %}
+            <div class="col-12 controls-col">
+                {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+            </div>
+        {% endif %}
 
-</div>
+    </div>
 {% endblock %}

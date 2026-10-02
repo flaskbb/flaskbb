@@ -1,22 +1,19 @@
-{% set page_title = _("Refresh Login") %}
-{% set active_forum_nav=True %}
-
 {% extends theme("layout.html") %}
+{% set page_title = _("Refresh Login") %}
+{% set active_forum_nav = True %}
 {% block content %}
-{% from theme("_macros/form.html") import horizontal_field %}
+    {% from theme("_macros/form.html") import horizontal_field %}
 
-<div class="card page">
-    <div class="card-header page-header">
-        {% trans %}Refresh Login{% endtrans %}
-    </div>
+    <div class="card page">
+        <div class="card-header page-header">{% trans %}Refresh Login{% endtrans %}</div>
 
-    <div class="card-body page-body">
-        <form role="form" method="POST">
-            {{ form.hidden_tag() }}
-            {{ horizontal_field(form.password)}}
-            {{ horizontal_field(form.submit, div_class="offset-3 col-4")}}
-        </form>
+        <div class="card-body page-body">
+            <form role="form" method="post">
+                {{ form.hidden_tag() }}
+                {{ horizontal_field(form.password) }}
+                {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+            </form>
+        </div>
     </div>
-</div>
 
 {% endblock %}

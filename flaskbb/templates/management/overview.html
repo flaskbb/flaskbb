@@ -1,179 +1,182 @@
+{% extends theme("management/management_layout.html") %}
 {% set page_title = _("Overview") %}
 
-{% extends theme("management/management_layout.html") %}
-
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Management{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Management{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block management_content %}
-<div class="col-md-12 settings-col">
-    <div class="card settings">
-        <div class="card-header settings-header">
-            <span class="fa fa-tasks"></span> {% trans %}Overview{% endtrans %}
-        </div>
-        <div class="card-body settings-body">
-            <div class="settings-content">
-                <div class="stats">
-                    <div class="row stats-row">
-                        <div class="overview-notifications col-12">
-                            {% if unread_reports > 0 %}
-                            <div class="alert-message alert-message-warning">
-                                <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
-                                <p>{% trans url=url_for('management.unread_reports') %}You have <a
-                                       href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
-                            </div>
-                            {% endif %}
-                            {# rendered even when hidden, a stopped celery puts its warning in its place #}
-                            <div id="overview-no-notifications" class="alert-message alert-message-success"{% if unread_reports > 0 %} hidden{% endif %}>
-                                <h4>{% trans %}Everything seems alright.{% endtrans %}</h4>
-                                <p>{% trans %}No new notifications.{% endtrans %}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row stats-row">
-                        <div class="col-4">
-                            <div class="stats-widget">
-                                <div class="icon">
-                                    <i class="fa fa-users text-success"></i>
-                                </div>
-                                <div class="text">
-                                    <var>{{ all_users }}</var>
-                                    <label class="text-muted">{% trans %}users{% endtrans %}</label>
+    <div class="col-md-12 settings-col">
+        <div class="card settings">
+            <div class="card-header settings-header">
+                <span class="fa fa-tasks"></span> {% trans %}Overview{% endtrans %}
+            </div>
+            <div class="card-body settings-body">
+                <div class="settings-content">
+                    <div class="stats">
+                        <div class="row stats-row">
+                            <div class="overview-notifications col-12">
+                                {% if unread_reports > 0 %}
+                                    <div class="alert-message alert-message-warning">
+                                        <h4>{% trans %}There is something that wants your attention.{% endtrans %}</h4>
+                                        <p>{% trans url=url_for("management.unread_reports") %}You have <a href="{{ url }}">{{ unread_reports }} unread reports</a>.{% endtrans %}</p>
+                                    </div>
+                                {% endif %}
+                                {# rendered even when hidden, a stopped celery puts its warning in its place #}
+                                <div id="overview-no-notifications"
+                                     class="alert-message alert-message-success"
+                                     {% if unread_reports > 0 %} hidden{% endif %}>
+                                    <h4>{% trans %}Everything seems alright.{% endtrans %}</h4>
+                                    <p>{% trans %}No new notifications.{% endtrans %}</p>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-4">
-                            <div class="stats-widget">
-                                <div class="icon">
-                                    <i class="fa fa-comment text-primary"></i>
+                        <div class="row stats-row">
+                            <div class="col-4">
+                                <div class="stats-widget">
+                                    <div class="icon">
+                                        <i class="fa fa-users text-success"></i>
+                                    </div>
+                                    <div class="text">
+                                        <var>{{ all_users }}</var>
+                                        <label class="text-muted">{% trans %}users{% endtrans %}</label>
+                                    </div>
                                 </div>
-                                <div class="text">
-                                    <var>{{ post_count }}</var>
-                                    <label class="text-muted">{% trans %}posts{% endtrans %}</label>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="stats-widget">
+                                    <div class="icon">
+                                        <i class="fa fa-comment text-primary"></i>
+                                    </div>
+                                    <div class="text">
+                                        <var>{{ post_count }}</var>
+                                        <label class="text-muted">{% trans %}posts{% endtrans %}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="stats-widget">
+                                    <div class="icon">
+                                        <i class="fa fa-comments text-info"></i>
+                                    </div>
+                                    <div class="text">
+                                        <var>{{ topic_count }}</var>
+                                        <label class="text-muted">{% trans %}topics{% endtrans %}</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="row stats-row">
 
-                        <div class="col-4">
-                            <div class="stats-widget">
-                                <div class="icon">
-                                    <i class="fa fa-comments text-info"></i>
+                            <div class="col-4">
+                                <div class="row stats-heading">{% trans %}Statistics{% endtrans %}</div>
+
+                                <div class="row">
+                                    <div class="col key text-start">{% trans %}Registered users{% endtrans %}</div>
+                                    <div class="col text-end">{{ all_users }}</div>
                                 </div>
-                                <div class="text">
-                                    <var>{{ topic_count }}</var>
-                                    <label class="text-muted">{% trans %}topics{% endtrans %}</label>
+                                <div class="row">
+                                    <div class="col">{% trans %}Online users{% endtrans %}</div>
+                                    <div class="col text-end">{{ online_users }}</div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row stats-row">
-
-                        <div class="col-4">
-                            <div class="row stats-heading">{% trans %}Statistics{% endtrans %}</div>
-
-                            <div class="row">
-                                <div class="col key text-start">{% trans %}Registered users{% endtrans %}</div>
-                                <div class="col text-end">{{ all_users }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Online users{% endtrans %}</div>
-                                <div class="col text-end">{{ online_users }}</div>
-                            </div>
-                            {% if online_guests is not none %}
-                            <div class="row">
-                                <div class="col">{% trans %}Online guests{% endtrans %}</div>
-                                <div class="col text-end">{{ online_guests }}</div>
-                            </div>
-                            {% endif %}
-                            <div class="row">
-                                <div class="col">{% trans %}Banned users{% endtrans %}</div>
-                                <div class="col text-end">{{ banned_users }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Groups{% endtrans %}</div>
-                                <div class="col text-end">{{ all_groups }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Topics{% endtrans %}</div>
-                                <div class="col text-end">{{ topic_count }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Posts{% endtrans %}</div>
-                                <div class="col text-end">{{ post_count }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Attachments{% endtrans %}</div>
-                                <div class="col text-end">{{ attachment_count }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">{% trans %}Reports{% endtrans %}</div>
-                                <div class="col text-end">{{ report_count }}</div>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="row stats-heading">{% trans %}Components{% endtrans %}</div>
-
-                            <div class="row">
-                                <div class="col">FlaskBB</div>
-                                <div class="col text-end">{{ flaskbb_version }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">Celery</div>
-                                <div class="col text-end">
-                                    <span id="celery-status" class="text-warning" hx-get="{{ url_for('management.celery_status') }}" hx-trigger="load" hx-swap="outerHTML">{% trans %}checking status{% endtrans %}</span>
-                                    {{ celery_version }}
+                                {% if online_guests is not none %}
+                                    <div class="row">
+                                        <div class="col">{% trans %}Online guests{% endtrans %}</div>
+                                        <div class="col text-end">{{ online_guests }}</div>
+                                    </div>
+                                {% endif %}
+                                <div class="row">
+                                    <div class="col">{% trans %}Banned users{% endtrans %}</div>
+                                    <div class="col text-end">{{ banned_users }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">{% trans %}Groups{% endtrans %}</div>
+                                    <div class="col text-end">{{ all_groups }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">{% trans %}Topics{% endtrans %}</div>
+                                    <div class="col text-end">{{ topic_count }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">{% trans %}Posts{% endtrans %}</div>
+                                    <div class="col text-end">{{ post_count }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">{% trans %}Attachments{% endtrans %}</div>
+                                    <div class="col text-end">{{ attachment_count }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">{% trans %}Reports{% endtrans %}</div>
+                                    <div class="col text-end">{{ report_count }}</div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col">Flask</div>
-                                <div class="col text-end">{{ flask_version }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col">Python</div>
-                                <div class="col text-end">{{ python_version }}</div>
-                            </div>
-                        </div>
 
-                        <div class="col-4">
-                            <div class="row stats-heading">{% trans %}Plugins{% endtrans %}</div>
+                            <div class="col-4">
+                                <div class="row stats-heading">{% trans %}Components{% endtrans %}</div>
 
-                            {% for plugin in plugins %}
-                            <div class="row">
-                                <div class="col">
-                                    {% if plugin.installed %}
-                                    <a
-                                       href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
-                                    {% else %}
-                                    <a href="{{ url_for('management.plugins') }}">{{ plugin.name.title() }}</a>
-                                    {% endif %}
+                                <div class="row">
+                                    <div class="col">FlaskBB</div>
+                                    <div class="col text-end">{{ flaskbb_version }}</div>
                                 </div>
-                                <div class="col text-end">
-                                    {% if not plugin.enabled %}
-                                    <span class="text-danger">{% trans %}not enabled{% endtrans %}</span>
-                                    {% elif plugin.enabled %}
-                                    {% if plugin.is_installed %}
-                                    <span class="text-success">{% trans %}enabled &amp; installed{% endtrans %}</span>
-                                    {% elif not plugin.is_installable %}
-                                    <span class="text-success">{% trans %}enabled{% endtrans %}</span>
-                                    {% elif not plugin.is_installed %}
-                                    <span class="text-warning">{% trans %}not installed{% endtrans %}</span>
-                                    {% endif %}
-                                    {% endif %}
-                                    {{ plugin.version }}
+                                <div class="row">
+                                    <div class="col">Celery</div>
+                                    <div class="col text-end">
+                                        <span id="celery-status"
+                                              class="text-warning"
+                                              hx-get="{{ url_for('management.celery_status') }}"
+                                              hx-trigger="load"
+                                              hx-swap="outerHTML">{% trans %}checking status{% endtrans %}</span>
+                                        {{ celery_version }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">Flask</div>
+                                    <div class="col text-end">{{ flask_version }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">Python</div>
+                                    <div class="col text-end">{{ python_version }}</div>
                                 </div>
                             </div>
-                            {% endfor %}
+
+                            <div class="col-4">
+                                <div class="row stats-heading">{% trans %}Plugins{% endtrans %}</div>
+
+                                {% for plugin in plugins %}
+                                    <div class="row">
+                                        <div class="col">
+                                            {% if plugin.installed %}
+                                                <a href="{{ url_for('management.settings', plugin=plugin.name) }}">{{ plugin.name.title() }}</a>
+                                            {% else %}
+                                                <a href="{{ url_for('management.plugins') }}">{{ plugin.name.title() }}</a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col text-end">
+                                            {% if not plugin.enabled %}
+                                                <span class="text-danger">{% trans %}not enabled{% endtrans %}</span>
+                                            {% elif plugin.enabled %}
+                                                {% if plugin.is_installed %}
+                                                    <span class="text-success">{% trans %}enabled &amp; installed{% endtrans %}</span>
+                                                {% elif not plugin.is_installable %}
+                                                    <span class="text-success">{% trans %}enabled{% endtrans %}</span>
+                                                {% elif not plugin.is_installed %}
+                                                    <span class="text-warning">{% trans %}not installed{% endtrans %}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                            {{ plugin.version }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

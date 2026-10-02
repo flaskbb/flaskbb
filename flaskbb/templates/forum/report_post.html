@@ -1,22 +1,30 @@
+{% extends theme("layout.html") %}
 {% set page_title = _("Report Post") %}
 
-{% extends theme("layout.html") %}
-
 {% block content %}
-{% from theme("_macros/form.html") import render_field %}
+    {% from theme("_macros/form.html") import render_field %}
 
-{# the topic page loads this form into its report dialog #}
-<form id="report-form" class="p-3" role="form" method="post" hx-post="{{ url_for('forum.report_post', post_id=post_id) }}" hx-target="this" hx-select="#report-form" hx-swap="outerHTML">
-    {{ form.hidden_tag() }}
-    <h3>{% trans %}Report Post{% endtrans %}</h3>
+    {# the topic page loads this form into its report dialog #}
+    <form id="report-form"
+          class="p-3"
+          role="form"
+          method="post"
+          hx-post="{{ url_for('forum.report_post', post_id=post_id) }}"
+          hx-target="this"
+          hx-select="#report-form"
+          hx-swap="outerHTML">
+        {{ form.hidden_tag() }}
+        <h3>{% trans %}Report Post{% endtrans %}</h3>
 
-    {% if reported %}
-    <p>{% trans %}Thanks for reporting.{% endtrans %}</p>
-    {% else %}
-    {{ render_field(form.reason) }}
+        {% if reported %}
+            <p>{% trans %}Thanks for reporting.{% endtrans %}</p>
+        {% else %}
+            {{ render_field(form.reason) }}
 
-    <button type="submit" class="btn btn-success">{% trans %}Report{% endtrans %}</button>
-    {% endif %}
-    <a class="btn btn-info" href="{{ url_for('forum.view_post', post_id=post_id) }}" data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</a>
-</form>
+            <button type="submit" class="btn btn-success">{% trans %}Report{% endtrans %}</button>
+        {% endif %}
+        <a class="btn btn-info"
+           href="{{ url_for('forum.view_post', post_id=post_id) }}"
+           data-bs-dismiss="modal">{% trans %}Close{% endtrans %}</a>
+    </form>
 {% endblock %}

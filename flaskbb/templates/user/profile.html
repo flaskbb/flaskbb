@@ -1,43 +1,42 @@
 {% extends theme("user/profile_layout.html") %}
 
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb bg-light">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item active"><a href="{{ user.url }}">{{ user.username }}</a></li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item active"><a href="{{ user.url }}">{{ user.username }}</a></li>
+    </ol>
 {% endblock %}
 
 {% block profile_content %}
-<div class="col-12 profile-content">
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="overview">
-            {% if user.notes %}
-            <div class="card page">
-                <div class="card-header page-header">{% trans %}Info{% endtrans %}</div>
-                <div class="card-body page-body">
-                    <div class="col-12 profile-field">
-                        {{ user.notes|markup }}
+    <div class="col-12 profile-content">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="overview">
+                {% if user.notes %}
+                    <div class="card page">
+                        <div class="card-header page-header">{% trans %}Info{% endtrans %}</div>
+                        <div class="card-body page-body">
+                            <div class="col-12 profile-field">{{ user.notes|markup }}</div>
+                        </div>
                     </div>
-                </div>
-            </div> <!-- end profile widget -->
-            {% else %}
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert-message alert-message-info" role="alert">
-                        {% trans %}User has not added any notes.{% endtrans %}
+                    <!-- end profile widget -->
+                {% else %}
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert-message alert-message-info"
+                                 role="alert">{% trans %}User has not added any notes.{% endtrans %}</div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            {% endif %}
+                {% endif %}
 
-            {% if user.signature %}
-            <div class="post-signature">
-                <hr />
-                {{ user.signature|markup }}
-            </div>
-            {% endif %}
+                {% if user.signature %}
+                    <div class="post-signature">
+                        <hr />
+                        {{ user.signature|markup }}
+                    </div>
+                {% endif %}
 
+            </div>
         </div>
     </div>
-</div> <!-- end col -->
+    <!-- end col -->
 {% endblock %}

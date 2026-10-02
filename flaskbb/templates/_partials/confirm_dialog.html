@@ -1,15 +1,22 @@
-<div class="modal fade" id="confirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<div class="modal fade"
+     id="confirmModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmModalLabel">{{ confirm_title|default(_("Are you sure?"), true) }}</h5>
+                <h5 class="modal-title"
+                    id="confirmModalLabel">{{ confirm_title|default(_("Are you sure?"), true) }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p>{{ confirm_message|default(_("Are you sure that you want to perform this action? This action is irreversible."), true) }}</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
                 <button type="button" class="btn btn-danger confirmBtn">{% trans %}Yes{% endtrans %}</button>
             </div>
         </div>

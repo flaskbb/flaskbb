@@ -1,62 +1,68 @@
-{% set page_title = _("Memberlist") %}
-
 {% extends theme("layout.html") %}
+{% set page_title = _("Memberlist") %}
 {% block content %}
-{% from theme('_macros/pagination.html') import render_pagination %}
-{% from theme('_macros/form.html') import render_input_field %}
+    {% from theme('_macros/pagination.html') import render_pagination %}
+    {% from theme('_macros/form.html') import render_input_field %}
 
-{% set order_by = 'desc' if request.args.get('order_by') == 'asc' else 'asc' %}
-{% set sort_by = request.args.get('sort_by') %}
+    {% set order_by = 'desc' if request.args.get('order_by') == 'asc' else 'asc' %}
+    {% set sort_by = request.args.get('sort_by') %}
 
-<div class="page-view">
-    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
-        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li class="breadcrumb-item active">{% trans %}Memberlist{% endtrans %}</li>
-    </ol>
+    <div class="page-view">
+        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+            <li class="breadcrumb-item active">{% trans %}Memberlist{% endtrans %}</li>
+        </ol>
 
-    <div class="row controls-row pt-0">
-        <div class="col me-auto g-0">
-            {{ render_pagination(users, url_for('forum.memberlist'), sort_by=sort_by, asc=(order_by == 'desc')) }}
+        <div class="row controls-row pt-0">
+            <div class="col me-auto g-0">
+                {{ render_pagination(users, url_for('forum.memberlist'), sort_by=sort_by, asc=(order_by == 'desc')) }}
+            </div>
+            <div class="col-auto g-0">
+                <form class="d-inline"
+                      role="form"
+                      method="post"
+                      hx-post="{{ url_for('forum.memberlist') }}"
+                      hx-trigger="input delay:300ms, submit"
+                      hx-target="#memberlist"
+                      hx-select="#memberlist"
+                      hx-swap="outerHTML">
+                    {{ search_form.hidden_tag() }}
+                    <div class="input-group mb-3">
+                        {{ render_input_field(search_form.search_query) }}
+                        <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="col-auto g-0">
-            <form class="d-inline" role="form" method="post" hx-post="{{ url_for('forum.memberlist') }}" hx-trigger="input delay:300ms, submit" hx-target="#memberlist" hx-select="#memberlist" hx-swap="outerHTML">
-                {{ search_form.hidden_tag() }}
-                <div class="input-group mb-3">
-                    {{ render_input_field(search_form.search_query) }}
-                    <button class="btn btn-primary" type="submit">{% trans %}Search{% endtrans %}</button>
+
+        <div class="card page" id="memberlist">
+            <div class="card-header page-header">
+                <a href="{{ url_for('forum.memberlist') }}">{% trans %}Memberlist{% endtrans %}</a>
+            </div>
+            <div class="card-body page-body">
+                <div class="row m-0 page-meta">
+                    <div class="col-md-1 col-sm-1 col-1 ps-3 meta-item">#</div>
+                    <div class="col-md-3 col-sm-3 col-5 meta-item">
+                        <a href="{{ url_for('forum.memberlist') }}?sort_by=username&order_by={{ order_by }}">{% trans %}Username{% endtrans %}</a>
+                    </div>
+                    <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">
+                        <a href="{{ url_for('forum.memberlist') }}?sort_by=reg_date&order_by={{ order_by }}">{% trans %}Date registered{% endtrans %}</a>
+                    </div>
+                    <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
+                    <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">
+                        <a href="{{ url_for('forum.memberlist') }}?sort_by=post_count&order_by={{ order_by }}">{% trans %}Posts{% endtrans %}</a>
+                    </div>
                 </div>
-            </form>
+                {% for user in users.items %}
+                    <div class="row page-row hover">
+                        <div class="col-md-1 col-sm-1 col-1 ps-3">{{ user.id }}</div>
+                        <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
+                        <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_datetime }}</div>
+                        <div class="col-md-3 col-sm-3 col-5">{{ user.primary_group.name }}</div>
+                        <div class="col-md-2 col-sm-2 d-none d-sm-block">{{ user.post_count }}</div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-
-    <div class="card page" id="memberlist">
-        <div class="card-header page-header">
-            <a href="{{ url_for('forum.memberlist') }}">{% trans %}Memberlist{% endtrans %}</a>
-        </div>
-        <div class="card-body page-body">
-            <div class="row m-0 page-meta">
-                <div class="col-md-1 col-sm-1 col-1 ps-3 meta-item">#</div>
-                <div class="col-md-3 col-sm-3 col-5 meta-item">
-                    <a href="{{ url_for('forum.memberlist') }}?sort_by=username&order_by={{ order_by }}">{% trans %}Username{% endtrans %}</a>
-                </div>
-                <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">
-                    <a href="{{ url_for('forum.memberlist') }}?sort_by=reg_date&order_by={{ order_by }}">{% trans %}Date registered{% endtrans %}</a>
-                </div>
-                <div class="col-md-3 col-sm-3 col-5 meta-item">{% trans %}Group{% endtrans %}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block meta-item">
-                    <a href="{{ url_for('forum.memberlist') }}?sort_by=post_count&order_by={{ order_by }}">{% trans %}Posts{% endtrans %}</a>
-                </div>
-            </div>
-            {% for user in users.items %}
-            <div class="row page-row hover">
-                <div class="col-md-1 col-sm-1 col-1 ps-3">{{ user.id }}</div>
-                <div class="col-md-3 col-sm-3 col-5"><a href="{{ user.url }}">{{ user.username }}</a></div>
-                <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_datetime }}</div>
-                <div class="col-md-3 col-sm-3 col-5">{{ user.primary_group.name }}</div>
-                <div class="col-md-2 col-sm-2 d-none d-sm-block">{{ user.post_count }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
 {% endblock %}

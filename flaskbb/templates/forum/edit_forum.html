@@ -1,109 +1,112 @@
-{% set page_title = forum.title %}
-{% set active_forum_nav=True %}
-
 {% extends theme("layout.html") %}
+{% set page_title = forum.title %}
+{% set active_forum_nav = True %}
 {% block content %}
-{% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
+    {% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
 
-<form class="form" role="form" method="POST">
-    <div class="d-none"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
-
-    <div class="forum-view">
-        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
-            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-            <li class="breadcrumb-item"><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
-            <li class="breadcrumb-item active">{{ forum.title }}</li>
-        </ol>
-
-        <div class="row controls-row pt-0">
-            <div class="col me-auto g-0">
-                {{ render_pagination(topics, forum.url) }}
-            </div> <!-- end span pagination -->
+    <form class="form" role="form" method="post">
+        <div class="d-none">
+            <input id="csrf_token"
+                   name="csrf_token"
+                   type="hidden"
+                   value="{{ csrf_token() }}">
         </div>
 
-        <div class="card forum">
-            <div class="card-header forum-header">
-                <a href="{{ forum.url }}">{{ forum.title }}</a>
+        <div class="forum-view">
+            <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+                <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+                <li class="breadcrumb-item"><a href="{{ forum.category.url }}">{{ forum.category.title }}</a></li>
+                <li class="breadcrumb-item active">{{ forum.title }}</li>
+            </ol>
+
+            <div class="row controls-row pt-0">
+                <div class="col me-auto g-0">{{ render_pagination(topics, forum.url) }}</div>
+                <!-- end span pagination -->
             </div>
 
-            <div class="card-body forum-body">
-                {% set with_checkbox = True %}
-                {% set forum_row_css_class = 'set-checkbox' %}
-                {% include theme("forum/_forum_meta.html") %}
+            <div class="card forum">
+                <div class="card-header forum-header">
+                    <a href="{{ forum.url }}">{{ forum.title }}</a>
+                </div>
 
-                {% for topic, last_post, topicread, first_unread_url in topics.items %}
-                    {% include theme("forum/_forum_row.html") %}
-                {% else %}
-                <div class="row forum-row">
-                    <div class="col-12">
-                        {% trans %}No Topics.{% endtrans %}
-                    </div>
-                </div> <!-- end forum-row -->
-                {% endfor %}
+                <div class="card-body forum-body">
+                    {% set with_checkbox = True %}
+                    {% set forum_row_css_class = "set-checkbox" %}
+                    {% include theme("forum/_forum_meta.html") %}
+
+                    {% for topic, last_post, topicread, first_unread_url in topics.items %}
+                        {% include theme("forum/_forum_row.html") %}
+                    {% else %}
+                        <div class="row forum-row">
+                            <div class="col-12">{% trans %}No Topics.{% endtrans %}</div>
+                        </div>
+                        <!-- end forum-row -->
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-        <div class="row g-0 pt-2">
-            <div class="col-2">
-                <a class="btn btn-outline-dark" href="{{ forum.url }}">
-                    <span class="fas fa-arrow-left"></span> {% trans %}Back{% endtrans %}
-                </a>
+            <div class="row g-0 pt-2">
+                <div class="col-2">
+                    <a class="btn btn-outline-dark" href="{{ forum.url }}">
+                        <span class="fas fa-arrow-left"></span> {% trans %}Back{% endtrans %}
+                    </a>
+                </div>
+
+                <div class="col-10">
+                    <div class="form-group float-end">
+
+                        <div class="btn-group" role="group">
+                            <button type="submit" name="lock" class="btn btn-warning">
+                                <span class="fas fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
+                            </button>
+                            <button type="submit" name="unlock" class="btn btn-warning">
+                                <span class="fas fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
+                            </button>
+                        </div>
+
+                        <div class="btn-group" role="group">
+                            <button type="submit" name="highlight" class="btn btn-success">
+                                <span class="fas fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
+                            </button>
+                            <button type="submit" name="trivialize" class="btn btn-success">
+                                <span class="far fa-star fa-fw"></span> {% trans %}Trivialize{% endtrans %}
+                            </button>
+                        </div>
+
+                        <button type="submit" name="delete" class="btn btn-danger">
+                            <span class="fas fa-trash fa-fw"></span> {% trans %}Delete{% endtrans %}
+                        </button>
+
+                        {% if current_user.permissions.get("makehidden") %}
+                            <div class="btn-group" role="group">
+                                <button type="submit" name="hide" class="btn btn-info">
+                                    <span class="fas fa-eye-slash fa-fw"></span> {% trans %}Hide{% endtrans %}
+                                </button>
+                                <button type="submit" name="unhide" class="btn btn-info">
+                                    <span class="fas fa-eye fa-fw"></span> {% trans %}Unhide{% endtrans %}
+                                </button>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
             </div>
+            <div class="row">
+                <div class="col-auto ms-auto pt-2">
+                    <div class="input-group">
+                        <select class="form-select" id="forum" name="forum">
+                            <option selected value="">{% trans %}Move to...{% endtrans %}</option>
+                            {% for forum in available_forums %}
+                                <option value="{{ forum.id }}">{{ forum.title }}</option>
+                            {% endfor %}
+                        </select>
 
-            <div class="col-10">
-                <div class="form-group float-end">
-
-                    <div class="btn-group" role="group">
-                        <button name="lock" class="btn btn-warning">
-                            <span class="fas fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
-                        </button>
-                        <button name="unlock" class="btn btn-warning">
-                            <span class="fas fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
-                        </button>
-                    </div>
-
-                    <div class="btn-group" role="group">
-                        <button name="highlight" class="btn btn-success">
-                            <span class="fas fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
-                        </button>
-                        <button name="trivialize" class="btn btn-success">
-                            <span class="far fa-star fa-fw"></span> {% trans %}Trivialize{% endtrans %}
+                        <button type="submit" name="move" class="btn btn-outline-dark">
+                            <span class="fas fa-plane"></span> {% trans %}Move{% endtrans %}
                         </button>
                     </div>
-
-                    <button name="delete" class="btn btn-danger">
-                        <span class="fas fa-trash fa-fw"></span> {% trans %}Delete{% endtrans %}
-                    </button>
-
-                    {% if current_user.permissions.get('makehidden') %}
-                    <div class="btn-group" role="group">
-                        <button name="hide" class="btn btn-info">
-                            <span class="fas fa-eye-slash fa-fw"></span> {% trans %}Hide{% endtrans %}
-                        </button>
-                        <button name="unhide" class="btn btn-info">
-                            <span class="fas fa-eye fa-fw"></span> {% trans %}Unhide{% endtrans %}
-                        </button>
-                    </div>
-                    {% endif %}
-
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-auto ms-auto pt-2">
-                <div class="input-group">
-                    <select class="form-select" id="forum" name="forum">
-                        <option selected value="">{% trans %}Move to...{% endtrans %}</option>
-                        {% for forum in available_forums %}
-                        <option value={{forum.id}}>{{ forum.title }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <button name="move" class="btn btn-outline-dark">
-                        <span class="fas fa-plane"></span> {% trans %}Move{% endtrans %}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div> <!-- end forum-view -->
-</form>
+        <!-- end forum-view -->
+    </form>
 {% endblock %}

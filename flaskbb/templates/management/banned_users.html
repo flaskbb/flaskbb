@@ -1,104 +1,139 @@
+{% extends theme("management/management_layout.html") %}
 {% set page_title = _("Banned Users") %}
 
-{% extends theme("management/management_layout.html") %}
-
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block management_content %}
-{%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import render_input_field, bulk_action -%}
+    {%- from theme('_macros/pagination.html') import render_pagination -%}
+    {%- from theme('_macros/form.html') import render_input_field, bulk_action -%}
 
-<div class="col-md-12 settings-col">
-    <div class="card settings">
-        <div class="card-header settings-header">
-            <div class="row">
-                <div class="col-auto me-auto">
-                    <span class="far fa-user"></span> {% trans %}Banned Users{% endtrans %}
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-white btn-xs" onclick="return window.app.show_management_search()">
-                        <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="card-body settings-body">
-
-            <div class="settings-search">
-                <form class="search-form" role="form" method="post" hx-post="{{ url_for('management.banned_users') }}" hx-trigger="input delay:300ms, submit" hx-target="next .settings-content" hx-select=".settings-content" hx-swap="outerHTML">
-                    {{ search_form.hidden_tag() }}
-                    <div class="input-group">
-                        {{ render_input_field(search_form.search_query, class="form-control") }}
-                        <button class="btn btn-white" type="button"><span class="fas fa-search"></span></button>
+    <div class="col-md-12 settings-col">
+        <div class="card settings">
+            <div class="card-header settings-header">
+                <div class="row">
+                    <div class="col-auto me-auto">
+                        <span class="far fa-user"></span> {% trans %}Banned Users{% endtrans %}
                     </div>
-                </form>
+                    <div class="col-auto">
+                        <button type="button"
+                                class="btn btn-white btn-xs"
+                                onclick="return window.app.show_management_search()">
+                            <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
+                        </button>
+                    </div>
+                </div>
             </div>
+            <div class="card-body settings-body">
 
-            <div class="settings-content">
-                <div class="settings-meta row">
-                    <div class="col-md-1 col-sm-1 col-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
-                    <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Username{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Posts{% endtrans %}</div>
-                    <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Group{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-2">
-                        <div class="dropdown">
-                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                                <span class="fa fa-fw fa-cog"></span>
-                                {% trans %}Actions{% endtrans %}
-                            </a>
+                <div class="settings-search">
+                    <form class="search-form"
+                          role="form"
+                          method="post"
+                          hx-post="{{ url_for('management.banned_users') }}"
+                          hx-trigger="input delay:300ms, submit"
+                          hx-target="next .settings-content"
+                          hx-select=".settings-content"
+                          hx-swap="outerHTML">
+                        {{ search_form.hidden_tag() }}
+                        <div class="input-group">
+                            {{ render_input_field(search_form.search_query, class="form-control") }}
+                            <button class="btn btn-white" type="button">
+                                <span class="fas fa-search"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                            <ul class="dropdown-menu">
-                                {{ bulk_action(url_for('management.unban_user'), _("Unban selected Users"), "fas fa-fw fa-flag text-success") }}
-                            </ul>
+                <div class="settings-content">
+                    <div class="settings-meta row">
+                        <div class="col-md-1 col-sm-1 col-1 meta-item">
+                            <input type="checkbox"
+                                   name="rowtoggle"
+                                   class="action-checkall"
+                                   title="Select All" />
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Username{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Posts{% endtrans %}</div>
+                        <div class="col-md-3 col-sm-3 d-none d-sm-block meta-item">{% trans %}Date registered{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-2 col-3 meta-item">{% trans %}Group{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-2 col-2">
+                            <div class="dropdown">
+                                <a class="dropdown-toggle text-dark text-decoration-none fw-bold"
+                                   data-bs-toggle="dropdown"
+                                   href="#"
+                                   role="button"
+                                   aria-expanded="false">
+                                    <span class="fa fa-fw fa-cog"></span>
+                                    {% trans %}Actions{% endtrans %}
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    {{ bulk_action(url_for('management.unban_user'), _("Unban selected Users"), "fas fa-fw fa-flag text-success") }}
+                                </ul>
+                            </div>
                         </div>
                     </div>
+                    {% for user in users.items %}
+                        <div class="row settings-row hover">
+                            <div class="col-md-1 col-sm-1 col-1">
+                                <input type="checkbox"
+                                       name="rowid"
+                                       class="action-checkbox"
+                                       value="{{ user.id }}"
+                                       title="Select User" />
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-3"><a href="{{ user.url }}">{{ user.username }}</a></div>
+                            <div class="col-md-2 col-sm-2 col-3">{{ user.post_count }}</div>
+                            <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
+                            <div class="col-md-2 col-sm-2 col-3">{{ user.primary_group.name }}</div>
+                            <div class="col-2">
+                                {% if current_user|can_edit_user(user) %}
+                                    <a href="{{ url_for('management.edit_user', user_id = user.id) }}"
+                                       class="btn btn-icon">
+                                        <span class="fas fa-edit text-primary"
+                                              data-bs-toggle="tooltip"
+                                              title="{% trans %}Edit{% endtrans %}"></span>
+                                    </a>
+                                {% endif %}
+
+                                {% if current_user|can_ban_user(user) and user.permissions["banned"] %}
+                                    <form class="d-inline"
+                                          id="ban-{{ user.id }}"
+                                          method="post"
+                                          action="{{ url_for('management.unban_user', user_id = user.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                        <button type="button"
+                                                class="btn btn-icon"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#confirmModal">
+                                            <span class="fas fa-flag text-success"
+                                                  data-bs-toggle="tooltip"
+                                                  title="{% trans %}Unban{% endtrans %}"></span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row settings-row">
+                            <div class="col-12">{% trans %}No banned users found matching your search criteria.{% endtrans %}</div>
+                        </div>
+                    {% endfor %}
+
                 </div>
-            {% for user in users.items %}
-                <div class="row settings-row hover">
-                    <div class="col-md-1 col-sm-1 col-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select User"/></div>
-                    <div class="col-md-2 col-sm-2 col-3"><a href="{{ user.url }}">{{ user.username }}</a></div>
-                    <div class="col-md-2 col-sm-2 col-3">{{ user.post_count }}</div>
-                    <div class="col-md-3 col-sm-3 d-none d-sm-block">{{ user.date_joined|format_date }}</div>
-                    <div class="col-md-2 col-sm-2 col-3">{{ user.primary_group.name }}</div>
-                    <div class="col-2">
-                    {% if current_user|can_edit_user(user) %}
-                        <a href="{{ url_for('management.edit_user', user_id = user.id) }}" class="btn btn-icon">
-                            <span class="fas fa-edit text-primary" data-bs-toggle="tooltip" title="{% trans %}Edit{% endtrans %}"></span>
-                        </a>
-                    {% endif %}
+                <!-- end settings content -->
+            </div>
 
-                    {% if current_user|can_ban_user(user) and user.permissions['banned'] %}
-                        <form class="d-inline" id="ban-{{user.id}}" method="post" action="{{ url_for('management.unban_user', user_id = user.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-                            <button type="button" class="btn btn-icon" data-bs-toggle="modal" data-bs-target="#confirmModal">
-                                <span class="fas fa-flag text-success" data-bs-toggle="tooltip" title="{% trans %}Unban{% endtrans %}"></span>
-                            </button>
-                        </form>
-                    {% endif %}
-
-                    </div>
-                </div>
-            {% else %}
-                <div class="row settings-row">
-                    <div class="col-12">{% trans %}No banned users found matching your search criteria.{% endtrans %}</div>
-                </div>
-            {% endfor %}
-
-            </div> <!-- end settings content -->
-        </div>
-
-        <div class="card-footer settings-footer p-2">
-            {{ render_pagination(users, url_for('management.banned_users')) }}
+            <div class="card-footer settings-footer p-2">{{ render_pagination(users, url_for('management.banned_users')) }}</div>
         </div>
     </div>
-</div>
-{% include theme('_partials/confirm_dialog.html') %}
+    {% include theme("_partials/confirm_dialog.html") %}
 {% endblock %}

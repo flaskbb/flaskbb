@@ -212,6 +212,18 @@ testpaths = [
     "tests",
 ]
 
+[tool.djlint]
+profile = "jinja"
+indent = 4
+max_line_length = 120
+max_blank_lines = 1
+extend_exclude = "node_modules,static,docs"
+format_attribute_template_tags = false
+format_js = false
+format_css = false
+# Images use responsive CSS; templates use mixed quotes and unnamed endblocks.
+ignore = "H006,T002,T003"
+
 [tool.ruff]
 src = ["flaskbb", "tests"]
 fix = true

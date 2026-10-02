@@ -1,3 +1,4 @@
+{% extends theme("layout.html") %}
 {% if edit_mode %}
     {% set title = _("Edit Post") %}
 {% else %}
@@ -5,97 +6,92 @@
 {% endif %}
 
 {% set page_title = title %}
-{% set active_forum_nav=True %}
-
-{% extends theme("layout.html") %}
+{% set active_forum_nav = True %}
 
 {% block content %}
-{% from theme("_macros/form.html") import render_field, render_submit_field %}
-{% set show_options = form.track_topic.data %}
+    {% from theme("_macros/form.html") import render_field, render_submit_field %}
+    {% set show_options = form.track_topic.data %}
 
-<div class="page-view topic-composer-view">
-    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
-        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li class="breadcrumb-item"><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
-        <li class="breadcrumb-item"><a href="{{ topic.url }}">{{ topic.title }}</a></li>
-        <li class="breadcrumb-item active">
-            {{ title }}
-        </li>
-    </ol>
+    <div class="page-view topic-composer-view">
+        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+            <li class="breadcrumb-item"><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ topic.url }}">{{ topic.title }}</a></li>
+            <li class="breadcrumb-item active">{{ title }}</li>
+        </ol>
 
-    <header class="topic-composer-heading">
-        <h1>{{ title }}</h1>
-        {% if edit_mode %}
-        <p>{{ gettext("Editing a post in %(topic)s", topic=topic.title) }}</p>
-        {% else %}
-        <p>{{ gettext("Replying to %(topic)s", topic=topic.title) }}</p>
-        {% endif %}
-    </header>
+        <header class="topic-composer-heading">
+            <h1>{{ title }}</h1>
+            {% if edit_mode %}
+                <p>{{ gettext("Editing a post in %(topic)s", topic=topic.title) }}</p>
+            {% else %}
+                <p>{{ gettext("Replying to %(topic)s", topic=topic.title) }}</p>
+            {% endif %}
+        </header>
 
-    <form class="topic-composer" method="post" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        {% if form.errors %}
-        <div class="alert alert-danger" role="alert">
-            <div class="fw-semibold">{% trans %}Please correct the highlighted fields.{% endtrans %}</div>
-            <ul class="mb-0 mt-2">
-                {% for field_name, errors in form.errors.items() %}
-                    {% for error in errors %}
-                    <li>{{ form[field_name].label.text }}: {{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        <div class="card topic-composer-card">
-            <div class="card-body">
-                <div class="topic-composer-main">
-                    {{ run_hook("flaskbb_tpl_form_new_post_before", form=form) }}
-
-                    {{ render_field(
-                        form.content,
-                        div_class="topic-content-field",
-                        rows=14,
-                        mode_tabs=True,
-                        placeholder=_("Update your post...") if edit_mode else _("Write your reply...")
-                    ) }}
-
-                    {% include theme("forum/_attachment_fields.html") %}
-
-                    {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
+        <form class="topic-composer" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <div class="fw-semibold">{% trans %}Please correct the highlighted fields.{% endtrans %}</div>
+                    <ul class="mb-0 mt-2">
+                        {% for field_name, errors in form.errors.items() %}
+                            {% for error in errors %}
+                                <li>{{ form[field_name].label.text }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
                 </div>
+            {% endif %}
 
-                <div class="accordion topic-options" id="post-options">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button{{ '' if show_options else ' collapsed' }}" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#post-options-body"
-                                    aria-expanded="{{ 'true' if show_options else 'false' }}"
-                                    aria-controls="post-options-body">
-                                {% trans %}Options{% endtrans %}
-                            </button>
-                        </h2>
-                        <div id="post-options-body" class="accordion-collapse collapse{{ ' show' if show_options }}">
-                            <div class="accordion-body">
-                                <section class="topic-option-group">
-                                    <h3>{% trans %}Your preferences{% endtrans %}</h3>
-                                    {{ render_field(form.track_topic, div_class="topic-option") }}
-                                </section>
+            <div class="card topic-composer-card">
+                <div class="card-body">
+                    <div class="topic-composer-main">
+                        {{ run_hook("flaskbb_tpl_form_new_post_before", form=form) }}
+
+                        {{ render_field(
+                            form.content,
+                            div_class="topic-content-field",
+                            rows=14,
+                            mode_tabs=True,
+                            placeholder=_("Update your post...") if edit_mode else _("Write your reply...")
+                        ) }}
+
+                        {% include theme("forum/_attachment_fields.html") %}
+
+                        {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
+                    </div>
+
+                    <div class="accordion topic-options" id="post-options">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button{{ '' if show_options else ' collapsed' }}"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#post-options-body"
+                                        aria-expanded="{{ 'true' if show_options else 'false' }}"
+                                        aria-controls="post-options-body">{% trans %}Options{% endtrans %}</button>
+                            </h2>
+                            <div id="post-options-body"
+                                 class="accordion-collapse collapse{{ ' show' if show_options }}">
+                                <div class="accordion-body">
+                                    <section class="topic-option-group">
+                                        <h3>{% trans %}Your preferences{% endtrans %}</h3>
+                                        {{ render_field(form.track_topic, div_class="topic-option") }}
+                                    </section>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="topic-composer-actions">
-                    <a class="btn btn-outline-secondary" href="{{ topic.url }}">
-                        {% trans %}Cancel{% endtrans %}
-                    </a>
-                    {{ render_submit_field(form.submit, class="btn btn-primary") }}
+                    <div class="topic-composer-actions">
+                        <a class="btn btn-outline-secondary" href="{{ topic.url }}">{% trans %}Cancel{% endtrans %}</a>
+                        {{ render_submit_field(form.submit, class="btn btn-primary") }}
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
 {% endblock %}

@@ -343,6 +343,8 @@ h5.author-title {
 
 // the editor preview renders with the post renderer
 .preview {
+    display: none;
+    padding: 0.375rem 0.75rem;
     @include post-quotes;
 }
 

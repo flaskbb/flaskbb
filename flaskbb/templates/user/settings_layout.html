@@ -2,31 +2,34 @@
 {% set page_title = _("Settings - %(user)s - User", user=current_user.username) %}
 
 {% block content %}
-{%- from theme("_macros/navigation.html") import navlink with context -%}
+    {%- from theme("_macros/navigation.html") import navlink with context -%}
 
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Settings{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ current_user.url }}">{{ current_user.username }}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Settings{% endtrans %}</li>
+    </ol>
 
-<div class="row">
-    <div class="col-sm-3">
-        <div class="sidebar">
-            <ul class="nav sidenav">
-                {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False, user=current_user) %}
-                    {% if view == None %}
-                    <li class="sidenav-header">{{ _(text) }}</li>
-                    {% else %}
-                    {{ navlink(view, _(text)) }}
-                    {% endif %}
-                {% endfor %}
-            </ul>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="sidebar">
+                <ul class="nav sidenav">
+                    {% for view, text in run_hook('flaskbb_tpl_profile_settings_menu', is_markup=False, user=current_user) %}
+                        {% if view == None %}
+                            <li class="sidenav-header">{{ _(text) }}</li>
+                        {% else %}
+                            {{ navlink(view, _(text)) }}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div><!--/.col-sm-3 -->
-    <div class="col-sm-9">
-        {% block settings_content %}{% endblock %}
-    </div><!--/.col-sm-9 -->
-</div><!--/row-->
+        <!--/.col-sm-3 -->
+        <div class="col-sm-9">
+            {% block settings_content %}{% endblock %}
+        </div>
+        <!--/.col-sm-9 -->
+    </div>
+    <!--/row-->
 
 {% endblock %}

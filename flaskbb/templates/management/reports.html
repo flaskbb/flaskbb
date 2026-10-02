@@ -1,89 +1,100 @@
+{% extends theme("management/management_layout.html") %}
 {% set page_title = _("Reports") %}
 
-{% extends theme("management/management_layout.html") %}
-
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Reports{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Reports{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block management_content %}
-{%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import action_confirm, bulk_action -%}
+    {%- from theme('_macros/pagination.html') import render_pagination -%}
+    {%- from theme('_macros/form.html') import action_confirm, bulk_action -%}
 
-<div class="col-md-12 settings-col">
-    <div class="card settings">
-        <div class="card-header settings-header">
-            <span class="fa fa-flag"></span> {% trans %}Reports{% endtrans %}
-        </div>
-        <div class="card-body settings-body">
-            <div class="settings-content">
-                <div class="settings-meta row">
-                    <div class="col-md-1 col-sm-1 col-1 meta-item"><input type="checkbox" name="rowtoggle" class="action-checkall" title="Select All"/></div>
-                    <div class="col-md-1 col-sm-2 col-2 meta-item">{% trans %}Poster{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-3 col-3 meta-item">{% trans %}Topic{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-4 col-3 meta-item">{% trans %}Reason{% endtrans %}</div>
-                    <div class="col-md-2 d-none d-sm-block meta-item">{% trans %}Reporter{% endtrans %}</div>
-                    <div class="col-md-2 d-none d-sm-block meta-item">{% trans %}Reported{% endtrans %}</div>
-                    <div class="col-md-2 col-sm-2 col-2">
-                        <div class="dropdown">
-                            <a class="dropdown-toggle text-dark text-decoration-none fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                                <span class="fa fa-fw fa-cog"></span>
-                                {% trans %}Actions{% endtrans %}
-                            </a>
+    <div class="col-md-12 settings-col">
+        <div class="card settings">
+            <div class="card-header settings-header">
+                <span class="fa fa-flag"></span> {% trans %}Reports{% endtrans %}
+            </div>
+            <div class="card-body settings-body">
+                <div class="settings-content">
+                    <div class="settings-meta row">
+                        <div class="col-md-1 col-sm-1 col-1 meta-item">
+                            <input type="checkbox"
+                                   name="rowtoggle"
+                                   class="action-checkall"
+                                   title="Select All" />
+                        </div>
+                        <div class="col-md-1 col-sm-2 col-2 meta-item">{% trans %}Poster{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-3 col-3 meta-item">{% trans %}Topic{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-4 col-3 meta-item">{% trans %}Reason{% endtrans %}</div>
+                        <div class="col-md-2 d-none d-sm-block meta-item">{% trans %}Reporter{% endtrans %}</div>
+                        <div class="col-md-2 d-none d-sm-block meta-item">{% trans %}Reported{% endtrans %}</div>
+                        <div class="col-md-2 col-sm-2 col-2">
+                            <div class="dropdown">
+                                <a class="dropdown-toggle text-dark text-decoration-none fw-bold"
+                                   data-bs-toggle="dropdown"
+                                   href="#"
+                                   role="button"
+                                   aria-expanded="false">
+                                    <span class="fa fa-fw fa-cog"></span>
+                                    {% trans %}Actions{% endtrans %}
+                                </a>
 
-                            <ul class="dropdown-menu">
-                                {{ bulk_action(url_for('management.report_markread'), _("Mark as Read"), "fa fa-fw fa-flag-o text-primary") }}
-                                {{ bulk_action(url_for('management.delete_report'), _("Delete selected reports"), "fa fa-fw fa-trash text-danger") }}
-                            </ul>
+                                <ul class="dropdown-menu">
+                                    {{ bulk_action(url_for('management.report_markread'), _("Mark as Read"), "fa fa-fw fa-flag-o text-primary") }}
+                                    {{ bulk_action(url_for('management.delete_report'), _("Delete selected reports"), "fa fa-fw fa-trash text-danger") }}
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% for report in reports.items %}
-                <div class="row settings-row hover">
-                    <div class="col-md-1 col-sm-1 col-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ report.id }}" title="Select Report"/></div>
-                    <div class="col-md-1 col-sm-2 col-2"><a href="{{ report.post.user.url }}">{{ report.post.user.username }}</a></div>
-                    <div class="col-md-2 col-sm-3 col-3"><a href="{{ report.post.url }}" target="_blank">{{ report.post.topic.title }}</a></div>
-                    <div class="col-md-2 col-sm-4 col-3">{{ report.reason }}</div>
-                    <div class="col-md-2 d-none d-sm-block">{{ report.reporter.username }}</div>
-                    <div class="col-md-2 d-none d-sm-block">{{ report.reported|time_since }}</div>
-                    <div class="col-md-2 col-sm-2 col-2">
-                        {% if not report.zapped %}
-                            <!-- Mark as Read -->
-                            {{
-                                action_confirm(
-                                    id="read-" ~ report.id,
-                                    url=url_for('management.report_markread', report_id=report.id),
-                                    title=_("Mark as Read"),
-                                    icon="fa fa-flag-o text-primary"
-                                )
-                            }}
-                        {% endif %}
-                            <!-- Delete -->
-                            {{
-                                action_confirm(
+                    {% for report in reports.items %}
+                        <div class="row settings-row hover">
+                            <div class="col-md-1 col-sm-1 col-1">
+                                <input type="checkbox"
+                                       name="rowid"
+                                       class="action-checkbox"
+                                       value="{{ report.id }}"
+                                       title="Select Report" />
+                            </div>
+                            <div class="col-md-1 col-sm-2 col-2"><a href="{{ report.post.user.url }}">{{ report.post.user.username }}</a></div>
+                            <div class="col-md-2 col-sm-3 col-3"><a href="{{ report.post.url }}"
+   target="_blank">{{ report.post.topic.title }}</a></div>
+                            <div class="col-md-2 col-sm-4 col-3">{{ report.reason }}</div>
+                            <div class="col-md-2 d-none d-sm-block">{{ report.reporter.username }}</div>
+                            <div class="col-md-2 d-none d-sm-block">{{ report.reported|time_since }}</div>
+                            <div class="col-md-2 col-sm-2 col-2">
+                                {% if not report.zapped %}
+                                    <!-- Mark as Read -->
+                                    {{ action_confirm(
+                                        id="read-" ~ report.id,
+                                        url=url_for('management.report_markread', report_id=report.id),
+                                        title=_("Mark as Read"),
+                                        icon="fa fa-flag-o text-primary"
+                                    )
+                                    }}
+                                {% endif %}
+                                <!-- Delete -->
+                                {{ action_confirm(
                                     id="delete-" ~ report.id,
                                     url=url_for('management.delete_report', report_id=report.id),
                                     title=_("Delete"),
                                     icon="fa fa-trash text-danger"
                                 )
-                            }}
-                    </div>
+                                }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row settings-row">
+                            <div class="col-12">{% trans %}No reports.{% endtrans %}</div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% else %}
-                <div class="row settings-row">
-                    <div class="col-12">{% trans %}No reports.{% endtrans %}</div>
-                </div>
-            {% endfor %}
-            </div>
-            <div class="card-footer settings-footer">
-                {{ render_pagination(reports, url_for(request.endpoint)) }}
+                <div class="card-footer settings-footer">{{ render_pagination(reports, url_for(request.endpoint)) }}</div>
             </div>
         </div>
     </div>
-</div>
-{% include theme('_partials/confirm_dialog.html') %}
+    {% include theme("_partials/confirm_dialog.html") %}
 {% endblock %}

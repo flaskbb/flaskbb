@@ -1,32 +1,33 @@
 {% extends theme("layout.html") %}
 {% block content %}
 
-<div class="index-view">
-    {% for category, forums in categories %}
-        {% include theme("forum/category_layout.html") %}
-    {% endfor %}
+    <div class="index-view">
+        {% for category, forums in categories %}
+            {% include theme("forum/category_layout.html") %}
+        {% endfor %}
 
-    <div class="card page mt-3">
-        <div class="card-header page-header">
-            {% trans %}Board Statistics{% endtrans %}
-            [<a href="{{ url_for('forum.who_is_online') }}" onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
-        </div>
-        <div class="card-body page-body">
-            <div class="row page-row">
-                <div class="col-md-6 col-sm-6 col-12">
-                    <p class="flaskbb-stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
-                    <p class="flaskbb-stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>
-                    <p class="flaskbb-stats">{% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong></p>
-                </div>
-                <div class="col-md-6 col-sm-6 col-12">
-                    <p class="flaskbb-stats">{% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}</p>
-                    <p class="flaskbb-stats">{% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong></p>
-                    {% if online_guests is not none %}
-                    <p class="flaskbb-stats">{% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong></p>
-                    {% endif %}
+        <div class="card page mt-3">
+            <div class="card-header page-header">
+                {% trans %}Board Statistics{% endtrans %}
+                [<a href="{{ url_for('forum.who_is_online') }}"
+   onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+            </div>
+            <div class="card-body page-body">
+                <div class="row page-row">
+                    <div class="col-md-6 col-sm-6 col-12">
+                        <p class="flaskbb-stats">{% trans %}Total number of registered users{% endtrans %}: <strong>{{ user_count }}</strong></p>
+                        <p class="flaskbb-stats">{% trans %}Total number of topics{% endtrans %}: <strong>{{ topic_count }}</strong></p>
+                        <p class="flaskbb-stats">{% trans %}Total number of posts{% endtrans %}: <strong>{{ post_count }}</strong></p>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-12">
+                        <p class="flaskbb-stats">{% trans %}Newest registered user{% endtrans %}: {% if newest_user %}<a href="{{ newest_user.url }}">{{ newest_user.username }}</a>{% else %}{% trans %}No users{% endtrans %}{% endif %}</p>
+                        <p class="flaskbb-stats">{% trans %}Registered users online{% endtrans %}: <strong>{{ online_users }}</strong></p>
+                        {% if online_guests is not none %}
+                            <p class="flaskbb-stats">{% trans %}Guests online{% endtrans %}: <strong>{{ online_guests }}</strong></p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

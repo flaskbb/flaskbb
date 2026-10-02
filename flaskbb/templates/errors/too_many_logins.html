@@ -1,14 +1,13 @@
-{% set page_title = _("Too Many Requests") %}
-
 {% extends theme("layout.html") %}
+{% set page_title = _("Too Many Requests") %}
 {% block content %}
 
-<div class="card page">
-    <div class="card-body">
-        <h1 class="card-title">{% trans %}429 - Too Many Requests{% endtrans %}</h1>
-        <p class="card-text mb-0">{% trans %}In order to prevent brute force attacks on accounts we have limited the amount of requests on this route.{% endtrans %}</p>
-        <p class="card-text">{% trans %}Please try again in{% endtrans %} <strong>{{ timeout }}</strong></p>
+    <div class="card page">
+        <div class="card-body">
+            <h1 class="card-title">{% trans %}429 - Too Many Requests{% endtrans %}</h1>
+            <p class="card-text mb-0">{% trans %}In order to prevent brute force attacks on accounts we have limited the amount of requests on this route.{% endtrans %}</p>
+            <p class="card-text">{% trans %}Please try again in{% endtrans %} <strong>{{ timeout }}</strong></p>
+        </div>
     </div>
-</div>
 
 {% endblock %}

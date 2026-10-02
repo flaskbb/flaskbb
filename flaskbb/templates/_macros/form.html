@@ -6,29 +6,24 @@
     {% endif %}
 {% endmacro %}
 
-
 {%- macro field_description(field) -%}
     {% if field.description %}
         <div class="form-text">{{ field.description|safe }}</div>
     {% endif %}
 {%- endmacro -%}
 
-
 {%- macro field_errors(field) -%}
     {% if field.errors %}
         {%- for error in field.errors -%}
-        <div class="invalid-feedback">
-            {{error}}
-        </div>
+            <div class="invalid-feedback">{{ error }}</div>
         {%- endfor -%}
     {% endif %}
 {%- endmacro -%}
 
-
 {%- macro render_input_field(field, div_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {% set placeholder = kwargs['placeholder']|length or field.label.text %}
     {% set css_error = ' is-invalid' if field.errors else '' %}
@@ -39,45 +34,41 @@
     {{ field_description(field) }}
     {{ field_errors(field) }}
 
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
 
-
 {%- macro render_boolean_field(field, div_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {% set css_error = ' is-invalid' if field.errors else '' %}
     {% set css_class = kwargs['class'] if kwargs['class'] else 'form-check-input' %}
     {% set css_class = css_class + css_error if css_error else css_class %}
     <div class="form-check">
         {{ field(class=css_class, **kwargs) }}
-        <label class="form-check-label" for="{{ field.id }}">
-        {{ field.label.text }}
-        </label>
+        <label class="form-check-label" for="{{ field.id }}">{{ field.label.text }}</label>
         {{ field_description(field) }}
         {{ field_errors(field) }}
     </div>
 
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
 
-
 {%- macro render_select_field(field, div_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {% set css_error = ' is-invalid' if field.errors else '' %}
     {% set css_class = kwargs['class'] if kwargs['class'] else 'form-select' %}
     {% set css_class = css_class + css_error if css_error else css_class %}
 
-    {% if field.type == 'QuerySelectMultipleField' or field.type == 'SelectMultipleField' %}
+    {% if field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
         {{ field(multiple=True, class=css_class) }}
     {% else %}
         {{ field(class=css_class) }}
@@ -86,17 +77,16 @@
     {{ field_description(field) }}
     {{ field_errors(field) }}
 
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
-
 
 {# markdown: 'post' or 'nonpost', the renderer the preview uses #}
 {%- macro render_editor_field(field, div_class='', markdown='post', mode_tabs=False) -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {% set placeholder = kwargs['placeholder']|length or field.label.text %}
     {% set css_error = ' is-invalid' if field.errors else '' %}
@@ -106,71 +96,96 @@
         <div class="card-header">
             <div class="btn-toolbar">
                 <markdown-toolbar for="{{ field.id }}">
-                    <div class="btn-group btn-group-sm me-2">
-                        <md-header class="btn btn-white" data-tooltip="tooltip" title="Heading"><span class="fas fa-heading"></span></md-header>
-                        <md-bold class="btn btn-white" data-tooltip="tooltip" title="Bold"><span class="fas fa-bold"></span></md-bold>
-                        <md-italic class="btn btn-white" data-tooltip="tooltip" title="Italic"><span class="fas fa-italic"></span></md-italic>
-                        <md-strikethrough class="btn btn-white" data-tooltip="tooltip" title="Strikethrough"><span class="fas fa-strikethrough"></span></md-strikethrough>
-                    </div>
+                <div class="btn-group btn-group-sm me-2">
+                    <md-header class="btn btn-white" data-tooltip="tooltip" title="Heading"><span class="fas fa-heading"></span></md-header>
+                    <md-bold class="btn btn-white" data-tooltip="tooltip" title="Bold"><span class="fas fa-bold"></span></md-bold>
+                    <md-italic class="btn btn-white" data-tooltip="tooltip" title="Italic"><span class="fas fa-italic"></span></md-italic>
+                    <md-strikethrough class="btn btn-white" data-tooltip="tooltip" title="Strikethrough"><span class="fas fa-strikethrough"></span></md-strikethrough>
+                </div>
 
-                    <div class="btn-group btn-group-sm me-2">
-                        <md-quote class="btn btn-white" data-tooltip="tooltip" title="Quote"><span class="fas fa-quote-left"></span></md-quote>
-                        <md-code class="btn btn-white" data-tooltip="tooltip" title="Code"><span class="fas fa-code"></span></md-code>
-                        <md-link class="btn btn-white" data-tooltip="tooltip" title="Insert Link"><span class="fas fa-link"></span></md-link>
-                        <md-image class="btn btn-white" data-tooltip="tooltip" title="Insert Image"><span class="fas fa-image"></span></md-image>
-                    </div>
+                <div class="btn-group btn-group-sm me-2">
+                    <md-quote class="btn btn-white" data-tooltip="tooltip" title="Quote"><span class="fas fa-quote-left"></span></md-quote>
+                    <md-code class="btn btn-white" data-tooltip="tooltip" title="Code"><span class="fas fa-code"></span></md-code>
+                    <md-link class="btn btn-white" data-tooltip="tooltip" title="Insert Link"><span class="fas fa-link"></span></md-link>
+                    <md-image class="btn btn-white" data-tooltip="tooltip" title="Insert Image"><span class="fas fa-image"></span></md-image>
+                </div>
 
-                    <div class="btn-group btn-group-sm me-2">
-                        <md-unordered-list class="btn btn-white" data-tooltip="tooltip" title="Unordered List"><span class="fas fa-list-ul"></span></md-unordered-list>
-                        <md-ordered-list class="btn btn-white" data-tooltip="tooltip" title="Ordered List"><span class="fas fa-list-ol"></span></md-ordered-list>
-                        <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
-                        <button type="button" class="btn btn-white emoji-picker-btn" data-editor="{{ field.id }}" aria-haspopup="dialog" aria-controls="emoji-picker" aria-label="{{ _('Insert emoji') }}" title="{{ _('Insert emoji') }}"><span class="far fa-smile" aria-hidden="true"></span></button>
-                    </div>
+                <div class="btn-group btn-group-sm me-2">
+                    <md-unordered-list class="btn btn-white" data-tooltip="tooltip" title="Unordered List"><span class="fas fa-list-ul"></span></md-unordered-list>
+                    <md-ordered-list class="btn btn-white" data-tooltip="tooltip" title="Ordered List"><span class="fas fa-list-ol"></span></md-ordered-list>
+                    <md-mention class="btn btn-white" data-tooltip="tooltip" title="Mention"><span class="fas fa-at"></span></md-mention>
+                    <button type="button"
+                            class="btn btn-white emoji-picker-btn"
+                            data-editor="{{ field.id }}"
+                            aria-haspopup="dialog"
+                            aria-controls="emoji-picker"
+                            aria-label="{{ _('Insert emoji') }}"
+                            title="{{ _('Insert emoji') }}">
+                        <span class="far fa-smile" aria-hidden="true"></span>
+                    </button>
+                </div>
 
-                    {{ run_hook("flaskbb_tpl_markdown_toolbar_buttons") }}
+                {{ run_hook("flaskbb_tpl_markdown_toolbar_buttons") }}
 
-                    {% if mode_tabs %}
-                    <div class="btn-group btn-group-sm me-2 editor-mode-tabs" role="group" aria-label="{{ _('Editor mode') }}">
-                        <button type="button" class="btn btn-primary write-btn active" data-editor="{{ field.id }}" aria-pressed="true">{{ _('Write') }}</button>
-                        <button type="button" class="btn btn-white preview-btn" data-preview="{{ field.id }}" data-preview-url="{{ url_for('forum.markdown_preview', mode=markdown) }}" aria-pressed="false">{{ _('Preview') }}</button>
+                {% if mode_tabs %}
+                    <div class="btn-group btn-group-sm me-2 editor-mode-tabs"
+                         role="group"
+                         aria-label="{{ _('Editor mode') }}">
+                        <button type="button"
+                                class="btn btn-primary write-btn active"
+                                data-editor="{{ field.id }}"
+                                aria-pressed="true">{{ _("Write") }}</button>
+                        <button type="button"
+                                class="btn btn-white preview-btn"
+                                data-preview="{{ field.id }}"
+                                data-preview-url="{{ url_for('forum.markdown_preview', mode=markdown) }}"
+                                aria-pressed="false">{{ _("Preview") }}</button>
                     </div>
-                    {% else %}
-                    <button type="button" class="btn btn-sm btn-primary me-2 preview-btn" data-preview="{{ field.id }}" data-preview-url="{{ url_for('forum.markdown_preview', mode=markdown) }}">{{ _('Preview') }}</button>
-                    {% endif %}
-                    <button type="button" class="btn btn-sm btn-white help-btn" data-bs-toggle="modal" data-bs-target="#editor-help" data-tooltip="tooltip" title="Markdown Cheatsheet"><span class="fas fa-question"></span></button>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-sm btn-primary me-2 preview-btn"
+                            data-preview="{{ field.id }}"
+                            data-preview-url="{{ url_for('forum.markdown_preview', mode=markdown) }}">{{ _("Preview") }}</button>
+                {% endif %}
+                <button type="button"
+                        class="btn btn-sm btn-white help-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editor-help"
+                        data-tooltip="tooltip"
+                        title="Markdown Cheatsheet">
+                    <span class="fas fa-question"></span>
+                </button>
                 </markdown-toolbar>
 
             </div>
         </div>
         {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
-        <div class="preview" id="{{ field.id }}-preview" style="display: none; padding:  0.375rem 0.75rem"></div>
+        <div class="preview" id="{{ field.id }}-preview"></div>
     </div>
     {{ field_description(field) }}
     {{ field_errors(field) }}
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
 
-
 {%- macro render_submit_field(field, div_class='') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {% set css_class = kwargs['class'] if kwargs['class'] else 'btn btn-success' %}
     {{ field(class=css_class) }}
 
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
 
-
 {%- macro render_field(field, div_class='mb-3 col-12') -%}
-{% if div_class %}
-<div class="{{ div_class }}">
-{% endif %}
+    {% if div_class %}
+        <div class="{{ div_class }}">
+    {% endif %}
 
     {{ field_label(field) }}
 
@@ -186,62 +201,63 @@
         {{ render_input_field(field, **kwargs) }}
     {% endif %}
 
-{% if div_class %}
-</div>
-{% endif %}
+    {% if div_class %}
+        </div>
+    {% endif %}
 {%- endmacro -%}
-
 
 {%- macro horizontal_field(field, label_class='col-3 col-form-label text-end', div_class='col-4') -%}
-<div class="row mb-3">
+    <div class="row mb-3">
 
-    {{ field_label(field, class=label_class) }}
+        {{ field_label(field, class=label_class) }}
 
-    <div class="{{ div_class }}">
-    {% if field.type == "BooleanField" %}
-        {{ render_boolean_field(field, **kwargs) }}
-    {% elif field.type == "SelectField" or field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
-        {{ render_select_field(field, **kwargs) }}
-    {% elif field.type == "SubmitField" %}
-        {{ render_submit_field(field, **kwargs) }}
-    {% elif field.type == "TextAreaField" %}
-        {{ render_editor_field(field, **kwargs) }}
-    {% else %}
-        {{ render_input_field(field, **kwargs) }}
-    {% endif %}
+        <div class="{{ div_class }}">
+            {% if field.type == "BooleanField" %}
+                {{ render_boolean_field(field, **kwargs) }}
+            {% elif field.type == "SelectField" or field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
+                {{ render_select_field(field, **kwargs) }}
+            {% elif field.type == "SubmitField" %}
+                {{ render_submit_field(field, **kwargs) }}
+            {% elif field.type == "TextAreaField" %}
+                {{ render_editor_field(field, **kwargs) }}
+            {% else %}
+                {{ render_input_field(field, **kwargs) }}
+            {% endif %}
+        </div>
+
     </div>
-
-</div>
 {%- endmacro -%}
 
-
 {% macro action_confirm(id, url, title, icon='', btn='btn btn-icon', icon_only=True) %}
-<form class="d-inline" id="{{ id }}" method="post" action="{{ url }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <button type="button" class="{{ btn }}" data-bs-toggle="modal" data-bs-target="#confirmModal">
-        {% if icon_only %}
-        <span class="{{ icon }}" data-bs-toggle="tooltip" title="{{ title }}"></span>
-        {% else %}
-        <span class="{{ icon }}"></span> {{ title }}
-        {% endif %}
-    </button>
-</form>
+    <form class="d-inline" id="{{ id }}" method="post" action="{{ url }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button type="button"
+                class="{{ btn }}"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmModal">
+            {% if icon_only %}
+                <span class="{{ icon }}" data-bs-toggle="tooltip" title="{{ title }}"></span>
+            {% else %}
+                <span class="{{ icon }}"></span> {{ title }}
+            {% endif %}
+        </button>
+    </form>
 {% endmacro %}
-
 
 {# Posts the checked .action-checkbox rows and swaps the refreshed list in. #}
 {% macro bulk_action(url, title, icon) %}
-<li>
-    <button type="button" class="dropdown-item btn btn-sm"
-            hx-post="{{ url }}"
-            hx-trigger="click[document.querySelector('input.action-checkbox:checked')]"
-            hx-include="input.action-checkbox:checked"
-            hx-confirm="{{ _('Are you sure?') }}"
-            hx-target="closest .settings-col"
-            hx-select=".settings-col"
-            hx-swap="outerHTML"
-            hx-select-oob="#flashed-messages">
-        <span class="{{ icon }}"></span> {{ title }}
-    </button>
-</li>
+    <li>
+        <button type="button"
+                class="dropdown-item btn btn-sm"
+                hx-post="{{ url }}"
+                hx-trigger="click[document.querySelector('input.action-checkbox:checked')]"
+                hx-include="input.action-checkbox:checked"
+                hx-confirm="{{ _('Are you sure?') }}"
+                hx-target="closest .settings-col"
+                hx-select=".settings-col"
+                hx-swap="outerHTML"
+                hx-select-oob="#flashed-messages">
+            <span class="{{ icon }}"></span> {{ title }}
+        </button>
+    </li>
 {% endmacro %}

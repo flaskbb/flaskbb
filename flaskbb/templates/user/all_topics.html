@@ -2,55 +2,50 @@
 {%- from theme("_macros/pagination.html") import render_pagination, topic_pages %}
 
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb bg-light">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ user.url }}">{{ user.username }}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Topics{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ user.url }}">{{ user.username }}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Topics{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block profile_content %}
-<div class="col-12 profile-content">
+    <div class="col-12 profile-content">
 
-    {% for topic in topics.items %}
-    <div class="card page mb-3">
-        <div class="card-header page-header topic-header fw-normal">
-            {% trans trimmed
-                topic_url=topic.url,
-                topic_title=topic.title,
-                forum_url=topic.forum.url,
-                forum_title=topic.forum.title
-            %}
-                <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
-                in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
-            {% endtrans %}
-        </div>
-        <div class="card-body page-body topic-content">
-            <div class="col-12 ps-3">
-                <div class="topic-created">
-                    {{ topic.date_created|format_datetime }}
+        {% for topic in topics.items %}
+            <div class="card page mb-3">
+                <div class="card-header page-header topic-header fw-normal">
+                    {% trans trimmed
+                        topic_url=topic.url,
+                        topic_title=topic.title,
+                        forum_url=topic.forum.url,
+                        forum_title=topic.forum.title
+                        %}
+                    <strong><a href="{{ topic_url }}">{{ topic_title }}</a></strong>
+                    in forum <a href="{{ forum_url }}">{{ forum_title }}</a>
+                    {% endtrans %}
                 </div>
-                <div class="topic-content">
-                    {{ topic.first_post.content|markup }}
+                <div class="card-body page-body topic-content">
+                    <div class="col-12 ps-3">
+                        <div class="topic-created">{{ topic.date_created|format_datetime }}</div>
+                        <div class="topic-content">{{ topic.first_post.content|markup }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="row">
-        <div class="col-12">
-            <div class="alert-message alert-message-info" role="alert">
-                {% trans %}No topics yet{% endtrans %}
+        {% else %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert-message alert-message-info"
+                         role="alert">{% trans %}No topics yet{% endtrans %}</div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
 
-    {% if topics.items %}
-    <div class="col-12 controls-col">
-        {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
-    </div>
-    {% endif %}
+        {% if topics.items %}
+            <div class="col-12 controls-col">
+                {{ render_pagination(topics, url_for('user.view_all_topics', username=user.username)) }}
+            </div>
+        {% endif %}
 
-</div>
+    </div>
 {% endblock %}

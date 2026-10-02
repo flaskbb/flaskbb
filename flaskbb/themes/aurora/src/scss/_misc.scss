@@ -147,6 +147,22 @@ p.flaskbb-stats {
 }
 
 .cheatsheet {
+    .typography-example {
+        margin-top: 1em;
+    }
+
+    .code-hints {
+        margin-top: 2em;
+    }
+
+    .credit {
+        bottom: 10px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+    }
+
     h2 {
         text-align: center;
         font-size: 1.6em;

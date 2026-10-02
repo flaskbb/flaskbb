@@ -1,109 +1,114 @@
+{% extends theme("management/management_layout.html") %}
 {% set page_title = title %}
 {% set active = "management.add_user" if user is not defined else "management.users" %}
 
-{% extends theme("management/management_layout.html") %}
-
 {% block breadcrumb %}
-<ol class="breadcrumb flaskbb-breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
-</ol>
+    <ol class="breadcrumb flaskbb-breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
+        <li class="breadcrumb-item active">{% trans %}Manage Users{% endtrans %}</li>
+    </ol>
 {% endblock %}
 
 {% block management_content %}
-{%- from theme('_macros/pagination.html') import render_pagination -%}
-{%- from theme('_macros/form.html') import horizontal_field -%}
-{%- from theme('_macros/utils.html') import avatar_img -%}
+    {%- from theme('_macros/pagination.html') import render_pagination -%}
+    {%- from theme('_macros/form.html') import horizontal_field -%}
+    {%- from theme('_macros/utils.html') import avatar_img -%}
 
-{#- `user` is undefined on the Add User page, hence the `is defined` guard.
+    {#- `user` is undefined on the Add User page, hence the `is defined` guard.
     Only fields that can cost you your own access need confirming, so this is
     false for a super moderator or moderator editing themselves - they have
     neither field. -#}
-{% set editing_self = user is defined and current_user.id == user.id %}
-{% set confirm_self_change = editing_self
+    {% set editing_self = user is defined and current_user.id == user.id %}
+    {% set confirm_self_change = editing_self
     and (form.primary_group is not none or form.activated is not none) %}
 
-<div class="col-md-12 settings-col">
-    <div class="card settings">
-        <div class="card-header settings-header">
-            <span class="fa fa-user-plus"></span> {{ title }}
-        </div>
-        <div class="card-body settings-body">
-            <form class="row p-3" role="form" method="post" enctype="multipart/form-data">
-                {{ form.hidden_tag() }}
+    <div class="col-md-12 settings-col">
+        <div class="card settings">
+            <div class="card-header settings-header">
+                <span class="fa fa-user-plus"></span> {{ title }}
+            </div>
+            <div class="card-body settings-body">
+                <form class="row p-3"
+                      role="form"
+                      method="post"
+                      enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
 
-                {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
+                    {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
 
-                {{ horizontal_field(form.username) }}
-                {% if form.email is not none %}
-                {{ horizontal_field(form.email) }}
-                {% endif %}
-                {% if form.password is not none %}
-                {{ horizontal_field(form.password) }}
-                {% endif %}
-                {{ horizontal_field(form.birthday) }}
-                {{ horizontal_field(form.gender) }}
-                {{ horizontal_field(form.location) }}
-                {{ horizontal_field(form.website) }}
-                {% if form.primary_group is not none %}
-                {{ horizontal_field(form.primary_group) }}
-                {% endif %}
-                {% if form.secondary_groups is not none %}
-                {{ horizontal_field(form.secondary_groups) }}
-                {% endif %}
-                {% if form.activated is not none %}
-                {{ horizontal_field(form.activated, div_class="offset-3 col-4") }}
-                {% endif %}
-                {{ form.delete_avatar(id="delete_avatar") }}
-                {{ horizontal_field(form.avatar, div_class="col-5") }}
-                <div class="row mb-3">
-                    <div class="offset-3 col-5">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <label>{% trans %}Current Avatar{% endtrans %}</label>
+                    {{ horizontal_field(form.username) }}
+                    {% if form.email is not none %}
+                        {{ horizontal_field(form.email) }}
+                    {% endif %}
+                    {% if form.password is not none %}
+                        {{ horizontal_field(form.password) }}
+                    {% endif %}
+                    {{ horizontal_field(form.birthday) }}
+                    {{ horizontal_field(form.gender) }}
+                    {{ horizontal_field(form.location) }}
+                    {{ horizontal_field(form.website) }}
+                    {% if form.primary_group is not none %}
+                        {{ horizontal_field(form.primary_group) }}
+                    {% endif %}
+                    {% if form.secondary_groups is not none %}
+                        {{ horizontal_field(form.secondary_groups) }}
+                    {% endif %}
+                    {% if form.activated is not none %}
+                        {{ horizontal_field(form.activated, div_class="offset-3 col-4") }}
+                    {% endif %}
+                    {{ form.delete_avatar(id="delete_avatar") }}
+                    {{ horizontal_field(form.avatar, div_class="col-5") }}
+                    <div class="row mb-3">
+                        <div class="offset-3 col-5">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <label>{% trans %}Current Avatar{% endtrans %}</label>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center">
+                                {{ avatar_img(user, size=150, class="profilepicture rounded") }}
+                            </div>
+                            {% if user and user.avatar %}
+                                <div class="d-flex justify-content-center align-items-center deleteavatar">
+                                    <button type="button" class="btn btn-sm">
+                                        <span class="fas fa-fw fa-trash text-danger"></span>
+                                        {% trans %}Delete Avatar{% endtrans %}
+                                    </button>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="d-flex justify-content-center align-items-center">
-                            {{ avatar_img(user, size=150, class="profilepicture rounded") }}
-                        </div>
-                        {% if user and user.avatar %}
-                        <div class="d-flex justify-content-center align-items-center deleteavatar">
-                            <button type="button" class="btn btn-sm">
-                                <span class="fas fa-fw fa-trash text-danger"></span>
-                                {% trans %}Delete Avatar{% endtrans %}
-                            </button>
-                        </div>
-                        {% endif %}
                     </div>
-                </div>
-                {{ horizontal_field(form.signature, rows=4, div_class="col-sm-8") }}
-                {{ horizontal_field(form.notes, rows=8, div_class="col-sm-8") }}
+                    {{ horizontal_field(form.signature, rows=4, div_class="col-sm-8") }}
+                    {{ horizontal_field(form.notes, rows=8, div_class="col-sm-8") }}
 
-                {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
+                    {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
 
-                {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
+                    {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
 
-                {%- if confirm_self_change %}
-                {#- Hidden trigger so the shared confirm_modal.js handles the
+                    {%- if confirm_self_change %}
+                        {#- Hidden trigger so the shared confirm_modal.js handles the
                     dialog and the submit - it needs a real click with this
                     button as relatedTarget, and it submits the closest form. -#}
-                <button type="button" id="confirm-self-change" class="d-none"
-                        data-bs-toggle="modal" data-bs-target="#confirmModal"></button>
-                {%- endif %}
-            </form>
+                        <button type="button"
+                                id="confirm-self-change"
+                                class="d-none"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmModal"></button>
+                    {%- endif %}
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-{% if confirm_self_change %}
-{% set confirm_title = _("Change your own account?") %}
-{% set confirm_message = _("You are about to change your own group or activation state. This can take away your access to the management panel, and you may not be able to undo it yourself.") %}
-{% include theme('_partials/confirm_dialog.html') %}
-{% endif %}
+    {% if confirm_self_change %}
+        {% set confirm_title = _("Change your own account?") %}
+        {% set confirm_message = _("You are about to change your own group or activation state. This can take away your access to the management panel, and you may not be able to undo it yourself.") %}
+        {% include theme("_partials/confirm_dialog.html") %}
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
-{%- if confirm_self_change %}
-<script type="text/javascript">
+    {%- if confirm_self_change %}
+        <script>
     // Editing your own account: make a change to your own group or activation
     // state go through the confirm dialog first.
     (function () {
@@ -139,9 +144,9 @@
             trigger.click();
         });
     })();
-</script>
-{%- endif %}
-<script type="text/javascript">
+        </script>
+    {%- endif %}
+    <script>
     const defaultAvatar = "{{ url_for('static', filename='avatar100x100.png') }}"
 
     // Only rendered when the user actually has an avatar
@@ -170,5 +175,5 @@
             deleteAvatarBtn.remove()
         }, { once: true });
     }
-</script>
+    </script>
 {% endblock %}

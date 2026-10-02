@@ -1,121 +1,129 @@
-{% set page_title = _("Topic Tracker") %}
-{% set active_forum_nav=False %}
-
 {% extends theme("layout.html") %}
+{% set page_title = _("Topic Tracker") %}
+{% set active_forum_nav = False %}
 {% block content %}
-{% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
+    {% from theme('_macros/pagination.html') import render_pagination, topic_pages %}
 
-<form role="form" method="POST">
-    <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
-
-    <div class="forum-view">
-
-        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
-            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-            <li class="breadcrumb-item active">{% trans %}Topic Tracker{% endtrans %}</li>
-        </ol>
-
-        <div class="row controls-row pt-0">
-            <div class="col me-auto g-0">
-                {{ render_pagination(topics, url_for('forum.topictracker')) }}
-            </div>
+    <form role="form" method="post">
+        <div class="d-none">
+            <input id="csrf_token"
+                   name="csrf_token"
+                   type="hidden"
+                   value="{{ csrf_token() }}">
         </div>
 
-        <div class="card forum">
-            <div class="card-header forum-header">
-                <a href="{{ url_for('forum.topictracker') }}">{% trans %}Topic Tracker{% endtrans %}</a>
+        <div class="forum-view">
+
+            <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+                <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+                <li class="breadcrumb-item active">{% trans %}Topic Tracker{% endtrans %}</li>
+            </ol>
+
+            <div class="row controls-row pt-0">
+                <div class="col me-auto g-0">{{ render_pagination(topics, url_for('forum.topictracker')) }}</div>
             </div>
 
-            <div class="card-body forum-body">
-                <div class="row m-0 forum-meta">
-                    <div class="col-7 col-sm-4 topic-name">{% trans %}Topic{% endtrans %}</div>
-                    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
-                    <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
-                    <div class="col-4 col-sm-3 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
-                    <div class="col-1 topic-select-all"><input type="checkbox" name="rowtoggle" class="action-checkall" title="{% trans %}Select all{% endtrans %}"/></div>
+            <div class="card forum">
+                <div class="card-header forum-header">
+                    <a href="{{ url_for('forum.topictracker') }}">{% trans %}Topic Tracker{% endtrans %}</a>
                 </div>
 
-                {% for topic, last_post, topicread, forumsread in topics.items %}
-                <div class="row forum-row hover">
-                    <div class="col-7 col-sm-4 topic-info">
-                        <div class="col-auto topic-status">
-                        {% if topic.locked %}
-                            <span class="fas fa-lock fa-fw topic-locked"></span>
-                        {% elif topic.hidden %}
-                            <span class="far fa-eye"></span>
-                        {% elif topic.important %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="far fa-star fa-fw topic-starred-unread"></span>
-                            {% else %}
-                                <span class="fas fa-star fa-fw topic-starred-read"></span>
-                            {% endif %}
-                        {% else %}
-                            {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                                <span class="fas fa-comment fa-fw topic-unread"></span>
-                            {% else %}
-                                <span class="far fa-comment fa-fw topic-read"></span>
-                            {% endif %}
-                        {% endif %}
-                        </div>
-
-                        <div class="topic-name">
-                            <a href="{{ topic.url }}">{{ topic.title }}</a>
-                            <!-- Topic Pagination -->
-                            <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
-                        </div>
-
-                        <div class="topic-author">
-                            {% trans %}by{% endtrans %}
-                            {% if topic.user_id %}
-                             <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
-                            {% else %}
-                            {{ topic.username }}
-                            {% endif %}
-                        </div>
-
-                    </div>
-
-                    <div class="col-sm-2 d-none d-sm-block topic-stats">
-                        {{ topic.post_count }}
-                    </div>
-
-                    <div class="col-sm-2 d-none d-sm-block topic-stats">
-                        {{ topic.views }}
-                    </div>
-
-                    <div class="col-4 col-sm-3 topic-last-post">
-                        <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a><br />
-
-                        <div class="topic-author">
-                            {% trans %}by{% endtrans %}
-                            {% if last_post.user_id %}
-                            <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
-                            {% else %}
-                            {{ last_post.username }}
-                            {% endif %}
+                <div class="card-body forum-body">
+                    <div class="row m-0 forum-meta">
+                        <div class="col-7 col-sm-4 topic-name">{% trans %}Topic{% endtrans %}</div>
+                        <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Posts{% endtrans %}</div>
+                        <div class="col-sm-2 d-none d-sm-block topic-stats">{% trans %}Views{% endtrans %}</div>
+                        <div class="col-4 col-sm-3 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
+                        <div class="col-1 topic-select-all">
+                            <input type="checkbox"
+                                   name="rowtoggle"
+                                   class="action-checkall"
+                                   title="{% trans %}Select all{% endtrans %}" />
                         </div>
                     </div>
 
-                    <div class="col-1 topic-select">
-                        <input type="checkbox" name="rowid" class="action-checkbox" value="{{ topic.id }}" title="{% trans %}Select topic{% endtrans %}"/>
-                    </div>
+                    {% for topic, last_post, topicread, forumsread in topics.items %}
+                        <div class="row forum-row hover">
+                            <div class="col-7 col-sm-4 topic-info">
+                                <div class="col-auto topic-status">
+                                    {% if topic.locked %}
+                                        <span class="fas fa-lock fa-fw topic-locked"></span>
+                                    {% elif topic.hidden %}
+                                        <span class="far fa-eye"></span>
+                                    {% elif topic.important %}
+                                        {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                            <span class="far fa-star fa-fw topic-starred-unread"></span>
+                                        {% else %}
+                                            <span class="fas fa-star fa-fw topic-starred-read"></span>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
+                                            <span class="fas fa-comment fa-fw topic-unread"></span>
+                                        {% else %}
+                                            <span class="far fa-comment fa-fw topic-read"></span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="topic-name">
+                                    <a href="{{ topic.url }}">{{ topic.title }}</a>
+                                    <!-- Topic Pagination -->
+                                    <span class="topic-pages">{{ topic_pages(topic, flaskbb_config["POSTS_PER_PAGE"]) }}</span>
+                                </div>
+
+                                <div class="topic-author">
+                                    {% trans %}by{% endtrans %}
+                                    {% if topic.user_id %}
+                                        <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                                    {% else %}
+                                        {{ topic.username }}
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-2 d-none d-sm-block topic-stats">{{ topic.post_count }}</div>
+
+                            <div class="col-sm-2 d-none d-sm-block topic-stats">{{ topic.views }}</div>
+
+                            <div class="col-4 col-sm-3 topic-last-post">
+                                <a href="{{ last_post.url }}">{{ last_post.date_created|time_since }}</a>
+                                <br />
+
+                                <div class="topic-author">
+                                    {% trans %}by{% endtrans %}
+                                    {% if last_post.user_id %}
+                                        <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
+                                    {% else %}
+                                        {{ last_post.username }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-1 topic-select">
+                                <input type="checkbox"
+                                       name="rowid"
+                                       class="action-checkbox"
+                                       value="{{ topic.id }}"
+                                       title="{% trans %}Select topic{% endtrans %}" />
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row forum-row">
+                            <div class="col-12">{% trans %}No Topics.{% endtrans %}</div>
+                        </div>
+                        <!-- end forum-row -->
+                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="row forum-row">
-                    <div class="col-12">
-                        {% trans %}No Topics.{% endtrans %}
-                    </div>
-                </div> <!-- end forum-row -->
-                {% endfor %}
             </div>
+            <div class="row pt-2">
+                <div class="col-auto ms-auto">
+                    <button type="submit" name="untrack" class="btn btn-primary">
+                        <span class="fas fa-tag"></span> {% trans %}Untrack Topics{% endtrans %}
+                    </button>
+                </div>
+            </div>
+            <!-- end controls-row -->
         </div>
-        <div class="row pt-2">
-            <div class="col-auto ms-auto">
-                <button name="untrack" class="btn btn-primary">
-                    <span class="fas fa-tag"></span> {% trans %}Untrack Topics{% endtrans %}
-                </button>
-            </div>
-        </div> <!-- end controls-row -->
-    </div>
-</form>
+    </form>
 {% endblock %}

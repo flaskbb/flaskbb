@@ -1,123 +1,123 @@
+{% extends theme("layout.html") %}
 {%- from theme("_macros/navigation.html") import sidebar with context -%}
 {%- from theme("_macros/utils.html") import avatar_img -%}
-
-{% extends theme("layout.html") %}
 {% set page_title = _("%(user)s - User", user=user.username) %}
 
 {% block content %}
 
-{% block breadcrumb %}
-{% endblock %}
-<div class="page-view">
-    <div class="card profile">
+    {% block breadcrumb %}{% endblock %}
+    <div class="page-view">
+        <div class="card profile">
 
-        <div class="card-header profile-header bg-white">
-            <div class="row">
-                <div class="col-12 col-sm-auto mb-3">
-                    <div class="mx-auto" style="width: 150px;">
-                        <div class="d-flex justify-content-center align-items-center">
-                            {{ avatar_img(user, size=150, class="rounded") }}
+            <div class="card-header profile-header bg-white">
+                <div class="row">
+                    <div class="col-12 col-sm-auto mb-3">
+                        <div class="mx-auto profile-avatar">
+                            <div class="d-flex justify-content-center align-items-center">{{ avatar_img(user, size=150, class="rounded") }}</div>
                         </div>
                     </div>
-                </div>
-                <div class="col d-flex flex-column flex-md-row justify-content-between mb-3">
-                    <div class="text-start mb-2 mb-md-0">
-                        <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap author-name">{{ user.username }}</h4>
-                        <h5 class="author-title mb-0">{{ user.primary_group.name }}</h5>
-                        <div class="text-muted">
-                            <small>
-                                {%- if user|is_online %}
-                                <span class="badge bg-success">{% trans %}online{% endtrans %}</span>
-                                {%- else %}
-                                    {%- if user.lastseen -%}
-                                    Last seen {{ user.lastseen|time_since }}
-                                    {%- else -%}
-                                    {% trans %}Never seen{% endtrans %}
-                                    {%- endif -%}
-                                {%- endif %}
-                            </small>
-                        </div>
-                        <div class="mt-2 profile-actions">
+                    <div class="col d-flex flex-column flex-md-row justify-content-between mb-3">
+                        <div class="text-start mb-2 mb-md-0">
+                            <h4 class="pt-sm-2 pb-1 mb-0 text-nowrap author-name">{{ user.username }}</h4>
+                            <h5 class="author-title mb-0">{{ user.primary_group.name }}</h5>
+                            <div class="text-muted">
+                                <small>
+                                    {%- if user|is_online %}
+                                        <span class="badge bg-success">{% trans %}online{% endtrans %}</span>
+                                    {%- else %}
+                                        {%- if user.lastseen -%}
+                                            Last seen {{ user.lastseen|time_since }}
+                                        {%- else -%}
+                                            {% trans %}Never seen{% endtrans %}
+                                        {%- endif -%}
+                                    {%- endif %}
+                                </small>
+                            </div>
+                            <div class="mt-2 profile-actions">
 
-                            {% if current_user == user %}
-                            <a class="btn btn-sm btn-primary" href="{{ url_for('user.settings')}}">
-                                <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
-                            </a>
-                            {% elif current_user|can_edit_user(user) %}
-                            <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_user', user_id=user.id)}}">
-                                <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
-                            </a>
-                            {% endif %}
+                                {% if current_user == user %}
+                                    <a class="btn btn-sm btn-primary" href="{{ url_for('user.settings') }}">
+                                        <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
+                                    </a>
+                                {% elif current_user|can_edit_user(user) %}
+                                    <a class="btn btn-sm btn-primary"
+                                       href="{{ url_for('management.edit_user', user_id=user.id) }}">
+                                        <span class="fas fa-edit"></span> {% trans %}Edit{% endtrans %}
+                                    </a>
+                                {% endif %}
 
-                            {# Ban user #}
-                            {% if current_user|can_ban_user(user) and not user.permissions['banned'] %}
-                            <form class="d-inline" method="post" action="{{ url_for('management.ban_user', user_id=user.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button class="btn btn-sm btn-danger">
-                                    <span class="fas fa-ban"></span> {% trans %}Ban{% endtrans %}
-                                </button>
-                            </form>
+                                {# Ban user #}
+                                {% if current_user|can_ban_user(user) and not user.permissions["banned"] %}
+                                    <form class="d-inline"
+                                          method="post"
+                                          action="{{ url_for('management.ban_user', user_id=user.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <span class="fas fa-ban"></span> {% trans %}Ban{% endtrans %}
+                                        </button>
+                                    </form>
 
-                            {# Unban user #}
-                            {% elif current_user|can_ban_user(user) and user.permissions['banned'] %}
-                            <form class="d-inline" method="post" action="{{ url_for('management.unban_user', user_id=user.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                <button class="btn btn-sm btn-warning">
-                                    <span class="fas fa-ban"></span> {% trans %}Unban{% endtrans %}
-                                </button>
-                            </form>
-                            {% endif %}
+                                    {# Unban user #}
+                                {% elif current_user|can_ban_user(user) and user.permissions["banned"] %}
+                                    <form class="d-inline"
+                                          method="post"
+                                          action="{{ url_for('management.unban_user', user_id=user.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit" class="btn btn-sm btn-warning">
+                                            <span class="fas fa-ban"></span> {% trans %}Unban{% endtrans %}
+                                        </button>
+                                    </form>
+                                {% endif %}
 
-                            {{ run_hook("flaskbb_tpl_profile_actions", user=user) }}
+                                {{ run_hook("flaskbb_tpl_profile_actions", user=user) }}
 
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-auto profile-stats">
-                        <div class="row">
-                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Joined:</div>
-                            <div class="col-auto ps-0 text-start text-nowrap">
-                                {{ user.date_joined|format_date }}
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Posts:</div>
-                            <div class="col-auto ps-0 text-start text-nowrap">{{ user.post_count }}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-auto text-end text-nowrap" style="width: 80px;">Topics:</div>
-                            <div class="col-auto ps-0 text-start text-nowrap">{{ user.topic_count }}</div>
-                        </div>
+                        <div class="col-12 col-md-auto profile-stats">
+                            <div class="row">
+                                <div class="col-auto text-end text-nowrap profile-stat-label">Joined:</div>
+                                <div class="col-auto ps-0 text-start text-nowrap">{{ user.date_joined|format_date }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-auto text-end text-nowrap profile-stat-label">Posts:</div>
+                                <div class="col-auto ps-0 text-start text-nowrap">{{ user.post_count }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-auto text-end text-nowrap profile-stat-label">Topics:</div>
+                                <div class="col-auto ps-0 text-start text-nowrap">{{ user.topic_count }}</div>
+                            </div>
 
-                        {{ run_hook("flaskbb_tpl_profile_stats", user=user) }}
+                            {{ run_hook("flaskbb_tpl_profile_stats", user=user) }}
 
+                        </div>
                     </div>
+
                 </div>
+                {% block profile_navigation %}
 
-            </div>
-            {% block profile_navigation %}
-
-                {{ sidebar(
-                    run_hook(
-                        "flaskbb_tpl_profile_links",
-                        user=user,
-                        is_markup=False
-                    ),
-                    extra_class="nav-tabs card-header-tabs profile-header-tab"
+                    {{ sidebar(
+                        run_hook(
+                            "flaskbb_tpl_profile_links",
+                            user=user,
+                            is_markup=False
+                        ),
+                        extra_class="nav-tabs card-header-tabs profile-header-tab"
                     )
-                }}
+                    }}
 
-            {% endblock %}
-        </div>
-
-        <div class="card-body page-body">
-            <div class="row">
-                {% block profile_content %}
                 {% endblock %}
             </div>
 
-        </div> <!-- end col -->
-    </div> <!-- end row -->
-</div> <!-- end page-view -->
+            <div class="card-body page-body">
+                <div class="row">
+                    {% block profile_content %}{% endblock %}
+                </div>
 
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end page-view -->
 
 {% endblock content %}

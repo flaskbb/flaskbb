@@ -16,3 +16,10 @@ repos:
       - id: debug-statements
       - id: fix-byte-order-marker
       - id: trailing-whitespace
+  - repo: https://github.com/djlint/djLint
+    rev: v1.46.2
+    hooks:
+      - id: djlint-reformat
+        files: ^flaskbb/templates/.*\.html$
+      - id: djlint
+        files: ^flaskbb/templates/.*\.html$
