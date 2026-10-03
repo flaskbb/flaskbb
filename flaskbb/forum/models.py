@@ -593,12 +593,14 @@ class Post(HideableMixin, BaseModel):
                 Post.id != self.id,
                 Post.hidden.is_(False),
             )
+            .order_by(Post.date_created.desc(), Post.id.desc())
             .limit(1)
         ).scalar_one_or_none()
 
         # should never be None, but deal with it anyways to be safe
         if last_unhidden_post and self.date_created > last_unhidden_post.date_created:
             self.topic.last_post = self
+            self.topic.last_updated = self.date_created
 
             # if we're the newest in the topic again, we might be the newest
             # in the forum again only set if our parent topic isn't hidden

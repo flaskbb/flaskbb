@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 
 from flask import current_app
 from flask_login import current_user, login_user, logout_user
@@ -17,6 +17,7 @@ from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import CategoryForums, ForumRow
 from flaskbb.utils.queries import hidden
+from freezegun import freeze_time
 from sqlalchemy import select
 
 
@@ -646,6 +647,39 @@ def test_hiding_post_updates_counts(forum, topic, user):
     assert topic.last_post == new_post
     assert forum.last_post == new_post
     assert new_post.hidden_by is None
+
+
+def test_unhiding_older_post_preserves_newest_post(forum, topic, user):
+    with freeze_time(topic.date_created + timedelta(seconds=1)):
+        older_post = Post(content="Older reply").save(user=user, topic=topic)
+    with freeze_time(topic.date_created + timedelta(seconds=2)):
+        newest_post = Post(content="Newest reply").save(user=user, topic=topic)
+
+    older_post.hide(user)
+    older_post.unhide()
+
+    assert topic.last_post == newest_post
+    assert topic.last_updated == newest_post.date_created
+    assert forum.last_post == newest_post
+    assert forum.last_post_created == newest_post.date_created
+    assert topic.post_count == 3
+    assert forum.post_count == 3
+    assert user.post_count == 3
+
+
+def test_unhiding_newest_post_restores_last_updated(forum, topic, user):
+    with freeze_time(topic.date_created + timedelta(seconds=1)):
+        newest_post = Post(content="Newest reply").save(user=user, topic=topic)
+
+    newest_post.hide(user)
+    assert topic.last_updated == topic.first_post.date_created
+
+    newest_post.unhide()
+
+    assert topic.last_post == newest_post
+    assert topic.last_updated == newest_post.date_created
+    assert forum.last_post == newest_post
+    assert forum.last_post_created == newest_post.date_created
 
 
 def test_hiding_topic_updates_counts(forum, topic, user):
