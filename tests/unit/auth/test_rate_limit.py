@@ -79,6 +79,34 @@ def test_rate_limited_login_returns_429_with_a_timeout(application, clean_limite
     assert "15 minutes" in response.get_data(as_text=True)
 
 
+@pytest.mark.parametrize("endpoint", ["/auth/login", "/auth/register", "/auth/reset-password"])
+def test_disabled_auth_rate_limit_allows_repeated_requests(application, clean_limiter, endpoint):
+    flaskbb_config.update({"AUTH_RATELIMIT_ENABLED": False, "AUTH_REQUESTS": 1, "AUTH_TIMEOUT": 15})
+
+    with application.test_client() as client:
+        for _ in range(3):
+            assert client.get(endpoint).status_code == 200
+
+        flaskbb_config["AUTH_RATELIMIT_ENABLED"] = True
+        assert client.get(endpoint).status_code == 200
+        assert client.get(endpoint).status_code == 429
+
+
+def test_auth_rate_limit_setting_is_checked_on_each_request(application, clean_limiter):
+    flaskbb_config.update({"AUTH_RATELIMIT_ENABLED": True, "AUTH_REQUESTS": 1, "AUTH_TIMEOUT": 15})
+
+    with application.test_client() as client:
+        assert client.get("/auth/login").status_code == 200
+        assert client.get("/auth/login").status_code == 429
+
+        flaskbb_config["AUTH_RATELIMIT_ENABLED"] = False
+        assert client.get("/auth/login").status_code == 200
+        assert client.get("/auth/login").status_code == 200
+
+        flaskbb_config["AUTH_RATELIMIT_ENABLED"] = True
+        assert client.get("/auth/login").status_code == 429
+
+
 def test_enforce_recaptcha_without_a_current_limit(request_context):
     flaskbb_config["LOGIN_RECAPTCHA"] = 1
 

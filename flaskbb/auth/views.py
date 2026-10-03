@@ -424,14 +424,6 @@ def login_rate_limit_message():
 def flaskbb_load_blueprints(app: FlaskBB):
     auth = Blueprint("auth", __name__)
 
-    @auth.before_request
-    def check_rate_limiting():  # pyright: ignore[reportUnusedFunction]
-        """Check the the rate limits for each request for this blueprint."""
-        if not flaskbb_config["AUTH_RATELIMIT_ENABLED"]:
-            return None
-        # TODO: Figure this out
-        # return limiter.check()
-
     @auth.errorhandler(429)
     def login_rate_limit_error(  # pyright: ignore[reportUnusedFunction]
         error: TooManyRequests,
@@ -444,7 +436,11 @@ def flaskbb_load_blueprints(app: FlaskBB):
         )
 
     # Activate rate limiting on the whole blueprint
-    limiter.limit(login_rate_limit, error_message=login_rate_limit_message)(auth)
+    limiter.limit(
+        login_rate_limit,
+        error_message=login_rate_limit_message,
+        exempt_when=lambda: not flaskbb_config["AUTH_RATELIMIT_ENABLED"],
+    )(auth)
 
     register_view(auth, routes=["/logout"], view_func=Logout.as_view("logout"))
     register_view(
