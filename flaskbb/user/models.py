@@ -447,25 +447,22 @@ class User(BaseModel, UserMixin):
 
     @override
     def save(self, groups: list[Group] | None = None) -> "User":
-        """Saves a user. If a list with groups is provided, it will add those
-        to the secondary groups from the user.
+        """Saves a user. If groups are provided, they replace the user's
+        secondary groups, excluding the primary group.
 
         :param groups: A list with groups that should be added to the
                        secondary groups from user.
         """
         if groups is not None:
-            # TODO: Only remove/add groups that are selected
             with db.session.no_autoflush:
-                secondary_groups = self.secondary_groups.all()
+                secondary_groups = set(self.secondary_groups.all())
+                selected_groups = set(groups) - {self.primary_group}
 
-                for group in secondary_groups:
-                    self.remove_from_group(group)
+                for group in secondary_groups - selected_groups:
+                    self.secondary_groups.remove(group)
 
-            for group in groups:
-                # Do not add the primary group to the secondary groups
-                if group == self.primary_group:
-                    continue
-                self.add_to_group(group)
+                for group in selected_groups - secondary_groups:
+                    self.secondary_groups.add(group)
 
             self.invalidate_cache()
 
