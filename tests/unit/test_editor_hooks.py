@@ -69,7 +69,7 @@ def test_toolbar_renders_without_plugins(request_context, default_settings):
 
 
 def test_toolbar_has_an_emoji_picker_for_its_field(request_context, default_settings):
-    rendered = render_editor()
+    rendered = " ".join(render_editor().split())
 
     assert 'emoji-picker-btn" data-editor="content"' in rendered
     assert 'aria-controls="emoji-picker"' in rendered
