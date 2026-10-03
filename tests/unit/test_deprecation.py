@@ -11,8 +11,7 @@ def only_a_drill():
     pass
 
 
-# TODO(anr): Make the parens optional
-@deprecated()
+@deprecated
 def default_deprecation():
     """
     Existing docstring
@@ -31,7 +30,7 @@ class TestDeprecation:
         assert recwarn[0].filename == __file__
         # assert on the next line is conditional on the position of the call
         # to default_deprecation please don't jiggle it around too much
-        assert recwarn[0].lineno == 26
+        assert recwarn[0].lineno == 25
         assert "only_a_drill is deprecated" in only_a_drill.__doc__
 
     def tests_emits_specialized_message(self, recwarn):
@@ -64,6 +63,39 @@ class TestDeprecation:
 
         assert "Existing docstring" in docstring
         assert "default_deprecation is deprecated" in docstring
+
+    @pytest.mark.parametrize("decorator", [deprecated, deprecated()])
+    def test_preserves_function_arguments_return_value_and_metadata(
+        self, decorator, recwarn, default_settings
+    ):
+        def add(left, *, right):
+            return left + right
+
+        decorated = decorator(add)
+
+        warnings.simplefilter("default", RemovedInFlaskBB4)
+        assert decorated(2, right=3) == 5
+
+        assert len(recwarn) == 1
+        assert recwarn[0].category == RemovedInFlaskBB4
+        assert recwarn[0].filename == __file__
+        assert "add is deprecated" in str(recwarn[0].message)
+        assert decorated.__name__ == add.__name__
+        assert decorated.__wrapped__ is add
+        assert "add is deprecated" in decorated.__doc__
+
+    def test_decorator_without_parentheses_works_with_method(self, recwarn, default_settings):
+        class Example:
+            @deprecated
+            def add(self, value):
+                return value + 1
+
+        warnings.simplefilter("default", RemovedInFlaskBB4)
+        assert Example().add(2) == 3
+
+        assert len(recwarn) == 1
+        assert recwarn[0].category == RemovedInFlaskBB4
+        assert "add is deprecated" in str(recwarn[0].message)
 
     @deprecated()
     def deprecated_instance_method(self):

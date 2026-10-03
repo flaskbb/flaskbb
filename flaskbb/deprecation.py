@@ -49,15 +49,22 @@ class RemovedInFlaskBB4(FlaskBBDeprecation):
     version = (4, 0, 0)
 
 
-def deprecated(message: str = "", category: type[FlaskBBDeprecation] = RemovedInFlaskBB4):
+def deprecated(
+    message: str | Callable[..., Any] = "",
+    category: type[FlaskBBDeprecation] = RemovedInFlaskBB4,
+):
     """
     Flags a function or method as deprecated, should not be used on
     classes as it will break inheritance and introspection.
+    Supports both @deprecated and @deprecated(...).
 
     :param message: Optional message to display along with deprecation warning.
     :param category: Warning category to use, defaults to RemovedInFlaskBB4,
         if provided must be a subclass of FlaskBBDeprecation.
     """
+
+    if callable(message):
+        return deprecated(category=category)(message)
 
     def deprecation_decorator(f: Callable[..., None]):
         if not issubclass(category, FlaskBBDeprecation):  # pyright: ignore[reportUnnecessaryIsInstance]
