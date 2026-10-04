@@ -150,13 +150,13 @@ class User(BaseModel, UserMixin):
 
     primary_group_id: Mapped[int] = mapped_column(sa.ForeignKey("groups.id"), nullable=False)
 
-    posts: Mapped[list[Post]] = relationship(
+    posts: DynamicMapped["Post"] = relationship(
         "Post",
         primaryjoin="User.id == Post.user_id",
         lazy="dynamic",
     )
 
-    topics: Mapped[list[Topic]] = relationship(
+    topics: DynamicMapped["Topic"] = relationship(
         "Topic",
         primaryjoin="User.id == Topic.user_id",
         lazy="dynamic",
@@ -325,7 +325,7 @@ class User(BaseModel, UserMixin):
         posts = db.paginate(stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"])
         return posts
 
-    def track_topic(self, topic: Topic):
+    def track_topic(self, topic: "Topic"):
         """Tracks the specified topic.
 
         :param topic: The topic which should be added to the topic tracker.
@@ -334,7 +334,7 @@ class User(BaseModel, UserMixin):
             self.tracked_topics.add(topic)
             return self
 
-    def untrack_topic(self, topic: Topic):
+    def untrack_topic(self, topic: "Topic"):
         """Untracks the specified topic.
 
         :param topic: The topic which should be removed from the
@@ -344,7 +344,7 @@ class User(BaseModel, UserMixin):
             self.tracked_topics.remove(topic)
             return self
 
-    def is_tracking_topic(self, topic: Topic):
+    def is_tracking_topic(self, topic: "Topic"):
         """Checks if the user is already tracking this topic.
 
         :param topic: The topic which should be checked.
