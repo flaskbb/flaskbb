@@ -119,3 +119,178 @@ def test_topic_page_renders_htmx_moderation(default_settings, admin_user, topic)
     assert 'hx-target="#topic-posts"' in response
     assert 'id="topic-posts"' in response
     assert f'hx-post="{_topic_path(topic)}/lock"' in response
+
+
+@pytest.mark.parametrize(
+    "view_cls",
+    [
+        views.DeleteTopic,
+        views.LockTopic,
+        views.UnlockTopic,
+        views.HighlightTopic,
+        views.TrivializeTopic,
+    ],
+)
+@pytest.mark.parametrize(
+    "headers, expected",
+    [
+        ({"Referer": "/forum/1?page=2"}, "/forum/1?page=2"),
+        (
+            {"Referer": "http://localhost:5000/forum/1?page=2"},
+            "http://localhost:5000/forum/1?page=2",
+        ),
+        ({"Referer": "https://evil.example/"}, None),
+        ({}, None),
+        (
+            {"HX-Request": "true", "HX-Current-URL": "http://localhost/forum/1?page=2"},
+            "/forum/1?page=2",
+        ),
+    ],
+)
+def test_denied_topic_action_returns_to_safe_origin(
+    application, user, topic_moderator, view_cls, headers, expected, monkeypatch
+):
+    monkeypatch.setitem(application.config, "ALLOWED_HOSTS", ["localhost:5000"])
+    topic = topic_moderator
+    with application.test_request_context(method="POST", headers=headers):
+        g.forum = topic.forum
+        g.topic = topic
+        login_user(user)
+        response = view_cls.as_view("action")(topic_id=topic.id)
+        messages = get_flashed_messages(with_categories=True)
+        logout_user()
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == (expected or _topic_path(topic))
+    assert len(messages) == 1
+    assert messages[0][0] == "danger"
+    assert db.session.get(views.Topic, topic.id) is topic
+    assert not topic.locked
+    assert not topic.important
+
+
+def _bulk_post(application, actor, forum, data):
+    with application.test_request_context(method="POST", data=data):
+        g.forum = forum
+        g.topic = None
+        login_user(actor)
+        response = views.ManageForum.as_view("manage")(forum_id=forum.id)
+        messages = get_flashed_messages(with_categories=True)
+        logout_user()
+    return response, messages
+
+
+@pytest.mark.parametrize(
+    "action, attribute, value, verb",
+    [
+        ("lock", "locked", True, "locked"),
+        ("unlock", "locked", False, "unlocked"),
+        ("highlight", "important", True, "highlighted"),
+        ("trivialize", "important", False, "trivialized"),
+        ("hide", "hidden", True, "hidden"),
+        ("unhide", "hidden", False, "unhidden"),
+    ],
+)
+def test_bulk_action_counts_only_changed_topics(
+    application, admin_user, topic, topic_moderator, action, attribute, value, verb
+):
+    if action == "unhide":
+        topic.hide(admin_user)
+    elif attribute != "hidden":
+        setattr(topic, attribute, not value)
+        topic.save()
+
+    if action == "hide":
+        topic_moderator.hide(admin_user)
+    elif attribute != "hidden":
+        setattr(topic_moderator, attribute, value)
+        topic_moderator.save()
+
+    data = {"rowid": [str(topic.id), str(topic_moderator.id)], action: ""}
+    response, messages = _bulk_post(application, admin_user, topic.forum, data)
+    db.session.refresh(topic)
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == f"/forum/{topic.forum.id}-{topic.forum.slug}/edit"
+    assert getattr(topic, attribute) is value
+    assert messages == [("success", f"1 topics {verb}.")]
+    if action == "hide":
+        assert topic.hidden_by == admin_user
+        assert topic.first_post.hidden
+    elif action == "unhide":
+        assert not topic.first_post.hidden
+
+    _response, messages = _bulk_post(application, admin_user, topic.forum, data)
+    assert messages == [("success", f"0 topics {verb}.")]
+
+
+def test_bulk_delete(application, moderator_user, topic):
+    topic_id = topic.id
+    response, messages = _bulk_post(
+        application, moderator_user, topic.forum, {"rowid": [str(topic_id)], "delete": ""}
+    )
+
+    assert response.status_code == 302
+    assert db.session.get(views.Topic, topic_id) is None
+    assert messages == [("success", "1 topics deleted.")]
+
+
+@pytest.mark.parametrize("action", ["delete", "hide", "unhide"])
+def test_denied_bulk_action_does_not_flash_success(application, moderator_user, topic, action):
+    moderator_user.primary_group.deletetopic = False
+    moderator_user.primary_group.save()
+    if action == "unhide":
+        topic.hide(moderator_user)
+    hidden = topic.hidden
+    response, messages = _bulk_post(
+        application, moderator_user, topic.forum, {"rowid": [str(topic.id)], action: ""}
+    )
+
+    assert response.status_code == 302
+    assert db.session.get(views.Topic, topic.id) is topic
+    assert topic.hidden == hidden
+    assert len(messages) == 1
+    assert messages[0][0] == "danger"
+
+
+@pytest.mark.parametrize("action", ["lock", "delete", "hide", "move"])
+def test_bulk_action_rejects_topics_outside_requested_forum(application, admin_user, topic, action):
+    other_forum = views.Forum(title="Other forum", category=topic.forum.category).save()
+    response, messages = _bulk_post(
+        application,
+        admin_user,
+        other_forum,
+        {"rowid": [str(topic.id)], action: "", "forum": str(other_forum.id)},
+    )
+
+    assert response.status_code == 302
+    assert messages == [("danger", "Please modify topics in only one forum at a time.")]
+    assert db.session.get(views.Topic, topic.id) is topic
+    assert topic.forum != other_forum
+    assert not topic.locked
+    assert not topic.hidden
+
+
+def test_bulk_move(application, admin_user, topic):
+    other_forum = views.Forum(title="Other forum", category=topic.forum.category).save()
+    response, messages = _bulk_post(
+        application,
+        admin_user,
+        topic.forum,
+        {"rowid": [str(topic.id)], "move": "", "forum": str(other_forum.id)},
+    )
+    db.session.refresh(topic)
+
+    assert response.status_code == 302
+    assert messages == [("success", "Topics moved.")]
+    assert topic.forum == other_forum
+
+
+def test_topic_action_uses_supplied_user(application, admin_user, user, topic):
+    with application.test_request_context():
+        login_user(admin_user)
+        changed = views.do_topic_action([topic], user, "locked", False)
+        logout_user()
+
+    assert changed is False
+    assert not topic.locked

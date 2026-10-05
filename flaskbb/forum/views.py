@@ -52,7 +52,6 @@ from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (
     count_online_users,
-    do_topic_action,
     FlashAndRedirect,
     format_quote,
     get_online_users,
@@ -79,7 +78,7 @@ from flaskbb.utils.requirements import (
 )
 
 from .locals import current_category, current_forum, current_topic
-from .utils import force_login_if_needed
+from .utils import do_topic_action, force_login_if_needed
 
 impl = HookimplMarker("flaskbb")
 
@@ -414,130 +413,69 @@ class ManageForum(MethodView):
             forumsread=forumsread,
         )
 
-    # TODO(anr): Clean this up. @_@
-    def post(self, forum_id: int, slug: str | None = None):  # noqa: C901
-        forum_instance, __ = Forum.get_forum(forum_id=forum_id, user=real(current_user))
+    def post(self, forum_id: int, slug: str | None = None):
+        user = real(current_user)
+        forum_instance, _forumsread = Forum.get_forum(forum_id=forum_id, user=user)
         mod_forum_url = url_for(
             "forum.manage_forum", forum_id=forum_instance.id, slug=forum_instance.slug
         )
+        topic_ids = request.form.getlist("rowid")
+        topics = list(db.session.scalars(sa.select(Topic).where(Topic.id.in_(topic_ids))))
 
-        ids = request.form.getlist("rowid")
-        tmp_topics = db.session.execute(sa.select(Topic).where(Topic.id.in_(ids))).scalars().all()
-
-        if not len(tmp_topics) > 0:
+        if not topics:
             flash(
                 _("In order to perform this action you have to select at least one topic."),
                 "danger",
             )
             return redirect(mod_forum_url)
 
-        # locking/unlocking
-        if "lock" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="locked",
-                reverse=False,
-            )
-
-            flash(_("%(count)s topics locked.", count=changed), "success")
+        if any(topic.forum_id != forum_instance.id for topic in topics):
+            flash(_("Please modify topics in only one forum at a time."), "danger")
             return redirect(mod_forum_url)
 
-        elif "unlock" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="locked",
-                reverse=True,
-            )
-            flash(_("%(count)s topics unlocked.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        # highlighting/trivializing
-        elif "highlight" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="important",
-                reverse=False,
-            )
-            flash(_("%(count)s topics highlighted.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        elif "trivialize" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="important",
-                reverse=True,
-            )
-            flash(_("%(count)s topics trivialized.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        # deleting
-        elif "delete" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="delete",
-                reverse=False,
-            )
-            flash(_("%(count)s topics deleted.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        # moving
-        elif "move" in request.form:
-            new_forum_id = request.form.get("forum", type=int)
-
-            if not new_forum_id:
-                flash(_("Please choose a new forum for the topics."), "info")
-                return redirect(mod_forum_url)
-
-            origin_forum_ids = set(topic.forum_id for topic in tmp_topics)
-            if origin_forum_ids - {forum_instance.id}:
-                flash(_("Please modify topics in only one forum at a time."), "danger")
-                return redirect(mod_forum_url)
-
-            new_forum = first_or_404(sa.select(Forum).where(Forum.id == new_forum_id))
-
-            # check the permission in the current forum and in the new forum
-            if not Permission(
-                And(
-                    IsAtleastModeratorInForum(forum_id=new_forum_id),
-                    IsAtleastModeratorInForum(forum=forum_instance),
-                )
-            ):
-                flash(_("You do not have the permissions to move this topic."), "danger")
-                return redirect(mod_forum_url)
-
-            if new_forum.move_topics_to(tmp_topics):
-                flash(_("Topics moved."), "success")
-            else:
-                flash(_("Failed to move topics."), "danger")
-
-            return redirect(mod_forum_url)
-
-        # hiding/unhiding
-        elif "hide" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics, user=real(current_user), action="hide", reverse=False
-            )
-            flash(_("%(count)s topics hidden.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        elif "unhide" in request.form:
-            changed = do_topic_action(
-                topics=tmp_topics,
-                user=real(current_user),
-                action="unhide",
-                reverse=False,
-            )
-            flash(_("%(count)s topics unhidden.", count=changed), "success")
-            return redirect(mod_forum_url)
-
-        else:
+        actions = {
+            "lock": ("locked", False, _("%(count)s topics locked.")),
+            "unlock": ("locked", True, _("%(count)s topics unlocked.")),
+            "highlight": ("important", False, _("%(count)s topics highlighted.")),
+            "trivialize": ("important", True, _("%(count)s topics trivialized.")),
+            "delete": ("delete", False, _("%(count)s topics deleted.")),
+            "move": ("move", False, ""),
+            "hide": ("hide", False, _("%(count)s topics hidden.")),
+            "unhide": ("unhide", False, _("%(count)s topics unhidden.")),
+        }
+        action = next((name for name in actions if name in request.form), None)
+        if action is None:
             flash(_("Unknown action requested"), "danger")
-            return redirect(mod_forum_url)
+        elif action == "move":
+            self._move_topics(topics, forum_instance)
+        else:
+            topic_action, reverse, message = actions[action]
+            changed = do_topic_action(topics, user, topic_action, reverse)
+            if changed is not False:
+                flash(message % {"count": changed}, "success")
+
+        return redirect(mod_forum_url)
+
+    def _move_topics(self, topics: list[Topic], forum_instance: Forum) -> None:
+        new_forum_id = request.form.get("forum", type=int)
+        if not new_forum_id:
+            flash(_("Please choose a new forum for the topics."), "info")
+            return
+
+        new_forum = first_or_404(sa.select(Forum).where(Forum.id == new_forum_id))
+        if not Permission(
+            And(
+                IsAtleastModeratorInForum(forum_id=new_forum_id),
+                IsAtleastModeratorInForum(forum=forum_instance),
+            )
+        ):
+            flash(_("You do not have the permissions to move this topic."), "danger")
+            return
+
+        if new_forum.move_topics_to(topics):
+            flash(_("Topics moved."), "success")
+        else:
+            flash(_("Failed to move topics."), "danger")
 
 
 class NewPost(MethodView):
@@ -778,8 +716,7 @@ class DeleteTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to delete this topic"),
                 level="danger",
-                # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=_topic_url,
+                endpoint=lambda *a, **k: redirect_url(_topic_url()),
             ),
         ),
     ]
@@ -798,8 +735,7 @@ class LockTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to lock this topic"),
                 level="danger",
-                # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=_topic_url,
+                endpoint=lambda *a, **k: redirect_url(_topic_url()),
             ),
         ),
     ]
@@ -819,8 +755,7 @@ class UnlockTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to unlock this topic"),
                 level="danger",
-                # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=_topic_url,
+                endpoint=lambda *a, **k: redirect_url(_topic_url()),
             ),
         ),
     ]
@@ -840,8 +775,7 @@ class HighlightTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to highlight this topic"),
                 level="danger",
-                # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=_topic_url,
+                endpoint=lambda *a, **k: redirect_url(_topic_url()),
             ),
         ),
     ]
@@ -861,8 +795,7 @@ class TrivializeTopic(MethodView):
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to trivialize this topic"),
                 level="danger",
-                # TODO(anr): consider the referrer -- for now, back to topic
-                endpoint=_topic_url,
+                endpoint=lambda *a, **k: redirect_url(_topic_url()),
             ),
         ),
     ]

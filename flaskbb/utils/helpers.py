@@ -40,7 +40,6 @@ from flask import (
     url_for,
 )
 from flask.typing import RouteCallable
-from flask_allows2 import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_limiter import Limiter
 from flask_themes2 import get_themes_list, render_theme_template
@@ -167,95 +166,6 @@ def redirect_or_reload(location: str):
     return redirect(location)
 
 
-# TODO(anr): clean this up
-def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):
-    """Executes a specific action for topics. Returns a list with the modified
-    topic objects.
-
-    :param topics: A iterable with ``Topic`` objects.
-    :param user: The user object which wants to perform the action.
-    :param action: One of the following actions: locked, important and delete.
-    :param reverse: If the action should be done in a reversed way.
-                    For example, to unlock a topic, ``reverse`` should be
-                    set to ``True``.
-    """
-    if not topics:
-        return False
-
-    from flaskbb.utils.requirements import (
-        CanDeleteTopic,
-        Has,
-        IsAtleastModeratorInForum,
-    )
-
-    forum_ids = set(topic.forum_id for topic in topics)
-    if len(forum_ids) > 1:
-        flash(
-            _("Please modify topics in only one forum at a time."),
-            "danger",
-        )
-        return False
-
-    if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum)):
-        flash(
-            _("You do not have the permissions to execute this action."),
-            "danger",
-        )
-        return False
-
-    modified_topics = 0
-    if action not in {"delete", "hide", "unhide"}:
-        for topic in topics:
-            if getattr(topic, action) and not reverse:
-                continue
-
-            setattr(topic, action, not reverse)
-            modified_topics += 1
-            topic.save()
-
-    elif action == "delete":
-        if not Permission(CanDeleteTopic):
-            flash(
-                _("You do not have the permissions to delete these topics."),
-                "danger",
-            )
-            return False
-
-        for topic in topics:
-            modified_topics += 1
-            topic.delete()
-
-    elif action == "hide":
-        if not Permission(Has("makehidden")):
-            flash(
-                _("You do not have the permissions to hide these topics."),
-                "danger",
-            )
-            return False
-
-        for topic in topics:
-            if topic.hidden:
-                continue
-            modified_topics += 1
-            topic.hide(user)
-
-    elif action == "unhide":
-        if not Permission(Has("makehidden")):
-            flash(
-                _("You do not have the permissions to unhide these topics."),
-                "danger",
-            )
-            return False
-
-        for topic in topics:
-            if not topic.hidden:
-                continue
-            modified_topics += 1
-            topic.unhide()
-
-    return modified_topics
-
-
 @dataclass(frozen=True)
 class ForumRow:
     forum: "Forum"
@@ -295,7 +205,7 @@ def _group_forums_by_category(
 
 
 def get_categories_and_forums(
-    query_result: Iterable[Row[tuple[Any, ...]]],
+    query_result: Iterable[Row[*tuple[Any, ...]]],
     user: "User",
 ) -> list[CategoryForums]:
     """Returns a list with categories. Every category has a list for all
@@ -332,7 +242,7 @@ def get_categories_and_forums(
 
 
 def get_forums(
-    query_result: Iterable[Row[tuple[Any, ...]]],
+    query_result: Iterable[Row[*tuple[Any, ...]]],
     user: "User",
 ) -> CategoryForums:
     """Returns a tuple which contains the category and the forums as list.

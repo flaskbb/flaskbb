@@ -12,10 +12,11 @@ import logging
 import mimetypes
 import os
 import re
+from collections.abc import Sequence
 from typing import cast, TYPE_CHECKING
 
-from flask import Response
-from flask_allows2 import Permission
+from flask import flash, Response
+from flask_allows2 import Or, Permission
 from flask_babelplus import lazy_gettext as _
 from flask_wtf.file import MultipleFileField
 from jinja2.filters import do_filesizeformat
@@ -27,7 +28,12 @@ from wtforms.validators import Optional, ValidationError
 from flaskbb.extensions import db, login_manager
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.proxies import current_user
-from flaskbb.utils.requirements import CanPostAttachment
+from flaskbb.utils.requirements import (
+    CanPostAttachment,
+    Has,
+    IsAtleastModeratorInForum,
+    IsAtleastSuperModerator,
+)
 from flaskbb.utils.uploads import (
     get_attachment_disk_path,
     get_image_info,
@@ -35,7 +41,7 @@ from flaskbb.utils.uploads import (
 )
 
 if TYPE_CHECKING:
-    from flaskbb.forum.models import Forum, Post
+    from flaskbb.forum.models import Forum, Post, Topic
     from flaskbb.user.models import User
 
 from .locals import current_forum
@@ -44,6 +50,60 @@ logger = logging.getLogger(__name__)
 
 ATTACHMENT_TOKEN_RE = re.compile(r"^[0-9a-f]{32}$")
 INLINE_ATTACHMENT_RE = re.compile(r"!?\[(?:\\.|[^\]])*\]\(attachment:[0-9a-f]{32}\)")
+
+
+def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, reverse: bool):
+    """Apply a moderation action and return the number of changed topics.
+
+    Return False when no topics are supplied or permission is denied.
+    The locked and important actions use reverse to clear the flag.
+    """
+    if not topics:
+        return False
+
+    if len({topic.forum_id for topic in topics}) > 1:
+        flash(_("Please modify topics in only one forum at a time."), "danger")
+        return False
+
+    if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum), identity=user):
+        flash(_("You do not have the permissions to execute this action."), "danger")
+        return False
+
+    action_permissions = {
+        "delete": (
+            Or(IsAtleastSuperModerator, Has("deletetopic")),
+            _("You do not have the permissions to delete these topics."),
+        ),
+        "hide": (Has("makehidden"), _("You do not have the permissions to hide these topics.")),
+        "unhide": (Has("makehidden"), _("You do not have the permissions to unhide these topics.")),
+    }
+    if action in action_permissions:
+        requirement, message = action_permissions[action]
+        if not Permission(requirement, identity=user):
+            flash(message, "danger")
+            return False
+
+    modified_topics = 0
+    for topic in topics:
+        if action == "delete":
+            topic.delete()
+        elif action == "hide":
+            if topic.hidden:
+                continue
+            topic.hide(user)
+        elif action == "unhide":
+            if not topic.hidden:
+                continue
+            topic.unhide()
+        else:
+            value = not reverse
+            if getattr(topic, action) == value:
+                continue
+            setattr(topic, action, value)
+            topic.save()
+        modified_topics += 1
+
+    return modified_topics
 
 
 def force_login_if_needed() -> Response | None:
