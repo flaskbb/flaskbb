@@ -64,7 +64,10 @@ def upgrade():
         sa.Column("granted", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("group_id", "permission"),
     )
-    op.add_column("groups", sa.Column("role", sa.String(length=20), nullable=True))
+    op.add_column(
+        "groups",
+        sa.Column("role", sa.String(length=20), nullable=False, server_default="member"),
+    )
 
     groups = groups_table()
     permissions = permissions_table()
@@ -79,20 +82,34 @@ def upgrade():
             ],
         )
 
-    with op.batch_alter_table("groups") as batch_op:
-        batch_op.alter_column("role", existing_type=sa.String(length=20), nullable=False)
+    if needs_rebuild(bind):
+        with op.batch_alter_table("groups") as batch_op:
+            for name in ROLE_FLAGS + PERMISSIONS:
+                batch_op.drop_column(name)
+    else:
         for name in ROLE_FLAGS + PERMISSIONS:
-            batch_op.drop_column(name)
+            op.drop_column("groups", name)
+
+
+def needs_rebuild(bind):
+    """SQLite drops a column in place since 3.35, unless a constraint refers
+    to it: FlaskBB 2.x created a CHECK constraint per boolean column there,
+    and only rebuilding the table gets rid of those along with the columns.
+    """
+    if bind.dialect.name != "sqlite":
+        return False
+    if bind.dialect.server_version_info < (3, 35):
+        return True
+    return bool(sa.inspect(bind).get_check_constraints("groups"))
 
 
 def downgrade():
     bind = op.get_bind()
 
-    with op.batch_alter_table("groups") as batch_op:
-        for name in ROLE_FLAGS + PERMISSIONS:
-            batch_op.add_column(
-                sa.Column(name, sa.Boolean(), nullable=False, server_default=sa.false())
-            )
+    for name in ROLE_FLAGS + PERMISSIONS:
+        op.add_column(
+            "groups", sa.Column(name, sa.Boolean(), nullable=False, server_default=sa.false())
+        )
 
     groups = groups_table()
     permissions = permissions_table()
@@ -106,6 +123,5 @@ def downgrade():
         values.update({name: bool(value) for name, value in granted if name in PERMISSIONS})
         bind.execute(groups.update().where(groups.c.id == group_id).values(**values))
 
-    with op.batch_alter_table("groups") as batch_op:
-        batch_op.drop_column("role")
+    op.drop_column("groups", "role")
     op.drop_table("group_permissions")

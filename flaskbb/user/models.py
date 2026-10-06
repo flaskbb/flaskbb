@@ -172,6 +172,7 @@ class Group(BaseModel):
             values_callable=lambda roles: [role.value for role in roles],
         ),
         default=GroupRole.MEMBER,
+        server_default=GroupRole.MEMBER.value,
         nullable=False,
     )
 

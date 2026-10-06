@@ -246,7 +246,11 @@ def test_merge_can_not_join_plugins(application, second_plugin_branch, created):
     assert len(created) == 1
 
 
-def test_group_roles_migration_moves_flags_and_permissions_to_rows(database):
+@pytest.mark.parametrize("old_install", [False, True])
+def test_group_roles_migration_moves_flags_and_permissions_to_rows(database, old_install):
+    """FlaskBB 2.x installs carry a CHECK constraint per boolean column, which
+    SQLite can only drop by rebuilding the table; newer ones drop in place.
+    """
     migration = _load_migration("202610061554_1791294853_group_roles_and_permissions.py")
     connection = db.session.connection()
     # the migration runner suspends foreign keys for the batch rebuild (see
@@ -257,12 +261,12 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database):
         context = MigrationContext.configure(connection)
         operations = Operations(context)
         operations.drop_table("group_permissions")
-        with operations.batch_alter_table("groups") as batch_op:
-            batch_op.drop_column("role")
-            for name in migration.ROLE_FLAGS + migration.PERMISSIONS:
-                batch_op.add_column(
-                    sa.Column(name, sa.Boolean(), nullable=False, server_default=sa.false())
-                )
+        operations.drop_column("groups", "role")
+        for name in migration.ROLE_FLAGS + migration.PERMISSIONS:
+            check = f" CHECK ({name} IN (0, 1))" if old_install else ""
+            connection.exec_driver_sql(
+                f"ALTER TABLE groups ADD COLUMN {name} BOOLEAN NOT NULL DEFAULT 0{check}"
+            )
         db.session.execute(
             sa.text(
                 "INSERT INTO groups (name, mod, editpost, viewhidden) VALUES ('Old Mods', 1, 1, 1)"
@@ -279,7 +283,9 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database):
         granted = dict(
             db.session.execute(sa.text("SELECT permission, granted FROM group_permissions")).all()
         )
-        columns = {c["name"] for c in sa.inspect(db.engine).get_columns("groups")}
+        inspector = sa.inspect(db.engine)
+        columns = {c["name"] for c in inspector.get_columns("groups")}
+        checks = inspector.get_check_constraints("groups")
         db.session.commit()
     finally:
         # the commit released the connection above; the pooled one stays
@@ -293,3 +299,4 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database):
     assert granted["deletepost"] == 0
     assert set(migration.PERMISSIONS) == set(granted)
     assert columns.isdisjoint(migration.ROLE_FLAGS + migration.PERMISSIONS)
+    assert checks == []

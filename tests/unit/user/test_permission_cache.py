@@ -2,8 +2,11 @@
 cached across requests under a version every group change bumps.
 """
 
+import pytest
+import sqlalchemy as sa
 from flaskbb.core.auth.permissions import forget_permissions, permissions_for
 from flaskbb.user.models import Group, GroupRole, permissions_version
+from flaskbb.utils import requirements as r
 
 ADMINISTRATOR, SUPER_MODERATOR, MODERATOR, MEMBER, BANNED, GUEST = range(6)
 
@@ -87,3 +90,67 @@ def test_moderator_lookup_is_cached_within_the_snapshot(moderator_user, forum):
     assert permissions.moderates(forum)
     forget_permissions()
     assert not permissions_for(moderator_user).moderates(forum)
+
+
+@pytest.fixture
+def selects(database):
+    statements = []
+
+    def record(connection, cursor, statement, parameters, context, executemany):
+        if statement.lstrip().lower().startswith("select"):
+            statements.append(statement)
+
+    sa.event.listen(database.engine, "before_cursor_execute", record)
+    yield statements
+    sa.event.remove(database.engine, "before_cursor_execute", record)
+
+
+def test_repeated_checks_within_a_request_do_not_query(user, forum, selects):
+    assert r.Has("postreply")(user)
+    assert r.can_access_forum(forum)(user)
+    assert not r.can_moderate(forum)(user)
+    selects.clear()
+
+    for _ in range(50):
+        assert r.Has("postreply")(user)
+        assert not r.IsAdmin(user)
+        assert r.can_access_forum(forum)(user)
+        assert not r.can_moderate(forum)(user)
+
+    assert selects == []
+
+
+def test_warm_request_does_not_query_the_database(user, selects):
+    assert user.permissions["postreply"]
+    assert permissions_for(user).group_ids
+    # the next request starts without a snapshot but with a warm cache
+    forget_permissions()
+    selects.clear()
+
+    assert user.permissions["postreply"]
+    assert not r.IsAdmin(user)
+    assert permissions_for(user).group_ids
+
+    assert selects == []
+
+
+def test_warm_guest_request_does_not_query_the_database(guest, default_groups, selects):
+    assert not guest.permissions["postreply"]
+    forget_permissions()
+    selects.clear()
+
+    assert not guest.permissions["postreply"]
+    assert not r.IsAtleastModerator(guest)
+
+    assert selects == []
+
+
+def test_saving_a_group_does_not_load_its_members(user, default_groups, selects):
+    assert not user.permissions["deletepost"]
+    selects.clear()
+
+    default_groups[MEMBER].set_permission("deletepost", True)
+    default_groups[MEMBER].save()
+
+    assert not any("FROM users" in statement for statement in selects)
+    assert user.permissions["deletepost"]

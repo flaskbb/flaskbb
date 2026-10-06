@@ -9,6 +9,7 @@ from flaskbb.management import views
 from flaskbb.plugins import utils
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.settings.models import Setting
+from flaskbb.user.models import GroupPermission
 
 # flaskbb.cli.plugins is shadowed by the click group of the same name
 cli_plugins = importlib.import_module("flaskbb.cli.plugins")
@@ -274,3 +275,42 @@ def test_applied_migrations_badge(
 
     assert (">migrations</span>" in html) is applied_badge
     assert ("requires migrations" in html) is pending
+
+
+def _grant(group, key):
+    group.permission_rows.append(GroupPermission(permission=key, granted=True))
+    group.save()
+
+
+def _grants(prefix):
+    return (
+        db.session.execute(
+            db.select(GroupPermission.permission).where(
+                GroupPermission.permission.startswith(prefix)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+
+def test_uninstalling_removes_the_plugins_grants(
+    application, admin_user, dummy_registry, reverted, removed_settings, default_groups
+):
+    _grant(default_groups[3], "dummy_plugin_do_things")
+
+    post_as_admin(application, admin_user, views.UninstallPlugin, "dummy_plugin")
+
+    assert _grants("dummy_plugin_") == []
+    assert default_groups[3].permissions["editpost"]
+
+
+def test_cli_uninstall_removes_the_plugins_grants(
+    cli_runner, dummy_registry, reverted, removed_settings, default_groups
+):
+    _grant(default_groups[3], "dummy_plugin_do_things")
+
+    result = cli_runner.invoke(cli_plugins.uninstall, ["--force", "dummy_plugin"])
+
+    assert result.exit_code == 0
+    assert _grants("dummy_plugin_") == []

@@ -303,6 +303,7 @@ def uninstall(
             _revert_migrations(plugin.name)
 
         if do_settings:
+            plugin.remove_permissions()
             if plugin.has_stored_settings:
                 plugin.remove_settings()
                 click.secho(f"[+] Plugin '{plugin.name}' has been uninstalled.", fg="green")

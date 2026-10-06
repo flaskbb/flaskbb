@@ -4,6 +4,7 @@ and stored per group as rows that fall back to the definition's default.
 
 import pytest
 from flaskbb.permissions import permission_registry, PermissionDefinition, PermissionGroup
+from flaskbb.plugins.models import PluginRegistry
 from flaskbb.utils import requirements as r
 
 MEMBER = 3
@@ -94,3 +95,16 @@ def test_a_decision_is_stored_once_per_permission(default_groups):
     rows = [row for row in group.permission_rows if row.permission == "deletepost"]
     assert len(rows) == 1
     assert group.permissions["deletepost"] is False
+
+
+def test_uninstalling_a_plugin_removes_its_grants(plugin_permissions, user, default_groups):
+    member = default_groups[MEMBER]
+    member.set_permission("myplugin_do_things", False)
+    member.save()
+    assert user.permissions["myplugin_do_things"] is False
+
+    PluginRegistry("myplugin").remove_permissions()
+
+    assert not any(row.permission.startswith("myplugin_") for row in member.permission_rows)
+    assert member.permissions["editpost"] is True
+    assert user.permissions["myplugin_do_things"] is True

@@ -60,7 +60,7 @@ Unreleased
 - The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
 - Online users and guests are tracked with redis-py instead of `flask-redis`
 - Permission checks share one rule per action between views and templates, read a user's permissions once per request, and a group change invalidates every cached permission set at once.
-- Permissions are declared in a registry instead of as columns of the groups table, so plugins can add their own through the `flaskbb_load_permissions` hook. The five group type flags became a single role, and `flaskbb groups` takes `--role` instead of `--type`.
+- Permissions are declared in a registry instead of as columns of the groups table, so plugins can add their own through the `flaskbb_load_permissions` hook. The five group type flags became a single role, and `flaskbb groups` takes `--role` instead of `--type`. Uninstalling a plugin removes the grants of its permissions.
 
 
 ## Version 2.2.1

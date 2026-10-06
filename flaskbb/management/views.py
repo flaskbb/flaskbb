@@ -1529,6 +1529,7 @@ class UninstallPlugin(MethodView):
             return redirect(url_for("management.plugins"))
 
         plugin.remove_settings()
+        plugin.remove_permissions()
 
         flash(_("Plugin has been uninstalled."), "success")
         return redirect(url_for("management.plugins"))
