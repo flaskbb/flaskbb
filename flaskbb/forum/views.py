@@ -50,6 +50,7 @@ from flaskbb.forum.models import (
 from flaskbb.markup import nonpost_renderer, post_renderer
 from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
+from flaskbb.utils.database import commit_without_expiring
 from flaskbb.utils.helpers import (
     count_online_users,
     FlashAndRedirect,
@@ -223,7 +224,7 @@ class ViewTopic(MethodView):
 
         # Count the topic views
         topic.views += 1
-        topic.save()
+        commit_without_expiring()
 
         # Update the topicsread status if the user hasn't read it
         forumsread = None
@@ -245,6 +246,7 @@ class ViewTopic(MethodView):
             posts=posts,
             last_seen=time_diff(),
             form=self.form(topic),
+            is_tracking=current_user.is_authenticated and current_user.is_tracking_topic(topic),
         )
 
     @allows.requires(

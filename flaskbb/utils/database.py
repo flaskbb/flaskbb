@@ -342,3 +342,16 @@ def create_database(url: sa.engine.url.URL) -> None:
         name = conn.dialect.identifier_preparer.quote(database)
         conn.execute(sa.text(template.format(name)))
     engine.dispose()
+
+
+def commit_without_expiring() -> None:
+    """Commits like ``db.session.commit()`` but keeps the loaded objects as
+    they are. For writes made on every request, such as counters, where
+    expiring would make the view reload everything it has already loaded.
+    """
+    session = db.session()
+    session.expire_on_commit = False
+    try:
+        session.commit()
+    finally:
+        session.expire_on_commit = True

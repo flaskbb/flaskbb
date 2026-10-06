@@ -33,11 +33,12 @@ from sqlalchemy.orm import (
     mapped_column,
     Mapper,
     relationship,
+    selectinload,
     Session,
 )
 
 from flaskbb.extensions import db, pluggy
-from flaskbb.utils.queries import hidden, paginate
+from flaskbb.utils.queries import can_view_hidden, hidden, paginate
 
 if TYPE_CHECKING:
     from flaskbb.user.models import Group, User
@@ -333,7 +334,6 @@ class Post(HideableMixin, BaseModel):
         "Attachment",
         back_populates="post",
         cascade="all, delete-orphan",
-        lazy="selectin",
         order_by="Attachment.id",
     )
 
@@ -767,12 +767,10 @@ class Topic(HideableMixin, BaseModel):
 
     @classmethod
     def get_topic(cls, topic_id: int, hiddencheck: bool = False):
-        stmt = sa.select(cls).where(Topic.id == topic_id)
-        if hiddencheck:
-            stmt = hidden(stmt)
-
-        topic = db.session.execute(stmt).scalar_one_or_none()
-        if topic is None:
+        # the identity map answers this without a query when the request
+        # already loaded the topic, e.g. for its permission checks
+        topic = db.session.get(cls, topic_id)
+        if topic is None or (hiddencheck and topic.hidden and not can_view_hidden()):
             abort(404)
         return topic
 
@@ -783,6 +781,7 @@ class Topic(HideableMixin, BaseModel):
         stmt = (
             sa.select(Post, User)
             .outerjoin(User, Post.user_id == User.id)
+            .options(selectinload(Post.attachments))
             .where(Post.topic_id == topic_id)
             .order_by(Post.id.asc())
         )

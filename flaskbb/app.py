@@ -71,6 +71,7 @@ from flaskbb.settings import (
 
 # models
 from flaskbb.user.models import Guest, User
+from flaskbb.utils.database import commit_without_expiring
 
 # various helpers
 from flaskbb.utils.helpers import (
@@ -425,7 +426,7 @@ def configure_before_handlers(app: FlaskBB):
         if current_user.is_authenticated:
             current_user.lastseen = time_utcnow()
             db.session.add(current_user)
-            db.session.commit()
+            commit_without_expiring()
 
     if app.config["REDIS_ENABLED"]:
 
