@@ -9,6 +9,7 @@ This module provides the models for the user.
 """
 
 import logging
+from collections.abc import Iterable
 from datetime import datetime
 from typing import override
 
@@ -27,6 +28,7 @@ from sqlalchemy.orm import (
 from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from flaskbb.core.auth.permissions import forget_permissions, permissions_for
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
 from flaskbb.settings import flaskbb_config
@@ -52,6 +54,36 @@ groups_users = sa.Table(
         nullable=False,
     ),
 )
+
+
+PERMISSIONS_VERSION_KEY = "permissions_version"
+GROUP_METADATA_COLUMNS = {"id", "name", "description"}
+
+
+def permissions_version() -> int:
+    """The cache generation the permissions of every identity are keyed on."""
+    return cache.get(PERMISSIONS_VERSION_KEY) or 0
+
+
+def invalidate_all_permissions() -> None:
+    """Starts a new cache generation, so every cached permission set is
+    recomputed on its next use. Constant time, no matter how many users a
+    changed group has.
+    """
+    cache.set(PERMISSIONS_VERSION_KEY, permissions_version() + 1, timeout=0)
+    forget_permissions()
+
+
+def permissions_of(groups: Iterable["Group"]) -> dict[str, bool]:
+    """Merges the permissions of ``groups``: a permission is granted when any
+    group grants it.
+    """
+    keys = [c for c in Group.__table__.columns.keys() if c not in GROUP_METADATA_COLUMNS]
+    permissions = dict.fromkeys(keys, False)
+    for group in groups:
+        for key in keys:
+            permissions[key] = permissions[key] or bool(getattr(group, key))
+    return permissions
 
 
 @make_comparable
@@ -89,6 +121,18 @@ class Group(BaseModel):
         Required for cache.memoize() to work across requests.
         """
         return f"<{self.__class__.__name__} {self.id} {self.name}>"
+
+    @override
+    def save(self):
+        super().save()
+        invalidate_all_permissions()
+        return self
+
+    @override
+    def delete(self):
+        super().delete()
+        invalidate_all_permissions()
+        return self
 
     @classmethod
     def selectable_groups_choices(cls):
@@ -216,8 +260,8 @@ class User(BaseModel, UserMixin):
 
     @property
     def permissions(self):
-        """Returns the permissions for the user."""
-        return self.get_permissions()
+        """The effective permissions of the user, read once per request."""
+        return permissions_for(self).granted
 
     @property
     def groups(self):
@@ -378,36 +422,32 @@ class User(BaseModel, UserMixin):
         stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
         return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
-    @cache.memoize()
-    def get_groups(self):
+    def get_groups(self) -> list[Group]:
         """Returns all the groups the user is in."""
+        return self._load_groups(permissions_version())
+
+    def get_permissions(self) -> dict[str, bool]:
+        """Returns a dictionary with all permissions the user has"""
+        return self._load_permissions(permissions_version())
+
+    @cache.memoize()
+    def _load_groups(self, version: int) -> list[Group]:
         return [self.primary_group] + list(self.secondary_groups)
 
     @cache.memoize()
-    def get_permissions(self, exclude: set[str] | None = None):
-        """Returns a dictionary with all permissions the user has"""
-        if exclude:
-            exclude = set(exclude)
-        else:
-            exclude = set()
-        exclude.update(["id", "name", "description"])
-
-        perms: dict[str, bool] = {}
-        # Get the Guest group
-        for group in self.groups:
-            columns = set(group.__table__.columns.keys()) - set(exclude)
-            for c in columns:
-                perms[c] = getattr(group, c) or perms.get(c, False)
-        return perms
+    def _load_permissions(self, version: int) -> dict[str, bool]:
+        return permissions_of(self.get_groups())
 
     def invalidate_cache(self):
-        """Invalidates this objects cached metadata."""
-        cache.delete_memoized(self.get_permissions, self)
-        cache.delete_memoized(self.get_groups, self)
+        """Drops the cached groups and permissions of this user."""
+        version = permissions_version()
+        cache.delete_memoized(self._load_permissions, version)
+        cache.delete_memoized(self._load_groups, version)
+        forget_permissions()
 
     def ban(self):
         """Bans the user. Returns True upon success."""
-        if not self.get_permissions()["banned"]:
+        if not self.permissions["banned"]:
             banned_group = db.session.execute(
                 sa.select(Group).filter(Group.banned.is_(True))
             ).scalar_one_or_none()
@@ -423,7 +463,7 @@ class User(BaseModel, UserMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
-        if self.get_permissions()["banned"]:
+        if self.permissions["banned"]:
             member_group = db.session.scalar(
                 sa.select(Group)
                 .filter(
@@ -479,39 +519,28 @@ class User(BaseModel, UserMixin):
         return self
 
 
+@cache.memoize()
+def _load_guest_groups(version: int) -> list[Group]:
+    return list(db.session.execute(sa.select(Group).where(Group.guest.is_(True))).scalars())
+
+
+@cache.memoize()
+def _load_guest_permissions(version: int) -> dict[str, bool]:
+    return permissions_of(_load_guest_groups(version))
+
+
 class Guest(AnonymousUserMixin):
     @property
     def permissions(self):
-        return self.get_permissions()
+        """The effective permissions of a guest, read once per request."""
+        return permissions_for(self).granted
 
     @property
     def groups(self):
         return self.get_groups()
 
-    @cache.memoize()
-    def get_groups(self):
-        stmt = sa.select(Group).where(Group.guest == True)
-        result = db.session.execute(stmt).scalars().all()
-        return result
+    def get_groups(self) -> list[Group]:
+        return _load_guest_groups(permissions_version())
 
-    @cache.memoize()
-    def get_permissions(self, exclude: set[str] | None = None):
-        """Returns a dictionary with all permissions the user has"""
-        if exclude:
-            exclude = set(exclude)
-        else:
-            exclude = set()
-        exclude.update(["id", "name", "description"])
-
-        perms: dict[str, bool] = {}
-        # Get the Guest group
-        for group in self.groups:
-            columns = set(group.__table__.columns.keys()) - set(exclude)
-            for c in columns:
-                perms[c] = getattr(group, c) or perms.get(c, False)
-        return perms
-
-    @classmethod
-    def invalidate_cache(cls):
-        """Invalidates this objects cached metadata."""
-        cache.delete_memoized(cls.get_permissions, cls)
+    def get_permissions(self) -> dict[str, bool]:
+        return _load_guest_permissions(permissions_version())

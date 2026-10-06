@@ -59,6 +59,7 @@ Unreleased
 - Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`.
 - The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
 - Online users and guests are tracked with redis-py instead of `flask-redis`
+- Permission checks share one rule per action between views and templates, read a user's permissions once per request, and a group change invalidates every cached permission set at once.
 
 
 ## Version 2.2.1

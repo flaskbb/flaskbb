@@ -20,7 +20,6 @@ from flaskbb.cli.utils import (
     get_group,
     group_permissions,
     GROUP_TYPES,
-    invalidate_permission_cache,
     print_details,
     print_table,
 )
@@ -251,7 +250,6 @@ def update_group(
             fg="red",
         ) from e
 
-    invalidate_permission_cache(group)
     click.secho(f"[+] Group {group.name} updated.", fg="cyan")
 
 

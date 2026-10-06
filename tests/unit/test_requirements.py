@@ -1,17 +1,17 @@
 import pytest
 from flask import g
+from flaskbb.exceptions import FlaskBBError
 from flaskbb.utils import requirements as r
 
 
-def push_onto_request_context(**kw):
-    for name, value in kw.items():
-        setattr(g, name, value)
-
-
 @pytest.fixture
-def request_context(application):
+def request_topic_on_g(application, topic):
     with application.test_request_context():
-        yield
+        g.topic = topic
+        try:
+            yield topic
+        finally:
+            g.pop("topic", None)
 
 
 def test_Fred_IsNotAdmin(Fred):
@@ -54,101 +54,132 @@ def test_Fred_CannotBanUser(Fred):
     assert not r.CanBanUser(Fred)
 
 
-def test_CanEditTopic_with_member(user, topic, request_context):
-    push_onto_request_context(topic=topic)
-    assert r.CanEditPost(user)
+def test_member_can_edit_own_post(user, topic):
+    assert r.can_edit_post(topic.first_post)(user)
 
 
-def test_Fred_cannot_edit_other_members_post(user, Fred, topic, request_context):
-    push_onto_request_context(topic=topic)
-    assert not r.CanEditPost(Fred)
+def test_Fred_cannot_edit_other_members_post(Fred, topic):
+    assert not r.can_edit_post(topic.first_post)(Fred)
 
 
-def test_Fred_CannotEditLockedTopic(Fred, topic_locked, request_context):
-    push_onto_request_context(topic=topic_locked)
-    assert not r.CanEditPost(Fred)
+def test_member_cannot_edit_post_in_locked_topic(user, topic_locked):
+    assert not r.can_edit_post(topic_locked.first_post)(user)
 
 
-def test_Moderator_in_Forum_CanEditLockedTopic(moderator_user, topic_locked, request_context):
-    push_onto_request_context(topic=topic_locked)
-    assert r.CanEditPost(moderator_user)
+def test_moderator_in_forum_can_edit_post_in_locked_topic(moderator_user, topic_locked):
+    assert r.can_edit_post(topic_locked.first_post)(moderator_user)
 
 
-def test_FredIsAMod_but_still_cant_edit_topic_in_locked_forum(
-    Fred, topic_locked, default_groups, request_context
+def test_moderator_of_other_forums_cannot_edit_post_in_locked_topic(
+    other_moderator_user, topic_locked
 ):
-    Fred.primary_group = default_groups[2]
-
-    push_onto_request_context(topic=topic_locked)
-    assert not r.CanEditPost(Fred)
+    assert not r.can_edit_post(topic_locked.first_post)(other_moderator_user)
 
 
-def test_Fred_cannot_reply_to_locked_topic(Fred, topic_locked, request_context):
-    push_onto_request_context(topic=topic_locked)
-    assert not r.CanPostReply(Fred)
+def test_member_can_edit_own_topic(user, topic):
+    assert r.can_edit_topic(topic)(user)
 
 
-def test_Fred_cannot_delete_others_post(Fred, topic, request_context):
-    push_onto_request_context(post=topic.first_post)
-    assert not r.CanDeletePost(Fred)
+def test_member_cannot_edit_topic_in_locked_forum(user, topic_in_locked_forum):
+    assert not r.can_edit_topic(topic_in_locked_forum)(user)
 
 
-def test_Mod_can_delete_others_post(moderator_user, topic, request_context):
-    push_onto_request_context(post=topic.first_post)
-    assert r.CanDeletePost(moderator_user)
+def test_admin_can_edit_topic_in_locked_forum(admin_user, topic_in_locked_forum):
+    assert r.can_edit_topic(topic_in_locked_forum)(admin_user)
 
 
-def test_CanPostAttachment_with_member(user):
-    assert r.CanPostAttachment(user)
+def test_member_can_reply(user, topic):
+    assert r.can_post_reply(topic)(user)
 
 
-def test_CanPostAttachment_with_mod(moderator_user):
-    assert r.CanPostAttachment(moderator_user)
+def test_Fred_cannot_reply_to_locked_topic(Fred, topic_locked):
+    assert not r.can_post_reply(topic_locked)(Fred)
 
 
-def test_guest_cannot_post_attachment(guest, forum, request_context):
-    push_onto_request_context(forum=forum)
-    assert not r.CanPostAttachment(guest)
+def test_moderator_in_forum_can_reply_to_locked_topic(moderator_user, topic_locked):
+    assert r.can_post_reply(topic_locked)(moderator_user)
+
+
+def test_Fred_cannot_delete_others_post(Fred, topic):
+    assert not r.can_delete_post(topic.first_post)(Fred)
+
+
+def test_Mod_can_delete_others_post(moderator_user, topic):
+    assert r.can_delete_post(topic.first_post)(moderator_user)
+
+
+def test_member_cannot_delete_own_topic_without_permission(user, topic):
+    assert not r.can_delete_topic(topic)(user)
+
+
+def test_Mod_can_delete_others_topic(moderator_user, topic):
+    assert r.can_delete_topic(topic)(moderator_user)
+
+
+def test_member_can_post_attachment(user, forum):
+    assert r.can_post_attachment(forum)(user)
+
+
+def test_moderator_can_post_attachment(moderator_user, forum):
+    assert r.can_post_attachment(forum)(moderator_user)
+
+
+def test_guest_cannot_post_attachment(guest, forum):
+    assert not r.can_post_attachment(forum)(guest)
+
+
+def test_member_can_post_topic_in_unlocked_forum(user, forum):
+    assert r.can_post_topic(forum)(user)
+
+
+def test_member_cannot_post_topic_in_locked_forum(user, forum_locked):
+    assert not r.can_post_topic(forum_locked)(user)
+
+
+def test_admin_can_post_topic_in_locked_forum(admin_user, forum_locked):
+    assert r.can_post_topic(forum_locked)(admin_user)
+
+
+def test_super_moderator_cannot_post_topic_in_locked_forum(super_moderator_user, forum_locked):
+    assert not r.can_post_topic(forum_locked)(super_moderator_user)
+
+
+def test_member_cannot_access_forum_closed_to_their_groups(user, admin_user, forum, default_groups):
+    forum.groups = [default_groups[0]]
+    forum.save()
+
+    assert not r.can_access_forum(forum)(user)
+    assert r.can_access_forum(forum)(admin_user)
+
+
+def test_moderator_moderates_only_their_own_forum(moderator_user, other_moderator_user, forum):
+    assert r.can_moderate(forum)(moderator_user)
+    assert not r.can_moderate(forum)(other_moderator_user)
+
+
+def test_super_moderator_moderates_every_forum(super_moderator_user, forum):
+    assert r.can_moderate(forum)(super_moderator_user)
+
+
+def test_ForRequest_applies_the_policy_to_the_object_of_the_request(user, request_topic_on_g):
+    assert r.ForRequest(r.can_post_reply, r.request_topic)(user)
+
+
+def test_ForRequest_denies_like_the_policy_it_wraps(Fred, request_topic_on_g):
+    request_topic_on_g.locked = True
+    assert not r.ForRequest(r.can_post_reply, r.request_topic)(Fred)
+
+
+def test_request_forum_without_a_forum_in_the_request_raises(application):
+    for name in ("post", "topic", "forum"):
+        g.pop(name, None)
+    with application.test_request_context():
+        with pytest.raises(FlaskBBError):
+            r.request_forum()
 
 
 def test_IsMorePrivilegedThan_ranks_admin_over_mod(admin_user, moderator_user):
     assert r.IsMorePrivilegedThan(moderator_user)(admin_user)
-
-
-def test_member_can_post_topic_in_unlocked_forum(user, forum, request_context):
-    push_onto_request_context(forum=forum, topic=None, post=None)
-    assert r.CanPostTopic(user)
-
-
-def test_member_cannot_post_topic_in_locked_forum(user, forum_locked, request_context):
-    push_onto_request_context(forum=forum_locked, topic=None, post=None)
-    assert not r.CanPostTopic(user)
-
-
-def test_admin_can_post_topic_in_locked_forum(admin_user, forum_locked, request_context):
-    push_onto_request_context(forum=forum_locked, topic=None, post=None)
-    assert r.CanPostTopic(admin_user)
-
-
-def test_super_moderator_cannot_post_topic_in_locked_forum(
-    super_moderator_user, forum_locked, request_context
-):
-    push_onto_request_context(forum=forum_locked, topic=None, post=None)
-    assert not r.CanPostTopic(super_moderator_user)
-
-
-def test_post_topic_filter_denies_super_moderator_in_locked_forum(
-    super_moderator_user, forum_locked, request_context
-):
-    assert not r.can_post_topic(super_moderator_user, forum_locked)
-
-
-def test_post_topic_filter_allows_admin_in_locked_forum(admin_user, forum_locked, request_context):
-    assert r.can_post_topic(admin_user, forum_locked)
-
-
-def test_post_topic_filter_denies_member_in_locked_forum(user, forum_locked, request_context):
-    assert not r.can_post_topic(user, forum_locked)
 
 
 def test_IsMorePrivilegedThan_ranks_mod_over_member(moderator_user, user):
@@ -169,35 +200,40 @@ def test_IsMorePrivilegedThan_counts_secondary_groups(user, moderator_user, defa
     assert not r.IsMorePrivilegedThan(user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_can_edit_member(moderator_user, user):
-    assert r.CanEditTargetUser(user)(moderator_user)
+def test_can_edit_user_mod_can_edit_member(moderator_user, user):
+    assert r.can_edit_user(user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_cannot_edit_other_mod(moderator_user, other_moderator_user):
-    assert not r.CanEditTargetUser(other_moderator_user)(moderator_user)
+def test_can_edit_user_mod_cannot_edit_other_mod(moderator_user, other_moderator_user):
+    assert not r.can_edit_user(other_moderator_user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_cannot_edit_supermod(moderator_user, super_moderator_user):
-    assert not r.CanEditTargetUser(super_moderator_user)(moderator_user)
+def test_can_edit_user_mod_cannot_edit_supermod(moderator_user, super_moderator_user):
+    assert not r.can_edit_user(super_moderator_user)(moderator_user)
 
 
-def test_CanEditTargetUser_mod_cannot_edit_admin(moderator_user, admin_user):
-    assert not r.CanEditTargetUser(admin_user)(moderator_user)
+def test_can_edit_user_mod_cannot_edit_admin(moderator_user, admin_user):
+    assert not r.can_edit_user(admin_user)(moderator_user)
 
 
-def test_CanEditTargetUser_admin_can_edit_admin(admin_user, super_moderator_user):
+def test_can_edit_user_admin_can_edit_admin(admin_user, super_moderator_user):
     """Admins bypass the ranking check so they can still manage each other."""
-    assert r.CanEditTargetUser(admin_user)(admin_user)
-    assert r.CanEditTargetUser(super_moderator_user)(admin_user)
+    assert r.can_edit_user(admin_user)(admin_user)
+    assert r.can_edit_user(super_moderator_user)(admin_user)
 
 
-def test_CanEditTargetUser_still_requires_the_permission(Fred, user):
-    assert not r.CanEditTargetUser(user)(Fred)
+def test_can_edit_user_still_requires_the_permission(Fred, user):
+    assert not r.can_edit_user(user)(Fred)
 
 
-def test_CanBanTargetUser_mod_cannot_ban_supermod(moderator_user, super_moderator_user):
-    assert not r.CanBanTargetUser(super_moderator_user)(moderator_user)
+def test_can_edit_user_without_a_target_is_the_plain_permission(moderator_user, Fred):
+    assert r.can_edit_user()(moderator_user)
+    assert not r.can_edit_user()(Fred)
 
 
-def test_CanBanTargetUser_mod_can_ban_member(moderator_user, user):
-    assert r.CanBanTargetUser(user)(moderator_user)
+def test_can_ban_user_mod_cannot_ban_supermod(moderator_user, super_moderator_user):
+    assert not r.can_ban_user(super_moderator_user)(moderator_user)
+
+
+def test_can_ban_user_mod_can_ban_member(moderator_user, user):
+    assert r.can_ban_user(user)(moderator_user)

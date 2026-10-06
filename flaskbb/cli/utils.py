@@ -26,7 +26,7 @@ from jinja2 import Template
 from flaskbb._version import __version__
 from flaskbb.extensions import db, pluggy
 from flaskbb.fixtures.groups import fixture
-from flaskbb.user.models import Group, Guest, User
+from flaskbb.user.models import Group, User
 from flaskbb.utils.populate import create_user, update_user
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
@@ -115,25 +115,6 @@ def get_group(name: str) -> Group:
     if group is None:
         raise FlaskBBCLIError(f"The group with name {name} does not exist.", fg="red")
     return group
-
-
-def invalidate_permission_cache(group: Group):
-    """Drops the cached permissions of everyone who is affected by a change
-    on ``group``.
-    """
-    if group.guest:
-        Guest.invalidate_cache()
-
-    members = db.session.execute(
-        sa.select(User).filter(
-            sa.or_(
-                User.primary_group_id == group.id,
-                User.secondary_groups.any(Group.id == group.id),
-            )
-        )
-    ).scalars()
-    for member in members:
-        member.invalidate_cache()
 
 
 def print_table(headers: list[str], rows: list[list[str]]):

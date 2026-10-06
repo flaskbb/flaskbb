@@ -66,7 +66,7 @@ from flaskbb.settings import flaskbb_config
 from flaskbb.settings.forms import build_form
 from flaskbb.settings.models import Setting
 from flaskbb.settings.registry import setting_registry
-from flaskbb.user.models import Group, Guest, User
+from flaskbb.user.models import Group, User
 from flaskbb.utils.helpers import (
     count_online_users,
     FlashAndRedirect,
@@ -77,9 +77,9 @@ from flaskbb.utils.helpers import (
 )
 from flaskbb.utils.proxies import current_app, current_user
 from flaskbb.utils.requirements import (
-    CanBanTargetUser,
+    can_ban_user,
+    can_edit_user,
     CanBanUser,
-    CanEditTargetUser,
     CanEditUser,
     IsAdmin,
     IsAtleastModerator,
@@ -295,7 +295,7 @@ class EditUser(MethodView):
         """
         user = User.get_by_or_404(id=user_id)
 
-        if not Permission(CanEditTargetUser(user), identity=current_user):
+        if not Permission(can_edit_user(user), identity=current_user):
             return None
 
         return user
@@ -564,7 +564,7 @@ class BanUser(MethodView):
                 # don't let a user ban himself and do not allow banning a user
                 # who is not outranked by the acting user
                 if current_user.id == user.id or not Permission(
-                    CanBanTargetUser(user), identity=current_user
+                    can_ban_user(user), identity=current_user
                 ):
                     continue
 
@@ -576,7 +576,7 @@ class BanUser(MethodView):
 
         user = User.get_by_or_404(id=user_id)
         # Do not allow banning a user who is not outranked by the acting user
-        if not Permission(CanBanTargetUser(user), identity=current_user):
+        if not Permission(can_ban_user(user), identity=current_user):
             flash(_("You are not allowed to ban this user."), "danger")
             return redirect(url_for("management.overview"))
 
@@ -611,7 +611,7 @@ class UnbanUser(MethodView):
             for user in User.get_all(User.id.in_(ids)):
                 # unban() drops the user into the member group, so it needs the
                 # same target check as banning
-                if not Permission(CanBanTargetUser(user), identity=current_user):
+                if not Permission(can_ban_user(user), identity=current_user):
                     continue
 
                 if user.unban():
@@ -622,7 +622,7 @@ class UnbanUser(MethodView):
 
         user = User.get_by_or_404(id=user_id)
 
-        if not Permission(CanBanTargetUser(user), identity=current_user):
+        if not Permission(can_ban_user(user), identity=current_user):
             flash(_("You are not allowed to unban this user."), "danger")
             return redirect(url_for("management.overview"))
 
@@ -709,9 +709,6 @@ class EditGroup(MethodView):
         if form.validate_on_submit():
             form.populate_obj(group)
             group.save()
-
-            if group.guest:
-                Guest.invalidate_cache()
 
             flash(_("Group updated."), "success")
             return redirect(url_for("management.groups", group_id=group.id))

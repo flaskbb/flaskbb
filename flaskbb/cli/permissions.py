@@ -17,7 +17,6 @@ from flaskbb.cli.utils import (
     get_group,
     get_user,
     group_permissions,
-    invalidate_permission_cache,
     print_table,
 )
 from flaskbb.extensions import db
@@ -93,7 +92,6 @@ def set_permission(group_name: str, permission: str, value: bool):
 
     setattr(group, permission, value)
     group.save()
-    invalidate_permission_cache(group)
 
     click.secho(
         f"[+] Permission {permission} of group {group.name} set to {str(value).lower()}.",
