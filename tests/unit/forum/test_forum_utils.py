@@ -3,7 +3,7 @@ from flask import g, url_for
 from flask_login import FlaskLoginClient
 from flaskbb.forum import utils
 from flaskbb.forum.models import Forum
-from flaskbb.user.models import Group
+from flaskbb.user.models import Group, GroupRole
 
 
 class TestForceLoginHelpers:
@@ -16,7 +16,7 @@ class TestForceLoginHelpers:
     def test_would_force_login_for_anon_in_guest_unallowed(self, database, guest, category):
         with database.session.no_autoflush:
             forum = Forum(title="no guest", category=category)
-            forum.groups = Group.get_all(Group.guest == False)
+            forum.groups = Group.get_all(Group.role != GroupRole.GUEST)
             forum.save()
         assert utils.should_force_login(guest, forum)
 
@@ -25,7 +25,7 @@ class TestForceLoginHelpers:
     ):
         with database.session.no_autoflush:
             forum = Forum(title="no guest", category=category)
-            forum.groups = Group.get_all(Group.guest == False)
+            forum.groups = Group.get_all(Group.role != GroupRole.GUEST)
             forum.save()
         # sets current_forum
         g.forum = forum

@@ -102,7 +102,7 @@
                                     </a>
                                 {% endif %}
 
-                                {% if current_user|can_ban_user(user) and user.permissions["banned"] %}
+                                {% if current_user|can_ban_user(user) and user.is_banned %}
                                     <form class="d-inline"
                                           id="ban-{{ user.id }}"
                                           method="post"

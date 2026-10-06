@@ -740,7 +740,7 @@ Create, update or delete groups. The name of a group is case insensitive.
 
 .. describe:: list
 
-    Lists all groups including their type and how many members they have.
+    Lists all groups including their role and how many members they have.
 
 .. describe:: show NAME
 
@@ -758,11 +758,11 @@ Create, update or delete groups. The name of a group is case insensitive.
 
         The description of the group.
 
-    .. describe:: --type TYPE, -t TYPE
+    .. describe:: --role ROLE, -r ROLE
 
-        The type of the group, one of ``admin``, ``super_mod``, ``mod``,
-        ``banned`` or ``guest``. Omit it to create an ordinary member
-        group. There can only be one ``guest`` and one ``banned`` group.
+        The role of the group, one of ``member``, ``mod``, ``super_mod``,
+        ``admin``, ``banned`` or ``guest``. Defaults to ``member``. There
+        can only be one ``guest`` and one ``banned`` group.
 
     .. describe:: --grant PERMISSION
 
@@ -780,9 +780,6 @@ Create, update or delete groups. The name of a group is case insensitive.
     .. describe:: --name NAME, -n NAME
 
         The new name of the group.
-
-    ``--type`` additionally accepts ``member`` here, which turns a typed
-    group back into an ordinary one.
 
 .. describe:: delete NAME
 

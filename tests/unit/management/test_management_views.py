@@ -16,7 +16,7 @@ from flaskbb.forum import views as forum_views
 from flaskbb.forum.models import Post, Topic
 from flaskbb.management import views
 from flaskbb.user import views as user_views
-from flaskbb.user.models import Group, User
+from flaskbb.user.models import Group, GroupRole, User
 
 
 @pytest.fixture
@@ -202,7 +202,7 @@ def test_moderator_cannot_ban_super_moderator(
 
     assert response.status_code == 302
     assert ("danger", "You are not allowed to ban this user.") in messages
-    assert not super_moderator_user.permissions["banned"]
+    assert not super_moderator_user.is_banned
 
 
 def test_moderator_cannot_unban_user_holding_admin_via_secondary_group(
@@ -213,7 +213,7 @@ def test_moderator_cannot_unban_user_holding_admin_via_secondary_group(
     """
     user.save(groups=[default_groups[0]])
     user.ban()
-    assert user.permissions["banned"]
+    assert user.is_banned
 
     view = views.UnbanUser.as_view("unban_user")
 
@@ -225,7 +225,7 @@ def test_moderator_cannot_unban_user_holding_admin_via_secondary_group(
 
     assert response.status_code == 302
     assert ("danger", "You are not allowed to unban this user.") in messages
-    assert user.permissions["banned"]
+    assert user.is_banned
 
 
 def _bulk(view_cls, actor, ids):
@@ -251,9 +251,9 @@ def test_bulk_ban_skips_self_and_outranked_users(
 
     assert response.status_code == 302
     assert ("success", "1 users banned.") in messages
-    assert user.permissions["banned"]
-    assert not moderator_user.permissions["banned"]
-    assert not super_moderator_user.permissions["banned"]
+    assert user.is_banned
+    assert not moderator_user.is_banned
+    assert not super_moderator_user.is_banned
 
 
 def test_bulk_delete_groups(default_settings, admin_user, default_groups, plain_group):
@@ -458,7 +458,7 @@ def test_super_moderator_cannot_smuggle_admin_in_as_a_secondary_group(
     )
 
     assert [group.id for group in user.secondary_groups] == []
-    assert not user.permissions["admin"]
+    assert all(group.role is not GroupRole.ADMINISTRATOR for group in user.groups)
 
 
 def test_super_moderator_cannot_change_a_password(
@@ -549,7 +549,7 @@ def test_admin_can_still_ban_themselves_after_confirming(
     )
 
     assert response.status_code == 302
-    assert admin_user.permissions["banned"]
+    assert admin_user.is_banned
 
 
 def test_admin_can_still_change_their_own_password(
@@ -567,7 +567,7 @@ def test_admin_can_still_change_their_own_password(
 
     assert response.status_code == 302
     assert admin_user.check_password("New-Self-Set-Password")
-    assert admin_user.permissions["admin"]
+    assert admin_user.primary_group.role is GroupRole.ADMINISTRATOR
 
 
 def test_super_moderator_can_edit_themselves_without_groups(default_settings, super_moderator_user):
@@ -604,7 +604,7 @@ def test_super_moderator_self_edit_applies_profile_changes(
     assert response.status_code == 302
     assert super_moderator_user.signature == "edited by myself"
     assert super_moderator_user.primary_group_id == original
-    assert not super_moderator_user.permissions["banned"]
+    assert not super_moderator_user.is_banned
 
 
 def test_moderator_can_edit_themselves(default_settings, moderator_user):

@@ -23,7 +23,7 @@ from flaskbb.core.auth.permissions import permissions_for
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.locals import current_forum, current_post, current_topic
 from flaskbb.forum.models import Forum, Post, Topic
-from flaskbb.user.models import User
+from flaskbb.user.models import GroupRole, User
 from flaskbb.utils.helpers import real
 
 logger = logging.getLogger(__name__)
@@ -149,13 +149,26 @@ class CanAccessForum(Requirement):
         return permissions_for(user).can_access(self.forum)
 
 
-IsMod = And(IsAuthed(), Has("mod"))
-IsSuperMod = And(IsAuthed(), Has("super_mod"))
-IsAdmin = And(IsAuthed(), Has("admin"))
+class IsAtLeast(Requirement):
+    """Fulfilled when a group of the acting user has ``role`` or outranks it."""
 
-IsAtleastModerator = Or(IsAdmin, IsSuperMod, IsMod)
+    def __init__(self, role: GroupRole):
+        self.role = role
 
-IsAtleastSuperModerator = Or(IsAdmin, IsSuperMod)
+    @override
+    def __repr__(self):
+        return f"<IsAtLeast({self.role!s})>"
+
+    @override
+    def fulfill(self, user: User):
+        return permissions_for(user).rank >= self.role.rank
+
+
+IsAdmin = IsAtLeast(GroupRole.ADMINISTRATOR)
+
+IsAtleastSuperModerator = IsAtLeast(GroupRole.SUPER_MODERATOR)
+
+IsAtleastModerator = IsAtLeast(GroupRole.MODERATOR)
 
 CanBanUser = Or(IsAtleastSuperModerator, Has("mod_banuser"))
 

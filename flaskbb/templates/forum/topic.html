@@ -88,7 +88,7 @@
                             {% if current_user|is_admin %}
                                 <div class="author-adminactions">
                                     {# Ban user #}
-                                    {% if current_user|can_ban_user(user) and not user.permissions["banned"] and not current_user == user %}
+                                    {% if current_user|can_ban_user(user) and not user.is_banned and not current_user == user %}
                                         <form class="d-inline"
                                               method="post"
                                               action="{{ url_for('management.ban_user', user_id=user.id) }}">
@@ -100,7 +100,7 @@
                                     {% endif %}
 
                                     {# Unban user #}
-                                    {% if current_user|can_ban_user(user) and user.permissions["banned"] %}
+                                    {% if current_user|can_ban_user(user) and user.is_banned %}
                                         <form class="d-inline"
                                               method="post"
                                               action="{{ url_for('management.unban_user', user_id=user.id) }}">

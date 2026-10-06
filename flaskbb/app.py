@@ -49,6 +49,7 @@ from flaskbb.extensions import (
     pluggy,
     themes,
 )
+from flaskbb.permissions import permission_registry
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import (
@@ -163,6 +164,8 @@ def create_app(config: object | None = None, instance_path: str | None = None):
 
     setting_registry.load_from_internal(pluggy)
     setting_registry.load_from_plugins(pluggy)
+    permission_registry.load_from_internal(pluggy)
+    permission_registry.load_from_plugins(pluggy)
 
     pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 

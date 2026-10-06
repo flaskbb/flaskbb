@@ -29,6 +29,8 @@ The hooks below are listed in the order they are called.
 .. autofunction:: flaskbb_load_nonpost_markdown_plugins
 .. autofunction:: flaskbb_load_internal_setting_groups
 .. autofunction:: flaskbb_load_setting_groups
+.. autofunction:: flaskbb_load_internal_permissions
+.. autofunction:: flaskbb_load_permissions
 .. autofunction:: flaskbb_additional_setup
 
 .. note::

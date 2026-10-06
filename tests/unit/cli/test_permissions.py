@@ -38,12 +38,12 @@ def test_set_permission(cli_runner, default_groups):
     result = cli_runner.invoke(set_permission, ["Member", "deletepost", "true"])
 
     assert result.exit_code == 0
-    assert default_groups[3].deletepost
+    assert default_groups[3].permissions["deletepost"]
 
     result = cli_runner.invoke(set_permission, ["member", "deletepost", "false"])
 
     assert result.exit_code == 0
-    assert not default_groups[3].deletepost
+    assert not default_groups[3].permissions["deletepost"]
 
 
 def test_set_unknown_permission(cli_runner, default_groups):

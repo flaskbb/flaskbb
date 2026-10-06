@@ -61,16 +61,17 @@ class EffectivePermissions:
     def group_ids(self) -> frozenset[int]:
         return frozenset(group.id for group in self.user.get_groups())
 
+    @cached_property
+    def roles(self) -> frozenset[Any]:
+        return frozenset(group.role for group in self.user.get_groups())
+
+    def has_role(self, role: Any) -> bool:
+        return role in self.roles
+
     @property
     def rank(self) -> int:
-        """Ranks the identity by the highest privilege any of its groups grants."""
-        if self.has("admin"):
-            return 3
-        if self.has("super_mod"):
-            return 2
-        if self.has("mod"):
-            return 1
-        return 0
+        """Ranks the identity by the highest role any of its groups has."""
+        return max((role.rank for role in self.roles), default=0)
 
     def can_access(self, forum: ForumLike) -> bool:
         return any(group.id in self.group_ids for group in forum.groups)

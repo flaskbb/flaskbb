@@ -3,7 +3,7 @@ cached across requests under a version every group change bumps.
 """
 
 from flaskbb.core.auth.permissions import forget_permissions, permissions_for
-from flaskbb.user.models import Group, permissions_version
+from flaskbb.user.models import Group, GroupRole, permissions_version
 
 ADMINISTRATOR, SUPER_MODERATOR, MODERATOR, MEMBER, BANNED, GUEST = range(6)
 
@@ -39,7 +39,7 @@ def test_saving_a_group_starts_a_new_cache_generation(default_groups):
 def test_a_group_change_reaches_its_members_at_once(user, default_groups):
     assert not user.permissions["deletepost"]
 
-    default_groups[MEMBER].deletepost = True
+    default_groups[MEMBER].set_permission("deletepost", True)
     default_groups[MEMBER].save()
 
     assert user.permissions["deletepost"]
@@ -48,7 +48,7 @@ def test_a_group_change_reaches_its_members_at_once(user, default_groups):
 def test_a_group_change_reaches_guests_at_once(guest, default_groups):
     assert not guest.permissions["posttopic"]
 
-    default_groups[GUEST].posttopic = True
+    default_groups[GUEST].set_permission("posttopic", True)
     default_groups[GUEST].save()
 
     assert guest.permissions["posttopic"]
@@ -62,19 +62,19 @@ def test_deleting_a_group_starts_a_new_cache_generation(database, default_groups
 
 
 def test_changing_a_users_groups_reaches_the_user_at_once(user, default_groups):
-    assert not user.permissions["admin"]
+    assert all(group.role is not GroupRole.ADMINISTRATOR for group in user.groups)
 
     user.save(groups=[default_groups[ADMINISTRATOR]])
 
-    assert user.permissions["admin"]
+    assert any(group.role is GroupRole.ADMINISTRATOR for group in user.groups)
 
 
 def test_banning_reaches_the_user_at_once(user, default_groups):
-    assert not user.permissions["banned"]
+    assert not user.is_banned
     user.ban()
-    assert user.permissions["banned"]
+    assert user.is_banned
     user.unban()
-    assert not user.permissions["banned"]
+    assert not user.is_banned
 
 
 def test_moderator_lookup_is_cached_within_the_snapshot(moderator_user, forum):

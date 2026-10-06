@@ -13,7 +13,6 @@ import importlib.metadata
 import os
 import re
 import sys
-from collections import Counter
 from collections.abc import Callable
 from typing import Any, IO, override
 
@@ -25,29 +24,11 @@ from jinja2 import Template
 
 from flaskbb._version import __version__
 from flaskbb.extensions import db, pluggy
-from flaskbb.fixtures.groups import fixture
+from flaskbb.permissions import permission_registry
 from flaskbb.user.models import Group, User
 from flaskbb.utils.populate import create_user, update_user
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
-
-
-def _group_types() -> tuple[str, ...]:
-    """Derives the columns that mark what kind of group it is, as opposed to
-    what its members are allowed to do, from the default groups: every
-    default group is of exactly one type, so a type is a column that is only
-    ever true for a single one of them.
-
-    A permission that only one default group has would be mistaken for a
-    type - ``tests/unit/cli/test_utils.py`` guards against that.
-    """
-    columns = Counter(
-        column for group in fixture.values() for column, value in group.items() if value is True
-    )
-    return tuple(column for column, count in columns.items() if count == 1)
-
-
-GROUP_TYPES = _group_types()
 
 
 class FlaskBBCLIError(click.ClickException):
@@ -90,11 +71,8 @@ class EmailType(click.ParamType[str]):
 
 
 def group_permissions() -> list[str]:
-    """Returns the permission columns of the group model - everything that
-    is neither metadata nor one of the :data:`GROUP_TYPES`.
-    """
-    excluded = {"id", "name", "description", *GROUP_TYPES}
-    return [c for c in Group.__table__.columns.keys() if c not in excluded]
+    """Returns the keys of every registered permission."""
+    return permission_registry.keys()
 
 
 def get_user(username: str) -> User:

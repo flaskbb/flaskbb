@@ -269,3 +269,56 @@ settings or another plugin's - accessible at runtime via
 
 For more information see the :ref:`settings` chapter.
 
+
+Permissions
+-----------
+Plugins can declare their own permissions. They show up as a section of
+the group form in the Admin Panel, where administrators grant or revoke
+them per group like FlaskBB's own permissions.
+
+Permissions are declared as a
+:class:`~flaskbb.permissions.definitions.PermissionGroup` of
+:class:`~flaskbb.permissions.definitions.PermissionDefinition` instances
+and registered by implementing the ``flaskbb_load_permissions`` hook. As
+with settings, the group's ``key`` must equal your plugin's entry point
+name: the permissions are stored prefixed with it, so they can't collide
+with FlaskBB's own or another plugin's.
+
+::
+
+    from flaskbb.permissions import PermissionDefinition, PermissionGroup
+    from pluggy import HookimplMarker
+
+    impl = HookimplMarker("flaskbb")
+
+    PERMISSIONS = PermissionGroup(
+        # Has to match the plugin's entry point name.
+        key="portal",
+
+        # The heading of the section in the group form.
+        name="Portal",
+
+        permissions=(
+            PermissionDefinition(
+                # Only has to be unique within this group.
+                key="view_stats",
+
+                name="Can view the portal statistics",
+                description="Shows the statistics box on the portal.",
+
+                # What a group gets until an administrator decides
+                # otherwise. Defaults to False.
+                default=True,
+            ),
+        ),
+    )
+
+    @impl
+    def flaskbb_load_permissions():
+        return PERMISSIONS
+
+A permission is checked with its prefixed key, in views through
+``Has("portal_view_stats")`` from :mod:`flaskbb.utils.requirements` and in
+templates through ``current_user|has_permission("portal_view_stats")``. A
+user has it when any of their groups grants it.
+

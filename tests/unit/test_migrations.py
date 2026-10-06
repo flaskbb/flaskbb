@@ -244,3 +244,52 @@ def test_merge_can_not_join_plugins(application, second_plugin_branch, created):
     alembic.merge(["conversations@head", "default@head"])
 
     assert len(created) == 1
+
+
+def test_group_roles_migration_moves_flags_and_permissions_to_rows(database):
+    migration = _load_migration("202610061554_1791294853_group_roles_and_permissions.py")
+    connection = db.session.connection()
+    # the migration runner suspends foreign keys for the batch rebuild (see
+    # flaskbb.utils.alembic); calling the migration directly has to as well,
+    # or dropping the rebuilt groups table cascades into group_permissions
+    connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+    try:
+        context = MigrationContext.configure(connection)
+        operations = Operations(context)
+        operations.drop_table("group_permissions")
+        with operations.batch_alter_table("groups") as batch_op:
+            batch_op.drop_column("role")
+            for name in migration.ROLE_FLAGS + migration.PERMISSIONS:
+                batch_op.add_column(
+                    sa.Column(name, sa.Boolean(), nullable=False, server_default=sa.false())
+                )
+        db.session.execute(
+            sa.text(
+                "INSERT INTO groups (name, mod, editpost, viewhidden) VALUES ('Old Mods', 1, 1, 1)"
+            )
+        )
+
+        with Operations.context(context):
+            migration.upgrade()
+        db.session.commit()
+
+        role = db.session.execute(
+            sa.text("SELECT role FROM groups WHERE name = 'Old Mods'")
+        ).scalar_one()
+        granted = dict(
+            db.session.execute(sa.text("SELECT permission, granted FROM group_permissions")).all()
+        )
+        columns = {c["name"] for c in sa.inspect(db.engine).get_columns("groups")}
+        db.session.commit()
+    finally:
+        # the commit released the connection above; the pooled one stays
+        # switched off otherwise, as the connect listener does not run again
+        db.session.connection().exec_driver_sql("PRAGMA foreign_keys=ON")
+        db.session.commit()
+
+    assert role == "mod"
+    assert granted["editpost"] == 1
+    assert granted["viewhidden"] == 1
+    assert granted["deletepost"] == 0
+    assert set(migration.PERMISSIONS) == set(granted)
+    assert columns.isdisjoint(migration.ROLE_FLAGS + migration.PERMISSIONS)

@@ -8,8 +8,9 @@ This module provides the models for the user.
 :license: BSD, see LICENSE for more details.
 """
 
+import enum
 import logging
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 from typing import override
 
@@ -31,6 +32,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flaskbb.core.auth.permissions import forget_permissions, permissions_for
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
+from flaskbb.permissions import permission_registry
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.database import BaseModel, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
@@ -57,7 +59,26 @@ groups_users = sa.Table(
 
 
 PERMISSIONS_VERSION_KEY = "permissions_version"
-GROUP_METADATA_COLUMNS = {"id", "name", "description"}
+
+
+class GroupRole(enum.StrEnum):
+    GUEST = "guest"
+    BANNED = "banned"
+    MEMBER = "member"
+    MODERATOR = "mod"
+    SUPER_MODERATOR = "super_mod"
+    ADMINISTRATOR = "admin"
+
+    @property
+    def rank(self) -> int:
+        """Moderators outrank members, super moderators outrank moderators and
+        administrators outrank everyone. Guests and banned users rank as members.
+        """
+        return {
+            GroupRole.MODERATOR: 1,
+            GroupRole.SUPER_MODERATOR: 2,
+            GroupRole.ADMINISTRATOR: 3,
+        }.get(self, 0)
 
 
 def permissions_version() -> int:
@@ -78,12 +99,62 @@ def permissions_of(groups: Iterable["Group"]) -> dict[str, bool]:
     """Merges the permissions of ``groups``: a permission is granted when any
     group grants it.
     """
-    keys = [c for c in Group.__table__.columns.keys() if c not in GROUP_METADATA_COLUMNS]
-    permissions = dict.fromkeys(keys, False)
+    granted = dict.fromkeys(permission_registry.keys(), False)
     for group in groups:
-        for key in keys:
-            permissions[key] = permissions[key] or bool(getattr(group, key))
-    return permissions
+        for key, value in group.permissions.items():
+            granted[key] = granted[key] or value
+    return granted
+
+
+class HasPermissions:
+    """The groups and permissions of an identity, a user or a guest.
+
+    Subclasses provide ``query_groups``; everything else derives from it and
+    is cached under the permissions version, so a group change reaches every
+    identity at once (see ``invalidate_all_permissions``).
+    """
+
+    @property
+    def is_authenticated(self) -> bool:
+        """Supplied by the flask-login mixin of the subclass."""
+        raise NotImplementedError
+
+    @property
+    def permissions(self) -> Mapping[str, bool]:
+        """The effective permissions, read once per request."""
+        return permissions_for(self).granted
+
+    @property
+    def groups(self) -> list["Group"]:
+        return self.get_groups()
+
+    @property
+    def is_banned(self) -> bool:
+        return permissions_for(self).has_role(GroupRole.BANNED)
+
+    def get_groups(self) -> list["Group"]:
+        return self._load_groups(permissions_version())
+
+    def get_permissions(self) -> dict[str, bool]:
+        return self._load_permissions(permissions_version())
+
+    def query_groups(self) -> list["Group"]:
+        raise NotImplementedError
+
+    @cache.memoize()
+    def _load_groups(self, version: int) -> list["Group"]:
+        return self.query_groups()
+
+    @cache.memoize()
+    def _load_permissions(self, version: int) -> dict[str, bool]:
+        return permissions_of(self._load_groups(version))
+
+    def invalidate_cache(self) -> None:
+        """Drops the cached groups and permissions of this identity."""
+        version = permissions_version()
+        cache.delete_memoized(self._load_permissions, version)
+        cache.delete_memoized(self._load_groups, version)
+        forget_permissions()
 
 
 @make_comparable
@@ -93,27 +164,22 @@ class Group(BaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    role: Mapped[GroupRole] = mapped_column(
+        sa.Enum(
+            GroupRole,
+            native_enum=False,
+            length=20,
+            values_callable=lambda roles: [role.value for role in roles],
+        ),
+        default=GroupRole.MEMBER,
+        nullable=False,
+    )
 
-    # Group types
-    admin: Mapped[bool] = mapped_column(default=False, nullable=False)
-    super_mod: Mapped[bool] = mapped_column(default=False, nullable=False)
-    mod: Mapped[bool] = mapped_column(default=False, nullable=False)
-    guest: Mapped[bool] = mapped_column(default=False, nullable=False)
-    banned: Mapped[bool] = mapped_column(default=False, nullable=False)
-
-    # Moderator permissions (only available when the user a moderator)
-    mod_edituser: Mapped[bool] = mapped_column(default=False, nullable=False)
-    mod_banuser: Mapped[bool] = mapped_column(default=False, nullable=False)
-
-    # User permissions
-    editpost: Mapped[bool] = mapped_column(default=True, nullable=False)
-    deletepost: Mapped[bool] = mapped_column(default=False, nullable=False)
-    deletetopic: Mapped[bool] = mapped_column(default=False, nullable=False)
-    posttopic: Mapped[bool] = mapped_column(default=True, nullable=False)
-    postreply: Mapped[bool] = mapped_column(default=True, nullable=False)
-    postattachment: Mapped[bool] = mapped_column(default=True, nullable=False)
-    viewhidden: Mapped[bool] = mapped_column(default=False, nullable=False)
-    makehidden: Mapped[bool] = mapped_column(default=False, nullable=False)
+    # every registered permission the group has decided on; the rest fall
+    # back to the permission's default
+    permission_rows: Mapped[list["GroupPermission"]] = relationship(
+        cascade="all, delete-orphan", lazy="selectin"
+    )
 
     @override
     def __repr__(self):
@@ -121,6 +187,24 @@ class Group(BaseModel):
         Required for cache.memoize() to work across requests.
         """
         return f"<{self.__class__.__name__} {self.id} {self.name}>"
+
+    @property
+    def permissions(self) -> dict[str, bool]:
+        stored = {row.permission: row.granted for row in self.permission_rows}
+        return {
+            key: stored.get(key, default) for key, default in permission_registry.defaults().items()
+        }
+
+    def set_permission(self, key: str, granted: bool) -> None:
+        for row in self.permission_rows:
+            if row.permission == key:
+                row.granted = granted
+                return
+        self.permission_rows.append(GroupPermission(permission=key, granted=granted))
+
+    def set_permissions(self, permissions: Mapping[str, bool]) -> None:
+        for key, granted in permissions.items():
+            self.set_permission(key, granted)
 
     @override
     def save(self):
@@ -140,26 +224,27 @@ class Group(BaseModel):
 
     @classmethod
     def get_guest_group(cls) -> "Group":
-        return db.session.execute(sa.select(cls).filter(cls.guest.is_(True))).scalar_one()
+        return db.session.execute(sa.select(cls).filter(cls.role == GroupRole.GUEST)).scalar_one()
 
     @classmethod
     def get_member_group(cls) -> "Group":
         """Returns the first member group."""
         return db.session.execute(
-            sa.select(cls)
-            .filter(
-                cls.admin.is_(False),
-                cls.super_mod.is_(False),
-                cls.mod.is_(False),
-                cls.guest.is_(False),
-                cls.banned.is_(False),
-            )
-            .order_by(cls.id.asc())
-            .limit(1)
+            sa.select(cls).filter(cls.role == GroupRole.MEMBER).order_by(cls.id.asc()).limit(1)
         ).scalar_one()
 
 
-class User(BaseModel, UserMixin):
+class GroupPermission(BaseModel):
+    __tablename__: str = "group_permissions"
+
+    group_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True
+    )
+    permission: Mapped[str] = mapped_column(String(255), primary_key=True)
+    granted: Mapped[bool] = mapped_column(nullable=False)
+
+
+class User(BaseModel, UserMixin, HasPermissions):
     __tablename__: str = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -257,16 +342,6 @@ class User(BaseModel, UserMixin):
     @property
     def avatar_url(self):
         return url_for("uploads.avatar", avatar=self.avatar)
-
-    @property
-    def permissions(self):
-        """The effective permissions of the user, read once per request."""
-        return permissions_for(self).granted
-
-    @property
-    def groups(self):
-        """Returns the user groups."""
-        return self.get_groups()
 
     @property
     def days_registered(self) -> int:
@@ -422,34 +497,15 @@ class User(BaseModel, UserMixin):
         stmt = self.secondary_groups.filter(groups_users.c.group_id == group.id)
         return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
-    def get_groups(self) -> list[Group]:
-        """Returns all the groups the user is in."""
-        return self._load_groups(permissions_version())
-
-    def get_permissions(self) -> dict[str, bool]:
-        """Returns a dictionary with all permissions the user has"""
-        return self._load_permissions(permissions_version())
-
-    @cache.memoize()
-    def _load_groups(self, version: int) -> list[Group]:
+    @override
+    def query_groups(self) -> list[Group]:
         return [self.primary_group] + list(self.secondary_groups)
-
-    @cache.memoize()
-    def _load_permissions(self, version: int) -> dict[str, bool]:
-        return permissions_of(self.get_groups())
-
-    def invalidate_cache(self):
-        """Drops the cached groups and permissions of this user."""
-        version = permissions_version()
-        cache.delete_memoized(self._load_permissions, version)
-        cache.delete_memoized(self._load_groups, version)
-        forget_permissions()
 
     def ban(self):
         """Bans the user. Returns True upon success."""
-        if not self.permissions["banned"]:
+        if not self.is_banned:
             banned_group = db.session.execute(
-                sa.select(Group).filter(Group.banned.is_(True))
+                sa.select(Group).filter(Group.role == GroupRole.BANNED)
             ).scalar_one_or_none()
 
             if not banned_group:
@@ -463,17 +519,9 @@ class User(BaseModel, UserMixin):
 
     def unban(self):
         """Unbans the user. Returns True upon success."""
-        if self.permissions["banned"]:
+        if self.is_banned:
             member_group = db.session.scalar(
-                sa.select(Group)
-                .filter(
-                    Group.admin.is_(False),
-                    Group.super_mod.is_(False),
-                    Group.mod.is_(False),
-                    Group.guest.is_(False),
-                    Group.banned.is_(False),
-                )
-                .order_by(Group.id.asc())
+                sa.select(Group).filter(Group.role == GroupRole.MEMBER).order_by(Group.id.asc())
             )
 
             if not member_group:
@@ -519,28 +567,14 @@ class User(BaseModel, UserMixin):
         return self
 
 
-@cache.memoize()
-def _load_guest_groups(version: int) -> list[Group]:
-    return list(db.session.execute(sa.select(Group).where(Group.guest.is_(True))).scalars())
+class Guest(AnonymousUserMixin, HasPermissions):
+    @override
+    def __repr__(self):
+        """Every guest shares the cached guest group and its permissions."""
+        return "<Guest>"
 
-
-@cache.memoize()
-def _load_guest_permissions(version: int) -> dict[str, bool]:
-    return permissions_of(_load_guest_groups(version))
-
-
-class Guest(AnonymousUserMixin):
-    @property
-    def permissions(self):
-        """The effective permissions of a guest, read once per request."""
-        return permissions_for(self).granted
-
-    @property
-    def groups(self):
-        return self.get_groups()
-
-    def get_groups(self) -> list[Group]:
-        return _load_guest_groups(permissions_version())
-
-    def get_permissions(self) -> dict[str, bool]:
-        return _load_guest_permissions(permissions_version())
+    @override
+    def query_groups(self) -> list[Group]:
+        return list(
+            db.session.execute(sa.select(Group).where(Group.role == GroupRole.GUEST)).scalars()
+        )

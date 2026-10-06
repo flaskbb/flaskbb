@@ -47,7 +47,7 @@ def list_permissions(group_name: str | None):
         selected = list(db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars())
 
     rows = [
-        [permission] + ["yes" if getattr(group, permission) else "no" for group in selected]
+        [permission] + ["yes" if group.permissions[permission] else "no" for group in selected]
         for permission in group_permissions()
     ]
 
@@ -66,7 +66,7 @@ def show_permissions(username: str):
 
     rows: list[list[str]] = []
     for permission in group_permissions():
-        granted_by = [group.name for group in user_groups if getattr(group, permission)]
+        granted_by = [group.name for group in user_groups if group.permissions[permission]]
         rows.append(
             [
                 permission,
@@ -90,7 +90,7 @@ def set_permission(group_name: str, permission: str, value: bool):
     _validate_permission(permission)
     group = get_group(group_name)
 
-    setattr(group, permission, value)
+    group.set_permission(permission, value)
     group.save()
 
     click.secho(

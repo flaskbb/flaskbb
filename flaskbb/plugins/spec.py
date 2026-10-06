@@ -161,6 +161,53 @@ def flaskbb_load_setting_groups():
 
 
 @spec
+def flaskbb_load_internal_permissions():
+    """Hook for registering FlaskBB's own permissions.
+
+    This is internal-only - implemented by flaskbb.permissions.fixture and
+    nothing else. Plugin authors should implement flaskbb_load_permissions
+    instead (see below).
+
+    Implementations should return a PermissionGroup instance, or a list of
+    PermissionGroup instances. All results are collected and registered -
+    this hookspec does not use firstresult.
+    """
+
+
+@spec
+def flaskbb_load_permissions():
+    """Hook for plugins to register their own permissions.
+
+    Implementations should return a PermissionGroup instance, or a list of
+    PermissionGroup instances. All results across every installed plugin
+    are collected and registered - this hookspec does not use firstresult.
+
+    The group's key must equal the plugin's name. Its permissions are stored
+    prefixed with that key, so a permission declared as ``view_stats`` by
+    the plugin ``portal`` is checked with ``Has("portal_view_stats")`` and
+    shows up as its own section of the group form in the admin panel. A
+    group that has never been edited gets the permission's ``default``.
+
+    Example::
+
+        @impl
+        def flaskbb_load_permissions():
+            return PermissionGroup(
+                key="portal",
+                name="Portal",
+                permissions=(
+                    PermissionDefinition(
+                        key="view_stats",
+                        name="Can view the portal statistics",
+                        description="Shows the statistics box on the portal.",
+                        default=True,
+                    ),
+                ),
+            )
+    """
+
+
+@spec
 def flaskbb_load_search_backends():
     """Hook for plugins to register additional search backends.
 

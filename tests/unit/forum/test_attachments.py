@@ -171,7 +171,7 @@ def test_reply_form_rejects_too_many(member_request, topic):
 def test_reply_form_rejects_without_permission(
     application, user, topic, attachment_upload_path, default_settings
 ):
-    user.primary_group.postattachment = False
+    user.primary_group.set_permission("postattachment", False)
     user.primary_group.save()
     user.invalidate_cache()
 

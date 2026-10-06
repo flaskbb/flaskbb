@@ -10,7 +10,7 @@ from flaskbb.cli.users import (
     unban_user,
 )
 from flaskbb.extensions import db
-from flaskbb.user.models import User
+from flaskbb.user.models import GroupRole, User
 
 
 def test_list_users(cli_runner, user, admin_user):
@@ -78,12 +78,12 @@ def test_ban_and_unban_user(cli_runner, user, default_groups):
     result = cli_runner.invoke(ban_user, ["test_normal"])
 
     assert result.exit_code == 0
-    assert user.primary_group.banned
+    assert user.primary_group.role is GroupRole.BANNED
 
     result = cli_runner.invoke(unban_user, ["test_normal"])
 
     assert result.exit_code == 0
-    assert not user.primary_group.banned
+    assert user.primary_group.role is not GroupRole.BANNED
 
 
 def test_ban_banned_user(cli_runner, user, default_groups):

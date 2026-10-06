@@ -42,14 +42,13 @@ from flaskbb.forum.forms import UserSearchForm
 from flaskbb.forum.models import Attachment, Category, Forum, Post, Report, Topic
 from flaskbb.management.forms import (
     AddForumForm,
-    AddGroupForm,
     AddUserForm,
     assignable_groups,
     AttachmentSearchForm,
     CategoryForm,
     EditForumForm,
-    EditGroupForm,
     EditUserForm,
+    group_form,
     ModeratorEditUserForm,
     SuperModeratorEditUserForm,
 )
@@ -66,7 +65,7 @@ from flaskbb.settings import flaskbb_config
 from flaskbb.settings.forms import build_form
 from flaskbb.settings.models import Setting
 from flaskbb.settings.registry import setting_registry
-from flaskbb.user.models import Group, User
+from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.helpers import (
     count_online_users,
     FlashAndRedirect,
@@ -123,7 +122,9 @@ class ManagementOverview(MethodView):
 
     def get(self):
         # user and group stats
-        banned_users = User.count(clause=[Group.banned == True, Group.id == User.primary_group_id])
+        banned_users = User.count(
+            clause=[Group.role == GroupRole.BANNED, Group.id == User.primary_group_id]
+        )
         online_users, online_guests = count_online_users()
 
         unread_reports = Report.count(Report.zapped == None)
@@ -504,7 +505,7 @@ class BannedUsers(MethodView):
         users = db.paginate(
             sa.select(User)
             .join(Group, Group.id == User.primary_group_id)
-            .where(Group.banned == True),
+            .where(Group.role == GroupRole.BANNED),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -519,7 +520,7 @@ class BannedUsers(MethodView):
         users = db.paginate(
             sa.select(User)
             .join(Group, Group.id == User.primary_group_id)
-            .where(Group.banned == True),
+            .where(Group.role == GroupRole.BANNED),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -669,13 +670,14 @@ class AddGroup(MethodView):
             ),
         )
     ]
-    form = AddGroupForm
 
     def get(self):
-        return render_template("management/group_form.html", form=self.form(), title=_("Add Group"))
+        return render_template(
+            "management/group_form.html", form=group_form(), title=_("Add Group")
+        )
 
     def post(self):
-        form = AddGroupForm()
+        form = group_form()
         if form.validate_on_submit():
             form.save()
             flash(_("Group added."), "success")
@@ -695,20 +697,18 @@ class EditGroup(MethodView):
             ),
         )
     ]
-    form = EditGroupForm
 
     def get(self, group_id: int):
         group = Group.get_by_or_404(id=group_id)
-        form = self.form(group)
+        form = group_form(group)
         return render_template("management/group_form.html", form=form, title=_("Edit Group"))
 
     def post(self, group_id: int):
         group = Group.get_by_or_404(id=group_id)
-        form = EditGroupForm(group)
+        form = group_form(group)
 
         if form.validate_on_submit():
-            form.populate_obj(group)
-            group.save()
+            form.save()
 
             flash(_("Group updated."), "success")
             return redirect(url_for("management.groups", group_id=group.id))
