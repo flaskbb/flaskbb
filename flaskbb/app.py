@@ -522,7 +522,7 @@ def configure_migrations(app: FlaskBB):
             disabled_dirs.append(migrations)
 
     app.config["ALEMBIC"]["version_locations"] = get_alembic_locations(plugin_dirs + blocked_dirs)
-    app.config["ALEMBIC"]["disabled_version_locations"] = disabled_dirs
+    app.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] = disabled_dirs
 
 
 def configure_translations(app: FlaskBB):

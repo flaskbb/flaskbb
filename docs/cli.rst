@@ -363,6 +363,8 @@ migration branch, keyed by the plugin's name.
     Run migrations to upgrade the database. ``TARGET`` defaults to
     ``heads``, which upgrades FlaskBB and every enabled plugin, and can
     be scoped to a single branch, e.g. ``flaskbb db upgrade portal@head``.
+    A number goes up that many revisions, e.g. ``flaskbb db upgrade 2``,
+    unless it is a revision id such as ``1789335000``.
 
 .. describe:: downgrade [TARGET]
 

@@ -107,6 +107,9 @@ class AppConfig(TypedDict, extra_items=Any):  # type: ignore[call-arg]
     DEBUG_TB_PANELS: list[str]
     DEPRECATION_LEVEL: NotRequired[str]
 
+    # Set by configure_migrations()
+    MIGRATIONS_DISABLED_VERSION_LOCATIONS: list[str]
+
 
 class FlaskBB(Flask):
     """Exists only to give ``app.config`` a static type.

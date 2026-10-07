@@ -38,12 +38,13 @@ def test_disabled_plugin_migrations_are_loaded_without_importing_the_plugin(
         ],
     )
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
 
     configure_migrations(application)
 
     migrations = str(plugin_dir / "migrations")
     assert ("disabled_plugin", migrations) in application.config["ALEMBIC"]["version_locations"]
-    assert application.config["ALEMBIC"]["disabled_version_locations"] == [migrations]
+    assert application.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] == [migrations]
     assert "disabled_plugin" not in sys.modules
 
 
@@ -112,10 +113,11 @@ def test_held_back_plugin_migrations_run_with_upgrade_heads(
     monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
     monkeypatch.setitem(application.extensions, "flaskbb_held_back_plugins", {"pending_plugin"})
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
 
     configure_migrations(application)
 
-    assert application.config["ALEMBIC"]["disabled_version_locations"] == []
+    assert application.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] == []
     assert any(
         name == "pending_plugin" for name, _ in application.config["ALEMBIC"]["version_locations"]
     )
@@ -123,7 +125,7 @@ def test_held_back_plugin_migrations_run_with_upgrade_heads(
 
 def test_upgrade_heads_leaves_out_disabled_plugin_migrations(application, monkeypatch):
     migrations = os.path.join(pluggy.get_plugin_path("conversations"), "migrations")
-    monkeypatch.setitem(application.config["ALEMBIC"], "disabled_version_locations", [migrations])
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [migrations])
     planned = []
     monkeypatch.setattr(
         alembic,
@@ -199,6 +201,7 @@ def test_attachment_filename_index_matches_the_migration(database):
 def second_plugin_branch(application, monkeypatch, pending_plugin):
     monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
     configure_migrations(application)
     monkeypatch.setattr(alembic._get_cache(), "config", None)
     monkeypatch.setattr(alembic._get_cache(), "script", None)

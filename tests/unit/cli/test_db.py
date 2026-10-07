@@ -1,6 +1,29 @@
 import pytest
-from flaskbb.cli.db import downgrade
+from flaskbb.cli.db import downgrade, upgrade
 from flaskbb.extensions import alembic
+
+
+@pytest.mark.parametrize(
+    ("arguments", "target"),
+    [
+        (["1789335000"], "1789335000"),
+        (["2"], "+2"),
+        (["+2"], "+2"),
+        (["9"], "+9"),
+        ([], "heads"),
+        (["portal@head"], "portal@head"),
+    ],
+)
+def test_upgrade_tells_revision_ids_and_step_counts_apart(
+    cli_runner, monkeypatch, arguments, target
+):
+    targets = []
+    monkeypatch.setattr(alembic, "upgrade", targets.append)
+
+    result = cli_runner.invoke(upgrade, arguments, obj=alembic)
+
+    assert result.exit_code == 0, result.output
+    assert targets == [target]
 
 
 @pytest.mark.parametrize(
