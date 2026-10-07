@@ -1,5 +1,6 @@
 from flaskbb.cli.groups import delete_group, list_groups, new_group, show_group, update_group
 from flaskbb.extensions import db
+from flaskbb.permissions import PermissionLevel
 from flaskbb.user.models import Group, GroupRole
 
 
@@ -52,6 +53,20 @@ def test_new_group(cli_runner, default_groups):
     # untouched permissions keep the default of their definition
     assert group.permissions["postreply"]
     assert not group.permissions["makehidden"]
+
+
+def test_new_group_with_never(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["Probation", "--never", "deletepost"])
+
+    assert result.exit_code == 0
+    assert _get_group("Probation").permission_levels["deletepost"] is PermissionLevel.NEVER
+
+
+def test_new_group_granting_and_nevering_the_same_permission(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["VIP", "--grant", "editpost", "--never", "editpost"])
+
+    assert result.exit_code != 0
+    assert "Can't grant and revoke" in result.stderr
 
 
 def test_new_group_with_role(cli_runner, default_groups):

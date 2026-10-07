@@ -12,6 +12,7 @@ from alembic.util.exc import CommandError
 from flask_alembic import Alembic as FlaskAlembic
 from flaskbb.app import configure_migrations
 from flaskbb.extensions import alembic, db, pluggy
+from flaskbb.permissions import PermissionLevel
 from flaskbb.plugins.utils import plugins_with_pending_migrations
 
 
@@ -303,3 +304,40 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database, old
     assert set(migration.PERMISSIONS) == set(granted)
     assert columns.isdisjoint(migration.ROLE_FLAGS + migration.PERMISSIONS)
     assert checks == []
+
+
+def test_group_permission_levels_migration_round_trips(default_groups):
+    migration = _load_migration("202610070930_1791358200_group_permission_levels.py")
+    member = default_groups[3]
+    member.set_permission("deletepost", PermissionLevel.NEVER)
+    member.save()
+    context = MigrationContext.configure(db.session.connection())
+
+    with Operations.context(context):
+        migration.downgrade()
+    db.session.commit()
+    granted = dict(
+        db.session.execute(
+            sa.text("SELECT permission, granted FROM group_permissions WHERE group_id = :id"),
+            {"id": member.id},
+        ).all()
+    )
+    assert granted["editpost"] == 1
+    assert granted["makehidden"] == 0
+    assert granted["deletepost"] == 0
+
+    context = MigrationContext.configure(db.session.connection())
+    with Operations.context(context):
+        migration.upgrade()
+    db.session.commit()
+    levels = dict(
+        db.session.execute(
+            sa.text("SELECT permission, level FROM group_permissions WHERE group_id = :id"),
+            {"id": member.id},
+        ).all()
+    )
+    assert levels["editpost"] == "allow"
+    assert levels["makehidden"] == "deny"
+    assert levels["deletepost"] == "deny"
+    columns = {c["name"] for c in sa.inspect(db.engine).get_columns("group_permissions")}
+    assert columns == {"group_id", "permission", "level"}

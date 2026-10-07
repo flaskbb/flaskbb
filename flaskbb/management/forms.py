@@ -44,7 +44,7 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from flaskbb.extensions import db
 from flaskbb.forum.models import Attachment, Category, Forum, Post
-from flaskbb.permissions import permission_registry
+from flaskbb.permissions import permission_registry, PermissionLevel
 from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
@@ -280,9 +280,17 @@ def role_choices() -> list[tuple[GroupRole, str]]:
     ]
 
 
+def level_choices() -> list[tuple[PermissionLevel, str]]:
+    return [
+        (PermissionLevel.ALLOW, _("Allow")),
+        (PermissionLevel.DENY, _("Deny")),
+        (PermissionLevel.NEVER, _("Never")),
+    ]
+
+
 class GroupForm(FlaskBBForm):
     """The name, description and role of a group. ``group_form`` adds one
-    checkbox per registered permission.
+    level field per registered permission.
     """
 
     group: Group | None = None
@@ -311,7 +319,7 @@ class GroupForm(FlaskBBForm):
         return [self[key] for key in permission_registry.keys()]
 
     def permission_sections(self) -> list[tuple[str, list[Field]]]:
-        """The permission checkboxes, grouped the way they were registered."""
+        """The permission fields, grouped the way they were registered."""
         return [
             (group.name, [self[key] for key, _definition in permissions])
             for group, permissions in permission_registry.sections()
@@ -355,7 +363,7 @@ class GroupForm(FlaskBBForm):
         # guests never get any permissions
         result = True
         for field in self.permission_fields():
-            if field.data:
+            if field.data is PermissionLevel.ALLOW:
                 field.errors = [*field.errors, _("Can't assign any permissions to this group.")]
                 result = False
         return result
@@ -364,23 +372,30 @@ class GroupForm(FlaskBBForm):
         group = self.group if self.group is not None else Group()
         permission_keys = permission_registry.keys()
         self.populate_obj(group, exclude=["submit", "csrf_token", *permission_keys])
-        group.set_permissions({key: bool(self[key].data) for key in permission_keys})
+        group.set_permissions({key: self[key].data for key in permission_keys})
         return group.save()
 
 
 def group_form(group: Group | None = None, **kwargs: Any) -> GroupForm:
-    """Builds a group form with a checkbox per registered permission, filled
-    from ``group`` when one is being edited.
+    """Builds a group form with a level field per registered permission,
+    preset to the permission's default and filled from ``group`` when one is
+    being edited.
     """
     fields = {
-        key: BooleanField(_(definition.name), description=_(definition.description))
+        key: SelectField(
+            _(definition.name),
+            description=_(definition.description),
+            choices=level_choices,
+            coerce=PermissionLevel,
+            default=PermissionLevel.of(definition.default),
+        )
         for _group, permissions in permission_registry.sections()
         for key, definition in permissions
     }
     form_class = type("GroupPermissionsForm", (GroupForm,), fields)
 
     if group is not None:
-        kwargs.update(obj=group, data=group.permissions)
+        kwargs.update(obj=group, data=group.permission_levels)
     form = form_class(**kwargs)
     form.group = group
     return form

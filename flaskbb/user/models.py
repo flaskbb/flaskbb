@@ -10,13 +10,12 @@ This module provides the models for the user.
 
 import enum
 import logging
-from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from datetime import datetime
 from typing import override
 
 import sqlalchemy as sa
-from flask import g, has_app_context, url_for
+from flask import url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy.orm import (
@@ -30,10 +29,10 @@ from sqlalchemy.orm import (
 from sqlalchemy.types import DateTime, String, Text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskbb.core.auth.permissions import forget_permissions, permissions_for
+from flaskbb.core.auth.permissions import UserPermissions
 from flaskbb.extensions import cache, db
 from flaskbb.forum.models import Forum, Post, Topic, topictracker
-from flaskbb.permissions import permission_registry
+from flaskbb.permissions import permission_manager, permission_registry, PermissionLevel
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.database import BaseModel, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
@@ -60,7 +59,6 @@ groups_users = sa.Table(
 
 
 PERMISSIONS_VERSION_KEY = "permissions_version"
-MEMBERSHIPS_KEY = "group_memberships"
 
 
 class GroupRole(enum.StrEnum):
@@ -94,14 +92,7 @@ def invalidate_all_permissions() -> None:
     changed group has.
     """
     cache.set(PERMISSIONS_VERSION_KEY, permissions_version() + 1, timeout=0)
-    forget_memberships()
-    forget_permissions()
-
-
-def forget_memberships() -> None:
-    """Drops the group memberships the current request has loaded."""
-    if has_app_context():
-        g.pop(MEMBERSHIPS_KEY, None)
+    permission_manager.forget()
 
 
 @cache.memoize()
@@ -110,11 +101,11 @@ def _load_groups(version: int) -> dict[int, "Group"]:
 
 
 @cache.memoize()
-def _load_group_permissions(version: int) -> dict[tuple[int, str], bool]:
+def _load_group_permissions(version: int) -> dict[tuple[int, str], PermissionLevel]:
     return {
-        (group_id, key): granted
-        for group_id, key, granted in db.session.execute(
-            sa.select(GroupPermission.group_id, GroupPermission.permission, GroupPermission.granted)
+        (group_id, key): level
+        for group_id, key, level in db.session.execute(
+            sa.select(GroupPermission.group_id, GroupPermission.permission, GroupPermission.level)
         )
     }
 
@@ -139,45 +130,22 @@ def groups_by_id(group_ids: Iterable[int]) -> list["Group"]:
 
 def permissions_of(groups: Iterable["Group"]) -> dict[str, bool]:
     """Merges the permissions of ``groups``: a permission is granted when any
-    group grants it. The decided permissions of every group are cached as one
-    table, so this never queries per identity.
+    group allows it, unless any group has set it to never. A group without a
+    decision counts as the permission's default. The decisions of every group
+    are cached as one table, so this never queries per identity.
     """
     stored = _load_group_permissions(permissions_version())
-    defaults = permission_registry.defaults()
-    granted = dict.fromkeys(defaults, False)
-    for group in groups:
-        for key, default in defaults.items():
-            granted[key] = granted[key] or stored.get((group.id, key), default)
+    group_ids = [group.id for group in groups]
+    granted: dict[str, bool] = {}
+    for key, default in permission_registry.defaults().items():
+        levels = [stored.get((group_id, key)) for group_id in group_ids]
+        if PermissionLevel.NEVER in levels:
+            granted[key] = False
+        else:
+            granted[key] = any(
+                level is PermissionLevel.ALLOW or (level is None and default) for level in levels
+            )
     return granted
-
-
-def secondary_group_ids(user_id: int) -> tuple[int, ...]:
-    """The secondary groups of one user, loaded together with those of every
-    other user the request has loaded so far. A page that lists many users
-    therefore costs one membership query, not one per user.
-    """
-    if not has_app_context():
-        return _query_memberships({user_id})[user_id]
-    memberships: dict[int, tuple[int, ...]] = g.setdefault(MEMBERSHIPS_KEY, {})
-    if user_id not in memberships:
-        pending = {user_id, *_loaded_user_ids()} - memberships.keys()
-        memberships.update(_query_memberships(pending))
-    return memberships[user_id]
-
-
-def _loaded_user_ids() -> set[int]:
-    # the identity key carries the id, so expired instances are not refreshed
-    return {key[1][0] for key in db.session.identity_map.keys() if issubclass(key[0], User)}
-
-
-def _query_memberships(user_ids: set[int]) -> dict[int, tuple[int, ...]]:
-    found: dict[int, list[int]] = defaultdict(list)
-    membership = sa.select(groups_users.c.user_id, groups_users.c.group_id).where(
-        groups_users.c.user_id.in_(user_ids)
-    )
-    for user_id, group_id in db.session.execute(membership):
-        found[user_id].append(group_id)
-    return {user_id: tuple(found[user_id]) for user_id in user_ids}
 
 
 class HasPermissions:
@@ -196,9 +164,9 @@ class HasPermissions:
         raise NotImplementedError
 
     @property
-    def permissions(self) -> Mapping[str, bool]:
+    def permissions(self) -> UserPermissions:
         """The effective permissions, read once per request."""
-        return permissions_for(self).granted
+        return permission_manager.for_user(self)
 
     @property
     def groups(self) -> list["Group"]:
@@ -206,7 +174,7 @@ class HasPermissions:
 
     @property
     def is_banned(self) -> bool:
-        return permissions_for(self).has_role(GroupRole.BANNED)
+        return permission_manager.for_user(self).has_role(GroupRole.BANNED)
 
     def get_groups(self) -> list["Group"]:
         raise NotImplementedError
@@ -215,9 +183,8 @@ class HasPermissions:
         return permissions_of(self.get_groups())
 
     def invalidate_cache(self) -> None:
-        """Drops what the current request has loaded about this identity."""
-        forget_memberships()
-        forget_permissions()
+        """Drops what the current request has resolved so far."""
+        permission_manager.forget()
 
 
 @make_comparable
@@ -253,22 +220,35 @@ class Group(BaseModel):
         return f"<{self.__class__.__name__} {self.id} {self.name}>"
 
     @property
-    def permissions(self) -> dict[str, bool]:
-        stored = {row.permission: row.granted for row in self.permission_rows}
+    def permission_levels(self) -> dict[str, PermissionLevel]:
+        """The level of every registered permission. One the group has not
+        decided on shows as allow or deny after the permission's default.
+        """
+        decided = {row.permission: row.level for row in self.permission_rows}
         return {
-            key: stored.get(key, default) for key, default in permission_registry.defaults().items()
+            key: decided.get(key, PermissionLevel.of(default))
+            for key, default in permission_registry.defaults().items()
         }
 
-    def set_permission(self, key: str, granted: bool) -> None:
+    @property
+    def permissions(self) -> dict[str, bool]:
+        """Whether the group on its own grants each registered permission."""
+        return {
+            key: level is PermissionLevel.ALLOW for key, level in self.permission_levels.items()
+        }
+
+    def set_permission(self, key: str, level: PermissionLevel | bool) -> None:
+        if isinstance(level, bool):
+            level = PermissionLevel.of(level)
         for row in self.permission_rows:
             if row.permission == key:
-                row.granted = granted
+                row.level = level
                 return
-        self.permission_rows.append(GroupPermission(permission=key, granted=granted))
+        self.permission_rows.append(GroupPermission(permission=key, level=level))
 
-    def set_permissions(self, permissions: Mapping[str, bool]) -> None:
-        for key, granted in permissions.items():
-            self.set_permission(key, granted)
+    def set_permissions(self, permissions: Mapping[str, PermissionLevel | bool]) -> None:
+        for key, level in permissions.items():
+            self.set_permission(key, level)
 
     @override
     def save(self):
@@ -305,7 +285,15 @@ class GroupPermission(BaseModel):
         sa.ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True
     )
     permission: Mapped[str] = mapped_column(String(255), primary_key=True)
-    granted: Mapped[bool] = mapped_column(nullable=False)
+    level: Mapped[PermissionLevel] = mapped_column(
+        sa.Enum(
+            PermissionLevel,
+            native_enum=False,
+            length=10,
+            values_callable=lambda levels: [level.value for level in levels],
+        ),
+        nullable=False,
+    )
 
 
 class User(BaseModel, UserMixin, HasPermissions):
@@ -563,7 +551,8 @@ class User(BaseModel, UserMixin, HasPermissions):
 
     @override
     def get_groups(self) -> list[Group]:
-        return groups_by_id([self.primary_group_id, *secondary_group_ids(self.id)])
+        secondary_ids = permission_manager.secondary_group_ids(self.id)
+        return groups_by_id([self.primary_group_id, *secondary_ids])
 
     def ban(self):
         """Bans the user. Returns True upon success."""

@@ -273,8 +273,8 @@ For more information see the :ref:`settings` chapter.
 Permissions
 -----------
 Plugins can declare their own permissions. They show up as a section of
-the group form in the Admin Panel, where administrators grant or revoke
-them per group like FlaskBB's own permissions.
+the group form in the Admin Panel, where administrators set them per group
+to allow, deny or never like FlaskBB's own permissions.
 
 Permissions are declared as a
 :class:`~flaskbb.permissions.definitions.PermissionGroup` of
@@ -319,6 +319,7 @@ with FlaskBB's own or another plugin's.
 
 A permission is checked with its prefixed key, in views through
 ``Has("portal_view_stats")`` from :mod:`flaskbb.utils.requirements` and in
-templates through ``current_user|has_permission("portal_view_stats")``. A
-user has it when any of their groups grants it.
+templates through ``current_user|has_permission("portal_view_stats")`` or
+``current_permissions.has("portal_view_stats")``. A user has it when any of
+their groups allows it, unless one of their groups has set it to never.
 

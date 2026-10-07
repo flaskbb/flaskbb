@@ -6,6 +6,7 @@ from alembic.util.exc import CommandError
 from flask_login import login_user
 from flaskbb.extensions import db, pluggy
 from flaskbb.management import views
+from flaskbb.permissions import PermissionLevel
 from flaskbb.plugins import utils
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.settings.models import Setting
@@ -278,7 +279,7 @@ def test_applied_migrations_badge(
 
 
 def _grant(group, key):
-    group.permission_rows.append(GroupPermission(permission=key, granted=True))
+    group.permission_rows.append(GroupPermission(permission=key, level=PermissionLevel.ALLOW))
     group.save()
 
 

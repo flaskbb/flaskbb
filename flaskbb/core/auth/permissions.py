@@ -2,17 +2,15 @@
 flaskbb.core.auth.permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A per-request snapshot of the data authorization decisions are made from.
+The resolved permissions of one identity, as the requirements read them.
 
 :copyright: (c) 2026 by the FlaskBB Team.
 :license: BSD, see LICENSE for more details.
 """
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from functools import cached_property
-from typing import Any, Protocol
-
-from flask import g, has_app_context
+from typing import Any, override, Protocol
 
 
 class ForumLike(Protocol):
@@ -39,12 +37,13 @@ class Identity(Protocol):
     def get_groups(self) -> Sequence[Any]: ...
 
 
-class EffectivePermissions:
-    """What the requirements need to know about one identity.
+class UserPermissions(Mapping[str, bool]):
+    """The resolved permissions of one identity, a user or a guest.
 
-    The groups and permissions live in the cache across requests; reading
-    them once per request keeps a page with dozens of permission checks from
-    hitting the cache backend for every single one.
+    A mapping of permission key to whether the identity has it, plus the
+    groups and roles the requirements compare. Everything is read on first
+    use and kept for the rest of the request, so a page with dozens of
+    permission checks resolves each identity once.
     """
 
     def __init__(self, user: Identity):
@@ -60,6 +59,18 @@ class EffectivePermissions:
     @cached_property
     def groups(self) -> Sequence[Any]:
         return self.user.get_groups()
+
+    @override
+    def __getitem__(self, permission: str) -> bool:
+        return self.granted[permission]
+
+    @override
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.granted)
+
+    @override
+    def __len__(self) -> int:
+        return len(self.granted)
 
     def has(self, permission: str) -> bool:
         return bool(self.granted.get(permission, False))
@@ -91,23 +102,3 @@ class EffectivePermissions:
                 moderator.id == self.user_id for moderator in forum.moderators
             )
         return self._moderated_forum_ids[forum.id]
-
-
-def permissions_for(user: Identity) -> EffectivePermissions:
-    """Returns the snapshot of ``user`` for the current app context, building
-    it on first use. Guests share a single snapshot.
-    """
-    if not has_app_context():
-        return EffectivePermissions(user)
-
-    snapshots: dict[Any, EffectivePermissions] = g.setdefault("permissions", {})
-    key = getattr(user, "id", None)
-    if key not in snapshots:
-        snapshots[key] = EffectivePermissions(user)
-    return snapshots[key]
-
-
-def forget_permissions() -> None:
-    """Drops the snapshots of the current app context after a permission change."""
-    if has_app_context():
-        g.pop("permissions", None)

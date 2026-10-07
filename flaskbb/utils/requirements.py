@@ -19,10 +19,10 @@ from typing import Any, override
 
 from flask_allows2 import And, Or, Permission, Requirement
 
-from flaskbb.core.auth.permissions import permissions_for
 from flaskbb.exceptions import FlaskBBError
 from flaskbb.forum.locals import current_forum, current_post, current_topic
 from flaskbb.forum.models import Forum, Post, Topic
+from flaskbb.permissions import permission_manager
 from flaskbb.user.models import GroupRole, User
 from flaskbb.utils.helpers import real
 
@@ -39,7 +39,7 @@ class Has(Requirement):
 
     @override
     def fulfill(self, user: User):
-        return permissions_for(user).has(self.permission)
+        return permission_manager.for_user(user).has(self.permission)
 
 
 class IsAuthed(Requirement):
@@ -58,7 +58,7 @@ class IsModeratorInForum(IsAuthed):
 
     @override
     def fulfill(self, user: User):
-        return super().fulfill(user) and permissions_for(user).moderates(self.forum)
+        return super().fulfill(user) and permission_manager.for_user(user).moderates(self.forum)
 
 
 class IsMorePrivilegedThan(Requirement):
@@ -77,7 +77,8 @@ class IsMorePrivilegedThan(Requirement):
 
     @override
     def fulfill(self, user: User):
-        return permissions_for(user).rank > permissions_for(self.target).rank
+        acting, target = permission_manager.for_user(user), permission_manager.for_user(self.target)
+        return acting.rank > target.rank
 
 
 class IsSelf(Requirement):
@@ -146,7 +147,7 @@ class CanAccessForum(Requirement):
 
     @override
     def fulfill(self, user: User):
-        return permissions_for(user).can_access(self.forum)
+        return permission_manager.for_user(user).can_access(self.forum)
 
 
 class IsAtLeast(Requirement):
@@ -161,7 +162,7 @@ class IsAtLeast(Requirement):
 
     @override
     def fulfill(self, user: User):
-        return permissions_for(user).rank >= self.role.rank
+        return permission_manager.for_user(user).rank >= self.role.rank
 
 
 IsAdmin = IsAtLeast(GroupRole.ADMINISTRATOR)

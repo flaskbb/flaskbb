@@ -8,7 +8,24 @@ The types a permission is declared with.
 :license: BSD, see LICENSE for more details.
 """
 
+import enum
 from dataclasses import dataclass
+
+
+class PermissionLevel(enum.StrEnum):
+    """What a group has decided about one permission.
+
+    A member has a permission when any of their groups allows it, unless
+    one of their groups has set it to never.
+    """
+
+    ALLOW = "allow"
+    DENY = "deny"
+    NEVER = "never"
+
+    @classmethod
+    def of(cls, granted: bool) -> "PermissionLevel":
+        return cls.ALLOW if granted else cls.DENY
 
 
 @dataclass(frozen=True)

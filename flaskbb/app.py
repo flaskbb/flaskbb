@@ -49,7 +49,7 @@ from flaskbb.extensions import (
     pluggy,
     themes,
 )
-from flaskbb.permissions import permission_registry
+from flaskbb.permissions import current_permissions, permission_registry
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import (
@@ -408,7 +408,11 @@ def configure_context_processors(app: FlaskBB):
         """Injects the ``flaskbb_config`` config variable into the
         templates.
         """
-        return dict(flaskbb_config=flaskbb_config, format_date=format_date)
+        return dict(
+            flaskbb_config=flaskbb_config,
+            format_date=format_date,
+            current_permissions=current_permissions,
+        )
 
     @app.context_processor
     def inject_now():

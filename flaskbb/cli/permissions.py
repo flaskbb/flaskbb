@@ -20,7 +20,8 @@ from flaskbb.cli.utils import (
     print_table,
 )
 from flaskbb.extensions import db
-from flaskbb.user.models import Group
+from flaskbb.permissions import PermissionLevel
+from flaskbb.user.models import Group, permissions_of
 
 
 def _validate_permission(permission: str):
@@ -47,7 +48,7 @@ def list_permissions(group_name: str | None):
         selected = list(db.session.execute(sa.select(Group).order_by(Group.id.asc())).scalars())
 
     rows = [
-        [permission] + ["yes" if group.permissions[permission] else "no" for group in selected]
+        [permission] + [group.permission_levels[permission].value for group in selected]
         for permission in group_permissions()
     ]
 
@@ -64,36 +65,49 @@ def show_permissions(username: str):
     click.secho(f"[+] Permissions of {user.username}", fg="blue", bold=True)
     click.secho("Groups: {}".format(", ".join(group.name for group in user_groups)))
 
+    effective = permissions_of(user_groups)
     rows: list[list[str]] = []
     for permission in group_permissions():
-        granted_by = [group.name for group in user_groups if group.permissions[permission]]
+        levels = {group.name: group.permission_levels[permission] for group in user_groups}
+        never_by = [name for name, level in levels.items() if level is PermissionLevel.NEVER]
+        granted_by = [name for name, level in levels.items() if level is PermissionLevel.ALLOW]
+        decided_by = never_by if never_by else granted_by
         rows.append(
             [
                 permission,
-                "yes" if granted_by else "no",
-                ", ".join(granted_by) if granted_by else "-",
+                "never" if never_by else "yes" if effective[permission] else "no",
+                ", ".join(decided_by) if decided_by else "-",
             ]
         )
 
     print_table(["Permission", "Granted", "Granted by"], rows)
 
 
+LEVEL_ALIASES = {"true": PermissionLevel.ALLOW, "false": PermissionLevel.DENY}
+
+
 @permissions.command("set")
 @click.argument("group_name", metavar="GROUP")
 @click.argument("permission")
-@click.argument("value", type=click.BOOL)
-def set_permission(group_name: str, permission: str, value: bool):
-    """Grants or revokes a single permission of a group.
+@click.argument(
+    "value",
+    type=click.Choice([*PermissionLevel, *LEVEL_ALIASES], case_sensitive=False),
+)
+def set_permission(group_name: str, permission: str, value: str):
+    """Sets a single permission of a group.
 
-    VALUE is a boolean, e.g. 'true' or 'false'.
+    VALUE is 'allow', 'deny' or 'never'; 'true' and 'false' stand for allow
+    and deny. A member has a permission when any of their groups allows it,
+    unless one of their groups has set it to never.
     """
     _validate_permission(permission)
     group = get_group(group_name)
+    level = LEVEL_ALIASES[value] if value in LEVEL_ALIASES else PermissionLevel(value)
 
-    group.set_permission(permission, value)
+    group.set_permission(permission, level)
     group.save()
 
     click.secho(
-        f"[+] Permission {permission} of group {group.name} set to {str(value).lower()}.",
+        f"[+] Permission {permission} of group {group.name} set to {level.value}.",
         fg="cyan",
     )

@@ -750,8 +750,8 @@ Create, update or delete groups. The name of a group is case insensitive.
 
 .. describe:: new NAME
 
-    Creates a new group. Permissions that are neither granted nor revoked
-    are set to their default value, e.g.::
+    Creates a new group. Permissions that are neither granted, revoked nor
+    set to never keep their default value, e.g.::
 
         flaskbb groups new VIP --description "Trusted members" \
             --grant viewhidden --revoke postattachment
@@ -772,7 +772,13 @@ Create, update or delete groups. The name of a group is case insensitive.
 
     .. describe:: --revoke PERMISSION
 
-        A permission to revoke. Can be used multiple times.
+        A permission to revoke. Can be used multiple times. Members may
+        still have it through another group.
+
+    .. describe:: --never PERMISSION
+
+        A permission to revoke for every member, whatever their other
+        groups allow. Can be used multiple times.
 
 .. describe:: update NAME
 
@@ -809,11 +815,15 @@ Show or modify the permissions of the groups.
 .. describe:: show USERNAME
 
     Shows the effective permissions of a user and which of his groups grant
-    them.
+    them, or which group has set them to never.
 
 .. describe:: set GROUP PERMISSION VALUE
 
-    Grants or revokes a single permission of a group, where ``VALUE`` is a
-    boolean, e.g.::
+    Sets a single permission of a group, where ``VALUE`` is ``allow``,
+    ``deny`` or ``never``, e.g.::
 
-        flaskbb permissions set Member deletepost true
+        flaskbb permissions set Member deletepost allow
+
+    ``true`` and ``false`` are accepted for ``allow`` and ``deny``. A member
+    has a permission when any of their groups allows it, unless one of
+    their groups has set it to never.

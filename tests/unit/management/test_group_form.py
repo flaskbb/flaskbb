@@ -1,5 +1,10 @@
 from flaskbb.management.forms import group_form
-from flaskbb.permissions import permission_registry, PermissionDefinition, PermissionGroup
+from flaskbb.permissions import (
+    permission_registry,
+    PermissionDefinition,
+    PermissionGroup,
+    PermissionLevel,
+)
 from flaskbb.user.models import Group, GroupRole
 
 MODERATOR, MEMBER = 2, 3
@@ -18,13 +23,13 @@ def test_form_is_filled_from_the_group(application, default_groups):
 
     assert form.name.data == "Moderator"
     assert form.role.data is GroupRole.MODERATOR
-    assert form["mod_banuser"].data is True
-    assert form["makehidden"].data is False
+    assert form["mod_banuser"].data is PermissionLevel.ALLOW
+    assert form["makehidden"].data is PermissionLevel.DENY
 
 
 def test_form_saves_role_and_permissions(application, default_groups):
     form, valid = _posted(
-        application, name="VIP", description="Trusted", role="mod", viewhidden="y"
+        application, name="VIP", description="Trusted", role="mod", viewhidden="allow"
     )
     assert valid
 
@@ -33,13 +38,42 @@ def test_form_saves_role_and_permissions(application, default_groups):
 
     assert group.role is GroupRole.MODERATOR
     assert group.permissions["viewhidden"] is True
-    assert group.permissions["editpost"] is False
+    assert group.permissions["makehidden"] is False
+    # a permission that was not posted keeps the default of its definition
+    assert group.permission_levels["editpost"] is PermissionLevel.ALLOW
+    assert group.permission_levels["makehidden"] is PermissionLevel.DENY
+
+
+def test_new_form_presets_the_defaults(application, default_groups):
+    with application.test_request_context():
+        form = group_form()
+
+    assert form["editpost"].data is PermissionLevel.ALLOW
+    assert form["makehidden"].data is PermissionLevel.DENY
+
+
+def test_form_saves_never(application, default_groups):
+    form, valid = _posted(application, name="Probation", role="member", deletepost="never")
+    assert valid
+
+    with application.test_request_context():
+        group = form.save()
+
+    assert group.permission_levels["deletepost"] is PermissionLevel.NEVER
+    assert group.permissions["deletepost"] is False
+
+
+def test_form_rejects_an_unknown_level(application, default_groups):
+    form, valid = _posted(application, name="VIP", role="member", deletepost="maybe")
+
+    assert not valid
+    assert form["deletepost"].errors
 
 
 def test_form_updates_an_existing_group(application, default_groups):
     member = default_groups[MEMBER]
     with application.test_request_context(
-        method="POST", data={"name": "Members", "role": "member", "deletepost": "y"}
+        method="POST", data={"name": "Members", "role": "member", "deletepost": "allow"}
     ):
         form = group_form(member, meta={"csrf": False})
         assert form.validate()
@@ -47,12 +81,13 @@ def test_form_updates_an_existing_group(application, default_groups):
 
     assert member.name == "Members"
     assert member.permissions["deletepost"] is True
-    assert member.permissions["editpost"] is False
+    # a permission that was not posted keeps what the group had
+    assert member.permissions["editpost"] is True
 
 
 def test_guest_group_gets_no_permissions(application, default_groups):
     with application.test_request_context(
-        method="POST", data={"name": "Guest", "role": "guest", "editpost": "y"}
+        method="POST", data={"name": "Guest", "role": "guest", "editpost": "allow"}
     ):
         form = group_form(default_groups[5], meta={"csrf": False})
         assert not form.validate()

@@ -28,7 +28,7 @@ from flaskbb.cli.utils import (
     prompt_update_user,
 )
 from flaskbb.extensions import db
-from flaskbb.user.models import Group, GroupRole, User
+from flaskbb.user.models import Group, GroupRole, permissions_of, User
 
 
 @flaskbb.group()
@@ -184,11 +184,8 @@ def show_user(username: str):
         ]
     )
 
-    granted = [
-        permission
-        for permission in group_permissions()
-        if any(group.permissions[permission] for group in [user.primary_group] + secondary_groups)
-    ]
+    effective = permissions_of([user.primary_group] + secondary_groups)
+    granted = [permission for permission in group_permissions() if effective[permission]]
     click.secho("\nPermissions", fg="blue", bold=True)
     click.echo("  {}".format(", ".join(granted) if granted else "-"))
 

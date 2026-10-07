@@ -4,10 +4,10 @@ not cost a query per author.
 
 import pytest
 from flask_login.test_client import FlaskLoginClient
-from flaskbb.core.auth.permissions import forget_permissions
 from flaskbb.extensions import cache
 from flaskbb.forum.models import Post
-from flaskbb.user.models import forget_memberships, User
+from flaskbb.permissions import permission_manager
+from flaskbb.user.models import User
 
 
 @pytest.fixture
@@ -64,8 +64,7 @@ def test_warm_topic_page_still_loads_the_authors_groups_in_one_query(
 ):
     client.get(f"/topic/{busy_topic.id}")
     # the test client shares the test's app context, so reset ``g`` by hand
-    forget_memberships()
-    forget_permissions()
+    permission_manager.forget()
     selects.clear()
 
     response = client.get(f"/topic/{busy_topic.id}")
