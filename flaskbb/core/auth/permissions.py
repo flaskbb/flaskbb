@@ -42,7 +42,7 @@ class Identity(Protocol):
 class EffectivePermissions:
     """What the requirements need to know about one identity.
 
-    The permissions and groups live in the cache across requests; reading
+    The groups and permissions live in the cache across requests; reading
     them once per request keeps a page with dozens of permission checks from
     hitting the cache backend for every single one.
     """
@@ -51,19 +51,26 @@ class EffectivePermissions:
         self.user = user
         self.user_id: int | None = getattr(user, "id", None)
         self.is_authenticated = bool(user.is_authenticated)
-        self.granted: Mapping[str, bool] = user.get_permissions()
         self._moderated_forum_ids: dict[int, bool] = {}
+
+    @cached_property
+    def granted(self) -> Mapping[str, bool]:
+        return self.user.get_permissions()
+
+    @cached_property
+    def groups(self) -> Sequence[Any]:
+        return self.user.get_groups()
 
     def has(self, permission: str) -> bool:
         return bool(self.granted.get(permission, False))
 
     @cached_property
     def group_ids(self) -> frozenset[int]:
-        return frozenset(group.id for group in self.user.get_groups())
+        return frozenset(group.id for group in self.groups)
 
     @cached_property
     def roles(self) -> frozenset[Any]:
-        return frozenset(group.role for group in self.user.get_groups())
+        return frozenset(group.role for group in self.groups)
 
     def has_role(self, role: Any) -> bool:
         return role in self.roles

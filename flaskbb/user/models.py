@@ -10,12 +10,13 @@ This module provides the models for the user.
 
 import enum
 import logging
+from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from datetime import datetime
 from typing import override
 
 import sqlalchemy as sa
-from flask import url_for
+from flask import g, has_app_context, url_for
 from flask.helpers import abort
 from flask_login import AnonymousUserMixin, UserMixin
 from sqlalchemy.orm import (
@@ -59,6 +60,7 @@ groups_users = sa.Table(
 
 
 PERMISSIONS_VERSION_KEY = "permissions_version"
+MEMBERSHIPS_KEY = "group_memberships"
 
 
 class GroupRole(enum.StrEnum):
@@ -92,26 +94,100 @@ def invalidate_all_permissions() -> None:
     changed group has.
     """
     cache.set(PERMISSIONS_VERSION_KEY, permissions_version() + 1, timeout=0)
+    forget_memberships()
     forget_permissions()
+
+
+def forget_memberships() -> None:
+    """Drops the group memberships the current request has loaded."""
+    if has_app_context():
+        g.pop(MEMBERSHIPS_KEY, None)
+
+
+@cache.memoize()
+def _load_groups(version: int) -> dict[int, "Group"]:
+    return {group.id: group for group in db.session.scalars(sa.select(Group))}
+
+
+@cache.memoize()
+def _load_group_permissions(version: int) -> dict[tuple[int, str], bool]:
+    return {
+        (group_id, key): granted
+        for group_id, key, granted in db.session.execute(
+            sa.select(GroupPermission.group_id, GroupPermission.permission, GroupPermission.granted)
+        )
+    }
+
+
+def all_groups() -> dict[int, "Group"]:
+    """Every group by id. Groups are few, so one cached load serves every
+    identity instead of a query per user.
+    """
+    return _load_groups(permissions_version())
+
+
+def groups_by_id(group_ids: Iterable[int]) -> list["Group"]:
+    group_ids = list(group_ids)
+    groups = all_groups()
+    if any(group_id not in groups for group_id in group_ids):
+        # a group this process has not seen yet, e.g. created by another
+        # process while the cache is not shared
+        cache.delete_memoized(_load_groups, permissions_version())
+        groups = all_groups()
+    return [groups[group_id] for group_id in group_ids]
 
 
 def permissions_of(groups: Iterable["Group"]) -> dict[str, bool]:
     """Merges the permissions of ``groups``: a permission is granted when any
-    group grants it.
+    group grants it. The decided permissions of every group are cached as one
+    table, so this never queries per identity.
     """
-    granted = dict.fromkeys(permission_registry.keys(), False)
+    stored = _load_group_permissions(permissions_version())
+    defaults = permission_registry.defaults()
+    granted = dict.fromkeys(defaults, False)
     for group in groups:
-        for key, value in group.permissions.items():
-            granted[key] = granted[key] or value
+        for key, default in defaults.items():
+            granted[key] = granted[key] or stored.get((group.id, key), default)
     return granted
+
+
+def secondary_group_ids(user_id: int) -> tuple[int, ...]:
+    """The secondary groups of one user, loaded together with those of every
+    other user the request has loaded so far. A page that lists many users
+    therefore costs one membership query, not one per user.
+    """
+    if not has_app_context():
+        return _query_memberships({user_id})[user_id]
+    memberships: dict[int, tuple[int, ...]] = g.setdefault(MEMBERSHIPS_KEY, {})
+    if user_id not in memberships:
+        pending = {user_id, *_loaded_user_ids()} - memberships.keys()
+        memberships.update(_query_memberships(pending))
+    return memberships[user_id]
+
+
+def _loaded_user_ids() -> set[int]:
+    # the identity key carries the id, so expired instances are not refreshed
+    return {key[1][0] for key in db.session.identity_map.keys() if issubclass(key[0], User)}
+
+
+def _query_memberships(user_ids: set[int]) -> dict[int, tuple[int, ...]]:
+    found: dict[int, list[int]] = defaultdict(list)
+    membership = sa.select(groups_users.c.user_id, groups_users.c.group_id).where(
+        groups_users.c.user_id.in_(user_ids)
+    )
+    for user_id, group_id in db.session.execute(membership):
+        found[user_id].append(group_id)
+    return {user_id: tuple(found[user_id]) for user_id in user_ids}
 
 
 class HasPermissions:
     """The groups and permissions of an identity, a user or a guest.
 
-    Subclasses provide ``query_groups``; everything else derives from it and
-    is cached under the permissions version, so a group change reaches every
-    identity at once (see ``invalidate_all_permissions``).
+    Subclasses provide ``get_groups``; the permissions derive from it and
+    from the group permissions table. Groups and their permissions are cached
+    whole under the permissions version, so a group change reaches every
+    identity at once (see ``invalidate_all_permissions``). Membership is read
+    once per request for every loaded user together.
     """
 
     @property
@@ -133,27 +209,14 @@ class HasPermissions:
         return permissions_for(self).has_role(GroupRole.BANNED)
 
     def get_groups(self) -> list["Group"]:
-        return self._load_groups(permissions_version())
-
-    def get_permissions(self) -> dict[str, bool]:
-        return self._load_permissions(permissions_version())
-
-    def query_groups(self) -> list["Group"]:
         raise NotImplementedError
 
-    @cache.memoize()
-    def _load_groups(self, version: int) -> list["Group"]:
-        return self.query_groups()
-
-    @cache.memoize()
-    def _load_permissions(self, version: int) -> dict[str, bool]:
-        return permissions_of(self._load_groups(version))
+    def get_permissions(self) -> dict[str, bool]:
+        return permissions_of(self.get_groups())
 
     def invalidate_cache(self) -> None:
-        """Drops the cached groups and permissions of this identity."""
-        version = permissions_version()
-        cache.delete_memoized(self._load_permissions, version)
-        cache.delete_memoized(self._load_groups, version)
+        """Drops what the current request has loaded about this identity."""
+        forget_memberships()
         forget_permissions()
 
 
@@ -177,10 +240,10 @@ class Group(BaseModel):
     )
 
     # every registered permission the group has decided on; the rest fall
-    # back to the permission's default
-    permission_rows: Mapped[list["GroupPermission"]] = relationship(
-        cascade="all, delete-orphan", lazy="selectin"
-    )
+    # back to the permission's default. Loaded on demand: the effective
+    # permissions of a user are cached, so loading a group must not drag
+    # its rows along.
+    permission_rows: Mapped[list["GroupPermission"]] = relationship(cascade="all, delete-orphan")
 
     @override
     def __repr__(self):
@@ -499,8 +562,8 @@ class User(BaseModel, UserMixin, HasPermissions):
         return db.session.execute(sa.select(stmt.exists())).scalar_one()
 
     @override
-    def query_groups(self) -> list[Group]:
-        return [self.primary_group] + list(self.secondary_groups)
+    def get_groups(self) -> list[Group]:
+        return groups_by_id([self.primary_group_id, *secondary_group_ids(self.id)])
 
     def ban(self):
         """Bans the user. Returns True upon success."""
@@ -514,7 +577,6 @@ class User(BaseModel, UserMixin, HasPermissions):
 
             self.primary_group = banned_group
             self.save()
-            self.invalidate_cache()
             return True
         return False
 
@@ -530,7 +592,6 @@ class User(BaseModel, UserMixin, HasPermissions):
 
             self.primary_group = member_group
             self.save()
-            self.invalidate_cache()
             return True
         return False
 
@@ -542,6 +603,8 @@ class User(BaseModel, UserMixin, HasPermissions):
         :param groups: A list with groups that should be added to the
                        secondary groups from user.
         """
+        membership_changed = groups is not None or self._membership_changed()
+
         if groups is not None:
             with db.session.no_autoflush:
                 secondary_groups = set(self.secondary_groups.all())
@@ -553,11 +616,18 @@ class User(BaseModel, UserMixin, HasPermissions):
                 for group in selected_groups - secondary_groups:
                     self.secondary_groups.add(group)
 
-            self.invalidate_cache()
-
         db.session.add(self)
         db.session.commit()
+        if membership_changed:
+            self.invalidate_cache()
         return self
+
+    def _membership_changed(self) -> bool:
+        state = sa.inspect(self)
+        return state.persistent and any(
+            state.attrs[name].history.has_changes()
+            for name in ("primary_group", "primary_group_id", "secondary_groups")
+        )
 
     @override
     def delete(self) -> "User":
@@ -571,11 +641,8 @@ class User(BaseModel, UserMixin, HasPermissions):
 class Guest(AnonymousUserMixin, HasPermissions):
     @override
     def __repr__(self):
-        """Every guest shares the cached guest group and its permissions."""
         return "<Guest>"
 
     @override
-    def query_groups(self) -> list[Group]:
-        return list(
-            db.session.execute(sa.select(Group).where(Group.role == GroupRole.GUEST)).scalars()
-        )
+    def get_groups(self) -> list[Group]:
+        return [group for group in all_groups().values() if group.role is GroupRole.GUEST]
