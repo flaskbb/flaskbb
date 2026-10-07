@@ -1046,6 +1046,44 @@ def flaskbb_tpl_user_nav_loggedin_after():
 
 
 @spec
+def flaskbb_tpl_user_nav_menu(user: "User | Guest"):
+    """
+    Hook for registering items to show in the user nav menu. In the default
+    Aurora theme this is the dropdown menu next to the username or the login
+    button. This hook is emitted for both logged in users and guests, so
+    implementations should check ``user.is_authenticated`` before returning
+    items that only make sense for one of them.
+
+    Implementations of this hook should return an iterable of
+    :class:`~flaskbb.display.navigation.NavigationItem` instances::
+
+        @impl
+        def flaskbb_tpl_user_nav_menu(user):
+            if user.is_authenticated:
+                return [
+                    NavigationLink(
+                        endpoint="myplugin.inbox",
+                        name=_("Inbox"),
+                        icon="fa fa-inbox fa-fw",
+                    )
+                ]
+
+    The items are placed after FlaskBB's own items. For logged in users the
+    logout link stays at the end of the menu.
+
+    .. warning::
+        Hookwrappers for this spec should not be registered as FlaskBB registers
+        its own hook wrapper to flatten all the results into a single list.
+
+    in :file:`templates/layout.html`
+
+    .. versionadded:: 3.0
+
+    :param user: The current user object.
+    """
+
+
+@spec
 def flaskbb_tpl_form_registration_before(form: "FlaskForm"):
     """This hook is emitted in the Registration form **before** the first
     input field but after the hidden CSRF token field.
