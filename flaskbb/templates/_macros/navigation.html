@@ -94,6 +94,43 @@
     </li>
 {% endmacro %}
 
+{% macro dropdown(items) %}
+    <button type="button"
+            class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu">
+        {% for item in items %}
+            {% if item.content_type == NavigationContentType.link %}
+                <li>
+                    <a class="dropdown-item {% if item.active %}active{% endif %}"
+                       href="{{ url_for(item.endpoint, **item.urlforkwargs) }}">
+                        {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %} {{ item.name }}
+                    </a>
+                </li>
+            {% elif item.content_type == NavigationContentType.external_link %}
+                <li>
+                    <a class="dropdown-item" href="{{ item.uri }}">
+                        {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %} {{ item.name }}
+                    </a>
+                </li>
+            {% elif item.content_type == NavigationContentType.header %}
+                <li>
+                    <h6 class="dropdown-header">
+                        {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %} {{ item.text }}
+                    </h6>
+                </li>
+            {% elif item.content_type == NavigationContentType.divider %}
+                <li>
+                    <hr class="dropdown-divider" />
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
 {% macro sidebar(items, extra_class="") %}
     {% if items %}
         <ul class="nav {% if extra_class %}{{ extra_class }}{% endif %}">

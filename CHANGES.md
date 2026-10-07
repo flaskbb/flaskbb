@@ -34,6 +34,7 @@ Unreleased
 - New plugin lifecycle hooks: `on_plugin_install`, `on_plugin_uninstall`, `on_plugin_upgrade` and `on_plugin_settings_changed`. (#508)
 - New hooks let plugins add buttons to the markdown editor toolbar. (#464)
 - Plugins can add a quote to the editor with `window.app.insertQuote(editor, markdown)`.
+- New `flaskbb_tpl_user_nav_menu` hook lets plugins add items to the user dropdown menu for both users and guests.
 
 
 #### Admin panel

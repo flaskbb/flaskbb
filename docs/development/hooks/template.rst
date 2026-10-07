@@ -17,6 +17,7 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_navigation_after
 .. autofunction:: flaskbb_tpl_user_nav_loggedin_before
 .. autofunction:: flaskbb_tpl_user_nav_loggedin_after
+.. autofunction:: flaskbb_tpl_user_nav_menu
 .. autofunction:: flaskbb_tpl_form_registration_before
 .. autofunction:: flaskbb_tpl_form_registration_after
 .. autofunction:: flaskbb_tpl_form_user_details_before
