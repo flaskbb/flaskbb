@@ -20,15 +20,14 @@
     {% endif %}
 {%- endmacro -%}
 
-{%- macro render_input_field(field, div_class='') -%}
+{%- macro render_input_field(field, div_class='', control_class='') -%}
     {% if div_class %}
         <div class="{{ div_class }}">
     {% endif %}
 
     {% set placeholder = kwargs['placeholder']|length or field.label.text %}
     {% set css_error = ' is-invalid' if field.errors else '' %}
-    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-control' %}
-    {% set css_class = css_class + css_error if css_error else css_class %}
+    {% set css_class = ('form-control ' ~ control_class ~ css_error)|trim %}
 
     {{ field(class=css_class, placeholder=placeholder, **kwargs) }}
     {{ field_description(field) }}
@@ -39,14 +38,13 @@
     {% endif %}
 {%- endmacro -%}
 
-{%- macro render_boolean_field(field, div_class='') -%}
+{%- macro render_boolean_field(field, div_class='', control_class='') -%}
     {% if div_class %}
         <div class="{{ div_class }}">
     {% endif %}
 
     {% set css_error = ' is-invalid' if field.errors else '' %}
-    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-check-input' %}
-    {% set css_class = css_class + css_error if css_error else css_class %}
+    {% set css_class = ('form-check-input ' ~ control_class ~ css_error)|trim %}
     <div class="form-check">
         {{ field(class=css_class, **kwargs) }}
         <label class="form-check-label" for="{{ field.id }}">{{ field.label.text }}</label>
@@ -59,14 +57,13 @@
     {% endif %}
 {%- endmacro -%}
 
-{%- macro render_select_field(field, div_class='') -%}
+{%- macro render_select_field(field, div_class='', control_class='') -%}
     {% if div_class %}
         <div class="{{ div_class }}">
     {% endif %}
 
     {% set css_error = ' is-invalid' if field.errors else '' %}
-    {% set css_class = kwargs['class'] if kwargs['class'] else 'form-select' %}
-    {% set css_class = css_class + css_error if css_error else css_class %}
+    {% set css_class = ('form-select ' ~ control_class ~ css_error)|trim %}
 
     {% if field.type == "QuerySelectMultipleField" or field.type == "SelectMultipleField" %}
         {{ field(multiple=True, class=css_class) }}
@@ -83,16 +80,15 @@
 {%- endmacro -%}
 
 {# markdown: 'post' or 'nonpost', the renderer the preview uses #}
-{%- macro render_editor_field(field, div_class='', markdown='post', mode_tabs=False) -%}
+{%- macro render_editor_field(field, div_class='', control_class='', markdown='post', mode_tabs=False) -%}
     {% if div_class %}
         <div class="{{ div_class }}">
     {% endif %}
 
     {% set placeholder = kwargs['placeholder']|length or field.label.text %}
     {% set css_error = ' is-invalid' if field.errors else '' %}
-    {% set css_class = kwargs['class'] if kwargs['class'] else 'flaskbb-editor form-control border-0 rounded-0' %}
-    {% set css_class = css_class + css_error if css_error else css_class %}
-    <div class="card px-0">
+    {% set css_class = 'flaskbb-editor form-control border-0 rounded-0' ~ css_error %}
+    <div class="{{ ('card px-0 ' ~ control_class)|trim }}">
         <div class="card-header">
             <div class="btn-toolbar">
                 <markdown-toolbar for="{{ field.id }}">
@@ -169,12 +165,12 @@
     {% endif %}
 {%- endmacro -%}
 
-{%- macro render_submit_field(field, div_class='') -%}
+{%- macro render_submit_field(field, div_class='', control_class='btn-success') -%}
     {% if div_class %}
         <div class="{{ div_class }}">
     {% endif %}
 
-    {% set css_class = kwargs['class'] if kwargs['class'] else 'btn btn-success' %}
+    {% set css_class = 'btn ' ~ control_class %}
     {{ field(class=css_class) }}
 
     {% if div_class %}

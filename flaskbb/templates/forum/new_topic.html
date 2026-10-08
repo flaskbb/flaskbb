@@ -47,7 +47,6 @@
                         {{ render_field(
                             form.title,
                             div_class="topic-title-field",
-                            class="form-control",
                             placeholder=_("A short, descriptive title")
                         ) }}
 
@@ -102,7 +101,7 @@
                     <div class="topic-composer-actions">
                         <a class="btn btn-outline-secondary"
                            href="{{ topic.url if edit_mode else forum.url }}">{% trans %}Cancel{% endtrans %}</a>
-                        {{ render_submit_field(form.submit, class="btn btn-primary") }}
+                        {{ render_submit_field(form.submit, control_class="btn-primary") }}
                     </div>
                 </div>
             </div>
