@@ -17,13 +17,27 @@ from flaskbb.extensions import alembic
 def test_upgrade_tells_revision_ids_and_step_counts_apart(
     cli_runner, monkeypatch, arguments, target
 ):
-    targets = []
-    monkeypatch.setattr(alembic, "upgrade", targets.append)
+    calls = []
+    monkeypatch.setattr(
+        alembic, "upgrade", lambda target, skip_missing: calls.append((target, skip_missing))
+    )
 
     result = cli_runner.invoke(upgrade, arguments, obj=alembic)
 
     assert result.exit_code == 0, result.output
-    assert targets == [target]
+    assert calls == [(target, False)]
+
+
+def test_upgrade_skips_missing_revisions_on_request(cli_runner, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        alembic, "upgrade", lambda target, skip_missing: calls.append((target, skip_missing))
+    )
+
+    result = cli_runner.invoke(upgrade, ["--skip-missing"], obj=alembic)
+
+    assert result.exit_code == 0, result.output
+    assert calls == [("heads", True)]
 
 
 @pytest.mark.parametrize(

@@ -131,7 +131,7 @@ def test_upgrade_heads_leaves_out_disabled_plugin_migrations(application, monkey
     monkeypatch.setattr(
         alembic,
         "run_migrations",
-        lambda fn: planned.extend(step.revision.path for step in fn((), None)),
+        lambda fn, skip_missing: planned.extend(step.revision.path for step in fn((), None)),
     )
 
     alembic.upgrade()
@@ -284,8 +284,8 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database, old
         role = db.session.execute(
             sa.text("SELECT role FROM groups WHERE name = 'Old Mods'")
         ).scalar_one()
-        granted = dict(
-            db.session.execute(sa.text("SELECT permission, granted FROM group_permissions")).all()
+        levels = dict(
+            db.session.execute(sa.text("SELECT permission, level FROM group_permissions")).all()
         )
         inspector = sa.inspect(db.engine)
         columns = {c["name"] for c in inspector.get_columns("groups")}
@@ -298,33 +298,37 @@ def test_group_roles_migration_moves_flags_and_permissions_to_rows(database, old
         db.session.commit()
 
     assert role == "mod"
-    assert granted["editpost"] == 1
-    assert granted["viewhidden"] == 1
-    assert granted["deletepost"] == 0
-    assert set(migration.PERMISSIONS) == set(granted)
+    assert levels["editpost"] == "allow"
+    assert levels["viewhidden"] == "allow"
+    assert levels["deletepost"] == "deny"
+    assert set(migration.PERMISSIONS) == set(levels)
     assert columns.isdisjoint(migration.ROLE_FLAGS + migration.PERMISSIONS)
     assert checks == []
 
 
-def test_group_permission_levels_migration_round_trips(default_groups):
-    migration = _load_migration("202610070930_1791358200_group_permission_levels.py")
+def test_group_roles_migration_round_trips_permission_levels(default_groups):
+    migration = _load_migration("202610061554_1791294853_group_roles_and_permissions.py")
     member = default_groups[3]
     member.set_permission("deletepost", PermissionLevel.NEVER)
     member.save()
+    # the commits expire member, and the downgraded table can not refresh it
+    member_id = member.id
     context = MigrationContext.configure(db.session.connection())
 
     with Operations.context(context):
         migration.downgrade()
     db.session.commit()
-    granted = dict(
+    flags = (
         db.session.execute(
-            sa.text("SELECT permission, granted FROM group_permissions WHERE group_id = :id"),
-            {"id": member.id},
-        ).all()
+            sa.text("SELECT editpost, makehidden, deletepost FROM groups WHERE id = :id"),
+            {"id": member_id},
+        )
+        .mappings()
+        .one()
     )
-    assert granted["editpost"] == 1
-    assert granted["makehidden"] == 0
-    assert granted["deletepost"] == 0
+    assert flags["editpost"] == 1
+    assert flags["makehidden"] == 0
+    assert flags["deletepost"] == 0
 
     context = MigrationContext.configure(db.session.connection())
     with Operations.context(context):
@@ -333,7 +337,7 @@ def test_group_permission_levels_migration_round_trips(default_groups):
     levels = dict(
         db.session.execute(
             sa.text("SELECT permission, level FROM group_permissions WHERE group_id = :id"),
-            {"id": member.id},
+            {"id": member_id},
         ).all()
     )
     assert levels["editpost"] == "allow"
