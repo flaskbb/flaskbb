@@ -70,6 +70,13 @@ class PersistenceError(BaseFlaskBBError):
     """
 
 
+class ConfigNotFoundError(BaseFlaskBBError):
+    """
+    Raised when an explicitly given config is neither an existing file
+    nor an importable object.
+    """
+
+
 def accumulate_errors[T](
     caller: Callable[[T], Any], validators: Iterable[T], throw: bool = True
 ) -> list[tuple[str, str]]:

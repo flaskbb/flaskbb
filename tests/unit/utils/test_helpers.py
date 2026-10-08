@@ -1,5 +1,10 @@
 import datetime as dt
+import re
 
+import pytest
+from flask import Flask
+from flaskbb.configs.testing import TestingConfig
+from flaskbb.core.exceptions import ConfigNotFoundError
 from flaskbb.forum.models import Forum
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.helpers import (
@@ -7,6 +12,7 @@ from flaskbb.utils.helpers import (
     crop_title,
     format_quote,
     forum_is_unread,
+    get_flaskbb_config,
     get_online_users,
     is_online,
     redirect_or_reload,
@@ -168,3 +174,49 @@ def test_format_quote_links_the_quoted_post(topic):
     )
     actual = format_quote(topic.first_post.username, "first line\nsecond line\n", "/post/1")
     assert actual == expected_markdown
+
+
+@pytest.fixture
+def config_app(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("FLASKBB_SETTINGS", raising=False)
+    (tmp_path / "instance").mkdir()
+    return Flask("flaskbb", instance_path=str(tmp_path / "instance"))
+
+
+@pytest.mark.parametrize(
+    "config", ["missing.cfg", "../missing.cfg", "/nonexistent/flaskbb.cfg", "missing.Config"]
+)
+def test_get_flaskbb_config_rejects_a_config_it_cannot_find(config_app, config):
+    message = f"Config {config!r} is neither an existing file nor an importable object."
+
+    with pytest.raises(ConfigNotFoundError, match=re.escape(message)):
+        get_flaskbb_config(config_app, config)
+
+
+def test_get_flaskbb_config_rejects_a_flaskbb_settings_it_cannot_find(config_app, monkeypatch):
+    monkeypatch.setenv("FLASKBB_SETTINGS", "/nonexistent/flaskbb.cfg")
+    message = "Config '/nonexistent/flaskbb.cfg' from FLASKBB_SETTINGS is neither"
+
+    with pytest.raises(ConfigNotFoundError, match=re.escape(message)):
+        get_flaskbb_config(config_app, None)
+
+
+def test_get_flaskbb_config_finds_a_config_in_the_instance_folder(config_app, tmp_path):
+    instance_config = tmp_path / "instance" / "custom.cfg"
+    instance_config.touch()
+
+    assert get_flaskbb_config(config_app, "custom.cfg") == str(instance_config)
+
+
+def test_get_flaskbb_config_imports_a_config_object(config_app):
+    config = get_flaskbb_config(config_app, "flaskbb.configs.testing.TestingConfig")
+
+    assert config is TestingConfig
+
+
+def test_get_flaskbb_config_without_a_config_uses_the_instance_config(config_app, tmp_path):
+    instance_config = tmp_path / "instance" / "flaskbb.cfg"
+    instance_config.touch()
+
+    assert get_flaskbb_config(config_app, None) == str(instance_config)
