@@ -24,7 +24,7 @@ from typing import Any, cast
 import sqlalchemy as sa
 from celery import Celery
 from flask import flash, redirect, request, url_for
-from flask_allows2 import Permission
+from flask_allows2 import Permission, Requirement
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
 from redis import Redis
@@ -375,7 +375,7 @@ def configure_template_filters(app: FlaskBB):
 
     filters.update((name, permission_with_identity(perm, name=name)) for name, perm in permissions)
 
-    policies = [
+    policies: list[tuple[str, Callable[..., Requirement]]] = [
         ("can_ban_user", can_ban_user),
         ("can_edit_user", can_edit_user),
         ("can_moderate", can_moderate),

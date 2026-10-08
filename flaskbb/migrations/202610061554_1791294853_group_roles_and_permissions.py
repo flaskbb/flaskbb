@@ -1,5 +1,5 @@
 """replace the group type flags with a role and the permission columns with
-group_permissions rows
+group_permissions rows, whose level lets a group set a permission to never
 
 Revision ID: 1791294853
 Revises: 1789335000
@@ -45,7 +45,7 @@ def permissions_table():
         "group_permissions",
         sa.column("group_id", sa.Integer),
         sa.column("permission", sa.String),
-        sa.column("granted", sa.Boolean),
+        sa.column("level", sa.String),
     )
 
 
@@ -61,7 +61,7 @@ def upgrade():
             nullable=False,
         ),
         sa.Column("permission", sa.String(length=255), nullable=False),
-        sa.Column("granted", sa.Boolean(), nullable=False),
+        sa.Column("level", sa.String(length=10), nullable=False),
         sa.PrimaryKeyConstraint("group_id", "permission"),
     )
     op.add_column(
@@ -77,7 +77,11 @@ def upgrade():
         bind.execute(
             permissions.insert(),
             [
-                {"group_id": row["id"], "permission": name, "granted": bool(row[name])}
+                {
+                    "group_id": row["id"],
+                    "permission": name,
+                    "level": "allow" if row[name] else "deny",
+                }
                 for name in PERMISSIONS
             ],
         )
@@ -115,12 +119,12 @@ def downgrade():
     permissions = permissions_table()
     for group_id, role in bind.execute(sa.select(groups.c.id, groups.c.role)).all():
         values = {flag: flag == role for flag in ROLE_FLAGS}
-        granted = bind.execute(
-            sa.select(permissions.c.permission, permissions.c.granted).where(
+        levels = bind.execute(
+            sa.select(permissions.c.permission, permissions.c.level).where(
                 permissions.c.group_id == group_id
             )
         ).all()
-        values.update({name: bool(value) for name, value in granted if name in PERMISSIONS})
+        values.update({name: level == "allow" for name, level in levels if name in PERMISSIONS})
         bind.execute(groups.update().where(groups.c.id == group_id).values(**values))
 
     op.drop_column("groups", "role")
