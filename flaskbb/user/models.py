@@ -307,7 +307,7 @@ class User(BaseModel, UserMixin, HasPermissions):
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )
     lastseen: Mapped[datetime | None] = mapped_column(
-        UTCDateTime(timezone=True), default=time_utcnow, nullable=True
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=True, index=True
     )
     birthday: Mapped[DateTime | None] = mapped_column(DateTime, nullable=True)
     gender: Mapped[str | None] = mapped_column(String(10), nullable=True)

@@ -125,7 +125,7 @@ class TopicsRead(BaseModel):
     )
     user: Mapped["User"] = relationship("User", uselist=False, foreign_keys=[user_id])
     topic_id: Mapped[int] = mapped_column(
-        ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True
+        ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True, index=True
     )
     topic: Mapped["Topic"] = relationship(uselist=False, foreign_keys=[topic_id])
     forum_id: Mapped[int] = mapped_column(
@@ -305,13 +305,14 @@ def _discard_pending_unlinks(session: Session) -> None:  # pyright: ignore[repor
 @make_comparable
 class Post(HideableMixin, BaseModel):
     __tablename__ = "posts"
+    __table_args__ = (sa.Index("ix_posts_topic_id_id", "topic_id", "id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     topic_id: Mapped[int | None] = mapped_column(
         ForeignKey("topics.id", ondelete="CASCADE", use_alter=True),
         nullable=True,  # we sure this should be nullable?
     )
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     date_created: Mapped[datetime] = mapped_column(
@@ -618,13 +619,18 @@ class Post(HideableMixin, BaseModel):
 @make_comparable
 class Topic(HideableMixin, BaseModel):
     __tablename__ = "topics"
+    __table_args__ = (
+        sa.Index(
+            "ix_topics_forum_id_important_last_updated", "forum_id", "important", "last_updated"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     forum_id: Mapped[int] = mapped_column(
         ForeignKey("forums.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
     date_created: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
@@ -641,7 +647,7 @@ class Topic(HideableMixin, BaseModel):
 
     # One-to-one (uselist=False) relationship between first_post and topic
     first_post_id: Mapped[int | None] = mapped_column(
-        ForeignKey("posts.id", ondelete="CASCADE"), nullable=True
+        ForeignKey("posts.id", ondelete="CASCADE"), nullable=True, index=True
     )
     first_post: Mapped["Post | None"] = relationship(
         "Post",
@@ -651,7 +657,9 @@ class Topic(HideableMixin, BaseModel):
     )
 
     # One-to-one
-    last_post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    last_post_id: Mapped[int | None] = mapped_column(
+        ForeignKey("posts.id"), nullable=True, index=True
+    )
 
     last_post: Mapped["Post | None"] = relationship(
         "Post",
