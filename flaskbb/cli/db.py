@@ -52,6 +52,30 @@ def _is_revision_id(alembic: Alembic, target: str) -> bool:
 
 @db.command()
 @click.pass_obj
+@click.argument("target", default="heads")
+@click.option(
+    "--skip-missing",
+    is_flag=True,
+    help="Upgrades around the revisions of plugins that are no longer installed. "
+    "Their rows stay in the database.",
+)
+def upgrade(alembic: Alembic, target: str = "heads", skip_missing: bool = False):
+    """Run migrations to upgrade the database."""
+    # Flask-Alembic's upgrade reads a number as a revision id prefix first,
+    # "9" would upgrade to 933bd7d807c4 instead of going up nine revisions
+    try:
+        steps = int(target)
+    except ValueError:
+        pass
+    else:
+        if not _is_revision_id(alembic, target):
+            target = f"{abs(steps):+d}"
+
+    alembic.upgrade(target, skip_missing=skip_missing)
+
+
+@db.command()
+@click.pass_obj
 @click.argument("target", default="-1")
 def downgrade(alembic: Alembic, target: str = "-1"):
     """Run migrations to downgrade the database."""
@@ -76,6 +100,5 @@ db.add_command(alembic_cli.log)
 db.add_command(alembic_cli.show)
 db.add_command(alembic_cli.check)
 db.add_command(alembic_cli.stamp)
-db.add_command(alembic_cli.upgrade)
 db.add_command(alembic_cli.revision)
 db.add_command(alembic_cli.merge)

@@ -29,7 +29,7 @@ from flaskbb.forum.utils import AttachmentFormMixin, handle_post_attachments
 from flaskbb.search import flaskbb_search
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import time_utcnow
-from flaskbb.utils.requirements import Has, IsAtleastModeratorInForum
+from flaskbb.utils.requirements import can_moderate, Has
 
 logger = logging.getLogger(__name__)
 
@@ -138,16 +138,10 @@ class TopicForm(FlaskForm, AttachmentFormMixin):
 
     def save(self, user: User, forum: Forum):
         topic = Topic(title=self.title.data, content=self.content.data)
-        can_moderate = bool(Permission(IsAtleastModeratorInForum(forum=forum), identity=user))
-        can_hide = bool(
-            Permission(
-                Has("makehidden"),
-                IsAtleastModeratorInForum(forum=forum),
-                identity=user,
-            )
-        )
+        moderates = bool(Permission(can_moderate(forum), identity=user))
+        can_hide = bool(Permission(Has("makehidden"), can_moderate(forum), identity=user))
 
-        if can_moderate:
+        if moderates:
             topic.important = bool(self.important.data)
             topic.locked = bool(self.locked.data)
 
@@ -196,14 +190,8 @@ class EditTopicForm(TopicForm):
         title = self.title.data
         content = self.content.data
 
-        can_moderate = bool(Permission(IsAtleastModeratorInForum(forum=forum), identity=user))
-        can_hide = bool(
-            Permission(
-                Has("makehidden"),
-                IsAtleastModeratorInForum(forum=forum),
-                identity=user,
-            )
-        )
+        moderates = bool(Permission(can_moderate(forum), identity=user))
+        can_hide = bool(Permission(Has("makehidden"), can_moderate(forum), identity=user))
 
         # cannot be None as it was already checked using the Required validators
         self.topic.title = title  # type: ignore[assignment]  # pyright: ignore[reportAttributeAccessIssue]
@@ -214,7 +202,7 @@ class EditTopicForm(TopicForm):
         else:
             user.untrack_topic(self.topic)
 
-        if can_moderate:
+        if moderates:
             self.topic.important = bool(self.important.data)
             self.topic.locked = bool(self.locked.data)
 

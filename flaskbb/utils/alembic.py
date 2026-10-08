@@ -4,22 +4,28 @@ import logging
 import os
 import typing as t
 
-from alembic.config import Config
+import sqlalchemy as sa
 from alembic.runtime.migration import MigrationContext, MigrationStep
 from alembic.script import Script
 from alembic.util.exc import CommandError
-from flask import current_app
 from flask_alembic import Alembic as FlaskAlembic
 from flask_alembic.extension import t_rev
 
+from flaskbb.utils.proxies import current_app
+
 logger = logging.getLogger(__name__)
+
+type MigrationFn = t.Callable[
+    [str | list[str] | tuple[str, ...], MigrationContext], list[MigrationStep]
+]
 
 
 class Alembic(FlaskAlembic):
     @t.override
     def run_migrations(
         self,
-        fn: t.Callable[[str | list[str] | tuple[str, ...], MigrationContext], list[MigrationStep]],
+        fn: MigrationFn,
+        skip_missing: bool = False,
         **kwargs: t.Any,
     ) -> None:
         """Runs the migrations with foreign key enforcement suspended on SQLite.
@@ -27,7 +33,12 @@ class Alembic(FlaskAlembic):
         SQLite can't alter most columns in place, so batch operations copy a
         table, drop the original and rename the copy. Dropping a table that
         other rows still reference fails while foreign keys are enforced.
+
+        Revisions the database holds that no installed package provides fail
+        the run, unless ``skip_missing`` migrates around them.
         """
+        fn = self._around_unknown_revisions(fn, skip_missing)
+
         connections = [
             context.connection
             for context in self.migration_contexts.values()
@@ -55,35 +66,37 @@ class Alembic(FlaskAlembic):
                 )
 
     @t.override
-    def upgrade(self, target: int | str | Script = "heads") -> None:
+    def upgrade(self, target: int | str | Script = "heads", skip_missing: bool = False) -> None:
         """Runs migrations to upgrade the database.
 
         The migrations of disabled plugins are loaded so the revisions they
         already applied still resolve, but ``heads`` leaves them out. They run
-        once the plugin is enabled.
+        once the plugin is enabled. ``skip_missing`` upgrades around the
+        revisions of plugins that are no longer installed.
         """
-        if target != "heads":
-            super().upgrade(target)
-            return
-
-        disabled_locations = tuple(
-            os.path.join(location, "")
-            for location in t.cast(
-                list[str], current_app.config["ALEMBIC"]["disabled_version_locations"]
+        destination: str | list[str]
+        if target == "heads":
+            disabled_locations = tuple(
+                os.path.join(location, "")
+                for location in current_app.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"]
             )
-        )
-        heads = [
-            script.revision
-            for script in self.script_directory.get_revisions("heads")
-            if not script.path.startswith(disabled_locations)
-        ]
+            destination = [
+                script.revision
+                for script in self.script_directory.get_revisions("heads")
+                if not script.path.startswith(disabled_locations)
+            ]
+        else:
+            destination = self._simplify_rev(target, handle_int=True)
+            if len(destination) == 1:
+                # like in Flask-Alembic, a relative target (+1) must be a single value
+                destination = destination[0]
 
         def do_upgrade(
             revision: str | list[str] | tuple[str, ...], context: MigrationContext
         ) -> list[MigrationStep]:
-            return self.script_directory._upgrade_revs(heads, revision)  # type: ignore[arg-type,return-value]  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
+            return self.script_directory._upgrade_revs(destination, revision)  # type: ignore[arg-type,return-value]  # pyright: ignore[reportPrivateUsage, reportArgumentType, reportReturnType]
 
-        self.run_migrations(do_upgrade)
+        self.run_migrations(do_upgrade, skip_missing=skip_missing)
 
     @t.override
     def revision(
@@ -145,59 +158,75 @@ class Alembic(FlaskAlembic):
             if label != "default"
         }
 
-    @property
-    @t.override
-    def config(self) -> Config:
-        """Get the Alembic :class:`~alembic.config.Config` for the
-        current app.
+    def _around_unknown_revisions(self, fn: MigrationFn, skip_missing: bool) -> MigrationFn:
+        """Alembic can't locate a revision the database holds once the package
+        of a plugin with migrations is removed from the env without
+        uninstalling the plugin first. ``skip_missing`` hides those revisions
+        from the migrations, so their rows stay and the plugin picks up where
+        it left off once it is reinstalled.
         """
-        cache = self._get_cache()
+        current = [
+            revision
+            for context in self.migration_contexts.values()
+            for revision in context.get_current_heads()
+        ]
+        known = {script.revision for script in self.script_directory.walk_revisions()}
+        unknown = sorted(set(current) - known)
+        if not unknown:
+            return fn
 
-        if cache.config is not None:
-            return cache.config
+        # without a row of its own, FlaskBB's position would be guessed from the
+        # plugins' dependencies and its applied migrations would run again
+        skippable = any(
+            "default" in script.branch_labels
+            for script in self.script_directory.get_revisions(
+                tuple(revision for revision in current if revision in known)
+            )
+        )
+        if not skip_missing:
+            raise self._unknown_revisions_error(unknown, skippable)
+        if not skippable:
+            raise CommandError(
+                f"Can't skip {', '.join(unknown)}. No other revision in the database "
+                "records FlaskBB's own migrations, so they may be FlaskBB's. Install "
+                "the version of FlaskBB that applied them."
+            )
 
-        cache.config = c = Config()
-        script_location = t.cast(str, current_app.config["ALEMBIC"]["script_location"])
-
-        if not os.path.isabs(script_location) and ":" not in script_location:
-            script_location = os.path.join(current_app.root_path, script_location)
-
-        version_locations: list[str] = [script_location]
-
-        for item in current_app.config["ALEMBIC"]["version_locations"]:
-            version_location = t.cast(str, item if isinstance(item, str) else item[1])
-
-            if not os.path.isabs(version_location) and ":" not in version_location:
-                version_location = os.path.join(current_app.root_path, version_location)
-
-            version_locations.append(version_location)
-
-        c.set_main_option("script_location", script_location)
-        c.set_main_option("path_separator", current_app.config["ALEMBIC"]["path_separator"])
-        # path_separator is always set above, so this is never None
-        path_sep = t.cast(str, c._get_file_separator_char("path_separator"))
-        c.set_main_option(
-            "version_locations",
-            path_sep.join(version_locations),
+        logger.warning(
+            "Skipping the unknown revisions %s, they stay in the database.", ", ".join(unknown)
         )
 
-        for key, value in current_app.config["ALEMBIC"].items():
-            if key in (
-                "script_location",
-                "version_locations",
-                "disabled_version_locations",
-                "path_separator",
-            ):
-                continue
+        def skip_unknown(
+            revision: str | list[str] | tuple[str, ...], context: MigrationContext
+        ) -> list[MigrationStep]:
+            return fn(tuple(rev for rev in revision if rev not in unknown), context)
 
-            if isinstance(value, dict):
-                for inner_key, inner_value in value.items():
-                    c.set_section_option(key, inner_key, inner_value)
-            else:
-                c.set_main_option(key, value)
+        return skip_unknown
 
-        if len(self.metadatas) > 1:
-            # Add the names used by the multidb template.
-            c.set_main_option("databases", ", ".join(self.metadatas))
+    def _unknown_revisions_error(self, unknown: list[str], skippable: bool) -> CommandError:
+        # flaskbb.extensions imports this module
+        from flaskbb.extensions import db, pluggy
+        from flaskbb.plugins.models import PluginRegistry
 
-        return cache.config
+        registered = db.session.execute(sa.select(PluginRegistry.name)).scalars()
+        missing = sorted(set(registered) - set(pluggy.list_plugin_metadata()))
+
+        message = (
+            "The database holds migrations that no installed package provides: "
+            f"{', '.join(unknown)}."
+        )
+        if missing:
+            message += (
+                f" These plugins are registered but not installed: {', '.join(missing)}."
+                " Reinstall them and try again. To remove a plugin for good, run"
+                " 'flaskbb plugins uninstall <plugin>' before removing its package."
+            )
+        elif skippable:
+            message += " A plugin that is no longer installed applied them."
+        else:
+            message += (
+                " A plugin that is no longer installed or a newer version of FlaskBB applied them."
+            )
+        if skippable:
+            message += " To upgrade without them, run 'flaskbb db upgrade --skip-missing'."
+        return CommandError(message)

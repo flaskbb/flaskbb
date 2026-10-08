@@ -19,22 +19,15 @@ from flaskbb.cli.utils import (
     FlaskBBCLIError,
     get_group,
     group_permissions,
-    GROUP_TYPES,
-    invalidate_permission_cache,
     print_details,
     print_table,
 )
 from flaskbb.extensions import db
-from flaskbb.user.models import Group, User
+from flaskbb.permissions import PermissionLevel
+from flaskbb.user.models import Group, GroupRole, User
 
 PROTECTED_GROUP_ID = 6
-
-
-def _group_type(group: Group) -> str:
-    for group_type in GROUP_TYPES:
-        if getattr(group, group_type):
-            return group_type
-    return "member"
+ROLES = [role.value for role in GroupRole]
 
 
 def _member_count(group: Group) -> int:
@@ -46,9 +39,11 @@ def _member_count(group: Group) -> int:
     )
 
 
-def _validate_permissions(grant: tuple[str, ...], revoke: tuple[str, ...]):
+def _validate_permissions(
+    grant: tuple[str, ...], revoke: tuple[str, ...], never: tuple[str, ...] = ()
+):
     permissions = group_permissions()
-    unknown = set(grant + revoke) - set(permissions)
+    unknown = set(grant + revoke + never) - set(permissions)
     if unknown:
         raise FlaskBBCLIError(
             "Unknown permission(s): {}. Available permissions: {}.".format(
@@ -57,7 +52,7 @@ def _validate_permissions(grant: tuple[str, ...], revoke: tuple[str, ...]):
             fg="red",
         )
 
-    both = set(grant) & set(revoke)
+    both = (set(grant) & set(revoke)) | (set(grant) & set(never)) | (set(revoke) & set(never))
     if both:
         raise FlaskBBCLIError(
             "Can't grant and revoke the same permission(s): {}.".format(", ".join(sorted(both))),
@@ -65,35 +60,31 @@ def _validate_permissions(grant: tuple[str, ...], revoke: tuple[str, ...]):
         )
 
 
-def _update_permissions(group: Group, grant: tuple[str, ...], revoke: tuple[str, ...]):
+def _update_permissions(
+    group: Group, grant: tuple[str, ...], revoke: tuple[str, ...], never: tuple[str, ...] = ()
+):
     for permission in grant:
-        setattr(group, permission, True)
+        group.set_permission(permission, PermissionLevel.ALLOW)
     for permission in revoke:
-        setattr(group, permission, False)
+        group.set_permission(permission, PermissionLevel.DENY)
+    for permission in never:
+        group.set_permission(permission, PermissionLevel.NEVER)
 
 
-def _update_group_type(group: Group, group_type: str):
-    for candidate in GROUP_TYPES:
-        setattr(group, candidate, candidate == group_type)
-
-
-def _validate_group_type(group: Group, group_type: str):
-    """The guest and the banned group are looked up by their type, so there
+def _validate_role(group: Group, role: GroupRole):
+    """The guest and the banned group are looked up by their role, so there
     can only ever be one of each.
     """
-    if group_type not in ("guest", "banned"):
+    if role not in (GroupRole.GUEST, GroupRole.BANNED):
         return
 
     existing = db.session.execute(
-        sa.select(Group).filter(
-            getattr(Group, group_type).is_(True),
-            Group.id != group.id,
-        )
+        sa.select(Group).filter(Group.role == role, Group.id != group.id)
     ).scalar_one_or_none()
 
     if existing is not None:
         raise FlaskBBCLIError(
-            f"Only one group of type '{group_type}' (currently: '{existing.name}') is allowed.",
+            f"Only one group of role '{role.value}' (currently: '{existing.name}') is allowed.",
             fg="red",
         )
 
@@ -112,14 +103,14 @@ def list_groups():
         [
             str(group.id),
             group.name,
-            _group_type(group),
+            group.role.value,
             str(_member_count(group)),
             str(group.description or ""),
         ]
         for group in all_groups
     ]
 
-    print_table(["ID", "Name", "Type", "Members", "Description"], rows)
+    print_table(["ID", "Name", "Role", "Members", "Description"], rows)
 
 
 @groups.command("show")
@@ -133,29 +124,34 @@ def show_group(name: str):
             ("ID", str(group.id)),
             ("Name", group.name),
             ("Description", str(group.description or "-")),
-            ("Type", _group_type(group)),
+            ("Role", group.role.value),
             ("Members", str(_member_count(group))),
         ]
     )
 
     click.secho("\nPermissions", fg="blue", bold=True)
-    for permission in group_permissions():
-        granted = getattr(group, permission)
-        click.secho(
-            f"  {'[+]' if granted else '[-]'} {permission}",
-            fg="green" if granted else "red",
-        )
+    for permission, level in group.permission_levels.items():
+        marker, color = LEVEL_MARKERS[level]
+        click.secho(f"  {marker} {permission}", fg=color)
+
+
+LEVEL_MARKERS = {
+    PermissionLevel.ALLOW: ("[+]", "green"),
+    PermissionLevel.DENY: ("[-]", "red"),
+    PermissionLevel.NEVER: ("[x]", "red"),
+}
 
 
 @groups.command("new")
 @click.argument("name")
 @click.option("--description", "-d", help="The description of the group.")
 @click.option(
-    "--type",
-    "-t",
-    "group_type",
-    type=click.Choice(GROUP_TYPES),
-    help="The type of the group. Omit it to create an ordinary member group.",
+    "--role",
+    "-r",
+    type=click.Choice(ROLES),
+    default=GroupRole.MEMBER.value,
+    show_default=True,
+    help="The role of the group.",
 )
 @click.option(
     "--grant",
@@ -167,25 +163,30 @@ def show_group(name: str):
     multiple=True,
     help="A permission to revoke. Can be used multiple times.",
 )
+@click.option(
+    "--never",
+    multiple=True,
+    help="A permission to revoke for every member, whatever their other groups allow. "
+    "Can be used multiple times.",
+)
 def new_group(
     name: str,
     description: str | None,
-    group_type: str | None,
+    role: str,
     grant: tuple[str, ...],
     revoke: tuple[str, ...],
+    never: tuple[str, ...],
 ):
-    """Creates a new group. Permissions that are neither granted nor revoked
-    are set to their default value.
+    """Creates a new group. Permissions that are neither granted, revoked nor
+    set to never keep their default value.
     """
-    group = Group(name=name)
-    _validate_permissions(grant, revoke)
-    if group_type is not None:
-        _validate_group_type(group, group_type)
-        _update_group_type(group, group_type)
+    group = Group(name=name, role=GroupRole(role))
+    _validate_permissions(grant, revoke, never)
+    _validate_role(group, group.role)
 
     if description is not None:
         group.description = description
-    _update_permissions(group, grant, revoke)
+    _update_permissions(group, grant, revoke, never)
 
     try:
         group.save()
@@ -203,13 +204,7 @@ def new_group(
 @click.argument("name")
 @click.option("--name", "-n", "new_name", help="The new name of the group.")
 @click.option("--description", "-d", help="The description of the group.")
-@click.option(
-    "--type",
-    "-t",
-    "group_type",
-    type=click.Choice([*GROUP_TYPES, "member"]),
-    help="The type of the group. Use 'member' to turn it into an ordinary group.",
-)
+@click.option("--role", "-r", type=click.Choice(ROLES), help="The role of the group.")
 @click.option(
     "--grant",
     multiple=True,
@@ -220,27 +215,34 @@ def new_group(
     multiple=True,
     help="A permission to revoke. Can be used multiple times.",
 )
+@click.option(
+    "--never",
+    multiple=True,
+    help="A permission to revoke for every member, whatever their other groups allow. "
+    "Can be used multiple times.",
+)
 def update_group(
     name: str,
     new_name: str | None,
     description: str | None,
-    group_type: str | None,
+    role: str | None,
     grant: tuple[str, ...],
     revoke: tuple[str, ...],
+    never: tuple[str, ...],
 ):
     """Updates a group. Any option that is omitted is left unchanged."""
     group = get_group(name)
 
-    _validate_permissions(grant, revoke)
-    if group_type is not None:
-        _validate_group_type(group, group_type)
-        _update_group_type(group, group_type)
+    _validate_permissions(grant, revoke, never)
+    if role is not None:
+        _validate_role(group, GroupRole(role))
+        group.role = GroupRole(role)
 
     if new_name is not None:
         group.name = new_name
     if description is not None:
         group.description = description
-    _update_permissions(group, grant, revoke)
+    _update_permissions(group, grant, revoke, never)
 
     try:
         group.save()
@@ -251,7 +253,6 @@ def update_group(
             fg="red",
         ) from e
 
-    invalidate_permission_cache(group)
     click.secho(f"[+] Group {group.name} updated.", fg="cyan")
 
 

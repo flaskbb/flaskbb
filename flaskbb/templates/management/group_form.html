@@ -24,25 +24,18 @@
                     {{ form.hidden_tag() }}
                     {{ render_field(form.name) }}
 
-                    {{ render_field(form.description, div_class="col-sm-10 mb-3") }}
-                    {{ render_field(form.admin) }}
-                    {{ render_field(form.super_mod) }}
+                    {{ render_field(form.description, control_class="w-75") }}
+                    {{ render_field(form.role, control_class="w-50") }}
 
-                    {{ render_field(form.mod) }}
-                    {{ render_field(form.banned) }}
-                    {{ render_field(form.guest) }}
-
-                    {{ render_field(form.mod_edituser) }}
-                    {{ render_field(form.mod_banuser) }}
-
-                    {{ render_field(form.editpost) }}
-                    {{ render_field(form.deletepost) }}
-                    {{ render_field(form.deletetopic) }}
-                    {{ render_field(form.posttopic) }}
-                    {{ render_field(form.postreply) }}
-                    {{ render_field(form.postattachment) }}
-                    {{ render_field(form.makehidden) }}
-                    {{ render_field(form.viewhidden) }}
+                    <p class="col-12 mt-3 mb-0 text-muted">
+                        {% trans %}A member has a permission when any of their groups allows it. Deny leaves the decision to their other groups, never revokes it whatever their other groups say.{% endtrans %}
+                    </p>
+                    {% for section, fields in form.permission_sections() %}
+                        <h5 class="col-12 mt-3">{{ _(section) }}</h5>
+                        {% for field in fields %}
+                            {{ render_field(field, control_class="w-50") }}
+                        {% endfor %}
+                    {% endfor %}
 
                     {{ render_field(form.submit) }}
                 </form>

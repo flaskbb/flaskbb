@@ -12,6 +12,7 @@ from alembic.util.exc import CommandError
 from flask_alembic import Alembic as FlaskAlembic
 from flaskbb.app import configure_migrations
 from flaskbb.extensions import alembic, db, pluggy
+from flaskbb.permissions import PermissionLevel
 from flaskbb.plugins.utils import plugins_with_pending_migrations
 
 
@@ -38,12 +39,13 @@ def test_disabled_plugin_migrations_are_loaded_without_importing_the_plugin(
         ],
     )
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
 
     configure_migrations(application)
 
     migrations = str(plugin_dir / "migrations")
     assert ("disabled_plugin", migrations) in application.config["ALEMBIC"]["version_locations"]
-    assert application.config["ALEMBIC"]["disabled_version_locations"] == [migrations]
+    assert application.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] == [migrations]
     assert "disabled_plugin" not in sys.modules
 
 
@@ -112,10 +114,11 @@ def test_held_back_plugin_migrations_run_with_upgrade_heads(
     monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
     monkeypatch.setitem(application.extensions, "flaskbb_held_back_plugins", {"pending_plugin"})
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
 
     configure_migrations(application)
 
-    assert application.config["ALEMBIC"]["disabled_version_locations"] == []
+    assert application.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] == []
     assert any(
         name == "pending_plugin" for name, _ in application.config["ALEMBIC"]["version_locations"]
     )
@@ -123,12 +126,12 @@ def test_held_back_plugin_migrations_run_with_upgrade_heads(
 
 def test_upgrade_heads_leaves_out_disabled_plugin_migrations(application, monkeypatch):
     migrations = os.path.join(pluggy.get_plugin_path("conversations"), "migrations")
-    monkeypatch.setitem(application.config["ALEMBIC"], "disabled_version_locations", [migrations])
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [migrations])
     planned = []
     monkeypatch.setattr(
         alembic,
         "run_migrations",
-        lambda fn: planned.extend(step.revision.path for step in fn((), None)),
+        lambda fn, skip_missing: planned.extend(step.revision.path for step in fn((), None)),
     )
 
     alembic.upgrade()
@@ -199,6 +202,7 @@ def test_attachment_filename_index_matches_the_migration(database):
 def second_plugin_branch(application, monkeypatch, pending_plugin):
     monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
+    monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
     configure_migrations(application)
     monkeypatch.setattr(alembic._get_cache(), "config", None)
     monkeypatch.setattr(alembic._get_cache(), "script", None)
@@ -244,3 +248,100 @@ def test_merge_can_not_join_plugins(application, second_plugin_branch, created):
     alembic.merge(["conversations@head", "default@head"])
 
     assert len(created) == 1
+
+
+@pytest.mark.parametrize("old_install", [False, True])
+def test_group_roles_migration_moves_flags_and_permissions_to_rows(database, old_install):
+    """FlaskBB 2.x installs carry a CHECK constraint per boolean column, which
+    SQLite can only drop by rebuilding the table; newer ones drop in place.
+    """
+    migration = _load_migration("202610061554_1791294853_group_roles_and_permissions.py")
+    connection = db.session.connection()
+    # the migration runner suspends foreign keys for the batch rebuild (see
+    # flaskbb.utils.alembic); calling the migration directly has to as well,
+    # or dropping the rebuilt groups table cascades into group_permissions
+    connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+    try:
+        context = MigrationContext.configure(connection)
+        operations = Operations(context)
+        operations.drop_table("group_permissions")
+        operations.drop_column("groups", "role")
+        for name in migration.ROLE_FLAGS + migration.PERMISSIONS:
+            check = f" CHECK ({name} IN (0, 1))" if old_install else ""
+            connection.exec_driver_sql(
+                f"ALTER TABLE groups ADD COLUMN {name} BOOLEAN NOT NULL DEFAULT 0{check}"
+            )
+        db.session.execute(
+            sa.text(
+                "INSERT INTO groups (name, mod, editpost, viewhidden) VALUES ('Old Mods', 1, 1, 1)"
+            )
+        )
+
+        with Operations.context(context):
+            migration.upgrade()
+        db.session.commit()
+
+        role = db.session.execute(
+            sa.text("SELECT role FROM groups WHERE name = 'Old Mods'")
+        ).scalar_one()
+        levels = dict(
+            db.session.execute(sa.text("SELECT permission, level FROM group_permissions")).all()
+        )
+        inspector = sa.inspect(db.engine)
+        columns = {c["name"] for c in inspector.get_columns("groups")}
+        checks = inspector.get_check_constraints("groups")
+        db.session.commit()
+    finally:
+        # the commit released the connection above; the pooled one stays
+        # switched off otherwise, as the connect listener does not run again
+        db.session.connection().exec_driver_sql("PRAGMA foreign_keys=ON")
+        db.session.commit()
+
+    assert role == "mod"
+    assert levels["editpost"] == "allow"
+    assert levels["viewhidden"] == "allow"
+    assert levels["deletepost"] == "deny"
+    assert set(migration.PERMISSIONS) == set(levels)
+    assert columns.isdisjoint(migration.ROLE_FLAGS + migration.PERMISSIONS)
+    assert checks == []
+
+
+def test_group_roles_migration_round_trips_permission_levels(default_groups):
+    migration = _load_migration("202610061554_1791294853_group_roles_and_permissions.py")
+    member = default_groups[3]
+    member.set_permission("deletepost", PermissionLevel.NEVER)
+    member.save()
+    # the commits expire member, and the downgraded table can not refresh it
+    member_id = member.id
+    context = MigrationContext.configure(db.session.connection())
+
+    with Operations.context(context):
+        migration.downgrade()
+    db.session.commit()
+    flags = (
+        db.session.execute(
+            sa.text("SELECT editpost, makehidden, deletepost FROM groups WHERE id = :id"),
+            {"id": member_id},
+        )
+        .mappings()
+        .one()
+    )
+    assert flags["editpost"] == 1
+    assert flags["makehidden"] == 0
+    assert flags["deletepost"] == 0
+
+    context = MigrationContext.configure(db.session.connection())
+    with Operations.context(context):
+        migration.upgrade()
+    db.session.commit()
+    levels = dict(
+        db.session.execute(
+            sa.text("SELECT permission, level FROM group_permissions WHERE group_id = :id"),
+            {"id": member_id},
+        ).all()
+    )
+    assert levels["editpost"] == "allow"
+    assert levels["makehidden"] == "deny"
+    assert levels["deletepost"] == "deny"
+    columns = {c["name"] for c in sa.inspect(db.engine).get_columns("group_permissions")}
+    assert columns == {"group_id", "permission", "level"}

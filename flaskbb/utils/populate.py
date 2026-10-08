@@ -18,7 +18,7 @@ from alembic.util.exc import CommandError
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.forum.models import Category, Forum, Post, Topic
 from flaskbb.settings import Setting, setting_registry
-from flaskbb.user.models import Group, User
+from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.database import create_database, database_exists
 
 logger = logging.getLogger(__name__)
@@ -83,12 +83,13 @@ def create_default_groups():
     from flaskbb.fixtures.groups import fixture
 
     result: list[Group] = []
-    for key, value in fixture.items():
-        group = Group(name=key)
-
-        for k, v in value.items():
-            setattr(group, k, v)
-
+    for name, attributes in fixture.items():
+        group = Group(
+            name=name,
+            description=attributes["description"],
+            role=GroupRole(attributes["role"]),
+        )
+        group.set_permissions(attributes["permissions"])
         group.save()
         result.append(group)
     return result
@@ -104,15 +105,12 @@ def create_user(username: str, password: str, email: str, groupname: str):
     :param groupname: The name of the group to which the user
                       should belong to.
     """
-    if groupname == "member":
-        group = Group.get_member_group()
-    else:
-        group = db.session.execute(
-            sa.select(Group)
-            .filter(getattr(Group, groupname).is_(True))
-            .order_by(Group.id.asc())
-            .limit(1)
-        ).scalar_one()
+    group = db.session.execute(
+        sa.select(Group)
+        .filter(Group.role == GroupRole(groupname))
+        .order_by(Group.id.asc())
+        .limit(1)
+    ).scalar_one()
 
     user = User.create(
         username=username,
@@ -211,7 +209,7 @@ def create_test_data(
     # create one user per group - a guest can't create topics or posts
     users: list[User] = []
     for group in groups:
-        if group.guest:
+        if group.role is GroupRole.GUEST:
             continue
 
         username = group.name.lower().replace(" ", "_")

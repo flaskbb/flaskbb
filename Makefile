@@ -31,7 +31,7 @@ frontend-build: ## Builds both themes
 	cd flaskbb/themes/aurora && npm run build && cd ../aurora_dark && npm run build
 
 dev-plugins: ## Install the plugins as editable
-	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote -e ../flaskbb-plugin-ranks -e ../flaskbb-plugin-test-mail -e ../flaskbb-plugin-stopforumspam
+	uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations -e ../flaskbb-plugin-like -e ../flaskbb-plugin-vote -e ../flaskbb-plugin-ranks -e ../flaskbb-plugin-test-mail -e ../flaskbb-plugin-stopforumspam -e ../flaskbb-plugin-inviteonly
 
 devconfig:dependencies ## Generates a development config
 	uv run flaskbb makeconfig -d

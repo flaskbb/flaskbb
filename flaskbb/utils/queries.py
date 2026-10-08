@@ -131,13 +131,15 @@ def hidden[*Ts](
         return stmt
 
     # hidden is None, use permissions
-    has_view_hidden = current_user and current_user.permissions.get("viewhidden", False)
-
-    if not has_view_hidden:
+    if not can_view_hidden():
         for entity in hideable_entities:
             stmt = stmt.where(entity.hidden == False)
 
     return stmt
+
+
+def can_view_hidden() -> bool:
+    return bool(current_user and current_user.permissions.get("viewhidden", False))
 
 
 def first_or_404(

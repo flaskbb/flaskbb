@@ -26,6 +26,7 @@ from wtforms import (
     HiddenField,
     IntegerField,
     PasswordField,
+    SelectField,
     StringField,
     SubmitField,
     TextAreaField,
@@ -43,7 +44,8 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from flaskbb.extensions import db
 from flaskbb.forum.models import Attachment, Category, Forum, Post
-from flaskbb.user.models import Group, User
+from flaskbb.permissions import permission_registry, PermissionLevel
+from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.forms import (
     FlaskBBForm,
 )
@@ -75,7 +77,7 @@ def selectable_groups():
 
 def select_primary_group():
     return (
-        db.session.execute(sa.select(Group).where(Group.guest != True).order_by(Group.id))
+        db.session.execute(sa.select(Group).where(Group.role != GroupRole.GUEST).order_by(Group.id))
         .scalars()
         .all()
     )
@@ -92,13 +94,11 @@ def assignable_groups():
     if Permission(IsAdmin, identity=current_user):
         return select_primary_group()
 
-    member_group = sa.and_(
-        *[getattr(Group, p).is_(False) for p in ["admin", "mod", "super_mod", "banned", "guest"]]
-    )
-
     return (
         db.session.execute(
-            sa.select(Group).where(sa.or_(member_group, Group.mod, Group.banned)).order_by(Group.id)
+            sa.select(Group)
+            .where(Group.role.in_([GroupRole.MEMBER, GroupRole.MODERATOR, GroupRole.BANNED]))
+            .order_by(Group.id)
         )
         .scalars()
         .all()
@@ -269,7 +269,30 @@ class ModeratorEditUserForm(SuperModeratorEditUserForm):
     secondary_groups = None
 
 
-class GroupForm(FlaskForm):
+def role_choices() -> list[tuple[GroupRole, str]]:
+    return [
+        (GroupRole.MEMBER, _("Member")),
+        (GroupRole.MODERATOR, _("Moderator")),
+        (GroupRole.SUPER_MODERATOR, _("Super Moderator")),
+        (GroupRole.ADMINISTRATOR, _("Administrator")),
+        (GroupRole.BANNED, _("Banned")),
+        (GroupRole.GUEST, _("Guest")),
+    ]
+
+
+def level_choices() -> list[tuple[PermissionLevel, str]]:
+    return [
+        (PermissionLevel.ALLOW, _("Allow")),
+        (PermissionLevel.DENY, _("Deny")),
+        (PermissionLevel.NEVER, _("Never")),
+    ]
+
+
+class GroupForm(FlaskBBForm):
+    """The name, description and role of a group. ``group_form`` adds one
+    level field per registered permission.
+    """
+
     group: Group | None = None
 
     name = StringField(
@@ -279,78 +302,28 @@ class GroupForm(FlaskForm):
 
     description = TextAreaField(_("Description"), validators=[Optional()])
 
-    admin = BooleanField(
-        _("Is 'Admin' group?"),
-        description=_("With this option the group has access to the admin panel."),
-    )
-    super_mod = BooleanField(
-        _("Is 'Super Moderator' group?"),
+    role = SelectField(
+        _("Role"),
+        coerce=GroupRole,
+        choices=role_choices,
         description=_(
-            "Check this, if the users in this group are allowed to moderate every forum."
+            "Moderators can moderate the forums they are assigned to, super moderators "
+            "every forum, and administrators have access to the admin panel. There can "
+            "only be one banned and one guest group."
         ),
-    )
-    mod = BooleanField(
-        _("Is 'Moderator' group?"),
-        description=_(
-            "Check this, if the users in this group are allowed to moderate specified forums."
-        ),
-    )
-    banned = BooleanField(
-        _("Is 'Banned' group?"),
-        description=_("Only one group of type 'Banned' is allowed."),
-    )
-    guest = BooleanField(
-        _("Is 'Guest' group?"),
-        description=_("Only one group of type 'Guest' is allowed."),
-    )
-    editpost = BooleanField(
-        _("Can edit posts"),
-        description=_("Check this, if the users in this group can edit posts."),
-    )
-    deletepost = BooleanField(
-        _("Can delete posts"),
-        description=_("Check this, if the users in this group can delete posts."),
-    )
-    deletetopic = BooleanField(
-        _("Can delete topics"),
-        description=_("Check this, if the users in this group can delete topics."),
-    )
-    posttopic = BooleanField(
-        _("Can create topics"),
-        description=_("Check this, if the users in this group can create topics."),
-    )
-    postreply = BooleanField(
-        _("Can post replies"),
-        description=_("Check this, if the users in this group can post replies."),
-    )
-    postattachment = BooleanField(
-        _("Can upload attachments"),
-        description=_("Check this, if the users in this group can attach files to posts."),
-    )
-
-    mod_edituser = BooleanField(
-        _("Moderators can edit user profiles"),
-        description=_(
-            "Allow moderators to edit another user's profile including password and email changes."
-        ),
-    )
-
-    mod_banuser = BooleanField(
-        _("Moderators can ban users"),
-        description=_("Allow moderators to ban other users."),
-    )
-
-    viewhidden = BooleanField(
-        _("Can view hidden posts and topics"),
-        description=_("Allows a user to view hidden posts and topics"),
-    )
-
-    makehidden = BooleanField(
-        _("Can hide posts and topics"),
-        description=_("Allows a user to hide posts and topics"),
     )
 
     submit = SubmitField(_("Save"))
+
+    def permission_fields(self) -> list[Field]:
+        return [self[key] for key in permission_registry.keys()]
+
+    def permission_sections(self) -> list[tuple[str, list[Field]]]:
+        """The permission fields, grouped the way they were registered."""
+        return [
+            (group.name, [self[key] for key, _definition in permissions])
+            for group, permissions in permission_registry.sections()
+        ]
 
     def validate_name(self, field: Field):
         if self.group is not None:
@@ -366,83 +339,66 @@ class GroupForm(FlaskForm):
         if group:
             raise ValidationError(_("This group name is already taken."))
 
-    def validate_banned(self, field: Field):
+    def validate_role(self, field: Field):
+        if field.data not in (GroupRole.BANNED, GroupRole.GUEST):
+            return
+
+        others = Group.role == field.data
         if self.group is not None:
-            group = Group.count(sa.and_(Group.banned, sa.not_(Group.id == self.group.id)))
-        else:
-            group = Group.count(Group.banned == True)
+            others = sa.and_(others, sa.not_(Group.id == self.group.id))
 
-        if field.data and group > 0:
-            raise ValidationError(_("There is already a group of type 'Banned'."))
-
-    def validate_guest(self, field: Field):
-        if self.group is not None:
-            group = Group.count(sa.and_(Group.guest, sa.not_(Group.id == self.group.id)))
-        else:
-            group = Group.count(Group.guest == True)
-
-        if field.data and group > 0:
-            raise ValidationError(_("There is already a group of type 'Guest'."))
+        if Group.count(others) > 0:
+            raise ValidationError(
+                _("There is already a group of role '%(role)s'.", role=field.data.value)
+            )
 
     @override
     def validate(self, extra_validators: Mapping[str, Sequence[Any]] | None = None):
-        if not super().validate():
+        if not super().validate(extra_validators):
             return False
 
+        if self.role.data is not GroupRole.GUEST:
+            return True
+
+        # guests never get any permissions
         result = True
-        permission_fields = (
-            self.editpost,
-            self.deletepost,
-            self.deletetopic,
-            self.posttopic,
-            self.postreply,
-            self.postattachment,
-            self.mod_edituser,
-            self.mod_banuser,
-            self.viewhidden,
-            self.makehidden,
-        )
-        group_fields = [self.admin, self.super_mod, self.mod, self.banned, self.guest]
-        # we do not allow to modify any guest permissions
-        if self.guest.data:
-            for field in permission_fields:
-                if field.data:
-                    # if done in 'validate_guest' it would display this
-                    # warning on the fields
-                    field.errors = [
-                        *field.errors,
-                        _("Can't assign any permissions to this group."),
-                    ]
-                    result = False
-
-        checked: list[bool] = []
-        for field in group_fields:
-            if field.data and field.data in checked:
-                if len(checked) > 1:
-                    field.errors = [*field.errors, "A group can't have multiple group types."]
-                    result = False
-            else:
-                checked.append(field.data)
-
+        for field in self.permission_fields():
+            if field.data is PermissionLevel.ALLOW:
+                field.errors = [*field.errors, _("Can't assign any permissions to this group.")]
+                result = False
         return result
 
-    def save(self):
-        data = self.data
-        data.pop("submit", None)
-        data.pop("csrf_token", None)
-        group = Group(**data)
+    def save(self) -> Group:
+        group = self.group if self.group is not None else Group()
+        permission_keys = permission_registry.keys()
+        self.populate_obj(group, exclude=["submit", "csrf_token", *permission_keys])
+        group.set_permissions({key: self[key].data for key in permission_keys})
         return group.save()
 
 
-class EditGroupForm(GroupForm):
-    def __init__(self, group: Group, *args, **kwargs):
-        self.group = group
-        kwargs["obj"] = self.group
-        GroupForm.__init__(self, *args, **kwargs)
+def group_form(group: Group | None = None, **kwargs: Any) -> GroupForm:
+    """Builds a group form with a level field per registered permission,
+    preset to the permission's default and filled from ``group`` when one is
+    being edited.
+    """
+    fields = {
+        key: SelectField(
+            _(definition.name),
+            description=_(definition.description),
+            choices=level_choices,
+            coerce=PermissionLevel,
+            default=PermissionLevel.of(definition.default),
+        )
+        for _group, permissions in permission_registry.sections()
+        for key, definition in permissions
+    }
+    form_class = type("GroupPermissionsForm", (GroupForm,), fields)
 
-
-class AddGroupForm(GroupForm):
-    pass
+    if group is not None:
+        kwargs.update(obj=group, data=group.permission_levels)
+    form = form_class(**kwargs)
+    form.group = group
+    return form
 
 
 class ForumForm(FlaskForm):

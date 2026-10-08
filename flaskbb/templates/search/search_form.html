@@ -18,8 +18,8 @@
                         <form role="form" method="post">
                             {{ form.hidden_tag() }}
                             <div class="input-group mb-3">
-                                {{ render_input_field(form.search_query, class="form-control col-3") }}
-                                {{ render_select_field(form.search_type, class="form-select flex-grow-0 w-auto") }}
+                                {{ render_input_field(form.search_query, control_class="col-3") }}
+                                {{ render_select_field(form.search_type, control_class="flex-grow-0 w-auto") }}
                                 <button class="btn btn-primary" type="submit">
                                     <span class="fas fa-search"></span> {% trans %}Search{% endtrans %}
                                 </button>

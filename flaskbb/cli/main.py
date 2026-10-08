@@ -28,6 +28,7 @@ from flaskbb.cli.utils import (
     prompt_save_user,
     write_config,
 )
+from flaskbb.core.exceptions import ConfigNotFoundError
 from flaskbb.extensions import celery, db, pluggy
 from flaskbb.search import flaskbb_search
 from flaskbb.utils.database import database_exists, drop_all
@@ -84,7 +85,10 @@ def make_app():
         script_info = ctx.obj
 
     data = getattr(script_info, "data", {})
-    return create_app(data.get("config_file"), data.get("instance_path"))
+    try:
+        return create_app(data.get("config_file"), data.get("instance_path"))
+    except ConfigNotFoundError as e:
+        raise click.ClickException(str(e)) from e
 
 
 def set_config(ctx: click.Context, param: str, value: str):

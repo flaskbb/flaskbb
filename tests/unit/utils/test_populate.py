@@ -1,6 +1,6 @@
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.forum.models import Category, Post, Topic
-from flaskbb.user.models import Group, User
+from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.populate import (
     create_default_groups,
     create_test_data,
@@ -18,7 +18,7 @@ def test_create_user(default_groups):
         username="admin", password="test", email="test@example.org", groupname="admin"
     )
     assert user.username == "admin"
-    assert user.permissions["admin"]
+    assert user.primary_group.role is GroupRole.ADMINISTRATOR
 
 
 def test_create_welcome_forum(default_groups):

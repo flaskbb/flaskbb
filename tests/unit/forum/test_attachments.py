@@ -3,6 +3,7 @@
 from io import BytesIO
 
 import pytest
+from flask import g
 from flask_login import login_user, logout_user
 from flaskbb.forum.forms import ReplyForm
 from flaskbb.forum.models import Attachment
@@ -41,14 +42,18 @@ def _reply_form(files, obj=None, tokens=None, **formdata):
 
 
 @pytest.fixture
-def member_request(application, user, attachment_upload_path, default_settings):
-    # logout before the context is popped: login_user writes g._login_user
-    # onto the package-scoped app context, which outlives this request
-    # context and would leak a detached user into later tests
-    with application.test_request_context():
+def member_request(application, user, topic, attachment_upload_path, default_settings):
+    # the attachment permission reads the forum off the request, so the
+    # context is opened at the topic's URL. logout before the context is
+    # popped: login_user writes g._login_user onto the package-scoped app
+    # context, which outlives this request context and would leak a
+    # detached user into later tests - as would the topic resolved from the URL
+    with application.test_request_context(f"/topic/{topic.id}"):
         login_user(user)
         yield user
         logout_user()
+    for name in ("post", "topic", "forum", "category"):
+        g.pop(name, None)
 
 
 def test_reply_form_saves_attachment(member_request, topic, attachment_upload_path):
@@ -166,7 +171,7 @@ def test_reply_form_rejects_too_many(member_request, topic):
 def test_reply_form_rejects_without_permission(
     application, user, topic, attachment_upload_path, default_settings
 ):
-    user.primary_group.postattachment = False
+    user.primary_group.set_permission("postattachment", False)
     user.primary_group.save()
     user.invalidate_cache()
 

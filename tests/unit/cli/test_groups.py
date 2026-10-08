@@ -1,6 +1,7 @@
 from flaskbb.cli.groups import delete_group, list_groups, new_group, show_group, update_group
 from flaskbb.extensions import db
-from flaskbb.user.models import Group
+from flaskbb.permissions import PermissionLevel
+from flaskbb.user.models import Group, GroupRole
 
 
 def _get_group(name):
@@ -46,21 +47,33 @@ def test_new_group(cli_runner, default_groups):
 
     group = _get_group("VIP")
     assert group.description == "Trusted"
-    assert group.viewhidden
-    assert not group.editpost
-    # untouched permissions keep the default of the model
-    assert group.postreply
-    assert not group.makehidden
+    assert group.role is GroupRole.MEMBER
+    assert group.permissions["viewhidden"]
+    assert not group.permissions["editpost"]
+    # untouched permissions keep the default of their definition
+    assert group.permissions["postreply"]
+    assert not group.permissions["makehidden"]
 
 
-def test_new_group_with_type(cli_runner, default_groups):
-    result = cli_runner.invoke(new_group, ["Junior Mods", "--type", "mod"])
+def test_new_group_with_never(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["Probation", "--never", "deletepost"])
 
     assert result.exit_code == 0
+    assert _get_group("Probation").permission_levels["deletepost"] is PermissionLevel.NEVER
 
-    group = _get_group("Junior Mods")
-    assert group.mod
-    assert not group.admin
+
+def test_new_group_granting_and_nevering_the_same_permission(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["VIP", "--grant", "editpost", "--never", "editpost"])
+
+    assert result.exit_code != 0
+    assert "Can't grant and revoke" in result.stderr
+
+
+def test_new_group_with_role(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["Junior Mods", "--role", "mod"])
+
+    assert result.exit_code == 0
+    assert _get_group("Junior Mods").role is GroupRole.MODERATOR
 
 
 def test_new_group_with_taken_name(cli_runner, default_groups):
@@ -85,11 +98,11 @@ def test_new_group_granting_and_revoking_the_same_permission(cli_runner, default
     assert "Can't grant and revoke" in result.stderr
 
 
-def test_new_group_with_a_second_guest_type(cli_runner, default_groups):
-    result = cli_runner.invoke(new_group, ["Visitors", "--type", "guest"])
+def test_new_group_with_a_second_guest_role(cli_runner, default_groups):
+    result = cli_runner.invoke(new_group, ["Visitors", "--role", "guest"])
 
     assert result.exit_code != 0
-    assert "Only one group of type 'guest'" in result.stderr
+    assert "Only one group of role 'guest'" in result.stderr
 
 
 def test_update_group(cli_runner, default_groups):
@@ -101,18 +114,15 @@ def test_update_group(cli_runner, default_groups):
     assert result.exit_code == 0
 
     group = _get_group("Members")
-    assert group.deletepost
-    assert not group.editpost
+    assert group.permissions["deletepost"]
+    assert not group.permissions["editpost"]
 
 
-def test_update_group_type(cli_runner, default_groups):
-    result = cli_runner.invoke(update_group, ["Moderator", "--type", "member"])
+def test_update_group_role(cli_runner, default_groups):
+    result = cli_runner.invoke(update_group, ["Moderator", "--role", "member"])
 
     assert result.exit_code == 0
-
-    group = _get_group("Moderator")
-    assert not group.mod
-    assert not group.admin
+    assert _get_group("Moderator").role is GroupRole.MEMBER
 
 
 def test_update_group_leaves_omitted_options_alone(cli_runner, default_groups):
@@ -122,8 +132,9 @@ def test_update_group_leaves_omitted_options_alone(cli_runner, default_groups):
 
     group = _get_group("Member")
     assert group.description == "The Member Group"
-    assert group.makehidden
-    assert group.editpost
+    assert group.role is GroupRole.MEMBER
+    assert group.permissions["makehidden"]
+    assert group.permissions["editpost"]
 
 
 def test_update_unknown_group(cli_runner, default_groups):

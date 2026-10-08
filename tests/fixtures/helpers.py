@@ -2,6 +2,7 @@ from collections import namedtuple
 from os import path
 
 import pytest
+import sqlalchemy as sa
 from responses import RequestsMock, Response
 
 
@@ -10,6 +11,20 @@ def responses():
     mock = RequestsMock(assert_all_requests_are_fired=True)
     with mock:
         yield mock
+
+
+@pytest.fixture
+def selects(database):
+    """Records every SELECT the database runs while the test is running."""
+    statements = []
+
+    def record(connection, cursor, statement, parameters, context, executemany):
+        if statement.lstrip().lower().startswith("select"):
+            statements.append(statement)
+
+    sa.event.listen(database.engine, "before_cursor_execute", record)
+    yield statements
+    sa.event.remove(database.engine, "before_cursor_execute", record)
 
 
 _here = __file__

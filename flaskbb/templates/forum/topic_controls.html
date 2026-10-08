@@ -116,7 +116,7 @@
                 <!-- end Moderation buttons -->
             {% endif %}
 
-            {% if current_user.is_tracking_topic(topic) %}
+            {% if is_tracking %}
                 <form class="d-inline"
                       method="post"
                       action="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}"

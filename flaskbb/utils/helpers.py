@@ -50,6 +50,7 @@ from sqlalchemy import Row, select
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string, ImportStringError
 
+from flaskbb.core.exceptions import ConfigNotFoundError
 from flaskbb.extensions import babel, db
 from flaskbb.utils.proxies import current_app, current_user
 
@@ -628,9 +629,14 @@ def get_flaskbb_config(app: Flask, config_file: str | object):
     :param app: The app instance.
     :param config_file: A string which is either a module that can be
                         imported, a path to a config file or an object.
-                        If the provided config_file can't be found, it will
-                        search for a 'flaskbb.cfg' file in the instance
-                        directory and in the project's root directory.
+                        If it is ``None``, the ``FLASKBB_SETTINGS`` environment
+                        variable is used instead. If that isn't set either, it
+                        will search for a 'flaskbb.cfg' file in the instance
+                        directory and in the project's root directory and
+                        return ``None`` if there is none.
+    :raises ConfigNotFoundError: If the given config or ``FLASKBB_SETTINGS``
+                                 is neither an existing file nor an
+                                 importable object.
     """
     if config_file is not None:
         # config is an object
@@ -647,10 +653,13 @@ def get_flaskbb_config(app: Flask, config_file: str | object):
             return os.path.join(os.path.abspath(config_file))
 
         # config is an importable string
+        # import_string raises ValueError for relative paths like '../x.cfg'
         try:
             return import_string(config_file)
-        except ImportStringError:
-            return None
+        except (ImportStringError, ValueError) as e:
+            raise ConfigNotFoundError(
+                f"Config {config_file!r} is neither an existing file nor an importable object."
+            ) from e
     elif os.environ.get("FLASKBB_SETTINGS", None):
         config_file = os.environ.get("FLASKBB_SETTINGS", "")
 
@@ -660,8 +669,11 @@ def get_flaskbb_config(app: Flask, config_file: str | object):
         # config is an importable string
         try:
             return import_string(config_file)
-        except ImportStringError:
-            return None
+        except (ImportStringError, ValueError) as e:
+            raise ConfigNotFoundError(
+                f"Config {config_file!r} from FLASKBB_SETTINGS is neither an "
+                "existing file nor an importable object."
+            ) from e
     else:
         # this would be so much nicer and cleaner if we wouldn't
         # support the root/project dir.

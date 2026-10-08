@@ -47,7 +47,7 @@
                                 {% endif %}
 
                                 {# Ban user #}
-                                {% if current_user|can_ban_user(user) and not user.permissions["banned"] %}
+                                {% if current_user|can_ban_user(user) and not user.is_banned %}
                                     <form class="d-inline"
                                           method="post"
                                           action="{{ url_for('management.ban_user', user_id=user.id) }}">
@@ -58,7 +58,7 @@
                                     </form>
 
                                     {# Unban user #}
-                                {% elif current_user|can_ban_user(user) and user.permissions["banned"] %}
+                                {% elif current_user|can_ban_user(user) and user.is_banned %}
                                     <form class="d-inline"
                                           method="post"
                                           action="{{ url_for('management.unban_user', user_id=user.id) }}">

@@ -237,7 +237,7 @@ def test_bulk_delete(application, moderator_user, topic):
 
 @pytest.mark.parametrize("action", ["delete", "hide", "unhide"])
 def test_denied_bulk_action_does_not_flash_success(application, moderator_user, topic, action):
-    moderator_user.primary_group.deletetopic = False
+    moderator_user.primary_group.set_permission("deletetopic", False)
     moderator_user.primary_group.save()
     if action == "unhide":
         topic.hide(moderator_user)

@@ -13,6 +13,7 @@ from flaskbb.extensions import db, pluggy
 from flaskbb.settings.forms import build_form
 from flaskbb.settings.models import display_key, Setting, SettingsDiff
 from flaskbb.settings.registry import setting_registry
+from flaskbb.user.models import GroupPermission, invalidate_all_permissions
 from flaskbb.utils.database import BaseModel
 
 
@@ -189,3 +190,17 @@ class PluginRegistry(BaseModel):
         should succeed even if the plugin's SettingGroup is no longer
         registered (e.g. the plugin package itself was already removed)."""
         Setting.remove_group(self.name)
+
+    def remove_permissions(self) -> None:
+        """Deletes every grant of this plugin's permissions - called on plugin
+        uninstall. Matches the stored keys by their prefix, so it works after
+        the plugin package is gone and its definitions are no longer
+        registered.
+        """
+        db.session.execute(
+            sa.delete(GroupPermission).where(
+                GroupPermission.permission.startswith(f"{self.name}_", autoescape=True)
+            )
+        )
+        db.session.commit()
+        invalidate_all_permissions()

@@ -29,10 +29,11 @@ from flaskbb.extensions import db, login_manager
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.proxies import current_user
 from flaskbb.utils.requirements import (
-    CanPostAttachment,
+    can_moderate,
+    can_post_attachment,
     Has,
-    IsAtleastModeratorInForum,
     IsAtleastSuperModerator,
+    request_forum,
 )
 from flaskbb.utils.uploads import (
     get_attachment_disk_path,
@@ -65,7 +66,7 @@ def do_topic_action(topics: Sequence["Topic"], user: "User", action: str, revers
         flash(_("Please modify topics in only one forum at a time."), "danger")
         return False
 
-    if not Permission(IsAtleastModeratorInForum(forum=topics[0].forum), identity=user):
+    if not Permission(can_moderate(topics[0].forum), identity=user):
         flash(_("You do not have the permissions to execute this action."), "danger")
         return False
 
@@ -168,7 +169,7 @@ class AttachmentFormMixin:
         if not flaskbb_config["ATTACHMENTS_ENABLED"]:
             raise ValidationError(_("Attachments are disabled."))
 
-        if not Permission(CanPostAttachment, identity=current_user):
+        if not Permission(can_post_attachment(request_forum()), identity=current_user):
             raise ValidationError(_("You are not allowed to upload attachments."))
 
         per_post = int(flaskbb_config["ATTACHMENTS_PER_POST"] or 0)

@@ -24,7 +24,7 @@ from typing import Any, cast
 import sqlalchemy as sa
 from celery import Celery
 from flask import flash, redirect, request, url_for
-from flask_allows2 import Permission
+from flask_allows2 import Permission, Requirement
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
 from redis import Redis
@@ -49,6 +49,7 @@ from flaskbb.extensions import (
     pluggy,
     themes,
 )
+from flaskbb.permissions import current_permissions, permission_registry
 from flaskbb.plugins import spec
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import (
@@ -70,6 +71,7 @@ from flaskbb.settings import (
 
 # models
 from flaskbb.user.models import Guest, User
+from flaskbb.utils.database import commit_without_expiring
 
 # various helpers
 from flaskbb.utils.helpers import (
@@ -93,14 +95,16 @@ from flaskbb.utils.proxies import current_user
 
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (
+    as_template_filter,
     can_ban_user,
+    can_delete_post,
     can_delete_topic,
     can_edit_post,
     can_edit_user,
     can_moderate,
     can_post_reply,
     can_post_topic,
-    has_permission,
+    Has,
     IsAdmin,
     IsAtleastModerator,
     permission_with_identity,
@@ -161,6 +165,8 @@ def create_app(config: object | None = None, instance_path: str | None = None):
 
     setting_registry.load_from_internal(pluggy)
     setting_registry.load_from_plugins(pluggy)
+    permission_registry.load_from_internal(pluggy)
+    permission_registry.load_from_plugins(pluggy)
 
     pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 
@@ -369,15 +375,18 @@ def configure_template_filters(app: FlaskBB):
 
     filters.update((name, permission_with_identity(perm, name=name)) for name, perm in permissions)
 
-    filters["can_ban_user"] = can_ban_user
-    filters["can_edit_user"] = can_edit_user
-    filters["can_moderate"] = can_moderate
-    filters["post_reply"] = can_post_reply
-    filters["edit_post"] = can_edit_post
-    filters["delete_post"] = can_edit_post
-    filters["post_topic"] = can_post_topic
-    filters["delete_topic"] = can_delete_topic
-    filters["has_permission"] = has_permission
+    policies: list[tuple[str, Callable[..., Requirement]]] = [
+        ("can_ban_user", can_ban_user),
+        ("can_edit_user", can_edit_user),
+        ("can_moderate", can_moderate),
+        ("post_reply", can_post_reply),
+        ("edit_post", can_edit_post),
+        ("delete_post", can_delete_post),
+        ("post_topic", can_post_topic),
+        ("delete_topic", can_delete_topic),
+        ("has_permission", Has),
+    ]
+    filters.update((name, as_template_filter(policy, name)) for name, policy in policies)
 
     app.jinja_env.filters.update(filters)
 
@@ -399,7 +408,11 @@ def configure_context_processors(app: FlaskBB):
         """Injects the ``flaskbb_config`` config variable into the
         templates.
         """
-        return dict(flaskbb_config=flaskbb_config, format_date=format_date)
+        return dict(
+            flaskbb_config=flaskbb_config,
+            format_date=format_date,
+            current_permissions=current_permissions,
+        )
 
     @app.context_processor
     def inject_now():
@@ -417,7 +430,7 @@ def configure_before_handlers(app: FlaskBB):
         if current_user.is_authenticated:
             current_user.lastseen = time_utcnow()
             db.session.add(current_user)
-            db.session.commit()
+            commit_without_expiring()
 
     if app.config["REDIS_ENABLED"]:
 
@@ -513,7 +526,7 @@ def configure_migrations(app: FlaskBB):
             disabled_dirs.append(migrations)
 
     app.config["ALEMBIC"]["version_locations"] = get_alembic_locations(plugin_dirs + blocked_dirs)
-    app.config["ALEMBIC"]["disabled_version_locations"] = disabled_dirs
+    app.config["MIGRATIONS_DISABLED_VERSION_LOCATIONS"] = disabled_dirs
 
 
 def configure_translations(app: FlaskBB):

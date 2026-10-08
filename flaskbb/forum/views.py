@@ -23,7 +23,7 @@ from flask import (
     url_for,
 )
 from flask.views import MethodView
-from flask_allows2 import And, Or, Permission
+from flask_allows2 import And, Permission
 from flask_babelplus import gettext as _
 from flask_login import login_required
 from pluggy import HookimplMarker
@@ -50,6 +50,7 @@ from flaskbb.forum.models import (
 from flaskbb.markup import nonpost_renderer, post_renderer
 from flaskbb.settings import flaskbb_config
 from flaskbb.user.models import User
+from flaskbb.utils.database import commit_without_expiring
 from flaskbb.utils.helpers import (
     count_online_users,
     FlashAndRedirect,
@@ -67,14 +68,19 @@ from flaskbb.utils.helpers import (
 from flaskbb.utils.proxies import current_app, current_user
 from flaskbb.utils.queries import first_or_404, paginate
 from flaskbb.utils.requirements import (
-    CanAccessForum,
-    CanDeletePost,
-    CanDeleteTopic,
-    CanEditPost,
-    CanPostReply,
-    CanPostTopic,
+    can_access_forum,
+    can_delete_post,
+    can_delete_topic,
+    can_edit_post,
+    can_edit_topic,
+    can_moderate,
+    can_post_reply,
+    can_post_topic,
+    ForRequest,
     Has,
-    IsAtleastModeratorInForum,
+    request_forum,
+    request_post,
+    request_topic,
 )
 
 from .locals import current_category, current_forum, current_topic
@@ -147,7 +153,7 @@ class ViewCategory(MethodView):
 class ViewForum(MethodView):
     decorators = [
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
@@ -183,7 +189,7 @@ class ViewForum(MethodView):
 class ViewPost(MethodView):
     decorators = [
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that topic"),
                 level="warning",
@@ -201,7 +207,7 @@ class ViewPost(MethodView):
 class ViewTopic(MethodView):
     decorators = [
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that topic"),
                 level="warning",
@@ -218,7 +224,7 @@ class ViewTopic(MethodView):
 
         # Count the topic views
         topic.views += 1
-        topic.save()
+        commit_without_expiring()
 
         # Update the topicsread status if the user hasn't read it
         forumsread = None
@@ -239,11 +245,12 @@ class ViewTopic(MethodView):
             topic=topic,
             posts=posts,
             last_seen=time_diff(),
-            form=self.form(),
+            form=self.form(topic),
+            is_tracking=current_user.is_authenticated and current_user.is_tracking_topic(topic),
         )
 
     @allows.requires(
-        CanPostReply,
+        ForRequest(can_post_reply, request_topic),
         on_fail=FlashAndRedirect(
             message=_("You are not allowed to post a reply to this topic."),
             level="warning",
@@ -255,7 +262,7 @@ class ViewTopic(MethodView):
     )
     def post(self, topic_id: int, slug: str | None = None):
         topic = Topic.get_topic(topic_id, True)
-        form = self.form()
+        form = self.form(topic)
 
         if not form:
             flash(_("Cannot post reply"), "warning")
@@ -270,8 +277,8 @@ class ViewTopic(MethodView):
                 flash(e, "danger")
             return redirect(topic.url)
 
-    def form(self):
-        if Permission(CanPostReply):
+    def form(self, topic: Topic):
+        if Permission(can_post_reply(topic)):
             return QuickreplyForm()
         return None
 
@@ -280,8 +287,8 @@ class NewTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
-            CanPostTopic,
+            ForRequest(can_access_forum, request_forum),
+            ForRequest(can_post_topic, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to post a topic here"),
                 level="warning",
@@ -323,8 +330,7 @@ class EditTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            Or(CanPostTopic, IsAtleastModeratorInForum()),
-            CanEditPost,
+            ForRequest(can_edit_topic, request_topic),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that topic"),
                 level="warning",
@@ -373,7 +379,7 @@ class ManageForum(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            IsAtleastModeratorInForum(),
+            ForRequest(can_moderate, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to manage this forum"),
                 level="danger",
@@ -463,12 +469,7 @@ class ManageForum(MethodView):
             return
 
         new_forum = first_or_404(sa.select(Forum).where(Forum.id == new_forum_id))
-        if not Permission(
-            And(
-                IsAtleastModeratorInForum(forum_id=new_forum_id),
-                IsAtleastModeratorInForum(forum=forum_instance),
-            )
-        ):
+        if not Permission(And(can_moderate(new_forum), can_moderate(forum_instance))):
             flash(_("You do not have the permissions to move this topic."), "danger")
             return
 
@@ -482,8 +483,8 @@ class NewPost(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
-            CanPostReply,
+            ForRequest(can_access_forum, request_forum),
+            ForRequest(can_post_reply, request_topic),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to post a reply"),
                 level="warning",
@@ -532,7 +533,7 @@ class NewPost(MethodView):
 class EditPost(MethodView):
     decorators = [
         allows.requires(
-            CanEditPost,
+            ForRequest(can_edit_post, request_post),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to edit that post"),
                 level="danger",
@@ -712,7 +713,7 @@ class DeleteTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanDeleteTopic,
+            ForRequest(can_delete_topic, request_topic),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to delete this topic"),
                 level="danger",
@@ -731,7 +732,7 @@ class LockTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            IsAtleastModeratorInForum(),
+            ForRequest(can_moderate, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to lock this topic"),
                 level="danger",
@@ -751,7 +752,7 @@ class UnlockTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            IsAtleastModeratorInForum(),
+            ForRequest(can_moderate, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to unlock this topic"),
                 level="danger",
@@ -771,7 +772,7 @@ class HighlightTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            IsAtleastModeratorInForum(),
+            ForRequest(can_moderate, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to highlight this topic"),
                 level="danger",
@@ -791,7 +792,7 @@ class TrivializeTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            IsAtleastModeratorInForum(),
+            ForRequest(can_moderate, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to trivialize this topic"),
                 level="danger",
@@ -811,7 +812,7 @@ class DeletePost(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanDeletePost,
+            ForRequest(can_delete_post, request_post),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to delete this post"),
                 level="danger",
@@ -854,7 +855,7 @@ class RawPost(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
@@ -876,7 +877,7 @@ class MarkRead(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
@@ -954,7 +955,7 @@ class TrackTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
@@ -974,7 +975,7 @@ class UntrackTopic(MethodView):
     decorators = [
         login_required,
         allows.requires(
-            CanAccessForum(),
+            ForRequest(can_access_forum, request_forum),
             on_fail=FlashAndRedirect(
                 message=_("You are not allowed to access that forum"),
                 level="warning",
@@ -996,7 +997,7 @@ class HideTopic(MethodView):
     def post(self, topic_id: int, slug: str | None = None):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id))
 
-        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)):
+        if not Permission(Has("makehidden"), can_moderate(topic.forum)):
             flash(_("You do not have permission to hide this topic"), "danger")
             return redirect_or_reload(redirect_url(topic.url))
         topic.hide(user=current_user)
@@ -1012,7 +1013,7 @@ class UnhideTopic(MethodView):
 
     def post(self, topic_id: int, slug: str | None = None):
         topic = first_or_404(sa.select(Topic).where(Topic.id == topic_id), True)
-        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=topic.forum)):
+        if not Permission(Has("makehidden"), can_moderate(topic.forum)):
             flash(_("You do not have permission to unhide this topic"), "danger")
             return redirect_or_reload(redirect_url(topic.url))
         topic.unhide()
@@ -1026,7 +1027,7 @@ class HidePost(MethodView):
     def post(self, post_id: int):
         post = first_or_404(sa.select(Post).where(Post.id == post_id))
 
-        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)):
+        if not Permission(Has("makehidden"), can_moderate(post.topic.forum)):
             flash(_("You do not have permission to hide this post"), "danger")
             return redirect_or_reload(redirect_url(post.topic.url))
 
@@ -1053,7 +1054,7 @@ class UnhidePost(MethodView):
     def post(self, post_id: int):
         post = first_or_404(sa.select(Post).where(Post.id == post_id))
 
-        if not Permission(Has("makehidden"), IsAtleastModeratorInForum(forum=post.topic.forum)):
+        if not Permission(Has("makehidden"), can_moderate(post.topic.forum)):
             flash(_("You do not have permission to unhide this post"), "danger")
             return redirect_or_reload(redirect_url(post.topic.url))
 
