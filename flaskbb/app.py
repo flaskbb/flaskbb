@@ -17,7 +17,7 @@ import sys
 import time
 import warnings
 from collections.abc import Callable, Sequence
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 from email.utils import formataddr
 from typing import Any, cast
 
@@ -425,12 +425,15 @@ def configure_before_handlers(app: FlaskBB):
 
     @app.before_request
     def update_lastseen():
-        """Updates `lastseen` before every reguest if the user is
-        authenticated."""
-        if current_user.is_authenticated:
-            current_user.lastseen = time_utcnow()
-            db.session.add(current_user)
-            commit_without_expiring()
+        """Updates `lastseen` of the authenticated user."""
+        if not current_user.is_authenticated:
+            return
+        now = time_utcnow()
+        if current_user.lastseen and now - current_user.lastseen < timedelta(minutes=1):
+            return
+        current_user.lastseen = now
+        db.session.add(current_user)
+        commit_without_expiring()
 
     if app.config["REDIS_ENABLED"]:
 

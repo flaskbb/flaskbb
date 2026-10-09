@@ -28,7 +28,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import (
     aliased,
     backref,
-    joinedload,
     Mapped,
     mapped_column,
     Mapper,
@@ -814,12 +813,12 @@ class Topic(HideableMixin, BaseModel):
             read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
         # The tracker is disabled - abort
-        if read_cutoff is None or self.last_post is None:
+        if read_cutoff is None:
             logger.debug("Readtracker is disabled.")
             return False
 
         # Else the topic is still below the read_cutoff
-        elif read_cutoff > self.last_post.date_created:
+        elif read_cutoff > self.last_updated:
             logger.debug("Topic is below the read_cutoff (too old).")
             return False
 
@@ -828,12 +827,12 @@ class Topic(HideableMixin, BaseModel):
         if (
             forumsread
             and forumsread.cleared is not None
-            and forumsread.cleared >= self.last_post.date_created
+            and forumsread.cleared >= self.last_updated
         ):
             logger.debug("User has marked the forum as read. No new posts since then.")
             return False
 
-        if topicsread and topicsread.last_read >= self.last_post.date_created:
+        if topicsread and topicsread.last_read >= self.last_updated:
             logger.debug("The last post in this topic has already been read.")
             return False
 
@@ -1183,7 +1182,7 @@ class Forum(BaseModel):
     topic_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
     category: Mapped["Category"] = relationship(
-        "Category", back_populates="forums", foreign_keys=[category_id]
+        "Category", back_populates="forums", foreign_keys=[category_id], lazy="joined"
     )
 
     # One-to-one
@@ -1480,32 +1479,15 @@ class Forum(BaseModel):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        # the identity map answers this without a query when the request
+        # already loaded the forum, e.g. for its permission checks
+        forum = db.session.get(cls, forum_id)
+        if forum is None:
+            abort(404)
+
+        forumsread = None
         if user.is_authenticated:
-            item = db.session.execute(
-                sa.select(cls, ForumsRead)
-                .filter(cls.id == forum_id)
-                .options(joinedload(cls.category))
-                .outerjoin(
-                    ForumsRead,
-                    sa.and_(
-                        ForumsRead.forum_id == cls.id,
-                        ForumsRead.user_id == user.id,
-                    ),
-                )
-            ).first()
-            if not item:
-                abort(404)
-            forum, forumsread = item
-        else:
-            guest_forum = (
-                db.session.execute(sa.select(cls).filter(cls.id == forum_id))
-                .unique()
-                .scalar_one_or_none()
-            )
-            if not guest_forum:
-                abort(404)
-            forum = guest_forum
-            forumsread = None
+            forumsread = ForumsRead.get_for_user(user.id, forum_id)
 
         return forum, forumsread
 
@@ -1545,6 +1527,7 @@ class Forum(BaseModel):
                     ),
                 )
                 .outerjoin(Post, Topic.last_post_id == Post.id)
+                .options(selectinload(Post.user))
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
@@ -1589,6 +1572,7 @@ class Forum(BaseModel):
             guest_stmt = (
                 sa.select(Topic, Post)
                 .outerjoin(Post, Topic.last_post_id == Post.id)
+                .options(selectinload(Post.user))
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )

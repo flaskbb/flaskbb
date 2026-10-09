@@ -29,7 +29,7 @@ from flask_login import login_required
 from pluggy import HookimplMarker
 
 from flaskbb.core.app import FlaskBB
-from flaskbb.extensions import allows, db, pluggy
+from flaskbb.extensions import allows, cache, db, pluggy
 from flaskbb.forum.forms import (
     EditTopicForm,
     NewTopicForm,
@@ -120,23 +120,27 @@ def _post_url_in_topic(post: Post) -> str:
     return url_for("forum.view_topic", **url_kwargs)
 
 
+@cache.cached(timeout=60, key_prefix="board_statistics")
+def board_statistics():
+    """The board statistics cached for 60 seconds."""
+    return {
+        "user_count": db.session.scalar(sa.select(sa.func.count(User.id))),
+        "topic_count": db.session.scalar(sa.select(sa.func.count(Topic.id))),
+        "post_count": db.session.scalar(sa.select(sa.func.count(Post.id))),
+    }
+
+
 class ForumIndex(MethodView):
     def get(self):
         categories = Category.get_categories(user=real(current_user))
 
-        # Fetch a few stats about the forum
-        user_count = db.session.scalar(sa.select(sa.func.count(User.id)))
-        topic_count = db.session.scalar(sa.select(sa.func.count(Topic.id)))
-        post_count = db.session.scalar(sa.select(sa.func.count(Post.id)))
         newest_user = db.session.scalar(sa.select(User).order_by(User.id.desc()))
         online_users, online_guests = count_online_users()
 
         return render_template(
             "forum/index.html",
             categories=categories,
-            user_count=user_count,
-            topic_count=topic_count,
-            post_count=post_count,
+            **board_statistics(),
             newest_user=newest_user,
             online_users=online_users,
             online_guests=online_guests,
@@ -222,8 +226,8 @@ class ViewTopic(MethodView):
         # Fetch some information about the topic
         topic = Topic.get_topic(topic_id, True)
 
-        # Count the topic views
-        topic.views += 1
+        # incremented in SQL so concurrent views do not overwrite each other
+        topic.views = Topic.views + 1
         commit_without_expiring()
 
         # Update the topicsread status if the user hasn't read it
