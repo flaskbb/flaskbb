@@ -35,7 +35,7 @@ Unreleased
 - New hooks let plugins add buttons to the markdown editor toolbar. (#464)
 - Plugins can add a quote to the editor with `window.app.insertQuote(editor, markdown)`.
 - New `flaskbb_tpl_user_nav_menu` hook lets plugins add items to the user dropdown menu for both users and guests.
-- Moved the Portal and Conversations plugins to the `FlaskBB[plugins]` group along with a number of other official plugins.
+- `pip install FlaskBB[plugins]` installs the official plugins that aren't installed by default.
 
 
 #### Admin panel
@@ -58,7 +58,7 @@ Unreleased
 #### Improvements
 - htmx is now supported and used for various actions.
 - A full docker setup is now supported.
-- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb` and include all official plugins.
+- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`. The `-plugins` tags (e.g. `latest-plugins`) include all official plugins.
 - The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
 - Online users and guests are tracked with redis-py instead of `flask-redis`
 - Permissions are now declared in a registry instead of as columns of the groups table.

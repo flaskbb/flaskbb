@@ -25,6 +25,8 @@ dependencies = [
   "Flask-SQLAlchemy>=3.1.1",
   "Flask-Themes2>=1.0.1",
   "Flask-WTF>=1.3.0",
+  "flaskbb-plugin-conversations>=3.0.4",
+  "flaskbb-plugin-portal>=3.0.2",
   "Jinja2>=3.1.6",
   "MarkupSafe>=3.0.3",
   "mistune>=3.3.4",
@@ -79,10 +81,8 @@ mysql = [
   "pymysql>=1.2.0",
 ]
 plugins = [
-  "flaskbb-plugin-conversations>=3.0.4",
   "flaskbb-plugin-inviteonly>=1.0.1",
   "flaskbb-plugin-like>=1.0.1",
-  "flaskbb-plugin-portal>=3.0.2",
   "flaskbb-plugin-ranks>=1.0.2",
   "flaskbb-plugin-stopforumspam>=1.0.1",
   "flaskbb-plugin-test-mail>=0.3.1",
@@ -339,7 +339,6 @@ wheel_build_env = ".pkg"
 constrain_package_deps = true
 use_frozen_constraints = true
 dependency_groups = ["tests"]
-extras = ["plugins"]
 env_tmp_dir = "{toxworkdir}/tmp/{envname}"
 commands = [
     [

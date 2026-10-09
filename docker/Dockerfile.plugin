@@ -5,5 +5,5 @@ ARG FLASKBB_PLUGINS
 
 USER root
 RUN FLASKBB_BASE_VERSION="$(python -c 'from importlib.metadata import version; print(version("FlaskBB"))')" \
-    && uv pip install "flaskbb[plugins]==${FLASKBB_BASE_VERSION}" $FLASKBB_PLUGINS
+    && uv pip install "flaskbb==${FLASKBB_BASE_VERSION}" $FLASKBB_PLUGINS
 USER flaskbb

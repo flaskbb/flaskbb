@@ -139,7 +139,7 @@ Contributions of any size are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 before opening a pull request. The short version:
 
 ```bash
-uv sync --extra plugins
+uv sync
 make test
 make format
 ```

@@ -94,3 +94,25 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - id: meta-plugins
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: suffix=-plugins,onlatest=true
+          tags: |
+            type=pep440,pattern={{version}}
+            type=pep440,pattern={{major}}.{{minor}}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: docker
+          file: docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            FLASKBB_VERSION=${{ steps.meta.outputs.version }}
+            FLASKBB_EXTRAS=gunicorn,postgres,mysql,plugins
+          push: true
+          tags: ${{ steps.meta-plugins.outputs.tags }}
+          labels: ${{ steps.meta-plugins.outputs.labels }}
+          annotations: ${{ steps.meta-plugins.outputs.annotations }}
+          cache-from: type=gha,scope=plugins
+          cache-to: type=gha,mode=max,scope=plugins

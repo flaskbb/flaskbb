@@ -25,6 +25,7 @@ jobs:
     env:
       SECRET_KEY: smoke-test
       POSTGRES_PASSWORD: smoke-test
+      FLASKBB_PLUGINS: flaskbb-plugin-portal
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Validate Compose files

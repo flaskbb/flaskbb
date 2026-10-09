@@ -7,7 +7,7 @@ help: ## Displays this help message.
 
 dependencies:
 	@echo "Installing dependencies..."
-	@uv sync --extra plugins 1>/dev/null
+	@uv sync 1>/dev/null
 
 clean: ## Remove unwanted stuff such as __pycache__, etc...
 	find . -name '*.pyc' -exec rm -f {} +

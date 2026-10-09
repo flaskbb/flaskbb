@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile.plugin
       args:
         FLASKBB_IMAGE: ${FLASKBB_IMAGE:-ghcr.io/flaskbb/flaskbb:latest}
-        FLASKBB_PLUGINS: ${FLASKBB_PLUGINS:-}
+        FLASKBB_PLUGINS: ${FLASKBB_PLUGINS:?set FLASKBB_PLUGINS in docker/.env}
 
   celery:
     image: flaskbb:plugins

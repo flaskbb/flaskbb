@@ -30,9 +30,11 @@ RUN groupadd --gid 1000 flaskbb \
         "$VIRTUAL_ENV/var/flaskbb-instance" \
         /var/lib/flaskbb /var/lib/flaskbb/avatars /var/lib/flaskbb/attachments
 
+# the published -plugins images add the 'plugins' extra
+ARG FLASKBB_EXTRAS=gunicorn,postgres,mysql
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --allow-existing "$VIRTUAL_ENV" \
-    && uv pip install "/tmp/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl[gunicorn,postgres,mysql,plugins]"
+    && uv pip install "/tmp/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl[${FLASKBB_EXTRAS}]"
 
 WORKDIR /app
 

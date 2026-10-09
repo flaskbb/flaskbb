@@ -61,9 +61,7 @@ The web container checks its health by fetching a static file through the app
 (`healthcheck.py`), using `SERVER_NAME` or the first `TRUSTED_HOSTS` entry as
 the Host header. The Celery worker uses `celery inspect ping`.
 
-This image comes with `postgres`, `mysql` and `sqlite` drivers and all official
-plugins (`FlaskBB[plugins]`) pre-installed. The plugins stay disabled until you
-enable them.
+This image comes with `postgres`, `mysql` and `sqlite` drivers pre-installed.
 While all 3 are supported I have only tested `postgres` and `sqlite` myself!
 
 The Compose stack uses `ghcr.io/flaskbb/flaskbb:latest` by default. Set
@@ -74,10 +72,12 @@ use `down -v`, which removes the data volumes.
 
 Every release tag also publishes a prebuilt release image for linux/amd64
 and linux/arm64, tagged `<version>`, `<major>.<minor>` and `latest`
-(pre-releases only get `<version>`):
+(pre-releases only get `<version>`). The same tags with a `-plugins` suffix
+(`<version>-plugins`, `latest-plugins`, ...) contain all official plugins:
 
 ```bash
 docker pull ghcr.io/flaskbb/flaskbb:latest
+docker pull ghcr.io/flaskbb/flaskbb:latest-plugins
 ```
 
 The image runs without the docker-compose as well, it only needs a database,
@@ -94,8 +94,12 @@ docker run -d -p 8000:8000 -v flaskbb-storage:/var/lib/flaskbb \
 
 ## Plugins
 
-The release image already contains all official plugins. `Dockerfile.plugin`
-adds additional plugin packages on top of it. List the PyPI packages in `.env`:
+The `-plugins` images contain all official plugins, set `FLASKBB_IMAGE` in
+`.env` to one of them, e.g. `ghcr.io/flaskbb/flaskbb:latest-plugins`. The
+plugins stay disabled until you enable them.
+
+`Dockerfile.plugin` adds other plugin packages on top of `FLASKBB_IMAGE`.
+List the PyPI packages in `.env`:
 
 ```
 FLASKBB_PLUGINS="flaskbb-plugin-example another-flaskbb-plugin"
@@ -127,7 +131,8 @@ docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninst
 docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
 ```
 
-The prebuilt images on ghcr.io come with all official plugins.
+The prebuilt images on ghcr.io come with the portal and conversations plugins,
+the `-plugins` images with all official plugins.
 
 
 ### Updating a plugin image

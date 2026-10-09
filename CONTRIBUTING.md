@@ -27,7 +27,7 @@ us to figure out what went wrong.
 ## Contributing Code
 
 FlaskBB uses [uv][uv] to manage dependencies and run everything below. Once
-uv is installed, `uv sync --extra plugins` in the project root sets up a working dev
+uv is installed, `uv sync` in the project root sets up a working dev
 environment - no separate requirements file to install from.
 
   [uv]: https://docs.astral.sh/uv/
