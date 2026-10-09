@@ -1729,8 +1729,10 @@ class Category(BaseModel):
                             ForumsRead.user_id == user.id,
                         ),
                     )
-                    .add_columns(forum_alias)
-                    .add_columns(ForumsRead)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(Category.position, Category.id, forum_alias.position)
                 )
                 .unique()
@@ -1748,6 +1750,10 @@ class Category(BaseModel):
                 db.session.execute(
                     sa.select(cls, forum_alias)
                     .join(forum_alias, cls.id == forum_alias.category_id)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(Category.position, Category.id, forum_alias.position)
                 )
                 .unique()
@@ -1793,8 +1799,10 @@ class Category(BaseModel):
                             ForumsRead.user_id == user.id,
                         ),
                     )
-                    .add_columns(forum_alias)
-                    .add_columns(ForumsRead)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(forum_alias.position)
                 )
                 .unique()
@@ -1813,7 +1821,10 @@ class Category(BaseModel):
                     sa.select(cls, forum_alias)
                     .filter(cls.id == category_id)
                     .join(forum_alias, cls.id == forum_alias.category_id)
-                    .add_columns(forum_alias)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(forum_alias.position)
                 )
                 .unique()
