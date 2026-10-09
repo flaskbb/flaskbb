@@ -8,8 +8,6 @@ Prepares the database before FlaskBB starts, e.g. in a container entrypoint.
 :license: BSD, see LICENSE for more details.
 """
 
-import subprocess
-import sys
 import time
 
 import click
@@ -18,10 +16,9 @@ from flask.cli import with_appcontext
 from sqlalchemy.exc import OperationalError
 
 from flaskbb.cli.main import flaskbb
-from flaskbb.cli.utils import FlaskBBCLIError
+from flaskbb.cli.utils import FlaskBBCLIError, run_flaskbb
 from flaskbb.extensions import db
 from flaskbb.user.models import User
-from flaskbb.utils.proxies import current_app
 
 INSTALL_HINT = """\
 The database is empty and no administrator credentials were provided.
@@ -44,7 +41,7 @@ and ADMIN_PASSWORD), or install FlaskBB interactively with 'flaskbb install'."""
 @click.option(
     "--enable-plugins",
     default="",
-    help="Comma separated plugins to enable and install after a fresh installation.",
+    help="Comma separated plugins to enable and install after a fresh installation, or 'all'.",
 )
 @with_appcontext
 def bootstrap(
@@ -68,6 +65,7 @@ def bootstrap(
         # also applies the new migrations of every enabled plugin
         run_flaskbb("Migrating the database", "db", "upgrade")
     elif username and email and password:
+        plugins = ["--enable-plugins", enable_plugins] if enable_plugins else []
         run_flaskbb(
             "The database is empty, installing FlaskBB",
             "install",
@@ -78,17 +76,10 @@ def bootstrap(
             email,
             "--password",
             password,
+            *plugins,
         )
     else:
         raise FlaskBBCLIError(INSTALL_HINT, fg="red")
-
-    if installed:
-        return
-
-    names = [name.strip() for name in enable_plugins.split(",") if name.strip()]
-    for name in names:
-        run_flaskbb(f"Enabling plugin '{name}'", "plugins", "enable", name)
-        run_flaskbb(f"Installing plugin '{name}'", "plugins", "install", name)
 
 
 def wait_for_database(timeout: int):
@@ -112,19 +103,3 @@ def is_installed() -> bool:
         return False
     with db.engine.connect() as connection:
         return connection.scalar(sa.select(User.id).limit(1)) is not None
-
-
-def run_flaskbb(description: str, *args: str):
-    # Every step gets a fresh process: this app may have been created before
-    # the database was reachable, and a plugin is only loaded by an app that
-    # was created after it got enabled. The arguments aren't logged, they
-    # can contain the admin password.
-    options = ["--instance", current_app.instance_path]
-    if isinstance(current_app.config["CONFIG_PATH"], str):
-        options += ["--config", current_app.config["CONFIG_PATH"]]
-
-    click.secho(f"[+] {description}...", fg="cyan")
-    try:
-        subprocess.run([sys.executable, "-m", "flaskbb", *options, *args], check=True)
-    except subprocess.CalledProcessError as exc:
-        raise FlaskBBCLIError(f"{description} failed.", fg="red") from exc

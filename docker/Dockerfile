@@ -32,7 +32,7 @@ RUN groupadd --gid 1000 flaskbb \
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --allow-existing "$VIRTUAL_ENV" \
-    && uv pip install "/tmp/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl[gunicorn,postgres,mysql]"
+    && uv pip install "/tmp/flaskbb-${FLASKBB_VERSION}-py3-none-any.whl[gunicorn,postgres,mysql,plugins]"
 
 WORKDIR /app
 

@@ -61,7 +61,9 @@ The web container checks its health by fetching a static file through the app
 (`healthcheck.py`), using `SERVER_NAME` or the first `TRUSTED_HOSTS` entry as
 the Host header. The Celery worker uses `celery inspect ping`.
 
-This image comes with `postgres`, `mysql` and `sqlite` drivers pre-installed.
+This image comes with `postgres`, `mysql` and `sqlite` drivers and all official
+plugins (`FlaskBB[plugins]`) pre-installed. The plugins stay disabled until you
+enable them.
 While all 3 are supported I have only tested `postgres` and `sqlite` myself!
 
 The Compose stack uses `ghcr.io/flaskbb/flaskbb:latest` by default. Set
@@ -92,11 +94,11 @@ docker run -d -p 8000:8000 -v flaskbb-storage:/var/lib/flaskbb \
 
 ## Plugins
 
-`Dockerfile.plugin` adds plugin packages on top of the published FlaskBB image.
-List the PyPI packages in `.env`:
+The release image already contains all official plugins. `Dockerfile.plugin`
+adds additional plugin packages on top of it. List the PyPI packages in `.env`:
 
 ```
-FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
+FLASKBB_PLUGINS="flaskbb-plugin-example another-flaskbb-plugin"
 ```
 
 Build and start the derived image by applying the plugin Compose file after the
@@ -125,7 +127,7 @@ docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninst
 docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
 ```
 
-The prebuilt images on ghcr.io comes only with the portal and conversation plugins.
+The prebuilt images on ghcr.io come with all official plugins.
 
 
 ### Updating a plugin image

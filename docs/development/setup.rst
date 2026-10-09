@@ -40,10 +40,11 @@ Once ``uv`` is installed, set up the project's virtual environment and
 install all dependencies (including the development ones, e.g. pytest and
 ruff) with a single command run from the FlaskBB root folder::
 
-    $ uv sync
+    $ uv sync --extra plugins
 
 This creates a ``.venv`` folder and installs everything pinned in
-``uv.lock``, including the ``dev`` dependency group. From then on, prefix any
+``uv.lock``, including the ``dev`` dependency group and the official plugins,
+which the test suite needs. From then on, prefix any
 Python/FlaskBB command with ``uv run`` (e.g. ``uv run flaskbb run``) to have
 it execute inside that environment - or activate it directly with
 ``source .venv/bin/activate`` if you'd rather not type ``uv run`` every

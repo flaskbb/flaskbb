@@ -151,10 +151,11 @@ for whether a plugin is enabled. Container restarts do not change that state.
 Installing plugins
 ------------------
 
-Plugins must be installed in both the web and Celery images. Add their PyPI
-package names to ``docker/.env``::
+The release image contains all official plugins (``FlaskBB[plugins]``), they
+only need to be enabled. Additional plugins must be installed in both the web
+and Celery images. Add their PyPI package names to ``docker/.env``::
 
-    FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
+    FLASKBB_PLUGINS="flaskbb-plugin-example another-flaskbb-plugin"
 
 Build and start the plugin image with the Compose override::
 

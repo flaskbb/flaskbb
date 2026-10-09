@@ -511,8 +511,8 @@ def configure_migrations(app: FlaskBB):
 
     Blocked plugins are never imported, so they can't answer
     ``flaskbb_load_migrations``. Their migrations are looked up next to the
-    package instead, so the revisions they already applied (e.g. during
-    ``flaskbb install``) resolve. ``upgrade heads`` leaves out the disabled
+    package instead, so the revisions they already applied (e.g. before they
+    were disabled) resolve. ``upgrade heads`` leaves out the disabled
     ones, but not the enabled ones that are held back because of their
     pending migrations.
     """
@@ -639,9 +639,9 @@ def load_plugins(app: FlaskBB):
             "Database is not setup correctly or has not been setup yet.",
             exc_info=exc,
         )
-        # load plugins even though the database isn't setup correctly
-        # i.e. when creating the initial database and wanting to install
-        # the plugins migration as well
+        # no plugin is enabled before FlaskBB is installed, enabling one applies its migrations
+        for entry_point in importlib.metadata.entry_points(group="flaskbb_plugins"):
+            pluggy.set_blocked(entry_point.name)
         pluggy.load_setuptools_entrypoints("flaskbb_plugins")
         return
 

@@ -63,14 +63,13 @@ again as an "extraneous" package - re-run the ``uv pip install -e`` command
 above afterwards, or pass ``--inexact`` to ``uv sync`` to keep manually
 installed packages around.
 
-Developing the bundled Portal/Conversations plugins
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Developing the official plugins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-FlaskBB's own ``pyproject.toml`` already depends on ``flaskbb-plugin-portal``
-and ``flaskbb-plugin-conversations`` from PyPI. If you've also checked out
-their source, as siblings of FlaskBB (``../flaskbb-plugin-portal`` and
-``../flaskbb-plugin-conversations``), swap in editable installs of your
-local checkouts with::
+The official plugins are FlaskBB's ``plugins`` extra, ``uv sync --extra
+plugins`` installs them from PyPI. If you've also checked out their source
+as siblings of FlaskBB (e.g. ``../flaskbb-plugin-portal``), swap in editable
+installs of your local checkouts with::
 
     $ make dev-plugins
 
@@ -78,7 +77,7 @@ or directly::
 
     $ uv pip install -e ../flaskbb-plugin-portal -e ../flaskbb-plugin-conversations
 
-The same caveat as above applies - re-run this after any plain ``uv sync``.
+The same caveat as above applies - re-run this after any ``uv sync``.
 
 Verifying it's picked up
 ~~~~~~~~~~~~~~~~~~~~~~~~

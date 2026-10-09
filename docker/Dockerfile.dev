@@ -37,11 +37,11 @@ WORKDIR /app
 # Dependencies first, they change far less often than the source tree.
 COPY pyproject.toml uv.lock README.md /app/
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project --extra gunicorn --extra postgres --extra mysql
+    uv sync --frozen --no-install-project --extra gunicorn --extra postgres --extra mysql --extra plugins
 
 COPY --chown=flaskbb:flaskbb . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --extra gunicorn --extra postgres --extra mysql
+    uv sync --frozen --extra gunicorn --extra postgres --extra mysql --extra plugins
 
 COPY docker/healthcheck.py /usr/local/lib/flaskbb-docker/healthcheck.py
 COPY docker/entrypoint.sh /usr/local/bin/flaskbb-entrypoint
