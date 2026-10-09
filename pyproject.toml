@@ -80,6 +80,14 @@ postgres = [
 mysql = [
   "pymysql>=1.2.0",
 ]
+plugins = [
+  "flaskbb-plugin-inviteonly>=1.0.1",
+  "flaskbb-plugin-like>=1.0.1",
+  "flaskbb-plugin-ranks>=1.0.2",
+  "flaskbb-plugin-stopforumspam>=1.0.1",
+  "flaskbb-plugin-test-mail>=0.3.1",
+  "flaskbb-plugin-vote>=1.2.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/flaskbb/flaskbb"
