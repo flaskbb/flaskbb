@@ -11,7 +11,7 @@ It provides the models for the forum
 import logging
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import override, TYPE_CHECKING
+from typing import Any, override, TYPE_CHECKING
 
 import sqlalchemy as sa
 from flask import abort, url_for
@@ -1692,6 +1692,7 @@ class Category(BaseModel):
         # import Group model locally to avoid cicular imports
         from flaskbb.user.models import Group
 
+        forums: Sequence[sa.Row[*tuple[Any, ...]]]
         if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
@@ -1762,6 +1763,7 @@ class Category(BaseModel):
         """
         from flaskbb.user.models import Group
 
+        forums: Sequence[sa.Row[*tuple[Any, ...]]]
         if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
