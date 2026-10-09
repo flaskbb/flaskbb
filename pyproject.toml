@@ -66,6 +66,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
@@ -323,6 +324,7 @@ ignore_missing_imports = true
 
 [tool.tox]
 env_list = [
+    "py3.15",
     "py3.14",
     "py3.13",
     "py3.12",
