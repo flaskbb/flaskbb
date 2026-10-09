@@ -413,6 +413,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     default_conf: dict[str, bool | str | int] = {
         "is_debug": False,
         "server_name": "example.org",
+        "trusted_hosts": "None",
         "use_https": True,
         "database_uri": database_path,
         "redis_enabled": False,
@@ -443,6 +444,7 @@ def generate_config(development: bool, output: str | None, force: bool):
         default_conf["is_debug"] = True
         default_conf["use_https"] = False
         default_conf["server_name"] = "localhost:5000"
+        default_conf["trusted_hosts"] = '["localhost", "127.0.0.1"]'
         write_config(default_conf, config_template, config_path)
         sys.exit(0)
 
