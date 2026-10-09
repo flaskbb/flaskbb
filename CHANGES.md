@@ -35,6 +35,7 @@ Unreleased
 - New hooks let plugins add buttons to the markdown editor toolbar. (#464)
 - Plugins can add a quote to the editor with `window.app.insertQuote(editor, markdown)`.
 - New `flaskbb_tpl_user_nav_menu` hook lets plugins add items to the user dropdown menu for both users and guests.
+- `pip install FlaskBB[plugins]` installs the official plugins that aren't installed by default.
 
 
 #### Admin panel
@@ -52,15 +53,17 @@ Unreleased
 - New CLI commands manage users, groups and permissions. (#466)
 - `flaskbb plugins` can run plugin migrations.
 - `flaskbb upgrade` was removed. Migrations and plugin installs now handle setting fixtures.
+- `flaskbb install` no longer automatically install a plugin even though its disabled. Pass `--enable-plugins` to enable and installs plugins (or `all`) right after the installation.
 
 #### Improvements
 - htmx is now supported and used for various actions.
 - A full docker setup is now supported.
-- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`.
+- Release images are published to the GitHub Container Registry as `ghcr.io/flaskbb/flaskbb`. The `-plugins` tags (e.g. `latest-plugins`) include all official plugins.
 - The release docker-compose stack supports building images with additional plugins declared in `docker/.env`.
 - Online users and guests are tracked with redis-py instead of `flask-redis`
 - Permissions are now declared in a registry instead of as columns of the groups table.
   Plugins can add their own through the `flaskbb_load_permissions` hook.
+- Reduced the needed queries across FlaskBB and we leverage caching for a couple of more things
 
 ## Version 2.2.1
 

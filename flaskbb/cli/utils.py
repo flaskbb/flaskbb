@@ -12,6 +12,7 @@ commands.
 import importlib.metadata
 import os
 import re
+import subprocess
 import sys
 from collections.abc import Callable
 from typing import Any, IO, override
@@ -27,6 +28,7 @@ from flaskbb.extensions import db, pluggy
 from flaskbb.permissions import permission_registry
 from flaskbb.user.models import Group, User
 from flaskbb.utils.populate import create_user, update_user
+from flaskbb.utils.proxies import current_app
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
 
@@ -167,6 +169,34 @@ def get_version(ctx: click.Context, param: str | None, value: str | None) -> Non
         color=ctx.color,
     )
     ctx.exit()
+
+
+def plugin_names(ctx: click.Context, param: click.Parameter, value: str) -> list[str]:
+    """Parses a comma separated list of installed plugins, ``all`` selects every one."""
+    installed = sorted({ep.name for ep in importlib.metadata.entry_points(group="flaskbb_plugins")})
+    names = [name.strip() for name in value.split(",") if name.strip()]
+    if names == ["all"]:
+        return installed
+    unknown = [name for name in names if name not in installed]
+    if unknown:
+        raise click.BadParameter(f"not installed: {', '.join(unknown)}")
+    return names
+
+
+def run_flaskbb(description: str, *args: str):
+    # Every step gets a fresh process: this app may have been created before
+    # the database was reachable, and a plugin is only loaded by an app that
+    # was created after it got enabled. The arguments aren't logged, they
+    # can contain the admin password.
+    options = ["--instance", current_app.instance_path]
+    if isinstance(current_app.config["CONFIG_PATH"], str):
+        options += ["--config", current_app.config["CONFIG_PATH"]]
+
+    click.secho(f"[+] {description}...", fg="cyan")
+    try:
+        subprocess.run([sys.executable, "-m", "flaskbb", *options, *args], check=True)
+    except subprocess.CalledProcessError as exc:
+        raise FlaskBBCLIError(f"{description} failed.", fg="red") from exc
 
 
 def prompt_save_user(

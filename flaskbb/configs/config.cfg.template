@@ -22,6 +22,11 @@ TESTING = False
 # Example for the FlaskBB forums: SERVER_NAME = "forums.flaskbb.com"
 SERVER_NAME = "{{ server_name }}"
 
+# Hostnames accepted in the Host header. Defaults to [SERVER_NAME] when
+# left as None. Set it when FlaskBB is reachable under more than one name.
+# See https://flask.palletsprojects.com/en/stable/config/#TRUSTED_HOSTS
+TRUSTED_HOSTS = {{ trusted_hosts }}
+
 # Prefer HTTPS over HTTP
 PREFERRED_URL_SCHEME = {% if use_https %}"https"{% else %}"http"{%endif%}
 

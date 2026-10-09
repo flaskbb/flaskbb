@@ -85,9 +85,12 @@ will be run.
 
     The password of the user.
 
-.. describe:: --no-plugins, -n
+.. describe:: --enable-plugins NAMES
 
-    Don't run the migrations for the default plugins.
+    Comma separated names of plugins to enable and install after the
+    installation, or ``all`` for every installed plugin. Each plugin is
+    enabled, which applies its migrations, and then installed in its own
+    process. Without this option all plugins stay disabled.
 
 ``flaskbb bootstrap``
 ~~~~~~~~~~~~~~~~~~~~~
@@ -126,7 +129,8 @@ that variable.
 .. describe:: --enable-plugins NAMES
 
     Comma separated names of plugins to enable and install when creating a new
-    installation, as listed by ``flaskbb plugins list``. This option is ignored
+    installation, as listed by ``flaskbb plugins list``, or ``all``. It is
+    passed on to ``flaskbb install --enable-plugins``. This option is ignored
     when the database is already installed; use ``flaskbb plugins enable`` and
     ``flaskbb plugins disable`` to change an existing installation.
 

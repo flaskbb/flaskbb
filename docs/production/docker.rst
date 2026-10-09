@@ -113,7 +113,8 @@ to the FlaskBB containers. Common options include:
 
 ``FLASKBB_IMAGE``
     The image tag to deploy. Pin a release such as
-    ``ghcr.io/flaskbb/flaskbb:3.0.0`` for reproducible upgrades.
+    ``ghcr.io/flaskbb/flaskbb:3.0.0`` for reproducible upgrades. The
+    ``-plugins`` tags, e.g. ``3.0.0-plugins``, contain all official plugins.
 
 ``WEB_CONCURRENCY``
     The number of Gunicorn worker processes. The default is ``4``.
@@ -151,10 +152,14 @@ for whether a plugin is enabled. Container restarts do not change that state.
 Installing plugins
 ------------------
 
-Plugins must be installed in both the web and Celery images. Add their PyPI
-package names to ``docker/.env``::
+The ``-plugins`` release images (e.g. ``ghcr.io/flaskbb/flaskbb:latest-plugins``)
+contain all official plugins. Set ``FLASKBB_IMAGE`` to one of them and enable
+the plugins you want.
 
-    FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
+Other plugins must be installed in both the web and Celery images. Add their
+PyPI package names to ``docker/.env``::
+
+    FLASKBB_PLUGINS="flaskbb-plugin-example another-flaskbb-plugin"
 
 Build and start the plugin image with the Compose override::
 

@@ -72,10 +72,12 @@ use `down -v`, which removes the data volumes.
 
 Every release tag also publishes a prebuilt release image for linux/amd64
 and linux/arm64, tagged `<version>`, `<major>.<minor>` and `latest`
-(pre-releases only get `<version>`):
+(pre-releases only get `<version>`). The same tags with a `-plugins` suffix
+(`<version>-plugins`, `latest-plugins`, ...) contain all official plugins:
 
 ```bash
 docker pull ghcr.io/flaskbb/flaskbb:latest
+docker pull ghcr.io/flaskbb/flaskbb:latest-plugins
 ```
 
 The image runs without the docker-compose as well, it only needs a database,
@@ -92,11 +94,15 @@ docker run -d -p 8000:8000 -v flaskbb-storage:/var/lib/flaskbb \
 
 ## Plugins
 
-`Dockerfile.plugin` adds plugin packages on top of the published FlaskBB image.
+The `-plugins` images contain all official plugins, set `FLASKBB_IMAGE` in
+`.env` to one of them, e.g. `ghcr.io/flaskbb/flaskbb:latest-plugins`. The
+plugins stay disabled until you enable them.
+
+`Dockerfile.plugin` adds other plugin packages on top of `FLASKBB_IMAGE`.
 List the PyPI packages in `.env`:
 
 ```
-FLASKBB_PLUGINS="flaskbb-plugin-portal flaskbb-plugin-conversations"
+FLASKBB_PLUGINS="flaskbb-plugin-example another-flaskbb-plugin"
 ```
 
 Build and start the derived image by applying the plugin Compose file after the
@@ -125,7 +131,8 @@ docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninst
 docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
 ```
 
-The prebuilt images on ghcr.io comes only with the portal and conversation plugins.
+The prebuilt images on ghcr.io come with the portal and conversations plugins,
+the `-plugins` images with all official plugins.
 
 
 ### Updating a plugin image

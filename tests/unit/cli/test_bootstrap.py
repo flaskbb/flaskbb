@@ -43,17 +43,11 @@ def test_migrates_installed_database(cli_runner, user, steps):
     assert steps == [("db", "upgrade")]
 
 
-def test_enables_plugins_after_initial_install(cli_runner, database, steps):
+def test_passes_plugins_to_the_install(cli_runner, database, steps):
     result = cli_runner.invoke(bootstrap, [*ADMIN, "--enable-plugins", "portal, vote,"])
 
     assert result.exit_code == 0, result.output
-    assert steps == [
-        ("install", "--force", *ADMIN),
-        ("plugins", "enable", "portal"),
-        ("plugins", "install", "portal"),
-        ("plugins", "enable", "vote"),
-        ("plugins", "install", "vote"),
-    ]
+    assert steps == [("install", "--force", *ADMIN, "--enable-plugins", "portal, vote,")]
 
 
 def test_does_not_enable_plugins_on_later_bootstrap(cli_runner, user, steps):

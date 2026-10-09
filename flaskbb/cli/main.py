@@ -24,8 +24,10 @@ from flaskbb.app import create_app
 from flaskbb.cli.utils import (
     EmailType,
     get_version,
+    plugin_names,
     prompt_config_path,
     prompt_save_user,
+    run_flaskbb,
     write_config,
 )
 from flaskbb.core.exceptions import ConfigNotFoundError
@@ -157,11 +159,10 @@ def flaskbb(ctx: click.Context):
 @click.option("--email", "-e", type=EmailType(), help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
 @click.option(
-    "--no-plugins",
-    "-n",
-    default=False,
-    is_flag=True,
-    help="Don't run the migrations for the default plugins.",
+    "--enable-plugins",
+    default="",
+    callback=plugin_names,
+    help="Comma separated plugins to enable and install after the installation, or 'all'.",
 )
 @with_appcontext
 def install(
@@ -170,7 +171,7 @@ def install(
     username: str | None,
     email: str | None,
     password: str | None,
-    no_plugins: bool,
+    enable_plugins: list[str],
 ):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
@@ -209,9 +210,8 @@ def install(
         click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
 
-    if not no_plugins:
-        click.secho("[+] Installing default plugins...", fg="cyan")
-        run_plugin_migrations()
+    # only the plugins enabled in a replaced database are loaded, create_all made their tables too
+    run_plugin_migrations()
 
     # installed packages ship them, only source checkouts have to compile
     if not translations_are_compiled():
@@ -219,6 +219,10 @@ def install(
         compile_translations()
 
     click.secho("[+] FlaskBB has been successfully installed!", fg="green", bold=True)
+
+    for name in enable_plugins:
+        run_flaskbb(f"Enabling plugin '{name}'", "plugins", "enable", name)
+        run_flaskbb(f"Installing plugin '{name}'", "plugins", "install", name)
 
 
 @flaskbb.command()
@@ -413,6 +417,7 @@ def generate_config(development: bool, output: str | None, force: bool):
     default_conf: dict[str, bool | str | int] = {
         "is_debug": False,
         "server_name": "example.org",
+        "trusted_hosts": "None",
         "use_https": True,
         "database_uri": database_path,
         "redis_enabled": False,
@@ -443,6 +448,7 @@ def generate_config(development: bool, output: str | None, force: bool):
         default_conf["is_debug"] = True
         default_conf["use_https"] = False
         default_conf["server_name"] = "localhost:5000"
+        default_conf["trusted_hosts"] = '["localhost", "127.0.0.1"]'
         write_config(default_conf, config_template, config_path)
         sys.exit(0)
 

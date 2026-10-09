@@ -11,7 +11,7 @@ It provides the models for the forum
 import logging
 from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import override, TYPE_CHECKING
+from typing import Any, override, TYPE_CHECKING
 
 import sqlalchemy as sa
 from flask import abort, url_for
@@ -28,7 +28,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import (
     aliased,
     backref,
-    joinedload,
     Mapped,
     mapped_column,
     Mapper,
@@ -125,7 +124,7 @@ class TopicsRead(BaseModel):
     )
     user: Mapped["User"] = relationship("User", uselist=False, foreign_keys=[user_id])
     topic_id: Mapped[int] = mapped_column(
-        ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True
+        ForeignKey("topics.id", ondelete="CASCADE"), primary_key=True, index=True
     )
     topic: Mapped["Topic"] = relationship(uselist=False, foreign_keys=[topic_id])
     forum_id: Mapped[int] = mapped_column(
@@ -305,13 +304,14 @@ def _discard_pending_unlinks(session: Session) -> None:  # pyright: ignore[repor
 @make_comparable
 class Post(HideableMixin, BaseModel):
     __tablename__ = "posts"
+    __table_args__ = (sa.Index("ix_posts_topic_id_id", "topic_id", "id"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     topic_id: Mapped[int | None] = mapped_column(
         ForeignKey("topics.id", ondelete="CASCADE", use_alter=True),
         nullable=True,  # we sure this should be nullable?
     )
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     date_created: Mapped[datetime] = mapped_column(
@@ -618,13 +618,18 @@ class Post(HideableMixin, BaseModel):
 @make_comparable
 class Topic(HideableMixin, BaseModel):
     __tablename__ = "topics"
+    __table_args__ = (
+        sa.Index(
+            "ix_topics_forum_id_important_last_updated", "forum_id", "important", "last_updated"
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     forum_id: Mapped[int] = mapped_column(
         ForeignKey("forums.id", ondelete="CASCADE"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     username: Mapped[str] = mapped_column(String(200), nullable=False)
     date_created: Mapped[datetime] = mapped_column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
@@ -641,7 +646,7 @@ class Topic(HideableMixin, BaseModel):
 
     # One-to-one (uselist=False) relationship between first_post and topic
     first_post_id: Mapped[int | None] = mapped_column(
-        ForeignKey("posts.id", ondelete="CASCADE"), nullable=True
+        ForeignKey("posts.id", ondelete="CASCADE"), nullable=True, index=True
     )
     first_post: Mapped["Post | None"] = relationship(
         "Post",
@@ -651,7 +656,9 @@ class Topic(HideableMixin, BaseModel):
     )
 
     # One-to-one
-    last_post_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True)
+    last_post_id: Mapped[int | None] = mapped_column(
+        ForeignKey("posts.id"), nullable=True, index=True
+    )
 
     last_post: Mapped["Post | None"] = relationship(
         "Post",
@@ -806,12 +813,12 @@ class Topic(HideableMixin, BaseModel):
             read_cutoff = time_utcnow() - timedelta(days=flaskbb_config["TRACKER_LENGTH"])
 
         # The tracker is disabled - abort
-        if read_cutoff is None or self.last_post is None:
+        if read_cutoff is None:
             logger.debug("Readtracker is disabled.")
             return False
 
         # Else the topic is still below the read_cutoff
-        elif read_cutoff > self.last_post.date_created:
+        elif read_cutoff > self.last_updated:
             logger.debug("Topic is below the read_cutoff (too old).")
             return False
 
@@ -820,12 +827,12 @@ class Topic(HideableMixin, BaseModel):
         if (
             forumsread
             and forumsread.cleared is not None
-            and forumsread.cleared >= self.last_post.date_created
+            and forumsread.cleared >= self.last_updated
         ):
             logger.debug("User has marked the forum as read. No new posts since then.")
             return False
 
-        if topicsread and topicsread.last_read >= self.last_post.date_created:
+        if topicsread and topicsread.last_read >= self.last_updated:
             logger.debug("The last post in this topic has already been read.")
             return False
 
@@ -1175,7 +1182,7 @@ class Forum(BaseModel):
     topic_count: Mapped[int] = mapped_column(default=0, nullable=False)
 
     category: Mapped["Category"] = relationship(
-        "Category", back_populates="forums", foreign_keys=[category_id]
+        "Category", back_populates="forums", foreign_keys=[category_id], lazy="joined"
     )
 
     # One-to-one
@@ -1472,32 +1479,15 @@ class Forum(BaseModel):
         :param user: The user object is needed to check if we also need their
                      forumsread object.
         """
+        # the identity map answers this without a query when the request
+        # already loaded the forum, e.g. for its permission checks
+        forum = db.session.get(cls, forum_id)
+        if forum is None:
+            abort(404)
+
+        forumsread = None
         if user.is_authenticated:
-            item = db.session.execute(
-                sa.select(cls, ForumsRead)
-                .filter(cls.id == forum_id)
-                .options(joinedload(cls.category))
-                .outerjoin(
-                    ForumsRead,
-                    sa.and_(
-                        ForumsRead.forum_id == cls.id,
-                        ForumsRead.user_id == user.id,
-                    ),
-                )
-            ).first()
-            if not item:
-                abort(404)
-            forum, forumsread = item
-        else:
-            guest_forum = (
-                db.session.execute(sa.select(cls).filter(cls.id == forum_id))
-                .unique()
-                .scalar_one_or_none()
-            )
-            if not guest_forum:
-                abort(404)
-            forum = guest_forum
-            forumsread = None
+            forumsread = ForumsRead.get_for_user(user.id, forum_id)
 
         return forum, forumsread
 
@@ -1537,6 +1527,7 @@ class Forum(BaseModel):
                     ),
                 )
                 .outerjoin(Post, Topic.last_post_id == Post.id)
+                .options(selectinload(Post.user))
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
@@ -1581,6 +1572,7 @@ class Forum(BaseModel):
             guest_stmt = (
                 sa.select(Topic, Post)
                 .outerjoin(Post, Topic.last_post_id == Post.id)
+                .options(selectinload(Post.user))
                 .where(Topic.forum_id == forum_id)
                 .order_by(Topic.important.desc(), Topic.last_updated.desc())
             )
@@ -1700,6 +1692,7 @@ class Category(BaseModel):
         # import Group model locally to avoid cicular imports
         from flaskbb.user.models import Group
 
+        forums: Sequence[sa.Row[*tuple[Any, ...]]]
         if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
@@ -1721,8 +1714,10 @@ class Category(BaseModel):
                             ForumsRead.user_id == user.id,
                         ),
                     )
-                    .add_columns(forum_alias)
-                    .add_columns(ForumsRead)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(Category.position, Category.id, forum_alias.position)
                 )
                 .unique()
@@ -1740,6 +1735,10 @@ class Category(BaseModel):
                 db.session.execute(
                     sa.select(cls, forum_alias)
                     .join(forum_alias, cls.id == forum_alias.category_id)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(Category.position, Category.id, forum_alias.position)
                 )
                 .unique()
@@ -1764,6 +1763,7 @@ class Category(BaseModel):
         """
         from flaskbb.user.models import Group
 
+        forums: Sequence[sa.Row[*tuple[Any, ...]]]
         if user.is_authenticated:
             # get list of user group ids
             user_groups = [gr.id for gr in user.groups]
@@ -1785,8 +1785,10 @@ class Category(BaseModel):
                             ForumsRead.user_id == user.id,
                         ),
                     )
-                    .add_columns(forum_alias)
-                    .add_columns(ForumsRead)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(forum_alias.position)
                 )
                 .unique()
@@ -1805,7 +1807,10 @@ class Category(BaseModel):
                     sa.select(cls, forum_alias)
                     .filter(cls.id == category_id)
                     .join(forum_alias, cls.id == forum_alias.category_id)
-                    .add_columns(forum_alias)
+                    .options(
+                        selectinload(forum_alias.groups),
+                        selectinload(forum_alias.moderators),
+                    )
                     .order_by(forum_alias.position)
                 )
                 .unique()

@@ -17,7 +17,7 @@ import sys
 import time
 import warnings
 from collections.abc import Callable, Sequence
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 from email.utils import formataddr
 from typing import Any, cast
 
@@ -425,12 +425,15 @@ def configure_before_handlers(app: FlaskBB):
 
     @app.before_request
     def update_lastseen():
-        """Updates `lastseen` before every reguest if the user is
-        authenticated."""
-        if current_user.is_authenticated:
-            current_user.lastseen = time_utcnow()
-            db.session.add(current_user)
-            commit_without_expiring()
+        """Updates `lastseen` of the authenticated user."""
+        if not current_user.is_authenticated:
+            return
+        now = time_utcnow()
+        if current_user.lastseen and now - current_user.lastseen < timedelta(minutes=1):
+            return
+        current_user.lastseen = now
+        db.session.add(current_user)
+        commit_without_expiring()
 
     if app.config["REDIS_ENABLED"]:
 
@@ -508,8 +511,8 @@ def configure_migrations(app: FlaskBB):
 
     Blocked plugins are never imported, so they can't answer
     ``flaskbb_load_migrations``. Their migrations are looked up next to the
-    package instead, so the revisions they already applied (e.g. during
-    ``flaskbb install``) resolve. ``upgrade heads`` leaves out the disabled
+    package instead, so the revisions they already applied (e.g. before they
+    were disabled) resolve. ``upgrade heads`` leaves out the disabled
     ones, but not the enabled ones that are held back because of their
     pending migrations.
     """
@@ -636,9 +639,9 @@ def load_plugins(app: FlaskBB):
             "Database is not setup correctly or has not been setup yet.",
             exc_info=exc,
         )
-        # load plugins even though the database isn't setup correctly
-        # i.e. when creating the initial database and wanting to install
-        # the plugins migration as well
+        # no plugin is enabled before FlaskBB is installed, enabling one applies its migrations
+        for entry_point in importlib.metadata.entry_points(group="flaskbb_plugins"):
+            pluggy.set_blocked(entry_point.name)
         pluggy.load_setuptools_entrypoints("flaskbb_plugins")
         return
 

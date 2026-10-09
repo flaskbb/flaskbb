@@ -1,5 +1,4 @@
 import importlib.util
-import os
 import sys
 from importlib.metadata import EntryPoint
 from pathlib import Path
@@ -13,7 +12,7 @@ from flask_alembic import Alembic as FlaskAlembic
 from flaskbb.app import configure_migrations
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.permissions import PermissionLevel
-from flaskbb.plugins.utils import plugins_with_pending_migrations
+from flaskbb.plugins.utils import plugin_migrations_dir, plugins_with_pending_migrations
 
 
 def _load_migration(filename):
@@ -22,6 +21,13 @@ def _load_migration(filename):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_installing_flaskbb_leaves_out_the_plugins(database):
+    # like 'flaskbb install', the test app is created before its database
+    assert pluggy.get_plugin("conversations") is None
+    assert "conversations" in pluggy.get_disabled_plugins()
+    assert not sa.inspect(db.engine).has_table("conversations")
 
 
 def test_disabled_plugin_migrations_are_loaded_without_importing_the_plugin(
@@ -125,7 +131,8 @@ def test_held_back_plugin_migrations_run_with_upgrade_heads(
 
 
 def test_upgrade_heads_leaves_out_disabled_plugin_migrations(application, monkeypatch):
-    migrations = os.path.join(pluggy.get_plugin_path("conversations"), "migrations")
+    conversations = next(ep for ep in pluggy.list_disabled_plugins() if ep.name == "conversations")
+    migrations = plugin_migrations_dir(conversations)
     monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [migrations])
     planned = []
     monkeypatch.setattr(
@@ -200,7 +207,8 @@ def test_attachment_filename_index_matches_the_migration(database):
 
 @pytest.fixture
 def second_plugin_branch(application, monkeypatch, pending_plugin):
-    monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: [pending_plugin])
+    disabled = [*pluggy.list_disabled_plugins(), pending_plugin]
+    monkeypatch.setattr(pluggy, "list_disabled_plugins", lambda: disabled)
     monkeypatch.setitem(application.config, "ALEMBIC", dict(application.config["ALEMBIC"]))
     monkeypatch.setitem(application.config, "MIGRATIONS_DISABLED_VERSION_LOCATIONS", [])
     configure_migrations(application)
