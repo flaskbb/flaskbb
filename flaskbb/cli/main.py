@@ -41,7 +41,6 @@ from flaskbb.utils.populate import (
     create_test_data,
     create_welcome_forum,
     insert_bulk_data,
-    run_plugin_migrations,
 )
 from flaskbb.utils.proxies import current_app
 from flaskbb.utils.translations import compile_translations, translations_are_compiled
@@ -210,9 +209,6 @@ def install(
         click.secho("[+] Creating welcome forum...", fg="cyan")
         create_welcome_forum()
 
-    # only the plugins enabled in a replaced database are loaded, create_all made their tables too
-    run_plugin_migrations()
-
     # installed packages ship them, only source checkouts have to compile
     if not translations_are_compiled():
         click.secho("[+] Compiling translations...", fg="cyan")
@@ -254,7 +250,6 @@ def populate(bulk_data: bool, test_data: bool, posts: int, topics: int, force: b
     if initdb:
         click.secho("[+] Initializing database...", fg="cyan")
         create_latest_db()
-        run_plugin_migrations()
 
     if test_data:
         click.secho("[+] Adding some test data...", fg="cyan")

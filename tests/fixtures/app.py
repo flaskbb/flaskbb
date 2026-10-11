@@ -2,16 +2,35 @@ import pytest
 from flask import g
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
-from flaskbb.extensions import cache, db
+from flaskbb.extensions import cache, db, pluggy
 from flaskbb.permissions import permission_manager
 from flaskbb.utils.database import drop_all
 from flaskbb.utils.populate import create_default_groups, create_default_settings
 
 
+@pytest.fixture(scope="package")
+def tested_plugins():
+    """Entry point names of the plugins the test app loads.
+
+    The app is created before its database, so like 'flaskbb install' it
+    blocks every plugin. A plugin's test suite overrides this with its own
+    name in its conftest.
+    """
+    return []
+
+
 @pytest.fixture(scope="package", autouse=True)
-def application():
+def application(tested_plugins):
     """application with context."""
-    app = create_app(Config)
+    set_blocked = pluggy.set_blocked
+
+    def block_untested(name):
+        if name not in tested_plugins:
+            set_blocked(name)
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(pluggy, "set_blocked", block_untested)
+        app = create_app(Config)
     app.config.update(
         {
             "TESTING": True,

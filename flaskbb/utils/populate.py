@@ -314,13 +314,23 @@ def create_latest_db(target: str = "default@head"):
     The revision will be set to 'head' which indicates the latest alembic
     revision.
 
+    The loaded plugins, e.g. the ones enabled in a replaced database, have
+    their tables created as well, so their branches are stamped too. Not
+    ``heads``, it includes the branches of the disabled plugins.
+
     :param target: The target branch. Defaults to 'default@head'.
     """
     if not database_exists(db.engine.url):
         create_database(db.engine.url)
 
     db.create_all()
-    alembic.stamp(target=target)
+    plugins = {pluggy.get_name(plugin) for plugin in pluggy.get_external_plugins()}
+    plugin_heads = [
+        script.revision
+        for script in alembic.script_directory.get_revisions("heads")
+        if not plugins.isdisjoint(script.branch_labels)
+    ]
+    alembic.stamp(target=[target, *plugin_heads])
 
 
 def has_migrations(plugin: Any):

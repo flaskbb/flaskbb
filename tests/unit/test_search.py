@@ -443,10 +443,6 @@ def test_create_all_builds_sqlite_fts_schema(application):
         assert "posts_fts" in tables
         assert "posts_ai" in triggers
     finally:
-        migration = _load_fts_migration()
-        for statement in migration.sqlite_downgrade_sql():
-            db.session.execute(text(statement))
-        db.session.commit()
         drop_all()
         del application.config["SEARCH_BACKEND"]
 

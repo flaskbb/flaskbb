@@ -218,19 +218,28 @@ def try_commit(session: Session | scoped_session[Session], message: str = "Error
 
 
 def drop_all():
-    """Drops every table.
-
-    SQLite cannot DROP tables whose foreign keys are mutually dependent.
-    `defer_foreign_keys`` is needed since ``foreign_keys`` is a no-op while a transaction is open.
+    """Drops every table in the database, not only those in ``db.metadata``.
+    The tables of plugins that aren't loaded and ``alembic_version`` would
+    otherwise survive a reinstall, along with their rows and revisions.
     """
-    if db.engine.dialect.name != "sqlite":
-        db.drop_all()
-        return
-
+    db.session.close()
+    metadata = sa.MetaData()
     with db.engine.connect() as connection:
+        if connection.dialect.name != "sqlite":
+            metadata.reflect(bind=connection)
+            metadata.drop_all(bind=connection)
+            connection.commit()
+            return
+
         connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
-        connection.exec_driver_sql("PRAGMA defer_foreign_keys=ON")
-        db.metadata.drop_all(bind=connection)
+        tables = connection.exec_driver_sql(
+            "SELECT name FROM sqlite_master WHERE type = 'table' "
+            "AND name NOT LIKE 'sqlite~_%' ESCAPE '~' "
+            "ORDER BY sql LIKE 'CREATE VIRTUAL TABLE%' DESC"
+        ).scalars()
+        for name in tables.all():
+            # a virtual table, like the FTS index, takes its shadow tables with it
+            connection.execute(sa.schema.DropTable(sa.Table(name, metadata), if_exists=True))
         connection.commit()
 
         # the connection goes back to the pool afterwards, where the connect

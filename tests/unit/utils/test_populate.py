@@ -1,8 +1,11 @@
+import sqlalchemy as sa
+from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.fixtures.groups import fixture as group_fixture
 from flaskbb.forum.models import Category, Post, Topic
 from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.populate import (
     create_default_groups,
+    create_latest_db,
     create_test_data,
     create_user,
     create_welcome_forum,
@@ -60,3 +63,19 @@ def test_create_default_groups(database):
 
         for attribute, value in attributes.items():
             assert getattr(group, attribute) == value
+
+
+def test_create_latest_db_stamps_the_loaded_plugins(database, monkeypatch):
+    """create_all makes the tables of the loaded plugins, so their migrations
+    must not run again, but those of the disabled plugins still have to.
+    """
+    monkeypatch.setattr(pluggy, "get_external_plugins", lambda: {"conversations"})
+    monkeypatch.setattr(pluggy, "get_name", lambda plugin: plugin)
+
+    create_latest_db()
+
+    revisions = db.session.execute(sa.text("SELECT version_num FROM alembic_version"))
+    assert set(revisions.scalars()) == {
+        script.revision
+        for script in alembic.script_directory.get_revisions(("default@head", "conversations@head"))
+    }
