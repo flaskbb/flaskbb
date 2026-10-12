@@ -1,17 +1,25 @@
 {% extends theme("layout.html") %}
 {% set page_title = _("Online Users") %}
 
-{% block header %}{% endblock %}
-
-{% block navigation %}{% endblock %}
-
 {% block content %}
+    <div class="page-view">
+        <ol class="breadcrumb flaskbb-breadcrumb bg-light">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+            <li class="breadcrumb-item active">{% trans %}Online Users{% endtrans %}</li>
+        </ol>
 
-    <legend>{% trans %}Online Users{% endtrans %}</legend>
-    {% for user in online_users %}
-        <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a>{% if not loop.last %}, {% endif %}
-    {% endfor %}
-
+        <div class="card page">
+            <div class="card-header page-header">{% trans %}Online Users{% endtrans %}</div>
+            <div class="card-body">
+                {# the index page loads this into its who-is-online dialog #}
+                <div id="online-users">
+                    {% for user in online_users %}
+                        <a href="{{ url_for('user.profile', username=user.username) }}">{{ user.username }}</a>{% if not loop.last %}, {% endif %}
+                    {% else %}
+                        {% trans %}No registered users online.{% endtrans %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
-
-{% block footer %}{% endblock %}

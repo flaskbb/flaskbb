@@ -10,8 +10,11 @@
         <div class="card page mt-3">
             <div class="card-header page-header">
                 {% trans %}Board Statistics{% endtrans %}
-                [<a href="{{ url_for('forum.who_is_online') }}"
-   onclick="window.open(this.href, 'wio_window','width=500,height=500'); return false;">{% trans %}Who is online?{% endtrans %}</a>]
+                [
+                <a href="{{ url_for('forum.who_is_online') }}"
+                   data-bs-toggle="modal"
+                   data-bs-target="#online-users-dialog">{% trans %}Who is online?{% endtrans %}</a>
+                ]
             </div>
             <div class="card-body page-body">
                 <div class="row page-row">
@@ -32,4 +35,21 @@
         </div>
     </div>
     {{ run_hook("flaskbb_tpl_index_after") }}
+
+    <div class="modal fade" id="online-users-dialog" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{% trans %}Online Users{% endtrans %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                {# fetched every time the dialog opens, so the list is current #}
+                <div class="modal-body"
+                     hx-get="{{ url_for('forum.who_is_online') }}"
+                     hx-trigger="show.bs.modal from:closest .modal"
+                     hx-select="#online-users"
+                     hx-swap="innerHTML ignoreTitle:true"></div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
