@@ -15,7 +15,7 @@ from flask_babelplus import gettext as _
 from ...core.auth.activation import AccountActivator as _AccountActivator
 from ...core.exceptions import ValidationError
 from ...core.tokens import Token, TokenActions, TokenError, TokenSerializer
-from ...email import send_activation_token
+from ...email import delay_or_run, send_activation_token
 from ...extensions import db
 from ...user.models import User
 
@@ -44,7 +44,7 @@ class AccountActivator(_AccountActivator):
             Token(user_id=user.id, operation=TokenActions.ACTIVATE_ACCOUNT)
         )
 
-        send_activation_token.delay(token=token, username=user.username, email=user.email)  # pyright: ignore[reportUnknownMemberType]
+        delay_or_run(send_activation_token, token=token, username=user.username, email=user.email)
 
     @override
     def activate_account(self, token: str):

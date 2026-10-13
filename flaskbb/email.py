@@ -16,6 +16,7 @@ from celery import Task
 from flask import render_template
 from flask_babelplus import lazy_gettext as _
 from flask_mail import Message
+from kombu.exceptions import OperationalError
 
 from flaskbb.extensions import celery, mail
 
@@ -25,8 +26,25 @@ logger = logging.getLogger(__name__)
 def task(fn: Callable[..., None]) -> Task:
     """``celery.task`` is untyped, so a function decorated with it keeps its
     plain function type and ``.delay()`` is invisible to the type checker.
+
+    Results are never read, and tracking them makes ``.delay()`` block for
+    ~20s and raise ``RuntimeError`` when the result backend is unreachable.
     """
-    return cast(Task, celery.task(fn))  # pyright: ignore[reportUnknownMemberType]
+    return cast(Task, celery.task(fn, ignore_result=True))  # pyright: ignore[reportUnknownMemberType]
+
+
+def delay_or_run(celery_task: Task, **kwargs: Any):
+    """Queues ``celery_task``, or runs it in-process if the broker is
+    unreachable. As in a worker, a failing task is logged, not raised.
+    """
+    try:
+        celery_task.delay(**kwargs)  # pyright: ignore[reportUnknownMemberType]
+    except OperationalError as e:
+        logger.warning("Could not queue %s, running it in-process: %s", celery_task.name, e)
+        try:
+            celery_task(**kwargs)
+        except Exception:
+            logger.exception("Task %s failed", celery_task.name)
 
 
 @task

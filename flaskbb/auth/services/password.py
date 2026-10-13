@@ -17,7 +17,7 @@ from flask_babelplus import gettext as _
 from ...core.auth.password import ResetPasswordService as _ResetPasswordService
 from ...core.exceptions import StopValidation, ValidationError
 from ...core.tokens import Token, TokenActions, TokenError, TokenSerializer, TokenVerifier
-from ...email import send_reset_token
+from ...email import delay_or_run, send_reset_token
 from ...extensions import db
 from ...user.models import User
 
@@ -49,7 +49,7 @@ class ResetPasswordService(_ResetPasswordService):
             Token(user_id=user.id, operation=TokenActions.RESET_PASSWORD)
         )
 
-        send_reset_token.delay(token=token, username=user.username, email=user.email)  # pyright: ignore[reportUnknownMemberType]
+        delay_or_run(send_reset_token, token=token, username=user.username, email=user.email)
 
     @override
     def reset_password(self, token: str, email: str, new_password: str):
