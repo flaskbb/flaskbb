@@ -10,7 +10,7 @@ dependencies = [
   "click>=8.5.0",
   "click-log>=0.4.0",
   "click-plugins>=1.1.1.2",
-  "click-repl>=0.4.0",
+  "click-repl>=0.4.1",
   "email-validator>=2.3.0",
   "Flask>=3.1.3",
   "Flask-Alembic>=3.3.0",
@@ -26,23 +26,23 @@ dependencies = [
   "Flask-Themes2>=2.0.0",
   "Flask-WTF>=1.3.0",
   "flaskbb-plugin-conversations>=3.0.5",
-  "flaskbb-plugin-portal>=3.0.2",
+  "flaskbb-plugin-portal>=3.0.3",
   "Jinja2>=3.1.6",
-  "MarkupSafe>=3.0.3",
+  "MarkupSafe>=3.0.4",
   "mistune>=3.3.4",
   "Pillow>=12.3.0",
   "pluggy>=1.6.0",
   "Pygments>=2.21.0",
-  "PyJWT>=2.14.0",
-  "pytz>=2026.2",
+  "PyJWT>=2.15.1",
+  "pytz>=2026.5",
   "redis>=8.1.0",
+  "requests>=2.34.2",
   "SQLAlchemy>=2.1.4",
   "typing-extensions>=4.16",
   "Unidecode>=1.4.0",
-  "Werkzeug>=3.1.8",
+  "Werkzeug>=3.1.9",
   "WTForms>=3.2.2",
   "WTForms-SQLAlchemy>=0.4.2",
-  "requests>=2.34.2",
 ]
 requires-python = ">=3.12"
 authors = [
@@ -73,13 +73,13 @@ classifiers = [
 
 [project.optional-dependencies]
 gunicorn = [
-  "gunicorn>=26.0.0",
+  "gunicorn>=26.2.0",
 ]
 postgres = [
-  "psycopg[binary]>=3.3.0",
+  "psycopg[binary]>=3.3.6",
 ]
 mysql = [
-  "pymysql>=1.2.0",
+  "pymysql>=1.2.3",
 ]
 plugins = [
   "flaskbb-plugin-inviteonly>=1.0.1",
@@ -132,11 +132,11 @@ dependencies = ["Babel>=2.18.0"]
 
 [dependency-groups]
 dev = [
+    "cookiecutter",
     "ipython>=9.17.1",
     "ruff",
-    "tox>=4.61.0",
+    "tox>=4.65.4",
     "tox-uv",
-    "cookiecutter",
     {include-group = "pre-commit"},
     {include-group = "docs"},
     {include-group = "tests"},
@@ -148,27 +148,27 @@ pre-commit = [
 ]
 docs = [
     "alabaster",
+    "myst-parser",
     "sphinx",
+    "sphinx-intl>=2.4.0",
     "sphinx-issues",
     "sphinx-tabs",
-    "sphinx-intl>=2.3.1",
-    "sphinxcontrib-log-cabinet",
-    "myst-parser"
+    "sphinxcontrib-log-cabinet"
 ]
 tests = [
+    "cov-core",
+    "coverage",
+    "freezegun",
     "pytest",
     "pytest-cov",
     "pytest-mock",
     "pytest-xdist",
     "pytest-xprocess",
-    "cov-core",
-    "coverage",
-    "freezegun",
     "responses"
 ]
 typing = [
-    "mypy",
     "basedpyright",
+    "mypy",
     "types-gunicorn",
     "types-Pygments",
     "types-pytz",
