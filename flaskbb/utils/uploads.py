@@ -13,7 +13,7 @@ import os
 import uuid
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, url_for
 from PIL import ImageFile
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
@@ -29,6 +29,13 @@ def get_avatar_upload_path() -> str:
     if upload_path is None:
         return os.path.join(current_app.static_folder or "static", "uploads", "avatar")
     return upload_path
+
+
+def get_avatar_url(avatar: str | None) -> str:
+    # FlaskBB 2.x stored a link to an external image instead of an uploaded file
+    if avatar and avatar.startswith(("http://", "https://")):
+        return avatar
+    return url_for("uploads.avatar", avatar=avatar)
 
 
 def get_avatar_filename(username: str, filename: str | None) -> str:

@@ -36,6 +36,7 @@ from flaskbb.permissions import permission_manager, permission_registry, Permiss
 from flaskbb.settings import flaskbb_config
 from flaskbb.utils.database import BaseModel, make_comparable, UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
+from flaskbb.utils.uploads import get_avatar_url
 
 logger = logging.getLogger(__name__)
 
@@ -393,7 +394,7 @@ class User(BaseModel, UserMixin, HasPermissions):
 
     @property
     def avatar_url(self):
-        return url_for("uploads.avatar", avatar=self.avatar)
+        return get_avatar_url(self.avatar)
 
     @property
     def days_registered(self) -> int:
@@ -467,12 +468,15 @@ class User(BaseModel, UserMixin, HasPermissions):
         group_ids = [g.id for g in viewer.groups]
         stmt = (
             sa.select(Topic)
+            .join(Topic.forum)
             .where(
                 Topic.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
             )
             .order_by(Topic.id.desc())
         )
+        if not viewer.permissions.get("viewhidden"):
+            stmt = stmt.where(Topic.hidden.is_(False))
         topics = db.paginate(stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"])
         return topics
 
@@ -487,12 +491,17 @@ class User(BaseModel, UserMixin, HasPermissions):
         group_ids = [g.id for g in viewer.groups]
         stmt = (
             sa.select(Post)
+            .join(Post.topic)
+            .join(Topic.forum)
             .where(
                 Post.user_id == self.id,
                 Forum.groups.any(Group.id.in_(group_ids)),
             )
             .order_by(Post.id.desc())
         )
+        if not viewer.permissions.get("viewhidden"):
+            # hiding a topic only hides its first post
+            stmt = stmt.where(Post.hidden.is_(False), Topic.hidden.is_(False))
         posts = db.paginate(stmt, page=page, per_page=flaskbb_config["TOPICS_PER_PAGE"])
         return posts
 

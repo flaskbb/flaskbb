@@ -7,6 +7,7 @@ User Documentation
    development/setup
    production/deployment
    production/docker
+   production/upgrading
    cli
    plugins/index
    faq

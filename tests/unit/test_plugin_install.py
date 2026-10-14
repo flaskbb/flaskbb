@@ -2,14 +2,18 @@ import importlib
 import types
 
 import pytest
+import sqlalchemy as sa
 from alembic.util.exc import CommandError
 from flask_login import login_user
+from flaskbb.app import upgrade_installed_plugin_settings
 from flaskbb.extensions import db, pluggy
 from flaskbb.management import views
 from flaskbb.permissions import PermissionLevel
 from flaskbb.plugins import utils
 from flaskbb.plugins.models import PluginRegistry
+from flaskbb.settings.definitions import IntSetting, SettingGroup
 from flaskbb.settings.models import Setting
+from flaskbb.settings.registry import setting_registry
 from flaskbb.user.models import GroupPermission
 
 # flaskbb.cli.plugins is shadowed by the click group of the same name
@@ -31,6 +35,24 @@ def dummy_registry(database, dummy_plugin):
     registry = PluginRegistry("dummy_plugin")
     registry.enabled = False
     return registry.save()
+
+
+@pytest.fixture
+def dummy_settings(dummy_plugin):
+    group = SettingGroup(
+        key="dummy_plugin",
+        name="Dummy",
+        description="Dummy settings",
+        settings=(
+            IntSetting(key="OLD", value=1, name="Old", description="Installed setting"),
+            IntSetting(key="NEW", value=2, name="New", description="Added by an update"),
+        ),
+    )
+    setting_registry.register_group(group, is_plugin=True)
+
+    yield group
+
+    setting_registry.unregister_group(group.key)
 
 
 @pytest.fixture
@@ -315,3 +337,34 @@ def test_cli_uninstall_removes_the_plugins_grants(
 
     assert result.exit_code == 0
     assert _grants("dummy_plugin_") == []
+
+
+def test_startup_adds_the_new_settings_of_an_installed_plugin(
+    application, dummy_registry, dummy_settings
+):
+    db.session.add(Setting(key="OLD", value="5", group_key="dummy_plugin"))
+    db.session.commit()
+    Setting.invalidate_cache()
+
+    upgrade_installed_plugin_settings(application)
+
+    assert Setting.as_dict()["DUMMY_PLUGIN_OLD"] == 5
+    assert Setting.as_dict()["DUMMY_PLUGIN_NEW"] == 2
+
+
+def test_startup_does_not_install_a_plugin(application, dummy_registry, dummy_settings):
+    upgrade_installed_plugin_settings(application)
+
+    assert "DUMMY_PLUGIN_NEW" not in Setting.as_dict()
+
+
+def test_startup_skips_plugin_settings_before_the_migrations(
+    application, dummy_registry, dummy_settings
+):
+    db.session.execute(sa.text("ALTER TABLE settings RENAME TO old_settings"))
+    try:
+        upgrade_installed_plugin_settings(application)
+
+        assert db.session.execute(sa.select(PluginRegistry)).scalars().all() == [dummy_registry]
+    finally:
+        db.session.execute(sa.text("ALTER TABLE old_settings RENAME TO settings"))

@@ -13,6 +13,7 @@ from flaskbb.app import configure_migrations
 from flaskbb.extensions import alembic, db, pluggy
 from flaskbb.permissions import PermissionLevel
 from flaskbb.plugins.utils import plugin_migrations_dir, plugins_with_pending_migrations
+from flaskbb.settings.registry import setting_registry
 
 
 def _load_migration(filename):
@@ -194,6 +195,36 @@ def test_hidden_and_post_count_migration_fills_null_rows(user):
     columns = {c["name"]: c for c in sa.inspect(db.engine).get_columns("users")}
     assert post_count == 0
     assert columns["post_count"]["nullable"] is False
+
+
+def test_missing_core_settings_migration_adds_only_missing_rows(default_settings):
+    migration = _load_migration("202610142024_1792002242_add_missing_core_settings.py")
+    db.session.execute(sa.text("DELETE FROM settings WHERE key = 'OPEN_LINKS_IN_NEW_TAB'"))
+    db.session.execute(
+        sa.text("UPDATE settings SET value = '100' WHERE key = 'SEARCH_SNIPPET_LENGTH'")
+    )
+    context = MigrationContext.configure(db.session.connection())
+
+    with Operations.context(context):
+        migration.upgrade()
+    db.session.commit()
+
+    values = dict(
+        db.session.execute(
+            sa.text(
+                "SELECT key, value FROM settings "
+                "WHERE key IN ('OPEN_LINKS_IN_NEW_TAB', 'SEARCH_SNIPPET_LENGTH')"
+            )
+        ).all()
+    )
+    assert values == {"OPEN_LINKS_IN_NEW_TAB": "false", "SEARCH_SNIPPET_LENGTH": "100"}
+
+
+def test_missing_core_settings_migration_matches_the_fixture():
+    migration = _load_migration("202610142024_1792002242_add_missing_core_settings.py")
+
+    for group_key, key, value in migration.SETTINGS:
+        assert setting_registry.definition(group_key, key).value == value
 
 
 def test_attachment_filename_index_matches_the_migration(database):

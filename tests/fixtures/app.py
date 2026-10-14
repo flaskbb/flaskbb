@@ -2,7 +2,7 @@ import pytest
 from flask import g
 from flaskbb import create_app
 from flaskbb.configs.testing import TestingConfig as Config
-from flaskbb.extensions import cache, db, pluggy
+from flaskbb.extensions import alembic, cache, db, pluggy
 from flaskbb.permissions import permission_manager
 from flaskbb.utils.database import drop_all
 from flaskbb.utils.populate import create_default_groups, create_default_settings
@@ -70,6 +70,26 @@ def clear_logged_in_user(application):
     """
     yield
     g.pop("_login_user", None)
+
+
+@pytest.fixture(autouse=True)
+def release_alembic_connections(application):
+    """Returns the connections Flask-Alembic holds until its app context ends.
+
+    ``alembic.stamp()``, ``alembic.upgrade()`` and the plugin migration checks
+    keep a connection in a per-app cache that Flask-Alembic invalidates when
+    the app context is torn down. The package-scoped context never is, so the
+    connection would leak into the following tests, and the next nested app
+    context to end would invalidate it there. Invalidating closes the one
+    connection of the in-memory database, under every other session as well.
+    """
+    yield
+    alembic_cache = alembic._get_cache()
+    for context in (alembic_cache.contexts or {}).values():
+        if context.connection is not None:
+            context.connection.close()
+    alembic_cache.contexts = None
+    alembic_cache.ops = None
 
 
 @pytest.fixture()

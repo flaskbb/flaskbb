@@ -171,6 +171,20 @@ def test_search_forums_hidden_state_requires_viewhidden(request_context, topic, 
     assert topic in _all(results["topic"])
 
 
+def test_search_forums_excludes_replies_of_hidden_topics(request_context, topic, user, admin_user):
+    cache.clear()  # see comment in test_search_form_forum_choices_are_permission_scoped
+
+    reply = Post(content="Test Reply Normal")
+    reply.save(topic=topic, user=user)
+    topic.hide(user=admin_user)
+
+    results = service.search_forums("Test Reply", user, content_type="post")
+    assert _all(results["post"]) == []
+
+    results = service.search_forums("Test Reply", admin_user, content_type="post")
+    assert reply in _all(results["post"])
+
+
 @contextmanager
 def _csrf_disabled(application):
     """Search views build their form from `request.form` via

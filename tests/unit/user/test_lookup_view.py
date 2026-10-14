@@ -123,3 +123,20 @@ def test_returns_profile_and_default_avatar(client, user, default_settings):
             "avatar_url": "/static/avatar100x100.png",
         }
     ]
+
+
+@pytest.mark.parametrize(
+    ("avatar", "avatar_url"),
+    [
+        ("avatar_test_normal.png", "/uploads/avatar/avatar_test_normal.png"),
+        ("https://example.org/test_normal.png", "https://example.org/test_normal.png"),
+    ],
+)
+def test_returns_the_avatar(client, user, default_settings, avatar, avatar_url):
+    user.avatar = avatar
+    user.save()
+    login(client, user)
+
+    resp = client.get("/user/lookup/usernames", query_string={"q": "test_normal"})
+
+    assert resp.get_json()[0]["avatar_url"] == avatar_url

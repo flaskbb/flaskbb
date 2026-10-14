@@ -125,6 +125,8 @@ to bring an existing database up to date::
 
     uv run flaskbb db upgrade
 
+To upgrade from FlaskBB 2.x, follow :ref:`upgrading`.
+
 Finally, to get going - fire up FlaskBB!
 ::
 
@@ -186,13 +188,16 @@ configuration variable.
 **Celery**
 ::
 
-    CELERY_BROKER_URL = REDIS_URL
-    CELERY_RESULT_BACKEND = REDIS_URL
+    CELERY_CONFIG = {
+        "broker_url": REDIS_URL,
+        "result_backend": REDIS_URL,
+        "broker_transport_options": {"max_retries": 1},
+    }
 
 **Caching**
 ::
 
-    CACHE_TYPE = "redis"
+    CACHE_TYPE = "RedisCache"
     CACHE_REDIS_URL = REDIS_URL
 
 **Rate Limiting**
@@ -377,8 +382,8 @@ other background jobs plugins register). Start a worker with::
 This is just a preconfigured wrapper around the ``celery`` command -
 additional arguments are passed straight through, e.g. ``flaskbb celery
 worker --loglevel=info`` or ``flaskbb celery beat``. It requires
-``CELERY_BROKER_URL`` to be configured - see `Redis (optional)`_ above, or
-point it at another broker.
+``broker_url`` in ``CELERY_CONFIG`` to be configured - see `Redis (optional)`_
+above, or point it at another broker.
 
 
 systemd Unit Files

@@ -39,7 +39,7 @@ from flaskbb.user.services.update import (
 )
 from flaskbb.utils.helpers import escape_like, real, register_view, render_template
 from flaskbb.utils.proxies import current_user
-from flaskbb.utils.uploads import delete_avatar_file
+from flaskbb.utils.uploads import delete_avatar_file, get_avatar_url
 
 from ..core.exceptions import PersistenceError, StopValidation
 from .services.factories import (
@@ -292,9 +292,7 @@ class UserLookup(MethodView):
                 {
                     "username": username,
                     "url": url_for("user.profile", username=username),
-                    "avatar_url": url_for("uploads.avatar", avatar=avatar)
-                    if avatar
-                    else default_avatar,
+                    "avatar_url": get_avatar_url(avatar) if avatar else default_avatar,
                 }
                 for username, avatar in db.session.execute(stmt)
                 if MENTIONABLE_USERNAME_REGEX.fullmatch(username)

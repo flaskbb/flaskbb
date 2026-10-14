@@ -43,6 +43,12 @@ class SettingsRegistry:
         if is_plugin:
             self._plugin_group_keys.add(group.key)
 
+    def unregister_group(self, key: str) -> None:
+        group = self._groups.pop(key)
+        for setting in group.settings:
+            del self._definitions[(key, setting.key.upper())]
+        self._plugin_group_keys.discard(key)
+
     def group(self, key: str) -> SettingGroup:
         return self._groups[key]
 

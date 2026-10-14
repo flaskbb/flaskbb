@@ -100,6 +100,9 @@ def search_forums(
         stmt = hidden(stmt, hidden=True)
     elif not has_viewhidden:
         stmt = hidden(stmt, hidden=False)
+        # hiding a topic only hides its first post
+        if model is Post:
+            stmt = stmt.where(Post.topic.has(Topic.hidden.is_(False)))
 
     if model is Topic:
         stmt = stmt.options(joinedload(Topic.forum), joinedload(Topic.first_post))

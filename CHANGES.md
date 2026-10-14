@@ -9,7 +9,7 @@ Unreleased
 ### Features
 
 #### Users and content
-- **Avatars**: Users can upload and delete avatars
+- **Avatars**: Users can upload and delete avatars. Avatar links set in FlaskBB 2.x keep working.
 - **Attachments**: Posts and topics can have attachments. Admins can manage all attachments from the Admin CP.
 - Links can open in a new tab. (#671)
 - Admins can delete all posts of a user. (#534)
