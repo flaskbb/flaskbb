@@ -179,10 +179,12 @@ Restart the web and worker services after changing plugin state::
 The same operations are available in the admin panel. Follow its restart
 notices before configuring or installing a newly enabled plugin.
 
-To remove a plugin, uninstall it while it is enabled, then disable it::
+To remove a plugin, disable it and restart the web and worker services so they
+stop using its tables, then uninstall it::
 
-    $ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml exec flaskbb flaskbb plugins uninstall portal
     $ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml exec flaskbb flaskbb plugins disable portal
+    $ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml restart flaskbb celery
+    $ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml exec flaskbb flaskbb plugins uninstall portal
 
 Remove its package from ``FLASKBB_PLUGINS``, rebuild the plugin image, and
 restart the stack.

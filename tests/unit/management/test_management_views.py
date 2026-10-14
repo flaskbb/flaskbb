@@ -6,6 +6,7 @@ views are invoked directly rather than over HTTP, which skips the blueprint's
 ``login_fresh()`` gate - that gate is orthogonal to what is tested here.
 """
 
+import io
 import re
 
 import pytest
@@ -15,8 +16,10 @@ from flaskbb.extensions import db
 from flaskbb.forum import views as forum_views
 from flaskbb.forum.models import Post, Topic
 from flaskbb.management import views
+from flaskbb.plugins.models import PluginRegistry
 from flaskbb.user import views as user_views
 from flaskbb.user.models import Group, GroupRole, User
+from werkzeug.exceptions import NotFound
 
 
 @pytest.fixture
@@ -699,3 +702,77 @@ def test_deleting_posts_for_a_user_with_none_is_a_no_op(
         logout_user()
 
     assert response.status_code == 302
+
+
+def _add(actor, **data):
+    view = views.AddUser.as_view("add_user")
+
+    with views.current_app.test_request_context(method="POST", data=data):
+        login_user(actor)
+        response = view()
+        logout_user()
+
+    return response
+
+
+def test_admin_can_add_a_user(default_settings, no_csrf, admin_user, default_groups, plain_group):
+    response = _add(
+        admin_user,
+        username="added_member",
+        email="added_member@example.org",
+        password="Test-Password-Only",
+        primary_group=str(default_groups[3].id),
+        secondary_groups=str(plain_group.id),
+        activated="y",
+    )
+
+    assert response.status_code == 302
+    user = User.get(User.username == "added_member")
+    assert user is not None
+    assert user.check_password("Test-Password-Only")
+    assert user.activated
+    assert user.primary_group_id == default_groups[3].id
+    assert [group.id for group in user.secondary_groups] == [plain_group.id]
+    assert user.avatar is None
+
+
+def test_admin_can_add_a_user_with_an_avatar(
+    application,
+    default_settings,
+    no_csrf,
+    admin_user,
+    default_groups,
+    image_just_right,
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.setitem(application.config, "AVATAR_UPLOAD_PATH", str(tmp_path))
+
+    response = _add(
+        admin_user,
+        username="added_avatar",
+        email="added_avatar@example.org",
+        password="Test-Password-Only",
+        primary_group=str(default_groups[3].id),
+        avatar=(io.BytesIO(image_just_right.body), "me.png"),
+    )
+
+    assert response.status_code == 302
+    user = User.get(User.username == "added_avatar")
+    assert user is not None
+    assert user.avatar == "avatar_added_avatar.png"
+    assert (tmp_path / "avatar_added_avatar.png").read_bytes() == image_just_right.body
+
+
+@pytest.mark.parametrize("target", [{"slug": "no-such-group"}, {"plugin": "settingless"}])
+def test_settings_of_a_group_that_does_not_exist_are_not_found(
+    default_settings, admin_user, target
+):
+    PluginRegistry(name="settingless").save()
+    view = views.ManagementSettings.as_view("settings")
+
+    with views.current_app.test_request_context():
+        login_user(admin_user)
+        with pytest.raises(NotFound):
+            view(**target)
+        logout_user()

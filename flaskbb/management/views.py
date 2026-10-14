@@ -19,6 +19,7 @@ import sqlalchemy as sa
 from alembic.util.exc import CommandError
 from celery import __version__ as celery_version
 from flask import (
+    abort,
     Blueprint,
     flash,
     redirect,
@@ -209,6 +210,8 @@ class ManagementSettings(MethodView):
             # plugin settings (PluginRegistry) are a separate mechanism
             # from SettingGroup and are untouched by this refactor
             plugin_obj = PluginRegistry.get_by_or_404(name=plugin)
+            if not plugin_obj.has_settings:
+                abort(404)
             active_nav.update({"key": plugin_obj.name, "title": plugin_obj.name.title()})
             form = plugin_obj.get_settings_form()
             if plugin_obj.needs_setting_upgrade():
@@ -216,7 +219,10 @@ class ManagementSettings(MethodView):
                 form.disable_all()
             old_settings = plugin_obj.settings
         else:
-            group_obj = setting_registry.group(slug)
+            try:
+                group_obj = setting_registry.group(slug)
+            except KeyError:
+                abort(404)
             active_nav.update({"key": group_obj.key, "title": group_obj.name})
 
             form_cls = build_form(group_obj)

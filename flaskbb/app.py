@@ -336,9 +336,10 @@ def configure_extensions(app: FlaskBB):
     login_manager.anonymous_user = Guest
 
     @login_manager.user_loader  # type: ignore[untyped-decorator]  # pyright: ignore[reportUnknownMemberType]
-    def load_user(user_id: int):
+    def load_user(user_id: str):
         """Loads the user. Required by the `login` extension."""
-        user = db.session.execute(sa.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        # SQLAlchemy 2.1 binds a str as VARCHAR, which PostgreSQL won't compare to an integer
+        user = db.session.execute(sa.select(User).filter_by(id=int(user_id))).scalar_one_or_none()
         pluggy.hook.flaskbb_current_user(app=app, user=user)
         return user
 

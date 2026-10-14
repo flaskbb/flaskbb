@@ -113,8 +113,12 @@ uninstall every plugin::
 
     $ flaskbb plugins uninstall --all --force
 
+A plugin whose migrations are applied has to be disabled (see `Disable`_) and
+FlaskBB restarted first, otherwise the running server would keep using the
+dropped tables. The uninstall refuses to revert the migrations until then.
+
 To keep the plugin's tables around and only get rid of its settings, use
-``--settings-only`` - that is also what the Admin Panel does::
+``--settings-only``::
 
     $ flaskbb plugins uninstall <plugin_name> --settings-only
 

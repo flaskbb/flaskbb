@@ -9,6 +9,7 @@ It provides the forms that are needed for the management views.
 """
 
 import logging
+import os
 from collections.abc import Mapping, Sequence
 from typing import Any, override
 
@@ -19,6 +20,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import make_transient, make_transient_to_detached
+from werkzeug.datastructures import FileStorage
 from wtforms import (
     BooleanField,
     DateField,
@@ -52,6 +54,8 @@ from flaskbb.utils.forms import (
 from flaskbb.utils.proxies import current_user
 from flaskbb.utils.requirements import IsAdmin, IsAtleastModerator
 from flaskbb.utils.uploads import (
+    get_avatar_filename,
+    get_avatar_upload_path,
     validate_image,
 )
 from flaskbb.utils.validators import AvatarExtensionValidator, AvatarSizeValidator
@@ -225,9 +229,15 @@ class UserForm(FlaskBBForm):
 
     def save(self):
         data = self.data
-        data.pop("submit", None)
-        data.pop("csrf_token", None)
+        for field in ("submit", "csrf_token", "delete_avatar", "avatar"):
+            data.pop(field, None)
         user = User(**data)
+
+        if isinstance(self.avatar.data, FileStorage):
+            filename = get_avatar_filename(user.username, self.avatar.data.filename)
+            self.avatar.data.save(os.path.join(get_avatar_upload_path(), filename))
+            user.avatar = filename
+
         return user.save()
 
 

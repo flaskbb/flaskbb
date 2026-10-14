@@ -122,13 +122,14 @@ docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yam
 docker compose -f docker/docker-compose.yaml -f docker/docker-compose.plugin.yaml restart flaskbb celery
 ```
 
-To remove a plugin, uninstall it while it is still enabled, which drops its
-settings and reverts its migrations. Then disable it, remove the package from
-`FLASKBB_PLUGINS` and rebuild:
+To remove a plugin, disable it and restart the web and worker processes so they
+stop using its tables. Then uninstall it, which drops its settings and reverts
+its migrations, remove the package from `FLASKBB_PLUGINS` and rebuild:
 
 ```bash
-docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninstall portal
 docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins disable portal
+docker compose -f docker/docker-compose.yaml restart flaskbb celery
+docker compose -f docker/docker-compose.yaml exec flaskbb flaskbb plugins uninstall portal
 ```
 
 The prebuilt images on ghcr.io come with the portal and conversations plugins,
