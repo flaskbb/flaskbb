@@ -3,6 +3,7 @@ import shutil
 import tarfile
 from pathlib import Path, PurePosixPath
 from tempfile import TemporaryFile
+from typing import cast, IO
 
 import click
 import requests
@@ -17,7 +18,7 @@ TWEMOJI_VERSION = "17.0.3"
 @flaskbb.command("download-emoji", short_help="Download Twemoji SVGs into static/emoji/.")
 @with_appcontext
 def download_emoji():
-    destination = Path(current_app.static_folder) / "emoji"
+    destination = Path(current_app.static_folder or "static") / "emoji"
     url = f"https://codeload.github.com/jdecked/twemoji/tar.gz/refs/tags/v{TWEMOJI_VERSION}"
     click.echo(f"Downloading Twemoji {TWEMOJI_VERSION}...")
     count = 0
@@ -40,7 +41,7 @@ def download_emoji():
                     is_license = len(path.parts) == 2 and path.name == "LICENSE-GRAPHICS"
                     if not is_svg and not is_license:
                         continue
-                    with archive.extractfile(member) as source:
+                    with cast(IO[bytes], archive.extractfile(member)) as source:
                         with (destination / path.name).open("wb") as target:
                             shutil.copyfileobj(source, target)
                     if is_svg:

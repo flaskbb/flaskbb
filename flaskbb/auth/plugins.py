@@ -80,7 +80,7 @@ def flaskbb_post_reauth(user: User):
 @impl
 def flaskbb_errorhandlers(app: Flask):
     @app.errorhandler(ForceLogout)
-    def handle_force_logout(error: ForceLogout):  # pyright: ignore[reportUnusedFunction]
+    def handle_force_logout(error: ForceLogout):
         if current_user:
             logout_user()
             if error.reason:

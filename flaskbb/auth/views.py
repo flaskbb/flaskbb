@@ -425,7 +425,7 @@ def flaskbb_load_blueprints(app: FlaskBB):
     auth = Blueprint("auth", __name__)
 
     @auth.errorhandler(429)
-    def login_rate_limit_error(  # pyright: ignore[reportUnusedFunction]
+    def login_rate_limit_error(
         error: TooManyRequests,
     ) -> tuple[str, int]:
         """Register a custom error handler for a 'Too Many Requests'

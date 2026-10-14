@@ -9,7 +9,6 @@ manages the app creation and configuration process
 """
 
 import importlib.metadata
-import importlib.util
 import logging
 import logging.config
 import os
@@ -356,7 +355,7 @@ def configure_extensions(app: FlaskBB):
     debugtoolbar.init_app(app)
 
     # Flask-Themes
-    themes.init_themes(app, app_identifier="flaskbb")  # pyright: ignore[reportUnknownMemberType]
+    themes.init_themes(app, app_identifier="flaskbb")
 
     # redis-py
     if app.config["REDIS_ENABLED"]:

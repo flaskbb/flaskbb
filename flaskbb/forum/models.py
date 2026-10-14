@@ -282,7 +282,7 @@ type PendingUnlinks = list[tuple[int, str]]
 # topic delete-orphan cascade over its posts) because they all go through
 # ORM-level deletes, never bulk DELETE statements.
 @event.listens_for(Attachment, "after_delete")
-def _queue_attachment_unlink(  # pyright: ignore[reportUnusedFunction]
+def _queue_attachment_unlink(
     mapper: Mapper[Attachment], connection: Connection, target: Attachment
 ) -> None:
     pending: PendingUnlinks = db.session.info.setdefault(_PENDING_UNLINK_KEY, [])
@@ -290,14 +290,14 @@ def _queue_attachment_unlink(  # pyright: ignore[reportUnusedFunction]
 
 
 @event.listens_for(db.session, "after_commit")
-def _unlink_deleted_attachment_files(session: Session) -> None:  # pyright: ignore[reportUnusedFunction]
+def _unlink_deleted_attachment_files(session: Session) -> None:
     pending: PendingUnlinks = session.info.pop(_PENDING_UNLINK_KEY, [])
     for post_id, filename in pending:
         delete_attachment_file(post_id, filename)
 
 
 @event.listens_for(db.session, "after_rollback")
-def _discard_pending_unlinks(session: Session) -> None:  # pyright: ignore[reportUnusedFunction]
+def _discard_pending_unlinks(session: Session) -> None:
     session.info.pop(_PENDING_UNLINK_KEY, None)
 
 

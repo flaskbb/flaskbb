@@ -1149,7 +1149,7 @@ class ManageAttachments(MethodView):
             .order_by(Attachment.id.desc())
         )
 
-    def _render(self, stmt: sa.Select[tuple[Attachment]], search_form: AttachmentSearchForm):
+    def _render(self, stmt: sa.Select[Attachment], search_form: AttachmentSearchForm):
         page = request.args.get("page", 1, type=int)
         attachments = db.paginate(
             stmt,
@@ -1576,7 +1576,7 @@ def flaskbb_load_blueprints(app: FlaskBB):
     management = Blueprint("management", __name__)
 
     @management.before_request
-    def check_fresh_login() -> Response | None:  # pyright: ignore[reportUnusedFunction]
+    def check_fresh_login() -> Response | None:
         """Checks if the login is fresh for the current user, otherwise the user
         has to reauthenticate."""
         if not login_fresh():

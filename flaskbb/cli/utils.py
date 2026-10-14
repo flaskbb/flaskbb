@@ -140,7 +140,7 @@ def validate_theme(theme: str):
 def get_cookiecutter() -> Callable[..., str]:
     cookiecutter_available = False
     try:
-        from cookiecutter.main import cookiecutter  # pyright: ignore
+        from cookiecutter.main import cookiecutter
 
         cookiecutter_available = True
     except ImportError:
@@ -226,7 +226,7 @@ def prompt_save_user(
             default="admin",
         )
 
-    return create_user(username, password, email, group)  # pyright: ignore
+    return create_user(username, password, email, group)
 
 
 def prompt_update_user(

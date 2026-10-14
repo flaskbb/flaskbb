@@ -315,6 +315,7 @@ module = [
     "celery.*",
     "flask_login.*",
     "flask_wtf.*",
+    "kombu.*",
     "wtforms_sqlalchemy.*",
 ]
 follow_untyped_imports = true

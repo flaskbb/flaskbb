@@ -68,6 +68,10 @@ class AppConfig(TypedDict, extra_items=Any):  # type: ignore[call-arg]
     CACHE_TYPE: str
     CACHE_DEFAULT_TIMEOUT: int
 
+    # Rate limiting
+    RATELIMIT_STORAGE_URI: NotRequired[str]
+    RATELIMIT_STORAGE_URL: NotRequired[str]
+
     # Mail
     MAIL_SERVER: str
     MAIL_PORT: int
