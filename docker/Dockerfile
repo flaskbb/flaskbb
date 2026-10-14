@@ -2,7 +2,7 @@
 # The build context is this directory:
 #
 #   docker build -f docker/Dockerfile -t flaskbb:release docker/
-ARG PYTHON_VERSION=3.14
+ARG PYTHON_VERSION=3.15
 ARG UV_VERSION=0.12
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv

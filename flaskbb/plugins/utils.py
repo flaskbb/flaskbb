@@ -140,7 +140,7 @@ def validate_plugin(name: str):
     return pluggy.get_plugin(name)
 
 
-def remove_zombie_plugins_from_db():
+def remove_zombie_plugins_from_db() -> list[str]:
     """Removes 'zombie' plugins from the db. A zombie plugin is a plugin
     which exists in the database but isn't installed in the env anymore.
     Returns the names of the deleted plugins.

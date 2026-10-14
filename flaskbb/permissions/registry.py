@@ -18,7 +18,7 @@ from .definitions import PermissionDefinition, PermissionGroup
 
 
 class PermissionsRegistry:
-    def __init__(self):
+    def __init__(self) -> None:
         self._groups: dict[str, PermissionGroup] = {}
         # keyed by the stored key: the raw key for FlaskBB's own permissions,
         # "<group key>_<raw key>" for a plugin's

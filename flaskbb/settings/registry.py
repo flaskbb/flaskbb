@@ -17,7 +17,7 @@ from .definitions import SettingDefinition, SettingGroup
 
 
 class SettingsRegistry:
-    def __init__(self):
+    def __init__(self) -> None:
         self._groups: dict[str, SettingGroup] = {}
         # keyed by (group_key, KEY.upper()) instead of a flat key - two
         # different groups (core or plugin) can register the same

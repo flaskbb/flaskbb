@@ -46,7 +46,7 @@ class IntSetting(SettingDefinition):
     max: int | None = None
 
     @override
-    def wtf_field(self):
+    def wtf_field(self) -> wtf_fields.Field:
         validators: list[Any] = []
         if self.min is not None or self.max is not None:
             validators.append(wtf_validators.NumberRange(min=self.min, max=self.max))
@@ -61,7 +61,7 @@ class IntSetting(SettingDefinition):
 @dataclass(frozen=True)
 class BoolSetting(SettingDefinition):
     @override
-    def wtf_field(self):
+    def wtf_field(self) -> wtf_fields.Field:
         return wtf_fields.BooleanField(self.name, description=self.description, default=self.value)
 
 
@@ -71,7 +71,7 @@ class StringSetting(SettingDefinition):
     max: int | None = None
 
     @override
-    def wtf_field(self):
+    def wtf_field(self) -> wtf_fields.Field:
         validators: list[Any] = []
         if self.min is not None or self.max is not None:
             validators.append(wtf_validators.Length(min=self.min or 0, max=self.max or -1))
@@ -89,7 +89,7 @@ class SelectSetting(SettingDefinition):
     coerce: type = str
 
     @override
-    def wtf_field(self):
+    def wtf_field(self) -> wtf_fields.Field:
         return wtf_fields.SelectField(
             self.name,
             description=self.description,
@@ -102,7 +102,7 @@ class SelectSetting(SettingDefinition):
 @dataclass(frozen=True)
 class SelectMultipleSetting(SelectSetting):
     @override
-    def wtf_field(self):
+    def wtf_field(self) -> wtf_fields.Field:
         return wtf_fields.SelectMultipleField(
             self.name,
             description=self.description,

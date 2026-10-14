@@ -78,7 +78,7 @@ def delete_settings_from_fixture(group_key: str | None = None) -> None:
     Setting.invalidate_cache()
 
 
-def create_default_groups():
+def create_default_groups() -> list[Group]:
     """This will create the 5 default groups."""
     from flaskbb.fixtures.groups import fixture
 

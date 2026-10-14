@@ -27,6 +27,7 @@ from flask import (
     Response,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 from flask_allows2 import Permission
 from flask_babelplus import gettext as _
@@ -1215,7 +1216,7 @@ class CleanupAttachments(MethodView):
         )
     ]
 
-    def post(self):
+    def post(self) -> ResponseReturnValue:
         # the disk is scanned before the table is read: a file that appears
         # in between is then guaranteed to have its row in the snapshot
         storage = scan_attachment_storage()

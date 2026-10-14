@@ -715,7 +715,6 @@ def load_plugins(app: FlaskBB):
         db.session.add_all(unregistered)
         db.session.commit()
 
-        removed = 0
         if app.config["REMOVE_DEAD_PLUGINS"]:
             removed = remove_zombie_plugins_from_db()
             logger.info(f"Removed Plugins: {removed}")
