@@ -233,6 +233,10 @@ format_css = false
 # Images use responsive CSS; templates use mixed quotes and unnamed endblocks.
 ignore = "H006,T002,T003"
 
+# Many mail clients drop <style> blocks, so emails need inline styles.
+[tool.djlint.per-file-ignores]
+"templates/email/" = "H021"
+
 [tool.ruff]
 src = ["flaskbb", "tests"]
 fix = true

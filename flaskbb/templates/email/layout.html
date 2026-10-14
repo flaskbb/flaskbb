@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="{{ flaskbb_config['DEFAULT_LANGUAGE'] | replace('_', '-') }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="x-apple-disable-message-reformatting">
+        <meta name="color-scheme" content="light dark">
+        <meta name="supported-color-schemes" content="light dark">
+        <title>{{ flaskbb_config["PROJECT_TITLE"] }}</title>
+        <!--[if mso]>
+<style>
+  body, table, td, p, a { font-family: Arial, sans-serif !important; }
+</style>
+<![endif]-->
+        <style>
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+  body { margin: 0; padding: 0; width: 100%; }
+  @media (max-width: 620px) {
+    .email-pad { padding-left: 16px !important; padding-right: 16px !important; }
+    .email-header, .email-card { padding-left: 24px !important; padding-right: 24px !important; }
+  }
+        </style>
+        {# Separate block: if a client rejects these rules, the layout rules above still apply. #}
+        <style>
+  @media (prefers-color-scheme: dark) {
+    .email-bg { background-color: #0d1117 !important; }
+    .email-header { background-color: #1f6feb !important; }
+    .email-card { background-color: #161b22 !important; border-color: #30363d !important; color: #c9d1d9 !important; }
+    .email-muted { color: #8b949e !important; }
+    .email-link { color: #58a6ff !important; }
+    .email-button { background-color: #1f6feb !important; border-color: #1f6feb !important; }
+  }
+  [data-ogsb] .email-bg { background-color: #0d1117 !important; }
+  [data-ogsb] .email-header { background-color: #1f6feb !important; }
+  [data-ogsb] .email-card { background-color: #161b22 !important; }
+  [data-ogsc] .email-card { color: #c9d1d9 !important; }
+  [data-ogsc] .email-muted { color: #8b949e !important; }
+  [data-ogsc] .email-link { color: #58a6ff !important; }
+  [data-ogsb] .email-button { background-color: #1f6feb !important; }
+        </style>
+    </head>
+    <body class="email-bg" style="margin:0;padding:0;background-color:#f6f9fc;">
+        <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+            {% block preheader %}{% endblock %}
+        </div>
+        <table role="presentation"
+               class="email-bg"
+               width="100%"
+               cellspacing="0"
+               cellpadding="0"
+               border="0"
+               bgcolor="#f6f9fc"
+               style="background-color:#f6f9fc">
+            <tr>
+                <td align="center" class="email-pad" style="padding:32px 24px;">
+                    <!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0"><tr><td><![endif]-->
+                    <table role="presentation"
+                           width="100%"
+                           cellspacing="0"
+                           cellpadding="0"
+                           border="0"
+                           style="width:100%;
+                                  max-width:600px;
+                                  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
+                        <tr>
+                            <td class="email-header"
+                                bgcolor="#0088cc"
+                                style="padding:20px 32px;
+                                       background-color:#0088cc">
+                                <a href="{{ url_for('forum.index', _external=True) }}"
+                                   style="color:#ffffff;
+                                          font-size:20px;
+                                          font-weight:bold;
+                                          line-height:28px;
+                                          text-decoration:none">{{ flaskbb_config["PROJECT_TITLE"] }}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="email-card"
+                                bgcolor="#ffffff"
+                                style="padding:32px;
+                                       background-color:#ffffff;
+                                       border:1px solid #cad7e1;
+                                       border-top:0;
+                                       color:#212529;
+                                       font-size:16px;
+                                       line-height:24px">
+                                {% block content %}{% endblock %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="email-muted"
+                                align="center"
+                                style="padding:24px 32px 0;
+                                       color:#6c757d;
+                                       font-size:13px;
+                                       line-height:20px">
+                                {% block footer %}{% endblock %}
+                                <p style="margin:0;"><a class="email-link"
+   href="{{ url_for('forum.index', _external=True) }}"
+   style="color:#337ab7;
+          text-decoration:none">{{ flaskbb_config["PROJECT_TITLE"] }}</a></p>
+                            </td>
+                        </tr>
+                    </table>
+                    <!--[if mso]></td></tr></table><![endif]-->
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

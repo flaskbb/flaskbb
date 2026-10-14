@@ -1,10 +1,16 @@
+{% extends "email/layout.html" %}
+{% from "email/macros.html" import button %}
 {% set link = url_for('auth.autoactivate_account', token=token, _external=True) %}
 
-<p>{% trans %}Dear {{ username }},{% endtrans %}</p>
+{% block preheader %}{% trans %}Click the link below to activate your account:{% endtrans %}{% endblock %}
 
-<p>{% trans %}Click the link below to activate your account:{% endtrans %}</p>
+{% block content %}
+    <p style="margin:0 0 16px;">{% trans %}Dear {{ username }},{% endtrans %}</p>
+    <p style="margin:0;">{% trans %}Click the link below to activate your account:{% endtrans %}</p>
+    {{ button(link, _("Activate Account")) }}
+    <p style="margin:0;">{% trans %}Sincerely,{% endtrans %}<br>{% trans %}The Administration{% endtrans %}</p>
+{% endblock %}
 
-<p><a href="{{ link }}">{{ link }}</a></p>
-
-<p>{% trans %}Sincerely,{% endtrans %}</p>
-<p>{% trans %}The Administration{% endtrans %}</p>
+{% block footer %}
+    <p style="margin:0 0 8px;">{% trans %}If you did not request this email, you can safely ignore it.{% endtrans %}</p>
+{% endblock %}

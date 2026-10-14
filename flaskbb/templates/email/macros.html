@@ -1,0 +1,38 @@
+{% macro button(url, label) %}
+    <table role="presentation"
+           cellspacing="0"
+           cellpadding="0"
+           border="0"
+           style="margin:24px 0">
+        <tr>
+            <td class="email-button"
+                bgcolor="#0088cc"
+                style="background-color:#0088cc;
+                       mso-padding-alt:12px 24px">
+                <a class="email-button"
+                   href="{{ url }}"
+                   target="_blank"
+                   style="display:inline-block;
+                          padding:12px 24px;
+                          border:1px solid #0088cc;
+                          background-color:#0088cc;
+                          color:#ffffff;
+                          font-size:16px;
+                          font-weight:bold;
+                          line-height:20px;
+                          text-decoration:none">{{ label }}</a>
+            </td>
+        </tr>
+    </table>
+    <p class="email-muted"
+       style="margin:0 0 4px;
+              color:#6c757d;
+              font-size:13px;
+              line-height:20px">{% trans %}If the button does not work, copy this link into your browser:{% endtrans %}</p>
+    <p style="margin:0 0 24px;
+              font-size:13px;
+              line-height:20px;
+              word-break:break-all"><a class="email-link"
+   href="{{ url }}"
+   style="color:#337ab7">{{ url }}</a></p>
+{% endmacro %}
