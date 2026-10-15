@@ -14,7 +14,6 @@ from importlib.metadata import Distribution, EntryPoint, PackageMetadata
 from typing import override
 
 import pluggy
-from pluggy._manager import DistFacade
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +194,7 @@ class FlaskBBPluginManager(pluggy.PluginManager):
                     continue
 
                 plugin = ep.load()
-                self._plugin_distinfo.append((plugin, DistFacade(dist)))
+                self._plugin_distinfo.append((plugin, dist))
                 self.register(plugin, name=ep.name)
 
                 count += 1
