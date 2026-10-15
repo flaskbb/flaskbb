@@ -82,10 +82,10 @@ def _user_nav_menu(user: User | Guest) -> list[NavigationItem]:
         NavigationLink(
             endpoint="forum.topictracker",
             name=_("Topic Tracker"),
-            icon="fa fa-book fa-fw",
+            icon="fa fa-book",
         ),
         NavigationDivider(),
-        NavigationLink(endpoint="user.settings", name=_("Settings"), icon="fa fa-cog fa-fw"),
+        NavigationLink(endpoint="user.settings", name=_("Settings"), icon="fa fa-cog"),
     ]
 
     if Permission(IsAtleastModerator, identity=user):
@@ -93,7 +93,7 @@ def _user_nav_menu(user: User | Guest) -> list[NavigationItem]:
             NavigationLink(
                 endpoint="management.overview",
                 name=_("Management"),
-                icon="fa fa-lock fa-fw",
+                icon="fa fa-lock",
             )
         )
 
@@ -108,7 +108,7 @@ def _guest_nav_menu() -> list[NavigationItem]:
             NavigationLink(
                 endpoint="auth.register",
                 name=_("Register"),
-                icon="fas fa-user-plus fa-fw",
+                icon="fas fa-user-plus",
             )
         )
 
@@ -116,7 +116,7 @@ def _guest_nav_menu() -> list[NavigationItem]:
         NavigationLink(
             endpoint="auth.forgot_password",
             name=_("Reset Password"),
-            icon="fas fa-undo fa-fw",
+            icon="fas fa-undo",
         )
     )
 
@@ -125,7 +125,7 @@ def _guest_nav_menu() -> list[NavigationItem]:
             NavigationLink(
                 endpoint="auth.request_activation_token",
                 name=_("Activate Account"),
-                icon="fas fa-user-check fa-fw",
+                icon="fas fa-user-check",
             )
         )
 
@@ -146,7 +146,7 @@ def flaskbb_tpl_user_nav_menu(
     if user.is_authenticated:
         logout = [
             NavigationDivider(),
-            NavigationLink(endpoint="auth.logout", name=_("Logout"), icon="fa fa-power-off fa-fw"),
+            NavigationLink(endpoint="auth.logout", name=_("Logout"), icon="fa fa-power-off"),
         ]
         outcome.force_result(chain(_user_nav_menu(user), plugin_items, logout))
     else:

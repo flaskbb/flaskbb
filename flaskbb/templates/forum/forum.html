@@ -27,19 +27,19 @@
                           hx-select-oob="#flashed-messages">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button type="submit" class="btn btn-white">
-                            <span class="fas fa-check fa-fw"></span> {% trans %}Mark as Read{% endtrans %}
+                            <span class="fas fa-check"></span> {% trans %}Mark as Read{% endtrans %}
                         </button>
                     </form>
 
                     {% if forum.locked %}
                         <span class="btn btn-white disabled">
-                            <span class="fas fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}
+                            <span class="fas fa-lock"></span> {% trans %}Locked{% endtrans %}
                         </span>
                     {% endif %}
                     {% if current_user|post_topic(forum) %}
                         <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}"
                            class="btn btn-primary">
-                            <span class="fas fa-plus fa-fw"></span> {% trans %}New Topic{% endtrans %}
+                            <span class="fas fa-plus"></span> {% trans %}New Topic{% endtrans %}
                         </a>
                     {% endif %}
                 </div>
@@ -70,7 +70,7 @@
                 <div class="col-auto ms-auto g-0">
                     <a class="btn btn-outline-dark"
                        href="{{ url_for('forum.manage_forum', forum_id=forum.id, slug=forum.slug) }}">
-                        <span class="fas fa-tasks fa-fw"></span> {% trans %}Moderation Mode{% endtrans %}
+                        <span class="fas fa-tasks"></span> {% trans %}Moderation Mode{% endtrans %}
                     </a>
                 </div>
             </div>

@@ -11,7 +11,7 @@
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false">
-                        <span class="fas fa-bars fa-fw" aria-hidden="true"></span> {% trans %}Moderate{% endtrans %}
+                        <span class="fas fa-bars" aria-hidden="true"></span> {% trans %}Moderate{% endtrans %}
                     </button>
                     <ul class="dropdown-menu">
 
@@ -27,7 +27,7 @@
                                             data-bs-target="#confirmModal"
                                             data-tooltip="tooltip"
                                             title="{% trans %}Delete this topic{% endtrans %}">
-                                        <span class="fas fa-trash fa-fw"></span> {% trans %}Delete Topic{% endtrans %}
+                                        <span class="fas fa-trash"></span> {% trans %}Delete Topic{% endtrans %}
                                     </button>
                                 </form>
                             </li>
@@ -42,7 +42,7 @@
                                           hx-post="{{ url_for('forum.lock_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="fas fa-lock fa-fw"></span> {% trans %}Lock Topic{% endtrans %}
+                                            <span class="fas fa-lock"></span> {% trans %}Lock Topic{% endtrans %}
                                         </button>
                                     </form>
                                 </li>
@@ -54,7 +54,7 @@
                                           hx-post="{{ url_for('forum.unlock_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="fas fa-unlock fa-fw"></span> {% trans %}Unlock Topic{% endtrans %}
+                                            <span class="fas fa-unlock"></span> {% trans %}Unlock Topic{% endtrans %}
                                         </button>
                                     </form>
                                 </li>
@@ -68,7 +68,7 @@
                                           hx-post="{{ url_for('forum.highlight_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="fas fa-star fa-fw"></span> {% trans %}Highlight Topic{% endtrans %}
+                                            <span class="fas fa-star"></span> {% trans %}Highlight Topic{% endtrans %}
                                         </button>
                                     </form>
                                 </li>
@@ -80,7 +80,7 @@
                                           hx-post="{{ url_for('forum.trivialize_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="far fa-star fa-fw"></span> {% trans %}Trivialize Topic{% endtrans %}
+                                            <span class="far fa-star"></span> {% trans %}Trivialize Topic{% endtrans %}
                                         </button>
                                     </form>
                                 </li>
@@ -95,7 +95,7 @@
                                           hx-post="{{ url_for('forum.unhide_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="fas fa-user fa-fw"></span> {% trans %}Unhide Topic{% endtrans %}
+                                            <span class="fas fa-user"></span> {% trans %}Unhide Topic{% endtrans %}
                                         </button>
                                     </form>
                                 {% else %}
@@ -105,7 +105,7 @@
                                           hx-post="{{ url_for('forum.hide_topic', topic_id=topic.id, slug=topic.slug) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button type="submit" class="dropdown-item">
-                                            <span class="fas fa-user-secret fa-fw"></span> {% trans %}Hide Topic{% endtrans %}
+                                            <span class="fas fa-user-secret"></span> {% trans %}Hide Topic{% endtrans %}
                                         </button>
                                     </form>
                                 {% endif %}
@@ -123,7 +123,7 @@
                       hx-post="{{ url_for('forum.untrack_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button type="submit" class="btn btn-outline-dark">
-                        <span class="fas fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Untrack Topic{% endtrans %}
+                        <span class="fas fa-tag" aria-hidden="true"></span> {% trans %}Untrack Topic{% endtrans %}
                     </button>
                 </form>
             {% else %}
@@ -133,7 +133,7 @@
                       hx-post="{{ url_for('forum.track_topic', topic_id=topic.id, slug=topic.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <button type="submit" class="btn btn-outline-dark">
-                        <span class="fas fa-tag fa-fw" aria-hidden="true"></span> {% trans %}Track Topic{% endtrans %}
+                        <span class="fas fa-tag" aria-hidden="true"></span> {% trans %}Track Topic{% endtrans %}
                     </button>
                 </form>
             {% endif %}
@@ -141,10 +141,10 @@
             {% if current_user|post_reply(topic) %}
                 <a href="{{ url_for('forum.new_post', topic_id=topic.id, slug=topic.slug) }}"
                    class="btn btn-primary">
-                    <span class="fas fa-reply fa-fw"></span> {% trans %}Reply{% endtrans %}
+                    <span class="fas fa-reply"></span> {% trans %}Reply{% endtrans %}
                 </a>
             {% else %}
-                <div class="btn btn-primary"><span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}</div>
+                <div class="btn btn-primary"><span class="fa fa-lock"></span> {% trans %}Locked{% endtrans %}</div>
             {% endif %}
 
             {{ run_hook("flaskbb_tpl_topic_controls", topic=topic) }}

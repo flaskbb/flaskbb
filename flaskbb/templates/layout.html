@@ -86,11 +86,11 @@
                                 {% if current_user and current_user.is_authenticated %}
                                     <a class="btn btn-primary"
                                        href="{{ url_for('user.profile', username=current_user.username) }}">
-                                        <span class="far fa-user fa-fw"></span> {{ current_user.username }}
+                                        <span class="far fa-user"></span> {{ current_user.username }}
                                     </a>
                                 {% else %}
                                     <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
-                                        <span class="fa fa-user fa-fw"></span>
+                                        <span class="fa fa-user"></span>
                                         {% trans %}Login{% endtrans %}
                                     </a>
                                 {% endif %}

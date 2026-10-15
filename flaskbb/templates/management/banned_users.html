@@ -69,12 +69,12 @@
                                    href="#"
                                    role="button"
                                    aria-expanded="false">
-                                    <span class="fa fa-fw fa-cog"></span>
+                                    <span class="fa fa-cog"></span>
                                     {% trans %}Actions{% endtrans %}
                                 </a>
 
                                 <ul class="dropdown-menu">
-                                    {{ bulk_action(url_for('management.unban_user'), _("Unban selected Users"), "fas fa-fw fa-flag text-success") }}
+                                    {{ bulk_action(url_for('management.unban_user'), _("Unban selected Users"), "fas fa-flag text-success") }}
                                 </ul>
                             </div>
                         </div>

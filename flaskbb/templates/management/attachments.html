@@ -90,11 +90,11 @@
                                    href="#"
                                    role="button"
                                    aria-expanded="false">
-                                    <span class="fa fa-fw fa-cog"></span>
+                                    <span class="fa fa-cog"></span>
                                     {% trans %}Actions{% endtrans %}
                                 </a>
                                 <ul class="dropdown-menu">
-                                    {{ bulk_action(url_for('management.delete_attachment'), _("Delete selected Attachments"), "far fa-fw fa-trash-alt text-danger") }}
+                                    {{ bulk_action(url_for('management.delete_attachment'), _("Delete selected Attachments"), "far fa-trash-alt text-danger") }}
                                 </ul>
                             </div>
                         </div>

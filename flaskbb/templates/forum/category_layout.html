@@ -14,10 +14,10 @@
             <div class="row category-row hover">
 
                 {% if forum.external %}
-                    <div class="col-md-5 col-sm-5 col-8 forum-info ps-3">
+                    <div class="col-md-5 col-sm-5 col-8 forum-info ps-2">
                         <!-- Icon -->
                         <div class="forum-status">
-                            <span class="fas fa-external-link-alt fa-fw forum-external"></span>
+                            <span class="fas fa-external-link-alt forum-external"></span>
                         </div>
 
                         <!-- Forum Name -->
@@ -26,7 +26,9 @@
                         </div>
 
                         <!-- Forum Description -->
-                        <div class="forum-description">{{ forum.description|nonpost_markup }}</div>
+                        {% if forum.description %}
+                            <div class="forum-description">{{ forum.description|nonpost_markup }}</div>
+                        {% endif %}
                     </div>
                     <!-- end forum-info -->
 
@@ -43,11 +45,11 @@
                         <!-- Icon -->
                         <div class="forum-status">
                             {% if forum.locked %}
-                                <span class="fas fa-lock fa-fw forum-locked"></span>
+                                <span class="fas fa-lock forum-locked"></span>
                             {% elif forum|forum_is_unread(forumsread, current_user) %}
-                                <span class="fas fa-comments fa-fw forum-unread"></span>
+                                <span class="fas fa-comments forum-unread"></span>
                             {% else %}
-                                <span class="far fa-comments fa-fw forum-read"></span>
+                                <span class="far fa-comments forum-read"></span>
                             {% endif %}
                         </div>
 

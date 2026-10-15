@@ -1,0 +1,8 @@
+// The font files themselves are reused from the default theme's static
+// folder (served at /static), so they are not re-emitted for this theme.
+@use "@fortawesome/fontawesome-free/scss/variables" with (
+    $font-path: "/static"
+);
+@use "@fortawesome/fontawesome-free/scss/fontawesome";
+@use "@fortawesome/fontawesome-free/scss/solid";
+@use "@fortawesome/fontawesome-free/scss/regular";

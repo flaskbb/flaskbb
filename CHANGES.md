@@ -46,6 +46,7 @@ Unreleased
 #### Appearance
 - A dark version of the Aurora theme was added.
 - New favicon based on the FlaskBB logo that adapts to light and dark browser themes.
+- Font Awesome was upgraded to version 7.
 
 #### CLI
 - New `flaskbb serve` command runs FlaskBB with gunicorn.

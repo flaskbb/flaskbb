@@ -1111,7 +1111,7 @@ def flaskbb_tpl_user_nav_menu(user: "User | Guest"):
                     NavigationLink(
                         endpoint="myplugin.inbox",
                         name=_("Inbox"),
-                        icon="fa fa-inbox fa-fw",
+                        icon="fa fa-inbox",
                     )
                 ]
 

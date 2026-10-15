@@ -33,6 +33,11 @@
         &.hover:hover {
             background-color: $page-hover;
         }
+
+        // a single name line is shorter than the icon
+        &:has(> .forum-info > .forum-name:last-child) {
+            align-items: center;
+        }
     }
 
     .forum-info {
@@ -56,6 +61,11 @@
 
             > :not(.forum-status) {
                 grid-column: 2;
+            }
+
+            > .forum-name:last-child {
+                grid-row: span 3;
+                align-self: center;
             }
         }
 

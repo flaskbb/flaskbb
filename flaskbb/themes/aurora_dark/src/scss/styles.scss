@@ -7,13 +7,8 @@
 @import "variables";
 @import "bootstrap/scss/bootstrap";
 
-// Import fontawesome icons.
-// The font files themselves are reused from the default theme's static
-// folder (served at /static), so they are not re-emitted for this theme.
-$fa-font-path: "/static";
-@import "@fortawesome/fontawesome-free/scss/fontawesome";
-@import "@fortawesome/fontawesome-free/scss/solid";
-@import "@fortawesome/fontawesome-free/scss/regular";
+// Import fontawesome icons
+@import "fontawesome";
 
 // Import FlaskBB theme (shared with the default theme)
 @import "../../../aurora/src/scss/text";

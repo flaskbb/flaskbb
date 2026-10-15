@@ -3,7 +3,8 @@
 }
 
 .btn-icon {
-    font-family: "Font Awesome 6 Free";
+    --fa-width: auto;
+    font-family: var(--fa-family-classic);
     font-size: 1em;
     line-height: 1.5em;
     background: none;

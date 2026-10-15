@@ -3,20 +3,20 @@
     <div class="{% if with_checkbox %}col-7{% else %}col-8{% endif %} col-sm-4 topic-info">
         <div class="topic-status h-100">
             {% if topic.locked %}
-                <span class="fas fa-lock fa-fw topic-locked"></span>
+                <span class="fas fa-lock topic-locked"></span>
             {% elif topic.hidden %}
                 <span class="far fa-eye"></span>
             {% elif topic.important %}
                 {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                    <span class="far fa-star fa-fw topic-starred-unread"></span>
+                    <span class="far fa-star topic-starred-unread"></span>
                 {% else %}
-                    <span class="fas fa-star fa-fw topic-starred-read"></span>
+                    <span class="fas fa-star topic-starred-read"></span>
                 {% endif %}
             {% else %}
                 {% if topic|topic_is_unread(topicread, current_user, forumsread) %}
-                    <span class="fas fa-comment fa-fw topic-unread"></span>
+                    <span class="fas fa-comment topic-unread"></span>
                 {% else %}
-                    <span class="far fa-comment fa-fw topic-read"></span>
+                    <span class="far fa-comment topic-read"></span>
                 {% endif %}
             {% endif %}
         </div>

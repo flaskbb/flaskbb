@@ -39,13 +39,13 @@
                                    href="#"
                                    role="button"
                                    aria-expanded="false">
-                                    <span class="fa fa-fw fa-cog"></span>
+                                    <span class="fa fa-cog"></span>
                                     {% trans %}Actions{% endtrans %}
                                 </a>
 
                                 <ul class="dropdown-menu">
-                                    {{ bulk_action(url_for('management.report_markread'), _("Mark as Read"), "fa fa-fw fa-flag-o text-primary") }}
-                                    {{ bulk_action(url_for('management.delete_report'), _("Delete selected reports"), "fa fa-fw fa-trash text-danger") }}
+                                    {{ bulk_action(url_for('management.report_markread'), _("Mark as Read"), "far fa-flag text-primary") }}
+                                    {{ bulk_action(url_for('management.delete_report'), _("Delete selected reports"), "fa fa-trash text-danger") }}
                                 </ul>
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                                         id="read-" ~ report.id,
                                         url=url_for('management.report_markread', report_id=report.id),
                                         title=_("Mark as Read"),
-                                        icon="fa fa-flag-o text-primary"
+                                        icon="far fa-flag text-primary"
                                     )
                                     }}
                                 {% endif %}
