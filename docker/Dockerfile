@@ -3,7 +3,7 @@
 #
 #   docker build -f docker/Dockerfile -t flaskbb:release docker/
 ARG PYTHON_VERSION=3.15
-ARG UV_VERSION=0.12
+ARG UV_VERSION=0.13
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
