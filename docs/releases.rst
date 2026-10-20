@@ -27,6 +27,111 @@ cut from this branch.
 Feature and example branches may also be found in the official FlaskBB repo
 but these are not considered release ready and may be unstable.
 
+.. _making-a-release:
+
+Making a Release
+~~~~~~~~~~~~~~~~
+
+A release is cut by pushing a version tag. Everything after the push is done
+by the ``Publish`` workflow in ``.github/workflows/publish.yaml``, see
+:ref:`publish-workflow`.
+
+1. Check that the ``Tests``, ``Typing`` and ``pre-commit`` workflows are green
+   on the commit you are about to tag. ``Publish`` does not run any of them.
+
+2. Rebuild both themes and commit ``flaskbb/static`` and
+   ``flaskbb/themes/aurora_dark/static`` if anything changed:
+
+   .. code-block:: bash
+
+       make frontend-build
+
+   The wheel ships the compiled theme assets from the repository, the
+   workflow does not build them. ``make frontend`` writes development builds,
+   don't release those.
+
+3. In ``CHANGES.md``, replace ``Unreleased`` below the version's heading with
+   the release date, e.g. ``Released October 15th, 2026``.
+
+4. Set ``__version__`` in ``flaskbb/_version.py`` to the new version. Hatchling
+   reads the package version from this file.
+
+5. Commit both files and create an annotated tag. The tag is the version with
+   a ``v`` prefix and must match ``__version__``:
+
+   .. code-block:: bash
+
+       git commit -m "release version v3.0.0" CHANGES.md flaskbb/_version.py
+       git tag -a v3.0.0 -m "release version v3.0.0"
+
+6. Push the branch and the tag together, so that neither arrives without the
+   other:
+
+   .. code-block:: bash
+
+       git push --atomic origin master v3.0.0
+
+7. Follow the ``Publish`` run in the Actions tab of the repository. If the
+   ``publish`` environment requires a reviewer, approve the deployment when
+   the run waits for it.
+
+8. When the run has finished, open the draft release the workflow created on
+   GitHub, write the release notes and publish it. Mark release candidates as
+   pre-releases.
+
+.. warning::
+
+    ``Publish`` runs for every tag that is pushed, not only version tags, and
+    it does not compare the tag with ``__version__``. PyPI receives the version
+    from ``flaskbb/_version.py``, while the Docker job derives the wheel's file
+    name from the tag. If they differ, the Docker job fails after the upload
+    to PyPI has already happened.
+
+PyPI never accepts the same version twice. If something is wrong with a
+release after it has been uploaded, fix it and release the next version
+instead of moving the tag.
+
+.. _publish-workflow:
+
+The Publish Workflow
+~~~~~~~~~~~~~~~~~~~~
+
+``build``
+    Builds the sdist and the wheel with ``uv build``. ``SOURCE_DATE_EPOCH`` is
+    set to the commit date so that the build is reproducible. The build hook
+    in ``hatch_build.py`` compiles the translations into the wheel.
+
+``create-release``
+    Creates a draft GitHub release for the tag and attaches the sdist and the
+    wheel.
+
+``publish-pypi``
+    Uploads the sdist and the wheel to PyPI with trusted publishing, there is
+    no API token. PyPI trusts the workflow by its file name ``publish.yaml``
+    and the environment ``publish``, renaming either one requires updating the
+    trusted publisher on PyPI.
+
+``publish-docker``
+    Runs after the upload to PyPI. Builds the release image
+    (``docker/Dockerfile``) from the wheel for ``linux/amd64`` and
+    ``linux/arm64`` and pushes it to ``ghcr.io/flaskbb/flaskbb``, once as it is
+    and once with the ``plugins`` extra, which contains all official plugins.
+
+The image tags follow the version. Pre-releases only get their exact version:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Tag
+     - Image tags
+   * - ``v3.0.0``
+     - ``3.0.0``, ``3.0``, ``latest``, ``3.0.0-plugins``, ``3.0-plugins``,
+       ``latest-plugins``
+   * - ``v3.0.0rc4``
+     - ``3.0.0rc4``, ``3.0.0rc4-plugins``
+
+See :ref:`docker-deployment` for how the images are used.
+
 Deprecation Policy
 ~~~~~~~~~~~~~~~~~~
 
