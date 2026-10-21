@@ -1,0 +1,32 @@
+version: 2
+
+multi-ecosystem-groups:
+  dependencies:
+    schedule:
+      interval: weekly
+
+updates:
+  - package-ecosystem: uv
+    directory: /
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
+
+  - package-ecosystem: npm
+    directory: /flaskbb/themes/aurora
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
+
+  # the Dockerfiles take their base image tags from build args, only the compose images are updatable
+  - package-ecosystem: docker
+    directory: /docker
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
+
+  - package-ecosystem: github-actions
+    directory: /
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
