@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-15 20:25+0200\n"
-"PO-Revision-Date: 2026-10-18 13:41+0000\n"
+"PO-Revision-Date: 2026-10-21 07:15+0000\n"
 "Last-Translator: Daniel Nylander "
 "<yeagersthlm2@users.noreply.hosted.weblate.org>\n"
 "Language: sv_SE\n"
@@ -26,11 +26,11 @@ msgstr ""
 #: flaskbb/app.py:510
 #, python-format
 msgid "The upload is too large. A request cannot be bigger than %(size)s."
-msgstr ""
+msgstr "Uppladdningen är för stor. En begäran får inte vara större än %(size)s."
 
 #: flaskbb/app.py:514
 msgid "The upload is too large."
-msgstr ""
+msgstr "Uppladdningen är för stor."
 
 #: flaskbb/app.py:536
 #, python-format
@@ -38,71 +38,73 @@ msgid ""
 "The migrations of %(plugins)s have not been applied yet. Apply them with "
 "'flaskbb plugins install --migrations-only <plugin>'."
 msgstr ""
+"Migreringarna för %(plugins)s har ännu inte tillämpats. Tillämpa dem med "
+"'flaskbb plugins install --migrations-only <plugin>'."
 
 #: flaskbb/app.py:543
 msgid "This page is currently unavailable."
-msgstr ""
+msgstr "Den här sidan är för närvarande inte tillgänglig."
 
 #: flaskbb/deprecation.py:78
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr ""
+msgstr "%(name)s kommer att fasas ut och tas bort i version %(version)s."
 
 #: flaskbb/email.py:59
 msgid "Password Recovery Confirmation"
-msgstr ""
+msgstr "Bekräftelse av lösenordsåterställning"
 
 #: flaskbb/email.py:75 flaskbb/templates/auth/account_activation.html:2
 #: flaskbb/templates/auth/account_activation.html:8
 msgid "Account Activation"
-msgstr ""
+msgstr "Kontoaktivering"
 
 #: flaskbb/markup.py:296
 msgid "Quote"
-msgstr ""
+msgstr "Citat"
 
 #: flaskbb/markup.py:312
 msgid "Show full quote"
-msgstr ""
+msgstr "Visa hela citatet"
 
 #: flaskbb/markup.py:321
 #, python-format
 msgid "%(author)s wrote:"
-msgstr ""
+msgstr "%(author)s skrev:"
 
 #: flaskbb/markup.py:327
 msgid "Go to quoted post"
-msgstr ""
+msgstr "Gå till citerat inlägg"
 
 #: flaskbb/auth/forms.py:36 flaskbb/management/forms.py:67
 msgid "You can only use letters, numbers or dashes."
-msgstr ""
+msgstr "Du får bara använda bokstäver, siffror eller bindestreck."
 
 #: flaskbb/auth/forms.py:42
 msgid "Username or Email address"
-msgstr ""
+msgstr "Användarnamn eller e-postadress"
 
 #: flaskbb/auth/forms.py:43
 msgid "Please enter your username or email address."
-msgstr ""
+msgstr "Ange ditt användarnamn eller din e-postadress."
 
 #: flaskbb/auth/forms.py:47 flaskbb/auth/forms.py:75 flaskbb/auth/forms.py:97
 #: flaskbb/auth/forms.py:129 flaskbb/user/forms.py:109
 msgid "Password"
-msgstr ""
+msgstr "Lösenord"
 
 #: flaskbb/auth/forms.py:48 flaskbb/auth/forms.py:98 flaskbb/user/forms.py:110
 msgid "Please enter your password."
-msgstr ""
+msgstr "Ange ditt lösenord."
 
 #: flaskbb/auth/forms.py:51
 msgid "Remember me"
-msgstr ""
+msgstr "Kom ihåg mig"
 
 #: flaskbb/auth/forms.py:53 flaskbb/templates/auth/login.html:2
 #: flaskbb/templates/auth/login.html:8 flaskbb/templates/layout.html:94
 msgid "Login"
-msgstr ""
+msgstr "Logga in"
 
 #: flaskbb/auth/forms.py:59 flaskbb/auth/forms.py:143
 #: flaskbb/management/forms.py:142 flaskbb/templates/forum/memberlist.html:46
@@ -110,281 +112,287 @@ msgstr ""
 #: flaskbb/templates/management/users.html:61
 #: flaskbb/templates/search/search_result.html:76
 msgid "Username"
-msgstr ""
+msgstr "Användarnamn"
 
 #: flaskbb/auth/forms.py:61
 msgid "A valid username is required"
-msgstr ""
+msgstr "Ett giltigt användarnamn krävs"
 
 #: flaskbb/auth/forms.py:67 flaskbb/auth/forms.py:107 flaskbb/auth/forms.py:121
 #: flaskbb/auth/forms.py:151 flaskbb/management/forms.py:150
 msgid "Email address"
-msgstr ""
+msgstr "E-postadress"
 
 #: flaskbb/auth/forms.py:69 flaskbb/auth/forms.py:109 flaskbb/auth/forms.py:123
 #: flaskbb/auth/forms.py:153 flaskbb/management/forms.py:152
 #: flaskbb/user/forms.py:80
 msgid "A valid email address is required."
-msgstr ""
+msgstr "En giltig e-postadress krävs."
 
 #: flaskbb/auth/forms.py:70 flaskbb/auth/forms.py:154
 #: flaskbb/management/forms.py:153 flaskbb/user/forms.py:81
 #: flaskbb/user/forms.py:89 flaskbb/user/forms.py:94
 msgid "Invalid email address."
-msgstr ""
+msgstr "Ogiltig e-postadress."
 
 #: flaskbb/auth/forms.py:78 flaskbb/auth/forms.py:132
 msgid "Passwords must match."
-msgstr ""
+msgstr "Lösenorden måste stämma överens."
 
 #: flaskbb/auth/forms.py:82 flaskbb/auth/forms.py:136
 msgid "Confirm password"
-msgstr ""
+msgstr "Bekräfta lösenord"
 
 #: flaskbb/auth/forms.py:84 flaskbb/user/forms.py:56
 msgid "Language"
-msgstr ""
+msgstr "Språk"
 
 #: flaskbb/auth/forms.py:87
 msgid "I accept the Terms of Service"
-msgstr ""
+msgstr "Jag godkänner användarvillkoren"
 
 #: flaskbb/auth/forms.py:88
 msgid "Please accept the TOS."
-msgstr ""
+msgstr "Godkänn användarvillkoren."
 
 #: flaskbb/auth/forms.py:92 flaskbb/templates/auth/register.html:2
 #: flaskbb/templates/auth/register.html:8 flaskbb/user/plugins.py:110
 msgid "Register"
-msgstr ""
+msgstr "Registrera"
 
 #: flaskbb/auth/forms.py:101 flaskbb/templates/auth/reauth.html:2
 #: flaskbb/templates/auth/reauth.html:8
 msgid "Refresh Login"
-msgstr ""
+msgstr "Uppdatera inloggningen"
 
 #: flaskbb/auth/forms.py:114
 msgid "Request Password"
-msgstr ""
+msgstr "Begär lösenord"
 
 #: flaskbb/auth/forms.py:138
 msgid "Reset password"
-msgstr ""
+msgstr "Återställ lösenord"
 
 #: flaskbb/auth/forms.py:145 flaskbb/management/forms.py:144
 msgid "A valid username is required."
-msgstr ""
+msgstr "Ett giltigt användarnamn krävs."
 
 #: flaskbb/auth/forms.py:158
 msgid "Send Confirmation Mail"
-msgstr ""
+msgstr "Skicka bekräftelsemeddelande"
 
 #: flaskbb/auth/forms.py:163
 msgid "Email confirmation token"
-msgstr ""
+msgstr "Token för e-postbekräftelse"
 
 #: flaskbb/auth/forms.py:164
 msgid "Please enter the token we have sent to you."
-msgstr ""
+msgstr "Ange token som vi har skickat till dig."
 
 #: flaskbb/auth/forms.py:166
 msgid "Confirm Email"
-msgstr ""
+msgstr "Bekräfta e-postadress"
 
 #: flaskbb/auth/views.py:82
 msgid "Logged out"
-msgstr ""
+msgstr "Utloggad"
 
 #: flaskbb/auth/views.py:117
 msgid "Unrecoverable error while handling login"
-msgstr ""
+msgstr "Ett oåterkalleligt fel uppstod när inloggningen hanterades"
 
 #: flaskbb/auth/views.py:146
 msgid "Reauthenticated."
-msgstr ""
+msgstr "Autentiseringen har förnyats."
 
 #: flaskbb/auth/views.py:151
 msgid "Unrecoverable error while handling reauthentication"
-msgstr ""
+msgstr "Ett oåterkalleligt fel uppstod när förnyad autentisering hanterades"
 
 #: flaskbb/auth/views.py:195
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr ""
+msgstr "Registreringen kunde inte behandlas på grund av ett oåterkalleligt fel"
 
 #: flaskbb/auth/views.py:227
 msgid ""
 "You have entered an username or email address that is not linked with "
 "your account."
 msgstr ""
+"Du har angett ett användarnamn eller en e-postadress som inte är kopplad "
+"till ditt konto."
 
 #: flaskbb/auth/views.py:233
 msgid "Email sent! Please check your inbox."
-msgstr ""
+msgstr "E-postmeddelandet har skickats! Kontrollera din inkorg."
 
 #: flaskbb/auth/views.py:268
 msgid "Error when resetting password"
-msgstr ""
+msgstr "Fel vid återställning av lösenord"
 
 #: flaskbb/auth/views.py:279
 msgid "Your password has been updated."
-msgstr ""
+msgstr "Ditt lösenord har uppdaterats."
 
 #: flaskbb/auth/views.py:308
 msgid "A new account activation token has been sent to your email address."
-msgstr ""
+msgstr "En ny token för kontoaktivering har skickats till din e-postadress."
 
 #: flaskbb/auth/views.py:341 flaskbb/auth/views.py:387
 msgid "Could not activate account due to an unrecoverable error"
-msgstr ""
+msgstr "Kontot kunde inte aktiveras på grund av ett oåterkalleligt fel"
 
 #: flaskbb/auth/views.py:348 flaskbb/auth/views.py:395
 msgid "Your account has been activated and you can now login."
-msgstr ""
+msgstr "Ditt konto har aktiverats och du kan nu logga in."
 
 #: flaskbb/auth/services/activation.py:38
 msgid "Entered email doesn't exist"
-msgstr ""
+msgstr "Den angivna e-postadressen finns inte"
 
 #: flaskbb/auth/services/activation.py:41
 #: flaskbb/auth/services/activation.py:60
 msgid "Account is already activated"
-msgstr ""
+msgstr "Kontot är redan aktiverat"
 
 #: flaskbb/auth/services/authentication.py:76
 msgid "Your account is currently locked out due to too many failed login attempts"
 msgstr ""
+"Ditt konto är för närvarande låst på grund av för många misslyckade "
+"inloggningsförsök"
 
 #: flaskbb/auth/services/authentication.py:134
 msgid ""
 "In order to use your account you have to activate it through the link we "
 "have sent to your email address."
 msgstr ""
+"För att använda ditt konto måste du aktivera det via länken som vi har "
+"skickat till din e-postadress."
 
 #: flaskbb/auth/services/authentication.py:169
 msgid "Wrong username or password."
-msgstr ""
+msgstr "Fel användarnamn eller lösenord."
 
 #: flaskbb/auth/services/password.py:46
 msgid "Invalid email"
-msgstr ""
+msgstr "Ogiltig e-postadress"
 
 #: flaskbb/auth/services/reauthentication.py:84
 msgid "Wrong password."
-msgstr ""
+msgstr "Fel lösenord."
 
 #: flaskbb/auth/services/registration.py:81
 #, python-format
 msgid "Username must be between %(min)s and %(max)s characters long"
-msgstr ""
+msgstr "Användarnamnet måste innehålla mellan %(min)s och %(max)s tecken"
 
 #: flaskbb/auth/services/registration.py:92
 #, python-format
 msgid "%(username)s is a forbidden username"
-msgstr ""
+msgstr "%(username)s är ett otillåtet användarnamn"
 
 #: flaskbb/auth/services/registration.py:117
 #, python-format
 msgid "%(username)s is already registered"
-msgstr ""
+msgstr "%(username)s är redan registrerat"
 
 #: flaskbb/auth/services/registration.py:141
 #: flaskbb/user/services/validators.py:44
 #, python-format
 msgid "%(email)s is already registered"
-msgstr ""
+msgstr "%(email)s är redan registrerad"
 
 #: flaskbb/auth/services/registration.py:161
 #, python-format
 msgid "An account activation email has been sent to %(email)s"
-msgstr ""
+msgstr "Ett e-postmeddelande för kontoaktivering har skickats till %(email)s"
 
 #: flaskbb/auth/services/registration.py:176
 msgid "Thanks for registering."
-msgstr ""
+msgstr "Tack för att du registrerade dig."
 
 #: flaskbb/core/tokens.py:41
 msgid "Token is invalid"
-msgstr ""
+msgstr "Token är ogiltig"
 
 #: flaskbb/core/tokens.py:49
 msgid "Token is expired"
-msgstr ""
+msgstr "Token har gått ut"
 
 #: flaskbb/core/tokens.py:56
 msgid "Token cannot be processed"
-msgstr ""
+msgstr "Token kan inte bearbetas"
 
 #: flaskbb/forum/forms.py:39 flaskbb/forum/forms.py:105
 msgid "Content"
-msgstr ""
+msgstr "Innehåll"
 
 #: flaskbb/forum/forms.py:40 flaskbb/forum/forms.py:106
 msgid "You cannot post a reply without content."
-msgstr ""
+msgstr "Du kan inte skicka ett svar utan innehåll."
 
 #: flaskbb/forum/forms.py:43 flaskbb/templates/forum/topic_controls.html:144
 msgid "Reply"
-msgstr ""
+msgstr "Svara"
 
 #: flaskbb/forum/forms.py:59 flaskbb/forum/forms.py:110
 msgid "Track this topic"
-msgstr ""
+msgstr "Följ det här ämnet"
 
 #: flaskbb/forum/forms.py:61 flaskbb/forum/forms.py:112
 msgid "Add this topic to your Topic Tracker."
-msgstr ""
+msgstr "Lägg till det här ämnet i din ämnesbevakning."
 
 #: flaskbb/forum/forms.py:100
 msgid "Topic title"
-msgstr ""
+msgstr "Ämnets titel"
 
 #: flaskbb/forum/forms.py:101
 msgid "Please choose a title for your topic."
-msgstr ""
+msgstr "Välj en titel för ditt ämne."
 
 #: flaskbb/forum/forms.py:117
 msgid "Highlight topic"
-msgstr ""
+msgstr "Fäst ämne"
 
 #: flaskbb/forum/forms.py:119
 msgid "Keep this topic above regular topics in the forum."
-msgstr ""
+msgstr "Håll det här ämnet ovanför vanliga ämnen i forumet."
 
 #: flaskbb/forum/forms.py:124
 msgid "Lock topic"
-msgstr ""
+msgstr "Lås ämne"
 
 #: flaskbb/forum/forms.py:126
 msgid "Prevent regular members from replying."
-msgstr ""
+msgstr "Hindra vanliga medlemmar från att svara."
 
 #: flaskbb/forum/forms.py:131
 msgid "Hide topic"
-msgstr ""
+msgstr "Dölj ämne"
 
 #: flaskbb/forum/forms.py:133
 msgid "Hide this topic from regular forum listings."
-msgstr ""
+msgstr "Dölj det här ämnet från vanliga forumlistor."
 
 #: flaskbb/forum/forms.py:137
 msgid "Post topic"
-msgstr ""
+msgstr "Skapa ämne"
 
 #: flaskbb/forum/forms.py:166
 msgid "Save topic"
-msgstr ""
+msgstr "Spara ämne"
 
 #: flaskbb/forum/forms.py:228 flaskbb/templates/management/reports.html:32
 msgid "Reason"
-msgstr ""
+msgstr "Anledning"
 
 #: flaskbb/forum/forms.py:229
 msgid "What is the reason for reporting this post?"
-msgstr ""
+msgstr "Vad är anledningen till att du anmäler det här inlägget?"
 
 #: flaskbb/forum/forms.py:232
 msgid "Report post"
-msgstr ""
+msgstr "Anmäl inlägg"
 
 #: flaskbb/forum/forms.py:240 flaskbb/forum/forms.py:242
 #: flaskbb/management/forms.py:113 flaskbb/management/forms.py:115
@@ -398,27 +406,27 @@ msgstr ""
 #: flaskbb/templates/search/search_form.html:13
 #: flaskbb/templates/search/search_form.html:24
 msgid "Search"
-msgstr ""
+msgstr "Sök"
 
 #: flaskbb/forum/utils.py:66 flaskbb/forum/views.py:443
 msgid "Please modify topics in only one forum at a time."
-msgstr ""
+msgstr "Ändra bara ämnen i ett forum åt gången."
 
 #: flaskbb/forum/utils.py:70
 msgid "You do not have the permissions to execute this action."
-msgstr ""
+msgstr "Du har inte behörighet att utföra den här åtgärden."
 
 #: flaskbb/forum/utils.py:76
 msgid "You do not have the permissions to delete these topics."
-msgstr ""
+msgstr "Du har inte behörighet att ta bort de här ämnena."
 
 #: flaskbb/forum/utils.py:78
 msgid "You do not have the permissions to hide these topics."
-msgstr ""
+msgstr "Du har inte behörighet att dölja de här ämnena."
 
 #: flaskbb/forum/utils.py:79
 msgid "You do not have the permissions to unhide these topics."
-msgstr ""
+msgstr "Du har inte behörighet att visa de här ämnena igen."
 
 #: flaskbb/forum/utils.py:143 flaskbb/management/navigation.py:216
 #: flaskbb/templates/forum/_attachment_fields.html:9
@@ -428,247 +436,247 @@ msgstr ""
 #: flaskbb/templates/management/attachments.html:22
 #: flaskbb/templates/management/overview.html:110
 msgid "Attachments"
-msgstr ""
+msgstr "Bilagor"
 
 #: flaskbb/forum/utils.py:146
 msgid "Delete attachments"
-msgstr ""
+msgstr "Ta bort bilagor"
 
 #: flaskbb/forum/utils.py:170
 msgid "Attachments are disabled."
-msgstr ""
+msgstr "Bilagor är inaktiverade."
 
 #: flaskbb/forum/utils.py:173
 msgid "You are not allowed to upload attachments."
-msgstr ""
+msgstr "Du har inte behörighet att ladda upp bilagor."
 
 #: flaskbb/forum/utils.py:181
 #: flaskbb/templates/forum/_attachment_fields.html:24
 #, python-format
 msgid "Only %(amount)s attachments per post are allowed."
-msgstr ""
+msgstr "Högst %(amount)s bilagor per inlägg är tillåtna."
 
 #: flaskbb/forum/utils.py:194
 #, python-format
 msgid "File type %(ext)s is not allowed. Allowed types are: %(types)s"
-msgstr ""
+msgstr "Filtypen %(ext)s är inte tillåten. Tillåtna typer är: %(types)s"
 
 #: flaskbb/forum/utils.py:206
 #: flaskbb/templates/forum/_attachment_fields.html:27
 #, python-format
 msgid "Attachments cannot be bigger than %(size)s."
-msgstr ""
+msgstr "Bilagor får inte vara större än %(size)s."
 
 #: flaskbb/forum/views.py:162 flaskbb/forum/views.py:864
 #: flaskbb/forum/views.py:886 flaskbb/forum/views.py:964
 #: flaskbb/forum/views.py:984
 msgid "You are not allowed to access that forum"
-msgstr ""
+msgstr "Du har inte behörighet att öppna det forumet"
 
 #: flaskbb/forum/views.py:198 flaskbb/forum/views.py:216
 msgid "You are not allowed to access that topic"
-msgstr ""
+msgstr "Du har inte behörighet att öppna det ämnet"
 
 #: flaskbb/forum/views.py:259
 msgid "You are not allowed to post a reply to this topic."
-msgstr ""
+msgstr "Du har inte behörighet att svara i det här ämnet."
 
 #: flaskbb/forum/views.py:272
 msgid "Cannot post reply"
-msgstr ""
+msgstr "Kan inte skicka svar"
 
 #: flaskbb/forum/views.py:297
 msgid "You are not allowed to post a topic here"
-msgstr ""
+msgstr "Du har inte behörighet att skapa ett ämne här"
 
 #: flaskbb/forum/views.py:339
 msgid "You are not allowed to edit that topic"
-msgstr ""
+msgstr "Du har inte behörighet att redigera det ämnet"
 
 #: flaskbb/forum/views.py:388
 msgid "You are not allowed to manage this forum"
-msgstr ""
+msgstr "Du har inte behörighet att hantera det här forumet"
 
 #: flaskbb/forum/views.py:437
 msgid "In order to perform this action you have to select at least one topic."
-msgstr ""
+msgstr "För att utföra den här åtgärden måste du välja minst ett ämne."
 
 #: flaskbb/forum/views.py:447
 #, python-format
 msgid "%(count)s topics locked."
-msgstr ""
+msgstr "%(count)s ämnen har låsts."
 
 #: flaskbb/forum/views.py:448
 #, python-format
 msgid "%(count)s topics unlocked."
-msgstr ""
+msgstr "%(count)s ämnen har låsts upp."
 
 #: flaskbb/forum/views.py:449
 #, python-format
 msgid "%(count)s topics highlighted."
-msgstr ""
+msgstr "%(count)s ämnen har fästs."
 
 #: flaskbb/forum/views.py:450
 #, python-format
 msgid "%(count)s topics trivialized."
-msgstr ""
+msgstr "%(count)s ämnen har markerats som oviktiga."
 
 #: flaskbb/forum/views.py:451
 #, python-format
 msgid "%(count)s topics deleted."
-msgstr ""
+msgstr "%(count)s ämnen har tagits bort."
 
 #: flaskbb/forum/views.py:453
 #, python-format
 msgid "%(count)s topics hidden."
-msgstr ""
+msgstr "%(count)s ämnen har dolts."
 
 #: flaskbb/forum/views.py:454
 #, python-format
 msgid "%(count)s topics unhidden."
-msgstr ""
+msgstr "%(count)s ämnen har visats igen."
 
 #: flaskbb/forum/views.py:458
 msgid "Unknown action requested"
-msgstr ""
+msgstr "Okänd begärd åtgärd"
 
 #: flaskbb/forum/views.py:472
 msgid "Please choose a new forum for the topics."
-msgstr ""
+msgstr "Välj ett nytt forum för ämnena."
 
 #: flaskbb/forum/views.py:477
 msgid "You do not have the permissions to move this topic."
-msgstr ""
+msgstr "Du har inte behörighet att flytta det här ämnet."
 
 #: flaskbb/forum/views.py:481
 msgid "Topics moved."
-msgstr ""
+msgstr "Ämnena har flyttats."
 
 #: flaskbb/forum/views.py:483
 msgid "Failed to move topics."
-msgstr ""
+msgstr "Det gick inte att flytta ämnena."
 
 #: flaskbb/forum/views.py:493
 msgid "You are not allowed to post a reply"
-msgstr ""
+msgstr "Du har inte behörighet att svara"
 
 #: flaskbb/forum/views.py:542
 msgid "You are not allowed to edit that post"
-msgstr ""
+msgstr "Du har inte behörighet att redigera det inlägget"
 
 #: flaskbb/forum/views.py:710
 #, python-format
 msgid "%(topic_count)s topics untracked."
-msgstr ""
+msgstr "%(topic_count)s ämnen följs inte längre."
 
 #: flaskbb/forum/views.py:722
 msgid "You are not allowed to delete this topic"
-msgstr ""
+msgstr "Du har inte behörighet att ta bort det här ämnet"
 
 #: flaskbb/forum/views.py:741
 msgid "You are not allowed to lock this topic"
-msgstr ""
+msgstr "Du har inte behörighet att låsa det här ämnet"
 
 #: flaskbb/forum/views.py:761
 msgid "You are not allowed to unlock this topic"
-msgstr ""
+msgstr "Du har inte behörighet att låsa upp det här ämnet"
 
 #: flaskbb/forum/views.py:781
 msgid "You are not allowed to highlight this topic"
-msgstr ""
+msgstr "Du har inte behörighet att fästa det här ämnet"
 
 #: flaskbb/forum/views.py:801
 msgid "You are not allowed to trivialize this topic"
-msgstr ""
+msgstr "Du har inte behörighet att markera det här ämnet som oviktigt"
 
 #: flaskbb/forum/views.py:821
 msgid "You are not allowed to delete this post"
-msgstr ""
+msgstr "Du har inte behörighet att ta bort det här inlägget"
 
 #: flaskbb/forum/views.py:923
 #, python-format
 msgid "Forum %(forum)s marked as read."
-msgstr ""
+msgstr "Forumet %(forum)s har markerats som läst."
 
 #: flaskbb/forum/views.py:947
 msgid "All forums marked as read."
-msgstr ""
+msgstr "Alla forum har markerats som lästa."
 
 #: flaskbb/forum/views.py:1005
 msgid "You do not have permission to hide this topic"
-msgstr ""
+msgstr "Du har inte behörighet att dölja det här ämnet"
 
 #: flaskbb/forum/views.py:1021
 msgid "You do not have permission to unhide this topic"
-msgstr ""
+msgstr "Du har inte behörighet att visa det här ämnet igen"
 
 #: flaskbb/forum/views.py:1035
 msgid "You do not have permission to hide this post"
-msgstr ""
+msgstr "Du har inte behörighet att dölja det här inlägget"
 
 #: flaskbb/forum/views.py:1039
 msgid "Post is already hidden"
-msgstr ""
+msgstr "Inlägget är redan dolt"
 
 #: flaskbb/forum/views.py:1046
 msgid "Topic hidden"
-msgstr ""
+msgstr "Ämnet har dolts"
 
 #: flaskbb/forum/views.py:1048
 msgid "Post hidden"
-msgstr ""
+msgstr "Inlägget har dolts"
 
 #: flaskbb/forum/views.py:1062
 msgid "You do not have permission to unhide this post"
-msgstr ""
+msgstr "Du har inte behörighet att visa det här inlägget igen"
 
 #: flaskbb/forum/views.py:1066
 msgid "Post is already unhidden"
-msgstr ""
+msgstr "Inlägget visas redan"
 
 #: flaskbb/forum/views.py:1071
 msgid "Post unhidden"
-msgstr ""
+msgstr "Inlägget visas igen"
 
 #: flaskbb/management/forms.py:159 flaskbb/user/forms.py:147
 msgid "Birthday"
-msgstr ""
+msgstr "Födelsedag"
 
 #: flaskbb/management/forms.py:161 flaskbb/user/forms.py:148
 msgid "Gender"
-msgstr ""
+msgstr "Kön"
 
 #: flaskbb/management/forms.py:163 flaskbb/user/forms.py:149
 msgid "Location"
-msgstr ""
+msgstr "Plats"
 
 #: flaskbb/management/forms.py:165 flaskbb/user/forms.py:150
 msgid "Website"
-msgstr ""
+msgstr "Webbplats"
 
 #: flaskbb/management/forms.py:170
 msgid "Avatar"
-msgstr ""
+msgstr "Profilbild"
 
 #: flaskbb/management/forms.py:174
 msgid "Forum signature"
-msgstr ""
+msgstr "Forumsignatur"
 
 #: flaskbb/management/forms.py:176 flaskbb/user/forms.py:152
 msgid "Notes"
-msgstr ""
+msgstr "Anteckningar"
 
 #: flaskbb/management/forms.py:178
 msgid "Is active?"
-msgstr ""
+msgstr "Är aktiv?"
 
 #: flaskbb/management/forms.py:182
 msgid "Primary group"
-msgstr ""
+msgstr "Primär grupp"
 
 #: flaskbb/management/forms.py:186
 msgid "Secondary groups"
-msgstr ""
+msgstr "Sekundära grupper"
 
 #: flaskbb/management/forms.py:193 flaskbb/management/forms.py:326
 #: flaskbb/management/forms.py:471 flaskbb/management/forms.py:552
@@ -676,69 +684,69 @@ msgstr ""
 #: flaskbb/user/forms.py:96 flaskbb/user/forms.py:120 flaskbb/user/forms.py:138
 #: flaskbb/user/forms.py:153
 msgid "Save"
-msgstr ""
+msgstr "Spara"
 
 #: flaskbb/management/forms.py:207
 msgid "This username is already taken."
-msgstr ""
+msgstr "Användarnamnet används redan."
 
 #: flaskbb/management/forms.py:221
 msgid "This email address is already taken."
-msgstr ""
+msgstr "E-postadressen används redan."
 
 #: flaskbb/management/forms.py:284
 msgid "Member"
-msgstr ""
+msgstr "Medlem"
 
 #: flaskbb/management/forms.py:285
 msgid "Moderator"
-msgstr ""
+msgstr "Moderator"
 
 #: flaskbb/management/forms.py:286
 msgid "Super Moderator"
-msgstr ""
+msgstr "Huvudmoderator"
 
 #: flaskbb/management/forms.py:287
 msgid "Administrator"
-msgstr ""
+msgstr "Administratör"
 
 #: flaskbb/management/forms.py:288
 msgid "Banned"
-msgstr ""
+msgstr "Spärrad"
 
 #: flaskbb/management/forms.py:289 flaskbb/templates/forum/topic.html:85
 #: flaskbb/templates/management/attachments.html:129
 msgid "Guest"
-msgstr ""
+msgstr "Gäst"
 
 #: flaskbb/management/forms.py:295
 msgid "Allow"
-msgstr ""
+msgstr "Tillåt"
 
 #: flaskbb/management/forms.py:296
 msgid "Deny"
-msgstr ""
+msgstr "Neka"
 
 #: flaskbb/management/forms.py:297 flaskbb/user/forms.py:63
 msgid "Never"
-msgstr ""
+msgstr "Aldrig"
 
 #: flaskbb/management/forms.py:309
 msgid "Group name"
-msgstr ""
+msgstr "Gruppnamn"
 
 #: flaskbb/management/forms.py:310
 msgid "Please enter a name for the group."
-msgstr ""
+msgstr "Ange ett namn för gruppen."
 
 #: flaskbb/management/forms.py:313 flaskbb/management/forms.py:423
 #: flaskbb/management/forms.py:541 flaskbb/templates/management/groups.html:31
 msgid "Description"
-msgstr ""
+msgstr "Beskrivning"
 
 #: flaskbb/management/forms.py:316
 msgid "Role"
-msgstr ""
+msgstr "Roll"
 
 #: flaskbb/management/forms.py:320
 msgid ""
@@ -746,159 +754,165 @@ msgid ""
 " every forum, and administrators have access to the admin panel. There "
 "can only be one banned and one guest group."
 msgstr ""
+"Moderatorer kan moderera de forum som de har tilldelats, huvudmoderatorer "
+"alla forum och administratörer har åtkomst till administrationspanelen. Det "
+"kan bara finnas en grupp för spärrade användare och en gästgrupp."
 
 #: flaskbb/management/forms.py:350
 msgid "This group name is already taken."
-msgstr ""
+msgstr "Gruppnamnet används redan."
 
 #: flaskbb/management/forms.py:362
 #, python-format
 msgid "There is already a group of role '%(role)s'."
-msgstr ""
+msgstr "Det finns redan en grupp med rollen '%(role)s'."
 
 #: flaskbb/management/forms.py:377
 msgid "Can't assign any permissions to this group."
-msgstr ""
+msgstr "Det går inte att tilldela gruppen några behörigheter."
 
 #: flaskbb/management/forms.py:418
 msgid "Forum title"
-msgstr ""
+msgstr "Forumrubrik"
 
 #: flaskbb/management/forms.py:419
 msgid "Please enter a forum title."
-msgstr ""
+msgstr "Ange en titel för forumet."
 
 #: flaskbb/management/forms.py:425 flaskbb/management/forms.py:543
 msgid "You can format your description with Markdown."
-msgstr ""
+msgstr "Du kan formatera din beskrivning med Markdown."
 
 #: flaskbb/management/forms.py:429 flaskbb/management/forms.py:547
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: flaskbb/management/forms.py:431
 msgid "Please enter a position for theforum."
-msgstr ""
+msgstr "Ange en position för forumet."
 
 #: flaskbb/management/forms.py:435
 msgid "Category"
-msgstr ""
+msgstr "Kategori"
 
 #: flaskbb/management/forms.py:439
 msgid "The category that contains this forum."
-msgstr ""
+msgstr "Kategorin som innehåller det här forumet."
 
 #: flaskbb/management/forms.py:443
 msgid "External link"
-msgstr ""
+msgstr "Extern länk"
 
 #: flaskbb/management/forms.py:445
 msgid "A link to a website i.e. 'http://flaskbb.com'."
-msgstr ""
+msgstr "En länk till en webbplats, t.ex. 'http://flaskbb.com'."
 
 #: flaskbb/management/forms.py:449
 #: flaskbb/templates/forum/category_layout.html:67
 #: flaskbb/templates/management/forums.html:129
 msgid "Moderators"
-msgstr ""
+msgstr "Moderatorer"
 
 #: flaskbb/management/forms.py:451
 msgid ""
 "Comma separated usernames. Leave it blank if you do not want to set any "
 "moderators."
 msgstr ""
+"Kommaseparerade användarnamn. Lämna fältet tomt om du inte vill ange några "
+"moderatorer."
 
 #: flaskbb/management/forms.py:456
 msgid "Show moderators"
-msgstr ""
+msgstr "Visa moderatorer"
 
 #: flaskbb/management/forms.py:457
 msgid "Do you want to show the moderators on the index page?"
-msgstr ""
+msgstr "Vill du visa moderatorerna på indexsidan?"
 
 #: flaskbb/management/forms.py:461
 msgid "Locked?"
-msgstr ""
+msgstr "Låst?"
 
 #: flaskbb/management/forms.py:461
 msgid "Disable new posts and topics in this forum."
-msgstr ""
+msgstr "Inaktivera nya inlägg och ämnen i det här forumet."
 
 #: flaskbb/management/forms.py:465
 msgid "Group access"
-msgstr ""
+msgstr "Gruppåtkomst"
 
 #: flaskbb/management/forms.py:468
 msgid "Select the groups that can access this forum."
-msgstr ""
+msgstr "Välj de grupper som får åtkomst till det här forumet."
 
 #: flaskbb/management/forms.py:477
 msgid "You cannot convert a forum that contains topics into an external link."
 msgstr ""
+"Du kan inte konvertera ett forum som innehåller ämnen till en extern länk."
 
 #: flaskbb/management/forms.py:482
 msgid "You also need to specify some moderators."
-msgstr ""
+msgstr "Du måste också ange minst en moderator."
 
 #: flaskbb/management/forms.py:493
 #, python-format
 msgid "%(user)s is not in a moderators group."
-msgstr ""
+msgstr "%(user)s ingår inte i en moderatorgrupp."
 
 #: flaskbb/management/forms.py:536
 msgid "Category title"
-msgstr ""
+msgstr "Kategorirubrik"
 
 #: flaskbb/management/forms.py:537
 msgid "Please enter a category title."
-msgstr ""
+msgstr "Ange en titel för kategorin."
 
 #: flaskbb/management/forms.py:549
 msgid "Please enter a position for the category."
-msgstr ""
+msgstr "Ange en position för kategorin."
 
 #: flaskbb/management/navigation.py:57
 msgid "Plugin settings"
-msgstr ""
+msgstr "Insticksmodulinställningar"
 
 #: flaskbb/management/navigation.py:71
 #: flaskbb/templates/user/settings_layout.html:10 flaskbb/user/plugins.py:88
 msgid "Settings"
-msgstr ""
+msgstr "Inställningar"
 
 #: flaskbb/management/navigation.py:85
 #: flaskbb/templates/management/banned_users.html:8
 #: flaskbb/templates/management/user_form.html:9
 #: flaskbb/templates/management/users.html:8
 msgid "Manage Users"
-msgstr ""
+msgstr "Hantera användare"
 
 #: flaskbb/management/navigation.py:91
 #: flaskbb/templates/management/banned_users.html:2
 #: flaskbb/templates/management/banned_users.html:21
 msgid "Banned Users"
-msgstr ""
+msgstr "Spärrade användare"
 
 #: flaskbb/management/navigation.py:102 flaskbb/management/views.py:483
 #: flaskbb/management/views.py:492
 msgid "Add User"
-msgstr ""
+msgstr "Lägg till användare"
 
 #: flaskbb/management/navigation.py:110 flaskbb/search/forms.py:35
 #: flaskbb/templates/management/users.html:2
 #: flaskbb/templates/management/users.html:21
 msgid "Users"
-msgstr ""
+msgstr "Användare"
 
 #: flaskbb/management/navigation.py:195
 msgid "Core"
-msgstr ""
+msgstr "Kärna"
 
 #: flaskbb/management/navigation.py:198
 #: flaskbb/templates/management/overview.html:2
 #: flaskbb/templates/management/overview.html:15 flaskbb/user/plugins.py:59
 msgid "Overview"
-msgstr ""
+msgstr "Översikt"
 
 #: flaskbb/management/navigation.py:205
 #: flaskbb/templates/management/overview.html:114
@@ -906,297 +920,298 @@ msgstr ""
 #: flaskbb/templates/management/reports.html:8
 #: flaskbb/templates/management/reports.html:19
 msgid "Reports"
-msgstr ""
+msgstr "Rapporter"
 
 #: flaskbb/management/navigation.py:209
 msgid "Show all Reports"
-msgstr ""
+msgstr "Visa alla rapporter"
 
 #: flaskbb/management/navigation.py:210
 msgid "Show unread Reports"
-msgstr ""
+msgstr "Visa olästa rapporter"
 
 #: flaskbb/management/navigation.py:219
 msgid "All Attachments"
-msgstr ""
+msgstr "Alla bilagor"
 
 #: flaskbb/management/navigation.py:228
 #: flaskbb/templates/management/groups.html:2
 #: flaskbb/templates/management/groups.html:19
 #: flaskbb/templates/management/overview.html:98
 msgid "Groups"
-msgstr ""
+msgstr "Grupper"
 
 #: flaskbb/management/navigation.py:232
 #: flaskbb/templates/management/group_form.html:9
 #: flaskbb/templates/management/groups.html:8
 msgid "Manage Groups"
-msgstr ""
+msgstr "Hantera grupper"
 
 #: flaskbb/management/navigation.py:233 flaskbb/management/views.py:683
 #: flaskbb/management/views.py:693
 #: flaskbb/templates/management/group_form.html:3
 msgid "Add Group"
-msgstr ""
+msgstr "Lägg till grupp"
 
 #: flaskbb/management/navigation.py:238 flaskbb/search/forms.py:35
 #: flaskbb/templates/management/forums.html:2
 #: flaskbb/templates/management/forums.html:8
 msgid "Forums"
-msgstr ""
+msgstr "Forum"
 
 #: flaskbb/management/navigation.py:242
 #: flaskbb/templates/management/forums.html:19
 msgid "Manage Forums"
-msgstr ""
+msgstr "Hantera forum"
 
 #: flaskbb/management/navigation.py:243 flaskbb/management/views.py:853
 #: flaskbb/management/views.py:870
 #: flaskbb/templates/management/forum_form.html:3
 #: flaskbb/templates/management/forums.html:34
 msgid "Add Forum"
-msgstr ""
+msgstr "Lägg till forum"
 
 #: flaskbb/management/navigation.py:244 flaskbb/management/views.py:911
 #: flaskbb/management/views.py:922
 #: flaskbb/templates/management/category_form.html:3
 msgid "Add Category"
-msgstr ""
+msgstr "Lägg till kategori"
 
 #: flaskbb/management/navigation.py:250 flaskbb/management/navigation.py:260
 #: flaskbb/templates/management/overview.html:148
 #: flaskbb/templates/management/plugins.html:2
 #: flaskbb/templates/management/plugins.html:8
 msgid "Plugins"
-msgstr ""
+msgstr "Insticksmoduler"
 
 #: flaskbb/management/views.py:118
 msgid "You are not allowed to access the management panel"
-msgstr ""
+msgstr "Du har inte behörighet att öppna administrationspanelen"
 
 #: flaskbb/management/views.py:166 flaskbb/management/views.py:1314
 msgid "You are not allowed to access the management settings"
-msgstr ""
+msgstr "Du har inte behörighet att öppna administrationsinställningarna"
 
 #: flaskbb/management/views.py:219
 msgid "Upgrade the plugin first to update its setting!"
-msgstr ""
+msgstr "Uppgradera först insticksmodulen för att uppdatera dess inställningar!"
 
 #: flaskbb/management/views.py:243 flaskbb/management/views.py:292
 #: flaskbb/management/views.py:402 flaskbb/management/views.py:440
 #: flaskbb/management/views.py:474 flaskbb/management/views.py:500
 #: flaskbb/management/views.py:556 flaskbb/management/views.py:604
 msgid "You are not allowed to manage users"
-msgstr ""
+msgstr "Du har inte behörighet att hantera användare"
 
 #: flaskbb/management/views.py:346 flaskbb/management/views.py:359
 msgid "You are not allowed to edit this user."
-msgstr ""
+msgstr "Du har inte behörighet att redigera den här användaren."
 
 #: flaskbb/management/views.py:353 flaskbb/management/views.py:393
 msgid "Edit User"
-msgstr ""
+msgstr "Redigera användare"
 
 #: flaskbb/management/views.py:389
 msgid "User updated."
-msgstr ""
+msgstr "Användaren har uppdaterats."
 
 #: flaskbb/management/views.py:421
 #, python-format
 msgid "%(count)s users deleted."
-msgstr ""
+msgstr "%(count)s användare har tagits bort."
 
 #: flaskbb/management/views.py:427
 msgid "You cannot delete yourself."
-msgstr ""
+msgstr "Du kan inte ta bort dig själv."
 
 #: flaskbb/management/views.py:431
 msgid "User deleted."
-msgstr ""
+msgstr "Användaren har tagits bort."
 
 #: flaskbb/management/views.py:463
 #, python-format
 msgid "All posts by %(user)s have been deleted."
-msgstr ""
+msgstr "Alla inlägg av %(user)s har tagits bort."
 
 #: flaskbb/management/views.py:489
 msgid "User added."
-msgstr ""
+msgstr "Användaren har lagts till."
 
 #: flaskbb/management/views.py:565
 msgid "You do not have the permissions to ban this user."
-msgstr ""
+msgstr "Du har inte behörighet att spärra den här användaren."
 
 #: flaskbb/management/views.py:582
 #, python-format
 msgid "%(count)s users banned."
-msgstr ""
+msgstr "%(count)s användare har spärrats."
 
 #: flaskbb/management/views.py:588
 msgid "You are not allowed to ban this user."
-msgstr ""
+msgstr "Du har inte behörighet att spärra den här användaren."
 
 #: flaskbb/management/views.py:592
 msgid "User is now banned."
-msgstr ""
+msgstr "Användaren har spärrats."
 
 #: flaskbb/management/views.py:594
 msgid "Could not ban user."
-msgstr ""
+msgstr "Det gick inte att spärra användaren."
 
 #: flaskbb/management/views.py:613
 msgid "You do not have the permissions to unban this user."
-msgstr ""
+msgstr "Du har inte behörighet att häva spärren för den här användaren."
 
 #: flaskbb/management/views.py:628
 #, python-format
 msgid "%(count)s users unbanned."
-msgstr ""
+msgstr "Spärren har hävts för %(count)s användare."
 
 #: flaskbb/management/views.py:634
 msgid "You are not allowed to unban this user."
-msgstr ""
+msgstr "Du har inte behörighet att häva spärren för den här användaren."
 
 #: flaskbb/management/views.py:638
 msgid "User is now unbanned."
-msgstr ""
+msgstr "Spärren för användaren har hävts."
 
 #: flaskbb/management/views.py:640
 msgid "Could not unban user."
-msgstr ""
+msgstr "Det gick inte att häva spärren för användaren."
 
 #: flaskbb/management/views.py:650 flaskbb/management/views.py:674
 #: flaskbb/management/views.py:701 flaskbb/management/views.py:731
 msgid "You are not allowed to modify groups."
-msgstr ""
+msgstr "Du har inte behörighet att ändra grupper."
 
 #: flaskbb/management/views.py:690
 msgid "Group added."
-msgstr ""
+msgstr "Gruppen har lagts till."
 
 #: flaskbb/management/views.py:711 flaskbb/management/views.py:723
 msgid "Edit Group"
-msgstr ""
+msgstr "Redigera grupp"
 
 #: flaskbb/management/views.py:720
 msgid "Group updated."
-msgstr ""
+msgstr "Gruppen har uppdaterats."
 
 #: flaskbb/management/views.py:742
 msgid "You cannot delete one of the standard groups."
-msgstr ""
+msgstr "Du kan inte ta bort en av standardgrupperna."
 
 #: flaskbb/management/views.py:750
 #, python-format
 msgid "%(count)s groups deleted."
-msgstr ""
+msgstr "%(count)s grupper har tagits bort."
 
 #: flaskbb/management/views.py:756
 msgid "You cannot delete the standard groups. Try renaming it instead."
 msgstr ""
+"Du kan inte ta bort standardgrupperna. Försök att byta namn på dem i stället."
 
 #: flaskbb/management/views.py:763
 msgid "Group deleted."
-msgstr ""
+msgstr "Gruppen har tagits bort."
 
 #: flaskbb/management/views.py:766
 msgid "No group chosen."
-msgstr ""
+msgstr "Ingen grupp har valts."
 
 #: flaskbb/management/views.py:775 flaskbb/management/views.py:794
 #: flaskbb/management/views.py:836
 msgid "You are not allowed to modify forums."
-msgstr ""
+msgstr "Du har inte behörighet att ändra forum."
 
 #: flaskbb/management/views.py:812 flaskbb/management/views.py:828
 #: flaskbb/templates/management/forums.html:147
 msgid "Edit Forum"
-msgstr ""
+msgstr "Redigera forum"
 
 #: flaskbb/management/views.py:820
 msgid "Forum updated."
-msgstr ""
+msgstr "Forumet har uppdaterats."
 
 #: flaskbb/management/views.py:860
 msgid "Forum added."
-msgstr ""
+msgstr "Forumet har lagts till."
 
 #: flaskbb/management/views.py:878
 msgid "You are not allowed to modify forums"
-msgstr ""
+msgstr "Du har inte behörighet att ändra forum"
 
 #: flaskbb/management/views.py:892
 msgid "Forum deleted."
-msgstr ""
+msgstr "Forumet har tagits bort."
 
 #: flaskbb/management/views.py:901 flaskbb/management/views.py:930
 #: flaskbb/management/views.py:963
 msgid "You are not allowed to modify categories"
-msgstr ""
+msgstr "Du har inte behörighet att ändra kategorier"
 
 #: flaskbb/management/views.py:919
 msgid "Category added."
-msgstr ""
+msgstr "Kategorin har lagts till."
 
 #: flaskbb/management/views.py:943 flaskbb/management/views.py:955
 #: flaskbb/templates/management/forums.html:38
 msgid "Edit Category"
-msgstr ""
+msgstr "Redigera kategori"
 
 #: flaskbb/management/views.py:952
 msgid "Category updated."
-msgstr ""
+msgstr "Kategorin har uppdaterats."
 
 #: flaskbb/management/views.py:984
 msgid "Category with all associated forums deleted."
-msgstr ""
+msgstr "Kategorin och alla tillhörande forum har tagits bort."
 
 #: flaskbb/management/views.py:993 flaskbb/management/views.py:1014
 #: flaskbb/management/views.py:1037 flaskbb/management/views.py:1093
 msgid "You are not allowed to view reports."
-msgstr ""
+msgstr "Du har inte behörighet att visa rapporter."
 
 #: flaskbb/management/views.py:1054
 #, python-format
 msgid "%(count)s reports marked as read."
-msgstr ""
+msgstr "%(count)s rapporter har markerats som lästa."
 
 #: flaskbb/management/views.py:1062
 #, python-format
 msgid "Report %(id)s is already marked as read."
-msgstr ""
+msgstr "Rapport %(id)s är redan markerad som läst."
 
 #: flaskbb/management/views.py:1070
 #, python-format
 msgid "Report %(id)s marked as read."
-msgstr ""
+msgstr "Rapport %(id)s har markerats som läst."
 
 #: flaskbb/management/views.py:1084
 msgid "All reports were marked as read."
-msgstr ""
+msgstr "Alla rapporter har markerats som lästa."
 
 #: flaskbb/management/views.py:1108
 #, python-format
 msgid "%(count)s reports deleted."
-msgstr ""
+msgstr "%(count)s rapporter har tagits bort."
 
 #: flaskbb/management/views.py:1113
 msgid "Report deleted."
-msgstr ""
+msgstr "Rapporten har tagits bort."
 
 #: flaskbb/management/views.py:1122 flaskbb/management/views.py:1183
 #: flaskbb/management/views.py:1212 flaskbb/management/views.py:1271
 msgid "You are not allowed to manage attachments"
-msgstr ""
+msgstr "Du har inte behörighet att hantera bilagor"
 
 #: flaskbb/management/views.py:1198
 #, python-format
 msgid "%(count)s attachments deleted."
-msgstr ""
+msgstr "%(count)s bilagor har tagits bort."
 
 #: flaskbb/management/views.py:1203
 msgid "Attachment deleted."
-msgstr ""
+msgstr "Bilagan har tagits bort."
 
 #: flaskbb/management/views.py:1256
 #, python-format
@@ -1204,52 +1219,55 @@ msgid ""
 "Removed %(rows)s attachment(s) with a missing file and %(files)s orphaned"
 " file(s)."
 msgstr ""
+"Tog bort %(rows)s bilagor med saknade filer och %(files)s överblivna filer."
 
 #: flaskbb/management/views.py:1300
 #, python-format
 msgid "Purged %(rows)s attachment(s) and %(files)s leftover file(s)."
-msgstr ""
+msgstr "Rensade %(rows)s bilagor och %(files)s kvarvarande filer."
 
 #: flaskbb/management/views.py:1339 flaskbb/management/views.py:1366
 #: flaskbb/management/views.py:1414 flaskbb/management/views.py:1446
 #: flaskbb/management/views.py:1502 flaskbb/management/views.py:1550
 msgid "You are not allowed to modify plugins"
-msgstr ""
+msgstr "Du har inte behörighet att ändra insticksmoduler"
 
 #: flaskbb/management/views.py:1378
 #, python-format
 msgid "Plugin %(plugin)s is already enabled."
-msgstr ""
+msgstr "Insticksmodulen %(plugin)s är redan aktiverad."
 
 #: flaskbb/management/views.py:1388
 #, python-format
 msgid "Couldn't apply the migrations of %(plugin)s, it stays disabled: %(error)s"
 msgstr ""
+"Migreringarna för %(plugin)s kunde inte tillämpas och insticksmodulen "
+"förblir inaktiverad: %(error)s"
 
 #: flaskbb/management/views.py:1401
 #, python-format
 msgid "Plugin %(plugin)s enabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Insticksmodulen %(plugin)s har aktiverats. Starta om FlaskBB nu."
 
 #: flaskbb/management/views.py:1426
 #, python-format
 msgid "Plugin %(plugin)s is already disabled."
-msgstr ""
+msgstr "Insticksmodulen %(plugin)s är redan inaktiverad."
 
 #: flaskbb/management/views.py:1433
 #, python-format
 msgid "Plugin %(plugin)s disabled. Please restart FlaskBB now."
-msgstr ""
+msgstr "Insticksmodulen %(plugin)s har inaktiverats. Starta om FlaskBB nu."
 
 #: flaskbb/management/views.py:1459
 #, python-format
 msgid "Plugin %(plugin)s has to be enabled first."
-msgstr ""
+msgstr "Insticksmodulen %(plugin)s måste aktiveras först."
 
 #: flaskbb/management/views.py:1470
 #, python-format
 msgid "Couldn't apply the migrations of %(plugin)s: %(error)s"
-msgstr ""
+msgstr "Migreringarna för %(plugin)s kunde inte tillämpas: %(error)s"
 
 #: flaskbb/management/views.py:1485
 #, python-format
@@ -1257,10 +1275,12 @@ msgid ""
 "The migrations of %(plugin)s have been applied. Restart FlaskBB to load "
 "it and install its settings."
 msgstr ""
+"Migreringarna för %(plugin)s har tillämpats. Starta om FlaskBB för att läsa "
+"in insticksmodulen och installera dess inställningar."
 
 #: flaskbb/management/views.py:1493
 msgid "Plugin has been installed."
-msgstr ""
+msgstr "Insticksmodulen har installerats."
 
 #: flaskbb/management/views.py:1516
 #, python-format
@@ -1268,45 +1288,47 @@ msgid ""
 "Disable %(plugin)s and restart FlaskBB before uninstalling it, its tables"
 " are still in use."
 msgstr ""
+"Inaktivera %(plugin)s och starta om FlaskBB innan du avinstallerar den. Dess "
+"tabeller används fortfarande."
 
 #: flaskbb/management/views.py:1530
 #, python-format
 msgid "Couldn't revert the migrations of %(plugin)s: %(error)s"
-msgstr ""
+msgstr "Migreringarna för %(plugin)s kunde inte återställas: %(error)s"
 
 #: flaskbb/management/views.py:1541
 msgid "Plugin has been uninstalled."
-msgstr ""
+msgstr "Insticksmodulen har avinstallerats."
 
 #: flaskbb/management/views.py:1563
 msgid "This plugin has no settings to upgrade."
-msgstr ""
+msgstr "Den här insticksmodulen har inga inställningar att uppgradera."
 
 #: flaskbb/management/views.py:1567
 msgid "This plugin's settings are already up to date."
-msgstr ""
+msgstr "Inställningarna för den här insticksmodulen är redan uppdaterade."
 
 #: flaskbb/management/views.py:1571
 msgid "Plugin settings have been upgraded."
-msgstr ""
+msgstr "Inställningarna för insticksmodulen har uppgraderats."
 
 #: flaskbb/search/forms.py:30
 msgid "Criteria"
-msgstr ""
+msgstr "Kriterier"
 
 #: flaskbb/search/forms.py:33
 msgid "Search in"
-msgstr ""
+msgstr "Sök i"
 
 #: flaskbb/search/forms.py:41
 msgid "Content type"
-msgstr ""
+msgstr "Innehållstyp"
 
 #: flaskbb/search/forms.py:43 flaskbb/templates/forum/category_layout.html:9
 #: flaskbb/templates/management/overview.html:102
 #: flaskbb/templates/user/all_topics.html:8 flaskbb/user/plugins.py:65
 msgid "Topics"
-msgstr ""
+msgstr "Ämnen"
 
 #: flaskbb/search/forms.py:43 flaskbb/templates/forum/_forum_meta.html:3
 #: flaskbb/templates/forum/category_layout.html:10
@@ -1320,7 +1342,7 @@ msgstr ""
 #: flaskbb/templates/search/search_result.html:77
 #: flaskbb/templates/user/all_posts.html:8 flaskbb/user/plugins.py:71
 msgid "Posts"
-msgstr ""
+msgstr "Inlägg"
 
 #: flaskbb/search/forms.py:48 flaskbb/templates/forum/category.html:8
 #: flaskbb/templates/forum/category_layout.html:8
@@ -1354,226 +1376,230 @@ msgstr ""
 #: flaskbb/templates/user/profile.html:5
 #: flaskbb/templates/user/settings_layout.html:8
 msgid "Forum"
-msgstr ""
+msgstr "Forum"
 
 #: flaskbb/search/forms.py:51
 msgid "All forums"
-msgstr ""
+msgstr "Alla forum"
 
 #: flaskbb/search/forms.py:55
 msgid "Author"
-msgstr ""
+msgstr "Författare"
 
 #: flaskbb/search/forms.py:57
 msgid "From"
-msgstr ""
+msgstr "Från"
 
 #: flaskbb/search/forms.py:59
 msgid "To"
-msgstr ""
+msgstr "Till"
 
 #: flaskbb/search/forms.py:62
 msgid "State"
-msgstr ""
+msgstr "Status"
 
 #: flaskbb/search/forms.py:65
 msgid "Any"
-msgstr ""
+msgstr "Valfritt"
 
 #: flaskbb/search/forms.py:66 flaskbb/templates/forum/forum.html:36
 #: flaskbb/templates/forum/topic_controls.html:147
 msgid "Locked"
-msgstr ""
+msgstr "Låst"
 
 #: flaskbb/search/forms.py:67
 msgid "Not locked"
-msgstr ""
+msgstr "Inte låst"
 
 #: flaskbb/search/forms.py:68
 msgid "Pinned"
-msgstr ""
+msgstr "Fäst"
 
 #: flaskbb/search/forms.py:69
 msgid "Hidden"
-msgstr ""
+msgstr "Dolt"
 
 #: flaskbb/templates/forum/memberlist.html:2
 #: flaskbb/templates/forum/memberlist.html:13
 #: flaskbb/templates/forum/memberlist.html:40 flaskbb/templates/layout.html:74
 msgid "Memberlist"
-msgstr ""
+msgstr "Medlemslista"
 
 #: flaskbb/templates/auth/forgot_password.html:2
 #: flaskbb/templates/auth/forgot_password.html:8
 msgid "Forgot Password"
-msgstr ""
+msgstr "Glömt lösenord"
 
 #: flaskbb/templates/auth/login.html:24
 msgid "Not a member yet?"
-msgstr ""
+msgstr "Inte medlem än?"
 
 #: flaskbb/templates/auth/login.html:26
 msgid "Forgot your Password?"
-msgstr ""
+msgstr "Har du glömt ditt lösenord?"
 
 #: flaskbb/templates/auth/request_account_activation.html:2
 #: flaskbb/templates/auth/request_account_activation.html:8
 msgid "Request Account Activation"
-msgstr ""
+msgstr "Begär kontoaktivering"
 
 #: flaskbb/templates/auth/reset_password.html:2
 #: flaskbb/templates/auth/reset_password.html:8
 #: flaskbb/templates/email/reset_password.html:10 flaskbb/user/plugins.py:118
 msgid "Reset Password"
-msgstr ""
+msgstr "Återställ lösenord"
 
 #: flaskbb/templates/email/activate_account.html:5
 #: flaskbb/templates/email/activate_account.html:9
 msgid "Click the link below to activate your account:"
-msgstr ""
+msgstr "Klicka på länken nedan för att aktivera ditt konto:"
 
 #: flaskbb/templates/email/activate_account.html:8
 #: flaskbb/templates/email/reset_password.html:8
 #, python-format
 msgid "Dear %(username)s,"
-msgstr ""
+msgstr "Hej %(username)s,"
 
 #: flaskbb/templates/email/activate_account.html:10 flaskbb/user/plugins.py:127
 msgid "Activate Account"
-msgstr ""
+msgstr "Aktivera konto"
 
 #: flaskbb/templates/email/activate_account.html:11
 #: flaskbb/templates/email/reset_password.html:11
 msgid "Sincerely,"
-msgstr ""
+msgstr "Med vänliga hälsningar,"
 
 #: flaskbb/templates/email/activate_account.html:11
 #: flaskbb/templates/email/reset_password.html:11
 msgid "The Administration"
-msgstr ""
+msgstr "Administrationen"
 
 #: flaskbb/templates/email/activate_account.html:15
 #: flaskbb/templates/email/reset_password.html:15
 msgid "If you did not request this email, you can safely ignore it."
-msgstr ""
+msgstr "Om du inte begärde det här e-postmeddelandet kan du ignorera det."
 
 #: flaskbb/templates/email/macros.html:31
 msgid "If the button does not work, copy this link into your browser:"
 msgstr ""
+"Om knappen inte fungerar kopierar du den här länken och klistrar in den i "
+"webbläsaren:"
 
 #: flaskbb/templates/email/reset_password.html:5
 #: flaskbb/templates/email/reset_password.html:9
 msgid "Click the link below to reset your password:"
-msgstr ""
+msgstr "Klicka på länken nedan för att återställa ditt lösenord:"
 
 #: flaskbb/templates/errors/forbidden_page.html:2
 msgid "Forbidden"
-msgstr ""
+msgstr "Åtkomst nekad"
 
 #: flaskbb/templates/errors/forbidden_page.html:7
 msgid "403 - Forbidden Page"
-msgstr ""
+msgstr "403 - Åtkomst nekad"
 
 #: flaskbb/templates/errors/forbidden_page.html:8
 msgid "You do not have the permission to view this page."
-msgstr ""
+msgstr "Du har inte behörighet att visa den här sidan."
 
 #: flaskbb/templates/errors/forbidden_page.html:9
 #: flaskbb/templates/errors/page_not_found.html:9
 msgid "Back to the Forums"
-msgstr ""
+msgstr "Tillbaka till forumen"
 
 #: flaskbb/templates/errors/page_not_found.html:2
 msgid "Page not found"
-msgstr ""
+msgstr "Sidan hittades inte"
 
 #: flaskbb/templates/errors/page_not_found.html:7
 msgid "404 - Page not found!"
-msgstr ""
+msgstr "404 - Sidan hittades inte!"
 
 #: flaskbb/templates/errors/page_not_found.html:8
 msgid "The page you were looking for does not exist."
-msgstr ""
+msgstr "Sidan du letade efter finns inte."
 
 #: flaskbb/templates/errors/server_error.html:2
 msgid "Server Error"
-msgstr ""
+msgstr "Serverfel"
 
 #: flaskbb/templates/errors/server_error.html:7
 msgid "500 - Server Error"
-msgstr ""
+msgstr "500 - Serverfel"
 
 #: flaskbb/templates/errors/server_error.html:8
 msgid "Something went wrong!"
-msgstr ""
+msgstr "Något gick fel!"
 
 #: flaskbb/templates/errors/too_many_logins.html:2
 msgid "Too Many Requests"
-msgstr ""
+msgstr "För många förfrågningar"
 
 #: flaskbb/templates/errors/too_many_logins.html:7
 msgid "429 - Too Many Requests"
-msgstr ""
+msgstr "429 - För många förfrågningar"
 
 #: flaskbb/templates/errors/too_many_logins.html:8
 msgid ""
 "In order to prevent brute force attacks on accounts we have limited the "
 "amount of requests on this route."
 msgstr ""
+"För att förhindra angrepp mot konton med upprepade inloggningsförsök har vi "
+"begränsat antalet förfrågningar till den här sökvägen."
 
 #: flaskbb/templates/errors/too_many_logins.html:9
 msgid "Please try again in"
-msgstr ""
+msgstr "Försök igen om"
 
 #: flaskbb/templates/forum/_attachment_fields.html:6
 #: flaskbb/templates/forum/_attachment_fields.html:47
 msgid "Insert"
-msgstr ""
+msgstr "Infoga"
 
 #: flaskbb/templates/forum/_attachment_fields.html:7
 #: flaskbb/templates/forum/_attachment_fields.html:52
 msgid "Remove"
-msgstr ""
+msgstr "Ta bort"
 
 #: flaskbb/templates/forum/_attachment_fields.html:11
 #, python-format
 msgid "Attach up to %(amount)s files. Each file can be up to %(size)s."
-msgstr ""
+msgstr "Bifoga högst %(amount)s filer. Varje fil får vara högst %(size)s stor."
 
 #: flaskbb/templates/forum/_attachment_fields.html:20
 msgid "Choose files"
-msgstr ""
+msgstr "Välj filer"
 
 #: flaskbb/templates/forum/_attachment_fields.html:20
 msgid "or drag and drop them here"
-msgstr ""
+msgstr "eller dra och släpp dem här"
 
 #: flaskbb/templates/forum/_attachment_fields.html:35
 msgid "Attached files"
-msgstr ""
+msgstr "Bifogade filer"
 
 #: flaskbb/templates/forum/_forum_meta.html:2
 #: flaskbb/templates/forum/topictracker.html:33
 #: flaskbb/templates/management/attachments.html:84
 #: flaskbb/templates/management/reports.html:31
 msgid "Topic"
-msgstr ""
+msgstr "Ämne"
 
 #: flaskbb/templates/forum/_forum_meta.html:4
 #: flaskbb/templates/forum/topictracker.html:35
 msgid "Views"
-msgstr ""
+msgstr "Visningar"
 
 #: flaskbb/templates/forum/_forum_meta.html:5
 #: flaskbb/templates/forum/category_layout.html:11
 #: flaskbb/templates/forum/topictracker.html:36
 msgid "Last Post"
-msgstr ""
+msgstr "Senaste inlägg"
 
 #: flaskbb/templates/forum/_forum_meta.html:11
 #: flaskbb/templates/forum/topictracker.html:41
 msgid "Select all"
-msgstr ""
+msgstr "Markera alla"
 
 #: flaskbb/templates/forum/_forum_row.html:31
 #: flaskbb/templates/forum/_forum_row.html:55
@@ -1584,52 +1610,52 @@ msgstr ""
 #: flaskbb/templates/search/search_result.html:20
 #: flaskbb/templates/search/search_result.html:54
 msgid "by"
-msgstr ""
+msgstr "av"
 
 #: flaskbb/templates/forum/_forum_row.html:41
 #, python-format
 msgid "Hidden on %(when)s  by %(who)s"
-msgstr ""
+msgstr "Doldes %(when)s av %(who)s"
 
 #: flaskbb/templates/forum/_forum_row.html:70
 #: flaskbb/templates/forum/topictracker.html:108
 msgid "Select topic"
-msgstr ""
+msgstr "Välj ämne"
 
 #: flaskbb/templates/forum/category_layout.html:25
 #: flaskbb/templates/management/forums.html:74
 msgid "Link to"
-msgstr ""
+msgstr "Länk till"
 
 #: flaskbb/templates/forum/category_layout.html:102
 msgid "No posts."
-msgstr ""
+msgstr "Inga inlägg."
 
 #: flaskbb/templates/forum/edit_forum.html:41
 #: flaskbb/templates/forum/forum.html:61
 #: flaskbb/templates/forum/topictracker.html:113
 msgid "No Topics."
-msgstr ""
+msgstr "Inga ämnen."
 
 #: flaskbb/templates/forum/edit_forum.html:50
 msgid "Back"
-msgstr ""
+msgstr "Tillbaka"
 
 #: flaskbb/templates/forum/edit_forum.html:59
 msgid "Lock"
-msgstr ""
+msgstr "Lås"
 
 #: flaskbb/templates/forum/edit_forum.html:62
 msgid "Unlock"
-msgstr ""
+msgstr "Lås upp"
 
 #: flaskbb/templates/forum/edit_forum.html:68
 msgid "Highlight"
-msgstr ""
+msgstr "Fäst"
 
 #: flaskbb/templates/forum/edit_forum.html:71
 msgid "Trivialize"
-msgstr ""
+msgstr "Markera som oviktigt"
 
 #: flaskbb/templates/forum/edit_forum.html:76
 #: flaskbb/templates/management/attachments.html:146
@@ -1637,224 +1663,224 @@ msgstr ""
 #: flaskbb/templates/management/reports.html:83
 #: flaskbb/templates/management/users.html:143
 msgid "Delete"
-msgstr ""
+msgstr "Ta bort"
 
 #: flaskbb/templates/forum/edit_forum.html:82
 msgid "Hide"
-msgstr ""
+msgstr "Dölj"
 
 #: flaskbb/templates/forum/edit_forum.html:85
 msgid "Unhide"
-msgstr ""
+msgstr "Visa igen"
 
 #: flaskbb/templates/forum/edit_forum.html:97
 msgid "Move to..."
-msgstr ""
+msgstr "Flytta till…"
 
 #: flaskbb/templates/forum/edit_forum.html:104
 msgid "Move"
-msgstr ""
+msgstr "Flytta"
 
 #: flaskbb/templates/forum/forum.html:30
 #: flaskbb/templates/management/reports.html:47
 #: flaskbb/templates/management/reports.html:74
 msgid "Mark as Read"
-msgstr ""
+msgstr "Markera som läst"
 
 #: flaskbb/templates/forum/forum.html:42
 #: flaskbb/templates/forum/new_topic.html:5
 msgid "New Topic"
-msgstr ""
+msgstr "Nytt ämne"
 
 #: flaskbb/templates/forum/forum.html:73
 msgid "Moderation Mode"
-msgstr ""
+msgstr "Moderatorläge"
 
 #: flaskbb/templates/forum/index.html:12
 msgid "Board Statistics"
-msgstr ""
+msgstr "Forumstatistik"
 
 #: flaskbb/templates/forum/index.html:16
 msgid "Who is online?"
-msgstr ""
+msgstr "Vem är online?"
 
 #: flaskbb/templates/forum/index.html:22
 msgid "Total number of registered users"
-msgstr ""
+msgstr "Totalt antal registrerade användare"
 
 #: flaskbb/templates/forum/index.html:23
 msgid "Total number of topics"
-msgstr ""
+msgstr "Totalt antal ämnen"
 
 #: flaskbb/templates/forum/index.html:24
 msgid "Total number of posts"
-msgstr ""
+msgstr "Totalt antal inlägg"
 
 #: flaskbb/templates/forum/index.html:27
 msgid "Newest registered user"
-msgstr ""
+msgstr "Senast registrerade användare"
 
 #: flaskbb/templates/forum/index.html:27
 msgid "No users"
-msgstr ""
+msgstr "Inga användare"
 
 #: flaskbb/templates/forum/index.html:28
 msgid "Registered users online"
-msgstr ""
+msgstr "Registrerade användare online"
 
 #: flaskbb/templates/forum/index.html:30
 msgid "Guests online"
-msgstr ""
+msgstr "Gäster online"
 
 #: flaskbb/templates/forum/index.html:43
 #: flaskbb/templates/forum/online_users.html:2
 #: flaskbb/templates/forum/online_users.html:8
 #: flaskbb/templates/forum/online_users.html:12
 msgid "Online Users"
-msgstr ""
+msgstr "Användare online"
 
 #: flaskbb/templates/forum/memberlist.html:49
 #: flaskbb/templates/management/banned_users.html:63
 #: flaskbb/templates/management/users.html:63
 #: flaskbb/templates/search/search_result.html:78
 msgid "Date registered"
-msgstr ""
+msgstr "Registreringsdatum"
 
 #: flaskbb/templates/forum/memberlist.html:51
 #: flaskbb/templates/management/banned_users.html:64
 #: flaskbb/templates/management/users.html:64
 #: flaskbb/templates/search/search_result.html:79
 msgid "Group"
-msgstr ""
+msgstr "Grupp"
 
 #: flaskbb/templates/forum/new_post.html:3
 msgid "Edit Post"
-msgstr ""
+msgstr "Redigera inlägg"
 
 #: flaskbb/templates/forum/new_post.html:5
 msgid "New Post"
-msgstr ""
+msgstr "Nytt inlägg"
 
 #: flaskbb/templates/forum/new_post.html:27
 #, python-format
 msgid "Editing a post in %(topic)s"
-msgstr ""
+msgstr "Redigerar ett inlägg i %(topic)s"
 
 #: flaskbb/templates/forum/new_post.html:29
 #, python-format
 msgid "Replying to %(topic)s"
-msgstr ""
+msgstr "Svarar på %(topic)s"
 
 #: flaskbb/templates/forum/new_post.html:37
 #: flaskbb/templates/forum/new_topic.html:33
 msgid "Please correct the highlighted fields."
-msgstr ""
+msgstr "Korrigera de markerade fälten."
 
 #: flaskbb/templates/forum/new_post.html:58
 msgid "Update your post..."
-msgstr ""
+msgstr "Uppdatera ditt inlägg…"
 
 #: flaskbb/templates/forum/new_post.html:58
 msgid "Write your reply..."
-msgstr ""
+msgstr "Skriv ditt svar…"
 
 #: flaskbb/templates/forum/new_post.html:74
 #: flaskbb/templates/forum/new_topic.html:76
 msgid "Options"
-msgstr ""
+msgstr "Alternativ"
 
 #: flaskbb/templates/forum/new_post.html:80
 #: flaskbb/templates/forum/new_topic.html:82
 msgid "Your preferences"
-msgstr ""
+msgstr "Dina inställningar"
 
 #: flaskbb/templates/forum/new_post.html:89
 #: flaskbb/templates/forum/new_topic.html:103
 msgid "Cancel"
-msgstr ""
+msgstr "Avbryt"
 
 #: flaskbb/templates/forum/new_topic.html:3
 msgid "Edit Topic"
-msgstr ""
+msgstr "Redigera ämne"
 
 #: flaskbb/templates/forum/new_topic.html:26
 #, python-format
 msgid "Posting in %(forum)s"
-msgstr ""
+msgstr "Skriver i %(forum)s"
 
 #: flaskbb/templates/forum/new_topic.html:50
 msgid "A short, descriptive title"
-msgstr ""
+msgstr "En kort beskrivande rubrik"
 
 #: flaskbb/templates/forum/new_topic.html:60
 msgid "Write your topic..."
-msgstr ""
+msgstr "Skriv ditt ämne…"
 
 #: flaskbb/templates/forum/new_topic.html:88
 msgid "Moderation"
-msgstr ""
+msgstr "Moderering"
 
 #: flaskbb/templates/forum/online_users.html:19
 msgid "No registered users online."
-msgstr ""
+msgstr "Inga registrerade användare är online."
 
 #: flaskbb/templates/forum/report_post.html:2
 #: flaskbb/templates/forum/report_post.html:17
 msgid "Report Post"
-msgstr ""
+msgstr "Anmäl inlägg"
 
 #: flaskbb/templates/forum/report_post.html:20
 msgid "Thanks for reporting."
-msgstr ""
+msgstr "Tack för anmälan."
 
 #: flaskbb/templates/forum/report_post.html:24
 msgid "Report"
-msgstr ""
+msgstr "Anmäl"
 
 #: flaskbb/templates/forum/report_post.html:28
 msgid "Close"
-msgstr ""
+msgstr "Stäng"
 
 #: flaskbb/templates/forum/topic.html:2
 #: flaskbb/templates/forum/topic_horizontal.html:2
 #, python-format
 msgid "%(title)s - Topic"
-msgstr ""
+msgstr "%(title)s - Ämne"
 
 #: flaskbb/templates/forum/topic.html:28
 #: flaskbb/templates/forum/topic_horizontal.html:20
 #, python-format
 msgid "This topic is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Det här ämnet är dolt (%(when)s av %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:53
 #: flaskbb/templates/forum/topic_horizontal.html:53
 #: flaskbb/templates/user/profile_layout.html:26
 msgid "online"
-msgstr ""
+msgstr "online"
 
 #: flaskbb/templates/forum/topic.html:57
 #: flaskbb/templates/forum/topic_horizontal.html:58
 msgid "offline"
-msgstr ""
+msgstr "offline"
 
 #: flaskbb/templates/forum/topic.html:73
 #: flaskbb/templates/forum/topic_horizontal.html:70
 msgid "Joined"
-msgstr ""
+msgstr "Blev medlem"
 
 #: flaskbb/templates/forum/topic.html:97
 #: flaskbb/templates/management/users.html:113
 #: flaskbb/templates/user/profile_layout.html:56
 msgid "Ban"
-msgstr ""
+msgstr "Spärra"
 
 #: flaskbb/templates/forum/topic.html:109
 #: flaskbb/templates/management/banned_users.html:118
 #: flaskbb/templates/management/users.html:123
 #: flaskbb/templates/user/profile_layout.html:67
 msgid "Unban"
-msgstr ""
+msgstr "Häv spärr"
 
 #: flaskbb/templates/forum/topic.html:118
 #: flaskbb/templates/management/banned_users.html:101
@@ -1863,143 +1889,143 @@ msgstr ""
 #: flaskbb/templates/user/profile_layout.html:40
 #: flaskbb/templates/user/profile_layout.html:45
 msgid "Edit"
-msgstr ""
+msgstr "Redigera"
 
 #: flaskbb/templates/forum/topic.html:133
 #: flaskbb/templates/forum/topic_horizontal.html:85
 #, python-format
 msgid "Last modified: %(date)s by <a href=\"%(user_url)s\">%(user)s</a>"
-msgstr ""
+msgstr "Senast ändrad: %(date)s av <a href=\"%(user_url)s\">%(user)s</a>"
 
 #: flaskbb/templates/forum/topic.html:148
 #, python-format
 msgid "This post is hidden (%(when)s by %(who)s)"
-msgstr ""
+msgstr "Det här inlägget är dolt (%(when)s av %(who)s)"
 
 #: flaskbb/templates/forum/topic.html:208
 #: flaskbb/templates/forum/topic_horizontal.html:126
 msgid "Quote this post"
-msgstr ""
+msgstr "Citera det här inlägget"
 
 #: flaskbb/templates/forum/topic.html:213
 #: flaskbb/templates/forum/topic_horizontal.html:132
 msgid "Full Reply"
-msgstr ""
+msgstr "Hela svaret"
 
 #: flaskbb/templates/forum/topic.html:222
 msgid "Edit this topic"
-msgstr ""
+msgstr "Redigera det här ämnet"
 
 #: flaskbb/templates/forum/topic.html:228
 #: flaskbb/templates/forum/topic_horizontal.html:141
 msgid "Edit this post"
-msgstr ""
+msgstr "Redigera det här inlägget"
 
 #: flaskbb/templates/forum/topic.html:244
 #: flaskbb/templates/forum/topic_controls.html:29
 #: flaskbb/templates/forum/topic_horizontal.html:153
 msgid "Delete this topic"
-msgstr ""
+msgstr "Ta bort det här ämnet"
 
 #: flaskbb/templates/forum/topic.html:259
 #: flaskbb/templates/forum/topic_horizontal.html:167
 msgid "Delete this post"
-msgstr ""
+msgstr "Ta bort det här inlägget"
 
 #: flaskbb/templates/forum/topic.html:275
 #: flaskbb/templates/forum/topic_horizontal.html:180
 msgid "Report this post"
-msgstr ""
+msgstr "Anmäl det här inlägget"
 
 #: flaskbb/templates/forum/topic.html:293
 #: flaskbb/templates/forum/topic_horizontal.html:195
 msgid "Unhide this topic"
-msgstr ""
+msgstr "Visa det här ämnet igen"
 
 #: flaskbb/templates/forum/topic.html:308
 #: flaskbb/templates/forum/topic_horizontal.html:208
 msgid "Hide this topic"
-msgstr ""
+msgstr "Dölj det här ämnet"
 
 #: flaskbb/templates/forum/topic.html:324
 #: flaskbb/templates/forum/topic_horizontal.html:222
 msgid "Unhide this post"
-msgstr ""
+msgstr "Visa det här inlägget igen"
 
 #: flaskbb/templates/forum/topic.html:338
 #: flaskbb/templates/forum/topic_horizontal.html:234
 msgid "Hide this post"
-msgstr ""
+msgstr "Dölj det här inlägget"
 
 #: flaskbb/templates/forum/topic_controls.html:14
 msgid "Moderate"
-msgstr ""
+msgstr "Moderera"
 
 #: flaskbb/templates/forum/topic_controls.html:30
 msgid "Delete Topic"
-msgstr ""
+msgstr "Ta bort ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:45
 msgid "Lock Topic"
-msgstr ""
+msgstr "Lås ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:57
 msgid "Unlock Topic"
-msgstr ""
+msgstr "Lås upp ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:71
 msgid "Highlight Topic"
-msgstr ""
+msgstr "Fäst ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:83
 msgid "Trivialize Topic"
-msgstr ""
+msgstr "Markera ämne som oviktigt"
 
 #: flaskbb/templates/forum/topic_controls.html:98
 msgid "Unhide Topic"
-msgstr ""
+msgstr "Visa ämne igen"
 
 #: flaskbb/templates/forum/topic_controls.html:108
 msgid "Hide Topic"
-msgstr ""
+msgstr "Dölj ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:126
 msgid "Untrack Topic"
-msgstr ""
+msgstr "Sluta följa ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:136
 msgid "Track Topic"
-msgstr ""
+msgstr "Följ ämne"
 
 #: flaskbb/templates/forum/topictracker.html:2
 #: flaskbb/templates/forum/topictracker.html:19
 #: flaskbb/templates/forum/topictracker.html:28 flaskbb/user/plugins.py:84
 msgid "Topic Tracker"
-msgstr ""
+msgstr "Ämnesbevakning"
 
 #: flaskbb/templates/forum/topictracker.html:122
 msgid "Untrack Topics"
-msgstr ""
+msgstr "Sluta följa ämnen"
 
 #: flaskbb/templates/management/_celery_status.html:2
 msgid "running"
-msgstr ""
+msgstr "körs"
 
 #: flaskbb/templates/management/_celery_status.html:4
 msgid "not running"
-msgstr ""
+msgstr "körs inte"
 
 #: flaskbb/templates/management/_celery_status.html:9
 msgid "There is a problem."
-msgstr ""
+msgstr "Det finns ett problem."
 
 #: flaskbb/templates/management/_celery_status.html:10
 msgid "Celery is <strong>not</strong> running."
-msgstr ""
+msgstr "Celery körs <strong>inte</strong>."
 
 #: flaskbb/templates/management/_celery_status.html:11
 msgid "You can start celery with this command:"
-msgstr ""
+msgstr "Du kan starta Celery med det här kommandot:"
 
 #: flaskbb/templates/management/attachments.html:8
 #: flaskbb/templates/management/banned_users.html:7
@@ -2015,27 +2041,27 @@ msgstr ""
 #: flaskbb/templates/management/user_form.html:8
 #: flaskbb/templates/management/users.html:7 flaskbb/user/plugins.py:95
 msgid "Management"
-msgstr ""
+msgstr "Administration"
 
 #: flaskbb/templates/management/attachments.html:29
 msgid "Cleanup"
-msgstr ""
+msgstr "Rensa upp"
 
 #: flaskbb/templates/management/attachments.html:38
 msgid "Purge all"
-msgstr ""
+msgstr "Rensa allt"
 
 #: flaskbb/templates/management/attachments.html:82
 msgid "File"
-msgstr ""
+msgstr "Fil"
 
 #: flaskbb/templates/management/attachments.html:83
 msgid "Uploader"
-msgstr ""
+msgstr "Uppladdare"
 
 #: flaskbb/templates/management/attachments.html:85
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: flaskbb/templates/management/attachments.html:94
 #: flaskbb/templates/management/banned_users.html:73
@@ -2043,48 +2069,48 @@ msgstr ""
 #: flaskbb/templates/management/reports.html:43
 #: flaskbb/templates/management/users.html:73
 msgid "Actions"
-msgstr ""
+msgstr "Åtgärder"
 
 #: flaskbb/templates/management/attachments.html:97
 msgid "Delete selected Attachments"
-msgstr ""
+msgstr "Ta bort valda bilagor"
 
 #: flaskbb/templates/management/attachments.html:118
 msgid "file missing"
-msgstr ""
+msgstr "fil saknas"
 
 #: flaskbb/templates/management/attachments.html:154
 msgid "No attachments found."
-msgstr ""
+msgstr "Inga bilagor hittades."
 
 #: flaskbb/templates/management/banned_users.html:77
 #: flaskbb/templates/management/users.html:78
 msgid "Unban selected Users"
-msgstr ""
+msgstr "Häv spärr för valda användare"
 
 #: flaskbb/templates/management/banned_users.html:127
 msgid "No banned users found matching your search criteria."
-msgstr ""
+msgstr "Inga spärrade användare matchade dina sökkriterier."
 
 #: flaskbb/templates/management/forums.html:43
 msgid "Delete Category"
-msgstr ""
+msgstr "Ta bort kategori"
 
 #: flaskbb/templates/management/forums.html:57
 msgid "Topics / Posts"
-msgstr ""
+msgstr "Ämnen / inlägg"
 
 #: flaskbb/templates/management/forums.html:92
 msgid "Edit Link"
-msgstr ""
+msgstr "Redigera länk"
 
 #: flaskbb/templates/management/forums.html:97
 msgid "Delete Link"
-msgstr ""
+msgstr "Ta bort länk"
 
 #: flaskbb/templates/management/forums.html:152
 msgid "Delete Forum"
-msgstr ""
+msgstr "Ta bort forum"
 
 #: flaskbb/templates/management/group_form.html:31
 msgid ""
@@ -2092,177 +2118,180 @@ msgid ""
 " the decision to their other groups, never revokes it whatever their "
 "other groups say."
 msgstr ""
+"En medlem har en behörighet om någon av dess grupper tillåter den. Neka "
+"överlåter beslutet till de andra grupperna och återkallar aldrig "
+"behörigheten, oavsett vad de andra grupperna anger."
 
 #: flaskbb/templates/management/groups.html:30
 msgid "Group Name"
-msgstr ""
+msgstr "Gruppnamn"
 
 #: flaskbb/templates/management/groups.html:43
 msgid "Delete selected Groups"
-msgstr ""
+msgstr "Ta bort valda grupper"
 
 #: flaskbb/templates/management/groups.html:81
 msgid "No groups found."
-msgstr ""
+msgstr "Inga grupper hittades."
 
 #: flaskbb/templates/management/overview.html:24
 msgid "There is something that wants your attention."
-msgstr ""
+msgstr "Det finns något som behöver din uppmärksamhet."
 
 #: flaskbb/templates/management/overview.html:25
 #, python-format
 msgid "You have <a href=\"%(url)s\">%(unread_reports)s unread reports</a>."
-msgstr ""
+msgstr "Du har <a href=\"%(url)s\">%(unread_reports)s olästa rapporter</a>."
 
 #: flaskbb/templates/management/overview.html:32
 msgid "Everything seems alright."
-msgstr ""
+msgstr "Allt verkar vara i ordning."
 
 #: flaskbb/templates/management/overview.html:33
 msgid "No new notifications."
-msgstr ""
+msgstr "Inga nya aviseringar."
 
 #: flaskbb/templates/management/overview.html:45
 msgid "users"
-msgstr ""
+msgstr "användare"
 
 #: flaskbb/templates/management/overview.html:57
 msgid "posts"
-msgstr ""
+msgstr "inlägg"
 
 #: flaskbb/templates/management/overview.html:69
 msgid "topics"
-msgstr ""
+msgstr "ämnen"
 
 #: flaskbb/templates/management/overview.html:77
 msgid "Statistics"
-msgstr ""
+msgstr "Statistik"
 
 #: flaskbb/templates/management/overview.html:80
 msgid "Registered users"
-msgstr ""
+msgstr "Registrerade användare"
 
 #: flaskbb/templates/management/overview.html:84
 msgid "Online users"
-msgstr ""
+msgstr "Användare online"
 
 #: flaskbb/templates/management/overview.html:89
 msgid "Online guests"
-msgstr ""
+msgstr "Gäster online"
 
 #: flaskbb/templates/management/overview.html:94
 msgid "Banned users"
-msgstr ""
+msgstr "Spärrade användare"
 
 #: flaskbb/templates/management/overview.html:120
 msgid "Components"
-msgstr ""
+msgstr "Komponenter"
 
 #: flaskbb/templates/management/overview.html:133
 msgid "checking status"
-msgstr ""
+msgstr "kontrollerar status"
 
 #: flaskbb/templates/management/overview.html:161
 msgid "not enabled"
-msgstr ""
+msgstr "inte aktiverad"
 
 #: flaskbb/templates/management/overview.html:164
 msgid "enabled &amp; installed"
-msgstr ""
+msgstr "aktiverad &amp; installerad"
 
 #: flaskbb/templates/management/overview.html:166
 msgid "enabled"
-msgstr ""
+msgstr "aktiverad"
 
 #: flaskbb/templates/management/overview.html:168
 msgid "not installed"
-msgstr ""
+msgstr "inte installerad"
 
 #: flaskbb/templates/management/plugins.html:19
 msgid "Manage Plugins"
-msgstr ""
+msgstr "Hantera insticksmoduler"
 
 #: flaskbb/templates/management/plugins.html:25
 msgid "Plugin"
-msgstr ""
+msgstr "Insticksmodul"
 
 #: flaskbb/templates/management/plugins.html:26
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: flaskbb/templates/management/plugins.html:27
 msgid "Manage"
-msgstr ""
+msgstr "Hantera"
 
 #: flaskbb/templates/management/plugins.html:45
 msgid "Apply them with the install button"
-msgstr ""
+msgstr "Tillämpa dem med installationsknappen"
 
 #: flaskbb/templates/management/plugins.html:46
 msgid "requires migrations"
-msgstr ""
+msgstr "kräver migreringar"
 
 #: flaskbb/templates/management/plugins.html:49
 msgid "migrations"
-msgstr ""
+msgstr "migreringar"
 
 #: flaskbb/templates/management/plugins.html:53
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: flaskbb/templates/management/plugins.html:64
 msgid "Enable"
-msgstr ""
+msgstr "Aktivera"
 
 #: flaskbb/templates/management/plugins.html:72
 msgid "Disable"
-msgstr ""
+msgstr "Inaktivera"
 
 #: flaskbb/templates/management/plugins.html:80
 msgid "Upgrade"
-msgstr ""
+msgstr "Uppgradera"
 
 #: flaskbb/templates/management/plugins.html:91
 msgid "Install"
-msgstr ""
+msgstr "Installera"
 
 #: flaskbb/templates/management/plugins.html:102
 msgid "Uninstall"
-msgstr ""
+msgstr "Avinstallera"
 
 #: flaskbb/templates/management/reports.html:30
 msgid "Poster"
-msgstr ""
+msgstr "Skribent"
 
 #: flaskbb/templates/management/reports.html:33
 msgid "Reporter"
-msgstr ""
+msgstr "Anmälare"
 
 #: flaskbb/templates/management/reports.html:34
 msgid "Reported"
-msgstr ""
+msgstr "Anmäld"
 
 #: flaskbb/templates/management/reports.html:48
 msgid "Delete selected reports"
-msgstr ""
+msgstr "Ta bort valda rapporter"
 
 #: flaskbb/templates/management/reports.html:91
 msgid "No reports."
-msgstr ""
+msgstr "Inga rapporter."
 
 #: flaskbb/templates/management/user_form.html:65
 #: flaskbb/templates/user/change_avatar.html:18
 msgid "Current Avatar"
-msgstr ""
+msgstr "Aktuell profilbild"
 
 #: flaskbb/templates/management/user_form.html:74
 #: flaskbb/templates/user/change_avatar.html:36
 msgid "Delete Avatar"
-msgstr ""
+msgstr "Ta bort profilbild"
 
 #: flaskbb/templates/management/user_form.html:103
 msgid "Change your own account?"
-msgstr ""
+msgstr "Ändra ditt eget konto?"
 
 #: flaskbb/templates/management/user_form.html:104
 msgid ""
@@ -2270,31 +2299,34 @@ msgid ""
 " away your access to the management panel, and you may not be able to "
 "undo it yourself."
 msgstr ""
+"Du håller på att ändra din egen grupp eller aktiveringsstatus. Det kan göra "
+"att du förlorar åtkomsten till administrationspanelen och kanske inte kan "
+"återställa den själv."
 
 #: flaskbb/templates/management/users.html:77
 msgid "Ban selected Users"
-msgstr ""
+msgstr "Spärra valda användare"
 
 #: flaskbb/templates/management/users.html:80
 msgid "Delete selected Users"
-msgstr ""
+msgstr "Ta bort valda användare"
 
 #: flaskbb/templates/management/users.html:133
 msgid "Delete all posts"
-msgstr ""
+msgstr "Ta bort alla inlägg"
 
 #: flaskbb/templates/management/users.html:152
 #: flaskbb/templates/search/search_result.html:91
 msgid "No users found matching your search criteria."
-msgstr ""
+msgstr "Inga användare matchade dina sökkriterier."
 
 #: flaskbb/templates/search/search_form.html:31
 msgid "Advanced filters"
-msgstr ""
+msgstr "Avancerade filter"
 
 #: flaskbb/templates/search/search_result.html:2
 msgid "Search results for Topics:"
-msgstr ""
+msgstr "Sökresultat för ämnen:"
 
 #: flaskbb/templates/search/search_result.html:7
 #: flaskbb/templates/user/all_topics.html:18
@@ -2303,14 +2335,16 @@ msgid ""
 "<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> in forum "
 "<a href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
+"<strong><a href=\"%(topic_url)s\">%(topic_title)s</a></strong> i forumet <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:29
 msgid "No topics found matching your search criteria."
-msgstr ""
+msgstr "Inga ämnen matchade dina sökkriterier."
 
 #: flaskbb/templates/search/search_result.html:36
 msgid "Search results for Posts:"
-msgstr ""
+msgstr "Sökresultat för inlägg:"
 
 #: flaskbb/templates/search/search_result.html:41
 #, python-format
@@ -2318,209 +2352,211 @@ msgid ""
 "<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> in forum <a"
 " href=\"%(forum_url)s\">%(forum_title)s</a>"
 msgstr ""
+"<strong><a href=\"%(post_url)s\">%(topic_title)s</a></strong> i forumet <a "
+"href=\"%(forum_url)s\">%(forum_title)s</a>"
 
 #: flaskbb/templates/search/search_result.html:63
 msgid "No posts found matching your search criteria."
-msgstr ""
+msgstr "Inga inlägg matchade dina sökkriterier."
 
 #: flaskbb/templates/search/search_result.html:70
 msgid "Search results for Users:"
-msgstr ""
+msgstr "Sökresultat för användare:"
 
 #: flaskbb/templates/user/all_posts.html:18
 #, python-format
 msgid "<strong>%(topic_title)s</strong>"
-msgstr ""
+msgstr "<strong>%(topic_title)s</strong>"
 
 #: flaskbb/templates/user/all_posts.html:31
 msgid "No posts yet"
-msgstr ""
+msgstr "Inga inlägg ännu"
 
 #: flaskbb/templates/user/all_topics.html:39
 msgid "No topics yet"
-msgstr ""
+msgstr "Inga ämnen ännu"
 
 #: flaskbb/templates/user/change_avatar.html:8
 msgid "Change Avatar"
-msgstr ""
+msgstr "Ändra profilbild"
 
 #: flaskbb/templates/user/change_avatar.html:30
 msgid "Are you sure?"
-msgstr ""
+msgstr "Är du säker?"
 
 #: flaskbb/templates/user/change_email.html:6
 msgid "Change E-Mail Address"
-msgstr ""
+msgstr "Ändra e-postadress"
 
 #: flaskbb/templates/user/change_password.html:6
 msgid "Change Password"
-msgstr ""
+msgstr "Ändra lösenord"
 
 #: flaskbb/templates/user/change_user_details.html:7
 msgid "Change User Details"
-msgstr ""
+msgstr "Ändra användaruppgifter"
 
 #: flaskbb/templates/user/general_settings.html:6
 msgid "General Settings"
-msgstr ""
+msgstr "Allmänna inställningar"
 
 #: flaskbb/templates/user/profile.html:16
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: flaskbb/templates/user/profile.html:26
 msgid "User has not added any notes."
-msgstr ""
+msgstr "Användaren har inte lagt till några anteckningar."
 
 #: flaskbb/templates/user/profile_layout.html:4
 #, python-format
 msgid "%(user)s - User"
-msgstr ""
+msgstr "%(user)s - Användare"
 
 #: flaskbb/templates/user/profile_layout.html:31
 msgid "Never seen"
-msgstr ""
+msgstr "Aldrig online"
 
 #: flaskbb/templates/user/settings_layout.html:2
 #, python-format
 msgid "Settings - %(user)s - User"
-msgstr ""
+msgstr "Inställningar - %(user)s - Användare"
 
 #: flaskbb/user/forms.py:57
 msgid "Theme"
-msgstr ""
+msgstr "Tema"
 
 #: flaskbb/user/forms.py:59
 msgid "Open Links in a New Tab"
-msgstr ""
+msgstr "Öppna länkar på en ny flik"
 
 #: flaskbb/user/forms.py:61
 msgid "Use forum default"
-msgstr ""
+msgstr "Använd forumets standardinställning"
 
 #: flaskbb/user/forms.py:62
 msgid "Always"
-msgstr ""
+msgstr "Alltid"
 
 #: flaskbb/user/forms.py:78
 msgid "Old email address"
-msgstr ""
+msgstr "Gammal e-postadress"
 
 #: flaskbb/user/forms.py:85
 msgid "New email address"
-msgstr ""
+msgstr "Ny e-postadress"
 
 #: flaskbb/user/forms.py:88
 msgid "Email addresses must match."
-msgstr ""
+msgstr "E-postadresserna måste stämma överens."
 
 #: flaskbb/user/forms.py:93
 msgid "Confirm email address"
-msgstr ""
+msgstr "Bekräfta e-postadress"
 
 #: flaskbb/user/forms.py:113
 msgid "New password"
-msgstr ""
+msgstr "Nytt lösenord"
 
 #: flaskbb/user/forms.py:116
 msgid "New passwords must match."
-msgstr ""
+msgstr "De nya lösenorden måste stämma överens."
 
 #: flaskbb/user/forms.py:119
 msgid "Confirm new password"
-msgstr ""
+msgstr "Bekräfta nytt lösenord"
 
 #: flaskbb/user/forms.py:131
 msgid "New Avatar"
-msgstr ""
+msgstr "Ny profilbild"
 
 #: flaskbb/user/forms.py:133
 msgid "A avatar image must be provided."
-msgstr ""
+msgstr "En profilbild måste anges."
 
 #: flaskbb/user/forms.py:134
 msgid "This file type is not supported for avatar images"
-msgstr ""
+msgstr "Den här filtypen stöds inte för profilbilder"
 
 #: flaskbb/user/forms.py:151
 msgid "Forum Signature"
-msgstr ""
+msgstr "Forumsignatur"
 
 #: flaskbb/user/plugins.py:149
 msgid "Logout"
-msgstr ""
+msgstr "Logga ut"
 
 #: flaskbb/user/views.py:87
 msgid "Error while updating user settings"
-msgstr ""
+msgstr "Fel vid uppdatering av användarinställningar"
 
 #: flaskbb/user/views.py:90
 msgid "Settings updated."
-msgstr ""
+msgstr "Inställningarna har uppdaterats."
 
 #: flaskbb/user/views.py:121
 msgid "Error while changing password"
-msgstr ""
+msgstr "Fel vid ändring av lösenord"
 
 #: flaskbb/user/views.py:124
 msgid "Password updated."
-msgstr ""
+msgstr "Lösenordet har uppdaterats."
 
 #: flaskbb/user/views.py:153
 msgid "Error while updating email"
-msgstr ""
+msgstr "Fel vid uppdatering av e-postadress"
 
 #: flaskbb/user/views.py:156
 msgid "Email address updated."
-msgstr ""
+msgstr "E-postadressen har uppdaterats."
 
 #: flaskbb/user/views.py:187
 msgid "Error while updating avatar"
-msgstr ""
+msgstr "Fel vid uppdatering av profilbild"
 
 #: flaskbb/user/views.py:190
 msgid "Avatar updated."
-msgstr ""
+msgstr "Profilbilden har uppdaterats."
 
 #: flaskbb/user/views.py:209
 msgid "Avatar deleted."
-msgstr ""
+msgstr "Profilbilden har tagits bort."
 
 #: flaskbb/user/views.py:233
 msgid "Error while updating user details"
-msgstr ""
+msgstr "Fel vid uppdatering av användaruppgifter"
 
 #: flaskbb/user/views.py:236
 msgid "User details updated."
-msgstr ""
+msgstr "Användaruppgifterna har uppdaterats."
 
 #: flaskbb/user/services/validators.py:56
 msgid "Old email does not match"
-msgstr ""
+msgstr "Den gamla e-postadressen stämmer inte"
 
 #: flaskbb/user/services/validators.py:68
 msgid "New email address must be different"
-msgstr ""
+msgstr "Den nya e-postadressen måste skilja sig från den gamla"
 
 #: flaskbb/user/services/validators.py:80
 msgid "New password must be different"
-msgstr ""
+msgstr "Det nya lösenordet måste skilja sig från det gamla"
 
 #: flaskbb/user/services/validators.py:92
 msgid "Old password is wrong"
-msgstr ""
+msgstr "Det gamla lösenordet är fel"
 
 #: flaskbb/user/services/validators.py:117
 msgid "Could not retrieve avatar"
-msgstr ""
+msgstr "Det gick inte att hämta profilbilden"
 
 #: flaskbb/utils/helpers.py:559
 msgid "view post"
-msgstr ""
+msgstr "visa inlägg"
 
 #: flaskbb/utils/helpers.py:792
 msgid "The registration has been disabled."
-msgstr ""
+msgstr "Registreringen har inaktiverats."
 
 #: flaskbb/utils/helpers.py:813
 msgid "This account is already activated."
@@ -2528,7 +2564,7 @@ msgstr "Detta konto är redan aktiverat."
 
 #: flaskbb/utils/validators.py:40
 msgid "Captcha"
-msgstr ""
+msgstr "Captcha"
 
 #~ msgid "Password Recovery Confirmation"
 #~ msgstr "Återställning av lösenord"
