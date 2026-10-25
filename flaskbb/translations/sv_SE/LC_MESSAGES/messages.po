@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: FlaskBB\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-10-15 20:25+0200\n"
-"PO-Revision-Date: 2026-10-21 07:15+0000\n"
+"PO-Revision-Date: 2026-10-25 19:03+0000\n"
 "Last-Translator: Daniel Nylander "
 "<yeagersthlm2@users.noreply.hosted.weblate.org>\n"
 "Language: sv_SE\n"
@@ -48,7 +48,7 @@ msgstr "Den här sidan är för närvarande inte tillgänglig."
 #: flaskbb/deprecation.py:78
 #, python-format
 msgid "%(name)s is deprecated and will be removed in version %(version)s."
-msgstr "%(name)s kommer att fasas ut och tas bort i version %(version)s."
+msgstr "%(name)s är föråldrad och kommer att tas bort i version %(version)s."
 
 #: flaskbb/email.py:59
 msgid "Password Recovery Confirmation"
@@ -199,7 +199,7 @@ msgstr "Utloggad"
 
 #: flaskbb/auth/views.py:117
 msgid "Unrecoverable error while handling login"
-msgstr "Ett oåterkalleligt fel uppstod när inloggningen hanterades"
+msgstr "Ett fel som inte kunde åtgärdas uppstod vid inloggningen"
 
 #: flaskbb/auth/views.py:146
 msgid "Reauthenticated."
@@ -207,11 +207,13 @@ msgstr "Autentiseringen har förnyats."
 
 #: flaskbb/auth/views.py:151
 msgid "Unrecoverable error while handling reauthentication"
-msgstr "Ett oåterkalleligt fel uppstod när förnyad autentisering hanterades"
+msgstr "Ett fel som inte kunde åtgärdas uppstod vid förnyad autentisering"
 
 #: flaskbb/auth/views.py:195
 msgid "Could not process registration dueto an unrecoverable error"
-msgstr "Registreringen kunde inte behandlas på grund av ett oåterkalleligt fel"
+msgstr ""
+"Registreringen kunde inte behandlas på grund av ett fel som inte kunde "
+"åtgärdas"
 
 #: flaskbb/auth/views.py:227
 msgid ""
@@ -239,7 +241,7 @@ msgstr "En ny token för kontoaktivering har skickats till din e-postadress."
 
 #: flaskbb/auth/views.py:341 flaskbb/auth/views.py:387
 msgid "Could not activate account due to an unrecoverable error"
-msgstr "Kontot kunde inte aktiveras på grund av ett oåterkalleligt fel"
+msgstr "Kontot kunde inte aktiveras på grund av ett fel som inte kunde åtgärdas"
 
 #: flaskbb/auth/views.py:348 flaskbb/auth/views.py:395
 msgid "Your account has been activated and you can now login."
@@ -519,7 +521,7 @@ msgstr "%(count)s ämnen har fästs."
 #: flaskbb/forum/views.py:450
 #, python-format
 msgid "%(count)s topics trivialized."
-msgstr "%(count)s ämnen har markerats som oviktiga."
+msgstr "Fästningen har tagits bort för %(count)s ämnen."
 
 #: flaskbb/forum/views.py:451
 #, python-format
@@ -587,7 +589,7 @@ msgstr "Du har inte behörighet att fästa det här ämnet"
 
 #: flaskbb/forum/views.py:801
 msgid "You are not allowed to trivialize this topic"
-msgstr "Du har inte behörighet att markera det här ämnet som oviktigt"
+msgstr "Du har inte behörighet att ta bort fästningen för det här ämnet"
 
 #: flaskbb/forum/views.py:821
 msgid "You are not allowed to delete this post"
@@ -1655,7 +1657,7 @@ msgstr "Fäst"
 
 #: flaskbb/templates/forum/edit_forum.html:71
 msgid "Trivialize"
-msgstr "Markera som oviktigt"
+msgstr "Ta bort fästning"
 
 #: flaskbb/templates/forum/edit_forum.html:76
 #: flaskbb/templates/management/attachments.html:146
@@ -1910,7 +1912,7 @@ msgstr "Citera det här inlägget"
 #: flaskbb/templates/forum/topic.html:213
 #: flaskbb/templates/forum/topic_horizontal.html:132
 msgid "Full Reply"
-msgstr "Hela svaret"
+msgstr "Svara med citat"
 
 #: flaskbb/templates/forum/topic.html:222
 msgid "Edit this topic"
@@ -1979,7 +1981,7 @@ msgstr "Fäst ämne"
 
 #: flaskbb/templates/forum/topic_controls.html:83
 msgid "Trivialize Topic"
-msgstr "Markera ämne som oviktigt"
+msgstr "Ta bort ämnets fästning"
 
 #: flaskbb/templates/forum/topic_controls.html:98
 msgid "Unhide Topic"
