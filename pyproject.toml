@@ -2,7 +2,7 @@
 name = "FlaskBB"
 dynamic = ["version"]
 dependencies = [
-  "alembic>=1.20.0",
+  "alembic>=1.20.1",
   "attrs>=26.1.0",
   "Babel>=2.18.0",
   "blinker>=1.9.0",
@@ -41,7 +41,7 @@ dependencies = [
   "typing-extensions>=4.16",
   "Unidecode>=1.4.0",
   "Werkzeug>=3.1.9",
-  "WTForms>=3.2.2",
+  "WTForms>=3.3.1",
   "WTForms-SQLAlchemy>=0.4.2",
 ]
 requires-python = ">=3.12"
@@ -135,7 +135,7 @@ dev = [
     "cookiecutter",
     "ipython>=9.17.1",
     "ruff",
-    "tox>=4.67.1",
+    "tox>=4.67.4",
     "tox-uv",
     {include-group = "pre-commit"},
     {include-group = "docs"},
