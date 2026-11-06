@@ -20,6 +20,7 @@ import sqlalchemy as sa
 import sqlalchemy.types as types
 from flask import abort
 from flask_sqlalchemy.session import Session
+from sqlalchemy.dialects import mysql
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm import (
     declared_attr,
@@ -154,6 +155,13 @@ class BaseModel(_DeclarativeBase):
 class UTCDateTime(types.TypeDecorator[datetime.datetime]):
     impl = types.DateTime
     cache_ok = True
+
+    @t.override
+    def load_dialect_impl(self, dialect: sa.Dialect) -> types.TypeEngine[t.Any]:
+        # a plain DATETIME keeps whole seconds there
+        if dialect.name == "mysql":
+            return dialect.type_descriptor(mysql.DATETIME(fsp=6))
+        return super().load_dialect_impl(dialect)
 
     @t.override
     def process_bind_param(

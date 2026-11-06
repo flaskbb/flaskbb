@@ -1,6 +1,13 @@
 import sqlalchemy as sa
 from flaskbb.extensions import db
-from flaskbb.utils.database import drop_all
+from flaskbb.utils.database import drop_all, UTCDateTime
+from sqlalchemy.dialects import mysql, postgresql, sqlite
+
+
+def test_utcdatetime_keeps_fractional_seconds_on_mysql():
+    assert UTCDateTime().compile(dialect=mysql.dialect()) == "DATETIME(6)"
+    assert UTCDateTime().compile(dialect=postgresql.dialect()) == "TIMESTAMP WITHOUT TIME ZONE"
+    assert UTCDateTime().compile(dialect=sqlite.dialect()) == "DATETIME"
 
 
 def test_sqlite_enforces_foreign_keys(database):

@@ -104,6 +104,6 @@ def downgrade():
     with op.batch_alter_table("groups", schema=None) as batch_op:
         batch_op.drop_column("postattachment")
 
-    op.drop_index(op.f("ix_attachments_filename"), table_name="attachments")
-    op.drop_index(op.f("ix_attachments_post_id"), table_name="attachments")
+    # the table takes its indexes with it; MySQL refuses to drop the one
+    # its foreign key uses on its own
     op.drop_table("attachments")

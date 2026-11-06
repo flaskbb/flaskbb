@@ -224,6 +224,8 @@ class ManagementSettings(MethodView):
                 group_obj = setting_registry.group(slug)
             except KeyError:
                 abort(404)
+            if setting_registry.is_plugin_group(slug):
+                abort(404)
             active_nav.update({"key": group_obj.key, "title": group_obj.name})
 
             form_cls = build_form(group_obj)

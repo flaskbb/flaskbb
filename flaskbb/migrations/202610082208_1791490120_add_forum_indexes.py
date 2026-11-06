@@ -6,6 +6,7 @@ Create Date: 2026-10-08 22:08:40
 
 """
 
+import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -35,6 +36,30 @@ def upgrade():
         op.create_index(name, table, columns, unique=False)
 
 
+def _mysql_foreign_key_on(table, column):
+    """MySQL lets a foreign key use any index on its column and refuses to
+    drop the last one, so the key has to go first and come back afterwards."""
+    bind = op.get_bind()
+    if bind.dialect.name != "mysql":
+        return None
+    for foreign_key in sa.inspect(bind).get_foreign_keys(table):
+        if foreign_key["constrained_columns"] == [column]:
+            return foreign_key
+    return None
+
+
 def downgrade():
-    for name, table, _columns in reversed(INDEXES):
+    for name, table, columns in reversed(INDEXES):
+        foreign_key = _mysql_foreign_key_on(table, columns[0])
+        if foreign_key:
+            op.drop_constraint(foreign_key["name"], table, type_="foreignkey")
         op.drop_index(name, table_name=table)
+        if foreign_key:
+            op.create_foreign_key(
+                foreign_key["name"],
+                table,
+                foreign_key["referred_table"],
+                foreign_key["constrained_columns"],
+                foreign_key["referred_columns"],
+                **foreign_key["options"],
+            )

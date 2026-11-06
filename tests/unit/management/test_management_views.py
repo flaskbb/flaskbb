@@ -17,6 +17,8 @@ from flaskbb.forum import views as forum_views
 from flaskbb.forum.models import Post, Topic
 from flaskbb.management import views
 from flaskbb.plugins.models import PluginRegistry
+from flaskbb.settings.definitions import SettingDefinition, SettingGroup
+from flaskbb.settings.registry import setting_registry
 from flaskbb.user import views as user_views
 from flaskbb.user.models import Group, GroupRole, User
 from werkzeug.exceptions import NotFound
@@ -776,3 +778,22 @@ def test_settings_of_a_group_that_does_not_exist_are_not_found(
         with pytest.raises(NotFound):
             view(**target)
         logout_user()
+
+
+def test_settings_page_404s_for_a_plugin_group_slug(default_settings, admin_user):
+    group = SettingGroup(
+        key="myplugin",
+        name="My Plugin",
+        description="",
+        settings=(SettingDefinition(key="ENABLED", value=True, name="Enabled", description=""),),
+    )
+    setting_registry.register_group(group, is_plugin=True)
+    view = views.ManagementSettings.as_view("settings")
+    try:
+        with views.current_app.test_request_context():
+            login_user(admin_user)
+            with pytest.raises(NotFound):
+                view(slug="myplugin")
+            logout_user()
+    finally:
+        setting_registry.unregister_group("myplugin")
