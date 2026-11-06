@@ -11,7 +11,7 @@ This module contains stuff for forms.
 import functools
 import json
 from collections.abc import Callable
-from typing import Any, override, TypeVar
+from typing import Any, Literal, override, TypeVar
 from urllib import request as http
 from urllib.parse import urlencode
 
@@ -32,7 +32,7 @@ from flaskbb.utils.proxies import current_app
 _F = TypeVar("_F", bound="FlaskForm")
 
 
-def recaptcha_key(name: str) -> str:
+def recaptcha_key(name: Literal["RECAPTCHA_PUBLIC_KEY", "RECAPTCHA_PRIVATE_KEY"]) -> str:
     """The key saved in the admin settings wins over the config file."""
     key = flaskbb_config.get(name) or current_app.config.get(name)
     if not key:

@@ -21,7 +21,7 @@
     neither field. -#}
     {% set editing_self = user is defined and current_user.id == user.id %}
     {% set confirm_self_change = editing_self
-    and (form.primary_group is not none or form.activated is not none) %}
+        and (form.primary_group is not none or form.activated is not none) %}
 
     <div class="col-md-12 settings-col">
         <div class="card settings">

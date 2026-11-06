@@ -63,6 +63,9 @@ class AppConfig(TypedDict, extra_items=Any):  # type: ignore[call-arg]
     REMEMBER_COOKIE_PATH: str
     REMEMBER_COOKIE_SECURE: bool | None
     REMEMBER_COOKIE_HTTPONLY: bool
+    RECAPTCHA_PUBLIC_KEY: NotRequired[str]
+    RECAPTCHA_PRIVATE_KEY: NotRequired[str]
+    RECAPTCHA_VERIFY_SERVER: NotRequired[str]
 
     # Caching
     CACHE_TYPE: str
