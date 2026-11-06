@@ -85,6 +85,10 @@ about each of these settings until you update it. Other changes:
 - ``TRUSTED_HOSTS`` is new and defaults to ``SERVER_NAME``.
 - ``AVATAR_UPLOAD_PATH`` and ``ATTACHMENT_UPLOAD_PATH`` are new, see
   `Uploads`_.
+- The reCAPTCHA keys are managed in the admin panel again. Keys saved in a
+  2.0 or 2.1 admin panel are picked up by the migration, and
+  ``RECAPTCHA_PUBLIC_KEY`` and ``RECAPTCHA_PRIVATE_KEY`` from a 2.2 config
+  are still used as long as the admin panel fields are empty.
 
 To start with a new config instead, run ``flaskbb makeconfig`` and copy at
 least ``SQLALCHEMY_DATABASE_URI``, ``SECRET_KEY``, ``WTF_CSRF_SECRET_KEY`` and

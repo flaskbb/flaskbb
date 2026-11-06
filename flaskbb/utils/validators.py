@@ -9,13 +9,20 @@ This module contains stuff for forms.
 """
 
 import functools
+import json
 from collections.abc import Callable
-from typing import override, TypeVar
+from typing import Any, override, TypeVar
+from urllib import request as http
+from urllib.parse import urlencode
 
 from flask_babelplus import lazy_gettext as _
-from flask_wtf import FlaskForm, RecaptchaField
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileSize
-from wtforms import Field
+from flask_wtf.recaptcha import fields as recaptcha_fields
+from flask_wtf.recaptcha import validators as recaptcha_validators
+from flask_wtf.recaptcha import widgets as recaptcha_widgets
+from markupsafe import Markup
+from wtforms import Field, ValidationError
 from wtforms.form import BaseForm
 
 from flaskbb.extensions import limiter
@@ -23,6 +30,58 @@ from flaskbb.settings import flaskbb_config
 from flaskbb.utils.proxies import current_app
 
 _F = TypeVar("_F", bound="FlaskForm")
+
+
+def recaptcha_key(name: str) -> str:
+    """The key saved in the admin settings wins over the config file."""
+    key = flaskbb_config.get(name) or current_app.config.get(name)
+    if not key:
+        raise RuntimeError(f"{name} is set neither in the admin settings nor in the config")
+    return key
+
+
+class RecaptchaWidget(recaptcha_widgets.RecaptchaWidget):
+    @override
+    def __call__(self, field: Any, error: Any = None, **kwargs: Any) -> Markup:
+        kwargs.setdefault("id", field.id)
+        return self.recaptcha_html(  # pyright: ignore[reportUnknownMemberType]
+            recaptcha_key("RECAPTCHA_PUBLIC_KEY"), nonce=field.nonce, **kwargs
+        )
+
+
+class Recaptcha(recaptcha_validators.Recaptcha):
+    @override
+    def _validate_recaptcha(self, response: str, remote_addr: str | None) -> bool:
+        verify_server = (
+            current_app.config.get("RECAPTCHA_VERIFY_SERVER")
+            or recaptcha_validators.RECAPTCHA_VERIFY_SERVER_DEFAULT
+        )
+        data = urlencode(
+            {
+                "secret": recaptcha_key("RECAPTCHA_PRIVATE_KEY"),
+                "remoteip": remote_addr,
+                "response": response,
+            }
+        )
+        http_response = http.urlopen(verify_server, data.encode("utf-8"))
+        if http_response.code != 200:
+            return False
+
+        json_resp = json.loads(http_response.read())
+        if json_resp["success"]:
+            return True
+
+        for error in json_resp.get("error-codes", []):
+            if error in recaptcha_validators.RECAPTCHA_ERROR_CODES:
+                raise ValidationError(recaptcha_validators.RECAPTCHA_ERROR_CODES[error])
+        return False
+
+
+class RecaptchaField(recaptcha_fields.RecaptchaField):
+    widget = RecaptchaWidget()
+
+    def __init__(self, label: str = "", validators: Any = None, nonce: Any = None, **kwargs: Any):
+        super().__init__(label, validators or [Recaptcha()], nonce, **kwargs)  # pyright: ignore[reportUnknownMemberType]
 
 
 def add_recaptcha_field(

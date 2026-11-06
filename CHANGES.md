@@ -39,6 +39,7 @@ Unreleased
 
 
 #### Admin panel
+- The reCAPTCHA keys are managed in the admin panel again. `RECAPTCHA_PUBLIC_KEY` and `RECAPTCHA_PRIVATE_KEY` from the config are used as long as the admin panel fields are empty.
 - The admin layout was redesigned because adding a new item broke the whole nav. Instead they
   we use a sidenav now with an optional settings tree that can be toggled.
 - Admins are asked to confirm before editing their own account.

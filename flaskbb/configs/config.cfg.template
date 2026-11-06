@@ -88,6 +88,11 @@ REMEMBER_COOKIE_SECURE = {% if use_https %}True{% else %}False{%endif%}
 # Prevents the “Remember Me” cookie from being accessed by client-side scripts.
 REMEMBER_COOKIE_HTTPONLY = True
 
+# reCAPTCHA is enabled and its keys are managed in the admin panel under
+# "Auth". The keys can be set here instead, the admin panel takes precedence.
+# RECAPTCHA_PUBLIC_KEY = ""
+# RECAPTCHA_PRIVATE_KEY = ""
+
 
 # Search
 # ------------------------------

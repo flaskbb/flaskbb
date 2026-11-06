@@ -186,9 +186,25 @@ auth_group = SettingGroup(
             name="Enable reCAPTCHA",
             description=(
                 "Helps to prevent bots from creating accounts. "
-                "RECAPTCHA_PUBLIC_KEY (Site Key) and RECAPTCHA_PRIVATE_KEY "
-                "(Secret Key) must be set via environment variables or in "
-                "'flaskbb.cfg'."
+                "Needs the reCAPTCHA Site Key and Secret Key below."
+            ),
+        ),
+        StringSetting(
+            key="RECAPTCHA_PUBLIC_KEY",
+            value="",
+            name="reCAPTCHA Site Key",
+            description=(
+                "Your public reCAPTCHA key ('Site key'). Leave empty to use "
+                "RECAPTCHA_PUBLIC_KEY from 'flaskbb.cfg'."
+            ),
+        ),
+        StringSetting(
+            key="RECAPTCHA_PRIVATE_KEY",
+            value="",
+            name="reCAPTCHA Secret Key",
+            description=(
+                "The private reCAPTCHA key ('Secret key'). Leave empty to use "
+                "RECAPTCHA_PRIVATE_KEY from 'flaskbb.cfg'."
             ),
         ),
     ),

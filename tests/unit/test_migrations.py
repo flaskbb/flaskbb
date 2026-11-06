@@ -227,6 +227,36 @@ def test_missing_core_settings_migration_matches_the_fixture():
         assert setting_registry.definition(group_key, key).value == value
 
 
+def test_recaptcha_key_settings_migration_keeps_the_2x_rows(default_settings):
+    migration = _load_migration("202611062215_1793999700_add_recaptcha_key_settings.py")
+    db.session.execute(sa.text("DELETE FROM settings WHERE lower(key) LIKE 'recaptcha_%_key'"))
+    db.session.execute(
+        sa.text(
+            "INSERT INTO settings (key, value, group_key) "
+            "VALUES ('recaptcha_private_key', '\"secret-from-2x\"', 'auth')"
+        )
+    )
+    context = MigrationContext.configure(db.session.connection())
+
+    with Operations.context(context):
+        migration.upgrade()
+    db.session.commit()
+
+    values = dict(
+        db.session.execute(
+            sa.text("SELECT key, value FROM settings WHERE lower(key) LIKE 'recaptcha_%_key'")
+        ).all()
+    )
+    assert values == {"RECAPTCHA_PUBLIC_KEY": '""', "recaptcha_private_key": '"secret-from-2x"'}
+
+
+def test_recaptcha_key_settings_migration_matches_the_fixture():
+    migration = _load_migration("202611062215_1793999700_add_recaptcha_key_settings.py")
+
+    for group_key, key, value in migration.SETTINGS:
+        assert setting_registry.definition(group_key, key).value == value
+
+
 def test_attachment_filename_index_matches_the_migration(database):
     indexes = [
         (index["name"], index["column_names"], bool(index["unique"]))
