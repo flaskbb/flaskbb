@@ -6,8 +6,8 @@ dependencies = [
   "attrs>=26.1.0",
   "Babel>=2.18.0",
   "blinker>=1.9.0",
-  "celery>=5.6.3",
-  "click>=8.5.0",
+  "celery>=5.7.0",
+  "click>=8.5.1",
   "click-log>=0.4.0",
   "click-plugins>=1.1.1.2",
   "click-repl>=0.4.1",
@@ -25,8 +25,8 @@ dependencies = [
   "Flask-SQLAlchemy>=3.1.1",
   "Flask-Themes2>=2.0.0",
   "Flask-WTF>=1.3.0",
-  "flaskbb-plugin-conversations>=3.0.7",
-  "flaskbb-plugin-portal>=3.0.4",
+  "flaskbb-plugin-conversations>=3.0.8",
+  "flaskbb-plugin-portal>=3.0.5",
   "Jinja2>=3.1.6",
   "MarkupSafe>=3.0.4",
   "mistune>=3.4.0",
@@ -34,14 +34,14 @@ dependencies = [
   "pluggy>=1.7.0",
   "Pygments>=2.21.0",
   "PyJWT>=2.15.1",
-  "pytz>=2026.5",
+  "pytz>=2026.6",
   "redis>=8.1.0",
   "requests>=2.34.2",
-  "SQLAlchemy>=2.1.6",
+  "SQLAlchemy>=2.1.8",
   "typing-extensions>=4.16",
   "Unidecode>=1.4.0",
   "Werkzeug>=3.1.9",
-  "WTForms>=3.3.1",
+  "WTForms>=3.3.2",
   "WTForms-SQLAlchemy>=0.4.2",
 ]
 requires-python = ">=3.12"
@@ -76,18 +76,18 @@ gunicorn = [
   "gunicorn>=26.2.0",
 ]
 postgres = [
-  "psycopg[binary]>=3.3.6",
+  "psycopg[binary]>=3.3.8",
 ]
 mysql = [
   "pymysql>=1.2.3",
 ]
 plugins = [
-  "flaskbb-plugin-inviteonly>=1.0.2",
-  "flaskbb-plugin-like>=1.0.2",
-  "flaskbb-plugin-ranks>=1.0.3",
-  "flaskbb-plugin-stopforumspam>=1.0.2",
-  "flaskbb-plugin-test-mail>=0.3.2",
-  "flaskbb-plugin-vote>=1.2.2",
+  "flaskbb-plugin-inviteonly>=1.0.3",
+  "flaskbb-plugin-like>=1.0.3",
+  "flaskbb-plugin-ranks>=1.0.4",
+  "flaskbb-plugin-stopforumspam>=1.0.3",
+  "flaskbb-plugin-test-mail>=0.3.3",
+  "flaskbb-plugin-vote>=1.2.3",
 ]
 
 [project.urls]
@@ -133,9 +133,9 @@ dependencies = ["Babel>=2.18.0"]
 [dependency-groups]
 dev = [
     "cookiecutter",
-    "ipython>=9.17.1",
+    "ipython>=9.18.1",
     "ruff",
-    "tox>=4.67.4",
+    "tox>=4.67.13",
     "tox-uv",
     {include-group = "pre-commit"},
     {include-group = "docs"},

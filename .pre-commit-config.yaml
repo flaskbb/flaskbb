@@ -2,7 +2,7 @@ ci:
   autoupdate_schedule: monthly
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: a56c0b927e6465d37cae3e97d35d4d18ab2b96cd  # frozen: v0.16.9
+    rev: c0f278f1254ccc8fb09676bcdb8d847e7db493e5  # frozen: v0.17.4
     hooks:
       - id: ruff-check
         args: [ "--fix" ]
@@ -17,14 +17,14 @@ repos:
       - id: fix-byte-order-marker
       - id: trailing-whitespace
   - repo: https://github.com/djlint/djLint
-    rev: v1.46.2
+    rev: 328ae8ca553d7bf0c4123dec95ccb3dfda4f28ff  # frozen: v1.49.9
     hooks:
       - id: djlint-reformat
         files: ^flaskbb/templates/.*\.html$
       - id: djlint
         files: ^flaskbb/templates/.*\.html$
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.0.6
+    rev: bc3c1d9acd69eaa1e5912f282ca563f914fd78d3  # frozen: v2.6.4
     hooks:
       - id: biome-check
         additional_dependencies: ["@biomejs/biome@2.5.15"]
