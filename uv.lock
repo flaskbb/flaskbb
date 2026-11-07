@@ -1009,7 +1009,7 @@ requires-dist = [
     { name = "flaskbb-plugin-conversations", specifier = ">=3.0.8" },
     { name = "flaskbb-plugin-inviteonly", marker = "extra == 'plugins'", specifier = ">=1.0.3" },
     { name = "flaskbb-plugin-like", marker = "extra == 'plugins'", specifier = ">=1.0.3" },
-    { name = "flaskbb-plugin-portal", specifier = ">=3.0.5" },
+    { name = "flaskbb-plugin-portal", specifier = ">=3.0.6" },
     { name = "flaskbb-plugin-ranks", marker = "extra == 'plugins'", specifier = ">=1.0.4" },
     { name = "flaskbb-plugin-stopforumspam", marker = "extra == 'plugins'", specifier = ">=1.0.3" },
     { name = "flaskbb-plugin-test-mail", marker = "extra == 'plugins'", specifier = ">=0.3.3" },
@@ -1140,14 +1140,14 @@ wheels = [
 
 [[package]]
 name = "flaskbb-plugin-portal"
-version = "3.0.5"
+version = "3.0.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flaskbb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/db/8c/bc15c5a5a947b478769a2549746c2ab261dc93cca31bf69892a512c383e3/flaskbb_plugin_portal-3.0.5.tar.gz", hash = "sha256:7271b2d9ec465435b1adb09fb28f97654278e5e3a65b376b95096adbb0c4d6f8", size = 8504, upload-time = "2026-10-28T18:57:27.973Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/24/ac/4ba901ac898e0eee66abd0f801bea95cafba67052143f1b844886145dfcb/flaskbb_plugin_portal-3.0.6.tar.gz", hash = "sha256:7f3ef256b3f507287b955a7cad6689427111cf99d2adfb3a2582a4fa47c0dff6", size = 8530, upload-time = "2026-11-07T19:59:19.972Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/ee/776eea9f72d1cb28e86f2e8019ffdf5128220af22f0f797b10fa9f4fb302/flaskbb_plugin_portal-3.0.5-py3-none-any.whl", hash = "sha256:ea6a57576c23ede7aa85691a8e01c5e57ea94d95b6ba7417ab253dc0755ec17d", size = 11586, upload-time = "2026-10-28T18:57:26.862Z" },
+    { url = "https://files.pythonhosted.org/packages/83/66/886688963368d46bcd26136ae5615457192af0e2c5e958fb63dfd458d528/flaskbb_plugin_portal-3.0.6-py3-none-any.whl", hash = "sha256:9c41ca5c17b64fddacf198171c80bfdf00dc8368feba31151a6421cfe49f8a6f", size = 11611, upload-time = "2026-11-07T19:59:18.739Z" },
 ]
 
 [[package]]
