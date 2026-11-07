@@ -8,4 +8,4 @@ FlaskBB's current version
 :license: BSD, see LICENSE for more details.
 """
 
-__version__ = "3.0.0rc6"
+__version__ = "3.0.0"

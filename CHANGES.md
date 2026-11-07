@@ -4,7 +4,7 @@ Here you can see the full list of changes between each release.
 
 ## Version 3.0.0
 
-Unreleased
+Released November 7th, 2026
 
 ### Features
 
