@@ -29,6 +29,7 @@ class UserRegistrationInfo:
     email: str
     language: str
     group: int
+    activated: bool = False
 
 
 class UserValidator(ABC):

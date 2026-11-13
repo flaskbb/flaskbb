@@ -1153,6 +1153,50 @@ def flaskbb_tpl_form_registration_after(form: "FlaskForm"):
 
 
 @spec
+def flaskbb_tpl_form_login_before(form: "FlaskForm"):
+    """This hook is emitted in the Login form **before** the first
+    input field but after the hidden CSRF token field.
+
+    in :file:`templates/auth/login.html`.
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_login_after(form: "FlaskForm"):
+    """This hook is emitted in the Login form **after** the last
+    input field but before the submit field.
+
+    in :file:`templates/auth/login.html`.
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_reauth_before(form: "FlaskForm"):
+    """This hook is emitted in the Reauthentication form **before** the
+    password field but after the hidden CSRF token field.
+
+    in :file:`templates/auth/reauth.html`.
+
+    :param form: The form object.
+    """
+
+
+@spec
+def flaskbb_tpl_form_reauth_after(form: "FlaskForm"):
+    """This hook is emitted in the Reauthentication form **after** the
+    password field but before the submit field.
+
+    in :file:`templates/auth/reauth.html`.
+
+    :param form: The form object.
+    """
+
+
+@spec
 def flaskbb_tpl_form_user_details_before(form: "FlaskForm"):
     """This hook is emitted in the Change User Details form **before** an
     input field is rendered.

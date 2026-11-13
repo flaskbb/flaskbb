@@ -1,5 +1,6 @@
 from flask import get_flashed_messages
 from flask_login import current_user
+from flaskbb.auth.plugins import flaskbb_registration_post_processor
 from flaskbb.auth.services.registration import (
     AutoActivateUserPostProcessor,
     AutologinPostProcessor,
@@ -64,3 +65,27 @@ class TestSendActivationPostProcessor:
         assert activator.called
         assert activator.user == unactivated_user.email
         assert get_flashed_messages(with_categories=True)[0] == expected_message
+
+
+class TestRegistrationPostProcessorHook:
+    def test_sends_activation_email_to_unactivated_users(
+        self, unactivated_user, request_context, default_settings, mocker
+    ):
+        flaskbb_config["ACTIVATE_ACCOUNT"] = True
+        send_activation = mocker.patch("flaskbb.auth.plugins.SendActivationPostProcessor")
+
+        flaskbb_registration_post_processor(unactivated_user)
+
+        send_activation.return_value.post_process.assert_called_once_with(unactivated_user)
+        assert not current_user.is_authenticated
+
+    def test_logs_in_already_activated_users_without_activation_email(
+        self, Fred, request_context, default_settings, mocker
+    ):
+        flaskbb_config["ACTIVATE_ACCOUNT"] = True
+        send_activation = mocker.patch("flaskbb.auth.plugins.SendActivationPostProcessor")
+
+        flaskbb_registration_post_processor(Fred)
+
+        send_activation.assert_not_called()
+        assert current_user.username == Fred.username

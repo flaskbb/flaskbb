@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 from flaskbb.auth.services.registration import RegistrationService
 from flaskbb.core.auth.registration import (
@@ -58,6 +60,14 @@ class TestRegistrationService:
         actual_fred = User.get(User.username == "Fred")
 
         assert actual_fred.id is not None
+        assert not actual_fred.activated
+
+    def test_stores_activated_flag(self, database, plugin_manager, default_groups):
+        service = self._get_service(plugin_manager, database)
+
+        service.register(replace(self.fred, activated=True))
+
+        assert User.get(User.username == "Fred").activated
 
     def test_calls_post_processors_if_user_registration_works(
         self, database, plugin_manager, mocker, default_groups

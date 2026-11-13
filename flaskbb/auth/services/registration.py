@@ -251,6 +251,7 @@ class RegistrationService(UserRegistrationService):
                 password=user_info.password,
                 language=user_info.language,
                 primary_group_id=user_info.group,
+                activated=user_info.activated,
                 date_joined=datetime.now(UTC),
             )
             self.db.session.add(user)
