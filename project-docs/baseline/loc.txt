@@ -1,0 +1,1452 @@
+﻿flaskbb\app.py
+    LOC: 747
+    LLOC: 364
+    SLOC: 511
+    Comments: 76
+    Single comments: 66
+    Multi: 39
+    Blank: 131
+    - Comment Stats
+        (C % L): 10%
+        (C % S): 15%
+        (C + M % L): 15%
+flaskbb\deprecation.py
+    LOC: 109
+    LLOC: 44
+    SLOC: 52
+    Comments: 2
+    Single comments: 0
+    Multi: 29
+    Blank: 28
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 4%
+        (C + M % L): 28%
+flaskbb\email.py
+    LOC: 107
+    LLOC: 41
+    SLOC: 51
+    Comments: 2
+    Single comments: 0
+    Multi: 34
+    Blank: 22
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 4%
+        (C + M % L): 34%
+flaskbb\exceptions.py
+    LOC: 28
+    LLOC: 10
+    SLOC: 9
+    Comments: 1
+    Single comments: 0
+    Multi: 7
+    Blank: 12
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 11%
+        (C + M % L): 29%
+flaskbb\extensions.py
+    LOC: 98
+    LLOC: 46
+    SLOC: 49
+    Comments: 14
+    Single comments: 14
+    Multi: 10
+    Blank: 25
+    - Comment Stats
+        (C % L): 14%
+        (C % S): 29%
+        (C + M % L): 24%
+flaskbb\markup.py
+    LOC: 387
+    LLOC: 236
+    SLOC: 284
+    Comments: 7
+    Single comments: 6
+    Multi: 25
+    Blank: 72
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 2%
+        (C + M % L): 8%
+flaskbb\_version.py
+    LOC: 11
+    LLOC: 2
+    SLOC: 1
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 3
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 64%
+flaskbb\__init__.py
+    LOC: 17
+    LLOC: 5
+    SLOC: 4
+    Comments: 0
+    Single comments: 0
+    Multi: 8
+    Blank: 5
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 47%
+flaskbb\__main__.py
+    LOC: 3
+    LLOC: 2
+    SLOC: 2
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\auth\forms.py
+    LOC: 166
+    LLOC: 45
+    SLOC: 121
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 38
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 4%
+flaskbb\auth\plugins.py
+    LOC: 119
+    LLOC: 62
+    SLOC: 84
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 28
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 6%
+flaskbb\auth\views.py
+    LOC: 508
+    LLOC: 272
+    SLOC: 396
+    Comments: 14
+    Single comments: 9
+    Multi: 12
+    Blank: 91
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 4%
+        (C + M % L): 5%
+flaskbb\auth\__init__.py
+    LOC: 7
+    LLOC: 4
+    SLOC: 4
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 3
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\auth\services\activation.py
+    LOC: 61
+    LLOC: 35
+    SLOC: 37
+    Comments: 0
+    Single comments: 0
+    Multi: 11
+    Blank: 13
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 18%
+flaskbb\auth\services\authentication.py
+    LOC: 181
+    LLOC: 92
+    SLOC: 104
+    Comments: 1
+    Single comments: 0
+    Multi: 41
+    Blank: 36
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 23%
+flaskbb\auth\services\factories.py
+    LOC: 53
+    LLOC: 25
+    SLOC: 30
+    Comments: 0
+    Single comments: 0
+    Multi: 8
+    Blank: 15
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 15%
+flaskbb\auth\services\password.py
+    LOC: 77
+    LLOC: 44
+    SLOC: 50
+    Comments: 0
+    Single comments: 0
+    Multi: 11
+    Blank: 16
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 14%
+flaskbb\auth\services\reauthentication.py
+    LOC: 95
+    LLOC: 52
+    SLOC: 53
+    Comments: 0
+    Single comments: 0
+    Multi: 23
+    Blank: 19
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 24%
+flaskbb\auth\services\registration.py
+    LOC: 264
+    LLOC: 122
+    SLOC: 177
+    Comments: 5
+    Single comments: 0
+    Multi: 40
+    Blank: 47
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 17%
+flaskbb\auth\services\__init__.py
+    LOC: 55
+    LLOC: 7
+    SLOC: 42
+    Comments: 0
+    Single comments: 0
+    Multi: 10
+    Blank: 3
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 18%
+flaskbb\cli\bootstrap.py
+    LOC: 105
+    LLOC: 48
+    SLOC: 79
+    Comments: 2
+    Single comments: 2
+    Multi: 11
+    Blank: 13
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 12%
+flaskbb\cli\db.py
+    LOC: 104
+    LLOC: 68
+    SLOC: 68
+    Comments: 5
+    Single comments: 7
+    Multi: 10
+    Blank: 19
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 7%
+        (C + M % L): 14%
+flaskbb\cli\emoji.py
+    LOC: 54
+    LLOC: 48
+    SLOC: 49
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 5
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\cli\groups.py
+    LOC: 290
+    LLOC: 119
+    SLOC: 226
+    Comments: 0
+    Single comments: 5
+    Multi: 13
+    Blank: 46
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 4%
+flaskbb\cli\main.py
+    LOC: 722
+    LLOC: 305
+    SLOC: 574
+    Comments: 37
+    Single comments: 36
+    Multi: 21
+    Blank: 91
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 6%
+        (C + M % L): 8%
+flaskbb\cli\permissions.py
+    LOC: 113
+    LLOC: 58
+    SLOC: 74
+    Comments: 0
+    Single comments: 3
+    Multi: 12
+    Blank: 24
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 11%
+flaskbb\cli\plugins.py
+    LOC: 413
+    LLOC: 200
+    SLOC: 322
+    Comments: 2
+    Single comments: 8
+    Multi: 25
+    Blank: 58
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 1%
+        (C + M % L): 7%
+flaskbb\cli\themes.py
+    LOC: 106
+    LLOC: 47
+    SLOC: 71
+    Comments: 0
+    Single comments: 3
+    Multi: 13
+    Blank: 19
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 12%
+flaskbb\cli\translations.py
+    LOC: 98
+    LLOC: 45
+    SLOC: 74
+    Comments: 0
+    Single comments: 3
+    Multi: 9
+    Blank: 12
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 9%
+flaskbb\cli\users.py
+    LOC: 304
+    LLOC: 159
+    SLOC: 222
+    Comments: 2
+    Single comments: 13
+    Multi: 9
+    Blank: 60
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 4%
+flaskbb\cli\utils.py
+    LOC: 286
+    LLOC: 148
+    SLOC: 179
+    Comments: 8
+    Single comments: 13
+    Multi: 37
+    Blank: 57
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 4%
+        (C + M % L): 16%
+flaskbb\cli\__init__.py
+    LOC: 40
+    LLOC: 12
+    SLOC: 22
+    Comments: 0
+    Single comments: 0
+    Multi: 12
+    Blank: 6
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 30%
+flaskbb\configs\default.py
+    LOC: 316
+    LLOC: 74
+    SLOC: 128
+    Comments: 152
+    Single comments: 143
+    Multi: 8
+    Blank: 37
+    - Comment Stats
+        (C % L): 48%
+        (C % S): 119%
+        (C + M % L): 51%
+flaskbb\configs\docker.py
+    LOC: 125
+    LLOC: 60
+    SLOC: 90
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 28
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 6%
+flaskbb\configs\testing.py
+    LOC: 55
+    LLOC: 12
+    SLOC: 36
+    Comments: 3
+    Single comments: 2
+    Multi: 7
+    Blank: 10
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 8%
+        (C + M % L): 18%
+flaskbb\configs\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\core\app.py
+    LOC: 141
+    LLOC: 145
+    SLOC: 76
+    Comments: 21
+    Single comments: 18
+    Multi: 19
+    Blank: 28
+    - Comment Stats
+        (C % L): 15%
+        (C % S): 28%
+        (C + M % L): 28%
+flaskbb\core\changesets.py
+    LOC: 101
+    LLOC: 42
+    SLOC: 33
+    Comments: 3
+    Single comments: 2
+    Multi: 39
+    Blank: 27
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 9%
+        (C + M % L): 42%
+flaskbb\core\exceptions.py
+    LOC: 94
+    LLOC: 31
+    SLOC: 26
+    Comments: 0
+    Single comments: 0
+    Multi: 44
+    Blank: 24
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 47%
+flaskbb\core\tokens.py
+    LOC: 142
+    LLOC: 51
+    SLOC: 38
+    Comments: 6
+    Single comments: 6
+    Multi: 65
+    Blank: 33
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 16%
+        (C + M % L): 50%
+flaskbb\core\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\core\auth\activation.py
+    LOC: 55
+    LLOC: 12
+    SLOC: 8
+    Comments: 0
+    Single comments: 0
+    Multi: 36
+    Blank: 11
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 65%
+flaskbb\core\auth\authentication.py
+    LOC: 292
+    LLOC: 76
+    SLOC: 57
+    Comments: 0
+    Single comments: 0
+    Multi: 163
+    Blank: 72
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 56%
+flaskbb\core\auth\password.py
+    LOC: 53
+    LLOC: 12
+    SLOC: 8
+    Comments: 0
+    Single comments: 0
+    Multi: 33
+    Blank: 12
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 62%
+flaskbb\core\auth\permissions.py
+    LOC: 104
+    LLOC: 69
+    SLOC: 59
+    Comments: 0
+    Single comments: 1
+    Multi: 16
+    Blank: 28
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 15%
+flaskbb\core\auth\registration.py
+    LOC: 109
+    LLOC: 48
+    SLOC: 49
+    Comments: 3
+    Single comments: 0
+    Multi: 34
+    Blank: 26
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 6%
+        (C + M % L): 34%
+flaskbb\core\auth\__init__.py
+    LOC: 7
+    LLOC: 1
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 6
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 86%
+flaskbb\core\user\update.py
+    LOC: 106
+    LLOC: 68
+    SLOC: 46
+    Comments: 0
+    Single comments: 0
+    Multi: 32
+    Blank: 28
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 30%
+flaskbb\core\user\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\display\navigation.py
+    LOC: 136
+    LLOC: 68
+    SLOC: 50
+    Comments: 0
+    Single comments: 0
+    Multi: 56
+    Blank: 30
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 41%
+flaskbb\display\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\fixtures\groups.py
+    LOC: 110
+    LLOC: 4
+    SLOC: 99
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 4
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 6%
+flaskbb\fixtures\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\forum\forms.py
+    LOC: 249
+    LLOC: 140
+    SLOC: 178
+    Comments: 8
+    Single comments: 6
+    Multi: 7
+    Blank: 58
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 4%
+        (C + M % L): 6%
+flaskbb\forum\locals.py
+    LOC: 51
+    LLOC: 32
+    SLOC: 27
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 17
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 14%
+flaskbb\forum\models.py
+    LOC: 1823
+    LLOC: 871
+    SLOC: 1251
+    Comments: 123
+    Single comments: 134
+    Multi: 161
+    Blank: 277
+    - Comment Stats
+        (C % L): 7%
+        (C % S): 10%
+        (C + M % L): 16%
+flaskbb\forum\utils.py
+    LOC: 287
+    LLOC: 158
+    SLOC: 208
+    Comments: 2
+    Single comments: 2
+    Multi: 28
+    Blank: 49
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 10%
+flaskbb\forum\views.py
+    LOC: 1237
+    LLOC: 503
+    SLOC: 1011
+    Comments: 15
+    Single comments: 18
+    Multi: 8
+    Blank: 200
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 2%
+flaskbb\forum\__init__.py
+    LOC: 3
+    LLOC: 2
+    SLOC: 2
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\management\forms.py
+    LOC: 560
+    LLOC: 241
+    SLOC: 404
+    Comments: 14
+    Single comments: 10
+    Multi: 29
+    Blank: 117
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 8%
+flaskbb\management\navigation.py
+    LOC: 263
+    LLOC: 72
+    SLOC: 211
+    Comments: 0
+    Single comments: 0
+    Multi: 19
+    Blank: 33
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 7%
+flaskbb\management\plugins.py
+    LOC: 35
+    LLOC: 17
+    SLOC: 17
+    Comments: 0
+    Single comments: 0
+    Multi: 11
+    Blank: 7
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 31%
+flaskbb\management\views.py
+    LOC: 1753
+    LLOC: 708
+    SLOC: 1396
+    Comments: 64
+    Single comments: 54
+    Multi: 19
+    Blank: 284
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 5%
+        (C + M % L): 5%
+flaskbb\management\__init__.py
+    LOC: 19
+    LLOC: 5
+    SLOC: 4
+    Comments: 1
+    Single comments: 1
+    Multi: 8
+    Blank: 6
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 25%
+        (C + M % L): 47%
+flaskbb\permissions\definitions.py
+    LOC: 50
+    LLOC: 30
+    SLOC: 20
+    Comments: 2
+    Single comments: 0
+    Multi: 16
+    Blank: 14
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 10%
+        (C + M % L): 36%
+flaskbb\permissions\fixture.py
+    LOC: 92
+    LLOC: 9
+    SLOC: 75
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 10
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 8%
+flaskbb\permissions\locals.py
+    LOC: 21
+    LLOC: 8
+    SLOC: 8
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 6
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 33%
+flaskbb\permissions\manager.py
+    LOC: 86
+    LLOC: 49
+    SLOC: 42
+    Comments: 2
+    Single comments: 3
+    Multi: 21
+    Blank: 20
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 5%
+        (C + M % L): 27%
+flaskbb\permissions\registry.py
+    LOC: 96
+    LLOC: 61
+    SLOC: 59
+    Comments: 3
+    Single comments: 7
+    Multi: 9
+    Blank: 21
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 5%
+        (C + M % L): 12%
+flaskbb\permissions\__init__.py
+    LOC: 15
+    LLOC: 6
+    SLOC: 14
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\plugins\manager.py
+    LOC: 239
+    LLOC: 171
+    SLOC: 151
+    Comments: 8
+    Single comments: 17
+    Multi: 22
+    Blank: 49
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 5%
+        (C + M % L): 13%
+flaskbb\plugins\models.py
+    LOC: 206
+    LLOC: 124
+    SLOC: 117
+    Comments: 5
+    Single comments: 8
+    Multi: 50
+    Blank: 31
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 4%
+        (C + M % L): 27%
+flaskbb\plugins\spec.py
+    LOC: 1579
+    LLOC: 261
+    SLOC: 217
+    Comments: 6
+    Single comments: 7
+    Multi: 925
+    Blank: 430
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 3%
+        (C + M % L): 59%
+flaskbb\plugins\utils.py
+    LOC: 259
+    LLOC: 129
+    SLOC: 155
+    Comments: 4
+    Single comments: 3
+    Multi: 54
+    Blank: 47
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 22%
+flaskbb\plugins\__init__.py
+    LOC: 9
+    LLOC: 1
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 2
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 78%
+flaskbb\search\base.py
+    LOC: 149
+    LLOC: 78
+    SLOC: 58
+    Comments: 4
+    Single comments: 7
+    Multi: 55
+    Blank: 29
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 7%
+        (C + M % L): 40%
+flaskbb\search\forms.py
+    LOC: 108
+    LLOC: 39
+    SLOC: 75
+    Comments: 4
+    Single comments: 4
+    Multi: 7
+    Blank: 22
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 5%
+        (C + M % L): 10%
+flaskbb\search\service.py
+    LOC: 127
+    LLOC: 57
+    SLOC: 64
+    Comments: 8
+    Single comments: 8
+    Multi: 33
+    Blank: 22
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 12%
+        (C + M % L): 32%
+flaskbb\search\spec.py
+    LOC: 26
+    LLOC: 8
+    SLOC: 10
+    Comments: 2
+    Single comments: 2
+    Multi: 9
+    Blank: 5
+    - Comment Stats
+        (C % L): 8%
+        (C % S): 20%
+        (C + M % L): 42%
+flaskbb\search\views.py
+    LOC: 50
+    LLOC: 27
+    SLOC: 28
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 15
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 14%
+flaskbb\search\__init__.py
+    LOC: 143
+    LLOC: 82
+    SLOC: 91
+    Comments: 9
+    Single comments: 7
+    Multi: 16
+    Blank: 29
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 10%
+        (C + M % L): 17%
+flaskbb\search\backends\postgresql.py
+    LOC: 145
+    LLOC: 67
+    SLOC: 86
+    Comments: 13
+    Single comments: 13
+    Multi: 18
+    Blank: 28
+    - Comment Stats
+        (C % L): 9%
+        (C % S): 15%
+        (C + M % L): 21%
+flaskbb\search\backends\sql.py
+    LOC: 88
+    LLOC: 41
+    SLOC: 54
+    Comments: 0
+    Single comments: 0
+    Multi: 13
+    Blank: 21
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 15%
+flaskbb\search\backends\sqlite.py
+    LOC: 159
+    LLOC: 76
+    SLOC: 97
+    Comments: 10
+    Single comments: 10
+    Multi: 22
+    Blank: 30
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 10%
+        (C + M % L): 20%
+flaskbb\search\backends\__init__.py
+    LOC: 11
+    LLOC: 1
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 9
+    Blank: 2
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 82%
+flaskbb\settings\definitions.py
+    LOC: 124
+    LLOC: 84
+    SLOC: 86
+    Comments: 2
+    Single comments: 2
+    Multi: 10
+    Blank: 26
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 2%
+        (C + M % L): 10%
+flaskbb\settings\fixture.py
+    LOC: 367
+    LLOC: 15
+    SLOC: 340
+    Comments: 0
+    Single comments: 0
+    Multi: 7
+    Blank: 20
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 2%
+flaskbb\settings\forms.py
+    LOC: 31
+    LLOC: 15
+    SLOC: 11
+    Comments: 0
+    Single comments: 1
+    Multi: 10
+    Blank: 9
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 32%
+flaskbb\settings\models.py
+    LOC: 226
+    LLOC: 120
+    SLOC: 131
+    Comments: 6
+    Single comments: 4
+    Multi: 51
+    Blank: 40
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 5%
+        (C + M % L): 25%
+flaskbb\settings\proxy.py
+    LOC: 97
+    LLOC: 51
+    SLOC: 51
+    Comments: 6
+    Single comments: 4
+    Multi: 24
+    Blank: 18
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 12%
+        (C + M % L): 31%
+flaskbb\settings\registry.py
+    LOC: 136
+    LLOC: 78
+    SLOC: 76
+    Comments: 7
+    Single comments: 9
+    Multi: 22
+    Blank: 29
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 9%
+        (C + M % L): 21%
+flaskbb\settings\__init__.py
+    LOC: 28
+    LLOC: 6
+    SLOC: 27
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\tokens\serializer.py
+    LOC: 98
+    LLOC: 37
+    SLOC: 42
+    Comments: 11
+    Single comments: 5
+    Multi: 34
+    Blank: 17
+    - Comment Stats
+        (C % L): 11%
+        (C % S): 26%
+        (C + M % L): 46%
+flaskbb\tokens\verifiers.py
+    LOC: 43
+    LLOC: 20
+    SLOC: 17
+    Comments: 3
+    Single comments: 3
+    Multi: 12
+    Blank: 11
+    - Comment Stats
+        (C % L): 7%
+        (C % S): 18%
+        (C + M % L): 35%
+flaskbb\tokens\__init__.py
+    LOC: 11
+    LLOC: 3
+    SLOC: 2
+    Comments: 0
+    Single comments: 0
+    Multi: 6
+    Blank: 3
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 55%
+flaskbb\upload\views.py
+    LOC: 67
+    LLOC: 25
+    SLOC: 43
+    Comments: 8
+    Single comments: 2
+    Multi: 8
+    Blank: 14
+    - Comment Stats
+        (C % L): 12%
+        (C % S): 19%
+        (C + M % L): 24%
+flaskbb\upload\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\user\forms.py
+    LOC: 167
+    LLOC: 57
+    SLOC: 133
+    Comments: 4
+    Single comments: 2
+    Multi: 7
+    Blank: 25
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 7%
+flaskbb\user\models.py
+    LOC: 646
+    LLOC: 386
+    SLOC: 421
+    Comments: 11
+    Single comments: 29
+    Multi: 79
+    Blank: 117
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 14%
+flaskbb\user\plugins.py
+    LOC: 168
+    LLOC: 59
+    SLOC: 123
+    Comments: 0
+    Single comments: 0
+    Multi: 16
+    Blank: 29
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 10%
+flaskbb\user\views.py
+    LOC: 342
+    LLOC: 210
+    SLOC: 271
+    Comments: 3
+    Single comments: 0
+    Multi: 8
+    Blank: 63
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 1%
+        (C + M % L): 3%
+flaskbb\user\__init__.py
+    LOC: 18
+    LLOC: 5
+    SLOC: 4
+    Comments: 1
+    Single comments: 1
+    Multi: 7
+    Blank: 6
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 25%
+        (C + M % L): 44%
+flaskbb\user\services\factories.py
+    LOC: 99
+    LLOC: 41
+    SLOC: 61
+    Comments: 0
+    Single comments: 0
+    Multi: 8
+    Blank: 30
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 8%
+flaskbb\user\services\update.py
+    LOC: 121
+    LLOC: 90
+    SLOC: 72
+    Comments: 0
+    Single comments: 0
+    Multi: 22
+    Blank: 27
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 18%
+flaskbb\user\services\validators.py
+    LOC: 117
+    LLOC: 57
+    SLOC: 55
+    Comments: 0
+    Single comments: 0
+    Multi: 34
+    Blank: 28
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 29%
+flaskbb\user\services\__init__.py
+    LOC: 0
+    LLOC: 0
+    SLOC: 0
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 0
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+flaskbb\utils\alembic.py
+    LOC: 232
+    LLOC: 92
+    SLOC: 170
+    Comments: 9
+    Single comments: 8
+    Multi: 25
+    Blank: 29
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 5%
+        (C + M % L): 15%
+flaskbb\utils\database.py
+    LOC: 374
+    LLOC: 240
+    SLOC: 261
+    Comments: 21
+    Single comments: 25
+    Multi: 17
+    Blank: 71
+    - Comment Stats
+        (C % L): 6%
+        (C % S): 8%
+        (C + M % L): 10%
+flaskbb\utils\datastructures.py
+    LOC: 30
+    LLOC: 13
+    SLOC: 11
+    Comments: 0
+    Single comments: 0
+    Multi: 11
+    Blank: 8
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 37%
+flaskbb\utils\forms.py
+    LOC: 42
+    LLOC: 21
+    SLOC: 18
+    Comments: 3
+    Single comments: 3
+    Multi: 12
+    Blank: 9
+    - Comment Stats
+        (C % L): 7%
+        (C % S): 17%
+        (C + M % L): 36%
+flaskbb\utils\helpers.py
+    LOC: 851
+    LLOC: 411
+    SLOC: 424
+    Comments: 45
+    Single comments: 40
+    Multi: 198
+    Blank: 189
+    - Comment Stats
+        (C % L): 5%
+        (C % S): 11%
+        (C + M % L): 29%
+flaskbb\utils\http.py
+    LOC: 140
+    LLOC: 56
+    SLOC: 72
+    Comments: 19
+    Single comments: 17
+    Multi: 31
+    Blank: 20
+    - Comment Stats
+        (C % L): 14%
+        (C % S): 26%
+        (C + M % L): 36%
+flaskbb\utils\populate.py
+    LOC: 372
+    LLOC: 186
+    SLOC: 213
+    Comments: 5
+    Single comments: 6
+    Multi: 79
+    Blank: 74
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 2%
+        (C + M % L): 23%
+flaskbb\utils\proxies.py
+    LOC: 26
+    LLOC: 11
+    SLOC: 8
+    Comments: 4
+    Single comments: 4
+    Multi: 7
+    Blank: 7
+    - Comment Stats
+        (C % L): 15%
+        (C % S): 50%
+        (C + M % L): 42%
+flaskbb\utils\queries.py
+    LOC: 157
+    LLOC: 57
+    SLOC: 80
+    Comments: 3
+    Single comments: 2
+    Multi: 43
+    Blank: 32
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 4%
+        (C + M % L): 29%
+flaskbb\utils\requirements.py
+    LOC: 336
+    LLOC: 177
+    SLOC: 187
+    Comments: 3
+    Single comments: 7
+    Multi: 33
+    Blank: 109
+    - Comment Stats
+        (C % L): 1%
+        (C % S): 2%
+        (C + M % L): 11%
+flaskbb\utils\translations.py
+    LOC: 237
+    LLOC: 84
+    SLOC: 151
+    Comments: 4
+    Single comments: 4
+    Multi: 37
+    Blank: 45
+    - Comment Stats
+        (C % L): 2%
+        (C % S): 3%
+        (C + M % L): 17%
+flaskbb\utils\uploads.py
+    LOC: 236
+    LLOC: 138
+    SLOC: 148
+    Comments: 6
+    Single comments: 6
+    Multi: 28
+    Blank: 54
+    - Comment Stats
+        (C % L): 3%
+        (C % S): 4%
+        (C + M % L): 14%
+flaskbb\utils\validators.py
+    LOC: 131
+    LLOC: 81
+    SLOC: 93
+    Comments: 9
+    Single comments: 1
+    Multi: 7
+    Blank: 30
+    - Comment Stats
+        (C % L): 7%
+        (C % S): 10%
+        (C + M % L): 12%
+flaskbb\utils\__init__.py
+    LOC: 3
+    LLOC: 2
+    SLOC: 2
+    Comments: 0
+    Single comments: 0
+    Multi: 0
+    Blank: 1
+    - Comment Stats
+        (C % L): 0%
+        (C % S): 0%
+        (C + M % L): 0%
+** Total **
+    LOC: 23685
+    LLOC: 10542
+    SLOC: 14758
+    Comments: 866
+    Single comments: 866
+    Multi: 3570
+    Blank: 4491
+    - Comment Stats
+        (C % L): 4%
+        (C % S): 6%
+        (C + M % L): 19%
