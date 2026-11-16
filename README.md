@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <a href="https://flaskbb.com">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flaskbb/flaskbb/master/docs/_static/logo-full-dark.svg">
@@ -205,4 +205,5 @@ git push origin main
 | FR-7 | Управление профилем пользователя | Желательно | Уже есть |
 | FR-8 | Модерация содержимого форума | Обязательно | Уже есть |
 
-Подробные формулировки, критерии выполнения и нефункциональные требования приведены в [документе требований](docs/01-requirements.md).
+Подробные формулировки, критерии выполнения и нефункциональные требования приведены в docs/01-requirements.md.
+
