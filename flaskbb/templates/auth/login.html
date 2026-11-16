@@ -10,12 +10,14 @@
         <div class="card-body page-body">
             <form role="form" method="post">
                 {{ form.hidden_tag() }}
+                {{ run_hook('flaskbb_tpl_form_login_before', form=form) }}
                 {{ horizontal_field(form.login) }}
                 {{ horizontal_field(form.password) }}
                 {{ horizontal_field(form.remember_me, div_class="offset-3 col-4") }}
                 {% if flaskbb_config["RECAPTCHA_ENABLED"] and "recaptcha" in form %}
                     {{ horizontal_field(form.recaptcha) }}
                 {% endif %}
+                {{ run_hook('flaskbb_tpl_form_login_after', form=form) }}
 
                 {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
 

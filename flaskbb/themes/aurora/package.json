@@ -42,14 +42,14 @@
     "@babel/core": "^8.1.0",
     "@babel/preset-env": "^8.0.7",
     "@biomejs/biome": "2.6.6",
-    "@rolldown/plugin-babel": "^0.3.0",
+    "@rolldown/plugin-babel": "^0.3.1",
     "autoprefixer": "^10.6.2",
     "babel-plugin-polyfill-corejs3": "^1.0.0",
     "jsdom": "^31.0.0",
     "postcss": "^8.5.32",
-    "sass": "1.77.8",
+    "sass": "1.108.1",
     "typescript": "^6.0.3",
-    "vite": "^8.3.6"
+    "vite": "^8.3.7"
   },
   "browserslist": [
     "> 0.25%",

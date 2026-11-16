@@ -20,6 +20,10 @@ Template Hooks
 .. autofunction:: flaskbb_tpl_user_nav_menu
 .. autofunction:: flaskbb_tpl_form_registration_before
 .. autofunction:: flaskbb_tpl_form_registration_after
+.. autofunction:: flaskbb_tpl_form_login_before
+.. autofunction:: flaskbb_tpl_form_login_after
+.. autofunction:: flaskbb_tpl_form_reauth_before
+.. autofunction:: flaskbb_tpl_form_reauth_after
 .. autofunction:: flaskbb_tpl_form_user_details_before
 .. autofunction:: flaskbb_tpl_form_user_details_after
 .. autofunction:: flaskbb_tpl_form_new_post_before

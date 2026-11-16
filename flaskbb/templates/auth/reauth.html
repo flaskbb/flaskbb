@@ -10,7 +10,9 @@
         <div class="card-body page-body">
             <form role="form" method="post">
                 {{ form.hidden_tag() }}
+                {{ run_hook('flaskbb_tpl_form_reauth_before', form=form) }}
                 {{ horizontal_field(form.password) }}
+                {{ run_hook('flaskbb_tpl_form_reauth_after', form=form) }}
                 {{ horizontal_field(form.submit, div_class="offset-3 col-4") }}
             </form>
         </div>
