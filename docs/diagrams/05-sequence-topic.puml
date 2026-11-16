@@ -1,0 +1,43 @@
+﻿@startuml
+actor "Зарегистрированный пользователь" as User
+boundary "Форма создания темы" as Form
+control "NewTopic" as View
+control "Система проверки прав" as Permission
+control "NewTopicForm" as Validator
+entity "Topic" as Topic
+database "База данных" as DB
+
+User -> Form: Открывает создание темы
+Form -> View: GET /<forum_id>/topic/new
+
+View -> Permission: Проверка авторизации и прав
+Permission --> View: Доступ разрешён
+View --> Form: Отображение формы
+
+User -> Form: Вводит заголовок и текст
+User -> Form: Отправляет форму
+Form -> View: POST /<forum_id>/topic/new
+
+View -> Permission: Повторная проверка прав
+Permission --> View: Доступ разрешён
+
+View -> Validator: validate_on_submit()
+
+alt Данные корректны
+    Validator --> View: Проверка пройдена
+    View -> Topic: Создание темы
+    Topic -> DB: Сохранение темы и первого сообщения
+    DB --> Topic: Подтверждение сохранения
+    Topic --> View: Созданная тема
+    View --> User: Перенаправление на страницу темы
+else Данные некорректны
+    Validator --> View: Ошибки проверки полей
+    View --> Form: Повторное отображение формы
+    Form --> User: Сообщения об ошибках
+    note over User, DB
+      Тема не создаётся.
+      Пользователь может исправить данные.
+    end note
+end
+
+@enduml

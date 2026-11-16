@@ -1,0 +1,30 @@
+﻿@startuml
+actor "Гость" as User
+boundary "Форма регистрации" as Form
+control "Register" as View
+control "RegistrationService" as Service
+database "База данных" as DB
+
+User -> Form: Открывает страницу регистрации
+Form -> View: GET /register
+View --> Form: Отображает RegisterForm
+
+User -> Form: Вводит имя, email и пароль
+User -> Form: Подтверждает пароль и условия
+User -> Form: Отправляет форму
+
+Form -> View: POST /register
+View -> View: validate_on_submit()
+
+alt Данные корректны
+    View -> Service: register(registration_info)
+    Service -> DB: Сохранение учётной записи
+    DB --> Service: Подтверждение сохранения
+    Service --> View: Регистрация завершена
+    View --> User: Перенаправление на главную страницу
+else Данные некорректны
+    View --> Form: Отображение ошибок формы
+    Form --> User: Просьба исправить данные
+end
+
+@enduml

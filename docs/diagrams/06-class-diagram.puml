@@ -1,0 +1,68 @@
+﻿@startuml
+hide methods
+skinparam classAttributeIconSize 0
+
+class User <<Пользователь>> {
+    +id: int <<PK>>
+    +username: str
+    +email: str
+    +password: str (hash)
+    +date_joined: datetime
+    +activated: bool
+    +post_count: int
+    +primary_group_id: int <<FK>>
+}
+
+class Category <<Категория>> {
+    +id: int <<PK>>
+    +title: str
+    +description: Text
+    +position: int
+}
+
+class Forum <<Форум>> {
+    +id: int <<PK>>
+    +category_id: int <<FK>>
+    +title: str
+    +description: Text
+    +position: int
+    +locked: bool
+    +topic_count: int
+    +post_count: int
+}
+
+class Topic <<Тема>> {
+    +id: int <<PK>>
+    +forum_id: int <<FK>>
+    +user_id: int <<FK, nullable>>
+    +title: str
+    +date_created: datetime
+    +locked: bool
+    +important: bool
+    +views: int
+    +post_count: int
+    +first_post_id: int <<FK, nullable>>
+    +last_post_id: int <<FK, nullable>>
+}
+
+class Post <<Сообщение>> {
+    +id: int <<PK>>
+    +topic_id: int <<FK, nullable>>
+    +user_id: int <<FK, nullable>>
+    +username: str
+    +content: Text
+    +date_created: datetime
+    +date_modified: datetime
+    +modified_by: str
+}
+
+Category "1" -- "0..*" Forum : содержит
+Forum "1" -- "0..*" Topic : содержит
+User "0..1" -- "0..*" Topic : создаёт
+User "0..1" -- "0..*" Post : публикует
+Topic "0..1" -- "0..*" Post : содержит
+
+Topic "0..1" --> "0..1" Post : first_post
+Topic "0..1" --> "0..1" Post : last_post
+
+@enduml

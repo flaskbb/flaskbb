@@ -1,0 +1,36 @@
+﻿@startuml
+left to right direction
+
+actor "Гость" as Guest
+actor "Зарегистрированный\nпользователь" as User
+actor "Модератор" as Moderator
+actor "Администратор" as Admin
+
+rectangle "FlaskBB" {
+    usecase "Регистрация\n(FR-1)" as UC1
+    usecase "Вход и выход\n(FR-2)" as UC2
+    usecase "Просмотр форумов\nи тем (FR-3)" as UC3
+    usecase "Создание и\nредактирование тем\n(FR-4)" as UC4
+    usecase "Публикация и\nредактирование сообщений\n(FR-5)" as UC5
+    usecase "Поиск\n(FR-6)" as UC6
+    usecase "Управление\nпрофилем (FR-7)" as UC7
+    usecase "Модерация\n(FR-8)" as UC8
+}
+
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+
+Moderator --|> User
+Moderator --> UC8
+
+Admin --|> Moderator
+
+@enduml

@@ -1,0 +1,39 @@
+﻿@startuml
+hide empty description
+
+[*] --> Open : создание темы
+
+state Open : Тема доступна
+state Locked : Тема заблокирована
+state Hidden : Тема скрыта
+
+Open --> Locked : блокировка модератором
+Locked --> Open : разблокировка модератором
+
+Open --> Hidden : скрытие модератором
+Locked --> Hidden : скрытие модератором
+
+Hidden --> Open : восстановление модератором
+
+Open --> [*] : удаление
+Locked --> [*] : удаление
+Hidden --> [*] : окончательное удаление
+
+note right of Open
+  Пользователи могут
+  просматривать тему
+  и отвечать на неё
+end note
+
+note right of Locked
+  Просмотр разрешён,
+  публикация ответов
+  запрещена
+end note
+
+note right of Hidden
+  Тема скрыта
+  модератором
+end note
+
+@enduml

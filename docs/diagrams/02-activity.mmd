@@ -1,0 +1,30 @@
+﻿flowchart TD
+    Start([Начало])
+    OpenForum["Пользователь открывает форум"]
+    SelectTopic["Выбирает создание темы"]
+    AuthCheck{"Пользователь авторизован?"}
+    Login["Перенаправление на страницу входа"]
+    PermissionCheck{"Есть право создавать темы?"}
+    Denied["Сообщение об отсутствии прав"]
+    FillForm["Вводит заголовок и текст темы"]
+    Validate{"Обязательные поля заполнены?"}
+    FormError["Отображение формы с ошибками"]
+    Save["Сохранение темы и первого сообщения"]
+    Redirect["Перенаправление на страницу темы"]
+    End([Завершение])
+
+    Start --> OpenForum
+    OpenForum --> SelectTopic
+    SelectTopic --> AuthCheck
+    AuthCheck -->|Нет| Login
+    Login --> End
+    AuthCheck -->|Да| PermissionCheck
+    PermissionCheck -->|Нет| Denied
+    Denied --> End
+    PermissionCheck -->|Да| FillForm
+    FillForm --> Validate
+    Validate -->|Нет| FormError
+    FormError --> FillForm
+    Validate -->|Да| Save
+    Save --> Redirect
+    Redirect --> End
