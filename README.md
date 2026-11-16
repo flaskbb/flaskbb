@@ -154,3 +154,40 @@ for adding a new language.
 FlaskBB is licensed under the [BSD 3-Clause License](LICENSE). Code adapted
 from other projects is listed in [NOTICE](NOTICE), and the people behind
 FlaskBB are listed in [AUTHORS](AUTHORS).
+
+
+
+---
+
+## Синхронизация с исходным репозиторием
+
+Исходный проект: https://github.com/flaskbb/flaskbb
+
+Для получения обновлений оригинального проекта используется удалённый репозиторий upstream.
+
+### Проверка подключённых репозиториев
+
+```bash
+git remote -v
+```
+
+### Получение обновлений
+
+```bash
+git fetch upstream
+```
+
+### Обновление основной ветки
+
+```bash
+git switch main
+git merge upstream/main
+```
+
+### Отправка обновлений в собственный репозиторий
+
+```bash
+git push origin main
+```
+
+Перед синхронизацией необходимо убедиться в отсутствии незакоммиченных изменений и проверить совместимость обновлений с выполненными изменениями команды.
