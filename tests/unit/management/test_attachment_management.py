@@ -11,9 +11,10 @@ import os
 import pytest
 from flask import get_flashed_messages
 from flask_login import login_user, logout_user
-from flaskbb.forum.models import Attachment, Post
+from flaskbb.forum.models import Attachment, Forum, Post, Topic
 from flaskbb.management import views
 from flaskbb.utils.helpers import time_utcnow
+from werkzeug.exceptions import NotFound
 
 
 @pytest.fixture
@@ -22,6 +23,27 @@ def no_csrf(application):
     application.config["WTF_CSRF_ENABLED"] = False
     yield
     application.config["WTF_CSRF_ENABLED"] = previous
+
+
+@pytest.fixture
+def private_attachment(category, default_groups, admin_user, attachment_upload_path):
+    forum = Forum(title="Staff Forum", category_id=category.id)
+    forum.save(groups=[admin_user.primary_group])
+    topic = Topic(title="Staff Topic")
+    topic.save(forum=forum, user=admin_user, post=Post(content="Staff Content"))
+
+    post_dir = attachment_upload_path / str(topic.first_post_id)
+    post_dir.mkdir()
+    (post_dir / "cafebabe").write_bytes(b"staff only")
+
+    return Attachment(
+        post_id=topic.first_post_id,
+        user_id=admin_user.id,
+        filename="cafebabe",
+        original_filename="staff notes.txt",
+        content_type="text/plain",
+        size=10,
+    ).save()
 
 
 def _post(view, actor, data=None, **kwargs):
@@ -256,3 +278,72 @@ def test_attachments_search_matches_filename_and_uploader(
         logout_user()
 
     assert "No attachments found." in response
+
+
+def _list(actor, search_query=None):
+    view = views.ManageAttachments.as_view("attachments")
+    method, data = ("POST", {"search_query": search_query}) if search_query else ("GET", None)
+
+    with views.current_app.test_request_context(method=method, data=data):
+        login_user(actor)
+        response = view()
+        logout_user()
+
+    return response
+
+
+def test_attachments_list_hides_restricted_forums(
+    default_settings, no_csrf, moderator_user, attachment, private_attachment
+):
+    response = _list(moderator_user)
+
+    assert attachment.original_filename in response
+    assert private_attachment.original_filename not in response
+    assert private_attachment.filename not in response
+    assert "Staff Topic" not in response
+
+
+def test_attachments_search_hides_restricted_forums(
+    default_settings, no_csrf, moderator_user, private_attachment
+):
+    for query in ("staff notes", private_attachment.user.username):
+        response = _list(moderator_user, query)
+
+        assert private_attachment.original_filename not in response
+
+
+def test_attachments_list_shows_restricted_forum_to_its_group(
+    default_settings, no_csrf, admin_user, attachment, private_attachment
+):
+    response = _list(admin_user)
+
+    assert attachment.original_filename in response
+    assert private_attachment.original_filename in response
+
+
+def test_delete_refuses_attachment_of_restricted_forum(
+    default_settings, moderator_user, private_attachment, attachment_upload_path
+):
+    on_disk = attachment_upload_path / str(private_attachment.post_id) / private_attachment.filename
+    view = views.DeleteAttachment.as_view("delete_attachment")
+
+    with pytest.raises(NotFound):
+        _post(view, moderator_user, attachment_id=private_attachment.id)
+
+    assert Attachment.query.count() == 1
+    assert on_disk.exists()
+
+
+def test_bulk_delete_skips_attachments_of_restricted_forums(
+    default_settings, moderator_user, attachment, private_attachment, attachment_upload_path
+):
+    on_disk = attachment_upload_path / str(private_attachment.post_id) / private_attachment.filename
+    view = views.DeleteAttachment.as_view("delete_attachment")
+
+    _, messages = _post(
+        view, moderator_user, data={"rowid": [attachment.id, private_attachment.id]}
+    )
+
+    assert ("success", "1 attachments deleted.") in messages
+    assert [a.id for a in Attachment.query.all()] == [private_attachment.id]
+    assert on_disk.exists()

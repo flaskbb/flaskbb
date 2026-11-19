@@ -113,14 +113,22 @@ ATTACHMENT_CLEANUP_GRACE = timedelta(minutes=5)
 ATTACHMENT_DELETE_BATCH = 500
 
 
-def accessible_reports() -> sa.ColumnElement[bool]:
+def accessible_post_ids() -> sa.Select[int]:
     group_ids = permission_manager.for_user(real(current_user)).group_ids
-    return Report.post_id.in_(
+    return (
         sa.select(Post.id)
         .join(Post.topic)
         .join(Topic.forum)
         .where(Forum.groups.any(Group.id.in_(group_ids)))
     )
+
+
+def accessible_reports() -> sa.ColumnElement[bool]:
+    return Report.post_id.in_(accessible_post_ids())
+
+
+def accessible_attachments() -> sa.ColumnElement[bool]:
+    return Attachment.post_id.in_(accessible_post_ids())
 
 
 class ManagementOverview(MethodView):
@@ -1172,7 +1180,7 @@ class ManageAttachments(MethodView):
     def _render(self, stmt: sa.Select[Attachment], search_form: AttachmentSearchForm):
         page = request.args.get("page", 1, type=int)
         attachments = db.paginate(
-            stmt,
+            stmt.where(accessible_attachments()),
             page=page,
             per_page=flaskbb_config["USERS_PER_PAGE"],
             error_out=False,
@@ -1210,14 +1218,16 @@ class DeleteAttachment(MethodView):
         ids = request.form.getlist("rowid", type=int)
         if ids:
             deleted = 0
-            for attachment in Attachment.get_all(Attachment.id.in_(ids)):
+            for attachment in Attachment.get_all(Attachment.id.in_(ids), accessible_attachments()):
                 if attachment.delete():
                     deleted += 1
 
             flash(_("%(count)s attachments deleted.", count=deleted), "success")
             return redirect_or_next(url_for("management.attachments"))
 
-        attachment = Attachment.get_by_or_404(id=attachment_id)
+        attachment = first_or_404(
+            sa.select(Attachment).where(Attachment.id == attachment_id, accessible_attachments())
+        )
         attachment.delete()
         flash(_("Attachment deleted."), "success")
         return redirect_or_next(url_for("management.attachments"))
