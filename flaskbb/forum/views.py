@@ -578,7 +578,17 @@ class EditPost(MethodView):
 
 
 class ReportView(MethodView):
-    decorators = [login_required]
+    decorators = [
+        login_required,
+        allows.requires(
+            ForRequest(can_access_forum, request_forum),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access that forum"),
+                level="warning",
+                endpoint=_category_url,
+            ),
+        ),
+    ]
     form = ReportForm
 
     def get(self, post_id: int):

@@ -54,6 +54,7 @@ from flaskbb.management.forms import (
     ModeratorEditUserForm,
     SuperModeratorEditUserForm,
 )
+from flaskbb.permissions import permission_manager
 from flaskbb.plugins.models import PluginRegistry
 from flaskbb.plugins.utils import (
     apply_plugin_migrations,
@@ -71,12 +72,14 @@ from flaskbb.user.models import Group, GroupRole, User
 from flaskbb.utils.helpers import (
     count_online_users,
     FlashAndRedirect,
+    real,
     redirect_or_next,
     register_view,
     render_template,
     time_utcnow,
 )
 from flaskbb.utils.proxies import current_app, current_user
+from flaskbb.utils.queries import first_or_404
 from flaskbb.utils.requirements import (
     can_ban_user,
     can_edit_user,
@@ -110,6 +113,16 @@ ATTACHMENT_CLEANUP_GRACE = timedelta(minutes=5)
 ATTACHMENT_DELETE_BATCH = 500
 
 
+def accessible_reports() -> sa.ColumnElement[bool]:
+    group_ids = permission_manager.for_user(real(current_user)).group_ids
+    return Report.post_id.in_(
+        sa.select(Post.id)
+        .join(Post.topic)
+        .join(Topic.forum)
+        .where(Forum.groups.any(Group.id.in_(group_ids)))
+    )
+
+
 class ManagementOverview(MethodView):
     decorators = [
         allows.requires(
@@ -129,7 +142,7 @@ class ManagementOverview(MethodView):
         )
         online_users, online_guests = count_online_users()
 
-        unread_reports = Report.count(Report.zapped == None)
+        unread_reports = Report.count([Report.zapped == None, accessible_reports()])
 
         python_version = f"{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}"
 
@@ -1001,8 +1014,10 @@ class Reports(MethodView):
 
     def get(self):
         page = request.args.get("page", 1, type=int)
-        reports = Report.query.order_by(Report.id.asc()).paginate(
-            page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False
+        reports = (
+            Report.query.filter(accessible_reports())
+            .order_by(Report.id.asc())
+            .paginate(page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False)
         )
 
         return render_template("management/reports.html", reports=reports)
@@ -1023,7 +1038,7 @@ class UnreadReports(MethodView):
     def get(self):
         page = request.args.get("page", 1, type=int)
         reports = (
-            Report.query.filter(Report.zapped == None)
+            Report.query.filter(Report.zapped == None, accessible_reports())
             .order_by(Report.id.desc())
             .paginate(page=page, per_page=flaskbb_config["USERS_PER_PAGE"], error_out=False)
         )
@@ -1047,7 +1062,7 @@ class MarkReportRead(MethodView):
         ids = request.form.getlist("rowid", type=int)
         if ids:
             marked = 0
-            for report in Report.get_all(Report.id.in_(ids)):
+            for report in Report.get_all(Report.id.in_(ids), accessible_reports()):
                 report.zapped_by = current_user.id
                 report.zapped = time_utcnow()
                 report.save()
@@ -1058,7 +1073,9 @@ class MarkReportRead(MethodView):
 
         # mark single report as read
         if report_id:
-            report = Report.get_by_or_404(id=report_id)
+            report = first_or_404(
+                sa.select(Report).where(Report.id == report_id, accessible_reports())
+            )
             if report.zapped:
                 flash(
                     _("Report %(id)s is already marked as read.", id=report.id),
@@ -1073,7 +1090,7 @@ class MarkReportRead(MethodView):
             return redirect_or_next(url_for("management.reports"))
 
         # mark all as read
-        reports = Report.get_all(Report.zapped == None)
+        reports = Report.get_all(Report.zapped == None, accessible_reports())
         report_list: list[Report] = []
         for report in reports:
             report.zapped_by = current_user.id
@@ -1103,14 +1120,14 @@ class DeleteReport(MethodView):
         ids = request.form.getlist("rowid", type=int)
         if ids:
             deleted = 0
-            for report in Report.get_all(Report.id.in_(ids)):
+            for report in Report.get_all(Report.id.in_(ids), accessible_reports()):
                 if report.delete():
                     deleted += 1
 
             flash(_("%(count)s reports deleted.", count=deleted), "success")
             return redirect_or_next(url_for("management.reports"))
 
-        report = Report.get_by_or_404(id=report_id)
+        report = first_or_404(sa.select(Report).where(Report.id == report_id, accessible_reports()))
         report.delete()
         flash(_("Report deleted."), "success")
         return redirect_or_next(url_for("management.reports"))
