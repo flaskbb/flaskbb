@@ -506,7 +506,10 @@ class NewPost(MethodView):
         form.track_topic.data = current_user.is_tracking_topic(topic)
 
         if post_id is not None:
-            post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
+            # make sure the post belongs to the topic
+            post = first_or_404(
+                sa.select(Post).where(Post.id == post_id, Post.topic_id == topic.id), True
+            )
             form.content.data = format_quote(
                 post.username,
                 post.content,
@@ -519,9 +522,9 @@ class NewPost(MethodView):
         topic = Topic.get_topic(topic_id, True)
         form = self.form()
 
-        # check if topic exists
         if post_id is not None:
-            post = first_or_404(sa.select(Post).where(Post.id == post_id), True)
+            # same here - check if the post belongs to the topic
+            first_or_404(sa.select(Post).where(Post.id == post_id, Post.topic_id == topic.id), True)
 
         if form.validate_on_submit():
             post = form.save(real(current_user), topic)
