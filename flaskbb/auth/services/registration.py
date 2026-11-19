@@ -107,7 +107,7 @@ class UsernameUniquenessValidator(UserValidator):
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             sa.select(sa.func.count(self.users.id)).filter(
-                sa.func.lower(self.users.username) == user_info.username
+                sa.func.lower(self.users.username) == user_info.username.lower()
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch
@@ -132,7 +132,7 @@ class EmailUniquenessValidator(UserValidator):
     def validate(self, user_info: UserRegistrationInfo):
         count = db.session.execute(
             sa.select(sa.func.count(self.users.id)).filter(
-                sa.func.lower(self.users.email) == user_info.email
+                sa.func.lower(self.users.email) == user_info.email.lower()
             )
         ).scalar_one()
         if count != 0:  # pragma: no branch

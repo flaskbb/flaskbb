@@ -90,3 +90,37 @@ def test_raises_if_user_email_already_registered(Fred):
 
     assert excinfo.value.attribute == "email"
     assert "already registered" in excinfo.value.reason
+
+
+@pytest.mark.parametrize("username", ["FRED", "Fred", "fReD"])
+def test_raises_if_username_differs_only_by_case(Fred, username):
+    validator = UsernameUniquenessValidator(User)
+    registration = UserRegistrationInfo(
+        username=username,
+        email="other@fred.fred",
+        language="fred",
+        group=4,
+        password="fred",
+    )
+
+    with pytest.raises(ValidationError) as excinfo:
+        validator(registration)
+
+    assert excinfo.value.attribute == "username"
+
+
+@pytest.mark.parametrize("email", ["FRED@FRED.FRED", "Fred@fred.fred"])
+def test_raises_if_email_differs_only_by_case(Fred, email):
+    validator = EmailUniquenessValidator(User)
+    registration = UserRegistrationInfo(
+        username="someone_else",
+        email=email,
+        language="fred",
+        group=4,
+        password="fred",
+    )
+
+    with pytest.raises(ValidationError) as excinfo:
+        validator(registration)
+
+    assert excinfo.value.attribute == "email"

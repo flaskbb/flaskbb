@@ -196,12 +196,12 @@ class UserForm(FlaskBBForm):
         if self.user is not None:
             user = User.get(
                 sa.and_(
-                    User.username.like(field.data.lower()),
+                    sa.func.lower(User.username) == field.data.lower(),
                     sa.not_(User.id == self.user.id),
                 )
             )
         else:
-            user = User.get(User.username.like(field.data.lower()))
+            user = User.get(sa.func.lower(User.username) == field.data.lower())
 
         if user:
             raise ValidationError(_("This username is already taken."))
@@ -210,12 +210,12 @@ class UserForm(FlaskBBForm):
         if self.user is not None:
             user = User.get(
                 sa.and_(
-                    User.email.like(field.data.lower()),
+                    sa.func.lower(User.email) == field.data.lower(),
                     sa.not_(User.id == self.user.id),
                 )
             )
         else:
-            user = User.get(User.email.like(field.data.lower()))
+            user = User.get(sa.func.lower(User.email) == field.data.lower())
 
         if user:
             raise ValidationError(_("This email address is already taken."))

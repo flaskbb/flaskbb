@@ -47,6 +47,12 @@ class TestCantShareEmailValidator:
 
         assert "is already registered" in str(excinfo.value)
 
+    def test_raises_if_email_differs_only_by_case(self, Fred, user):
+        change = EmailUpdate("old@email.example", user.email.upper())
+
+        with pytest.raises(ValidationError):
+            validators.CantShareEmailValidator(User).validate(Fred, change)
+
     def test_doesnt_raise_if_email_isnt_registered(self, Fred):
         change = EmailUpdate("old@email.example", "new@email.example")
 
