@@ -58,14 +58,22 @@ class IsModeratorInForum(IsAuthed):
 
     @override
     def fulfill(self, user: User):
-        return super().fulfill(user) and permission_manager.for_user(user).moderates(self.forum)
+        # being listed as moderator of the forum outlives a ban or a demotion
+        permissions = permission_manager.for_user(user)
+        return (
+            super().fulfill(user)
+            and permissions.rank >= GroupRole.MODERATOR.rank
+            and permissions.moderates(self.forum)
+        )
 
 
 class IsMorePrivilegedThan(Requirement):
     """Fulfilled when the acting user outranks ``target``.
 
     The comparison is strict, so it is never fulfilled for an equally
-    privileged target - including the acting user themselves.
+    privileged target - including the acting user themselves. A banned target
+    is ranked by the groups the ban suspends, because unbanning or editing
+    them hands those groups back.
     """
 
     def __init__(self, target: User):
@@ -77,8 +85,8 @@ class IsMorePrivilegedThan(Requirement):
 
     @override
     def fulfill(self, user: User):
-        acting, target = permission_manager.for_user(user), permission_manager.for_user(self.target)
-        return acting.rank > target.rank
+        acting = permission_manager.for_user(user)
+        return acting.rank > max(group.role.rank for group in self.target.get_memberships())
 
 
 class IsSelf(Requirement):

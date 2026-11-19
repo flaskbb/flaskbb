@@ -710,7 +710,8 @@ interactively.
 
 .. describe:: ban USERNAME
 
-    Bans a user by moving him into the banned group.
+    Bans a user by moving him into the banned group. His secondary groups
+    are kept, but grant nothing while he is banned.
 
 .. describe:: unban USERNAME
 

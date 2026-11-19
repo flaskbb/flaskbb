@@ -188,3 +188,15 @@ def test_group_membership_survives_a_reload(cli_runner, user, default_groups):
 
     reloaded = db.session.execute(db.select(User).filter_by(username="test_normal")).scalar_one()
     assert [group.name for group in reloaded.secondary_groups] == ["Moderator"]
+
+
+def test_show_banned_user_lists_no_permissions_of_suspended_groups(
+    cli_runner, user, default_groups
+):
+    user.save(groups=[default_groups[2]])
+    user.ban()
+
+    result = cli_runner.invoke(show_user, ["test_normal"])
+
+    assert result.exit_code == 0
+    assert "mod_banuser" not in result.output

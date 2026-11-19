@@ -60,7 +60,10 @@ def list_permissions(group_name: str | None):
 def show_permissions(username: str):
     """Shows the effective permissions of a user."""
     user = get_user(username)
-    user_groups = [user.primary_group] + list(user.secondary_groups)
+    acting_ids = {group.id for group in user.get_groups()}
+    user_groups = [
+        group for group in [user.primary_group, *user.secondary_groups] if group.id in acting_ids
+    ]
 
     click.secho(f"[+] Permissions of {user.username}", fg="blue", bold=True)
     click.secho("Groups: {}".format(", ".join(group.name for group in user_groups)))

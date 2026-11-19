@@ -97,3 +97,16 @@ def test_set_permission_invalidates_the_cached_permissions(cli_runner, user, def
 
     assert result.exit_code == 0
     assert user.permissions["deletepost"]
+
+
+def test_show_permissions_of_a_banned_user_ignores_suspended_groups(
+    cli_runner, user, default_groups
+):
+    user.save(groups=[default_groups[2]])
+    user.ban()
+
+    result = cli_runner.invoke(show_permissions, ["test_normal"])
+
+    assert result.exit_code == 0
+    assert "Groups: Banned" in result.output
+    assert "Moderator" not in result.output

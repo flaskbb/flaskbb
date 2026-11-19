@@ -797,3 +797,29 @@ def test_settings_page_404s_for_a_plugin_group_slug(default_settings, admin_user
             logout_user()
     finally:
         setting_registry.unregister_group("myplugin")
+
+
+def test_banned_user_with_moderator_secondary_group_cannot_ban_or_unban(
+    default_settings, no_csrf, user, Fred, default_groups
+):
+    """a ban only swapped the primary group, so the privileges of a secondary group survived it."""
+    user.save(groups=[default_groups[2]])
+    user.ban()
+
+    with views.current_app.test_request_context(method="POST"):
+        login_user(user)
+        response = views.BanUser.as_view("ban_user")(user_id=Fred.id)
+        logout_user()
+
+    assert response.status_code == 302
+    assert not Fred.is_banned
+
+    Fred.ban()
+
+    with views.current_app.test_request_context(method="POST"):
+        login_user(user)
+        response = views.UnbanUser.as_view("unban_user")(user_id=Fred.id)
+        logout_user()
+
+    assert response.status_code == 302
+    assert Fred.is_banned

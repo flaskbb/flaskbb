@@ -560,6 +560,15 @@ class User(BaseModel, UserMixin, HasPermissions):
 
     @override
     def get_groups(self) -> list[Group]:
+        """The groups the user acts with. A ban suspends every other group,
+        whether the banned group is the primary or a secondary one.
+        """
+        groups = self.get_memberships()
+        banned = [group for group in groups if group.role is GroupRole.BANNED]
+        return banned or groups
+
+    def get_memberships(self) -> list[Group]:
+        """Every group the user belongs to, including those a ban suspends."""
         secondary_ids = permission_manager.secondary_group_ids(self.id)
         return groups_by_id([self.primary_group_id, *secondary_ids])
 
@@ -588,8 +597,13 @@ class User(BaseModel, UserMixin, HasPermissions):
             if not member_group:
                 abort(404)
 
-            self.primary_group = member_group
-            self.save()
+            if self.primary_group.role is GroupRole.BANNED:
+                self.primary_group = member_group
+            self.save(
+                groups=[
+                    group for group in self.secondary_groups if group.role is not GroupRole.BANNED
+                ]
+            )
             return True
         return False
 

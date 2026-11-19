@@ -237,3 +237,64 @@ def test_can_ban_user_mod_cannot_ban_supermod(moderator_user, super_moderator_us
 
 def test_can_ban_user_mod_can_ban_member(moderator_user, user):
     assert r.can_ban_user(user)(moderator_user)
+
+
+def test_banned_user_loses_the_privileges_of_a_secondary_group(user, Fred, default_groups):
+    user.save(groups=[default_groups[2]])
+    assert r.can_ban_user(Fred)(user)
+
+    user.ban()
+
+    assert not r.IsAtleastModerator(user)
+    assert not r.CanBanUser(user)
+    assert not r.can_ban_user(Fred)(user)
+    assert not r.can_edit_user(Fred)(user)
+
+
+def test_banned_user_loses_the_forum_access_of_a_secondary_group(user, forum, default_groups):
+    forum.groups = [default_groups[2]]
+    forum.save()
+    user.save(groups=[default_groups[2]])
+    assert r.can_access_forum(forum)(user)
+
+    user.ban()
+
+    assert not r.can_access_forum(forum)(user)
+
+
+def test_banned_moderator_no_longer_moderates_their_forum(moderator_user, forum, topic):
+    moderator_user.ban()
+
+    assert not r.can_moderate(forum)(moderator_user)
+    assert not r.can_post_reply(topic)(moderator_user)
+    assert not r.can_post_topic(forum)(moderator_user)
+
+
+def test_unbanned_moderator_does_not_moderate_as_member(moderator_user, forum):
+    moderator_user.ban()
+    moderator_user.unban()
+
+    assert not r.can_moderate(forum)(moderator_user)
+
+
+def test_banned_user_is_still_ranked_as_target_by_the_groups_they_keep(
+    user, moderator_user, default_groups
+):
+    """Unbanning or editing them hands those groups back."""
+    user.save(groups=[default_groups[0]])
+    user.ban()
+
+    assert not r.IsMorePrivilegedThan(user)(moderator_user)
+    assert not r.can_ban_user(user)(moderator_user)
+    assert not r.can_edit_user(user)(moderator_user)
+
+
+def test_unban_lifts_a_ban_held_as_secondary_group(moderator_user, default_groups):
+    moderator_user.save(groups=[default_groups[4]])
+    assert moderator_user.is_banned
+    assert not r.IsAtleastModerator(moderator_user)
+
+    assert moderator_user.unban()
+
+    assert not moderator_user.is_banned
+    assert moderator_user.primary_group == default_groups[2]
