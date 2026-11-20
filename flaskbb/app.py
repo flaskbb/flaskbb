@@ -22,7 +22,7 @@ from typing import Any, cast
 
 import sqlalchemy as sa
 from celery import Celery
-from flask import abort, flash, redirect, request, url_for
+from flask import flash, redirect, request, url_for
 from flask_allows2 import Permission, Requirement
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
@@ -33,6 +33,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound, RequestEntityTooLarge
 
 from flaskbb.core.app import FlaskBB
+from flaskbb.core.exceptions import InsecureSecretKeyError
 from flaskbb.extensions import (
     alembic,
     allows,
@@ -124,7 +125,12 @@ from .user import views as user_views  # noqa  # pyright: ignore[reportUnusedImp
 logger = logging.getLogger(__name__)
 
 
-def create_app(config: object | None = None, instance_path: str | None = None):
+def create_app(
+    config: object | None = None,
+    instance_path: str | None = None,
+    *,
+    check_secret_key: bool = True,
+):
     """Creates the app.
 
     :param instance_path: An alternative instance path for the application.
@@ -139,6 +145,13 @@ def create_app(config: object | None = None, instance_path: str | None = None):
                    later overwrite it from the ENVVAR.
                    If no config is provided, FlaskBB will try to load the
                    config named ``flaskbb.cfg`` from the instance path.
+    :param check_secret_key: Fail with
+                             :class:`~flaskbb.core.exceptions.InsecureSecretKeyError`
+                             if ``SECRET_KEY`` is empty or the publicly known
+                             ``"secret key"`` and neither ``DEBUG`` nor
+                             ``TESTING`` is set. The command line interface
+                             turns this off for the commands that do not
+                             serve the forum.
     """
 
     app = FlaskBB("flaskbb", instance_path=instance_path, instance_relative_config=True)
@@ -148,14 +161,8 @@ def create_app(config: object | None = None, instance_path: str | None = None):
 
     configure_app(app, config)
 
-    @app.before_request
-    def reject_insecure_secret_key():
-        secret = app.config["SECRET_KEY"]
-        if not secret or (isinstance(secret, str) and secret.strip() in {"", "secret key"}) or (
-            isinstance(secret, bytes) and secret.strip() in {b"", b"secret key"}
-        ):
-            logger.error("SECRET_KEY is missing or uses the published default; configure a unique random key")
-            abort(503)
+    if check_secret_key and not app.debug and not app.testing:
+        validate_secret_key(app)
 
     configure_celery_app(app, celery)
     configure_extensions(app)
@@ -181,6 +188,19 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     pluggy.hook.flaskbb_additional_setup(app=app, pluggy=pluggy)
 
     return app
+
+
+def validate_secret_key(app: FlaskBB):
+    secret = app.raw_config["SECRET_KEY"]
+    if isinstance(secret, bytes):
+        secret = secret.decode(errors="replace")
+
+    if not secret or secret.strip() in ("", "secret key"):
+        raise InsecureSecretKeyError(
+            "SECRET_KEY is not set or is the publicly known 'secret key'. "
+            "Set it to a unique random value in your config, or generate a "
+            "config with 'flaskbb makeconfig'."
+        )
 
 
 def configure_app(app: FlaskBB, config: Any):

@@ -30,7 +30,7 @@ from flaskbb.cli.utils import (
     run_flaskbb,
     write_config,
 )
-from flaskbb.core.exceptions import ConfigNotFoundError
+from flaskbb.core.exceptions import ConfigNotFoundError, InsecureSecretKeyError
 from flaskbb.extensions import celery, db, pluggy
 from flaskbb.search import flaskbb_search
 from flaskbb.utils.database import database_exists, drop_all
@@ -70,6 +70,8 @@ class FlaskBBGroup(FlaskGroup):
 
     @override
     def get_command(self, ctx: click.Context, name: str):
+        if name in ("run", "serve"):
+            ctx.ensure_object(ScriptInfo).data["check_secret_key"] = True
         self._load_flaskbb_plugins(ctx)
         return super().get_command(ctx, name)
 
@@ -87,8 +89,12 @@ def make_app():
 
     data = getattr(script_info, "data", {})
     try:
-        return create_app(data.get("config_file"), data.get("instance_path"))
-    except ConfigNotFoundError as e:
+        return create_app(
+            data.get("config_file"),
+            data.get("instance_path"),
+            check_secret_key=data.get("check_secret_key", False),
+        )
+    except (ConfigNotFoundError, InsecureSecretKeyError) as e:
         raise click.ClickException(str(e)) from e
 
 

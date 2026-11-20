@@ -59,9 +59,12 @@ modify are the following:
   ``Host`` header instead of reflecting it into emailed links
   (password reset, account activation)
 
-FlaskBB rejects HTTP requests with a 503 response when ``SECRET_KEY`` is empty
-or still uses the old ``"secret key"`` default. Replace the old key with a
-unique random value; changing the key invalidates existing signed sessions.
+FlaskBB refuses to start when ``SECRET_KEY`` is empty or still the old
+``"secret key"`` default, unless ``DEBUG`` or ``TESTING`` is set. This applies
+to the WSGI application, ``flaskbb serve`` and ``flaskbb run``; the other
+``flaskbb`` commands still work, so the installation can be repaired. Replace
+the old key with a unique random value; a new key logs out every user and
+invalidates the password reset and activation links sent before.
 
 By default it will try to save the configuration file with the name
 ``flaskbb.cfg`` in FlaskBB's root folder.
