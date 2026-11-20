@@ -32,24 +32,24 @@
     "@popperjs/core": "^2.11.8",
     "@textcomplete/core": "^0.1.13",
     "@textcomplete/textarea": "^0.1.13",
-    "bootstrap": "^5.3.8",
+    "bootstrap": "^5.3.9",
     "core-js": "^3.51.0",
     "emoji-regex": "11.0.0",
     "emojilib": "4.0.3",
     "htmx.org": "^2.0.11"
   },
   "devDependencies": {
-    "@babel/core": "^8.1.0",
+    "@babel/core": "^8.1.2",
     "@babel/preset-env": "^8.0.7",
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.8",
     "@rolldown/plugin-babel": "^0.3.1",
     "autoprefixer": "^10.6.2",
     "babel-plugin-polyfill-corejs3": "^1.0.0",
-    "jsdom": "^31.0.0",
-    "postcss": "^8.5.32",
-    "sass": "1.108.1",
+    "jsdom": "^31.0.1",
+    "postcss": "^8.5.33",
+    "sass": "1.108.2",
     "typescript": "^6.0.3",
-    "vite": "^8.3.7"
+    "vite": "^8.3.8"
   },
   "browserslist": [
     "> 0.25%",
