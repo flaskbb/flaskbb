@@ -41,7 +41,7 @@ For an installation from a Git checkout, as described in
 environment with the extras you need::
 
     $ git fetch --tags
-    $ git checkout v3.0.0
+    $ git checkout v3.0.1
     $ uv sync --no-dev --extra postgres
 
 The extras are ``postgres`` for PostgreSQL, ``mysql`` for MySQL, ``gunicorn``

@@ -113,8 +113,8 @@ to the FlaskBB containers. Common options include:
 
 ``FLASKBB_IMAGE``
     The image tag to deploy. Pin a release such as
-    ``ghcr.io/flaskbb/flaskbb:3.0.0`` for reproducible upgrades. The
-    ``-plugins`` tags, e.g. ``3.0.0-plugins``, contain all official plugins.
+    ``ghcr.io/flaskbb/flaskbb:3.0.1`` for reproducible upgrades. The
+    ``-plugins`` tags, e.g. ``3.0.1-plugins``, contain all official plugins.
 
 ``WEB_CONCURRENCY``
     The number of Gunicorn worker processes. The default is ``4``.
