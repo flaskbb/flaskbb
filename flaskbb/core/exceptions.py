@@ -77,6 +77,13 @@ class ConfigNotFoundError(BaseFlaskBBError):
     """
 
 
+class InsecureSecretKeyError(BaseFlaskBBError):
+    """
+    Raised on startup when ``SECRET_KEY`` is empty or the publicly known
+    ``"secret key"`` and neither ``DEBUG`` nor ``TESTING`` is set.
+    """
+
+
 def accumulate_errors[T](
     caller: Callable[[T], Any], validators: Iterable[T], throw: bool = True
 ) -> list[tuple[str, str]]:

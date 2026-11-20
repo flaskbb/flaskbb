@@ -15,6 +15,8 @@ class TestingConfig(DefaultConfig):
     # Indicates that it is a testing environment
     DEBUG = False
     TESTING = True
+    SECRET_KEY = "test-only-secret-key"
+    WTF_CSRF_SECRET_KEY = "test-only-csrf-secret-key"
 
     SQLALCHEMY_DATABASE_URI = "sqlite://"
 
