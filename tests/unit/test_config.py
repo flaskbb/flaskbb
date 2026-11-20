@@ -98,9 +98,5 @@ def test_insecure_secret_key_starts_in_debug_and_testing(start, flag):
     start(f'{flag} = True\nSECRET_KEY = "secret key"\n')
 
 
-def test_insecure_secret_key_starts_without_the_check(start):
-    start('SECRET_KEY = "secret key"\n', check_secret_key=False)
-
-
 def test_own_secret_key_starts(start):
     start('SECRET_KEY = "0b1a3a0c5d2e4f60718293a4b5c6d7e8"\n')

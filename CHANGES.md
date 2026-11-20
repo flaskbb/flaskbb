@@ -2,6 +2,32 @@
 
 Here you can see the full list of changes between each release.
 
+## Version 3.0.1
+
+Released November 20th, 2026
+
+### Features
+
+- Plugins can render into the login and reauthentication forms via the
+  `flaskbb_tpl_form_login_before/after` and `flaskbb_tpl_form_reauth_before/after`
+  template hooks, and can register users whose email address is already
+  verified via `UserRegistrationInfo(activated=True)`, which skips the
+  activation email.
+
+### Bug fixes
+
+- Usernames and email addresses are checked case insensitive. (GHSA-jxq4-h9p6-55pp)
+- Quote-replies reject a quoted post from another topic, which allowed replies
+  into restricted forums and locked topics. (GHSA-gg9m-mm8v-fx2m)
+- Moderators only see and manage reports on posts in forums they can access.
+  (GHSA-8354-mf4x-3cmf)
+- Moderators only see and delete attachments on posts in forums they can
+  access.
+- A ban also ignores the permissions of the secondary groups of a user. (GHSA-4gwg-xrxm-w5h6)
+- FlaskBB refuses to start with an empty `SECRET_KEY` or the old default
+  `"secret key"`, unless `DEBUG` or `TESTING` is set.
+
+
 ## Version 3.0.0
 
 Released November 7th, 2026
