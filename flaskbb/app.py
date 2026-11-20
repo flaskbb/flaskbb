@@ -22,7 +22,7 @@ from typing import Any, cast
 
 import sqlalchemy as sa
 from celery import Celery
-from flask import flash, redirect, request, url_for
+from flask import abort, flash, redirect, request, url_for
 from flask_allows2 import Permission, Requirement
 from flask_babelplus import gettext as _
 from jinja2.filters import do_filesizeformat
@@ -147,6 +147,16 @@ def create_app(config: object | None = None, instance_path: str | None = None):
     os.makedirs(app.instance_path, exist_ok=True)
 
     configure_app(app, config)
+
+    @app.before_request
+    def reject_insecure_secret_key():
+        secret = app.config["SECRET_KEY"]
+        if not secret or (isinstance(secret, str) and secret.strip() in {"", "secret key"}) or (
+            isinstance(secret, bytes) and secret.strip() in {b"", b"secret key"}
+        ):
+            logger.error("SECRET_KEY is missing or uses the published default; configure a unique random key")
+            abort(503)
+
     configure_celery_app(app, celery)
     configure_extensions(app)
 

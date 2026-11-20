@@ -179,13 +179,13 @@ class DefaultConfig:
     # ------------------------------
     # This is the secret key that is used for session signing.
     # You can generate a secure key with os.urandom(24)
-    SECRET_KEY = "secret key"
+    SECRET_KEY = ""
 
     # You can generate the WTF_CSRF_SECRET_KEY the same way as you have
     # generated the SECRET_KEY. If no WTF_CSRF_SECRET_KEY is provided, it will
     # use the SECRET_KEY.
     WTF_CSRF_ENABLED = True
-    WTF_CSRF_SECRET_KEY = "reallyhardtoguess"
+    WTF_CSRF_SECRET_KEY = ""
 
     # Search
     # ------------------------------
