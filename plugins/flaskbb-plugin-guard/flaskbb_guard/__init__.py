@@ -1,6 +1,7 @@
 """FlaskBB-Guard: AI-based toxicity detection for FlaskBB."""
 
 import logging
+import os
 
 from flaskbb.settings import BoolSetting, IntSetting, SettingGroup
 from pluggy import HookimplMarker
@@ -49,6 +50,12 @@ def get_service() -> ToxicityDetectionService:
     if _service is None:
         _service = ToxicityDetectionService(KeywordClassifier())
     return _service
+
+
+@hookimpl
+def flaskbb_load_migrations():
+    """Tell FlaskBB where this plugin's database migrations are."""
+    return os.path.join(os.path.dirname(__file__), "migrations")
 
 
 @hookimpl

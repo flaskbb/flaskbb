@@ -136,3 +136,42 @@ def test_classifier_failure_never_blocks_posting(topic, user, monkeypatch, caplo
     assert post.id is not None  # the post was saved
     assert reports_for(post) == []
     assert "toxicity check failed" in caplog.text
+
+
+# ---------- FR8: every score is stored ----------
+
+from flaskbb_guard.models import ToxicityScore  # noqa: E402
+
+
+def scores_for(post):
+    return db.session.execute(sa.select(ToxicityScore).filter_by(post_id=post.id)).scalars().all()
+
+
+def test_safe_post_score_is_stored(topic, user, monkeypatch):
+    monkeypatch.setattr(flaskbb_guard, "_service", make_service(0.10))
+    post = new_reply(topic, user)
+    [score] = scores_for(post)
+    assert score.score == 0.10
+    assert score.model_name == "fixed"
+    assert score.latency_ms >= 0.0
+
+
+def test_toxic_post_score_is_stored_with_its_label(topic, user, monkeypatch):
+    monkeypatch.setattr(flaskbb_guard, "_service", make_service(0.95))
+    post = new_reply(topic, user)
+    [score] = scores_for(post)
+    assert score.label == "insult"
+
+
+def test_skipped_posts_store_no_score(topic, user, monkeypatch):
+    monkeypatch.setattr(flaskbb_guard, "_service", make_service(0.95, GUARD_AUTOMOD_ENABLED=False))
+    post = new_reply(topic, user)
+    assert scores_for(post) == []
+
+
+def test_migration_is_labelled_with_the_plugin_name():
+    import importlib
+    mod = importlib.import_module(
+        "flaskbb_guard.migrations.202611271945_3f2a9c1d7b6e_add_toxicity_scores"
+    )
+    assert mod.branch_labels == ("guard",)
