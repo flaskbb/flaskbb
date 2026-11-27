@@ -17,11 +17,16 @@ def test_plugin_registers_its_settings(application):
     assert flaskbb_guard.SETTINGS in groups
 
 
-def test_hook_runs_when_a_post_is_saved(topic, user, caplog):
-    """Saving a post calls our flaskbb_event_post_save_after hook."""
+def test_settings_key_matches_plugin_name():
+    """FlaskBB links settings to a plugin by this key (lesson learned)."""
+    assert flaskbb_guard.SETTINGS.key == "guard"
+
+
+def test_hook_checks_every_saved_post(topic, user, caplog):
+    """Saving a post makes FlaskBB call our hook, which scores the post."""
     caplog.set_level(logging.INFO, logger="flaskbb.guard")
 
     reply = Post(content="Hello from the plugin test")
     reply.save(user=user, topic=topic)
 
-    assert f"post {reply.id} saved (new=True)" in caplog.text
+    assert f"post {reply.id} scored" in caplog.text
