@@ -16,6 +16,7 @@ from flaskbb.user.models import GroupRole, User
 from flaskbb.utils.populate import create_user
 
 from .classifier import ToxicityClassifier, ToxicityResult
+from .models import ToxicityScore
 
 logger = logging.getLogger("flaskbb.guard")
 
@@ -58,6 +59,8 @@ class ToxicityDetectionService:
             post.id, result.score, result.label, result.latency_ms,
         )
 
+        self.save_score(post, result)
+
         if result.is_toxic(self.threshold) and not self.has_open_report(post):
             self.create_report(post, result)
         return result
@@ -69,6 +72,16 @@ class ToxicityDetectionService:
         if user is None or user.primary_group is None:
             return False
         return user.primary_group.role.rank >= GroupRole.MODERATOR.rank
+
+    def save_score(self, post: Post, result: ToxicityResult) -> ToxicityScore:
+        """Store every score, safe or toxic, for evaluation (FR8)."""
+        return ToxicityScore(
+            post_id=post.id,
+            score=result.score,
+            label=result.label,
+            model_name=self.classifier.name,
+            latency_ms=result.latency_ms,
+        ).save()
 
     def has_open_report(self, post: Post) -> bool:
         """True if this feature already reported the post and nobody closed it."""
