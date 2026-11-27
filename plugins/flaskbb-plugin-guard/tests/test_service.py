@@ -120,6 +120,7 @@ def test_saving_a_toxic_post_creates_a_report_through_the_hook(topic, user, monk
 
 def test_keyword_classifier_reports_a_rude_post_end_to_end(topic, user, monkeypatch):
     monkeypatch.setattr(flaskbb_guard, "_service", None)  # use the real default service
+    monkeypatch.setattr(flaskbb_guard, "ai_available", lambda: False)  # keyword classifier
     post = new_reply(topic, user, "This is a stupid idea and you are an idiot.")
     assert len(reports_for(post)) == 1
 
@@ -175,3 +176,55 @@ def test_migration_is_labelled_with_the_plugin_name():
         "flaskbb_guard.migrations.202611271945_3f2a9c1d7b6e_add_toxicity_scores"
     )
     assert mod.branch_labels == ("guard",)
+
+
+# ---------- choosing the classifier ----------
+
+def test_keyword_classifier_is_the_fallback_without_ai_libraries(database, monkeypatch):
+    monkeypatch.setattr(flaskbb_guard, "ai_available", lambda: False)
+    monkeypatch.setattr(flaskbb_guard, "_service", None)
+    assert flaskbb_guard.get_service().classifier.name == "keyword"
+
+
+def test_ai_classifier_is_chosen_when_available(database, monkeypatch):
+    monkeypatch.setattr(flaskbb_guard, "ai_available", lambda: True)
+    monkeypatch.setattr(flaskbb_guard, "_service", None)
+    assert flaskbb_guard.get_service().classifier.name == "toxic-bert"
+
+
+def test_a_service_set_by_hand_is_not_replaced(database, monkeypatch):
+    manual = make_service(0.5)
+    monkeypatch.setattr(flaskbb_guard, "_service", manual)
+    assert flaskbb_guard.get_service() is manual
+
+
+# ---------- warm-up (model loaded when the server starts) ----------
+
+def test_warm_up_loads_the_classifier_once(application, monkeypatch):
+    scored = []
+
+    class FakeAI(ToxicityClassifier):
+        name = "toxic-bert"
+
+        def score(self, text):
+            scored.append(text)
+            return ToxicityResult(0.0, "none")
+
+    monkeypatch.setattr(flaskbb_guard, "ai_available", lambda: True)
+    monkeypatch.setattr(flaskbb_guard, "TransformerClassifier", FakeAI)
+    monkeypatch.setattr(flaskbb_guard, "_service", None)
+    # the warm-up thread has no test database, so give it plain default settings
+    monkeypatch.setattr(flaskbb_guard, "flaskbb_config", {})
+
+    flaskbb_guard.warm_up(application).join(timeout=10)
+
+    assert scored == ["warm up"]
+    assert flaskbb_guard.get_service().classifier.name == "toxic-bert"
+
+
+def test_no_warm_up_during_tests(application, monkeypatch):
+    started = []
+    monkeypatch.setattr(flaskbb_guard, "ai_available", lambda: True)
+    monkeypatch.setattr(flaskbb_guard, "warm_up", lambda app: started.append(app))
+    flaskbb_guard.flaskbb_additional_setup(application)
+    assert started == []

@@ -1,7 +1,7 @@
 [project]
 name = "flaskbb-plugin-guard"
 version = "0.1.0"
-description = "FlaskBB-Guard: AI-driven automatic content moderation for FlaskBB."
+description = "FlaskBB-Guard: AI-based toxicity detection for FlaskBB."
 readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.12"
@@ -9,6 +9,12 @@ authors = [
   {name = "Nikhil Mudavath"},
 ]
 dependencies = []
+
+[project.optional-dependencies]
+ai = [
+  "transformers>=4.40",
+  "torch>=2.5",
+]
 
 [project.entry-points.'flaskbb_plugins']
 guard = 'flaskbb_guard'

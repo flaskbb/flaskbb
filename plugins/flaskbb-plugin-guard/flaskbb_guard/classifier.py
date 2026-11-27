@@ -5,6 +5,7 @@ text into a ToxicityResult, so they can be developed and tested on their own.
 """
 
 import re
+import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -112,3 +113,59 @@ class KeywordClassifier(ToxicityClassifier):
         for s in scores:
             remaining *= 1 - s
         return 1 - remaining
+
+
+def ai_available() -> bool:
+    """True when the optional AI libraries (transformers + torch) are installed."""
+    import importlib.util
+
+    return (
+        importlib.util.find_spec("transformers") is not None
+        and importlib.util.find_spec("torch") is not None
+    )
+
+
+class TransformerClassifier(ToxicityClassifier):
+    """AI classifier using a pre-trained BERT model (unitary/toxic-bert).
+
+    The model runs locally on the CPU: post text is never sent to another
+    service. It is loaded the first time it is needed and then reused.
+    """
+
+    name = "toxic-bert"
+    LABEL_MIN_SCORE = 0.5
+
+    def __init__(self, model_name: str = "unitary/toxic-bert", pipeline_factory=None):
+        self.model_name = model_name
+        # tests can pass a fake factory so no real model has to be downloaded
+        self._pipeline_factory = pipeline_factory
+        self._pipe = None
+        self._lock = threading.Lock()  # stops two requests loading the model at once
+
+    def _load(self):
+        if self._pipe is None:
+            with self._lock:
+                if self._pipe is None:
+                    factory = self._pipeline_factory
+                    if factory is None:
+                        from transformers import pipeline as factory  # imported only when used
+                    self._pipe = factory("text-classification", model=self.model_name, top_k=None)
+        return self._pipe
+
+    def score(self, text: str) -> ToxicityResult:
+        start = time.perf_counter()
+        if not (text or "").strip():
+            return ToxicityResult(0.0, "none", {}, (time.perf_counter() - start) * 1000)
+
+        output = self._load()(text, truncation=True)
+        # a single text may come back as [[{...}, ...]] or [{...}, ...]
+        if output and isinstance(output[0], list):
+            output = output[0]
+
+        categories = {item["label"]: round(float(item["score"]), 4) for item in output}
+        label = max(categories, key=categories.get)
+        score = min(max(categories[label], 0.0), 1.0)
+        if score < self.LABEL_MIN_SCORE:
+            label = "none"  # every category is low, so nothing toxic was found
+        latency_ms = (time.perf_counter() - start) * 1000
+        return ToxicityResult(score, label, categories, latency_ms)
